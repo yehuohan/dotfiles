@@ -55,8 +55,29 @@ plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
+
+
+
+
+
 ####################
 # User configuration
+####################
+
+# ctrl+z 返回vim
+fancy-ctrl-z () {
+    if [[ $#BUFFER -eq 0 ]]; then
+        BUFFER="fg"
+        zle accept-line
+    else
+        zle push-input
+        zle clear-screen
+    fi
+}
+zle -N fancy-ctrl-z
+bindkey '^Z' fancy-ctrl-z
+
+
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
