@@ -14,6 +14,7 @@
  - .vimrc添加到display, keymap, vundel三部分
  - .zshrc添加ctrl-z返回vim
  - 添加cc.sh，将需要git的文件copy到文件侠LinuxCongifs中
+ 
 ## 20170311:
  - 添加git仓
  - 添加zsh和vim基本配置

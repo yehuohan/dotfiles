@@ -80,6 +80,11 @@ flags = [
 './tests/gmock',
 '-isystem',
 './tests/gmock/include',
+
+##############
+# user include
+'-I',
+'/usr/include/c++/5',
 ]
 
 

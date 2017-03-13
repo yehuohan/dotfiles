@@ -39,10 +39,10 @@ set smartcase                       " 有大写字母时才区别大小写搜索
 " KeyMap 
 " - 尽量不用ctrl,shift,alt，用<leader><leader>代替ctrl,shift或alt
 " - Command模式下使用<leader>代替:
-" - Normal模式下使用<leader><leader>代替<C-?>,<S-?>,<A-?>
+" - Normal模式下使用<leader><leader>代替<C-?>,<S-?>,<A-?>，用<leader>开头表示自己定义的命令
 " - Insert模式下map带ctrl,shift,alt的快捷键，不map字母或数字或<Space>开头的快捷键
 " - 尽量不改变vim原有键位的功能
-" - 尽量不需要同时按两个键，比<C-?>,<S-?>等
+" - 尽量不需要一只手同时按两个键
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " 使用Space作为leader
@@ -57,9 +57,13 @@ nnoremap <leader>wq :wq<CR>
 nnoremap <leader>bn :bn<CR>
 nnoremap <leader>bp :bp<CR>
 
-" s:select,快速先择单词
-nnoremap <leader>ss viw
+" 快速选择 
+nnoremap <leader>s viw
+nnoremap <leader>v V
     
+" 矩形选择模式
+nnoremap vv <C-v>
+
 " i:insert,在单词两边添加抱号等
 nnoremap <leader>i( viwxi(<esc>pa)<esc>     
 nnoremap <leader>i< viwxi<<esc>pa><esc>
@@ -75,10 +79,14 @@ inoremap <C-k> <up>
 inoremap <C-l> <right>
 
 " n和m作为滚动
-inoremap <C-n> <esc><C-E>i
-inoremap <C-m> <esc><C-Y>i
-nnoremap <C-n> <C-E>
-nnoremap <C-m> <C-Y>
+"inoremap <C-m> <esc><C-y>i "与Enter键有冲突
+"inoremap <C-n> <esc><C-e>i
+nnoremap <C-m> <C-y>
+nnoremap <C-n> <C-e>
+
+" 分割窗口
+nnoremap <leader>ws :split<CR>
+nnoremap <leader>wv :vsplit<CR>
 
 " 移动到别一个分屏窗口
 nnoremap <leader><leader>h <C-w>h
@@ -95,6 +103,16 @@ nnoremap <C-up> <esc>:resize+1<CR>
 nnoremap <C-down> <esc>:resize-1<CR>
 nnoremap <C-left> <esc>:vertical resize-1<CR>
 nnoremap <C-right> <esc>:vertical resize+1<CR>
+
+" 大写字母用;开头表示
+"inoremap ;a A
+nnoremap ;a A
+nnoremap ;d D
+nnoremap ;g G
+nnoremap ;i I
+nnoremap ;o O
+nnoremap ;4 $
+
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
