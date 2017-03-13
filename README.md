@@ -9,6 +9,10 @@
  - .zshrc: zsh配置文件
  
 # Log
+## 20170314:
+ - 添加zshrc配置，关于命令记录的命令
+ - 添加vim按键Map，使用;作为大写字母开头命令，添加“行”快速选择
+ 
 ## 20170312:
  - 添加.ycm_extra_conf.py
  - .vimrc添加到display, keymap, vundel三部分
