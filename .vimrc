@@ -27,12 +27,38 @@ set foldmethod=indent				" 设置语文折叠
 									" syntax:用语法高亮来定义折叠         
 									" diff:对没有更改的文本进行折叠         
 									" marker:对文中的标志折叠
-set guifont=Courier\ New\ 11		" 设置字体
 set hlsearch						" 设置高亮显示查找到的文本
 set nocompatible				    " 不兼容vi快捷键
 set nobackup                        " 不生成备份文件
 set ignorecase                      " 不区别大小写搜索
 set smartcase                       " 有大写字母时才区别大小写搜索
+set nobackup						" 不保留备份文件
+set autochdir						" 自动切换当前目录为当前文件所在的目录
+set encoding=utf8                   " vim内部使用utf-8编码
+set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
+                                    " 尝试解码序列
+set bs=2                            " Insert模式下使用BackSpace删除
+set showcmd                         " 显示寄存器命令，宏调用命令@等
+
+" gui vim配置
+if has("gui_running")
+    colorscheme koehler 			" 设定配色方案
+    set guioptions-=m               " 隐藏菜单栏
+    set guioptions-=T               " 隐藏工具栏
+    set guioptions+=L               " 隐藏左侧滚动条
+    set guioptions+=r               " 隐藏右侧滚动条
+    set guioptions+=b               " 隐藏底部滚动条
+    set guioptions+=0               " 隐藏Tab栏
+
+if has("unix")
+    set guifont=Courier\ 10\ Pitch\ 11	
+                                    " 设置字体
+elseif has("win32")
+    set guifont=Courier_New:h12	    " 设置字体
+    map <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
+                                    " gvim全屏快捷键
+endif
+endif
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -50,18 +76,22 @@ set smartcase                       " 有大写字母时才区别大小写搜索
 " Space组合的键位，连接3个键比较顺手
 let mapleader="\<space>"            
 
+" 复制相关快捷键
+vnoremap <C-c> "+y
+nnoremap <C-v> "+p
+inoremap <C-v> <esc>"+pi
+nnoremap <leader>p "0p
+
 " map语句后别注释，也别留任何空格
+nnoremap <leader>q :q<CR>
 nnoremap <leader>ww :w<CR>
-nnoremap <leader>qq :q<CR>
 nnoremap <leader>wq :wq<CR>
 nnoremap <leader>bn :bn<CR>
 nnoremap <leader>bp :bp<CR>
 
-" 快速选择 
+" 快速选择和矩形选择
 nnoremap <leader>s viw
 nnoremap <leader>v V
-    
-" 矩形选择模式
 nnoremap vv <C-v>
 
 " i:insert,在单词两边添加抱号等
@@ -79,10 +109,12 @@ inoremap <C-k> <up>
 inoremap <C-l> <right>
 
 " n和m作为滚动
-"inoremap <C-m> <esc><C-y>i "与Enter键有冲突
-"inoremap <C-n> <esc><C-e>i
 nnoremap <C-m> <C-y>
 nnoremap <C-n> <C-e>
+"inoremap <C-m> <esc><C-y>i "与Enter键有冲突
+"inoremap <C-n> <esc><C-e>i
+inoremap <C-b> <esc><C-b>i
+inoremap <C-f> <esc><C-f>i"
 
 " 分割窗口
 nnoremap <leader>ws :split<CR>
@@ -114,12 +146,12 @@ nnoremap ;o O
 nnoremap ;4 $
 
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vundel and Settings
 " - 插件设置全写在Plugin下
 " - 安键map写在每个Plugin的最后
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("unix")
 
 set nocompatible						" be iMproved, required
 filetype off							" required
@@ -144,7 +176,7 @@ let Tlist_Show_One_File=1               " 不同时显示多个文件的tag，�
 let Tlist_WinWidth = 30                 " 设置taglist的宽度
 let Tlist_Exit_OnlyWindow=1             " 如果taglist窗口是最后一个窗口，则退出vim
 let Tlist_Use_Right_Window=1            " 在右侧窗口中显示taglist窗口
-noremap <C-T> :TlistToggle<CR>
+noremap <C-T> :TlistToggle<CR>          " 先要 ctags -R 命令来生成tags
 inoremap <C-T> <esc>:TlistToggle<CR>
 
 
@@ -208,6 +240,8 @@ filetype plugin indent on    " required
 "
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
+
+endif
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
