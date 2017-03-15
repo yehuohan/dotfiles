@@ -9,6 +9,10 @@
  - .zshrc: zsh配置文件
  
 # Log
+## 20170315
+ - 修改KeyMap段注释
+ - 将<C-a>映射imap成<esc>
+
 ## 20170315:
  - 添加gvim配置
  - 对unix和win32环境分别配置

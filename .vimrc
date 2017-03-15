@@ -34,7 +34,6 @@ set ignorecase                      " 不区别大小写搜索
 set smartcase                       " 有大写字母时才区别大小写搜索
 set nobackup						" 不保留备份文件
 set autochdir						" 自动切换当前目录为当前文件所在的目录
-set encoding=utf8                   " vim内部使用utf-8编码
 set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
                                     " 尝试解码序列
 set bs=2                            " Insert模式下使用BackSpace删除
@@ -42,6 +41,7 @@ set showcmd                         " 显示寄存器命令，宏调用命令@�
 
 " gui vim配置
 if has("gui_running")
+    set encoding=utf8               " vim内部使用utf-8编码
     colorscheme koehler 			" 设定配色方案
     set guioptions-=m               " 隐藏菜单栏
     set guioptions-=T               " 隐藏工具栏
@@ -54,6 +54,7 @@ if has("unix")
     set guifont=Courier\ 10\ Pitch\ 11	
                                     " 设置字体
 elseif has("win32")
+    set encoding=gbk                " vim内部使用utf-8编码
     set guifont=Courier_New:h12	    " 设置字体
     map <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
                                     " gvim全屏快捷键
@@ -64,17 +65,22 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " KeyMap 
 " - 尽量不用ctrl,shift,alt，用<leader><leader>代替ctrl,shift或alt
-" - Command模式下使用<leader>代替:
-" - Normal模式下使用<leader><leader>代替<C-?>,<S-?>,<A-?>，用<leader>开头表示自己定义的命令
+" - Normal模式下使用<leader><leader>代替<C-?>,<S-?>,<A-?>，
+"   使用<leader>开头表示自己定义的命令
+"   使用<leader>代替:,?,/等进入Command模式
 " - Insert模式下map带ctrl,shift,alt的快捷键，不map字母或数字或<Space>开头的快捷键
 " - 尽量不改变vim原有键位的功能
 " - 尽量不需要一只手同时按两个键
+" - 建议调换左Ctrl和CapsLock键
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " 使用Space作为leader
 " Space只在Normal或Command或Visual模式下map，不适在Insert模式下map
 " Space组合的键位，连接3个键比较顺手
 let mapleader="\<space>"            
+
+" esc键，默认<C-[>，Insert模式下可以使用<C-a>
+inoremap <C-a> <esc>
 
 " 复制相关快捷键
 vnoremap <C-c> "+y
@@ -114,7 +120,7 @@ nnoremap <C-n> <C-e>
 "inoremap <C-m> <esc><C-y>i "与Enter键有冲突
 "inoremap <C-n> <esc><C-e>i
 inoremap <C-b> <esc><C-b>i
-inoremap <C-f> <esc><C-f>i"
+inoremap <C-f> <esc><C-f>i
 
 " 分割窗口
 nnoremap <leader>ws :split<CR>
@@ -199,10 +205,6 @@ Plugin 'Valloric/YouCompleteMe'
 let g:ycm_global_ycm_extra_conf='~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
 
 
-" 输入引号,括号时,自动补全
-Plugin 'Raimondi/delimitMate'			
-
-
 " 快速插入自定义的代码片段
 Plugin 'SirVer/ultisnips'				
 
@@ -240,6 +242,7 @@ filetype plugin indent on    " required
 "
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
+
 
 endif
 
