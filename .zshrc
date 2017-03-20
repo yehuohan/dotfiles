@@ -105,7 +105,8 @@ setopt HIST_IGNORE_SPACE
 #扩展路径, /v/c/p/p => /var/cache/pacman/pkg
 setopt complete_in_word
 
-
+# alias
+alias wiconv='iconv -f gbk -t utf-8'
 
 
 

@@ -79,9 +79,6 @@ endif
 " Space组合的键位，连接3个键比较顺手
 let mapleader="\<space>"            
 
-" esc键，默认<C-[>，Insert模式下可以使用<C-a>
-inoremap <C-a> <esc>
-
 " 复制相关快捷键
 vnoremap <C-c> "+y
 nnoremap <C-v> "+p

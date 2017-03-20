@@ -9,6 +9,9 @@
  - .zshrc: zsh配置文件
  
 # Log
+## 20170320
+ - 取消<C-a>映射，对调capslock和esc键
+ 
 ## 20170315
  - 修改KeyMap段注释
  - 将<C-a>映射imap成<esc>
