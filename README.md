@@ -9,6 +9,9 @@
  - .zshrc: zsh配置文件
  
 # Log
+## 20170325
+ - 添加alias cman，使用~代替主目录路径
+
 ## 20170320
  - 取消<C-a>映射，对调capslock和esc键
  
