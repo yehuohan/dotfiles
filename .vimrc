@@ -62,22 +62,44 @@ endif
 endif
 
 
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " KeyMap 
 " - 尽量不用ctrl,shift,alt，用<leader><leader>代替ctrl,shift或alt
-" - Normal模式下使用<leader><leader>代替<C-?>,<S-?>,<A-?>，
-"   使用<leader>开头表示自己定义的命令
-"   使用<leader>代替:,?,/等进入Command模式
-" - Insert模式下map带ctrl,shift,alt的快捷键，不map字母或数字或<Space>开头的快捷键
+" - Normal模式下使用<leader>代替<C-?>,<S-?>,<A-?>，
+" - Insert模式下map带ctrl,shift,alt的快捷键
 " - 尽量不改变vim原有键位的功能
 " - 尽量不需要一只手同时按两个键
-" - 建议调换左Ctrl和CapsLock键
+" - 建议调换Esc和CapsLock键
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " 使用Space作为leader
 " Space只在Normal或Command或Visual模式下map，不适在Insert模式下map
-" Space组合的键位，连接3个键比较顺手
 let mapleader="\<space>"            
+
+" map语句后别注释，也别留任何空格
+" 特殊键
+nnoremap ; :
+
+" 基本插入
+nnoremap <leader>a A
+nnoremap <leader>o O
+
+" 删除 
+nnoremap <leader>d D
+
+" 定位
+nnoremap <leader>4 $
+nnoremap <leader>6 ^
+nnoremap <leader>5 %
+
+" 搜索
+nnoremap <leader>3 #
+nnoremap <leader>8 *
+
+" 折叠
+nnoremap <leader>zr zR
+nnoremap <leader>zm zM
 
 " 复制相关快捷键
 vnoremap <C-c> "+y
@@ -85,17 +107,17 @@ nnoremap <C-v> "+p
 inoremap <C-v> <esc>"+pi
 nnoremap <leader>p "0p
 
+" 快速选择和矩形选择
+nnoremap <leader>s viw
+nnoremap <leader>v V
+nnoremap vv <C-v>
+
 " map语句后别注释，也别留任何空格
 nnoremap <leader>q :q<CR>
 nnoremap <leader>ww :w<CR>
 nnoremap <leader>wq :wq<CR>
 nnoremap <leader>bn :bn<CR>
 nnoremap <leader>bp :bp<CR>
-
-" 快速选择和矩形选择
-nnoremap <leader>s viw
-nnoremap <leader>v V
-nnoremap vv <C-v>
 
 " i:insert,在单词两边添加抱号等
 nnoremap <leader>i( viwxi(<esc>pa)<esc>     
@@ -114,10 +136,6 @@ inoremap <C-l> <right>
 " n和m作为滚动
 nnoremap <C-m> <C-y>
 nnoremap <C-n> <C-e>
-"inoremap <C-m> <esc><C-y>i "与Enter键有冲突
-"inoremap <C-n> <esc><C-e>i
-inoremap <C-b> <esc><C-b>i
-inoremap <C-f> <esc><C-f>i
 
 " 分割窗口
 nnoremap <leader>ws :split<CR>
@@ -138,15 +156,6 @@ nnoremap <C-up> <esc>:resize+1<CR>
 nnoremap <C-down> <esc>:resize-1<CR>
 nnoremap <C-left> <esc>:vertical resize-1<CR>
 nnoremap <C-right> <esc>:vertical resize+1<CR>
-
-" 大写字母用;开头表示
-"inoremap ;a A
-nnoremap ;a A
-nnoremap ;d D
-nnoremap ;g G
-nnoremap ;i I
-nnoremap ;o O
-nnoremap ;4 $
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
