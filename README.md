@@ -1,14 +1,22 @@
+
+---
 # LinuxConfigs
  - 管理Linux的一些配置文件
  - Author: yehuohan
  - E-mail: <550034086@qq.com>, <yehuohan@gmail.com>
 
+
+---
 # Files
  - .vimrc: vim配置文件
  - .ycm\_extra\_conf.py: vim-ycm配置文件
  - .zshrc: zsh配置文件
  
+---
 # Log
+## 20170410
+ - 去掉<leader>q等映射
+
 ## 20170329
  - 修改Map，将;映射成:
  - 增加一些映射，主要是当<leader>当成<S>

@@ -112,13 +112,6 @@ nnoremap <leader>s viw
 nnoremap <leader>v V
 nnoremap vv <C-v>
 
-" map语句后别注释，也别留任何空格
-nnoremap <leader>q :q<CR>
-nnoremap <leader>ww :w<CR>
-nnoremap <leader>wq :wq<CR>
-nnoremap <leader>bn :bn<CR>
-nnoremap <leader>bp :bp<CR>
-
 " i:insert,在单词两边添加抱号等
 nnoremap <leader>i( viwxi(<esc>pa)<esc>     
 nnoremap <leader>i< viwxi<<esc>pa><esc>
