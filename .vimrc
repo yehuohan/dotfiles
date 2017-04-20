@@ -150,6 +150,22 @@ nnoremap <C-down> <esc>:resize-1<CR>
 nnoremap <C-left> <esc>:vertical resize-1<CR>
 nnoremap <C-right> <esc>:vertical resize+1<CR>
 
+" tab页选择
+if has("gui_runding")
+    noremap <M-1> 1gt
+    noremap <M-2> 2gt
+    noremap <M-3> 3gt
+    noremap <M-4> 4gt
+    noremap <M-5> 5gt
+    noremap <M-6> 6gt
+    noremap <M-7> 7gt
+    noremap <M-8> 8gt
+    noremap <M-9> 9gt
+    noremap <M-0> 10gt
+endif
+noremap <M-left> gT
+noremap <M-right> gt
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vundel and Settings
@@ -160,13 +176,19 @@ if has("unix")
 
 set nocompatible						" be iMproved, required
 filetype off							" required
-
 set rtp+=~/.vim/bundle/Vundle.vim		" set the runtime path to include Vundle and initialize
+set rtp+=~/Desktop/AnyWorkSpace         " 临时添加RunTimePath，用于开发AnyWorkSpace插件
+
 call vundle#begin()						" alternatively, pass a path where Vundle should install plugins
 										" call vundle#begin('~/some/path/here')
 
 " user plugins 
 Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
+
+
+" 工作空间测试
+Plugin 'file:///~/yehuohanxing/Desktop/AnyWorkSpace'
+
 
 " 目录树导航
 Plugin 'scrooloose/nerdtree'			
