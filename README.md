@@ -11,10 +11,12 @@
  - .vimrc: vim配置文件
  - .ycm\_extra\_conf.py: vim-ycm配置文件
  - .zshrc: zsh配置文件
+ - plugin: vim插件，放于~/.vim/下即可
  
 ---
 # Log
 ## 20170420
+ - 添加visualmark
  - 添加<M-left/right/0～9>来切换tab标签
 
 ## 20170410
