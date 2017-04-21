@@ -15,6 +15,11 @@
  
 ---
 # Log
+## 20170422
+ - 添加文本对齐插件Tabularize
+ - YCM添加"转到定义"和"显示错误”快捷键
+ - 添加map <leader>` ~
+
 ## 20170420
  - 添加visualmark
  - 添加<M-left/right/0～9>来切换tab标签

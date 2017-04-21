@@ -80,6 +80,7 @@ let mapleader="\<space>"
 " map语句后别注释，也别留任何空格
 " 特殊键
 nnoremap ; :
+vnoremap ; :
 
 " 基本插入
 nnoremap <leader>a A
@@ -87,6 +88,10 @@ nnoremap <leader>o O
 
 " 删除 
 nnoremap <leader>d D
+
+" 大小写转换
+nnoremap <leader>` ~
+vnoremap <leader>` ~
 
 " 定位
 nnoremap <leader>4 $
@@ -194,7 +199,7 @@ Plugin 'file:///~/yehuohanxing/Desktop/AnyWorkSpace'
 Plugin 'scrooloose/nerdtree'			
 noremap <C-e> :NERDTreeToggle<CR>
 inoremap <C-e> <esc>:NERDTreeToggle<CR> " :NERDTree 命令可以打开目录树
-                                        " ctrl+w+h/l, 可以左右切换目录树与编辑窗口,ctrl+w连续两次，也可以切换
+
 
 " 代码结构预览
 Plugin 'vim-scripts/taglist.vim'
@@ -224,18 +229,26 @@ inoremap <C-\> <esc>:IndentLinesToggle<CR>
 " PluginInstall后，运行安装： ./install.py --clang-completer
 Plugin 'Valloric/YouCompleteMe'			
 let g:ycm_global_ycm_extra_conf='~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
+nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
+nmap <F4> :YcmDiags<CR>                 " 错误列表
 
 
 " 快速插入自定义的代码片段
-Plugin 'SirVer/ultisnips'				
+"Plugin 'SirVer/ultisnips'				
 
 
 " 快速批量加减注释
-Plugin 'scrooloose/nerdcommenter'		
+" <leader>cc for comment and <leader>cu for un-comment
+Plugin 'scrooloose/nerdcommenter'
 
 
-" 静态语法及风格检查,支持多种语言
-Plugin 'scrooloose/syntastic'			
+" 代码对齐
+Plugin 'godlygeek/tabular'
+vnoremap <leader>a :Tabularize /
+
+
+" 静态语法及风格检查,支持多种语言,  ycm已经有了此功能
+"Plugin 'scrooloose/syntastic'			
 
 
 call vundle#end()            " required
