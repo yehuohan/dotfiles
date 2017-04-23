@@ -101,6 +101,13 @@ nnoremap <leader>5 %
 " 搜索
 nnoremap <leader>3 #
 nnoremap <leader>8 *
+"nnoremap <leader>/ :call FindAndShow()<CR>
+function! FindAndShow()
+    let l:str=input('/')
+    exec "vimgrep /\\<".l:str."\\>/j %"
+    copen
+endfunction
+nnoremap <leader>/ :let g:__str__=input('/')<bar>exec "vimgrep /\\<".g:__str__."\\>/j %"<bar>copen<CR>
 
 " 折叠
 nnoremap <leader>zr zR
@@ -156,20 +163,8 @@ nnoremap <C-left> <esc>:vertical resize-1<CR>
 nnoremap <C-right> <esc>:vertical resize+1<CR>
 
 " tab页选择
-if has("gui_runding")
-    noremap <M-1> 1gt
-    noremap <M-2> 2gt
-    noremap <M-3> 3gt
-    noremap <M-4> 4gt
-    noremap <M-5> 5gt
-    noremap <M-6> 6gt
-    noremap <M-7> 7gt
-    noremap <M-8> 8gt
-    noremap <M-9> 9gt
-    noremap <M-0> 10gt
-endif
-noremap <M-left> gT
-noremap <M-right> gt
+noremap <A-left> gT
+noremap <A-right> gt
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -233,10 +228,6 @@ nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
 nmap <F4> :YcmDiags<CR>                 " 错误列表
 
 
-" 快速插入自定义的代码片段
-"Plugin 'SirVer/ultisnips'				
-
-
 " 快速批量加减注释
 " <leader>cc for comment and <leader>cu for un-comment
 Plugin 'scrooloose/nerdcommenter'
@@ -246,6 +237,20 @@ Plugin 'scrooloose/nerdcommenter'
 Plugin 'godlygeek/tabular'
 vnoremap <leader>a :Tabularize /
 
+
+" 会话保存
+Plugin 'xolox/vim-misc'
+Plugin 'xolox/vim-session'
+let g:session_autosave='no'             " 自动保存会话窗口
+let g:session_autoload='yes'            " 直接打开vim，自动加载default.vim
+noremap <leader>q :SaveSession<CR>:qa<CR>
+                                        " 关闭所有，且先保存会话
+nnoremap <C-o> :OpenSession<CR>         " 打开会话 
+                                        " vim --servename session.vim，也可以打开
+
+
+" 快速插入自定义的代码片段
+"Plugin 'SirVer/ultisnips'				
 
 " 静态语法及风格检查,支持多种语言,  ycm已经有了此功能
 "Plugin 'scrooloose/syntastic'			
