@@ -98,7 +98,7 @@ nnoremap <leader>4 $
 nnoremap <leader>6 ^
 nnoremap <leader>5 %
 
-" 搜索
+" 搜索(find)
 nnoremap <leader>3 #
 nnoremap <leader>8 *
 "nnoremap <leader>/ :call FindAndShow()<CR>
@@ -107,7 +107,10 @@ function! FindAndShow()
     exec "vimgrep /\\<".l:str."\\>/j %"
     copen
 endfunction
-nnoremap <leader>/ :let g:__str__=input('/')<bar>exec "vimgrep /\\<".g:__str__."\\>/j %"<bar>copen<CR>
+nnoremap <leader>/ :exec"let g:__str__=input('/')"<bar>exec "vimgrep /\\<".g:__str__."\\>/j %"<bar>copen<CR>
+nnoremap <leader>ff :exec"let g:__str__=expand(\"<cword>\")"<bar>exec "vimgrep /\\<".g:__str__."\\>/j %"<bar>copen<CR>
+nnoremap <leader>fj :cnext<CR>
+nnoremap <leader>fk :cprevious<CR>
 
 " 折叠
 nnoremap <leader>zr zR
@@ -120,8 +123,7 @@ inoremap <C-v> <esc>"+pi
 nnoremap <leader>p "0p
 
 " 快速选择和矩形选择
-nnoremap <leader>s viw
-nnoremap <leader>v V
+nnoremap <leader>v viw
 nnoremap vv <C-v>
 
 " i:insert,在单词两边添加抱号等
@@ -147,10 +149,10 @@ nnoremap <leader>ws :split<CR>
 nnoremap <leader>wv :vsplit<CR>
 
 " 移动到别一个分屏窗口
-nnoremap <leader><leader>h <C-w>h
-nnoremap <leader><leader>j <C-w>j
-nnoremap <leader><leader>k <C-w>k
-nnoremap <leader><leader>l <c-w>l
+nnoremap <leader>wh <C-w>h
+nnoremap <leader>wj <C-w>j
+nnoremap <leader>wk <C-w>k
+nnoremap <leader>wl <c-w>l
 
 " 使用C-up,down,left,right调整窗口大小
 inoremap <C-up> <esc>:resize+1<CR>i
@@ -172,12 +174,20 @@ noremap <A-right> gt
 " - 插件设置全写在Plugin下
 " - 安键map写在每个Plugin的最后
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 if has("unix")
+    let $MyVimPath="~/.vim/"
+elseif has("win32")
+    let $MyVimPath=$VIM."\\vimfiles\\"
+endif
 
 set nocompatible						" be iMproved, required
 filetype off							" required
-set rtp+=~/.vim/bundle/Vundle.vim		" set the runtime path to include Vundle and initialize
+
+set rtp+=$MyVimPath/bundle/Vundle.vim/  " set the runtime path to include Vundle and initialize
+if has("unix")
 set rtp+=~/Desktop/AnyWorkSpace         " 临时添加RunTimePath，用于开发AnyWorkSpace插件
+endif
 
 call vundle#begin()						" alternatively, pass a path where Vundle should install plugins
 										" call vundle#begin('~/some/path/here')
@@ -187,7 +197,9 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 
 " 工作空间测试
-Plugin 'file:///~/yehuohanxing/Desktop/AnyWorkSpace'
+if has("unix")
+Plugin 'file:///~/Desktop/AnyWorkSpace'
+endif
 
 
 " 目录树导航
@@ -198,32 +210,23 @@ inoremap <C-e> <esc>:NERDTreeToggle<CR> " :NERDTree 命令可以打开目录树
 
 " 代码结构预览
 Plugin 'vim-scripts/taglist.vim'
-let Tlist_Ctags_Cmd = '/usr/bin/ctags'  " 设置ctags路径，需要apt-get install ctags
+if has("unix")
+    let Tlist_Ctags_Cmd='/usr/bin/ctags'
+elseif has("win32")
+    let Tlist_Ctags_Cmd="C:\\MyApps\\Vim\\vim80\\ctags.exe"
+endif                                   " 设置ctags路径，需要apt-get install ctags
 let Tlist_Show_One_File=1               " 不同时显示多个文件的tag，只显示当前文件
 let Tlist_WinWidth = 30                 " 设置taglist的宽度
 let Tlist_Exit_OnlyWindow=1             " 如果taglist窗口是最后一个窗口，则退出vim
 let Tlist_Use_Right_Window=1            " 在右侧窗口中显示taglist窗口
-noremap <C-T> :TlistToggle<CR>          " 先要 ctags -R 命令来生成tags
+noremap <C-T> :TlistToggle<CR>          " 可以 ctags -R 命令自行生成tags
 inoremap <C-T> <esc>:TlistToggle<CR>
-
-
-" 状态栏美观
-Plugin 'Lokaltog/vim-powerline'		
-let g:Powerline_symbols = 'fancy'
-
-
-" 显示缩进标识
-Plugin 'Yggdroot/indentLine'			
-"let g:indentLine_char = '|'            " 设置标识符样式
-let g:indentLinet_color_term=200        " 设置标识符颜色
-noremap <C-\> :IndentLinesToggle<CR>
-inoremap <C-\> <esc>:IndentLinesToggle<CR>
 
 
 " 自动补全
 " PluginInstall后，运行安装： ./install.py --clang-completer
 Plugin 'Valloric/YouCompleteMe'			
-let g:ycm_global_ycm_extra_conf='~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
+let g:ycm_global_ycm_extra_conf=$MyVimPath.'/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
 nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
 nmap <F4> :YcmDiags<CR>                 " 错误列表
 
@@ -247,6 +250,19 @@ noremap <leader>q :SaveSession<CR>:qa<CR>
                                         " 关闭所有，且先保存会话
 nnoremap <C-o> :OpenSession<CR>         " 打开会话 
                                         " vim --servename session.vim，也可以打开
+
+
+" 显示缩进标识
+Plugin 'Yggdroot/indentLine'			
+"let g:indentLine_char = '|'            " 设置标识符样式
+let g:indentLinet_color_term=200        " 设置标识符颜色
+noremap <C-\> :IndentLinesToggle<CR>
+inoremap <C-\> <esc>:IndentLinesToggle<CR>
+
+
+" 状态栏美观
+Plugin 'Lokaltog/vim-powerline'		
+let g:Powerline_symbols = 'fancy'
 
 
 " 快速插入自定义的代码片段
@@ -282,8 +298,6 @@ filetype plugin indent on    " required
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
 
-
-endif
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

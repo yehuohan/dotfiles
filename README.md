@@ -15,6 +15,12 @@
  
 ---
 # Log
+## 20170424
+ - 添加MyVimPath，windows下同样添加插件
+ - 分屏窗口焦点移动，改成使用<leader>hjkl
+ - 添加<leader>ff，搜索当前单词，并显示结果，添加cnext和cprevious映射
+ - 修改<leader>v，为择择当前单词
+
 ## 20170423
  - 添加Session插件，并添加相应map
  - 添加显示查找结果窗口快捷键
