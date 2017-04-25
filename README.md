@@ -8,13 +8,20 @@
 
 ---
 # Files
- - .vimrc: vim配置文件
- - .ycm\_extra\_conf.py: vim-ycm配置文件
- - .zshrc: zsh配置文件
- - plugin: vim插件，放于~/.vim/下即可
+ - .vimrc               : vim配置文件
+ - .ycm\_extra\_conf.py : vim-ycm配置文件
+ - .zshrc               : zsh配置文件
+ - frisk.zsh-them       : zsh主题文件
+ - plugin               : vim插件，放于~/.vim/下即可
  
 ---
 # Log
+## 20170426
+ - 添加EasyMotion插件
+ - 添加frisk.zsh-theme主题
+ - .vimrc的vundle指定安装路径
+ - .vimrc添加MyNotes部分
+
 ## 20170424
  - 添加MyVimPath，windows下同样添加插件
  - 分屏窗口焦点移动，改成使用<leader>hjkl

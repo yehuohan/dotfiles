@@ -1,5 +1,31 @@
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" My Notes
+" [*]带python编译 {
+" 	使用MinGw-x64，更改.mak文件：
+" 	ARCH=i686								- 使用32位，python也使用32位
+" 	CC := $(CROSS_COMPILE)gcc -m32			- 32位编绎
+" 	CXX := $(CROSS_COMPILE)g++ -m32			- 32位编绎
+" 	WINDRES := windres --target=pe-i386		- 资源文件添加i386编绎
+"	若全部使用64位，则同样更改参数即可
+"}
+"
+" [*]替换字符串{
+"   :n,$s/ar\[i\]/*(ar+i)/g
+"       将第n行到最后一行的所有 ar[i] 替换成 *(ar+)
+"       注意：对于 * . / \ [ ] 需要转义
+"	
+"	:.,30s/ar\[i\]/*(ar+i)/g
+"		将当前行到第30行的所有 ar[i] 替换成 *(ar+)
+"	
+"	:s/"\([A-J]\)"/"Group \1"/g
+"		将"X" 替换成 "Group X"，其中X可为A-J，\( \)表示后面用\1引用()的内容
+"}
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " display 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -53,7 +79,7 @@ if has("gui_running")
 if has("unix")
     set guifont=Courier\ 10\ Pitch\ 11	
                                     " 设置字体
-elseif has("win32")
+elseif has("win32") || has("win64")
     set encoding=gbk                " vim内部使用utf-8编码
     set guifont=Courier_New:h12	    " 设置字体
     map <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
@@ -176,9 +202,9 @@ noremap <A-right> gt
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 if has("unix")
-    let $MyVimPath="~/.vim/"
-elseif has("win32")
-    let $MyVimPath=$VIM."\\vimfiles\\"
+    let $MyVimPath="~/.vim"
+elseif has("win32") || has("win64")
+    let $MyVimPath=$VIM."\\vimfiles"
 endif
 
 set nocompatible						" be iMproved, required
@@ -189,8 +215,8 @@ if has("unix")
 set rtp+=~/Desktop/AnyWorkSpace         " 临时添加RunTimePath，用于开发AnyWorkSpace插件
 endif
 
-call vundle#begin()						" alternatively, pass a path where Vundle should install plugins
-										" call vundle#begin('~/some/path/here')
+call vundle#begin($MyVimPath."/bundle")	" alternatively, pass a path where Vundle should install plugins
+										" call vundle#begin('~/some/path/here')设置插件安装路径
 
 " user plugins 
 Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
@@ -212,7 +238,7 @@ inoremap <C-e> <esc>:NERDTreeToggle<CR> " :NERDTree 命令可以打开目录树
 Plugin 'vim-scripts/taglist.vim'
 if has("unix")
     let Tlist_Ctags_Cmd='/usr/bin/ctags'
-elseif has("win32")
+elseif has("win32") || has("win64")
     let Tlist_Ctags_Cmd="C:\\MyApps\\Vim\\vim80\\ctags.exe"
 endif                                   " 设置ctags路径，需要apt-get install ctags
 let Tlist_Show_One_File=1               " 不同时显示多个文件的tag，只显示当前文件
@@ -225,7 +251,7 @@ inoremap <C-T> <esc>:TlistToggle<CR>
 
 " 自动补全
 " PluginInstall后，运行安装： ./install.py --clang-completer
-Plugin 'Valloric/YouCompleteMe'			
+"Plugin 'Valloric/YouCompleteMe'			
 let g:ycm_global_ycm_extra_conf=$MyVimPath.'/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
 nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
 nmap <F4> :YcmDiags<CR>                 " 错误列表
@@ -239,6 +265,25 @@ Plugin 'scrooloose/nerdcommenter'
 " 代码对齐
 Plugin 'godlygeek/tabular'
 vnoremap <leader>a :Tabularize /
+
+
+" 快速跳转
+Plugin 'easymotion/vim-easymotion'
+let g:EasyMotion_do_mapping = 0         " 禁止默认map
+let g:EasyMotion_smartcase = 1          " 不区分大小写
+nmap s <Plug>(easymotion-overwin-f)
+nmap <leader>s <plug>(easymotion-overwin-f2)
+                                        " 跨分屏快速跳转到字母，
+nmap <leader>j <plug>(easymotion-j)
+nmap <leader>k <plug>(easymotion-k)
+nmap <leader>w <plug>(easymotion-w)
+nmap <leader>W <plug>(easymotion-W)
+nmap <leader>b <plug>(easymotion-b)
+nmap <leader>B <plug>(easymotion-B)
+nmap <leader>e <plug>(easymotion-e)
+nmap <leader>E <plug>(easymotion-E)
+nmap <leader>ge <plug>(easymotion-ge)
+nmap <leader>gE <plug>(easymotion-gE)
 
 
 " 会话保存
