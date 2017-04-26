@@ -17,6 +17,9 @@
 ---
 # Log
 ## 20170426
+ - 将C-nm改成C-jk映射
+
+## 20170426
  - 添加EasyMotion插件
  - 添加frisk.zsh-theme主题
  - .vimrc的vundle指定安装路径

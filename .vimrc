@@ -167,8 +167,8 @@ inoremap <C-k> <up>
 inoremap <C-l> <right>
 
 " n和m作为滚动
-nnoremap <C-m> <C-y>
-nnoremap <C-n> <C-e>
+nnoremap <C-k> <C-y>
+nnoremap <C-j> <C-e>
 
 " 分割窗口
 nnoremap <leader>ws :split<CR>
