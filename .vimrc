@@ -215,7 +215,8 @@ elseif IsWin()
     let l:filename=expand("%:t")        " 文件名，不带路径，带扩展名 
     let l:name=expand("%:t:r")          " 文件名，不带路径，不带扩展名
 endif
-    exec "cd %:h"                       " 先切换目录
+    exec "cd %:h"
+    " 先切换目录
     if "c" == l:ext
         " c
         exec "!gcc -o ".l:name." ".l:filename." && ".l:name
