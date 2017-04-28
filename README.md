@@ -2,8 +2,9 @@
 ---
 # LinuxConfigs
  - 管理Linux的一些配置文件
- - Author: yehuohan
- - E-mail: <550034086@qq.com>, <yehuohan@gmail.com>
+ - Author : yehuohan
+ - E-mail : <550034086@qq.com>, <yehuohan@gmail.com>
+ - Git    : <github.com>, <git.oschina.net>
 
 
 ---

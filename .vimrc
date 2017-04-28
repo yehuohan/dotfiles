@@ -24,11 +24,22 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Platform
+silent function! IsLinux()
+    return has('unix') && !has('macunix') && !has('win32unix')
+endfunction
+silent function! IsWin()
+    return  (has('win32') || has('win64'))
+endfunction
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " display 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+set nocompatible				    " 不兼容vi快捷键
 syntax on							" 语法高亮
 colorscheme slate                   " 使用主题
 set number							" 显示行号
@@ -54,7 +65,6 @@ set foldmethod=indent				" 设置语文折叠
 									" diff:对没有更改的文本进行折叠         
 									" marker:对文中的标志折叠
 set hlsearch						" 设置高亮显示查找到的文本
-set nocompatible				    " 不兼容vi快捷键
 set nobackup                        " 不生成备份文件
 set ignorecase                      " 不区别大小写搜索
 set smartcase                       " 有大写字母时才区别大小写搜索
@@ -76,10 +86,10 @@ if has("gui_running")
     set guioptions+=b               " 隐藏底部滚动条
     set guioptions+=0               " 隐藏Tab栏
 
-if has("unix")
+if IsLinux()
     set guifont=Courier\ 10\ Pitch\ 11	
                                     " 设置字体
-elseif has("win32") || has("win64")
+elseif IsWin()
     set encoding=gbk                " vim内部使用utf-8编码
     set guifont=Courier_New:h12	    " 设置字体
     map <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
@@ -194,6 +204,31 @@ nnoremap <C-right> <esc>:vertical resize+1<CR>
 noremap <A-left> gT
 noremap <A-right> gt
 
+" F5 map，程序编译与运行
+nmap <F5> <esc>:call F5RunFile()<CR>
+function F5RunFile()
+    let l:ext=expand("%:e")             " 扩展名
+if IsLinux()
+    let l:filename=expand("./%:t")      " 文件名，不带路径，带扩展名 
+    let l:name=expand("./%:t:r")        " 文件名，不带路径，不带扩展名
+elseif IsWin()
+    let l:filename=expand("%:t")        " 文件名，不带路径，带扩展名 
+    let l:name=expand("%:t:r")          " 文件名，不带路径，不带扩展名
+endif
+    exec "cd %:h"                       " 先切换目录
+    if "c" == l:ext
+        " c
+        exec "!gcc -o ".l:name." ".l:filename." && ".l:name
+    elseif "cpp" == l:ext
+        " c++
+        exec "!g++ -o ".l:name." ".l:filename." && ".l:name
+    elseif "py" == l:ext
+        " python
+        exec "!python ".l:filename
+    endif
+endfunction
+
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vundel and Settings
@@ -201,9 +236,9 @@ noremap <A-right> gt
 " - 安键map写在每个Plugin的最后
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-if has("unix")
+if IsLinux()
     let $MyVimPath="~/.vim"
-elseif has("win32") || has("win64")
+elseif IsWin()
     let $MyVimPath=$VIM."\\vimfiles"
 endif
 
@@ -211,7 +246,7 @@ set nocompatible						" be iMproved, required
 filetype off							" required
 
 set rtp+=$MyVimPath/bundle/Vundle.vim/  " set the runtime path to include Vundle and initialize
-if has("unix")
+if IsLinux()
 set rtp+=~/Desktop/AnyWorkSpace         " 临时添加RunTimePath，用于开发AnyWorkSpace插件
 endif
 
@@ -223,7 +258,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 
 " 工作空间测试
-if has("unix")
+if IsLinux()
 Plugin 'file:///~/Desktop/AnyWorkSpace'
 endif
 
@@ -236,9 +271,9 @@ inoremap <C-e> <esc>:NERDTreeToggle<CR> " :NERDTree 命令可以打开目录树
 
 " 代码结构预览
 Plugin 'vim-scripts/taglist.vim'
-if has("unix")
+if IsLinux()
     let Tlist_Ctags_Cmd='/usr/bin/ctags'
-elseif has("win32") || has("win64")
+elseif IsWin()
     let Tlist_Ctags_Cmd="C:\\MyApps\\Vim\\vim80\\ctags.exe"
 endif                                   " 设置ctags路径，需要apt-get install ctags
 let Tlist_Show_One_File=1               " 不同时显示多个文件的tag，只显示当前文件
