@@ -286,8 +286,14 @@ inoremap <C-T> <esc>:TlistToggle<CR>
 
 
 " 自动补全
-" PluginInstall后，运行安装： ./install.py --clang-completer
-"Plugin 'Valloric/YouCompleteMe'			
+" Linux: 
+"   install python-dev, python3-dev, cmake
+"   ./install.py --clang-completer
+" Windows: 
+"   install python, Cmake, VS, 7-zip
+"   install.py --clang-completer --msvc 14 --build-dir <dir>
+"   自己指定vs版本，自己指定build路径
+Plugin 'Valloric/YouCompleteMe'			
 let g:ycm_global_ycm_extra_conf=$MyVimPath.'/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
 nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
 nmap <F4> :YcmDiags<CR>                 " 错误列表
