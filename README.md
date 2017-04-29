@@ -1,7 +1,7 @@
 
 ---
 # LinuxConfigs
- - 管理Linux的一些配置文件
+ - 管理Linux的一些配置文件，包括Msys2中的配置文件
  - Author : yehuohan
  - E-mail : <550034086@qq.com>, <yehuohan@gmail.com>
  - Git    : <github.com>, <git.oschina.net>
@@ -9,14 +9,21 @@
 
 ---
 # Files
- - .vimrc               : vim配置文件
- - .ycm\_extra\_conf.py : vim-ycm配置文件
- - .zshrc               : zsh配置文件
- - frisk.zsh-them       : zsh主题文件
- - plugin               : vim插件，放于~/.vim/下即可
+ - cf-vim                : vim配置文件
+  - .vimrc               : vim配置文件
+  - .ycm\_extra\_conf.py : vim-ycm配置文件
+  - plugin               : vim插件，放于~/.vim/下即可
+ - cf-zsh                : zsh配置文件
+  - .zshrc               : zsh配置文件
+  - frisk.zsh-them       : zsh主题文件
+ - cf-Msys2              : Windows下Msys2配置文件
+  - .minttyrc            : Msys2模拟终端mintty配置文件
  
 ---
 # Log
+## 20170429
+ - 添加windows下Msys2环境的配置文件
+
 ## 20170429
  - Window添加YCM插件  
 
