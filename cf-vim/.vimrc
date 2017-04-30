@@ -65,7 +65,6 @@ set foldmethod=indent				" 设置语文折叠
 									" diff:对没有更改的文本进行折叠         
 									" marker:对文中的标志折叠
 set hlsearch						" 设置高亮显示查找到的文本
-set nobackup                        " 不生成备份文件
 set ignorecase                      " 不区别大小写搜索
 set smartcase                       " 有大写字母时才区别大小写搜索
 set nobackup						" 不保留备份文件
