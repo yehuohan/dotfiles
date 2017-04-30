@@ -1,6 +1,7 @@
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"===============================================================================
 " My Notes
+"===============================================================================
 " [*]带python编译 {
 " 	使用MinGw-x64，更改.mak文件：
 " 	ARCH=i686								- 使用32位，python也使用32位
@@ -21,24 +22,23 @@
 "	:s/"\([A-J]\)"/"Group \1"/g
 "		将"X" 替换成 "Group X"，其中X可为A-J，\( \)表示后面用\1引用()的内容
 "}
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"===============================================================================
 " Platform
+"===============================================================================
 silent function! IsLinux()
     return has('unix') && !has('macunix') && !has('win32unix')
 endfunction
 silent function! IsWin()
     return  (has('win32') || has('win64'))
 endfunction
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" display 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
+"===============================================================================
+" settings 
+"===============================================================================
+" UI{
 set nocompatible				    " 不兼容vi快捷键
 syntax on							" 语法高亮
 colorscheme slate                   " 使用主题
@@ -49,11 +49,7 @@ hi CursorLine 	 cterm=NONE ctermbg=black ctermfg=gray guibg=NONE guifg=NONE
 hi CursorColumn  cterm=NONE ctermbg=black ctermfg=gray guibg=NONE guifg=NONE
 									" 设定高亮行列的颜色
 									" cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
-set tabstop=4						" 设置tab键宽度
-set expandtab						" 将Tab用Space代替，方便显示缩进标识indentLine
-retab								" 重新将Space转换为Tab
-set softtabstop=4					" 设置显示的缩进为4,实际Tab可能不是4个格
-set shiftwidth=4					" 设置>和<命令移动宽度为4
+set hlsearch						" 设置高亮显示查找到的文本
 set smartindent						" 新行智能自动缩进
 set foldenable						" 充许折叠
 set foldcolumn=1					" 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
@@ -64,17 +60,24 @@ set foldmethod=indent				" 设置语文折叠
 									" syntax:用语法高亮来定义折叠         
 									" diff:对没有更改的文本进行折叠         
 									" marker:对文中的标志折叠
-set hlsearch						" 设置高亮显示查找到的文本
+set showcmd                         " 显示寄存器命令，宏调用命令@等
+set tabstop=4						" 设置tab键宽4个空格
+set expandtab						" 将Tab用Space代替，方便显示缩进标识indentLine
+set softtabstop=4					" 设置显示的缩进为4,实际Tab可能不是4个格
+set shiftwidth=4					" 设置>和<命令移动宽度为4
 set ignorecase                      " 不区别大小写搜索
 set smartcase                       " 有大写字母时才区别大小写搜索
-set nobackup						" 不保留备份文件
+"}
+
+" Edit{
+set bs=2                            " Insert模式下使用BackSpace删除
+set nobackup                        " 不生成备份文件
 set autochdir						" 自动切换当前目录为当前文件所在的目录
 set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
                                     " 尝试解码序列
-set bs=2                            " Insert模式下使用BackSpace删除
-set showcmd                         " 显示寄存器命令，宏调用命令@等
+"}
 
-" gui vim配置
+" Vim-Gui{
 if has("gui_running")
     set encoding=utf8               " vim内部使用utf-8编码
     colorscheme koehler 			" 设定配色方案
@@ -95,10 +98,11 @@ elseif IsWin()
                                     " gvim全屏快捷键
 endif
 endif
+"}
 
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"===============================================================================
 " KeyMap 
 " - 尽量不用ctrl,shift,alt，用<leader><leader>代替ctrl,shift或alt
 " - Normal模式下使用<leader>代替<C-?>,<S-?>,<A-?>，
@@ -106,8 +110,7 @@ endif
 " - 尽量不改变vim原有键位的功能
 " - 尽量不需要一只手同时按两个键
 " - 建议调换Esc和CapsLock键
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
+"===============================================================================
 " 使用Space作为leader
 " Space只在Normal或Command或Visual模式下map，不适在Insert模式下map
 let mapleader="\<space>"            
@@ -214,8 +217,8 @@ elseif IsWin()
     let l:filename=expand("%:t")        " 文件名，不带路径，带扩展名 
     let l:name=expand("%:t:r")          " 文件名，不带路径，不带扩展名
 endif
-    exec "cd %:h"
     " 先切换目录
+    exec "cd %:h"
     if "c" == l:ext
         " c
         exec "!gcc -o ".l:name." ".l:filename." && ".l:name
@@ -230,11 +233,11 @@ endfunction
 
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"===============================================================================
 " Vundel and Settings
 " - 插件设置全写在Plugin下
 " - 安键map写在每个Plugin的最后
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"===============================================================================
 
 if IsLinux()
     let $MyVimPath="~/.vim"
@@ -384,8 +387,4 @@ filetype plugin indent on    " required
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
 
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
