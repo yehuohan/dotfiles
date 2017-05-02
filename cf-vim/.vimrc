@@ -211,11 +211,11 @@ nmap <F5> <esc>:call F5RunFile()<CR>
 function F5RunFile()
     let l:ext=expand("%:e")             " 扩展名
 if IsLinux()
-    let l:filename=expand("./%:t")      " 文件名，不带路径，带扩展名 
-    let l:name=expand("./%:t:r")        " 文件名，不带路径，不带扩展名
+    let l:filename="\"".expand("\"./%:t\"")."\""    " 文件名，不带路径，带扩展名 
+    let l:name="\"".expand("\"./%:t:r\"")."\""      " 文件名，不带路径，不带扩展名
 elseif IsWin()
-    let l:filename=expand("%:t")        " 文件名，不带路径，带扩展名 
-    let l:name=expand("%:t:r")          " 文件名，不带路径，不带扩展名
+    let l:filename="\"".expand("%:t")."\""          " 文件名，不带路径，带扩展名 
+    let l:name="\"".expand("%:t:r")."\""            " 文件名，不带路径，不带扩展名
 endif
     " 先切换目录
     exec "cd %:h"
