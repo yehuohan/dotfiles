@@ -335,7 +335,7 @@ Plugin 'xolox/vim-misc'
 Plugin 'xolox/vim-session'
 let g:session_autosave='no'             " 自动保存会话窗口
 let g:session_autoload='yes'            " 直接打开vim，自动加载default.vim
-noremap <leader>q :SaveSession<CR>:qa<CR>
+noremap <leader>q :SaveSession!<CR>:qa<CR>
                                         " 关闭所有，且先保存会话
 nnoremap <C-o> :OpenSession<CR>         " 打开会话 
                                         " vim --servename session.vim，也可以打开

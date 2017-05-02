@@ -21,6 +21,9 @@
  
 ---
 # Log
+##20170502
+ - 使用SaveSession!，强制保存会话
+
 ## 20170430
  - 优化vimrc注释格式
  - 去掉vimrc中折retab
