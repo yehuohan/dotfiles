@@ -320,7 +320,7 @@ nmap <leader>s <plug>(easymotion-overwin-f2)
                                         " 跨分屏快速跳转到字母，
 nmap <leader>j <plug>(easymotion-j)
 nmap <leader>k <plug>(easymotion-k)
-nmap <leader>w <plug>(easymotion-w)
+nmap <leader>ww <plug>(easymotion-w)
 nmap <leader>W <plug>(easymotion-W)
 nmap <leader>b <plug>(easymotion-b)
 nmap <leader>B <plug>(easymotion-B)
