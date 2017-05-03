@@ -8,6 +8,11 @@
 
 
 ---
+# TODO
+ - ctrlspace和airline配置
+ - 改变窗口大小时，内容未重新排布，airline的影响
+
+---
 # Files
  - cf-vim                : vim配置文件
   - .vimrc               : vim配置文件
@@ -21,6 +26,15 @@
  
 ---
 # Log
+## 20170503
+ - 添加vim-ctrlspace插件
+ - 去除powerline，改用airline，设置成非分屏时同样显示
+ - 去掉visualmark插件
+ - 添加wrap和nowrap映射
+ - 去掉<leader>d
+ - 去掉inoremap <C-hjkl>，改成用<C-hl>选择tab页
+ - vimgrep改成<leader>f，去除<leader>fj/k，因为quickfix可以直接跳转
+
 ## 20170503
  - EasyMotion修改<leader>w为<leader>ww，防止等待
 

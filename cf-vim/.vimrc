@@ -65,8 +65,7 @@ set tabstop=4						" 设置tab键宽4个空格
 set expandtab						" 将Tab用Space代替，方便显示缩进标识indentLine
 set softtabstop=4					" 设置显示的缩进为4,实际Tab可能不是4个格
 set shiftwidth=4					" 设置>和<命令移动宽度为4
-set ignorecase                      " 不区别大小写搜索
-set smartcase                       " 有大写字母时才区别大小写搜索
+set wrap                            " 默认开启折行 
 "}
 
 " Edit{
@@ -75,6 +74,9 @@ set nobackup                        " 不生成备份文件
 set autochdir						" 自动切换当前目录为当前文件所在的目录
 set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
                                     " 尝试解码序列
+set ignorecase                      " 不区别大小写搜索
+set smartcase                       " 有大写字母时才区别大小写搜索
+set noerrorbells                    " 关闭错误信息响铃
 "}
 
 " Vim-Gui{
@@ -124,8 +126,9 @@ vnoremap ; :
 nnoremap <leader>a A
 nnoremap <leader>o O
 
-" 删除 
-nnoremap <leader>d D
+" wrap
+nnoremap <leader>nw :set nowrap<CR>
+nnoremap <C-w> :set wrap<CR>
 
 " 大小写转换
 nnoremap <leader>` ~
@@ -135,20 +138,6 @@ vnoremap <leader>` ~
 nnoremap <leader>4 $
 nnoremap <leader>6 ^
 nnoremap <leader>5 %
-
-" 搜索(find)
-nnoremap <leader>3 #
-nnoremap <leader>8 *
-"nnoremap <leader>/ :call FindAndShow()<CR>
-function! FindAndShow()
-    let l:str=input('/')
-    exec "vimgrep /\\<".l:str."\\>/j %"
-    copen
-endfunction
-nnoremap <leader>/ :exec"let g:__str__=input('/')"<bar>exec "vimgrep /\\<".g:__str__."\\>/j %"<bar>copen<CR>
-nnoremap <leader>ff :exec"let g:__str__=expand(\"<cword>\")"<bar>exec "vimgrep /\\<".g:__str__."\\>/j %"<bar>copen<CR>
-nnoremap <leader>fj :cnext<CR>
-nnoremap <leader>fk :cprevious<CR>
 
 " 折叠
 nnoremap <leader>zr zR
@@ -172,64 +161,76 @@ nnoremap <leader>i{ viwxi{<esc>pa}<esc>
 nnoremap <leader>i" viwxi"<esc>pa"<esc>
 nnoremap <leader>i' viwxi'<esc>pa'<esc>
 
-" Insert模式下使用hjkl移动
-inoremap <C-h> <left>
-inoremap <C-j> <down>
-inoremap <C-k> <up>
-inoremap <C-l> <right>
-
-" n和m作为滚动
+" 滚动
 nnoremap <C-k> <C-y>
 nnoremap <C-j> <C-e>
 
-" 分割窗口
-nnoremap <leader>ws :split<CR>
-nnoremap <leader>wv :vsplit<CR>
-
-" 移动到别一个分屏窗口
-nnoremap <leader>wh <C-w>h
-nnoremap <leader>wj <C-w>j
-nnoremap <leader>wk <C-w>k
-nnoremap <leader>wl <c-w>l
-
-" 使用C-up,down,left,right调整窗口大小
-inoremap <C-up> <esc>:resize+1<CR>i
-inoremap <C-down> <esc>:resize-1<CR>i
-inoremap <C-left> <esc>:vertical resize-1<CR>i
-inoremap <C-right> <esc>:vertical resize+1<CR>i
-nnoremap <C-up> <esc>:resize+1<CR>
-nnoremap <C-down> <esc>:resize-1<CR>
-nnoremap <C-left> <esc>:vertical resize-1<CR>
-nnoremap <C-right> <esc>:vertical resize+1<CR>
-
 " tab页选择
-noremap <A-left> gT
-noremap <A-right> gt
+noremap <C-h> gT
+noremap <C-l> gt
 
-" F5 map，程序编译与运行
-nmap <F5> <esc>:call F5RunFile()<CR>
-function F5RunFile()
-    let l:ext=expand("%:e")             " 扩展名
-if IsLinux()
-    let l:filename="\"".expand("\"./%:t\"")."\""    " 文件名，不带路径，带扩展名 
-    let l:name="\"".expand("\"./%:t:r\"")."\""      " 文件名，不带路径，不带扩展名
-elseif IsWin()
-    let l:filename="\"".expand("%:t")."\""          " 文件名，不带路径，带扩展名 
-    let l:name="\"".expand("%:t:r")."\""            " 文件名，不带路径，不带扩展名
-endif
-    " 先切换目录
-    exec "cd %:h"
-    if "c" == l:ext
-        " c
-        exec "!gcc -o ".l:name." ".l:filename." && ".l:name
-    elseif "cpp" == l:ext
-        " c++
-        exec "!g++ -o ".l:name." ".l:filename." && ".l:name
-    elseif "py" == l:ext
-        " python
-        exec "!python ".l:filename
+" split map{
+    " 分割窗口
+    nnoremap <leader>ws :split<CR>
+    nnoremap <leader>wv :vsplit<CR>
+
+    " 移动到别一个分屏窗口
+    nnoremap <leader>wh <C-w>h
+    nnoremap <leader>wj <C-w>j
+    nnoremap <leader>wk <C-w>k
+    nnoremap <leader>wl <c-w>l
+
+    " 使用C-up,down,left,right调整窗口大小
+    inoremap <C-up> <esc>:resize+1<CR>i
+    inoremap <C-down> <esc>:resize-1<CR>i
+    inoremap <C-left> <esc>:vertical resize-1<CR>i
+    inoremap <C-right> <esc>:vertical resize+1<CR>i
+    nnoremap <C-up> <esc>:resize+1<CR>
+    nnoremap <C-down> <esc>:resize-1<CR>
+    nnoremap <C-left> <esc>:vertical resize-1<CR>
+    nnoremap <C-right> <esc>:vertical resize+1<CR>
+"}
+
+" vimgrep{
+    " 搜索(find)
+    nnoremap <leader>3 #
+    nnoremap <leader>8 *
+    "nnoremap <leader>/ :call FindAndShow()<CR>
+    function! FindAndShow()
+        let l:str=input('/')
+        exec "vimgrep /\\<".l:str."\\>/j %"
+        copen
+    endfunction
+    nnoremap <leader>/ :exec"let g:__str__=input('/')"<bar>exec "vimgrep /\\<".g:__str__."\\>/j %"<bar>copen<CR>
+    nnoremap <leader>f :exec"let g:__str__=expand(\"<cword>\")"<bar>exec "vimgrep /\\<".g:__str__."\\>/j %"<bar>copen<CR>
+"}
+
+" F5 map{
+    " 程序编译与运行
+    nmap <F5> <esc>:call F5RunFile()<CR>
+    function F5RunFile()
+        let l:ext=expand("%:e")             " 扩展名
+    if IsLinux()
+        let l:filename="\"".expand("./%:t")."\""    " 文件名，不带路径，带扩展名 
+        let l:name="\"".expand("./%:t:r")."\""      " 文件名，不带路径，不带扩展名
+    elseif IsWin()
+        let l:filename="\"".expand("%:t")."\""          " 文件名，不带路径，带扩展名 
+        let l:name="\"".expand("%:t:r")."\""            " 文件名，不带路径，不带扩展名
     endif
-endfunction
+        " 先切换目录
+        exec "cd %:h"
+        if "c" == l:ext
+            " c
+            exec "!gcc -o ".l:name." ".l:filename." && ".l:name
+        elseif "cpp" == l:ext
+            " c++
+            exec "!g++ -o ".l:name." ".l:filename." && ".l:name
+        elseif "py" == l:ext
+            " python
+            exec "!python ".l:filename
+        endif
+    endfunction
+"}
 
 
 
@@ -249,10 +250,6 @@ set nocompatible						" be iMproved, required
 filetype off							" required
 
 set rtp+=$MyVimPath/bundle/Vundle.vim/  " set the runtime path to include Vundle and initialize
-if IsLinux()
-set rtp+=~/Desktop/AnyWorkSpace         " 临时添加RunTimePath，用于开发AnyWorkSpace插件
-endif
-
 call vundle#begin($MyVimPath."/bundle")	" alternatively, pass a path where Vundle should install plugins
 										" call vundle#begin('~/some/path/here')设置插件安装路径
 
@@ -260,105 +257,124 @@ call vundle#begin($MyVimPath."/bundle")	" alternatively, pass a path where Vundl
 Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 
-" 工作空间测试
-if IsLinux()
-Plugin 'file:///~/Desktop/AnyWorkSpace'
-endif
-
-
+" nerd-tree{
 " 目录树导航
-Plugin 'scrooloose/nerdtree'			
-noremap <C-e> :NERDTreeToggle<CR>
-inoremap <C-e> <esc>:NERDTreeToggle<CR> " :NERDTree 命令可以打开目录树
+    Plugin 'scrooloose/nerdtree'			
+    noremap <C-e> :NERDTreeToggle<CR>
+    inoremap <C-e> <esc>:NERDTreeToggle<CR> " :NERDTree 命令可以打开目录树
+"}
 
 
+" taglist{
 " 代码结构预览
-Plugin 'vim-scripts/taglist.vim'
-if IsLinux()
-    let Tlist_Ctags_Cmd='/usr/bin/ctags'
-elseif IsWin()
-    let Tlist_Ctags_Cmd="C:\\MyApps\\Vim\\vim80\\ctags.exe"
-endif                                   " 设置ctags路径，需要apt-get install ctags
-let Tlist_Show_One_File=1               " 不同时显示多个文件的tag，只显示当前文件
-let Tlist_WinWidth = 30                 " 设置taglist的宽度
-let Tlist_Exit_OnlyWindow=1             " 如果taglist窗口是最后一个窗口，则退出vim
-let Tlist_Use_Right_Window=1            " 在右侧窗口中显示taglist窗口
-noremap <C-T> :TlistToggle<CR>          " 可以 ctags -R 命令自行生成tags
-inoremap <C-T> <esc>:TlistToggle<CR>
+    Plugin 'vim-scripts/taglist.vim'
+    if IsLinux()
+        let Tlist_Ctags_Cmd='/usr/bin/ctags'
+    elseif IsWin()
+        let Tlist_Ctags_Cmd="C:\\MyApps\\Vim\\vim80\\ctags.exe"
+    endif                                   " 设置ctags路径，需要apt-get install ctags
+    let Tlist_Show_One_File=1               " 不同时显示多个文件的tag，只显示当前文件
+    let Tlist_WinWidth = 30                 " 设置taglist的宽度
+    let Tlist_Exit_OnlyWindow=1             " 如果taglist窗口是最后一个窗口，则退出vim
+    let Tlist_Use_Right_Window=1            " 在右侧窗口中显示taglist窗口
+    noremap <C-T> :TlistToggle<CR>          " 可以 ctags -R 命令自行生成tags
+    inoremap <C-T> <esc>:TlistToggle<CR>
+"}
 
 
+" YouCompleteMe{
 " 自动补全
-" Linux: 
-"   install python-dev, python3-dev, cmake
-"   ./install.py --clang-completer
-" Windows: 
-"   install python, Cmake, VS, 7-zip
-"   install.py --clang-completer --msvc 14 --build-dir <dir>
-"   自己指定vs版本，自己指定build路径
-Plugin 'Valloric/YouCompleteMe'			
-let g:ycm_global_ycm_extra_conf=$MyVimPath.'/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
-nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
-nmap <F4> :YcmDiags<CR>                 " 错误列表
+    " Linux: 
+    "   install python-dev, python3-dev, cmake
+    "   ./install.py --clang-completer
+    " Windows: 
+    "   install python, Cmake, VS, 7-zip
+    "   install.py --clang-completer --msvc 14 --build-dir <dir>
+    "   自己指定vs版本，自己指定build路径
+    Plugin 'Valloric/YouCompleteMe'			
+    let g:ycm_global_ycm_extra_conf=$MyVimPath.'/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
+    nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
+    nmap <F4> :YcmDiags<CR>                 " 错误列表
+"}
 
 
+"nerd-commenter{
 " 快速批量加减注释
-" <leader>cc for comment and <leader>cu for un-comment
-Plugin 'scrooloose/nerdcommenter'
+    " <leader>cc for comment and <leader>cu for un-comment
+    Plugin 'scrooloose/nerdcommenter'
+"}
 
 
+" tabular{
 " 代码对齐
-Plugin 'godlygeek/tabular'
-vnoremap <leader>a :Tabularize /
+    Plugin 'godlygeek/tabular'
+    vnoremap <leader>a :Tabularize /
+"}
 
 
+" easy-motion{
 " 快速跳转
-Plugin 'easymotion/vim-easymotion'
-let g:EasyMotion_do_mapping = 0         " 禁止默认map
-let g:EasyMotion_smartcase = 1          " 不区分大小写
-nmap s <Plug>(easymotion-overwin-f)
-nmap <leader>s <plug>(easymotion-overwin-f2)
-                                        " 跨分屏快速跳转到字母，
-nmap <leader>j <plug>(easymotion-j)
-nmap <leader>k <plug>(easymotion-k)
-nmap <leader>ww <plug>(easymotion-w)
-nmap <leader>W <plug>(easymotion-W)
-nmap <leader>b <plug>(easymotion-b)
-nmap <leader>B <plug>(easymotion-B)
-nmap <leader>e <plug>(easymotion-e)
-nmap <leader>E <plug>(easymotion-E)
-nmap <leader>ge <plug>(easymotion-ge)
-nmap <leader>gE <plug>(easymotion-gE)
+    Plugin 'easymotion/vim-easymotion'
+    let g:EasyMotion_do_mapping = 0         " 禁止默认map
+    let g:EasyMotion_smartcase = 1          " 不区分大小写
+    nmap s <Plug>(easymotion-overwin-f)
+    nmap <leader>s <plug>(easymotion-overwin-f2)
+                                            " 跨分屏快速跳转到字母，
+    nmap <leader>j <plug>(easymotion-j)
+    nmap <leader>k <plug>(easymotion-k)
+    nmap <leader>ww <plug>(easymotion-w)
+    nmap <leader>W <plug>(easymotion-W)
+    nmap <leader>b <plug>(easymotion-b)
+    nmap <leader>B <plug>(easymotion-B)
+    nmap <leader>e <plug>(easymotion-e)
+    nmap <leader>E <plug>(easymotion-E)
+    nmap <leader>ge <plug>(easymotion-ge)
+    nmap <leader>gE <plug>(easymotion-gE)
+"}
 
 
+" ctrl-space{
+    Plugin 'vim-ctrlspace/vim-ctrlspace'
+    set nocompatible
+    set hidden
+    "let g:CtrlSpaceLoadLastWorkspaceOnStart = 1     " automatically saving worksapce
+    "let g:CtrlSpaceSaveWorkspaceOnSwitch = 1
+    "let g:CtrlSpaceSaveWorkspaceOnExit = 1
+"}
+
+
+" session{
 " 会话保存
-Plugin 'xolox/vim-misc'
-Plugin 'xolox/vim-session'
-let g:session_autosave='no'             " 自动保存会话窗口
-let g:session_autoload='yes'            " 直接打开vim，自动加载default.vim
-noremap <leader>q :SaveSession!<CR>:qa<CR>
-                                        " 关闭所有，且先保存会话
-nnoremap <C-o> :OpenSession<CR>         " 打开会话 
-                                        " vim --servename session.vim，也可以打开
+    Plugin 'xolox/vim-misc'
+    Plugin 'xolox/vim-session'
+    let g:session_autosave='no'             " 自动保存会话窗口
+    let g:session_autoload='yes'            " 直接打开vim，自动加载default.vim
+    noremap <leader>q :SaveSession!<CR>:qa<CR>
+                                            " 关闭所有，且先保存会话
+    nnoremap <C-o> :OpenSession<CR>         " 打开会话 
+                                            " vim --servename session.vim，也可以打开
+"}
 
 
+" indent-line{
 " 显示缩进标识
-Plugin 'Yggdroot/indentLine'			
-"let g:indentLine_char = '|'            " 设置标识符样式
-let g:indentLinet_color_term=200        " 设置标识符颜色
-noremap <C-\> :IndentLinesToggle<CR>
-inoremap <C-\> <esc>:IndentLinesToggle<CR>
+    Plugin 'Yggdroot/indentLine'			
+    "let g:indentLine_char = '|'            " 设置标识符样式
+    let g:indentLinet_color_term=200        " 设置标识符颜色
+    noremap <C-\> :IndentLinesToggle<CR>
+    inoremap <C-\> <esc>:IndentLinesToggle<CR>
+"}
 
 
+" air-line{
 " 状态栏美观
-Plugin 'Lokaltog/vim-powerline'		
-let g:Powerline_symbols = 'fancy'
+    Plugin 'vim-airline/vim-airline'
+    set laststatus=2
+"}
 
 
 " 快速插入自定义的代码片段
 "Plugin 'SirVer/ultisnips'				
-
-" 静态语法及风格检查,支持多种语言,  ycm已经有了此功能
-"Plugin 'scrooloose/syntastic'			
 
 
 call vundle#end()            " required
