@@ -83,6 +83,8 @@ flags = [
 
 # user define
 '-isystem',
+'/usr/include',
+'-isystem',
 '/usr/include/c++/5',
 
 '-isystem',

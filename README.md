@@ -3,13 +3,12 @@
 # LinuxConfigs
  - 管理Linux的一些配置文件，包括Msys2中的配置文件
  - Author : yehuohan
- - E-mail : <550034086@qq.com>, <yehuohan@gmail.com>
- - Git    : <github.com>, <git.oschina.net>
+ - E-mail : 550034086@qq.com, yehuohan@gmail.com
+ - Git    : [github](github.com), [oschina](git.oschina.net)
 
 
 ---
 # TODO
- - linux改变窗口大小时，内容未重新排布，airline的影响
  - 尝试新字体
 
 ---
@@ -28,6 +27,9 @@
  
 ---
 # Log
+## 20170504
+ - ycm添加linux下的/usr/include路径
+
 ## 20170504
  - 添加注释snippets
  - 设置C-n/m用于补全上下选择，Tab用于选择snippets补全，C-o/p用于snippets位置补全移动
