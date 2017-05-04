@@ -24,6 +24,7 @@
 "}
 
 
+
 "===============================================================================
 " Platform
 "===============================================================================
@@ -35,13 +36,14 @@ silent function! IsWin()
 endfunction
 
 
+
 "===============================================================================
 " settings 
 "===============================================================================
 " UI{
 set nocompatible				    " 不兼容vi快捷键
 syntax on							" 语法高亮
-colorscheme slate                   " 使用主题
+colorscheme new-railscasts          " 使用主题
 set number							" 显示行号
 set cursorline						" 高亮当前行
 set cursorcolumn					" 高亮当前列
@@ -74,15 +76,24 @@ set nobackup                        " 不生成备份文件
 set autochdir						" 自动切换当前目录为当前文件所在的目录
 set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
                                     " 尝试解码序列
+set encoding=utf-8                   " vim内部使用utf-8编码
 set ignorecase                      " 不区别大小写搜索
 set smartcase                       " 有大写字母时才区别大小写搜索
 set noerrorbells                    " 关闭错误信息响铃
+if IsWin()
+    let $HOME=$VIM                  " windows下将HOME设置VIM的安装路径
+    exec "cd $HOME" 
+    " 未打开文件时，切换到HOME目录
+endif
+if IsLinux()
+    let $MyVimPath="~/.vim"         " vim插件路径
+elseif IsWin()
+    let $MyVimPath=$VIM."\\vimfiles"
+endif
 "}
 
 " Vim-Gui{
 if has("gui_running")
-    set encoding=utf8               " vim内部使用utf-8编码
-    colorscheme koehler 			" 设定配色方案
     set guioptions-=m               " 隐藏菜单栏
     set guioptions-=T               " 隐藏工具栏
     set guioptions+=L               " 隐藏左侧滚动条
@@ -92,10 +103,8 @@ if has("gui_running")
 
 if IsLinux()
     set guifont=Courier\ 10\ Pitch\ 11	
-                                    " 设置字体
 elseif IsWin()
-    set encoding=gbk                " vim内部使用utf-8编码
-    set guifont=Courier_New:h12	    " 设置字体
+    set guifont=Courier_10_Pitch:h12
     map <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
                                     " gvim全屏快捷键
 endif
@@ -240,19 +249,13 @@ noremap <C-l> gt
 " - 安键map写在每个Plugin的最后
 "===============================================================================
 
-if IsLinux()
-    let $MyVimPath="~/.vim"
-elseif IsWin()
-    let $MyVimPath=$VIM."\\vimfiles"
-endif
-
 set nocompatible						" be iMproved, required
 filetype off							" required
 
 set rtp+=$MyVimPath/bundle/Vundle.vim/  " set the runtime path to include Vundle and initialize
 call vundle#begin($MyVimPath."/bundle")	" alternatively, pass a path where Vundle should install plugins
-										" call vundle#begin('~/some/path/here')设置插件安装路径
-
+                                        " call vundle#begin('~/some/path/here')
+                                        " 设置插件安装路径
 " user plugins 
 Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
@@ -334,12 +337,20 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 
 " ctrl-space{
+    " <h,o,l,w,b,/,?> for buffer,file,tab,workspace,bookmark,search and help
     Plugin 'vim-ctrlspace/vim-ctrlspace'
     set nocompatible
     set hidden
-    "let g:CtrlSpaceLoadLastWorkspaceOnStart = 1     " automatically saving worksapce
-    "let g:CtrlSpaceSaveWorkspaceOnSwitch = 1
-    "let g:CtrlSpaceSaveWorkspaceOnExit = 1
+    let g:CtrlSpaceSetDefaultMapping = 1
+    let g:CtrlSpaceDefaultMappingKey = "<C-Space>"      " 使用默认Map按键
+    let g:CtrlSpaceProjectRootMarkers = [
+         \ ".git", ".sln", ".pro",
+         \".hg", ".svn", ".bzr", "_darcs", "CVS"]       " Project root markers
+    " 更改配色
+    hi link CtrlSpaceNormal   Special
+    hi link CtrlSpaceSelected Title
+    hi link CtrlSpaceSearch   Search
+    hi link CtrlSpaceStatus   StatusLine
 "}
 
 
@@ -370,7 +381,13 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 " 状态栏美观
     Plugin 'vim-airline/vim-airline'
     set laststatus=2
+    let g:airline#extensions#ctrlspace#enabled = 1      " support for ctrlspace integration
+    let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()" 
+    let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
+    let g:airline#extensions#ycm#error_symbol = 'E:'
+    let g:airline#extensions#ycm#warning_symbol = 'W:'
 "}
+
 
 
 " 快速插入自定义的代码片段
