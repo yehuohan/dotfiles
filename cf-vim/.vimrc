@@ -171,8 +171,8 @@ nnoremap <leader>i" viwxi"<esc>pa"<esc>
 nnoremap <leader>i' viwxi'<esc>pa'<esc>
 
 " 滚动
-nnoremap <C-k> <C-y>
 nnoremap <C-j> <C-e>
+nnoremap <C-k> <C-y>
 
 " tab页选择
 noremap <C-h> gT
@@ -252,6 +252,7 @@ noremap <C-l> gt
 set nocompatible						" be iMproved, required
 filetype off							" required
 
+set rtp+=$MyVimPath                     " add .vim or vimfiles to runtime path
 set rtp+=$MyVimPath/bundle/Vundle.vim/  " set the runtime path to include Vundle and initialize
 call vundle#begin($MyVimPath."/bundle")	" alternatively, pass a path where Vundle should install plugins
                                         " call vundle#begin('~/some/path/here')
@@ -295,9 +296,26 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     "   install.py --clang-completer --msvc 14 --build-dir <dir>
     "   自己指定vs版本，自己指定build路径
     Plugin 'Valloric/YouCompleteMe'			
-    let g:ycm_global_ycm_extra_conf=$MyVimPath.'/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
+    let g:ycm_global_ycm_extra_conf=$MyVimPath.'/.ycm_extra_conf.py'
+    let g:ycm_seed_identifiers_with_syntax = 1  " 开启语法关键字补全
+    let g:ycm_warning_symbol = 'W:'             " warning符号
+    let g:ycm_error_symbol = 'E:'               " error符号
+    let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+    let g:ycm_key_list_previous_completion = ['<C-m>', '<Up>']
     nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
-    nmap <F4> :YcmDiags<CR>                 " 错误列表
+    nmap <F4> :YcmDiags<CR>                     " 错误列表
+"}
+
+
+" ultisnips{
+" 快速插入自定义的代码片段
+    Plugin 'SirVer/ultisnips'				" snippet insert engine
+    Plugin 'honza/vim-snippets'             " snippet collection
+    let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
+                                            " mySnippets is my own snippets colletrion
+    let g:UltiSnipsExpandTrigger="<tab>"
+    let g:UltiSnipsJumpForwardTrigger="<C-o>"
+    let g:UltiSnipsJumpBackwardTrigger="<C-p>"
 "}
 
 
@@ -362,8 +380,6 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     let g:session_autoload='yes'            " 直接打开vim，自动加载default.vim
     noremap <leader>q :SaveSession!<CR>:qa<CR>
                                             " 关闭所有，且先保存会话
-    nnoremap <C-o> :OpenSession<CR>         " 打开会话 
-                                            " vim --servename session.vim，也可以打开
 "}
 
 
@@ -387,11 +403,6 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     let g:airline#extensions#ycm#error_symbol = 'E:'
     let g:airline#extensions#ycm#warning_symbol = 'W:'
 "}
-
-
-
-" 快速插入自定义的代码片段
-"Plugin 'SirVer/ultisnips'				
 
 
 call vundle#end()            " required

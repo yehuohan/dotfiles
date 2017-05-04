@@ -81,10 +81,18 @@ flags = [
 '-isystem',
 './tests/gmock/include',
 
-##############
-# user include
-'-I',
+# user define
+'-isystem',
 '/usr/include/c++/5',
+
+'-isystem',
+'C:/MyApps/msys64/mingw64/include',
+'-isystem',
+'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include',
+'-isystem',
+'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include/ssp',
+'-isystem',
+'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include/c++',
 ]
 
 

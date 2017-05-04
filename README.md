@@ -11,7 +11,6 @@
 # TODO
  - linux改变窗口大小时，内容未重新排布，airline的影响
  - 尝试新字体
- - ycm添加库路径
 
 ---
 # Files
@@ -29,6 +28,13 @@
  
 ---
 # Log
+## 20170504
+ - 添加注释snippets
+ - 设置C-n/m用于补全上下选择，Tab用于选择snippets补全，C-o/p用于snippets位置补全移动
+ - 添加ultisnips和snippets插件，同时将自定义mySnippets添加到仓库
+ - YCM添加mingw头文件库
+ - YCM设置error和warning提示符
+ 
 ## 20170504
  - 添加Courier 10 Pitch字体到仓库
  - 改用new-railscasts theme，改用Courier 10 Pitch字体
