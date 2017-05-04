@@ -28,6 +28,7 @@
 ---
 # Log
 ## 20170504
+ - 完善注释snippet
  - ycm添加linux下的/usr/include路径
 
 ## 20170504
