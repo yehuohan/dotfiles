@@ -28,6 +28,11 @@
 ---
 # Log
 ## 20170505
+ - wrap映射改成leader-wn/wo
+ - 添加visual block的surronding映射
+ - 大小写toggle改成用leader-u
+
+## 20170505
  - mintty改用Courier 10 Picth字体
 
 ## 20170504

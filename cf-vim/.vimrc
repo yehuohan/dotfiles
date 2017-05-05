@@ -122,6 +122,7 @@ endif
 " - 尽量不需要一只手同时按两个键
 " - 建议调换Esc和CapsLock键
 "===============================================================================
+
 " 使用Space作为leader
 " Space只在Normal或Command或Visual模式下map，不适在Insert模式下map
 let mapleader="\<space>"            
@@ -135,24 +136,17 @@ vnoremap ; :
 nnoremap <leader>a A
 nnoremap <leader>o O
 
-" wrap
-nnoremap <leader>nw :set nowrap<CR>
-nnoremap <C-w> :set wrap<CR>
-
 " 大小写转换
-nnoremap <leader>` ~
-vnoremap <leader>` ~
+nnoremap <leader>u ~
+vnoremap <leader>u ~
 
-" 定位
-nnoremap <leader>4 $
-nnoremap <leader>6 ^
-nnoremap <leader>5 %
-
-" 折叠
+" wrap and fold
+nnoremap <leader>wn :set nowrap<CR>
+nnoremap <leader>wo :set wrap<CR>
 nnoremap <leader>zr zR
 nnoremap <leader>zm zM
 
-" 复制相关快捷键
+" copy
 vnoremap <C-c> "+y
 nnoremap <C-v> "+p
 inoremap <C-v> <esc>"+pi
@@ -162,21 +156,33 @@ nnoremap <leader>p "0p
 nnoremap <leader>v viw
 nnoremap vv <C-v>
 
-" i:insert,在单词两边添加抱号等
-nnoremap <leader>i( viwxi(<esc>pa)<esc>     
-nnoremap <leader>i< viwxi<<esc>pa><esc>
-nnoremap <leader>i[ viwxi[<esc>pa]<esc>
-nnoremap <leader>i{ viwxi{<esc>pa}<esc>
-nnoremap <leader>i" viwxi"<esc>pa"<esc>
-nnoremap <leader>i' viwxi'<esc>pa'<esc>
-
-" 滚动
-nnoremap <C-j> <C-e>
-nnoremap <C-k> <C-y>
-
 " tab页选择
 noremap <C-h> gT
 noremap <C-l> gt
+
+" move and goto
+nnoremap <leader>4 $
+nnoremap <leader>6 ^
+nnoremap <leader>5 %
+nnoremap <C-j> <C-e>
+nnoremap <C-k> <C-y>
+
+" surrounding with words{
+    nnoremap <leader>i( viwxi(<esc>pa)<esc>     
+    nnoremap <leader>i< viwxi<<esc>pa><esc>
+    nnoremap <leader>i[ viwxi[<esc>pa]<esc>
+    nnoremap <leader>i{ viwxi{<esc>pa}<esc>
+    nnoremap <leader>i" viwxi"<esc>pa"<esc>
+    nnoremap <leader>i' viwxi'<esc>pa'<esc>
+    nnoremap <leader>i/ viwxi/*<esc>pa*/<esc>
+    vnoremap <leader>i( xi(<esc>pa)<esc>     
+    vnoremap <leader>i< xi<<esc>pa><esc>
+    vnoremap <leader>i[ xi[<esc>pa]<esc>
+    vnoremap <leader>i{ xi{<esc>pa}<esc>
+    vnoremap <leader>i" xi"<esc>pa"<esc>
+    vnoremap <leader>i' xi'<esc>pa'<esc>
+    nnoremap <leader>i/ xi/*<esc>pa*/<esc>
+"}
 
 " split map{
     " 分割窗口
