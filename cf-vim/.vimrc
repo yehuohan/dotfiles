@@ -96,10 +96,10 @@ endif
 if has("gui_running")
     set guioptions-=m               " 隐藏菜单栏
     set guioptions-=T               " 隐藏工具栏
-    set guioptions+=L               " 隐藏左侧滚动条
-    set guioptions+=r               " 隐藏右侧滚动条
-    set guioptions+=b               " 隐藏底部滚动条
-    set guioptions+=0               " 隐藏Tab栏
+    set guioptions-=L               " 隐藏左侧滚动条
+    set guioptions-=r               " 隐藏右侧滚动条
+    set guioptions-=b               " 隐藏底部滚动条
+    set guioptions+=0               " 不隐藏Tab栏
 
 if IsLinux()
     set guifont=Courier\ 10\ Pitch\ 11	
@@ -334,6 +334,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 " tabular{
 " 代码对齐
+    " /:/r2 means align right and insert 2 space before next field
     Plugin 'godlygeek/tabular'
     vnoremap <leader>a :Tabularize /
 "}
