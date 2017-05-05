@@ -27,6 +27,9 @@
  
 ---
 # Log
+## 20170505
+ - mintty改用Courier 10 Picth字体
+
 ## 20170504
  - 完善注释snippet
  - ycm添加linux下的/usr/include路径
