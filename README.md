@@ -27,6 +27,10 @@
  
 ---
 # Log
+## 20170505 - v1.0.0
+ - release v1.0.0，方便对应commit和Log
+ - gvim高亮行和列背景改成black
+
 ## 20170505
  - wrap映射改成leader-wn/wo
  - 添加visual block的surronding映射

@@ -47,8 +47,8 @@ colorscheme new-railscasts          " 使用主题
 set number							" 显示行号
 set cursorline						" 高亮当前行
 set cursorcolumn					" 高亮当前列
-hi CursorLine 	 cterm=NONE ctermbg=black ctermfg=gray guibg=NONE guifg=NONE
-hi CursorColumn  cterm=NONE ctermbg=black ctermfg=gray guibg=NONE guifg=NONE
+hi CursorLine 	 cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
+hi CursorColumn  cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
 									" 设定高亮行列的颜色
 									" cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
 set hlsearch						" 设置高亮显示查找到的文本
