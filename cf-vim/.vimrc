@@ -104,7 +104,7 @@ if has("gui_running")
 if IsLinux()
     set guifont=Courier\ 10\ Pitch\ 11	
 elseif IsWin()
-    set guifont=Courier_10_Pitch:h12
+    set guifont=cousine:h12
     map <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
                                     " gvim全屏快捷键
 endif
