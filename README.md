@@ -27,7 +27,10 @@
  
 ---
 # Log
-## 201705058 - v1.0.5
+## 20170508 - v1.0.6
+ - win下gvim的cousine字体大小改为h11
+
+## 20170508 - v1.0.5
  - 修复多行block surrounding问题
  - highlight search的guifg改成white
  - nerdcommenter注释后添加space
