@@ -27,6 +27,11 @@
  
 ---
 # Log
+## 201705058 - v1.0.5
+ - 修复多行block surrounding问题
+ - highlight search的guifg改成white
+ - nerdcommenter注释后添加space
+ 
 ## 20170507 - v1.0.2
  - Win下gvim使用cousine字体
 

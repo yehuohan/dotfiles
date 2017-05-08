@@ -47,8 +47,9 @@ colorscheme new-railscasts          " 使用主题
 set number							" 显示行号
 set cursorline						" 高亮当前行
 set cursorcolumn					" 高亮当前列
-hi CursorLine 	 cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
-hi CursorColumn  cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
+hi CursorLine   cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
+hi CursorColumn cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
+hi Search       term=reverse ctermfg=236 guifg=white guibg=#072f95
 									" 设定高亮行列的颜色
 									" cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
 set hlsearch						" 设置高亮显示查找到的文本
@@ -175,13 +176,13 @@ nnoremap <C-k> <C-y>
     nnoremap <leader>i" viwxi"<esc>pa"<esc>
     nnoremap <leader>i' viwxi'<esc>pa'<esc>
     nnoremap <leader>i/ viwxi/*<esc>pa*/<esc>
-    vnoremap <leader>i( xi(<esc>pa)<esc>     
-    vnoremap <leader>i< xi<<esc>pa><esc>
-    vnoremap <leader>i[ xi[<esc>pa]<esc>
-    vnoremap <leader>i{ xi{<esc>pa}<esc>
-    vnoremap <leader>i" xi"<esc>pa"<esc>
-    vnoremap <leader>i' xi'<esc>pa'<esc>
-    nnoremap <leader>i/ xi/*<esc>pa*/<esc>
+    vnoremap <leader>i( xi()<esc>hp<esc>     
+    vnoremap <leader>i< xi<><esc>hp<esc>
+    vnoremap <leader>i[ xi[]<esc>hp<esc>
+    vnoremap <leader>i{ xi{}<esc>hp<esc>
+    vnoremap <leader>i" xi""<esc>hp<esc>
+    vnoremap <leader>i' xi''<esc>hp<esc>
+    vnoremap <leader>i/ xi/**/<esc>hhp<esc>
 "}
 
 " split map{
@@ -327,8 +328,11 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 "nerd-commenter{
 " 快速批量加减注释
-    " <leader>cc for comment and <leader>cu for un-comment
+    " <leader>cc for comment
+    " <leader>cl/cb for comment aligned
+    " <leader>cu for un-comment
     Plugin 'scrooloose/nerdcommenter'
+    let g:NERDSpaceDelims = 1               " add space after comment
 "}
 
 
