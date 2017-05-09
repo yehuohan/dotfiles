@@ -83,7 +83,7 @@ set smartcase                       " 有大写字母时才区别大小写搜索
 set noerrorbells                    " 关闭错误信息响铃
 if IsWin()
     let $HOME=$VIM                  " windows下将HOME设置VIM的安装路径
-    exec "cd $HOME" 
+    execute "cd $HOME" 
     " 未打开文件时，切换到HOME目录
 endif
 if IsLinux()
@@ -208,18 +208,20 @@ nnoremap <C-k> <C-y>
     nnoremap <C-right> <esc>:vertical resize+1<CR>
 "}
 
-" vimgrep{
+" find and search{
     " 搜索(find)
     nnoremap <leader>3 #
     nnoremap <leader>8 *
-    "nnoremap <leader>/ :call FindAndShow()<CR>
-    function! FindAndShow()
-        let l:str=input('/')
-        exec "vimgrep /\\<".l:str."\\>/j %"
-        copen
-    endfunction
-    nnoremap <leader>/ :exec"let g:__str__=input('/')"<bar>exec "vimgrep /\\<".g:__str__."\\>/j %"<bar>copen<CR>
-    nnoremap <leader>f :exec"let g:__str__=expand(\"<cword>\")"<bar>exec "vimgrep /\\<".g:__str__."\\>/j %"<bar>copen<CR>
+
+    " /\<the\> : can match chars in "for the vim", but can not match chars in "there"
+    " /the     : can match chars in "for the vim" and also in "there"
+    " search selected
+    vnoremap / "9y<bar>:execute"let g:__str__=getreg('9')"<bar>execute"/" . g:__str__<CR>
+
+    " vimgrep
+    nnoremap <leader>/ :execute"let g:__str__=input('/')"<bar>execute "vimgrep /" . g:__str__ . "/j %"<bar>copen<CR>
+    nnoremap <leader>f :execute"let g:__str__=expand(\"<cword>\")"<bar>execute "vimgrep /\\<" . g:__str__ . "\\>/j %"<bar>copen<CR>
+    vnoremap <leader>f "9y<bar>:execute"let g:__str__=getreg('9')"<bar>execute "vimgrep /" . g:__str__ . "/j %"<bar>copen<CR>
 "}
 
 " F5 map{
@@ -238,13 +240,13 @@ nnoremap <C-k> <C-y>
         exec "cd %:h"
         if "c" == l:ext
             " c
-            exec "!gcc -o ".l:name." ".l:filename." && ".l:name
+            execute "!gcc -o ".l:name." ".l:filename." && ".l:name
         elseif "cpp" == l:ext
             " c++
-            exec "!g++ -o ".l:name." ".l:filename." && ".l:name
+            execute "!g++ -o ".l:name." ".l:filename." && ".l:name
         elseif "py" == l:ext
             " python
-            exec "!python ".l:filename
+            execute "!python ".l:filename
         endif
     endfunction
 "}
