@@ -49,7 +49,6 @@ set cursorline						" 高亮当前行
 set cursorcolumn					" 高亮当前列
 hi CursorLine   cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
 hi CursorColumn cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
-hi Search       term=reverse ctermfg=236 guifg=white guibg=#072f95
 									" 设定高亮行列的颜色
 									" cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
 set hlsearch						" 设置高亮显示查找到的文本
@@ -95,6 +94,7 @@ endif
 
 " Vim-Gui{
 if has("gui_running")
+    hi Search term=reverse ctermfg=236 guifg=white guibg=#072f95
     set guioptions-=m               " 隐藏菜单栏
     set guioptions-=T               " 隐藏工具栏
     set guioptions-=L               " 隐藏左侧滚动条
@@ -351,6 +351,9 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     vnoremap <leader>a :Tabularize /
 "}
 
+" surround{
+    Plugin 'tpope/vim-surround'
+"}
 
 " easy-motion{
 " 快速跳转

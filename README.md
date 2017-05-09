@@ -27,6 +27,10 @@
  
 ---
 # Log
+## 20170509 - v1.0.14
+ - highlight search的guifg只在gvim环境下改
+ - 添加vim-surround插件
+
 ## 20170509 - v1.0.12
  - 添加buffer switch相关映射(leader-bn/bp/bl)
  - easy-motion原来的leader-b改成leader-bb映射
