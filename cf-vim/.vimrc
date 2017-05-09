@@ -1,6 +1,6 @@
 
 "===============================================================================
-" My Notes
+" My Notes(:help is better)
 "===============================================================================
 " [*]带python编译 {
 " 	使用MinGw-x64，更改.mak文件：
@@ -348,11 +348,23 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 " 代码对齐
     " /:/r2 means align right and insert 2 space before next field
     Plugin 'godlygeek/tabular'
+    " align map
     vnoremap <leader>a :Tabularize /
 "}
 
-" surround{
+" surround and repeat{
     Plugin 'tpope/vim-surround'
+    Plugin 'tpope/vim-repeat'
+    " simplify the map to 2 operation
+    nmap yi ysw
+    nmap yw ysiw
+    nmap yl yss
+    nmap yL ySS
+    
+    " surround selected text in visual mode
+    vmap s S
+    vmap <leader>s gS
+
 "}
 
 " easy-motion{

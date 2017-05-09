@@ -27,6 +27,10 @@
  
 ---
 # Log
+## 20170510 - v1.0.16
+ - 简化vim-surround的map
+ - 添加vim-repeat插件
+
 ## 20170509 - v1.0.14
  - highlight search的guifg只在gvim环境下改
  - 添加vim-surround插件
