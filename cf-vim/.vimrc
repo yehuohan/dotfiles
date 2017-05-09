@@ -120,7 +120,7 @@ endif
 " - 尽量不用ctrl,shift,alt，用<leader><leader>代替ctrl,shift或alt
 " - Normal模式下使用<leader>代替<C-?>,<S-?>,<A-?>，
 " - Insert模式下map带ctrl,shift,alt的快捷键
-" - 尽量不改变vim原有键位的功能
+" - 尽量不改变vim原有键位的功能定义
 " - 尽量不需要一只手同时按两个键
 " - 建议调换Esc和CapsLock键
 "===============================================================================
@@ -158,9 +158,14 @@ nnoremap <leader>p "0p
 nnoremap <leader>v viw
 nnoremap vv <C-v>
 
-" tab页选择
+" tab switch
 noremap <C-h> gT
 noremap <C-l> gt
+
+" buffer switch
+nnoremap <leader>bn :bn<CR>
+nnoremap <leader>bp :bp<CR>
+nnoremap <leader>bl :b#<CR>
 
 " move and goto
 nnoremap <leader>4 $
@@ -359,7 +364,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     nmap <leader>k <plug>(easymotion-k)
     nmap <leader>ww <plug>(easymotion-w)
     nmap <leader>W <plug>(easymotion-W)
-    nmap <leader>b <plug>(easymotion-b)
+    nmap <leader>bb <plug>(easymotion-b)
     nmap <leader>B <plug>(easymotion-B)
     nmap <leader>e <plug>(easymotion-e)
     nmap <leader>E <plug>(easymotion-E)

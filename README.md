@@ -27,6 +27,10 @@
  
 ---
 # Log
+## 20170509 - v1.0.12
+ - 添加buffer switch相关映射(leader-bn/bp/bl)
+ - easy-motion原来的leader-b改成leader-bb映射
+
 ## 20170509 - v1.0.10
  - 添加vmap / : 查找选择的字符串，所选字符串不能含有转义符
  - 添加vmap leader-f : 使用vimgrep查找所选字符串，所选字符串不能含有转义符
