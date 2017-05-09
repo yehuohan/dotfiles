@@ -68,7 +68,7 @@ set tabstop=4						" 设置tab键宽4个空格
 set expandtab						" 将Tab用Space代替，方便显示缩进标识indentLine
 set softtabstop=4					" 设置显示的缩进为4,实际Tab可能不是4个格
 set shiftwidth=4					" 设置>和<命令移动宽度为4
-set wrap                            " 默认开启折行 
+set nowrap                          " 默认半闭折行 
 "}
 
 " Edit{
