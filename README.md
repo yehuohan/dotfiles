@@ -27,6 +27,9 @@
  
 ---
 # Log
+## 20170510 - v1.0.17
+ - 将vmap leader-f改成使用vmap leader-/来vimgrep选择的字符串
+
 ## 20170510 - v1.0.16
  - 简化vim-surround的map
  - 添加vim-repeat插件
