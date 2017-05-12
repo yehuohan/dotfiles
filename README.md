@@ -27,6 +27,9 @@
  
 ---
 # Log
+## 20170512 - v1.0.18
+ - 修改c/c++ comment block snippet
+
 ## 20170510 - v1.0.17
  - 将vmap leader-f改成使用vmap leader-/来vimgrep选择的字符串
 
