@@ -27,6 +27,11 @@
  
 ---
 # Log
+## 20170513 - v1.1.21
+ - 添加smooth-scroll插件，平滑屏幕滚动效果
+ - 添加incsearch插件，并配置相应的搜索映射按键，强化查找功能
+ - 修改search在cterm下的背景与前景
+
 ## 20170512 - v1.0.18
  - 修改c/c++ comment block snippet
 

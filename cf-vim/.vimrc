@@ -49,6 +49,7 @@ set cursorline						" 高亮当前行
 set cursorcolumn					" 高亮当前列
 hi CursorLine   cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
 hi CursorColumn cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
+hi Search term=reverse ctermfg=white ctermbg=blue guifg=white guibg=#072f95
 									" 设定高亮行列的颜色
 									" cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
 set hlsearch						" 设置高亮显示查找到的文本
@@ -94,7 +95,6 @@ endif
 
 " Vim-Gui{
 if has("gui_running")
-    hi Search term=reverse ctermfg=236 guifg=white guibg=#072f95
     set guioptions-=m               " 隐藏菜单栏
     set guioptions-=T               " 隐藏工具栏
     set guioptions-=L               " 隐藏左侧滚动条
@@ -158,21 +158,20 @@ nnoremap <leader>p "0p
 nnoremap <leader>v viw
 nnoremap vv <C-v>
 
-" tab switch
-noremap <C-h> gT
-noremap <C-l> gt
-
-" buffer switch
-nnoremap <leader>bn :bn<CR>
-nnoremap <leader>bp :bp<CR>
-nnoremap <leader>bl :b#<CR>
-
 " move and goto
 nnoremap <leader>4 $
 nnoremap <leader>6 ^
 nnoremap <leader>5 %
 nnoremap <C-j> <C-e>
 nnoremap <C-k> <C-y>
+
+" tab and buffer switch{
+    noremap <C-h> gT
+    noremap <C-l> gt
+    nnoremap <leader>bn :bn<CR>
+    nnoremap <leader>bp :bp<CR>
+    nnoremap <leader>bl :b#<CR>
+"}
 
 " surrounding with words{
     nnoremap <leader>i( viwxi(<esc>pa)<esc>     
@@ -215,8 +214,6 @@ nnoremap <C-k> <C-y>
 
 " find and search{
     " 搜索(find)
-    nnoremap <leader>3 #
-    nnoremap <leader>8 *
 
     " /\<the\> : can match chars in "for the vim", but can not match chars in "there"
     " /the     : can match chars in "for the vim" and also in "there"
@@ -275,17 +272,15 @@ call vundle#begin($MyVimPath."/bundle")	" alternatively, pass a path where Vundl
 " user plugins 
 Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
-
 " nerd-tree{
-" 目录树导航
+    " 目录树导航
     Plugin 'scrooloose/nerdtree'			
     noremap <C-e> :NERDTreeToggle<CR>
     inoremap <C-e> <esc>:NERDTreeToggle<CR> " :NERDTree 命令可以打开目录树
 "}
 
-
 " taglist{
-" 代码结构预览
+    " 代码结构预览
     Plugin 'vim-scripts/taglist.vim'
     if IsLinux()
         let Tlist_Ctags_Cmd='/usr/bin/ctags'
@@ -300,9 +295,8 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     inoremap <C-T> <esc>:TlistToggle<CR>
 "}
 
-
 " YouCompleteMe{
-" 自动补全
+    " 自动补全
     " Linux: 
     "   install python-dev, python3-dev, cmake
     "   ./install.py --clang-completer
@@ -321,9 +315,8 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     nmap <F4> :YcmDiags<CR>                     " 错误列表
 "}
 
-
 " ultisnips{
-" 快速插入自定义的代码片段
+    " 代码片段插入
     Plugin 'SirVer/ultisnips'				" snippet insert engine
     Plugin 'honza/vim-snippets'             " snippet collection
     let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
@@ -333,9 +326,8 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     let g:UltiSnipsJumpBackwardTrigger="<C-p>"
 "}
 
-
 "nerd-commenter{
-" 快速批量加减注释
+    " 批量注释
     " <leader>cc for comment
     " <leader>cl/cb for comment aligned
     " <leader>cu for un-comment
@@ -343,9 +335,8 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     let g:NERDSpaceDelims = 1               " add space after comment
 "}
 
-
 " tabular{
-" 代码对齐
+    " 代码对齐
     " /:/r2 means align right and insert 2 space before next field
     Plugin 'godlygeek/tabular'
     " align map
@@ -353,6 +344,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 "}
 
 " surround and repeat{
+    " add surroundings
     Plugin 'tpope/vim-surround'
     Plugin 'tpope/vim-repeat'
     " simplify the map to 2 operation
@@ -364,11 +356,10 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     " surround selected text in visual mode
     vmap s S
     vmap <leader>s gS
-
 "}
 
 " easy-motion{
-" 快速跳转
+    " 快速跳转
     Plugin 'easymotion/vim-easymotion'
     let g:EasyMotion_do_mapping = 0         " 禁止默认map
     let g:EasyMotion_smartcase = 1          " 不区分大小写
@@ -387,8 +378,8 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     nmap <leader>gE <plug>(easymotion-gE)
 "}
 
-
 " ctrl-space{
+    " buffer管理
     " <h,o,l,w,b,/,?> for buffer,file,tab,workspace,bookmark,search and help
     Plugin 'vim-ctrlspace/vim-ctrlspace'
     set nocompatible
@@ -405,9 +396,44 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     hi link CtrlSpaceStatus   StatusLine
 "}
 
+" incsearch{
+    " 查找增强
+    Plugin 'haya14busa/incsearch.vim'
+    Plugin 'haya14busa/incsearch-fuzzy.vim'
+
+    let g:incsearch#auto_nohlsearch = 1
+    xmap <tab> <Over>(incsearch-next) 
+    xmap <S-tab> <Over>(incsearch-prev)
+    xmap <C-j> <Over>(incsearch-scroll-f)
+    xmap <c-k> <Over>(incsearch-scroll-b)
+    nmap /  <Plug>(incsearch-forward)
+    nmap ?  <Plug>(incsearch-backward)
+    nmap g/ <Plug>(incsearch-stay)
+    nmap n  <Plug>(incsearch-nohl-n)
+    nmap N  <Plug>(incsearch-nohl-N)
+    nmap *  <Plug>(incsearch-nohl-*)
+    nmap #  <Plug>(incsearch-nohl-#)
+    nmap <leader>8  <Plug>(incsearch-nohl-*)
+    nmap <leader>3  <Plug>(incsearch-nohl-#)
+    nmap g* <Plug>(incsearch-nohl-g*)
+    nmap g# <Plug>(incsearch-nohl-g#)
+
+    nmap z/ <Plug>(incsearch-fuzzy-/)
+    nmap z? <Plug>(incsearch-fuzzy-?)
+    nmap zg/ <Plug>(incsearch-fuzzy-stay)
+"}
+
+" smooth-scroll{
+    " 平滑滚动
+    Plugin 'terryma/vim-smooth-scroll'
+    noremap <silent> <C-u> :call smooth_scroll#up(&scroll, 0, 2)<CR>
+    noremap <silent> <C-d> :call smooth_scroll#down(&scroll, 0, 2)<CR>
+    noremap <silent> <C-b> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
+    noremap <silent> <C-f> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
+"}
 
 " session{
-" 会话保存
+    " 会话保存
     Plugin 'xolox/vim-misc'
     Plugin 'xolox/vim-session'
     let g:session_autosave='no'             " 自动保存会话窗口
@@ -416,9 +442,8 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
                                             " 关闭所有，且先保存会话
 "}
 
-
 " indent-line{
-" 显示缩进标识
+    " 显示缩进标识
     Plugin 'Yggdroot/indentLine'			
     "let g:indentLine_char = '|'            " 设置标识符样式
     let g:indentLinet_color_term=200        " 设置标识符颜色
@@ -426,9 +451,8 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     inoremap <C-\> <esc>:IndentLinesToggle<CR>
 "}
 
-
 " air-line{
-" 状态栏美观
+    " 状态栏美观
     Plugin 'vim-airline/vim-airline'
     set laststatus=2
     let g:airline#extensions#ctrlspace#enabled = 1      " support for ctrlspace integration
