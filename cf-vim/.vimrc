@@ -277,6 +277,13 @@ call vundle#begin($MyVimPath."/bundle")	" alternatively, pass a path where Vundl
 " user plugins 
 Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
+
+" asd2num {
+    " asd数字输入
+    Plugin 'yehuohan/asd2num'
+    inoremap <C-a> <esc>:Asd2NumToggle<CR>a
+"}
+
 " nerd-tree{
     " 目录树导航
     Plugin 'scrooloose/nerdtree'			

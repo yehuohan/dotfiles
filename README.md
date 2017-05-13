@@ -28,6 +28,9 @@
  
 ---
 # Log
+## 20170513 - v1.5.29
+ - 添加asd2num插件
+
 ## 20170513 - v1.4.28
  - 添加vim-over插件，实现substitute preview
  - 添加fswitch插件，使用leader-fh切换
