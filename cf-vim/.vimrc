@@ -12,15 +12,20 @@
 "}
 "
 " [*]替换字符串{
-"   :n,$s/ar\[i\]/*(ar+i)/g
-"       将第n行到最后一行的所有 ar[i] 替换成 *(ar+)
-"       注意：对于 * . / \ [ ] 需要转义
+"   :%s     - 所有行
+"   :'<,'>s - 所选范圈
+"   :n,$s   - 第n行到最一行
+"   :.,ns   - 当前行到第n行
+"   :'s,'es - 从ms标记到me标记的范围
+"   :s//g   - 替换一行中所有找到的字符串
+"   :s//c   - 替换前要确认
+"
+"   :s/ar\[i\]/*(ar+i)/
+"       ar[i] 替换成 *(ar+)，注意：对于 * . / \ [ ] 需要转义
 "	
-"	:.,30s/ar\[i\]/*(ar+i)/g
-"		将当前行到第30行的所有 ar[i] 替换成 *(ar+)
-"	
-"	:s/"\([A-J]\)"/"Group \1"/g
+"	:s/"\([A-J]\)"/"Group \1"/
 "		将"X" 替换成 "Group X"，其中X可为A-J，\( \)表示后面用\1引用()的内容
+"
 "}
 
 
@@ -41,83 +46,82 @@ endfunction
 " settings 
 "===============================================================================
 " UI{
-set nocompatible				    " 不兼容vi快捷键
-syntax on							" 语法高亮
-colorscheme new-railscasts          " 使用主题
-set number							" 显示行号
-set cursorline						" 高亮当前行
-set cursorcolumn					" 高亮当前列
-hi CursorLine   cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
-hi CursorColumn cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
-hi Search term=reverse ctermfg=white ctermbg=blue guifg=white guibg=#072f95
-									" 设定高亮行列的颜色
-									" cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
-set hlsearch						" 设置高亮显示查找到的文本
-set smartindent						" 新行智能自动缩进
-set foldenable						" 充许折叠
-set foldcolumn=1					" 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
-set foldmethod=indent				" 设置语文折叠
-									" manual:手工定义折叠         
-									" indent:更多的缩进表示更高级别的折叠         
-									" expr:用表达式来定义折叠         
-									" syntax:用语法高亮来定义折叠         
-									" diff:对没有更改的文本进行折叠         
-									" marker:对文中的标志折叠
-set showcmd                         " 显示寄存器命令，宏调用命令@等
-set tabstop=4						" 设置tab键宽4个空格
-set expandtab						" 将Tab用Space代替，方便显示缩进标识indentLine
-set softtabstop=4					" 设置显示的缩进为4,实际Tab可能不是4个格
-set shiftwidth=4					" 设置>和<命令移动宽度为4
-set nowrap                          " 默认半闭折行 
+    set nocompatible				    " 不兼容vi快捷键
+    syntax on							" 语法高亮
+    colorscheme new-railscasts          " 使用主题
+    set number							" 显示行号
+    set cursorline						" 高亮当前行
+    set cursorcolumn					" 高亮当前列
+    hi CursorLine   cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
+    hi CursorColumn cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
+    hi Search term=reverse ctermfg=white ctermbg=blue guifg=white guibg=#072f95
+                                        " 设定高亮行列的颜色
+                                        " cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
+    set hlsearch						" 设置高亮显示查找到的文本
+    set smartindent						" 新行智能自动缩进
+    set foldenable						" 充许折叠
+    set foldcolumn=1					" 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
+    set foldmethod=indent				" 设置语文折叠
+                                        " manual:手工定义折叠         
+                                        " indent:更多的缩进表示更高级别的折叠         
+                                        " expr:用表达式来定义折叠         
+                                        " syntax:用语法高亮来定义折叠         
+                                        " diff:对没有更改的文本进行折叠         
+                                        " marker:对文中的标志折叠
+    set showcmd                         " 显示寄存器命令，宏调用命令@等
+    set tabstop=4						" 设置tab键宽4个空格
+    set expandtab						" 将Tab用Space代替，方便显示缩进标识indentLine
+    set softtabstop=4					" 设置显示的缩进为4,实际Tab可以不是4个格
+    set shiftwidth=4					" 设置>和<命令移动宽度为4
+    set nowrap                          " 默认关闭折行 
 "}
 
 " Edit{
-set bs=2                            " Insert模式下使用BackSpace删除
-set nobackup                        " 不生成备份文件
-set autochdir						" 自动切换当前目录为当前文件所在的目录
-set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
-                                    " 尝试解码序列
-set encoding=utf-8                   " vim内部使用utf-8编码
-set ignorecase                      " 不区别大小写搜索
-set smartcase                       " 有大写字母时才区别大小写搜索
-set noerrorbells                    " 关闭错误信息响铃
-if IsWin()
-    let $HOME=$VIM                  " windows下将HOME设置VIM的安装路径
-    execute "cd $HOME" 
-    " 未打开文件时，切换到HOME目录
-endif
-if IsLinux()
-    let $MyVimPath="~/.vim"         " vim插件路径
-elseif IsWin()
-    let $MyVimPath=$VIM."\\vimfiles"
-endif
+    set bs=2                            " Insert模式下使用BackSpace删除
+    set nobackup                        " 不生成备份文件
+    set autochdir						" 自动切换当前目录为当前文件所在的目录
+    set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
+                                        " 尝试解码序列
+    set encoding=utf-8                   " vim内部使用utf-8编码
+    set ignorecase                      " 不区别大小写搜索
+    set smartcase                       " 有大写字母时才区别大小写搜索
+    set noerrorbells                    " 关闭错误信息响铃
+    if IsWin()
+        let $HOME=$VIM                  " windows下将HOME设置VIM的安装路径
+        execute "cd $HOME" 
+        " 未打开文件时，切换到HOME目录
+    endif
+    if IsLinux()
+        let $MyVimPath="~/.vim"         " vim插件路径
+    elseif IsWin()
+        let $MyVimPath=$VIM."\\vimfiles"
+    endif
 "}
 
 " Vim-Gui{
-if has("gui_running")
-    set guioptions-=m               " 隐藏菜单栏
-    set guioptions-=T               " 隐藏工具栏
-    set guioptions-=L               " 隐藏左侧滚动条
-    set guioptions-=r               " 隐藏右侧滚动条
-    set guioptions-=b               " 隐藏底部滚动条
-    set guioptions+=0               " 不隐藏Tab栏
+    if has("gui_running")
+        set guioptions-=m               " 隐藏菜单栏
+        set guioptions-=T               " 隐藏工具栏
+        set guioptions-=L               " 隐藏左侧滚动条
+        set guioptions-=r               " 隐藏右侧滚动条
+        set guioptions-=b               " 隐藏底部滚动条
+        set guioptions+=0               " 不隐藏Tab栏
 
-if IsLinux()
-    set guifont=Courier\ 10\ Pitch\ 11	
-elseif IsWin()
-    set guifont=cousine:h11
-    "set guifont=Consolas:h12
-    map <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
-                                    " gvim全屏快捷键
-endif
-endif
+    if IsLinux()
+        set guifont=Courier\ 10\ Pitch\ 11	
+    elseif IsWin()
+        set guifont=cousine:h11
+        "set guifont=Consolas:h12
+        map <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
+                                        " gvim全屏快捷键
+    endif
+    endif
 "}
 
 
 
 "===============================================================================
 " KeyMap 
-" - 尽量不用ctrl,shift,alt，用<leader><leader>代替ctrl,shift或alt
 " - Normal模式下使用<leader>代替<C-?>,<S-?>,<A-?>，
 " - Insert模式下map带ctrl,shift,alt的快捷键
 " - 尽量不改变vim原有键位的功能定义
@@ -136,34 +140,36 @@ vnoremap ; :
 
 " 基本插入
 nnoremap <leader>a A
-nnoremap <leader>o O
 
 " 大小写转换
 nnoremap <leader>u ~
 vnoremap <leader>u ~
 
-" wrap and fold
-nnoremap <leader>wn :set nowrap<CR>
-nnoremap <leader>wo :set wrap<CR>
-nnoremap <leader>zr zR
-nnoremap <leader>zm zM
-
-" copy
-vnoremap <C-c> "+y
-nnoremap <C-v> "+p
-inoremap <C-v> <esc>"+pi
-nnoremap <leader>p "0p
-
 " 快速选择和矩形选择
 nnoremap <leader>v viw
 nnoremap vv <C-v>
 
-" move and goto
-nnoremap <leader>4 $
-nnoremap <leader>6 ^
-nnoremap <leader>5 %
-nnoremap <C-j> <C-e>
-nnoremap <C-k> <C-y>
+" wrap and fold{
+    nnoremap <leader>wn :set nowrap<CR>
+    nnoremap <leader>wo :set wrap<CR>
+    nnoremap <leader>zr zR
+    nnoremap <leader>zm zM
+"}
+
+" copy{
+    vnoremap <C-c> "+y
+    nnoremap <C-v> "+p
+    inoremap <C-v> <esc>"+pi
+    nnoremap <leader>p "0p
+"}
+
+" move and goto{
+    nnoremap <S-s> %
+    nnoremap <S-l> $
+    nnoremap <S-h> ^
+    nnoremap <C-j> <C-e>
+    nnoremap <C-k> <C-y>
+"}
 
 " tab and buffer switch{
     noremap <C-h> gT
@@ -190,12 +196,9 @@ nnoremap <C-k> <C-y>
     vnoremap <leader>i/ xi/**/<esc>hhp<esc>
 "}
 
-" split map{
-    " 分割窗口
+" split{
     nnoremap <leader>ws :split<CR>
     nnoremap <leader>wv :vsplit<CR>
-
-    " 移动到别一个分屏窗口
     nnoremap <leader>wh <C-w>h
     nnoremap <leader>wj <C-w>j
     nnoremap <leader>wk <C-w>k
@@ -220,10 +223,12 @@ nnoremap <C-k> <C-y>
     " search selected
     vnoremap / "9y<bar>:execute"let g:__str__=getreg('9')"<bar>execute"/" . g:__str__<CR>
 
-    " vimgrep
+    " vimgrep what input or selected
     nnoremap <leader>/ :execute"let g:__str__=input('/')"<bar>execute "vimgrep /" . g:__str__ . "/j %"<bar>copen<CR>
     vnoremap <leader>/ "9y<bar>:execute"let g:__str__=getreg('9')"<bar>execute "vimgrep /" . g:__str__ . "/j %"<bar>copen<CR>
-    nnoremap <leader>f :execute"let g:__str__=expand(\"<cword>\")"<bar>execute "vimgrep /\\<" . g:__str__ . "\\>/j %"<bar>copen<CR>
+    " find word with vimgrep
+    nnoremap <leader>fw :execute"let g:__str__=expand(\"<cword>\")"<bar>execute "vimgrep /\\<" . g:__str__ . "\\>/j %"<bar>copen<CR>
+
 "}
 
 " F5 map{
@@ -275,8 +280,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 " nerd-tree{
     " 目录树导航
     Plugin 'scrooloose/nerdtree'			
-    noremap <C-e> :NERDTreeToggle<CR>
-    inoremap <C-e> <esc>:NERDTreeToggle<CR> " :NERDTree 命令可以打开目录树
+    noremap <leader>te :NERDTreeToggle<CR>
 "}
 
 " taglist{
@@ -291,8 +295,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     let Tlist_WinWidth = 30                 " 设置taglist的宽度
     let Tlist_Exit_OnlyWindow=1             " 如果taglist窗口是最后一个窗口，则退出vim
     let Tlist_Use_Right_Window=1            " 在右侧窗口中显示taglist窗口
-    noremap <C-T> :TlistToggle<CR>          " 可以 ctags -R 命令自行生成tags
-    inoremap <C-T> <esc>:TlistToggle<CR>
+    noremap <leader>tt :TlistToggle<CR>     " 可以 ctags -R 命令自行生成tags
 "}
 
 " YouCompleteMe{
@@ -326,13 +329,25 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     let g:UltiSnipsJumpBackwardTrigger="<C-p>"
 "}
 
-"nerd-commenter{
+" nerd-commenter{
     " 批量注释
     " <leader>cc for comment
     " <leader>cl/cb for comment aligned
     " <leader>cu for un-comment
     Plugin 'scrooloose/nerdcommenter'
     let g:NERDSpaceDelims = 1               " add space after comment
+"}
+
+" file switch{
+    " 文件切换
+    Plugin 'derekwyatt/vim-fswitch'
+    nnoremap <silent> <leader>fh :FSHere<CR>
+"}
+
+" vim-over {
+    " substitute preview
+    Plugin 'osyo-manga/vim-over'
+    nnoremap <leader>oc :OverCommandLine<CR>
 "}
 
 " tabular{
@@ -347,10 +362,11 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     " add surroundings
     Plugin 'tpope/vim-surround'
     Plugin 'tpope/vim-repeat'
+
     " simplify the map to 2 operation
-    nmap yi ysw
-    nmap yw ysiw
-    nmap yl yss
+    "nmap yi ysw
+    "nmap yw ysiw
+    "nmap yl yss
     nmap yL ySS
     
     " surround selected text in visual mode
@@ -409,6 +425,11 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     nmap /  <Plug>(incsearch-forward)
     nmap ?  <Plug>(incsearch-backward)
     nmap g/ <Plug>(incsearch-stay)
+
+    nmap z/ <Plug>(incsearch-fuzzy-/)
+    nmap z? <Plug>(incsearch-fuzzy-?)
+    nmap zg/ <Plug>(incsearch-fuzzy-stay)
+
     nmap n  <Plug>(incsearch-nohl-n)
     nmap N  <Plug>(incsearch-nohl-N)
     nmap *  <Plug>(incsearch-nohl-*)
@@ -417,10 +438,6 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     nmap <leader>3  <Plug>(incsearch-nohl-#)
     nmap g* <Plug>(incsearch-nohl-g*)
     nmap g# <Plug>(incsearch-nohl-g#)
-
-    nmap z/ <Plug>(incsearch-fuzzy-/)
-    nmap z? <Plug>(incsearch-fuzzy-?)
-    nmap zg/ <Plug>(incsearch-fuzzy-stay)
 "}
 
 " smooth-scroll{
@@ -447,8 +464,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     Plugin 'Yggdroot/indentLine'			
     "let g:indentLine_char = '|'            " 设置标识符样式
     let g:indentLinet_color_term=200        " 设置标识符颜色
-    noremap <C-\> :IndentLinesToggle<CR>
-    inoremap <C-\> <esc>:IndentLinesToggle<CR>
+    nnoremap <leader>t\ :IndentLinesToggle<CR>
 "}
 
 " air-line{
@@ -460,6 +476,13 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
     let g:airline#extensions#ycm#error_symbol = 'E:'
     let g:airline#extensions#ycm#warning_symbol = 'W:'
+"}
+
+" rainbow{
+    " 彩色括号
+    Plugin 'luochen1990/rainbow'
+    let g:rainbow_active = 1 "0 if you want to enable it later via :RainbowToggle
+    nnoremap <leader>tr :RainbowToggle<CR>
 "}
 
 

@@ -9,6 +9,7 @@
 
 ---
 # TODO
+ * 使用asd...kl;代替0~9输入
 
 
 ---
@@ -27,6 +28,15 @@
  
 ---
 # Log
+## 20170513 - v1.4.28
+ - 添加vim-over插件，实现substitute preview
+ - 添加fswitch插件，使用leader-fh切换
+ - 使用leader-t?作为toggle命令前缀
+ - 添加rainbow插件
+ - vimgrep查打当前单词改用leader-fw 
+ - map L to $ and H to ^ and S to %
+ - 取消ysw,ysiw,yss,ySS的映射
+
 ## 20170513 - v1.1.21
  - 添加smooth-scroll插件，平滑屏幕滚动效果
  - 添加incsearch插件，并配置相应的搜索映射按键，强化查找功能
