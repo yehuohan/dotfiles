@@ -56,12 +56,12 @@ endfunction
     set foldenable						" 充许折叠
     set foldcolumn=1					" 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
     set foldmethod=indent				" 设置语文折叠
-                                        " manual:手工定义折叠         
-                                        " indent:更多的缩进表示更高级别的折叠         
-                                        " expr:用表达式来定义折叠         
-                                        " syntax:用语法高亮来定义折叠         
-                                        " diff:对没有更改的文本进行折叠         
-                                        " marker:对文中的标志折叠
+                                        " manual : 手工定义折叠
+                                        " indent : 更多的缩进表示更高级别的折叠
+                                        " expr   : 用表达式来定义折叠
+                                        " syntax : 用语法高亮来定义折叠
+                                        " diff   : 对没有更改的文本进行折叠
+                                        " marker : 对文中的标志折叠
     set showcmd                         " 显示寄存器命令，宏调用命令@等
     set tabstop=4						" 设置tab键宽4个空格
     set expandtab						" 将Tab用Space代替，方便显示缩进标识indentLine
@@ -248,6 +248,9 @@ nnoremap vv <C-v>
             execute "!g++ -o ".l:name." ".l:filename." && ".l:name
         elseif "py" == l:ext
             " python
+            execute "!python ".l:filename
+        elseif "pyw" == l:ext
+            " python-gui
             execute "!python ".l:filename
         endif
     endfunction
