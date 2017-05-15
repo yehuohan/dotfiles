@@ -81,6 +81,8 @@ endfunction
     set ignorecase                      " 不区别大小写搜索
     set smartcase                       " 有大写字母时才区别大小写搜索
     set noerrorbells                    " 关闭错误信息响铃
+    set vb t_vb=                        " 关闭响铃(如normal模式时按esc会有响铃)
+
     if IsWin()
         let $HOME=$VIM                  " windows下将HOME设置VIM的安装路径
         execute "cd $HOME" 
@@ -102,14 +104,16 @@ endfunction
         set guioptions-=b               " 隐藏底部滚动条
         set guioptions+=0               " 不隐藏Tab栏
 
-    if IsLinux()
-        set guifont=Courier\ 10\ Pitch\ 11	
-    elseif IsWin()
-        set guifont=cousine:h11
-        "set guifont=Consolas:h12
-        map <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
-                                        " gvim全屏快捷键
-    endif
+        au GuiEnter * set t_vb=             " 关闭闪屏(关闭声音后，会用闪屏提示)
+
+        if IsLinux()
+            set guifont=Courier\ 10\ Pitch\ 11	
+        elseif IsWin()
+            set guifont=cousine:h11
+            "set guifont=Consolas:h12
+            map <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
+                                            " gvim全屏快捷键
+        endif
     endif
 "}
 
