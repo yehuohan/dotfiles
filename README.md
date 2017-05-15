@@ -1,33 +1,37 @@
 
 ---
 # LinuxConfigs
- - 管理Linux的一些配置文件，包括Msys2中的配置文件
- - Author : yehuohan
+ - brief  : 管理Linux的一些配置文件，包括vim, zsh, Msys2等配置文件
  - E-mail : 550034086@qq.com, yehuohan@gmail.com
+ - Author : yehuohan
  - Git    : [github](github.com), [oschina](git.oschina.net)
 
 
 ---
 # TODO
- * 使用asd...kl;代替0~9输入
 
 
 ---
 # Files
- - cf-vim                   : vim配置文件
-    - .vimrc                : vim配置文件
-    - .ycm\_extra\_conf.py  : vim-ycm配置文件
-    - plugin                : vim插件，放于~/.vim/下即可
+ - cf-vim                  : vim配置文件
+    - .vimrc               : vim配置文件
+    - .ycm\_extra\_conf.py : vim-ycm配置文件
+    - mySnippets           : 自定义snippets
 
- - cf-zsh                   : zsh配置文件
-    - .zshrc                : zsh配置文件
-    - frisk.zsh-them        : zsh主题文件
- 
- - cf-Msys2                 : Windows下Msys2配置文件
-    - .minttyrc             : Msys2模拟终端mintty配置文件
- 
+ - cf-zsh                  : zsh配置文件
+    - .zshrc               : zsh配置文件
+    - frisk.zsh-them       : zsh主题文件
+
+ - cf-Msys2                : Windows下Msys2配置文件
+    - .minttyrc            : Msys2模拟终端mintty配置文件
+
 ---
 # Log
+## 20170515 - v1.5.30
+ - 主题改成通插件new-railscasts-theme来加载
+ - 使用set invwrap的映射为leader-iw，同时去掉set wrap和set nowrap的命令
+ - 更新TODO和LinuxConfigs基本介绍
+
 ## 20170513 - v1.5.29
  - 添加asd2num插件
 

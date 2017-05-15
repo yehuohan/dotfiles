@@ -48,15 +48,9 @@ endfunction
 " UI{
     set nocompatible				    " 不兼容vi快捷键
     syntax on							" 语法高亮
-    colorscheme new-railscasts          " 使用主题
     set number							" 显示行号
     set cursorline						" 高亮当前行
     set cursorcolumn					" 高亮当前列
-    hi CursorLine   cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
-    hi CursorColumn cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
-    hi Search term=reverse ctermfg=white ctermbg=blue guifg=white guibg=#072f95
-                                        " 设定高亮行列的颜色
-                                        " cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
     set hlsearch						" 设置高亮显示查找到的文本
     set smartindent						" 新行智能自动缩进
     set foldenable						" 充许折叠
@@ -150,8 +144,8 @@ nnoremap <leader>v viw
 nnoremap vv <C-v>
 
 " wrap and fold{
-    nnoremap <leader>wn :set nowrap<CR>
-    nnoremap <leader>wo :set wrap<CR>
+    " <leader>i? for vim "set inv?" command
+    nnoremap <leader>iw :set invwrap<CR>
     nnoremap <leader>zr zR
     nnoremap <leader>zm zM
 "}
@@ -287,6 +281,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 " nerd-tree{
     " 目录树导航
     Plugin 'scrooloose/nerdtree'			
+    " <leader>t? for Plugins toggle
     noremap <leader>te :NERDTreeToggle<CR>
 "}
 
@@ -472,6 +467,18 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     "let g:indentLine_char = '|'            " 设置标识符样式
     let g:indentLinet_color_term=200        " 设置标识符颜色
     nnoremap <leader>t\ :IndentLinesToggle<CR>
+"}
+
+" new-railscasts-theme{
+    " 使用主题
+    set rtp+=$MyVimPath/bundle/new-railscasts-theme/
+    Plugin 'carakan/new-railscasts-theme'
+    colorscheme new-railscasts          
+    hi CursorLine   cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
+    hi CursorColumn cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
+    hi Search term=reverse ctermfg=white ctermbg=blue guifg=white guibg=#072f95
+                                        " 设定高亮行列的颜色
+                                        " cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
 "}
 
 " air-line{
