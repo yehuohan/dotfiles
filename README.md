@@ -27,6 +27,9 @@
 
 ---
 # Log
+## 20170515 - v1.5.31
+ - set fileformat=unix，以unix格式保存文件文件
+
 ## 20170515 - v1.5.30
  - 主题改成通插件new-railscasts-theme来加载
  - 使用set invwrap的映射为leader-iw，同时去掉set wrap和set nowrap的命令

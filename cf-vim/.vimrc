@@ -76,7 +76,8 @@ endfunction
     set autochdir						" 自动切换当前目录为当前文件所在的目录
     set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
                                         " 尝试解码序列
-    set encoding=utf-8                   " vim内部使用utf-8编码
+    set encoding=utf-8                  " vim内部使用utf-8编码
+    set fileformat=unix                 " 以unix格式保存文本文件，即CR作为换行符
     set ignorecase                      " 不区别大小写搜索
     set smartcase                       " 有大写字母时才区别大小写搜索
     set noerrorbells                    " 关闭错误信息响铃
