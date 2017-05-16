@@ -1,6 +1,6 @@
 
 "===============================================================================
-" My Notes(:help is better)
+" My Notes(:help index is better)
 "===============================================================================
 " [*]带python编译 {
 " 	使用MinGw-x64，更改.mak文件：
@@ -49,6 +49,7 @@ endfunction
     set nocompatible				    " 不兼容vi快捷键
     syntax on							" 语法高亮
     set number							" 显示行号
+    set relativenumber                  " 显示相对行号
     set cursorline						" 高亮当前行
     set cursorcolumn					" 高亮当前列
     set hlsearch						" 设置高亮显示查找到的文本
@@ -124,7 +125,7 @@ endfunction
 " - Normal模式下使用<leader>代替<C-?>,<S-?>,<A-?>，
 " - Insert模式下map带ctrl,shift,alt的快捷键
 " - 尽量不改变vim原有键位的功能定义
-" - 尽量不需要一只手同时按两个键
+" - 尽量一只手不同时按两个键
 " - 建议调换Esc和CapsLock键
 "===============================================================================
 
@@ -145,7 +146,6 @@ nnoremap <leader>u ~
 vnoremap <leader>u ~
 
 " 快速选择和矩形选择
-nnoremap <leader>v viw
 nnoremap vv <C-v>
 
 " wrap and fold{
