@@ -214,6 +214,7 @@ nnoremap vv <C-v>
     nnoremap <leader>wj <C-w>j
     nnoremap <leader>wk <C-w>k
     nnoremap <leader>wl <C-w>l
+    nnoremap <leader>wp <C-w>p
 
     " move window
     nnoremap <leader>wH <C-w>H
