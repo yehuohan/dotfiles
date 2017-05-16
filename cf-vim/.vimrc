@@ -1,3 +1,10 @@
+"===============================================================================
+" file   : vimrc
+" brief  : configuration for vim and gvim
+" e-mail : 550034086@qq.com, yehuohan@gmail.com
+" author : yehuohan
+"===============================================================================
+
 
 "===============================================================================
 " My Notes(:help index is better)
@@ -195,15 +202,27 @@ nnoremap vv <C-v>
     vnoremap <leader>i/ xi/**/<esc>hhp<esc>
 "}
 
-" split{
+" window manager{
+    " window-command
+
+    " split
     nnoremap <leader>ws :split<CR>
     nnoremap <leader>wv :vsplit<CR>
+
+    " move focus
     nnoremap <leader>wh <C-w>h
     nnoremap <leader>wj <C-w>j
     nnoremap <leader>wk <C-w>k
-    nnoremap <leader>wl <c-w>l
+    nnoremap <leader>wl <C-w>l
 
-    " 使用C-up,down,left,right调整窗口大小
+    " move window
+    nnoremap <leader>wH <C-w>H
+    nnoremap <leader>wJ <C-w>J
+    nnoremap <leader>wK <C-w>K
+    nnoremap <leader>wL <C-w>L
+    nnoremap <leader>wT <C-w>T
+
+    " reseize window with C-up/down/left/right
     inoremap <C-up> <esc>:resize+1<CR>i
     inoremap <C-down> <esc>:resize-1<CR>i
     inoremap <C-left> <esc>:vertical resize-1<CR>i
@@ -212,10 +231,11 @@ nnoremap vv <C-v>
     nnoremap <C-down> <esc>:resize-1<CR>
     nnoremap <C-left> <esc>:vertical resize-1<CR>
     nnoremap <C-right> <esc>:vertical resize+1<CR>
+    nnoremap <leader>w= <C-w>=
 "}
 
 " find and search{
-    " 搜索(find)
+    " find-search
 
     " /\<the\> : can match chars in "for the vim", but can not match chars in "there"
     " /the     : can match chars in "for the vim" and also in "there"
@@ -231,7 +251,7 @@ nnoremap vv <C-v>
 "}
 
 " F5 map{
-    " 程序编译与运行
+    " compliling and running
     nmap <F5> <esc>:call F5RunFile()<CR>
     function F5RunFile()
         let l:ext=expand("%:e")             " 扩展名
@@ -465,7 +485,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     Plugin 'xolox/vim-session'
     let g:session_autosave='no'             " 自动保存会话窗口
     let g:session_autoload='yes'            " 直接打开vim，自动加载default.vim
-    noremap <leader>q :SaveSession!<CR>:qa<CR>
+    noremap <leader>qa :SaveSession!<CR>:qa<CR>
                                             " 关闭所有，且先保存会话
 "}
 
