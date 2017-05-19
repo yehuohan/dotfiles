@@ -26,7 +26,10 @@
     - .minttyrc            : Msys2模拟终端mintty配置文件
 
 ---
-# Log
+# ChangeLog
+## 20170519 - v1.5.39
+ - 去掉yL对ySS的映射，添加yL和yH的映射
+ 
 ## 20170516 - v1.5.38
  - 添加leader-wp映射，跳转到preview窗口
  

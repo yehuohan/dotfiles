@@ -27,11 +27,12 @@
 "   :s//g   - 替换一行中所有找到的字符串
 "   :s//c   - 替换前要确认
 "
-"   :s/ar\[i\]/*(ar+i)/
+"   :s/ar\[i\]/\*(ar+i)/
 "       ar[i] 替换成 *(ar+)，注意：对于 * . / \ [ ] 需要转义
-"	
 "	:s/"\([A-J]\)"/"Group \1"/
 "		将"X" 替换成 "Group X"，其中X可为A-J，\( \)表示后面用\1引用()的内容
+"	:s/"\(.*\)"/set("\1")/
+"	    将“*"替换成set("*")，其*为任意字符
 "
 "}
 
@@ -173,6 +174,8 @@ nnoremap vv <C-v>
     nnoremap <S-s> %
     nnoremap <S-l> $
     nnoremap <S-h> ^
+    nnoremap y<S-l> y$
+    nnoremap y<S-h> y^
     nnoremap <C-j> <C-e>
     nnoremap <C-k> <C-y>
 "}
@@ -186,6 +189,7 @@ nnoremap vv <C-v>
 "}
 
 " surrounding with words{
+    " text object: ?i? or ?a?
     nnoremap <leader>i( viwxi(<esc>pa)<esc>     
     nnoremap <leader>i< viwxi<<esc>pa><esc>
     nnoremap <leader>i[ viwxi[<esc>pa]<esc>
@@ -395,10 +399,10 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     Plugin 'tpope/vim-repeat'
 
     " simplify the map to 2 operation
-    "nmap yi ysw
-    "nmap yw ysiw
-    "nmap yl yss
-    nmap yL ySS
+    " nmap yi ysw
+    " nmap yw ysiw
+    " nmap yl yss
+    " nmap yL ySS
     
     " surround selected text in visual mode
     vmap s S
