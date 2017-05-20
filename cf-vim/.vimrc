@@ -118,7 +118,7 @@ endfunction
         if IsLinux()
             set guifont=Courier\ 10\ Pitch\ 11	
         elseif IsWin()
-            set guifont=cousine:h11
+            set guifont=cousine:h12
             "set guifont=Consolas:h12
             map <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
                                             " gvim全屏快捷键
@@ -174,6 +174,8 @@ nnoremap vv <C-v>
     nnoremap <S-s> %
     nnoremap <S-l> $
     nnoremap <S-h> ^
+    vnoremap <S-l> $
+    vnoremap <S-h> ^
     nnoremap y<S-l> y$
     nnoremap y<S-h> y^
     nnoremap <C-j> <C-e>
