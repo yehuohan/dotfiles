@@ -27,6 +27,9 @@
 
 ---
 # ChangeLog
+## 20175021 - v1.5.41
+ - Linux下gvim字体使用Ubuntu Mono
+
 ## 20170520 - v1.5.40
  - 添加vnoremap下的S-l和S-h的映射
  

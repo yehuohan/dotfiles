@@ -116,7 +116,8 @@ endfunction
         au GuiEnter * set t_vb=             " 关闭闪屏(关闭声音后，会用闪屏提示)
 
         if IsLinux()
-            set guifont=Courier\ 10\ Pitch\ 11	
+            "set guifont=Courier\ 10\ Pitch\ 11	
+            set guifont=Ubuntu\ Mono\ 14
         elseif IsWin()
             set guifont=cousine:h12
             "set guifont=Consolas:h12
