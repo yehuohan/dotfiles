@@ -4,7 +4,7 @@
  - brief  : 管理Linux的一些配置文件，包括vim, zsh, Msys2等配置文件
  - E-mail : 550034086@qq.com, yehuohan@gmail.com
  - Author : yehuohan
- - Git    : [github](github.com), [oschina](git.oschina.net)
+ - Git    : [github](https://github.com/yehuohan/LinuxConfigs), [oschina](https://git.oschina.net/yehuohan/LinuxConfigs)
 
 
 ---
@@ -13,21 +13,29 @@
 
 ---
 # Files
- - cf-vim                  : vim配置文件
-    - .vimrc               : vim配置文件
-    - .ycm\_extra\_conf.py : vim-ycm配置文件
-    - mySnippets           : 自定义snippets
 
- - cf-zsh                  : zsh配置文件
-    - .zshrc               : zsh配置文件
-    - frisk.zsh-them       : zsh主题文件
+```
+.
+├── .git
+├── cf-msys2
+│   └── .minttyrc          : Msys2模拟终端mintty配置文件
+├── cf-vim
+│   ├── .vimrc             : vim配置文件
+│   ├── .ycm_extra_conf.py : vim-ycm配置文件
+│   └── mySnippets         : 自定义snippets
+├── cf-zsh
+│   ├── .zshrc             : zsh配置文件
+│   └── frisk.zsh-theme    : zsh主题文件
+```
 
- - cf-Msys2                : Windows下Msys2配置文件
-    - .minttyrc            : Msys2模拟终端mintty配置文件
 
 ---
 # ChangeLog
-#20170522 - v1.5.44
+
+## 20170531 -v1.5.45
+ - 优化README.md文件列表显示
+ 
+## 20170522 - v1.5.44
  - 添加Ycm Goto等命令的映射
  - 添加错误显示信息命令映射，以及设置错误列表窗口大小
  - 开启YCM语法补全和tags补全
