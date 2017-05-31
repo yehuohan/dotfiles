@@ -32,6 +32,11 @@
 ---
 # ChangeLog
 
+## 20170601 - v1.6.70
+ - 添加markdown-preview插件
+ - 添加mathjax-support-for-mkdp插件
+ - 添加MarkdownToggle函数以及映射
+
 ## 20170531 - v1.5.47
  - mintty更改背景颜色与透明度
  

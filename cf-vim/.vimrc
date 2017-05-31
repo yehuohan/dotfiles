@@ -301,7 +301,6 @@ set rtp+=$MyVimPath                     " add .vim or vimfiles to runtime path
 set rtp+=$MyVimPath/bundle/Vundle.vim/  " set the runtime path to include Vundle and initialize
 call vundle#begin($MyVimPath."/bundle")	" alternatively, pass a path where Vundle should install plugins
                                         " call vundle#begin('~/some/path/here')
-                                        " 设置插件安装路径
 " user plugins 
 Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
@@ -545,6 +544,26 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     nnoremap <leader>tr :RainbowToggle<CR>
 "}
 
+" markdown-preview{
+    "Plugin 'iamcco/mathjax-support-for-mkdp'
+    Plugin 'iamcco/markdown-preview.vim'
+    if IsWin()
+        let g:mkdp_path_to_chrome = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
+    elseif IsLinux()
+        let g:mkdp_path_to_chrome = ""
+    endif
+    let g:mkdp_auto_start = 0
+    let g:mkdp_auto_close = 1
+    let g:mkdp_refresh_slow = 0         " update preview instant
+    nnoremap <leader>tm :call MarkdownPreviewToggle()<CR>
+    function! MarkdownPreviewToggle()
+        if exists(':MarkdownPreviewStop')
+            MarkdownPreviewStop
+        else
+            MarkdownPreview
+        endif
+    endfunction
+"}
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -570,6 +589,5 @@ filetype plugin indent on    " required
 " :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
 "
 " see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
 
 
