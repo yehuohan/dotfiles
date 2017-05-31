@@ -116,7 +116,7 @@ endfunction
         au GuiEnter * set t_vb=             " 关闭闪屏(关闭声音后，会用闪屏提示)
 
         if IsLinux()
-            "set guifont=Courier\ 10\ Pitch\ 11	
+            "set guifont=Courier\ 10\ Pitch\ 11
             set guifont=Ubuntu\ Mono\ 14
         elseif IsWin()
             set guifont=cousine:h12
@@ -350,10 +350,22 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     let g:ycm_seed_identifiers_with_syntax = 1  " 开启语法关键字补全
     let g:ycm_warning_symbol = 'W:'             " warning符号
     let g:ycm_error_symbol = 'E:'               " error符号
+    let g:ycm_use_ultisnips_completer = 1       " query UltiSnips for completions
     let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-m>', '<Up>']
+    let g:ycm_max_diagnostics_to_display = 30
+    let g:ycm_autoclose_preview_window_after_insertion=1
+                                                " 自动关闭预览窗口
+    let g:ycm_cache_omnifunc = 0                " 禁止缓存匹配项，每次都重新生成匹配项
+    let g:ycm_seed_identifiers_with_syntax = 1  " 语法关键字补全         
+    let g:ycm_collect_identifiers_from_tags_files = 1 
+                                                " 开启YCM标签补全
     nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
-    nmap <F4> :YcmDiags<CR>                     " 错误列表
+    nnoremap <leader>gi :YcmCompleter GoToInclude<CR>
+    nnoremap <leader>gt :YcmCompleter GoTo<CR>
+    noremap <F4> :YcmDiags<CR> 
+    nnoremap <leader>gsd :YcmShowDetailedDiagnostic
+                                                " 错误列表
 "}
 
 " ultisnips{
