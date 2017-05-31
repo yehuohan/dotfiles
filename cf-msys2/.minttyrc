@@ -4,3 +4,4 @@ Charset=UTF-8
 Font=Courier 10 Pitch
 FontHeight=12
 CursorType=block
+BackgroundColour=36,37,38
