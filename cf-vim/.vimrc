@@ -1,3 +1,4 @@
+
 "===============================================================================
 " file   : vimrc
 " brief  : configuration for vim and gvim
@@ -23,6 +24,7 @@
 "   :'<,'>s - 所选范圈
 "   :n,$s   - 第n行到最一行
 "   :.,ns   - 当前行到第n行
+"   :.,+30s - 从当前行开始的30行
 "   :'s,'es - 从ms标记到me标记的范围
 "   :s//g   - 替换一行中所有找到的字符串
 "   :s//c   - 替换前要确认
@@ -54,17 +56,17 @@ endfunction
 " settings 
 "===============================================================================
 " UI{
-    set nocompatible				    " 不兼容vi快捷键
-    syntax on							" 语法高亮
-    set number							" 显示行号
+    set nocompatible                    " 不兼容vi快捷键
+    syntax on                           " 语法高亮
+    set number                          " 显示行号
     set relativenumber                  " 显示相对行号
-    set cursorline						" 高亮当前行
-    set cursorcolumn					" 高亮当前列
-    set hlsearch						" 设置高亮显示查找到的文本
-    set smartindent						" 新行智能自动缩进
-    set foldenable						" 充许折叠
-    set foldcolumn=1					" 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
-    set foldmethod=indent				" 设置语文折叠
+    set cursorline                      " 高亮当前行
+    set cursorcolumn                    " 高亮当前列
+    set hlsearch                        " 设置高亮显示查找到的文本
+    set smartindent                     " 新行智能自动缩进
+    set foldenable                      " 充许折叠
+    set foldcolumn=1                    " 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
+    set foldmethod=indent               " 设置语文折叠
                                         " manual : 手工定义折叠
                                         " indent : 更多的缩进表示更高级别的折叠
                                         " expr   : 用表达式来定义折叠
@@ -72,11 +74,11 @@ endfunction
                                         " diff   : 对没有更改的文本进行折叠
                                         " marker : 对文中的标志折叠
     set showcmd                         " 显示寄存器命令，宏调用命令@等
-    set tabstop=4						" 设置tab键宽4个空格
-    set expandtab						" 将Tab用Space代替，方便显示缩进标识indentLine
-    set softtabstop=4					" 设置显示的缩进为4,实际Tab可以不是4个格
-    set shiftwidth=4					" 设置>和<命令移动宽度为4
-    set nowrap                          " 默认关闭折行 
+    set tabstop=4                       " 设置tab键宽4个空格
+    set expandtab                       " 将Tab用Space代替，方便显示缩进标识indentLine
+    set softtabstop=4                   " 设置显示的缩进为4,实际Tab可以不是4个格
+    set shiftwidth=4                    " 设置>和<命令移动宽度为4
+    set nowrap                          " 默认关闭折行
 "}
 
 " Edit{
@@ -113,16 +115,16 @@ endfunction
         set guioptions-=b               " 隐藏底部滚动条
         set guioptions+=0               " 不隐藏Tab栏
 
-        au GuiEnter * set t_vb=             " 关闭闪屏(关闭声音后，会用闪屏提示)
+        au GuiEnter * set t_vb=         " 关闭闪屏(关闭声音后，会用闪屏提示)
 
         if IsLinux()
-            "set guifont=Courier\ 10\ Pitch\ 11
-            set guifont=Ubuntu\ Mono\ 14
+            "set guifont=Courier\ 10\ Pitch\ 11	
+            set set guifont=Ubuntu\ Mono\ 14
         elseif IsWin()
             set guifont=cousine:h12
             "set guifont=Consolas:h12
             map <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
-                                            " gvim全屏快捷键
+                                        " gvim全屏快捷键
         endif
     endif
 "}
@@ -255,20 +257,19 @@ nnoremap vv <C-v>
     vnoremap <leader>/ "9y<bar>:execute"let g:__str__=getreg('9')"<bar>execute "vimgrep /" . g:__str__ . "/j %"<bar>copen<CR>
     " find word with vimgrep
     nnoremap <leader>fw :execute"let g:__str__=expand(\"<cword>\")"<bar>execute "vimgrep /\\<" . g:__str__ . "\\>/j %"<bar>copen<CR>
-
 "}
 
 " F5 map{
     " compliling and running
     nmap <F5> <esc>:call F5RunFile()<CR>
     function F5RunFile()
-        let l:ext=expand("%:e")             " 扩展名
+        let l:ext=expand("%:e")                     " 扩展名
     if IsLinux()
         let l:filename="\"".expand("./%:t")."\""    " 文件名，不带路径，带扩展名 
         let l:name="\"".expand("./%:t:r")."\""      " 文件名，不带路径，不带扩展名
     elseif IsWin()
-        let l:filename="\"".expand("%:t")."\""          " 文件名，不带路径，带扩展名 
-        let l:name="\"".expand("%:t:r")."\""            " 文件名，不带路径，不带扩展名
+        let l:filename="\"".expand("%:t")."\""      " 文件名，不带路径，带扩展名 
+        let l:name="\"".expand("%:t:r")."\""        " 文件名，不带路径，不带扩展名
     endif
         " 先切换目录
         exec "cd %:h"
@@ -278,11 +279,8 @@ nnoremap vv <C-v>
         elseif "cpp" == l:ext
             " c++
             execute "!g++ -o ".l:name." ".l:filename." && ".l:name
-        elseif "py" == l:ext
+        elseif "py" == l:ext || "pyw" == l:ext
             " python
-            execute "!python ".l:filename
-        elseif "pyw" == l:ext
-            " python-gui
             execute "!python ".l:filename
         endif
     endfunction
@@ -370,7 +368,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 " ultisnips{
     " 代码片段插入
-    Plugin 'SirVer/ultisnips'				" snippet insert engine
+    Plugin 'SirVer/ultisnips'               " snippet insert engine
     Plugin 'honza/vim-snippets'             " snippet collection
     let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
                                             " mySnippets is my own snippets colletrion
