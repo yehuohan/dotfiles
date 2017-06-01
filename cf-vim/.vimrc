@@ -550,7 +550,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     if IsWin()
         let g:mkdp_path_to_chrome = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
     elseif IsLinux()
-        let g:mkdp_path_to_chrome = ""
+        let g:mkdp_path_to_chrome = "/usr/bin/google-chrome"
     endif
     let g:mkdp_auto_start = 0
     let g:mkdp_auto_close = 1

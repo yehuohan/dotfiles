@@ -32,6 +32,9 @@
 ---
 # ChangeLog
 
+## 20170602 - v1.6.71
+ - linux下天加markdown-preview插件的google路径
+
 ## 20170601 - v1.6.70
  - 添加markdown-preview插件
  - 添加mathjax-support-for-mkdp插件
