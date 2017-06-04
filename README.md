@@ -32,6 +32,9 @@
 ---
 # ChangeLog
 
+## 20170604 - v1.6.72
+ - 添加doxygen相关的snippets
+
 ## 20170602 - v1.6.71
  - linux下天加markdown-preview插件的google路径
 
