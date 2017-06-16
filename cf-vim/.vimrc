@@ -32,9 +32,9 @@
 "   :s/ar\[i\]/\*(ar+i)/
 "       ar[i] 替换成 *(ar+)，注意：对于 * . / \ [ ] 需要转义
 "	:s/"\([A-J]\)"/"Group \1"/
-"		将"X" 替换成 "Group X"，其中X可为A-J，\( \)表示后面用\1引用()的内容
+"		将"X" 替换成 "Group X"，其中X可为A-J， \( \) 表示后面用 \1 引用 () 的内容
 "	:s/"\(.*\)"/set("\1")/
-"	    将“*"替换成set("*")，其*为任意字符
+"	    将“*" 替换成 set("*") ，其中 .* 为任意字符
 "
 "}
 
@@ -121,8 +121,9 @@ endfunction
             "set guifont=Courier\ 10\ Pitch\ 11	
             set set guifont=Ubuntu\ Mono\ 14
         elseif IsWin()
-            set guifont=cousine:h12
-            "set guifont=Consolas:h12
+            "set guifont=cousine:h12:cANSI
+            set guifont=Consolas:h13:cANSI
+            set guifontwide=Yahei_Mono:h13:cGB2312
             map <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
                                         " gvim全屏快捷键
         endif

@@ -32,6 +32,9 @@
 ---
 # ChangeLog
 
+## 20170617 - v1.6.73
+ - windows下gvim中文字体使用YaHei Mono，对应英文字体使用Consolas
+
 ## 20170604 - v1.6.72
  - 添加doxygen相关的snippets
 
