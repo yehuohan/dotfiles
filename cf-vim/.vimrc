@@ -119,7 +119,7 @@ endfunction
 
         if IsLinux()
             "set guifont=Courier\ 10\ Pitch\ 11	
-            set set guifont=Ubuntu\ Mono\ 14
+            set guifont=Ubuntu\ Mono\ 13
         elseif IsWin()
             "set guifont=cousine:h12:cANSI
             set guifont=Consolas:h13:cANSI

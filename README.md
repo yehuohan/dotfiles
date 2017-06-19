@@ -32,6 +32,9 @@
 ---
 # ChangeLog
 
+## 20170619 - v1.6.74
+ - 修改linux下gvim字体设置错误
+
 ## 20170617 - v1.6.73
  - windows下gvim中文字体使用YaHei Mono，对应英文字体使用Consolas
 
