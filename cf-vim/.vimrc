@@ -279,7 +279,7 @@ nnoremap vv <C-v>
             execute "!gcc -o ".l:name." ".l:filename." && ".l:name
         elseif "cpp" == l:ext
             " c++
-            execute "!g++ -o ".l:name." ".l:filename." && ".l:name
+            execute "!g++ -std=c++11 -o ".l:name." ".l:filename." && ".l:name
         elseif "py" == l:ext || "pyw" == l:ext
             " python
             execute "!python ".l:filename
