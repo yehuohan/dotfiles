@@ -361,8 +361,8 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
     nnoremap <leader>gi :YcmCompleter GoToInclude<CR>
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
-    noremap <F4> :YcmDiags<CR> 
     nnoremap <leader>gsd :YcmShowDetailedDiagnostic
+    noremap <F4> :YcmDiags<CR> 
                                                 " 错误列表
 "}
 

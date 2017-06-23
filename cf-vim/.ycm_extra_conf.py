@@ -95,6 +95,15 @@ flags = [
 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include/ssp',
 '-isystem',
 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include/c++',
+
+'-isystem',
+'D:/Qt/Qt5.7.0/5.7/msvc2015/include/QtCore',
+'-isystem',
+'D:/Qt/Qt5.7.0/5.7/msvc2015/include/QtGui',
+'-isystem',
+'D:/Qt/Qt5.7.0/5.7/msvc2015/include/QtWidgets',
+'-isystem',
+'D:/Qt/Qt5.7.0/5.7/msvc2015/include/QtSerialBus',
 ]
 
 
