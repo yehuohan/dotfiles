@@ -94,15 +94,21 @@ endfunction
     set noerrorbells                    " 关闭错误信息响铃
     set vb t_vb=                        " 关闭响铃(如normal模式时按esc会有响铃)
 
-    if IsWin()
-        let $HOME=$VIM                  " windows下将HOME设置VIM的安装路径
-        execute "cd $HOME" 
-        " 未打开文件时，切换到HOME目录
-    endif
     if IsLinux()
         let $MyVimPath="~/.vim"         " vim插件路径
     elseif IsWin()
         let $MyVimPath=$VIM."\\vimfiles"
+
+        let $HOME=$VIM                  " windows下将HOME设置VIM的安装路径
+        execute "cd $HOME"          
+        " 未打开文件时，切换到HOME目录
+    endif
+"}
+
+" Other{
+    let fext=expand("%:e")                   " 扩展名
+    if "c" ==? fext || "cpp" ==? fext || "h" ==? fext
+        set foldmethod=syntax               " 设置语文折叠
     endif
 "}
 
@@ -274,13 +280,13 @@ nnoremap vv <C-v>
     endif
         " 先切换目录
         exec "cd %:h"
-        if "c" == l:ext
+        if "c" ==? l:ext
             " c
             execute "!gcc -o ".l:name." ".l:filename." && ".l:name
-        elseif "cpp" == l:ext
+        elseif "cpp" ==? l:ext
             " c++
             execute "!g++ -std=c++11 -o ".l:name." ".l:filename." && ".l:name
-        elseif "py" == l:ext || "pyw" == l:ext
+        elseif "py" ==? l:ext || "pyw" == l:ext
             " python
             execute "!python ".l:filename
         endif

@@ -32,6 +32,9 @@
 ---
 # ChangeLog
 
+## 20170626 - v1.6.77
+ - 将c,cpp等文件设置成syntax折叠
+
 ## 20170623 - v1.6.76
  - windows下ycm添加qt的QtCore等头文件路径
 
