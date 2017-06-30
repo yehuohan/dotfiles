@@ -32,6 +32,9 @@
 ---
 # ChangeLog
 
+## 20170630 - v1.6.78
+ - 添加page,module等snippets
+
 ## 20170626 - v1.6.77
  - 将c,cpp等文件设置成syntax折叠
 

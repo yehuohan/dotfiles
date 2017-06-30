@@ -3,6 +3,29 @@
 # doxygen style for c/c++
 #===============================================================================
 
+snippet dmpage"doxygen c/c++ mainpage"
+//==============================================================================
+/*!
+ * @mainpage ${1:title}
+#${0:markdown}
+ */
+//==============================================================================
+endsnippet
+
+snippet dpage"doxygen c/c++ page"
+//==============================================================================
+/*!
+ * @page ${1:name} ${2:title}
+${0:markdown}
+ */
+//==============================================================================
+endsnippet
+
+snippet dspage"doxygen c/c++ subpage"
+ * @subpage ${1:name} "${2:text}"
+endsnippet
+
+
 snippet dfile "doxygen c/c++ file"
 //==============================================================================
 /*!
@@ -19,17 +42,14 @@ endsnippet
 
 
 snippet dbrief "doxygen c/c++ brief for class etc."
-//==============================================================================
 /*!
  * @brief ${0}
  *
  */
-//==============================================================================
 endsnippet
 
 
 snippet dfunc "doxygen c/c++ function"
-//==============================================================================
 /*!
  * @brief ${0}
  *
@@ -37,19 +57,38 @@ snippet dfunc "doxygen c/c++ function"
  * @return
  * @retval None
  */
-//==============================================================================
 endsnippet
 
 
-snippet dgroup "doxygen c/c++ group"
-//==============================================================================
+snippet dmod "doxygen c/c++ module"
+/*!
+ * @defgroup ${1:label} ${2:name}
+ * ${0}
+ * @{
+ */
+
+/*! @} */
+endsnippet
+
+
+snippet damod "doxygen c/c++ addtomodule"
+/*!
+ * @addtogroup ${1:label}
+ * ${0}
+ * @{
+ */
+
+/*! @} */
+endsnippet
+
+
+snippet dblock "doxygen c/c++ block"
 /*!
  * @name ${0}
  * @{
  */
 
 /*! @} */
-//==============================================================================
 endsnippet
 
 snippet dline "doxygen c/c++ line"

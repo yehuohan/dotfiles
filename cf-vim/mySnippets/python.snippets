@@ -3,6 +3,21 @@
 # doxygeb style for python
 #===============================================================================
 
+snippet dmpage "doxygen python mainpage"
+##@mainpage ${1:title}
+#${0:markdown}
+endsnippet
+
+snippet dpage "doxygen python page"
+##@page ${1:name} ${2:title}
+#${0:markdown}
+endsnippet
+
+snippet dspage "doxygen python subpage"
+# @subpage ${1:name} "${2:text}"
+endsnippet
+
+
 snippet dfile "doxygen python file"
 ## @file ${0}
 #  @brief
@@ -29,7 +44,25 @@ snippet dfunc "doxygen python function"
 endsnippet
 
 
-snippet dgroup "doxygen python group"
+snippet dmod "doxygen python module"
+## @defgroup ${1:label} ${2:name}
+#  ${0}
+#  @{
+
+## @}
+endsnippet
+
+
+snippet damod "doxygen python addtomodule"
+## @addtogroup ${1:label}
+#  ${0}
+#  @{
+
+## @}
+endsnippet
+
+
+snippet dblock "doxygen python block"
 ## @name ${0}
 #  @{
 
