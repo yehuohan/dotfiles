@@ -32,6 +32,9 @@
 ---
 # ChangeLog
 
+## 20170711 - v1.6.79
+ - 添加C-r按键映射
+
 ## 20170630 - v1.6.78
  - 添加page,module等snippets
 

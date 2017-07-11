@@ -158,6 +158,7 @@ vnoremap ; :
 
 " 基本插入
 nnoremap <leader>a A
+nnoremap <S-u> <C-r>
 
 " 大小写转换
 nnoremap <leader>u ~
