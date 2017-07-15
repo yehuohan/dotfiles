@@ -82,7 +82,7 @@ endfunction
 "}
 
 " Edit{
-    set bs=2                            " Insert模式下使用BackSpace删除
+    set backspace=2                     " Insert模式下使用BackSpace删除
     set nobackup                        " 不生成备份文件
     set autochdir						" 自动切换当前目录为当前文件所在的目录
     set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
@@ -93,6 +93,7 @@ endfunction
     set smartcase                       " 有大写字母时才区别大小写搜索
     set noerrorbells                    " 关闭错误信息响铃
     set vb t_vb=                        " 关闭响铃(如normal模式时按esc会有响铃)
+    set conceallevel=0                  " 显示markdown等格式中的隐藏字符
 
     if IsLinux()
         let $MyVimPath="~/.vim"         " vim插件路径
@@ -122,13 +123,15 @@ endfunction
         set guioptions+=0               " 不隐藏Tab栏
 
         au GuiEnter * set t_vb=         " 关闭闪屏(关闭声音后，会用闪屏提示)
-        set lines=20
-        set columns=100
 
         if IsLinux()
+            set lines=20
+            set columns=100
             "set guifont=Courier\ 10\ Pitch\ 11	
             set guifont=Ubuntu\ Mono\ 13
         elseif IsWin()
+            set lines=25
+            set columns=100
             "set guifont=cousine:h12:cANSI
             set guifont=Consolas:h13:cANSI
             set guifontwide=Yahei_Mono:h13:cGB2312
@@ -137,7 +140,6 @@ endfunction
         endif
     endif
 "}
-
 
 
 "===============================================================================
@@ -174,6 +176,16 @@ nnoremap vv <C-v>
     nnoremap <leader>iw :set invwrap<CR>
     nnoremap <leader>zr zR
     nnoremap <leader>zm zM
+
+    " 映射隐藏字符功能，set conceallevel直接设置没交果
+    nnoremap <leader>ih <esc>:call InvConceallevel()<CR>
+    function! InvConceallevel()
+        if &conceallevel == 0
+            set conceallevel=2
+        elseif &conceallevel == 2
+            set conceallevel=0                  " 显示markdown等格式中的隐藏字符
+        endif
+    endfunction
 "}
 
 " copy{
@@ -271,8 +283,8 @@ nnoremap vv <C-v>
 
 " F5 map{
     " compliling and running
-    nmap <F5> <esc>:call F5RunFile()<CR>
-    function F5RunFile()
+    noremap <F5> <esc>:call F5RunFile()<CR>
+    function! F5RunFile()
         let l:ext=expand("%:e")                     " 扩展名
     if IsLinux()
         let l:filename="\"".expand("./%:t")."\""    " 文件名，不带路径，带扩展名 
@@ -283,13 +295,14 @@ nnoremap vv <C-v>
     endif
         " 先切换目录
         exec "cd %:h"
+        " ==? 忽略大小写比较， ==# 进行大小写比较
         if "c" ==? l:ext
             " c
             execute "!gcc -o ".l:name." ".l:filename." && ".l:name
         elseif "cpp" ==? l:ext
             " c++
             execute "!g++ -std=c++11 -o ".l:name." ".l:filename." && ".l:name
-        elseif "py" ==? l:ext || "pyw" == l:ext
+        elseif "py" ==? l:ext || "pyw" ==? l:ext
             " python
             execute "!python ".l:filename
         endif
@@ -555,7 +568,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 "}
 
 " markdown-preview{
-    "Plugin 'iamcco/mathjax-support-for-mkdp'
+    Plugin 'iamcco/mathjax-support-for-mkdp'
     Plugin 'iamcco/markdown-preview.vim'
     if IsWin()
         let g:mkdp_path_to_chrome = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
@@ -599,5 +612,3 @@ filetype plugin indent on    " required
 " :PluginClean      = confirms removal of unused plugins; append `!` to auto       - approve removal
 "
 " see :h vundle for more details or wiki for FAQ
-
-
