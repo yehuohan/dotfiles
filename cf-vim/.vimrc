@@ -193,14 +193,23 @@ nnoremap vv <C-v>
     nnoremap <C-v> "+p
     inoremap <C-v> <esc>"+pi
     nnoremap <leader>p "0p
+
+    " 寄存器快速复制与粘贴
+    let s:table_reg_map = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+    for t in s:table_reg_map
+        execute "vnoremap <leader>'" . t . "    \"" . t . "y"
+        execute "nnoremap <leader>'" . t . "    \"" . t . "p"
+    endfor
 "}
 
 " move and goto{
     nnoremap <S-s> %
     nnoremap <S-l> $
     nnoremap <S-h> ^
+
     vnoremap <S-l> $
     vnoremap <S-h> ^
+
     nnoremap y<S-l> y$
     nnoremap y<S-h> y^
     nnoremap <C-j> <C-e>
