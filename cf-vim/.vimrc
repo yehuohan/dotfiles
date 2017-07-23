@@ -104,13 +104,14 @@ endfunction
         execute "cd $HOME"          
         " 未打开文件时，切换到HOME目录
     endif
-"}
 
-" Other{
     let fext=expand("%:e")                   " 扩展名
     if "c" ==? fext || "cpp" ==? fext || "h" ==? fext
         set foldmethod=syntax               " 设置语文折叠
     endif
+    if "tikz" ==? fext
+        set filetype=tex
+    end
 "}
 
 " Vim-Gui{
@@ -595,6 +596,11 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
             MarkdownPreview
         endif
     endfunction
+"}
+
+" vim-latex{
+    Plugin 'vim-latex/vim-latex'
+    " 目前只是为了latex文件的高亮显示
 "}
 
 call vundle#end()            " required
