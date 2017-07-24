@@ -105,13 +105,20 @@ endfunction
         " 未打开文件时，切换到HOME目录
     endif
 
-    let fext=expand("%:e")                   " 扩展名
-    if "c" ==? fext || "cpp" ==? fext || "h" ==? fext
-        set foldmethod=syntax               " 设置语文折叠
-    endif
-    if "tikz" ==? fext
+    let s:file_ext=expand("%:e")         " 扩展名检测
+    function! FileExtIs(ext)
+        if a:ext ==? s:file_ext
+            return 1
+        else
+            return 0
+        endif
+    endfunction
+
+    if FileExtIs("c") || FileExtIs("cpp") || FileExtIs("h")
+        set foldmethod=syntax           " 设置语法折叠
+    elseif FileExtIs("tikz")
         set filetype=tex
-    end
+    endif
 "}
 
 " Vim-Gui{
@@ -411,11 +418,11 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 " nerd-commenter{
     " 批量注释
+    Plugin 'scrooloose/nerdcommenter'
+    let g:NERDSpaceDelims = 1               " add space after comment
     " <leader>cc for comment
     " <leader>cl/cb for comment aligned
     " <leader>cu for un-comment
-    Plugin 'scrooloose/nerdcommenter'
-    let g:NERDSpaceDelims = 1               " add space after comment
 "}
 
 " file switch{
@@ -599,7 +606,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 "}
 
 " vim-latex{
-    Plugin 'vim-latex/vim-latex'
+    "Plugin 'vim-latex/vim-latex'
     " 目前只是为了latex文件的高亮显示
 "}
 
