@@ -34,6 +34,9 @@
 ---
 # ChangeLog
 
+## 20170725 - v2.0.87
+ - 添加nnoremap Tabularize
+
 ## 20170724 - v2.0.86
  - 换用vim-plug管理插件
 

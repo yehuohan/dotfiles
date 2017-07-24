@@ -437,6 +437,7 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
     Plug 'godlygeek/tabular'
     " align map
     vnoremap <leader>a :Tabularize /
+    nnoremap <leader>a :Tabularize /
 "}
 
 " surround and repeat{
