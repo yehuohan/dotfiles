@@ -329,38 +329,32 @@ nnoremap vv <C-v>
 
 
 "===============================================================================
-" Vundel and Settings
+" Plug and Settings
 " - 插件设置全写在Plugin下
 " - 安键map写在每个Plugin的最后
 "===============================================================================
 
-set nocompatible						" be iMproved, required
-filetype off							" required
-
 set rtp+=$MyVimPath                     " add .vim or vimfiles to runtime path
-set rtp+=$MyVimPath/bundle/Vundle.vim/  " set the runtime path to include Vundle and initialize
-call vundle#begin($MyVimPath."/bundle")	" alternatively, pass a path where Vundle should install plugins
-                                        " call vundle#begin('~/some/path/here')
-" user plugins 
-Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
+call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install plugins
 
+" user plugins 
 
 " asd2num {
     " asd数字输入
-    Plugin 'yehuohan/asd2num'
+    Plug 'yehuohan/asd2num'
     inoremap <C-a> <esc>:Asd2NumToggle<CR>a
 "}
 
 " nerd-tree{
     " 目录树导航
-    Plugin 'scrooloose/nerdtree'			
+    Plug 'scrooloose/nerdtree'			
     " <leader>t? for Plugins toggle
     noremap <leader>te :NERDTreeToggle<CR>
 "}
 
 " taglist{
     " 代码结构预览
-    Plugin 'vim-scripts/taglist.vim'
+    Plug 'vim-scripts/taglist.vim'
     if IsLinux()
         let Tlist_Ctags_Cmd='/usr/bin/ctags'
     elseif IsWin()
@@ -382,7 +376,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
     "   install python, Cmake, VS, 7-zip
     "   install.py --clang-completer --msvc 14 --build-dir <dir>
     "   自己指定vs版本，自己指定build路径
-    Plugin 'Valloric/YouCompleteMe'			
+    Plug 'Valloric/YouCompleteMe'			
     let g:ycm_global_ycm_extra_conf=$MyVimPath.'/.ycm_extra_conf.py'
     let g:ycm_seed_identifiers_with_syntax = 1  " 开启语法关键字补全
     let g:ycm_warning_symbol = 'W:'             " warning符号
@@ -407,8 +401,8 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 " ultisnips{
     " 代码片段插入
-    Plugin 'SirVer/ultisnips'               " snippet insert engine
-    Plugin 'honza/vim-snippets'             " snippet collection
+    Plug 'SirVer/ultisnips'               " snippet insert engine
+    Plug 'honza/vim-snippets'             " snippet collection
     let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
                                             " mySnippets is my own snippets colletrion
     let g:UltiSnipsExpandTrigger="<tab>"
@@ -418,7 +412,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 " nerd-commenter{
     " 批量注释
-    Plugin 'scrooloose/nerdcommenter'
+    Plug 'scrooloose/nerdcommenter'
     let g:NERDSpaceDelims = 1               " add space after comment
     " <leader>cc for comment
     " <leader>cl/cb for comment aligned
@@ -427,28 +421,28 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 " file switch{
     " 文件切换
-    Plugin 'derekwyatt/vim-fswitch'
+    Plug 'derekwyatt/vim-fswitch'
     nnoremap <silent> <leader>fh :FSHere<CR>
 "}
 
 " vim-over {
     " substitute preview
-    Plugin 'osyo-manga/vim-over'
+    Plug 'osyo-manga/vim-over'
     nnoremap <leader>oc :OverCommandLine<CR>
 "}
 
 " tabular{
     " 代码对齐
     " /:/r2 means align right and insert 2 space before next field
-    Plugin 'godlygeek/tabular'
+    Plug 'godlygeek/tabular'
     " align map
     vnoremap <leader>a :Tabularize /
 "}
 
 " surround and repeat{
     " add surroundings
-    Plugin 'tpope/vim-surround'
-    Plugin 'tpope/vim-repeat'
+    Plug 'tpope/vim-surround'
+    Plug 'tpope/vim-repeat'
 
     " simplify the map to 2 operation
     " nmap yi ysw
@@ -463,7 +457,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 " easy-motion{
     " 快速跳转
-    Plugin 'easymotion/vim-easymotion'
+    Plug 'easymotion/vim-easymotion'
     let g:EasyMotion_do_mapping = 0         " 禁止默认map
     let g:EasyMotion_smartcase = 1          " 不区分大小写
     nmap s <Plug>(easymotion-overwin-f)
@@ -484,7 +478,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 " ctrl-space{
     " buffer管理
     " <h,o,l,w,b,/,?> for buffer,file,tab,workspace,bookmark,search and help
-    Plugin 'vim-ctrlspace/vim-ctrlspace'
+    Plug 'vim-ctrlspace/vim-ctrlspace'
     set nocompatible
     set hidden
     let g:CtrlSpaceSetDefaultMapping = 1
@@ -501,8 +495,8 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 " incsearch{
     " 查找增强
-    Plugin 'haya14busa/incsearch.vim'
-    Plugin 'haya14busa/incsearch-fuzzy.vim'
+    Plug 'haya14busa/incsearch.vim'
+    Plug 'haya14busa/incsearch-fuzzy.vim'
 
     let g:incsearch#auto_nohlsearch = 1
     xmap <tab> <Over>(incsearch-next) 
@@ -529,7 +523,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 " smooth-scroll{
     " 平滑滚动
-    Plugin 'terryma/vim-smooth-scroll'
+    Plug 'terryma/vim-smooth-scroll'
     noremap <silent> <C-u> :call smooth_scroll#up(&scroll, 0, 2)<CR>
     noremap <silent> <C-d> :call smooth_scroll#down(&scroll, 0, 2)<CR>
     noremap <silent> <C-b> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
@@ -538,8 +532,8 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 " session{
     " 会话保存
-    Plugin 'xolox/vim-misc'
-    Plugin 'xolox/vim-session'
+    Plug 'xolox/vim-misc'
+    Plug 'xolox/vim-session'
     let g:session_autosave='no'             " 自动保存会话窗口
     let g:session_autoload='yes'            " 直接打开vim，自动加载default.vim
     noremap <leader>qa :SaveSession!<CR>:qa<CR>
@@ -548,7 +542,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 " indent-line{
     " 显示缩进标识
-    Plugin 'Yggdroot/indentLine'			
+    Plug 'Yggdroot/indentLine'			
     "let g:indentLine_char = '|'            " 设置标识符样式
     let g:indentLinet_color_term=200        " 设置标识符颜色
     nnoremap <leader>t\ :IndentLinesToggle<CR>
@@ -557,7 +551,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 " new-railscasts-theme{
     " 使用主题
     set rtp+=$MyVimPath/bundle/new-railscasts-theme/
-    Plugin 'carakan/new-railscasts-theme'
+    Plug 'carakan/new-railscasts-theme'
     colorscheme new-railscasts          
     hi CursorLine   cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
     hi CursorColumn cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
@@ -568,7 +562,7 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 " air-line{
     " 状态栏美观
-    Plugin 'vim-airline/vim-airline'
+    Plug 'vim-airline/vim-airline'
     set laststatus=2
     let g:airline#extensions#ctrlspace#enabled = 1      " support for ctrlspace integration
     let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()" 
@@ -579,14 +573,14 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 
 " rainbow{
     " 彩色括号
-    Plugin 'luochen1990/rainbow'
+    Plug 'luochen1990/rainbow'
     let g:rainbow_active = 1 "0 if you want to enable it later via :RainbowToggle
     nnoremap <leader>tr :RainbowToggle<CR>
 "}
 
 " markdown-preview{
-    Plugin 'iamcco/mathjax-support-for-mkdp'
-    Plugin 'iamcco/markdown-preview.vim'
+    Plug 'iamcco/mathjax-support-for-mkdp'
+    Plug 'iamcco/markdown-preview.vim'
     if IsWin()
         let g:mkdp_path_to_chrome = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
     elseif IsLinux()
@@ -606,31 +600,34 @@ Plugin 'VundleVim/Vundle.vim'			" let Vundle manage Vundle, required
 "}
 
 " vim-latex{
-    "Plugin 'vim-latex/vim-latex'
-    " 目前只是为了latex文件的高亮显示
+    "Plug 'vim-latex/vim-latex'
+    " 暂时不用
 "}
 
-call vundle#end()            " required
-filetype plugin indent on    " required
+call plug#end()            " required
 
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
 
-""""""""""""""""""""""""""""""""""""""""""""""
-" Vundel使用举例，需要位于vundle#begin/end之间
-"
-"Plugin 'tpope/vim-fugitive'					" plugin on GitHub repo
-"Plugin 'L9'									" plugin from http://vim-scripts.org/vim/scripts.html
-"Plugin 'git://git.wincent.com/command-t.git'	" Git plugin not hosted on GitHub
-"Plugin 'file:///home/gmarik/path/to/plugin'	" git repos on your local machine (i.e. when working on your own plugin)
-"Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}		" The sparkup vim script is in a subdirectory of this repo called vim.
-												" Pass the path to set the runtimepath properly.
-"Plugin 'ascenator/L9', {'name': 'newL9'}		" Install L9 and avoid a Naming conflict if you've already installed a
-												" different version somewhere else.
-" Brief help
-" :PluginList       = lists configured plugins
-" :PluginInstall    = installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo = searches for foo; append `!` to refresh local cache
-" :PluginClean      = confirms removal of unused plugins; append `!` to auto       - approve removal
-"
-" see :h vundle for more details or wiki for FAQ
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" # Commands
+" | Command                             | Description                                                        |
+" | ----------------------------------- | ------------------------------------------------------------------ |
+" | PlugInstall [name ...] [#threads]   | Install plugins                                                    |
+" | PlugUpdate [name ...] [#threads]    | Install or update plugins                                          |
+" | PlugClean[!]                        | Remove unused directories (bang version will clean without prompt) |
+" | PlugUpgrade                         | Upgrade vim-plug itself                                            |
+" | PlugStatus                          | Check the status of plugins                                        |
+" | PlugDiff                            | Examine changes from the previous update and the pending changes   |
+" | PlugSnapshot[!] [output path]       | Generate script for restoring the current snapshot of the plugins  |
+
+" # Plug options
+" | Option                  | Description                                      |
+" | ----------------------- | ------------------------------------------------ |
+" | branch / tag / commit   | Branch/tag/commit of the repository to use       |
+" | rtp                     | Subdirectory that contains Vim plugin            |
+" | dir                     | Custom directory for the plugin                  |
+" | as                      | Use different name for the plugin                |
+" | do                      | Post-update hook (string or funcref)             |
+" | on                      | On-demand loading: Commands or `<Plug>`-mappings |
+" | for                     | On-demand loading: File types                    |
+" | frozen                  | Do not update unless explicitly specified        |
+

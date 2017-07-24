@@ -9,7 +9,8 @@
 
 ---
 # TODO
-
+ - 中文vimdoc
+ - 特殊字符插件
 
 ---
 # Files
@@ -22,6 +23,7 @@
 ├── cf-vim
 │   ├── .vimrc             : vim配置文件
 │   ├── .ycm_extra_conf.py : vim-ycm配置文件
+│   ├── autoload           : vim-plug插件
 │   └── mySnippets         : 自定义snippets
 ├── cf-zsh
 │   ├── .zshrc             : zsh配置文件
@@ -31,6 +33,9 @@
 
 ---
 # ChangeLog
+
+## 20170724 - v2.0.86
+ - 换用vim-plug管理插件
 
 ## 20170724 - v1.7.85
  - 添加后比缀名检测
@@ -272,7 +277,7 @@
 ## 20170422
  - 添加文本对齐插件Tabularize
  - YCM添加"转到定义"和"显示错误”快捷键
- - 添加map leader-` ~
+ - 添加map leader-\` ~
 
 ## 20170420
  - 添加visualmark
