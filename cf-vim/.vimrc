@@ -79,6 +79,8 @@ endfunction
     set softtabstop=4                   " 设置显示的缩进为4,实际Tab可以不是4个格
     set shiftwidth=4                    " 设置>和<命令移动宽度为4
     set nowrap                          " 默认关闭折行
+    set listchars=eol:$,tab:>-,trail:~,space:.
+                                        " 不可见字符显示
 "}
 
 " Edit{
@@ -180,10 +182,15 @@ vnoremap <leader>u ~
 nnoremap vv <C-v>
 
 " wrap and fold{
-    " <leader>i? for vim "set inv?" command
-    nnoremap <leader>iw :set invwrap<CR>
     nnoremap <leader>zr zR
     nnoremap <leader>zm zM
+
+    " <leader>i? for vim "set inv?" command
+    " 显示折行
+    nnoremap <leader>iw :set invwrap<CR>
+
+    " 显示不可见字符
+    nnoremap <leader>il :set invlist<CR>
 
     " 映射隐藏字符功能，set conceallevel直接设置没交果
     nnoremap <leader>ih <esc>:call InvConceallevel()<CR>
@@ -220,6 +227,7 @@ nnoremap vv <C-v>
 
     nnoremap y<S-l> y$
     nnoremap y<S-h> y^
+
     nnoremap <C-j> <C-e>
     nnoremap <C-k> <C-y>
 "}
