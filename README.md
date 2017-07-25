@@ -34,6 +34,9 @@
 ---
 # ChangeLog
 
+## 20170725 - v2.0.88
+ - 添加vimcdoc
+
 ## 20170725 - v2.0.87
  - 添加nnoremap Tabularize
 

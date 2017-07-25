@@ -8,7 +8,7 @@
 
 
 "===============================================================================
-" My Notes(:help index is better)
+" My Notes
 "===============================================================================
 " [*]带python编译 {
 " 	使用MinGw-x64，更改.mak文件：
@@ -338,6 +338,14 @@ set rtp+=$MyVimPath                     " add .vim or vimfiles to runtime path
 call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install plugins
 
 " user plugins 
+
+" vimcdoc {
+    " 中文帮助文档
+    Plug 'yianwillis/vimcdoc'
+    " :help       = 查看Vim帮助
+    " :help index = 查看帮助列表
+    " <s-k>       = 快速查看光标所在单词的vim帮助
+"}
 
 " asd2num {
     " asd数字输入
