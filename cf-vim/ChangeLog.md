@@ -2,7 +2,10 @@
 ---
 # cf-vim-ChangeLog
 
-## 20170726 - vv0.0.1
+## 20170726 - vv2.0.91
+ - 设置NERDTreeShowHidden为true
+
+## 20170726 - vv2.0.90
  - 不同项目配置，使用不同ChangeLog
 
 

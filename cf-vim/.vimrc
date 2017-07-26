@@ -159,6 +159,9 @@ endfunction
 " - 尽量不改变vim原有键位的功能定义
 " - 尽量一只手不同时按两个键
 " - 建议调换Esc和CapsLock键
+"
+"  <leader>t? for plugins toggle command
+"  <leader>i? for vim "set inv?" command
 "===============================================================================
 
 " 使用Space作为leader
@@ -185,7 +188,6 @@ nnoremap vv <C-v>
     nnoremap <leader>zr zR
     nnoremap <leader>zm zM
 
-    " <leader>i? for vim "set inv?" command
     " 显示折行
     nnoremap <leader>iw :set invwrap<CR>
 
@@ -364,7 +366,7 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
 " nerd-tree{
     " 目录树导航
     Plug 'scrooloose/nerdtree'			
-    " <leader>t? for Plugins toggle
+    let g:NERDTreeShowHidden=1
     noremap <leader>te :NERDTreeToggle<CR>
 "}
 
