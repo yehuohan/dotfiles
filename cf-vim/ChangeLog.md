@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170726 - vv2.0.92
+ - Linux下gvim使用consolas字体
+
 ## 20170726 - vv2.0.91
  - 设置NERDTreeShowHidden为true
 
