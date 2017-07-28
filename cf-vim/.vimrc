@@ -445,6 +445,7 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
 "}
 
 " vim-over {
+    " 替换预览
     " substitute preview
     Plug 'osyo-manga/vim-over'
     nnoremap <leader>oc :OverCommandLine<CR>
@@ -551,6 +552,13 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
     nmap g# <Plug>(incsearch-nohl-g#)
 "}
 
+" expand-region{
+    " 快速块选择
+    Plug 'terryma/vim-expand-region'
+    vmap <leader>h <Plug>(expand_region_expand)
+    vmap <leader>l <Plug>(expand_region_shrink)
+"}
+
 " smooth-scroll{
     " 平滑滚动
     Plug 'terryma/vim-smooth-scroll'
@@ -613,6 +621,7 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
 "}
 
 " markdown-preview{
+    " MarkDown预览 
     Plug 'iamcco/mathjax-support-for-mkdp'
     Plug 'iamcco/markdown-preview.vim'
     if IsWin()
