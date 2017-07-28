@@ -2,6 +2,10 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170728 - vv2.0.94
+ - incsearch使用C-j,k,n,b来在查找时滚动
+ - scroll使用C-n,b来滚屏
+
 ## 20170726 - vv2.0.92
  - Linux下gvim使用consolas字体
 

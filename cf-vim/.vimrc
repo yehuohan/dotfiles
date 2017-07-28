@@ -132,7 +132,7 @@ endfunction
         set guioptions-=b               " 隐藏底部滚动条
         set guioptions+=0               " 不隐藏Tab栏
 
-        au GuiEnter * set t_vb=         " 关闭闪屏(关闭声音后，会用闪屏提示)
+        autocmd GuiEnter * set t_vb=    " 关闭闪屏(关闭声音后，会用闪屏提示)
 
         if IsLinux()
             set lines=20
@@ -517,12 +517,22 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
     " 查找增强
     Plug 'haya14busa/incsearch.vim'
     Plug 'haya14busa/incsearch-fuzzy.vim'
-
     let g:incsearch#auto_nohlsearch = 1
-    xmap <tab> <Over>(incsearch-next) 
-    xmap <S-tab> <Over>(incsearch-prev)
-    xmap <C-j> <Over>(incsearch-scroll-f)
-    xmap <c-k> <Over>(incsearch-scroll-b)
+
+    " 设置查找时页面滚动映射
+    augroup incsearch-keymap
+        autocmd!
+        autocmd VimEnter * call s:incsearch_keymap()
+    augroup END
+    function! s:incsearch_keymap()
+        IncSearchNoreMap <C-j> <Over>(incsearch-next)
+        IncSearchNoreMap <C-k> <Over>(incsearch-prev)
+        IncSearchNoreMap <C-n> <Over>(incsearch-scroll-f)
+        "IncSearchNoreMap <C-m> <Over>(incsearch-scroll-b)
+        " <C-m>会影响Enter键
+        IncSearchNoreMap <C-b> <Over>(incsearch-scroll-b)
+    endfunction
+
     nmap /  <Plug>(incsearch-forward)
     nmap ?  <Plug>(incsearch-backward)
     nmap g/ <Plug>(incsearch-stay)
@@ -544,10 +554,14 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
 " smooth-scroll{
     " 平滑滚动
     Plug 'terryma/vim-smooth-scroll'
-    noremap <silent> <C-u> :call smooth_scroll#up(&scroll, 0, 2)<CR>
-    noremap <silent> <C-d> :call smooth_scroll#down(&scroll, 0, 2)<CR>
-    noremap <silent> <C-b> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
-    noremap <silent> <C-f> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
+    nnoremap <silent> <C-u> :call smooth_scroll#up(&scroll, 0, 2)<CR>
+    nnoremap <silent> <C-d> :call smooth_scroll#down(&scroll, 0, 2)<CR>
+    " nnoremap <silent> <C-f> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
+    nnoremap <silent> <C-b> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
+
+    nnoremap <silent> <C-n> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
+    "nnoremap <silent> <C-m> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
+    " <C-m>会影响Enter键
 "}
 
 " session{
