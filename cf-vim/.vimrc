@@ -139,7 +139,7 @@ endfunction
             set columns=100
             "set guifont=Courier\ 10\ Pitch\ 11	
             "set guifont=Ubuntu\ Mono\ 13
-            set guifont=Consolas\ 13
+            set guifont=DejaVu\ Sans\ Mono\ 13
         elseif IsWin()
             set lines=25
             set columns=100
