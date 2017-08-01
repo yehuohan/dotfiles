@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170801 - vv2.0.97
+ - 添加切换透明背景映射(Arch)
+
 ## 20170728 - vv2.0.96
  - linux下gvim改用DejaVu字体
 

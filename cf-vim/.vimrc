@@ -204,6 +204,19 @@ nnoremap vv <C-v>
             set conceallevel=0                  " 显示markdown等格式中的隐藏字符
         endif
     endfunction
+
+    " 更改透明背景
+    nnoremap <leader>it <esc>:call InvTransParentBackground()<CR>
+    let s:inv_transparent_bg_flg = 0
+    function! InvTransParentBackground()
+        if s:inv_transparent_bg_flg == 1
+            hi Normal ctermbg=234
+            let s:inv_transparent_bg_flg = 0
+        else
+            hi Normal ctermbg=NONE
+            let s:inv_transparent_bg_flg = 1
+        endif
+    endfunction
 "}
 
 " copy{
