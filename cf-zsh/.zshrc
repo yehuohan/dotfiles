@@ -110,10 +110,12 @@ alias wiconv='iconv -f gbk -t utf-8'
 alias cman='man -M /usr/local/zhman/share/man/zh_CN'
 
 # user path
-export PATH="$PATH:$HOME/MyApps/bochs268/bin"
-export PATH="$PATH:$HOME/MyApps/nasm212/bin"
+export PATH="$PATH:$HOME/MyApps/"
+
 export PATH="$PATH:$HOME/MyApps/Qt570/5.7/gcc_64/bin"
 export PATH="$PATH:$HOME/MyApps/Qt570/Tools/QtCreator/bin"
+export PATH="$PATH:$HOME/MyApps/bochs268/bin"
+export PATH="$PATH:$HOME/MyApps/nasm212/bin"
 export PATH="$PATH:$HOME/MyApps/node6111/bin"
 
 
