@@ -11,31 +11,30 @@
 " My Notes
 "===============================================================================
 " [*]带python编译 {
-" 	使用MinGw-x64，更改.mak文件：
-" 	ARCH=i686								- 使用32位，python也使用32位
-" 	CC := $(CROSS_COMPILE)gcc -m32			- 32位编绎
-" 	CXX := $(CROSS_COMPILE)g++ -m32			- 32位编绎
-" 	WINDRES := windres --target=pe-i386		- 资源文件添加i386编绎
-"	若全部使用64位，则同样更改参数即可
+    " 	使用MinGw-x64，更改.mak文件：
+    " 	ARCH=i686								- 使用32位，python也使用32位
+    " 	CC := $(CROSS_COMPILE)gcc -m32			- 32位编绎
+    " 	CXX := $(CROSS_COMPILE)g++ -m32			- 32位编绎
+    " 	WINDRES := windres --target=pe-i386		- 资源文件添加i386编绎
+    "	若全部使用64位，则同样更改参数即可
 "}
-"
 " [*]替换字符串{
-"   :%s     - 所有行
-"   :'<,'>s - 所选范圈
-"   :n,$s   - 第n行到最一行
-"   :.,ns   - 当前行到第n行
-"   :.,+30s - 从当前行开始的30行
-"   :'s,'es - 从ms标记到me标记的范围
-"   :s//g   - 替换一行中所有找到的字符串
-"   :s//c   - 替换前要确认
-"
-"   :s/ar\[i\]/\*(ar+i)/
-"       ar[i] 替换成 *(ar+)，注意：对于 * . / \ [ ] 需要转义
-"	:s/"\([A-J]\)"/"Group \1"/
-"		将"X" 替换成 "Group X"，其中X可为A-J， \( \) 表示后面用 \1 引用 () 的内容
-"	:s/"\(.*\)"/set("\1")/
-"	    将“*" 替换成 set("*") ，其中 .* 为任意字符
-"
+    "   :%s     - 所有行
+    "   :'<,'>s - 所选范圈
+    "   :n,$s   - 第n行到最一行
+    "   :.,ns   - 当前行到第n行
+    "   :.,+30s - 从当前行开始的30行
+    "   :'s,'es - 从ms标记到me标记的范围
+    "   :s//g   - 替换一行中所有找到的字符串
+    "   :s//c   - 替换前要确认
+    "
+    "   :s/ar\[i\]/\*(ar+i)/
+    "       ar[i] 替换成 *(ar+)，注意：对于 * . / \ [ ] 需要转义
+    "	:s/"\([A-J]\)"/"Group \1"/
+    "		将"X" 替换成 "Group X"，其中X可为A-J， \( \) 表示后面用 \1 引用 () 的内容
+    "	:s/"\(.*\)"/set("\1")/
+    "	    将“*" 替换成 set("*") ，其中 .* 为任意字符
+    "
 "}
 
 
@@ -44,16 +43,96 @@
 " Platform
 "===============================================================================
 silent function! IsLinux()
+    " linux
     return has('unix') && !has('macunix') && !has('win32unix')
 endfunction
 silent function! IsWin()
+    " windows
     return  (has('win32') || has('win64'))
+endfunction
+silent function! IsGw()
+    " GNU for windows
+    return (has('win32unix'))
+endfunction
+
+if IsLinux()
+    " vim插件路径
+    let $MyVimPath="~/.vim" 
+elseif IsWin()
+    let $MyVimPath=$VIM."\\vimfiles"
+    " windows下将HOME设置VIM的安装路径
+    let $HOME=$VIM 
+    " 未打开文件时，切换到HOME目录
+    execute "cd $HOME"          
+elseif IsGw()
+    " 使用Windows下GVim的插件 
+    let $MyVimPath="/c/MyApps/Vim/vimfiles"
+endif
+
+
+"===============================================================================
+" Defined functions
+"===============================================================================
+" 扩展名检测
+let s:file_ext=expand("%:e")         
+function! FileExtIs(ext)
+    if a:ext ==? s:file_ext
+        return 1
+    else
+        return 0
+    endif
+endfunction
+
+" 隐藏字符显示
+function! InvConceallevel()
+    if &conceallevel == 0
+        set conceallevel=2
+    elseif &conceallevel == 2
+        set conceallevel=0                  " 显示markdown等格式中的隐藏字符
+    endif
+endfunction
+
+" 透明背影控制（需要系统本身支持透明）
+let s:inv_transparent_bg_flg = 0
+function! InvTransParentBackground()
+    if s:inv_transparent_bg_flg == 1
+        hi Normal ctermbg=234
+        let s:inv_transparent_bg_flg = 0
+    else
+        hi Normal ctermbg=NONE
+        let s:inv_transparent_bg_flg = 1
+    endif
+endfunction
+
+" 编译环境函数
+function! F5ComplileFile(argstr)
+    let l:ext=expand("%:e")                         " 扩展名
+    if IsLinux()
+        let l:filename="\"".expand("./%:t")."\""    " 文件名，不带路径，带扩展名 
+        let l:name="\"".expand("./%:t:r")."\""      " 文件名，不带路径，不带扩展名
+    elseif IsWin()
+        let l:filename="\"".expand("%:t")."\""      " 文件名，不带路径，带扩展名 
+        let l:name="\"".expand("%:t:r")."\""        " 文件名，不带路径，不带扩展名
+    endif
+    " 先切换目录
+    exec "cd %:h"
+    " ==? 忽略大小写比较， ==# 进行大小写比较
+    if "c" ==? l:ext
+        " c
+        execute ":AsyncRun gcc ".a:argstr." -o ".l:name." ".l:filename." && ".l:name
+    elseif "cpp" ==? l:ext
+        " c++
+        execute ":AsyncRun g++ -std=c++11 ".a:argstr." -o ".l:name." ".l:filename." && ".l:name
+    elseif "py" ==? l:ext || "pyw" ==? l:ext
+        " python
+        execute ":AsyncRun python ".l:filename
+    endif
 endfunction
 
 
 
 "===============================================================================
-" settings 
+" Settings 
 "===============================================================================
 " UI{
     set nocompatible                    " 不兼容vi快捷键
@@ -96,25 +175,6 @@ endfunction
     set noerrorbells                    " 关闭错误信息响铃
     set vb t_vb=                        " 关闭响铃(如normal模式时按esc会有响铃)
     set conceallevel=0                  " 显示markdown等格式中的隐藏字符
-
-    if IsLinux()
-        let $MyVimPath="~/.vim"         " vim插件路径
-    elseif IsWin()
-        let $MyVimPath=$VIM."\\vimfiles"
-
-        let $HOME=$VIM                  " windows下将HOME设置VIM的安装路径
-        execute "cd $HOME"          
-        " 未打开文件时，切换到HOME目录
-    endif
-
-    let s:file_ext=expand("%:e")         " 扩展名检测
-    function! FileExtIs(ext)
-        if a:ext ==? s:file_ext
-            return 1
-        else
-            return 0
-        endif
-    endfunction
 
     if FileExtIs("c") || FileExtIs("cpp") || FileExtIs("h")
         set foldmethod=syntax           " 设置语法折叠
@@ -197,26 +257,9 @@ nnoremap vv <C-v>
 
     " 映射隐藏字符功能，set conceallevel直接设置没交果
     nnoremap <leader>ih <esc>:call InvConceallevel()<CR>
-    function! InvConceallevel()
-        if &conceallevel == 0
-            set conceallevel=2
-        elseif &conceallevel == 2
-            set conceallevel=0                  " 显示markdown等格式中的隐藏字符
-        endif
-    endfunction
 
     " 更改透明背景
     nnoremap <leader>it <esc>:call InvTransParentBackground()<CR>
-    let s:inv_transparent_bg_flg = 0
-    function! InvTransParentBackground()
-        if s:inv_transparent_bg_flg == 1
-            hi Normal ctermbg=234
-            let s:inv_transparent_bg_flg = 0
-        else
-            hi Normal ctermbg=NONE
-            let s:inv_transparent_bg_flg = 1
-        endif
-    endfunction
 "}
 
 " copy{
@@ -322,33 +365,13 @@ nnoremap vv <C-v>
     nnoremap <leader>fw :execute"let g:__str__=expand(\"<cword>\")"<bar>execute "vimgrep /\\<" . g:__str__ . "\\>/j %"<bar>copen<CR>
 "}
 
-" F5 map{
-    " compliling and running
-    noremap <F5> <esc>:call F5RunFile()<CR>
-    function! F5RunFile()
-        let l:ext=expand("%:e")                     " 扩展名
-    if IsLinux()
-        let l:filename="\"".expand("./%:t")."\""    " 文件名，不带路径，带扩展名 
-        let l:name="\"".expand("./%:t:r")."\""      " 文件名，不带路径，不带扩展名
-    elseif IsWin()
-        let l:filename="\"".expand("%:t")."\""      " 文件名，不带路径，带扩展名 
-        let l:name="\"".expand("%:t:r")."\""        " 文件名，不带路径，不带扩展名
-    endif
-        " 先切换目录
-        exec "cd %:h"
-        " ==? 忽略大小写比较， ==# 进行大小写比较
-        if "c" ==? l:ext
-            " c
-            execute "!gcc -o ".l:name." ".l:filename." && ".l:name
-        elseif "cpp" ==? l:ext
-            " c++
-            execute "!g++ -std=c++11 -o ".l:name." ".l:filename." && ".l:name
-        elseif "py" ==? l:ext || "pyw" ==? l:ext
-            " python
-            execute "!python ".l:filename
-        endif
-    endfunction
+" Run Program map{
+    " compiling and running
+    noremap <F5> <esc>:call F5ComplileFile('')<CR>
+    " compile args
+    nnoremap <leader>cg :execute"let g:__str__=input('/')"<bar>call F5ComplileFile(g:__str__)<CR>
 "}
+
 
 
 
@@ -406,9 +429,10 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
     "   ./install.py --clang-completer
     " Windows: 
     "   install python, Cmake, VS, 7-zip
-    "   install.py --clang-completer --msvc 14 --build-dir <dir>
-    "   自己指定vs版本，自己指定build路径
-    Plug 'Valloric/YouCompleteMe'			
+    "   install.py --clang-completer --msvc 14 --build-dir <ycm_build>
+    "   自己指定vs版本，自己指定build路径，编译完成后，可以删除<ycm_build>
+    "   如果已经安装了clang，可以使用--system-libclang参数，就不必再下载clang了
+    Plug 'Valloric/YouCompleteMe'
     let g:ycm_global_ycm_extra_conf=$MyVimPath.'/.ycm_extra_conf.py'
     let g:ycm_seed_identifiers_with_syntax = 1  " 开启语法关键字补全
     let g:ycm_warning_symbol = 'W:'             " warning符号
@@ -426,9 +450,18 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
     nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
     nnoremap <leader>gi :YcmCompleter GoToInclude<CR>
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
-    nnoremap <leader>gsd :YcmShowDetailedDiagnostic
+    nnoremap <leader>gs :YcmShowDetailedDiagnostic<CR>
     noremap <F4> :YcmDiags<CR> 
                                                 " 错误列表
+"}
+
+" AsyncRun {
+    " 导步运行程序
+    Plug 'skywind3000/asyncrun.vim'
+    augroup vimrc
+        autocmd User AsyncRunStart call asyncrun#quickfix_toggle(8, 1)
+    augroup END
+    nnoremap <leader>r :AsyncRun 
 "}
 
 " ultisnips{
@@ -568,8 +601,8 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
 " expand-region{
     " 快速块选择
     Plug 'terryma/vim-expand-region'
-    vmap <leader>h <Plug>(expand_region_expand)
-    vmap <leader>l <Plug>(expand_region_shrink)
+    vmap <leader>l <Plug>(expand_region_expand)
+    vmap <leader>h <Plug>(expand_region_shrink)
 "}
 
 " smooth-scroll{

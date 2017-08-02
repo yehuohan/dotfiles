@@ -31,6 +31,12 @@
 import os
 import ycm_core
 
+
+# User defined path
+WIN_GW = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include/'
+WIN_QT = 'D:/Qt/Qt5.7.0/5.7/msvc2015/include/'
+
+
 # These are the compilation flags that will be used in case there's no
 # compilation database set (by default, one is not set).
 # CHANGE THIS LIST OF FLAGS. YES, THIS IS THE DROID YOU HAVE BEEN LOOKING FOR.
@@ -81,29 +87,33 @@ flags = [
 '-isystem',
 './tests/gmock/include',
 
-# user define
+# user defined
 '-isystem',
 '/usr/include',
 '-isystem',
 '/usr/include/c++/5',
 
 '-isystem',
-'C:/MyApps/msys64/mingw64/include',
+WIN_GW,
 '-isystem',
-'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include',
+WIN_GW + 'ssp',
 '-isystem',
-'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include/ssp',
+WIN_GW + 'c++',
 '-isystem',
-'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include/c++',
+WIN_GW + 'c++/bits',
+'-isystem',
+WIN_GW + 'c++/x86_64-w64-mingw32',
+'-isystem',
+WIN_GW + 'c++/x86_64-w64-mingw32/bits',
 
 '-isystem',
-'D:/Qt/Qt5.7.0/5.7/msvc2015/include/QtCore',
+WIN_QT + 'QtCore',
 '-isystem',
-'D:/Qt/Qt5.7.0/5.7/msvc2015/include/QtGui',
+WIN_QT + 'QtGui',
 '-isystem',
-'D:/Qt/Qt5.7.0/5.7/msvc2015/include/QtWidgets',
+WIN_QT + 'QtWidgets',
 '-isystem',
-'D:/Qt/Qt5.7.0/5.7/msvc2015/include/QtSerialBus',
+WIN_QT + 'QtSerialBus',
 ]
 
 
