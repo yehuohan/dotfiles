@@ -54,6 +54,9 @@ silent function! IsGw()
     " GNU for windows
     return (has('win32unix'))
 endfunction
+silent function! IsGui()
+    return has("gui_running")
+endfunction
 
 if IsLinux()
     " vim插件路径
@@ -129,6 +132,29 @@ function! F5ComplileFile(argstr)
     endif
 endfunction
 
+" linux-fcitx输入法切换 
+function! LinuxFcitx2En()
+    if 2 == system("fcitx-remote")
+        let l:t = system("fcitx-remote -c")
+    endif
+endfunction
+function! LinuxFcitx2Zh()
+    if 1 == system("fcitx-remote")
+        let l:t = system("fcitx-remote -o")
+    endif
+endfunction
+
+"===============================================================================
+" Event handle
+"===============================================================================
+if IsGui()
+    autocmd GuiEnter * set t_vb=        " 关闭闪屏(关闭声音后，会用闪屏提示)
+endif
+if IsLinux()
+    "autocmd InsertLeave * call LinuxFcitx2En()
+    inoremap <esc> <esc>:call LinuxFcitx2En()<CR>
+endif
+
 
 
 "===============================================================================
@@ -184,15 +210,13 @@ endfunction
 "}
 
 " Vim-Gui{
-    if has("gui_running")
+    if IsGui()
         set guioptions-=m               " 隐藏菜单栏
         set guioptions-=T               " 隐藏工具栏
         set guioptions-=L               " 隐藏左侧滚动条
         set guioptions-=r               " 隐藏右侧滚动条
         set guioptions-=b               " 隐藏底部滚动条
         set guioptions+=0               " 不隐藏Tab栏
-
-        autocmd GuiEnter * set t_vb=    " 关闭闪屏(关闭声音后，会用闪屏提示)
 
         if IsLinux()
             set lines=20
