@@ -2,6 +2,10 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170803 - vv2.0.102
+ - 添加multiple-cursors插件
+ - 添加Alt按键映射设置
+
 ## 20170803 - vv2.0.100
  - 添加fcitx输入自动切换
 
