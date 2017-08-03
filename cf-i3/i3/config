@@ -1,4 +1,4 @@
-#===============================================================================
+#==============================================================================
 # i3-config 
 # yehuohan@gmail.com, yehuohan@qq.com
 #
@@ -24,7 +24,7 @@ exec --no-startup-id fcitx
 # 透明效果
 exec --no-startup-id compton
 # 背景
-exec_always --no-startup-id feh --bg-fill ~/WallPaper/wp.jpg
+exec_always --no-startup-id feh --bg-fill ~/WallPaper/wp2.jpg
 # 电池管理，包括亮度调节(可以使用Fn+亮度调节键)
 exec --no-startup-id xfce4-power-manager
 # 网络连接
@@ -74,8 +74,8 @@ for_window [window_role="task_dialog"] floating enable
 #for_window [class="xfce4-terminal"] border normal
 
 # 打开软件时自动移至相应工作区
-assign [class="Thunar"] workspace 9
-assign [class="Gvim"] workspace 10
+assign [class="Thunar"] workspace 10
+assign [class="Gvim"] workspace 1
 
 # i3-gaps configuration
 for_window [class="^.*"] border normal
@@ -118,20 +118,42 @@ bar {
 
 #===============================================================================
 # key bind for i3 operation
+# mod+Shift : 很少用的按键，或不希望被按误按
+# mod+mod1  : 作为mod的逆功能键
 #===============================================================================
 
+# Power Management
+set $mode_system  lock(L) logout(O) reboot(R) shutdown(S) exit(Esc)
+bindsym $mod+Shift+q mode "$mode_system"
+mode "$mode_system" {
+    bindsym l exec --no-startup-id i3lock -c '#000000', mode "default"
+    bindsym o exec --no-startup-id i3-msg exit, mode "default"
+    bindsym r exec --no-startup-id systemctl reboot, mode "default"
+    bindsym s exec --no-startup-id systemctl poweroff, mode "default"
+    bindsym Escape mode "default"
+}
+
 # reload the configuration file
-bindsym $mod+Shift+t reload
+bindsym $mod+Shift+w reload
+
+# exit i3 (logs you out of your X session)
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
 # restart i3 inplace 
 # preserves your layout/session, can be used to upgrade i3
 bindsym $mod+Shift+r restart
 
-# kill focused window
-bindsym $mod+q kill
+
+# kill(stop) focused window
+bindsym $mod+s kill
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
+
+# 把当前窗口设为便笺本
+bindsym $mod+mod1+p move scratchpad
+# 呼出第一个便笺本，将呼出的窗口设置成平铺才能继续呼出窗口
+bindsym $mod+p scratchpad show
 
 # change focus
 bindsym $mod+h focus left
@@ -169,16 +191,16 @@ bindsym $mod+8 workspace 8
 bindsym $mod+9 workspace 9
 
 # move focused container to workspace
-bindsym $mod+Shift+0 move container to workspace 10; workspace 10
-bindsym $mod+Shift+1 move container to workspace 1; workspace 1 
-bindsym $mod+Shift+2 move container to workspace 2; workspace 2
-bindsym $mod+Shift+3 move container to workspace 3; workspace 3
-bindsym $mod+Shift+4 move container to workspace 4; workspace 4
-bindsym $mod+Shift+5 move container to workspace 5; workspace 5
-bindsym $mod+Shift+6 move container to workspace 6; workspace 6
-bindsym $mod+Shift+7 move container to workspace 7; workspace 7
-bindsym $mod+Shift+8 move container to workspace 8; workspace 8
-bindsym $mod+Shift+9 move container to workspace 9; workspace 9
+bindsym $mod+mod1+0 move container to workspace 10; workspace 10
+bindsym $mod+mod1+1 move container to workspace 1; workspace 1 
+bindsym $mod+mod1+2 move container to workspace 2; workspace 2
+bindsym $mod+mod1+3 move container to workspace 3; workspace 3
+bindsym $mod+mod1+4 move container to workspace 4; workspace 4
+bindsym $mod+mod1+5 move container to workspace 5; workspace 5
+bindsym $mod+mod1+6 move container to workspace 6; workspace 6
+bindsym $mod+mod1+7 move container to workspace 7; workspace 7
+bindsym $mod+mod1+8 move container to workspace 8; workspace 8
+bindsym $mod+mod1+9 move container to workspace 9; workspace 9
 
 # switch to near workspace
 #bindsym $mod+Tab workspace next
@@ -187,13 +209,12 @@ bindsym $mod+o workspace next
 bindsym $mod+i workspace prev
 
 # focus the parent container
-bindsym $mod+n focus parent
-
+bindsym $mod+mod1+m focus parent
 # focus the child container
 bindsym $mod+m focus child
 
 # resize window (you can also use the mouse for that)
-bindsym $mod+r mode "resize"
+bindsym $mod+z mode "resize"
 mode "resize" {
     bindsym h resize shrink width 2 px or 2 ppt
     bindsym j resize grow height 22 px or 2 ppt
@@ -240,26 +261,12 @@ bindsym $mod+e exec thunar
 # file manager
 bindsym $mod+g exec google-chrome-stable
 
-# Power Management
-set $mode_system  lock(L) logout(O) reboot(R) shutdown(S) exit(Esc)
-bindsym $mod+Shift+c mode "$mode_system"
-mode "$mode_system" {
-    bindsym l exec --no-startup-id i3lock -c '#000000', mode "default"
-    bindsym o exec --no-startup-id i3-msg exit, mode "default"
-    bindsym r exec --no-startup-id systemctl reboot, mode "default"
-    bindsym s exec --no-startup-id systemctl poweroff, mode "default"
-    bindsym Escape mode "default"
-}
-
 # start dmenu (a program launcher)
 bindsym $mod+d exec dmenu_run
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
 # bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
-
-# exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
 # enable or disable touchpad
 # ToggleTouchPad should be linked to /usr/local/bin by 'ln -s'
@@ -269,7 +276,20 @@ bindsym $mod+F6 exec ToggleTouchPad
 bindsym XF86AudioRaiseVolume exec --no-startup-id amixer set -q Master 2%+
 bindsym XF86AudioLowerVolume exec --no-startup-id amixer set -q Master 2%-
 #bindsym XF86AudioMute exec --no-startup-id amixer -q set Master toggle
-bindsym $mod+Right exec --no-startup-id amixer set -q Master 2%+
-bindsym $mod+Left exec --no-startup-id amixer set -q Master 2%-
-bindsym $mod+s exec --no-startup-id amixer -q set Master toggle
+bindsym $mod+Right exec --no-startup-id amixer set -q Master 5%+
+bindsym $mod+Left exec --no-startup-id amixer set -q Master 5%-
+bindsym $mod+a exec --no-startup-id amixer -q set Master toggle
+
+# 快速切换窗口
+bindsym $mod+c exec quickswitch
+bindsym $mod+mod1+c exec quickswitch -s
+
+# 截图
+# -u : focused windows
+# -s : selected window
+# -e : execute
+set $scrot_dir ~/Pictures/Scrot
+bindsym Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -e 'mv $f $scrot_dir/'
+bindsym $mod+Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/'
+bindsym $mod+Shift+Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/ && ristretto $scrot_dir/$f'
 

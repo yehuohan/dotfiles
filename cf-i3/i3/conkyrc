@@ -12,18 +12,45 @@ cpu_avg_samples 2
 TEXT
 [
 # 公网地址
-{ "full_text": " ${exec curl icanhazip.com --ipv4}", "color": "\#F8DF58"},
-{ "full_text" : ${if_up eno1} "  ${upspeed eno1}/s  ${downspeed eno1}/s" ${else} ""${endif}, "color" : "\#94F397" },
-{ "full_text" : ${if_up wlo1} "  ${upspeed wlo1}/s  ${downspeed wlo1}/s" ${else} ""${endif}, "color" : "\#94F397" },
+{ 
+    "full_text" : " ${exec curl icanhazip.com --ipv4}", 
+    "color": "\#F8DF58"
+},
+{ 
+    "full_text" : ${if_up eno1} "  ${upspeed eno1}/s  ${downspeed eno1}/s" ${else} ""${endif},
+    "color" : "\#94F397" 
+},
+{ 
+    "full_text" : ${if_up wlo1} "  ${upspeed wlo1}/s  ${downspeed wlo1}/s" ${else} ""${endif},
+    "color" : "\#94F397" 
+},
 
-# 音量
-{"full_text" : "${exec amixer | grep 'Playback' | awk 'NR==3' | grep -oP '[0-9][0-9]\%'}", "color": "\#FA9A05"},
-
-#{ "full_text" : " ${cpu cpu0}%" , "color" : "\#8BC3E7" },
-#{ "full_text" : " ${mem}" , "color" : "\#B987D9" },
+# 资源
+#{ "full_text" : "CPU ${cpu cpu0}%" , "color" : "\#B987D9" },
+{ 
+    "full_text" : " ${mem}" ,
+    "color" : "\#8B0307" 
+    },
 #{ "full_text" : " ${fs_used_perc /}%" , "color" : "\#FF9D17" },
 
-{ "full_text" : " ${battery_percent}%" , "color" : "\#A4DC6A" },
-{ "full_text" : " ${time %Y - %m - %d %a}" , "color" : "\#ff797b" },
-{ "full_text" : " ${time %H:%M}" , "color" : "\#8BADF9" }
+# 音量
+{
+    "full_text" : " ${exec amixer | awk 'NR==6{if($6=="[on]") {print substr($5,2,length($5)-2)} else {print "off"}}'}",
+    "color": "\#9A0A95"
+},
+
+# 电池
+{ 
+    "full_text" : " ${battery_percent}%" , "color" : "\#A4DC6A" 
+},
+
+# 时间
+{
+    "full_text" : " ${time %Y - %m - %d %a}" , 
+    "color" : "\#ff797b" 
+},
+{ 
+    "full_text" : " ${time %H:%M}" , 
+    "color" : "\#8BADF9" 
+}
 ],
