@@ -21,7 +21,8 @@
 " 查看帮助 {
     " :help       = 查看Vim帮助
     " :help index = 查看帮助列表
-    " <s-k>       = 快速查看光标所在cword或选择内容的vim帮助
+    " <S-k>       = 快速查看光标所在cword或选择内容的vim帮助
+    " :help *@en  = 指定查看英文(en，cn即为中文)帮助
 " }
 " 替换字符串{
     "   :%s     - 所有行
@@ -48,11 +49,9 @@
 " Platform
 "===============================================================================
 silent function! IsLinux()
-    " linux
     return has('unix') && !has('macunix') && !has('win32unix')
 endfunction
 silent function! IsWin()
-    " windows
     return  (has('win32') || has('win64'))
 endfunction
 silent function! IsGw()
@@ -61,6 +60,12 @@ silent function! IsGw()
 endfunction
 silent function! IsGui()
     return has("gui_running")
+endfunction
+function! IsTermType(tt)
+    if &term ==? a:tt
+        return 1
+    else
+        return 0
 endfunction
 
 if IsLinux()
@@ -191,6 +196,18 @@ endif
     set nowrap                          " 默认关闭折行
     set listchars=eol:$,tab:>-,trail:~,space:.
                                         " 不可见字符显示
+    set conceallevel=0                  " 显示markdown等格式中的隐藏字符
+
+
+    " 终端光标设置
+    if IsTermType("xterm")
+        " compatible for urxvt,st,xterm,gnome-termial???
+        " 5,6: 竖线
+        " 3,4: 横线
+        " 1,2: 方块
+        let &t_SI = "\<Esc>[6 q"        " 进入Insert模式
+        let &t_EI = "\<Esc>[2 q"        " 退出Insert模式
+    endif
 " }
 
 " Edit{
@@ -205,7 +222,7 @@ endif
     set smartcase                       " 有大写字母时才区别大小写搜索
     set noerrorbells                    " 关闭错误信息响铃
     set vb t_vb=                        " 关闭响铃(vb)和可视闪铃(t_vb，即闪屏)，即normal模式时按esc会有响铃
-    set conceallevel=0                  " 显示markdown等格式中的隐藏字符
+    set helplang=cn,en                  " 优先查找中文帮助
 
     if FileExtIs("c") || FileExtIs("cpp") || FileExtIs("h")
         set foldmethod=syntax           " 设置语法折叠
@@ -228,7 +245,6 @@ if IsGui()
     if IsLinux()
         set lines=20
         set columns=100
-        "set guifont=Courier\ 10\ Pitch\ 11	
         "set guifont=Ubuntu\ Mono\ 13
         set guifont=DejaVu\ Sans\ Mono\ 13
     elseif IsWin()
@@ -274,12 +290,6 @@ set ttimeoutlen=70  " 键码超时时间为70ms
     set <M-j>=j
     set <M-k>=k
 " }
-
-" xterm终端设置
-"if &term =~# "xterm"
-"   let &t_SI = "\<Esc>]12;purple\x7"       " 进入Insert模式
-"   let &t_EI = "\<Esc>]12;blue\x7"         " 退出Insert模式
-"endif
 
 " 使用Space作为leader
 " Space只在Normal或Command或Visual模式下map，不适合在Insert模式下map
@@ -443,7 +453,7 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
 
 " vimcdoc {
     " 中文帮助文档
-    Plug 'yianwillis/vimcdoc'
+    Plug 'vimcn/vimcdoc',{'branch' : 'release'}
 " }
 
 " asd2num {
