@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170805 - vv2.0.106
+ - 完善ycm_extra_conf
+
 ## 20170804 - vv2.0.105
  - 添加markdown显示插件
  

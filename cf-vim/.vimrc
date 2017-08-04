@@ -197,7 +197,6 @@ endif
                                         " 不可见字符显示
     set conceallevel=0                  " 显示markdown等格式中的隐藏字符
 
-
     " 终端光标设置
     if IsTermType("xterm") || IsTermType("xterm-256color")
         " compatible for urxvt,st,xterm,gnome-termial
@@ -207,7 +206,6 @@ endif
         let &t_SI = "\<Esc>[6 q"        " 进入Insert模式
         let &t_EI = "\<Esc>[2 q"        " 退出Insert模式
     endif
-
 " }
 
 " Edit{
@@ -434,7 +432,7 @@ vnoremap ; :
     " compiling and running
     noremap <F5> <esc>:call F5ComplileFile('')<CR>
     " compile args
-    nnoremap <leader>cg :execute"let g:__str__=input('/')"<bar>call F5ComplileFile(g:__str__)<CR>
+    nnoremap <leader>cg :execute"let g:__str__=input('Compile Args: ')"<bar>call F5ComplileFile(g:__str__)<CR>
 " }
 
 
@@ -496,19 +494,19 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
     "   如果已经安装了clang，可以使用--system-libclang参数，就不必再下载clang了
     Plug 'Valloric/YouCompleteMe'
     let g:ycm_global_ycm_extra_conf=$MyVimPath.'/.ycm_extra_conf.py'
-    let g:ycm_seed_identifiers_with_syntax = 1  " 开启语法关键字补全
-    let g:ycm_warning_symbol = 'W:'             " warning符号
-    let g:ycm_error_symbol = 'E:'               " error符号
+    let g:ycm_enable_diagnostic_signs = 1       " 开启语法检测
+    let g:ycm_max_diagnostics_to_display = 30
+    let g:ycm_warning_symbol = '--'             " warning符号
+    let g:ycm_error_symbol = '>>'               " error符号
+    let g:ycm_seed_identifiers_with_syntax = 1  " 语法关键字补全         
+    let g:ycm_collect_identifiers_from_tags_files = 1 
+                                                " 开启标签补全
     let g:ycm_use_ultisnips_completer = 1       " query UltiSnips for completions
     let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-m>', '<Up>']
-    let g:ycm_max_diagnostics_to_display = 30
     let g:ycm_autoclose_preview_window_after_insertion=1
                                                 " 自动关闭预览窗口
     let g:ycm_cache_omnifunc = 0                " 禁止缓存匹配项，每次都重新生成匹配项
-    let g:ycm_seed_identifiers_with_syntax = 1  " 语法关键字补全         
-    let g:ycm_collect_identifiers_from_tags_files = 1 
-                                                " 开启YCM标签补全
     nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
     nnoremap <leader>gi :YcmCompleter GoToInclude<CR>
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
@@ -544,6 +542,17 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
     " <leader>cc for comment
     " <leader>cl/cb for comment aligned
     " <leader>cu for un-comment
+" }
+
+" air-line{
+    " 状态栏
+    Plug 'vim-airline/vim-airline'
+    set laststatus=2
+    let g:airline#extensions#ctrlspace#enabled = 1      " support for ctrlspace integration
+    let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()" 
+    let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
+    let g:airline#extensions#ycm#error_symbol = 'E:'
+    let g:airline#extensions#ycm#warning_symbol = 'W:'
 " }
 
 " file switch{
@@ -718,17 +727,6 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
     hi Search term=reverse ctermfg=white ctermbg=blue guifg=white guibg=#072f95
                                         " 设定高亮行列的颜色
                                         " cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
-" }
-
-" air-line{
-    " 状态栏美观
-    Plug 'vim-airline/vim-airline'
-    set laststatus=2
-    let g:airline#extensions#ctrlspace#enabled = 1      " support for ctrlspace integration
-    let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()" 
-    let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
-    let g:airline#extensions#ycm#error_symbol = 'E:'
-    let g:airline#extensions#ycm#warning_symbol = 'W:'
 " }
 
 " rainbow{
