@@ -1,6 +1,9 @@
 ---
 # cf-zsh-ChangeLog
 
+## 20170804 - vz0.0.2
+ - 添加alias -s后缀
+
 ## 20170726 - vz0.0.1
  - 不同项目配置，使用不同ChangeLog
 

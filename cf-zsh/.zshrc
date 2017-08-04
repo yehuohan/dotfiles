@@ -108,6 +108,8 @@ setopt complete_in_word
 # alias
 alias wiconv='iconv -f gbk -t utf-8'
 alias cman='man -M /usr/local/zhman/share/man/zh_CN'
+alias -s png=ristretto
+alias -s jpg=ristretto
 
 # user path
 export PATH="$PATH:$HOME/MyApps/"
