@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170804 - vv2.0.104
+ - 实现xfce4-terminal光标变化
+
 ## 20170803 - vv2.0.103
  - 实现xterm光标变化
 

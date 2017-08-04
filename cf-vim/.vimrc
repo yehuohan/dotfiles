@@ -6,7 +6,6 @@
 " author : yehuohan
 "===============================================================================
 
-
 "===============================================================================
 " My Notes
 "===============================================================================
@@ -200,14 +199,15 @@ endif
 
 
     " 终端光标设置
-    if IsTermType("xterm")
-        " compatible for urxvt,st,xterm,gnome-termial???
+    if IsTermType("xterm") || IsTermType("xterm-256color")
+        " compatible for urxvt,st,xterm,gnome-termial
         " 5,6: 竖线
         " 3,4: 横线
         " 1,2: 方块
         let &t_SI = "\<Esc>[6 q"        " 进入Insert模式
         let &t_EI = "\<Esc>[2 q"        " 退出Insert模式
     endif
+
 " }
 
 " Edit{
@@ -487,8 +487,8 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
 " YouCompleteMe{
     " 自动补全
     " Linux: 
-    "   install python-dev, python3-dev, cmake
-    "   ./install.py --clang-completer
+    "   install python-dev, python3-dev, cmake, llvm, clang
+    "   ./install.py --clang-completer --system-libclang
     " Windows: 
     "   install python, Cmake, VS, 7-zip
     "   install.py --clang-completer --msvc 14 --build-dir <ycm_build>
