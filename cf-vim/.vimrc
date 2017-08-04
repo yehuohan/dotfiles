@@ -758,6 +758,7 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
             MarkdownPreview
         endif
     endfunction
+    Plug 'plasticboy/vim-markdown'
 " }
 
 " vim-latex{

@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170804 - vv2.0.105
+ - 添加markdown显示插件
+ 
 ## 20170804 - vv2.0.104
  - 实现xfce4-terminal光标变化
 
