@@ -285,8 +285,10 @@ set ttimeoutlen=70  " 键码超时时间为70ms
 " }
 
 " 键码设置 {
+    set <M-h>=h
     set <M-j>=j
     set <M-k>=k
+    set <M-l>=l
 " }
 
 " 使用Space作为leader
@@ -299,8 +301,6 @@ nnoremap ; :
 vnoremap ; :
 
 " 基本编辑 {
-    " 插入
-    nnoremap <leader>a A
     " 回退操作
     nnoremap <S-u> <C-r>
     " 大小写转换
@@ -355,8 +355,8 @@ vnoremap ; :
 " }
 
 " tab and buffer switch{
-    noremap <C-h> gT
-    noremap <C-l> gt
+    noremap <M-h> gT
+    noremap <M-l> gt
     nnoremap <leader>bn :bn<CR>
     nnoremap <leader>bp :bp<CR>
     nnoremap <leader>bl :b#<CR>
@@ -382,25 +382,21 @@ vnoremap ; :
 
 " window manager{
     " window-command
-
     " split
     nnoremap <leader>ws :split<CR>
     nnoremap <leader>wv :vsplit<CR>
-
     " move focus
     nnoremap <leader>wh <C-w>h
     nnoremap <leader>wj <C-w>j
     nnoremap <leader>wk <C-w>k
     nnoremap <leader>wl <C-w>l
     nnoremap <leader>wp <C-w>p
-
     " move window
     nnoremap <leader>wH <C-w>H
     nnoremap <leader>wJ <C-w>J
     nnoremap <leader>wK <C-w>K
     nnoremap <leader>wL <C-w>L
     nnoremap <leader>wT <C-w>T
-
     " reseize window with C-up/down/left/right
     inoremap <C-up> <esc>:resize+1<CR>i
     inoremap <C-down> <esc>:resize-1<CR>i
@@ -529,7 +525,7 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
     Plug 'SirVer/ultisnips'               " snippet insert engine
     Plug 'honza/vim-snippets'             " snippet collection
     let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
-                                            " mySnippets is my own snippets colletrion
+                                            " mySnippets is my own snippets collection
     let g:UltiSnipsExpandTrigger="<tab>"
     let g:UltiSnipsJumpForwardTrigger="<C-o>"
     let g:UltiSnipsJumpBackwardTrigger="<C-p>"
@@ -594,35 +590,35 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-repeat'
 
-    " simplify the map to 2 operation
-    " nmap yi ysw
-    " nmap yw ysiw
-    " nmap yl yss
-    " nmap yL ySS
-    
+    " simplify the map
+    nmap <leader>sw ysiw
+    nmap <leader>si ysw
+    nmap <leader>sl yss
+    nmap <leader>sL ySS
     " surround selected text in visual mode
     vmap s S
     vmap <leader>s gS
 " }
 
 " easy-motion{
-    " 快速跳转
+    " 快速跳
     Plug 'easymotion/vim-easymotion'
     let g:EasyMotion_do_mapping = 0         " 禁止默认map
     let g:EasyMotion_smartcase = 1          " 不区分大小写
     nmap s <Plug>(easymotion-overwin-f)
-    nmap <leader>s <plug>(easymotion-overwin-f2)
+    nmap <leader>ss <plug>(easymotion-overwin-f2)
                                             " 跨分屏快速跳转到字母，
     nmap <leader>j <plug>(easymotion-j)
     nmap <leader>k <plug>(easymotion-k)
-    nmap <leader>ww <plug>(easymotion-w)
-    nmap <leader>W <plug>(easymotion-W)
-    nmap <leader>bb <plug>(easymotion-b)
-    nmap <leader>B <plug>(easymotion-B)
-    nmap <leader>e <plug>(easymotion-e)
-    nmap <leader>E <plug>(easymotion-E)
-    nmap <leader>ge <plug>(easymotion-ge)
-    nmap <leader>gE <plug>(easymotion-gE)
+    nmap <leader>mw <plug>(easymotion-w)
+    nmap <leader>mb <plug>(easymotion-b)
+    nmap <leader>me <plug>(easymotion-e)
+    nmap <leader>mg <plug>(easymotion-ge)
+    " nmap <leader>W <plug>(easymotion-W)
+    " nmap <leader>B <plug>(easymotion-B)
+    " nmap <leader>E <plug>(easymotion-E)
+    " nmap <leader>gE <plug>(easymotion-gE)
+    "
 " }
 
 " ctrl-space{
@@ -657,10 +653,8 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
     function! s:incsearch_keymap()
         IncSearchNoreMap <C-j> <Over>(incsearch-next)
         IncSearchNoreMap <C-k> <Over>(incsearch-prev)
-        IncSearchNoreMap <C-n> <Over>(incsearch-scroll-f)
-        "IncSearchNoreMap <C-m> <Over>(incsearch-scroll-b)
-        " <C-m>会影响Enter键
-        IncSearchNoreMap <C-b> <Over>(incsearch-scroll-b)
+        IncSearchNoreMap <M-j> <Over>(incsearch-scroll-f)
+        IncSearchNoreMap <M-k> <Over>(incsearch-scroll-b)
     endfunction
 
     nmap /  <Plug>(incsearch-forward)
@@ -684,8 +678,12 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
 " expand-region{
     " 快速块选择
     Plug 'terryma/vim-expand-region'
-    vmap <leader>l <Plug>(expand_region_expand)
-    vmap <leader>h <Plug>(expand_region_shrink)
+    nmap <leader>er <Plug>(expand_region_expand)
+    vmap <leader>er <Plug>(expand_region_expand)
+    nmap <C-l> <Plug>(expand_region_expand)
+    nmap <C-h> <Plug>(expand_region_shrink)
+    vmap <C-l> <Plug>(expand_region_expand)
+    vmap <C-h> <Plug>(expand_region_shrink)
 " }
 
 " smooth-scroll{
@@ -738,6 +736,7 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
 
 " markdown-preview{
     " MarkDown预览 
+    Plug 'plasticboy/vim-markdown'
     Plug 'iamcco/mathjax-support-for-mkdp'
     Plug 'iamcco/markdown-preview.vim'
     if IsWin()
@@ -756,7 +755,6 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
             MarkdownPreview
         endif
     endfunction
-    Plug 'plasticboy/vim-markdown'
 " }
 
 " vim-latex{
