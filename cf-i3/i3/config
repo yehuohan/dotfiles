@@ -74,8 +74,8 @@ for_window [window_role="task_dialog"] floating enable
 #for_window [class="xfce4-terminal"] border normal
 
 # 打开软件时自动移至相应工作区
-assign [class="Thunar"] workspace 10
-assign [class="Gvim"] workspace 1
+assign [class="Thunar"] workspace 1
+assign [class="Gvim"] workspace 2
 
 # i3-gaps configuration
 for_window [class="^.*"] border normal
@@ -123,7 +123,7 @@ bar {
 #===============================================================================
 
 # Power Management
-set $mode_system  lock(L) logout(O) reboot(R) shutdown(S) exit(Esc)
+set $mode_system   Lock(L)  Logout(O)  Reboot(R)  Shutdown(S)  Exit(Esc)
 bindsym $mod+Shift+q mode "$mode_system"
 mode "$mode_system" {
     bindsym l exec --no-startup-id i3lock -c '#000000', mode "default"
@@ -266,7 +266,7 @@ bindsym $mod+d exec dmenu_run
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
-# bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
+#bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
 # enable or disable touchpad
 # ToggleTouchPad should be linked to /usr/local/bin by 'ln -s'

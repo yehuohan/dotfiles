@@ -69,7 +69,7 @@ endfunction
 
 if IsLinux()
     " vim插件路径
-    let $MyVimPath="~/.vim" 
+    let $MyVimPath="/home/yehuohanxing/.vim"
 elseif IsWin()
     let $MyVimPath=$VIM."\\vimfiles"
     " windows下将HOME设置VIM的安装路径
@@ -440,7 +440,7 @@ vnoremap ; :
 " - 安键map写在每个Plugin的最后
 "===============================================================================
 
-set rtp+=$MyVimPath                     " add .vim or vimfiles to runtime path
+set rtp+=$MyVimPath                     " add .vim or vimfiles to rtp(runtimepath)
 call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install plugins
 
 " user plugins 
@@ -762,6 +762,9 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
     " 暂时不用
 " }
 
+" qml {
+    Plug 'crucerucalin/qml.vim'
+" }
 call plug#end()            " required
 
 
