@@ -24,7 +24,7 @@ exec --no-startup-id fcitx
 # 透明效果
 exec --no-startup-id compton
 # 背景
-exec_always --no-startup-id feh --bg-fill ~/WallPaper/wp2.jpg
+exec_always --no-startup-id feh --bg-fill ~/Pictures/WallPaper/wp2.jpg
 # 电池管理，包括亮度调节(可以使用Fn+亮度调节键)
 exec --no-startup-id xfce4-power-manager
 # 网络连接
@@ -214,10 +214,14 @@ bindsym $mod+mod1+m focus parent
 bindsym $mod+m focus child
 
 # resize window (you can also use the mouse for that)
+bindsym $mod+Left resize shrink width 2 px or 2 ppt
+bindsym $mod+Up resize grow height 2 px or 2 ppt
+bindsym $mod+Down resize shrink height 2 px or 2 ppt
+bindsym $mod+Right resize grow width 2 px or 2 ppt
 bindsym $mod+z mode "resize"
 mode "resize" {
     bindsym h resize shrink width 2 px or 2 ppt
-    bindsym j resize grow height 22 px or 2 ppt
+    bindsym j resize grow height 2 px or 2 ppt
     bindsym k resize shrink height 2 px or 2 ppt
     bindsym l resize grow width 2 px or 2 ppt
 
@@ -276,8 +280,8 @@ bindsym $mod+F6 exec ToggleTouchPad
 bindsym XF86AudioRaiseVolume exec --no-startup-id amixer set -q Master 5%+
 bindsym XF86AudioLowerVolume exec --no-startup-id amixer set -q Master 5%-
 #bindsym XF86AudioMute exec --no-startup-id amixer -q set Master toggle
-bindsym $mod+Right exec --no-startup-id amixer set -q Master 5%+
-bindsym $mod+Left exec --no-startup-id amixer set -q Master 5%-
+#bindsym $mod+Right exec --no-startup-id amixer set -q Master 5%+
+#bindsym $mod+Left exec --no-startup-id amixer set -q Master 5%-
 bindsym $mod+a exec --no-startup-id amixer -q set Master toggle
 
 # 快速切换窗口
