@@ -1,6 +1,9 @@
 ---
 # cf-zsh-ChangeLog
 
+## 20170808 - vz0.0.3
+ - 添加自启screenfetch
+
 ## 20170804 - vz0.0.2
  - 添加alias -s后缀
 
