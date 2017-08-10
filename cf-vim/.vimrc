@@ -50,39 +50,51 @@
 "===============================================================================
 " Platform
 "===============================================================================
-silent function! IsLinux()
-    return has('unix') && !has('macunix') && !has('win32unix')
-endfunction
-silent function! IsWin()
-    return  (has('win32') || has('win64'))
-endfunction
-silent function! IsGw()
-    " GNU for windows
-    return (has('win32unix'))
-endfunction
-silent function! IsGui()
-    return has("gui_running")
-endfunction
-function! IsTermType(tt)
-    if &term ==? a:tt
-        return 1
-    else
-        return 0
-endfunction
+" vim or nvim {
+    silent function! IsNVim()
+        return has('nvim')
+    endfunction
+" }
 
-if IsLinux()
+" linux or win {
+    silent function! IsLinux()
+        return has('unix') && !has('macunix') && !has('win32unix')
+    endfunction
+    silent function! IsWin()
+        return  (has('win32') || has('win64'))
+    endfunction
+    silent function! IsGw()
+        " GNU for windows
+        return (has('win32unix'))
+    endfunction
+" }
+
+" gui or term {
+    silent function! IsGui()
+        return has("gui_running")
+    endfunction
+    function! IsTermType(tt)
+        if &term ==? a:tt
+            return 1
+        else
+            return 0
+    endfunction
+" }
+
+" path {
     " vim插件路径
-    let $MyVimPath="/home/yehuohanxing/.vim"
-elseif IsWin()
-    let $MyVimPath=$VIM."\\vimfiles"
-    " windows下将HOME设置VIM的安装路径
-    let $HOME=$VIM 
-    " 未打开文件时，切换到HOME目录
-    execute "cd $HOME"          
-elseif IsGw()
-    " 使用Windows下GVim的插件 
-    let $MyVimPath="/c/MyApps/Vim/vimfiles"
-endif
+    if IsLinux()
+        let $VimPluginPath="/home/yehuohanxing/.vim"
+    elseif IsWin()
+        let $VimPluginPath="C:/MyApps/Vim/vimfiles"
+        " windows下将HOME设置VIM的安装路径
+        let $HOME=$VIM 
+        " 未打开文件时，切换到HOME目录
+        execute "cd $HOME"          
+    elseif IsGw()
+        let $VimPluginPath="/c/MyApps/Vim/vimfiles"
+    endif
+" }
 
 
 "===============================================================================
@@ -306,9 +318,15 @@ vnoremap ; :
 
 " 基本编辑 {
     " 查找vim帮助
-    nnoremap <S-k> :exec "help " . expand("<cword>")<CR>
-    " 查找man帮助（linux下可用，windows下仍是查找vim帮助）
-    nnoremap <S-m> <S-k>
+    if IsNVim()
+        " nvim用自己的帮助文件只有英文的
+        nnoremap <S-k> :exec "help " . expand("<cword>"). "@en"<CR>
+        nnoremap <S-m> <S-k>
+    else
+        nnoremap <S-k> :exec "help " . expand("<cword>")<CR>
+        " 查找man帮助（linux下可用，windows下仍是查找vim帮助）
+        nnoremap <S-m> <S-k>
+    endif
     " 回退操作
     nnoremap <S-u> <C-r>
     " 大小写转换
@@ -452,8 +470,8 @@ vnoremap ; :
 " - 安键map写在每个Plugin的最后
 "===============================================================================
 
-set rtp+=$MyVimPath                     " add .vim or vimfiles to rtp(runtimepath)
-call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install plugins
+set rtp+=$VimPluginPath                     " add .vim or vimfiles to rtp(runtimepath)
+call plug#begin($VimPluginPath."/bundle")	" alternatively, pass a path where install plugins
 
 " user plugins 
 
@@ -501,7 +519,7 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
     "   自己指定vs版本，自己指定build路径，编译完成后，可以删除<ycm_build>
     "   如果已经安装了clang，可以使用--system-libclang参数，就不必再下载clang了
     Plug 'Valloric/YouCompleteMe'
-    let g:ycm_global_ycm_extra_conf=$MyVimPath.'/.ycm_extra_conf.py'
+    let g:ycm_global_ycm_extra_conf=$VimPluginPath.'/.ycm_extra_conf.py'
     let g:ycm_enable_diagnostic_signs = 1       " 开启语法检测
     let g:ycm_max_diagnostics_to_display = 30
     let g:ycm_warning_symbol = '--'             " warning符号
@@ -729,7 +747,7 @@ call plug#begin($MyVimPath."/bundle")	" alternatively, pass a path where install
 
 " new-railscasts-theme{
     " 使用主题
-    set rtp+=$MyVimPath/bundle/new-railscasts-theme/
+    set rtp+=$VimPluginPath/bundle/new-railscasts-theme/
     Plug 'carakan/new-railscasts-theme'
     colorscheme new-railscasts          
     hi CursorLine   cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE

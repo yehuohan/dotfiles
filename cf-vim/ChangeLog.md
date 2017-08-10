@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170811 - vv2.1.110
+ - 添加neovim配置基本选项
+
 ## 20170810 - vv2.0.109
  - 添加quickfix窗口管理映射
  - 添加vim帮帮助和man帮助映射
