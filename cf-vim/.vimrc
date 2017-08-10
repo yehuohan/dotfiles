@@ -39,7 +39,10 @@
     "		将"X" 替换成 "Group X"，其中X可为A-J， \( \) 表示后面用 \1 引用 () 的内容
     "	:s/"\(.*\)"/set("\1")/
     "	    将“*" 替换成 set("*") ，其中 .* 为任意字符
-    "
+    "	:s/text/\rtext/
+    "	    \r相当于一个回车的效果
+    "	:s/text\n/text/
+    "	    查找内容为text，且其后是回车
 " }
 
 
@@ -261,9 +264,10 @@ endif
 "===============================================================================
 " Key-Map 
 " - Normal模式下使用<leader>代替<C-?>,<S-?>,<A-?>，
-" - Insert模式下map带ctrl,shift,alt的快捷键
+" - Insert模式下map带ctrl,alt的快捷键
 " - 尽量不改变vim原有键位的功能定义
 " - 尽量一只手不同时按两个键
+" - 尽量不映射偏远的按键（F1~F12，数字键等）
 " - 建议调换Esc和CapsLock键
 "
 "  <leader>t? for plugins toggle command
@@ -301,6 +305,10 @@ nnoremap ; :
 vnoremap ; :
 
 " 基本编辑 {
+    " 查找vim帮助
+    nnoremap <S-k> :exec "help " . expand("<cword>")<CR>
+    " 查找man帮助（linux下可用，windows下仍是查找vim帮助）
+    nnoremap <S-m> <S-k>
     " 回退操作
     nnoremap <S-u> <C-r>
     " 大小写转换
@@ -354,14 +362,6 @@ vnoremap ; :
     nnoremap <C-k> <C-y>
 " }
 
-" tab and buffer switch{
-    noremap <M-h> gT
-    noremap <M-l> gt
-    nnoremap <leader>bn :bn<CR>
-    nnoremap <leader>bp :bp<CR>
-    nnoremap <leader>bl :b#<CR>
-" }
-
 " surrounding with words{
     " text object: ?i? or ?a?
     nnoremap <leader>i( viwxi(<esc>pa)<esc>     
@@ -378,6 +378,18 @@ vnoremap ; :
     vnoremap <leader>i" xi""<esc>hp<esc>
     vnoremap <leader>i' xi''<esc>hp<esc>
     vnoremap <leader>i/ xi/**/<esc>hhp<esc>
+" }
+
+" tab ,buffer and quickfix {
+    noremap <M-h> gT
+    noremap <M-l> gt
+
+    nnoremap <leader>bn :bn<CR>
+    nnoremap <leader>bp :bp<CR>
+    nnoremap <leader>bl :b#<CR>
+
+    nnoremap <leader>qo :copen<CR>
+    nnoremap <leader>qc :cclose<CR>
 " }
 
 " window manager{
