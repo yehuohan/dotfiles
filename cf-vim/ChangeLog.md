@@ -2,6 +2,10 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170810 - vv2.0.109
+ - 添加quickfix窗口管理映射
+ - 添加vim帮帮助和man帮助映射
+
 ## 20170805 - vv2.0.107
  - 优化Surround和motion按键配置
 

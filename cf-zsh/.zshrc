@@ -123,6 +123,10 @@ export PATH="$PATH:$HOME/MyApps/bochs268/bin"
 export PATH="$PATH:$HOME/MyApps/nasm212/bin"
 export PATH="$PATH:$HOME/MyApps/node6111/bin"
 
+# auto program
+clear
+screenfetch
+
 
 
 # export MANPATH="/usr/local/man:$MANPATH"
