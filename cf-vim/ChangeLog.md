@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170811 - vv2.1.114
+ - 添加directx选项
+
 ## 20170811 - vv2.1.113
  - 添加undotree插件
  - 添加gruvbox主题

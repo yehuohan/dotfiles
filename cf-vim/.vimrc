@@ -10,12 +10,16 @@
 " My Notes
 "===============================================================================
 " 带python编译gvim {
-    " 	使用MinGw-x64，更改.mak文件：
-    " 	ARCH=i686								- 使用32位，python也使用32位
-    " 	CC := $(CROSS_COMPILE)gcc -m32			- 32位编绎
-    " 	CXX := $(CROSS_COMPILE)g++ -m32			- 32位编绎
-    " 	WINDRES := windres --target=pe-i386		- 资源文件添加i386编绎
-    "	若全部使用64位，则同样更改参数即可
+    " [x] 设置Make_cyg_ming.mak:
+    " DIRECTX=yes                         - 使用DirectX
+    " ARCH=i686                           - 使用32位(x86-64为64位)，python也使用32位
+    " CC := $(CROSS_COMPILE)gcc -m32      - 32位编绎
+    " CXX := $(CROSS_COMPILE)g++ -m32     - 32位编绎
+    " WINDRES := windres --target=pe-i386 - 资源文件添加i386编绎
+    " [x] 使用MinGw-x64:
+    " mingw32-make -f Make_ming.mak gvim.exe PYTHON3=C:/Python36 DYNAMIC_PYTHON3=yes PYTHON3_VER=36
+    " 若设置32位选项前编译过一次，清理一次.o文件再编译
+    " 若使用64位，只需要添加Python路径和DirectX支持
 " }
 " 查看帮助 {
     " :help       = 查看Vim帮助
@@ -35,14 +39,14 @@
     "
     "   :s/ar\[i\]/\*(ar+i)/
     "       ar[i] 替换成 *(ar+)，注意：对于 * . / \ [ ] 需要转义
-    "	:s/"\([A-J]\)"/"Group \1"/
-    "		将"X" 替换成 "Group X"，其中X可为A-J， \( \) 表示后面用 \1 引用 () 的内容
-    "	:s/"\(.*\)"/set("\1")/
-    "	    将“*" 替换成 set("*") ，其中 .* 为任意字符
-    "	:s/text/\rtext/
-    "	    \r相当于一个回车的效果
-    "	:s/text\n/text/
-    "	    查找内容为text，且其后是回车
+    "   :s/"\([A-J]\)"/"Group \1"/
+    "       将"X" 替换成 "Group X"，其中X可为A-J， \( \) 表示后面用 \1 引用 () 的内容
+    "   :s/"\(.*\)"/set("\1")/
+    "       将“*" 替换成 set("*") ，其中 .* 为任意字符
+    "   :s/text/\rtext/
+    "       \r相当于一个回车的效果
+    "   :s/text\n/text/
+    "       查找内容为text，且其后是回车
 " }
 
 
@@ -226,7 +230,7 @@ endif
 " Edit{
     set backspace=2                     " Insert模式下使用BackSpace删除
     set nobackup                        " 不生成备份文件
-    set autochdir						" 自动切换当前目录为当前文件所在的目录
+    set autochdir                       " 自动切换当前目录为当前文件所在的目录
     set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
                                         " 尝试解码序列
     set encoding=utf-8                  " vim内部使用utf-8编码
@@ -263,6 +267,7 @@ if IsGui()
     elseif IsWin()
         set lines=25
         set columns=100
+        set renderoptions=type:directx
         "set guifont=cousine:h12:cANSI
         set guifont=Consolas:h13:cANSI
         set guifontwide=Yahei_Mono:h13:cGB2312
@@ -473,7 +478,7 @@ vnoremap ; :
 "===============================================================================
 
 set rtp+=$VimPluginPath                     " add .vim or vimfiles to rtp(runtimepath)
-call plug#begin($VimPluginPath."/bundle")	" alternatively, pass a path where install plugins
+call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where install plugins
 
 " user plugins 
 
@@ -490,7 +495,7 @@ call plug#begin($VimPluginPath."/bundle")	" alternatively, pass a path where ins
 
 " nerd-tree{
     " 目录树导航
-    Plug 'scrooloose/nerdtree'			
+    Plug 'scrooloose/nerdtree'          
     let g:NERDTreeShowHidden=1
     noremap <leader>te :NERDTreeToggle<CR>
 " }
@@ -747,7 +752,7 @@ call plug#begin($VimPluginPath."/bundle")	" alternatively, pass a path where ins
 
 " indent-line{
     " 显示缩进标识
-    Plug 'Yggdroot/indentLine'			
+    Plug 'Yggdroot/indentLine'          
     "let g:indentLine_char = '|'            " 设置标识符样式
     let g:indentLinet_color_term=200        " 设置标识符颜色
     nnoremap <leader>t\ :IndentLinesToggle<CR>
