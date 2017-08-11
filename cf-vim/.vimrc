@@ -729,6 +729,12 @@ call plug#begin($VimPluginPath."/bundle")	" alternatively, pass a path where ins
     nnoremap <silent> <M-k> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
 " }
 
+" gundo {
+    " 撤消历史
+    Plug 'mbbill/undotree'
+    nnoremap <leader>tu :UndotreeToggle<CR>
+" }
+
 " session{
     " 会话保存
     Plug 'xolox/vim-misc'
@@ -747,14 +753,21 @@ call plug#begin($VimPluginPath."/bundle")	" alternatively, pass a path where ins
     nnoremap <leader>t\ :IndentLinesToggle<CR>
 " }
 
-" new-railscasts-theme{
-    " 使用主题
-    set rtp+=$VimPluginPath/bundle/new-railscasts-theme/
-    Plug 'carakan/new-railscasts-theme'
-    colorscheme new-railscasts          
-    hi CursorLine   cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
-    hi CursorColumn cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
-    hi Search term=reverse ctermfg=white ctermbg=blue guifg=white guibg=#072f95
+" theme {
+    " gruvbox主题
+    Plug 'morhetz/gruvbox'
+    set rtp+=$VimPluginPath/bundle/gruvbox/
+    colorscheme gruvbox 
+    set background=dark                 " dark or light mode
+    let g:gruvbox_contrast='medium'     " dark, medium or soft
+
+    " new-railscasts主题
+    " Plug 'carakan/new-railscasts-theme'
+    " set rtp+=$VimPluginPath/bundle/new-railscasts-theme/
+    " colorscheme new-railscasts          
+    " hi CursorLine   cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
+    " hi CursorColumn cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
+    " hi Search term=reverse ctermfg=white ctermbg=blue guifg=white guibg=#072f95
                                         " 设定高亮行列的颜色
                                         " cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
 " }
@@ -789,18 +802,21 @@ call plug#begin($VimPluginPath."/bundle")	" alternatively, pass a path where ins
     endfunction
 " }
 
+" qml {
+    " qml高亮
+    Plug 'crucerucalin/qml.vim'
+" }
+
 " vim-latex{
     "Plug 'vim-latex/vim-latex'
     " 暂时不用
 " }
 
-" qml {
-    Plug 'crucerucalin/qml.vim'
-" }
 
 
 if IsNVim()
 " neovim gui font {
+    " neovim-gui字体设置   
     Plug 'equalsraf/neovim-gui-shim'
 " }
 endif

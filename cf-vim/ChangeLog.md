@@ -2,6 +2,10 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170811 - vv2.1.113
+ - 添加undotree插件
+ - 添加gruvbox主题
+
 ## 20170811 - vv2.1.111
  - 添加neovim-gui-shim插件
 
