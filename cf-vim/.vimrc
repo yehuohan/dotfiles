@@ -9,7 +9,7 @@
 "===============================================================================
 " My Notes
 "===============================================================================
-" [*]带python编译 {
+" 带python编译gvim {
     " 	使用MinGw-x64，更改.mak文件：
     " 	ARCH=i686								- 使用32位，python也使用32位
     " 	CC := $(CROSS_COMPILE)gcc -m32			- 32位编绎
@@ -82,7 +82,7 @@
 " }
 
 " path {
-    " vim插件路径
+    " vim插件路径统一
     if IsLinux()
         let $VimPluginPath="/home/yehuohanxing/.vim"
     elseif IsWin()
@@ -301,10 +301,12 @@ set ttimeoutlen=70  " 键码超时时间为70ms
 " }
 
 " 键码设置 {
+if !IsNVim()
     set <M-h>=h
     set <M-j>=j
     set <M-k>=k
     set <M-l>=l
+endif
 " }
 
 " 使用Space作为leader
@@ -795,6 +797,14 @@ call plug#begin($VimPluginPath."/bundle")	" alternatively, pass a path where ins
 " qml {
     Plug 'crucerucalin/qml.vim'
 " }
+
+
+if IsNVim()
+" neovim gui font {
+    Plug 'equalsraf/neovim-gui-shim'
+" }
+endif
+
 call plug#end()            " required
 
 

@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170811 - vv2.1.111
+ - 添加neovim-gui-shim插件
+
 ## 20170811 - vv2.1.110
  - 添加neovim配置基本选项
 
