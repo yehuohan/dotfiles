@@ -30,7 +30,6 @@ exec --no-startup-id xfce4-power-manager
 # 网络连接
 exec --no-startup-id nm-applet
 
-#exec workspace 10
 
 #===============================================================================
 # i3 UI
@@ -38,7 +37,7 @@ exec --no-startup-id nm-applet
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
 #font pango:monospace 10 
-font pango:WenQuanYi Micro Hei 11
+font pango:WenQuanYi Micro Hei Bold 11
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
@@ -61,7 +60,7 @@ popup_during_fullscreen leave_fullscreen
 
 # window colors
 # class                 border  backgr. text    indicator child_border
-client.focused          #a000b0 #a000b0 #ffffff #2e9ef4   #000000
+client.focused          #a000b0 #a000b0 #eeeeee #2e9ef4   #000000
 client.focused_inactive #333333 #5f676a #ffffff #484e50   #5f676a
 client.unfocused        #333333 #222222 #888888 #292d2e   #222222
 client.urgent           #2f343a #900000 #ffffff #900000   #900000
@@ -79,8 +78,9 @@ assign [class="Gvim"] workspace 2
 
 # i3-gaps configuration
 for_window [class="^.*"] border normal
-#gaps inner all set 20
-#gaps outer current plus 5
+# for_window [class="^.*"] border pixel 0
+# gaps inner 5
+# gaps outer 5
 
 bar {
     i3bar_command i3bar -t
@@ -90,7 +90,7 @@ bar {
     status_command ~/.config/i3/conky.sh
     # 显示位置
 	position top
-    height 23
+    height 26
 
     # 显示托盘图标的显示器
 	tray_output primary
@@ -104,12 +104,12 @@ bar {
         background #30303000
         statusline #FFFFFF
         separator  #808080
-        # 工作区颜色         边框    背景    文字
-        focused_workspace  #A000B0 #111111 #FFFFFF
-        active_workspace   #FFFFFF #FFFFFF #FFFFFF
-        inactive_workspace #111111 #111111 #FFFFFF
-        urgent_workspace   #990000 #111111 #FFFFFF
-        binding_mode       #990000 #990000 #FFFFFF
+        # 工作区颜色       边框      背景      文字
+        focused_workspace  #A000B0FF #444444AA #80F020FF
+        active_workspace   #FFFFFF00 #FFFFFF00 #80F020FF
+        inactive_workspace #11111155 #FFFFFF00 #80F020B0
+        urgent_workspace   #FFFFFF00 #FFFFFF00 #80F020FF
+        binding_mode       #11111155 #900000FF #80F020B0
 	}
 }
 
@@ -192,7 +192,7 @@ bindsym $mod+9 workspace 9
 
 # move focused container to workspace
 bindsym $mod+mod1+0 move container to workspace 10; workspace 10
-bindsym $mod+mod1+1 move container to workspace 1; workspace 1 
+bindsym $mod+mod1+1 move container to workspace 1; workspace 1
 bindsym $mod+mod1+2 move container to workspace 2; workspace 2
 bindsym $mod+mod1+3 move container to workspace 3; workspace 3
 bindsym $mod+mod1+4 move container to workspace 4; workspace 4
