@@ -1,7 +1,7 @@
 
 ---
 # LinuxConfigs
- 管理Linux的一些配置文件，包括vim, zsh, i3, Msys2等配置文件。
+ 管理Linux的一些配置文件，包括vim(neovim), zsh, i3, Msys2等配置文件。
 
 
 ---

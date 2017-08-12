@@ -1,7 +1,7 @@
 
 "===============================================================================
-" file   : vimrc
-" brief  : configuration for vim and gvim
+" file   : .vimrc
+" brief  : configuration for vim, gvim, neovim and neovim-qt
 " e-mail : 550034086@qq.com, yehuohan@gmail.com
 " author : yehuohan
 "===============================================================================
@@ -665,7 +665,6 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     set nocompatible
     set hidden
     let g:CtrlSpaceSetDefaultMapping = 1
-    let g:CtrlSpaceDefaultMappingKey = "<C-Space>"      " 使用默认Map按键
     let g:CtrlSpaceProjectRootMarkers = [
          \ ".git", ".sln", ".pro",
          \".hg", ".svn", ".bzr", "_darcs", "CVS"]       " Project root markers
@@ -674,6 +673,9 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     hi link CtrlSpaceSelected Title
     hi link CtrlSpaceSearch   Search
     hi link CtrlSpaceStatus   StatusLine
+    " 切换按键
+    nnoremap <C-Space> :CtrlSpace<CR>
+    inoremap <C-Space> <esc>:CtrlSpace<CR>
 " }
 
 " incsearch{

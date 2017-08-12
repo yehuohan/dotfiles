@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170812 - vv2.1.115
+ - 修ctrlspace映射，同时支持neovim和vim
+
 ## 20170811 - vv2.1.114
  - 添加directx选项
 
