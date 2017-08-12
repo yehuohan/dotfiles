@@ -734,7 +734,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nnoremap <silent> <M-k> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
 " }
 
-" gundo {
+" undo {
     " 撤消历史
     Plug 'mbbill/undotree'
     nnoremap <leader>tu :UndotreeToggle<CR>
