@@ -464,8 +464,8 @@ vnoremap ; :
 " Run Program map{
     " compiling and running
     noremap <F5> <esc>:call F5ComplileFile('')<CR>
-    " compile args
-    nnoremap <leader>cg :execute"let g:__str__=input('Compile Args: ')"<bar>call F5ComplileFile(g:__str__)<CR>
+    " run with args
+    nnoremap <leader>ra :execute"let g:__str__=input('Compile Args: ')"<bar>call F5ComplileFile(g:__str__)<CR>
 " }
 
 
@@ -554,7 +554,8 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     augroup vimrc
         autocmd User AsyncRunStart call asyncrun#quickfix_toggle(8, 1)
     augroup END
-    nnoremap <leader>r :AsyncRun 
+    nnoremap <leader>rr :AsyncRun 
+    nnoremap <leader>rs :AsyncStop<CR>
 " }
 
 " ultisnips{
