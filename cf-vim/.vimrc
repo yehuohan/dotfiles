@@ -9,7 +9,7 @@
 "===============================================================================
 " My Notes
 "===============================================================================
-" 带python编译gvim {
+" 带python编译gvim {{{
     " [x] 设置Make_cyg_ming.mak:
     " DIRECTX=yes                         - 使用DirectX
     " ARCH=i686                           - 使用32位(x86-64为64位)，python也使用32位
@@ -20,14 +20,14 @@
     " mingw32-make -f Make_ming.mak gvim.exe PYTHON3=C:/Python36 DYNAMIC_PYTHON3=yes PYTHON3_VER=36
     " 若设置32位选项前编译过一次，清理一次.o文件再编译
     " 若使用64位，只需要添加Python路径和DirectX支持
-" }
-" 查看帮助 {
+" }}}
+" 查看帮助 {{{
     " :help       = 查看Vim帮助
     " :help index = 查看帮助列表
     " <S-k>       = 快速查看光标所在cword或选择内容的vim帮助
     " :help *@en  = 指定查看英文(en，cn即为中文)帮助
-" }
-" 替换字符串{
+" }}}
+" 替换字符串{{{
     "   :%s     - 所有行
     "   :'<,'>s - 所选范圈
     "   :n,$s   - 第n行到最一行
@@ -47,20 +47,22 @@
     "       \r相当于一个回车的效果
     "   :s/text\n/text/
     "       查找内容为text，且其后是回车
-" }
+" }}}
 
 
 
 "===============================================================================
 " Platform
 "===============================================================================
-" vim or nvim {
+" vim or nvim 
+" {{{
     silent function! IsNVim()
         return has('nvim')
     endfunction
-" }
+" }}}
 
-" linux or win {
+" linux or win 
+" {{{
     silent function! IsLinux()
         return has('unix') && !has('macunix') && !has('win32unix')
     endfunction
@@ -71,9 +73,10 @@
         " GNU for windows
         return (has('win32unix'))
     endfunction
-" }
+" }}}
 
-" gui or term {
+" gui or term 
+" {{{
     silent function! IsGui()
         return has("gui_running")
     endfunction
@@ -83,9 +86,10 @@
         else
             return 0
     endfunction
-" }
+" }}}
 
-" path {
+" path 
+" {{{
     " vim插件路径统一
     if IsLinux()
         let $VimPluginPath="/home/yehuohanxing/.vim"
@@ -98,13 +102,14 @@
     elseif IsGw()
         let $VimPluginPath="/c/MyApps/Vim/vimfiles"
     endif
-" }
+" }}}
 
 
 "===============================================================================
 " Defined functions
 "===============================================================================
 " 扩展名检测
+" {{{
 let s:file_ext=expand("%:e")         
 function! FileExtIs(ext)
     if a:ext ==? s:file_ext
@@ -113,8 +118,10 @@ function! FileExtIs(ext)
         return 0
     endif
 endfunction
+" }}}
 
 " 隐藏字符显示
+" {{{
 function! InvConceallevel()
     if &conceallevel == 0
         set conceallevel=2
@@ -122,8 +129,10 @@ function! InvConceallevel()
         set conceallevel=0                  " 显示markdown等格式中的隐藏字符
     endif
 endfunction
+" }}}
 
 " 透明背影控制（需要系统本身支持透明）
+" {{{
 let s:inv_transparent_bg_flg = 0
 function! InvTransParentBackground()
     if s:inv_transparent_bg_flg == 1
@@ -134,8 +143,10 @@ function! InvTransParentBackground()
         let s:inv_transparent_bg_flg = 1
     endif
 endfunction
+" }}}
 
 " 编译环境函数
+" {{{
 function! F5ComplileFile(argstr)
     let l:ext=expand("%:e")                         " 扩展名
     if IsLinux()
@@ -159,8 +170,10 @@ function! F5ComplileFile(argstr)
         execute ":AsyncRun python ".l:filename
     endif
 endfunction
+" }}}
 
 " linux-fcitx输入法切换 
+" {{{
 function! LinuxFcitx2En()
     if 2 == system("fcitx-remote")
         let l:t = system("fcitx-remote -c")
@@ -171,11 +184,13 @@ function! LinuxFcitx2Zh()
         let l:t = system("fcitx-remote -o")
     endif
 endfunction
+" }}}
 
 
 "===============================================================================
 " Event handle
 "===============================================================================
+" {{{
 if IsGui()
     autocmd GuiEnter * set t_vb=        " 关闭可视闪铃(即闪屏)
 endif
@@ -183,12 +198,14 @@ if IsLinux()
     "autocmd InsertLeave * call LinuxFcitx2En()
     inoremap <esc> <esc>:call LinuxFcitx2En()<CR>
 endif
+" }}}
 
 
 "===============================================================================
 " Settings 
 "===============================================================================
-" UI{
+" Term
+" {{{
     set nocompatible                    " 不兼容vi快捷键
     syntax on                           " 语法高亮
     set number                          " 显示行号
@@ -196,16 +213,9 @@ endif
     set cursorline                      " 高亮当前行
     set cursorcolumn                    " 高亮当前列
     set hlsearch                        " 设置高亮显示查找到的文本
-    set smartindent                     " 新行智能自动缩进
+    set autoindent                      " 使用autoindent缩进
     set foldenable                      " 充许折叠
     set foldcolumn=1                    " 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
-    set foldmethod=indent               " 设置语文折叠
-                                        " manual : 手工定义折叠
-                                        " indent : 更多的缩进表示更高级别的折叠
-                                        " expr   : 用表达式来定义折叠
-                                        " syntax : 用语法高亮来定义折叠
-                                        " diff   : 对没有更改的文本进行折叠
-                                        " marker : 对文中的标志折叠
     set showcmd                         " 显示寄存器命令，宏调用命令@等
     set tabstop=4                       " 设置tab键宽4个空格
     set expandtab                       " 将Tab用Space代替，方便显示缩进标识indentLine
@@ -215,19 +225,14 @@ endif
     set listchars=eol:$,tab:>-,trail:~,space:.
                                         " 不可见字符显示
     set conceallevel=0                  " 显示markdown等格式中的隐藏字符
+    set foldmethod=indent               " 设置折叠，默认为缩进折叠
+                                        " manual : 手工定义折叠
+                                        " indent : 更多的缩进表示更高级别的折叠
+                                        " expr   : 用表达式来定义折叠
+                                        " syntax : 用语法高亮来定义折叠
+                                        " diff   : 对没有更改的文本进行折叠
+                                        " marker : 对文中的标记折叠，默认使用{{{,}}}标记
 
-    " 终端光标设置
-    if IsTermType("xterm") || IsTermType("xterm-256color")
-        " compatible for urxvt,st,xterm,gnome-termial
-        " 5,6: 竖线
-        " 3,4: 横线
-        " 1,2: 方块
-        let &t_SI = "\<Esc>[6 q"        " 进入Insert模式
-        let &t_EI = "\<Esc>[2 q"        " 退出Insert模式
-    endif
-" }
-
-" Edit{
     set backspace=2                     " Insert模式下使用BackSpace删除
     set nobackup                        " 不生成备份文件
     set autochdir                       " 自动切换当前目录为当前文件所在的目录
@@ -241,16 +246,28 @@ endif
     set vb t_vb=                        " 关闭响铃(vb)和可视闪铃(t_vb，即闪屏)，即normal模式时按esc会有响铃
     set helplang=cn,en                  " 优先查找中文帮助
 
-    if FileExtIs("c") || FileExtIs("cpp") || FileExtIs("h")
+    " 终端光标设置
+    if IsTermType("xterm") || IsTermType("xterm-256color")
+        " compatible for urxvt,st,xterm,gnome-termial
+        " 5,6: 竖线
+        " 3,4: 横线
+        " 1,2: 方块
+        let &t_SI = "\<Esc>[6 q"        " 进入Insert模式
+        let &t_EI = "\<Esc>[2 q"        " 退出Insert模式
+    endif
+
+    " 针对特殊文件的设置
+    if FileExtIs("c") || FileExtIs("cpp") || FileExtIs("h") || FileExtIs("hpp")
         set foldmethod=syntax           " 设置语法折叠
+    elseif FileExtIs("")
+        set foldmethod=marker           " 无扩展名的使用标记折叠
     elseif FileExtIs("tikz")
         set filetype=tex
     endif
-" }
+" }}}
 
-"===============================================================================
-" Gui settings
-"===============================================================================
+" Gui
+" {{{
 if IsGui()
     set guioptions-=m               " 隐藏菜单栏
     set guioptions-=T               " 隐藏工具栏
@@ -275,6 +292,7 @@ if IsGui()
                                     " gvim全屏快捷键
     endif
 endif
+" }}}
 
 
 
@@ -295,7 +313,7 @@ set ttimeout        " 打开键码超时检测
 set timeoutlen=1000 " 映射超时时间为1000ms
 set ttimeoutlen=70  " 键码超时时间为70ms
 
-" 键码示例 {
+" 键码示例 {{{
     " 终端Alt键映射处理：如 Alt+x，实际连续发送 <esc>x 编码
     " 以下三种方法都可以使按下 Alt+x 后，执行 CmdTest 命令，但超时检测有区别
     "<1> set <M-x>=x  " 设置键码，这里的是一个字符，即<esc>的编码，不是^和[放在一起
@@ -303,16 +321,16 @@ set ttimeoutlen=70  " 键码超时时间为70ms
     "    nnoremap <M-x> :CmdTest<CR>  " 按键码超时时间检测
     "<2> nnoremap <esc>x :CmdTest<CR> " 按映射超时时间检测
     "<3> nnoremap x  :CmdTest<CR>   " 按映射超时时间检测
-" }
+" }}}
 
-" 键码设置 {
+" 键码设置 {{{
 if !IsNVim()
     set <M-h>=h
     set <M-j>=j
     set <M-k>=k
     set <M-l>=l
 endif
-" }
+" }}}
 
 " 使用Space作为leader
 " Space只在Normal或Command或Visual模式下map，不适合在Insert模式下map
@@ -323,7 +341,7 @@ let mapleader="\<space>"
 nnoremap ; :
 vnoremap ; :
 
-" 基本编辑 {
+" 基本编辑 {{{
     " 查找vim帮助
     if IsNVim()
         " nvim用自己的帮助文件只有英文的
@@ -344,9 +362,9 @@ vnoremap ; :
     " 折叠
     nnoremap <leader>zr zR
     nnoremap <leader>zm zM
-" }
+" }}}
 
-" Show Setting{
+" Show Setting{{{
     " 显示折行
     nnoremap <leader>iw :set invwrap<CR>
     " 显示不可见字符
@@ -355,9 +373,9 @@ vnoremap ; :
     nnoremap <leader>ih <esc>:call InvConceallevel()<CR>
     " 更改透明背景
     nnoremap <leader>it <esc>:call InvTransParentBackground()<CR>
-" }
+" }}}
 
-" copy and paste{
+" copy and paste{{{
     vnoremap <C-c> "+y
     nnoremap <C-v> "+p
     inoremap <C-v> <esc>"+pi
@@ -370,9 +388,9 @@ vnoremap ; :
         execute "vnoremap <leader>'" . t . "    \"" . t . "y"
         execute "nnoremap <leader>'" . t . "    \"" . t . "p"
     endfor
-" }
+" }}}
 
-" move and goto{
+" move and goto{{{
     nnoremap <S-s> %
     nnoremap <S-l> $
     nnoremap <S-h> ^
@@ -385,9 +403,9 @@ vnoremap ; :
 
     nnoremap <C-j> <C-e>
     nnoremap <C-k> <C-y>
-" }
+" }}}
 
-" surrounding with words{
+" surrounding with words{{{
     " text object: ?i? or ?a?
     nnoremap <leader>i( viwxi(<esc>pa)<esc>     
     nnoremap <leader>i< viwxi<<esc>pa><esc>
@@ -403,9 +421,9 @@ vnoremap ; :
     vnoremap <leader>i" xi""<esc>hp<esc>
     vnoremap <leader>i' xi''<esc>hp<esc>
     vnoremap <leader>i/ xi/**/<esc>hhp<esc>
-" }
+" }}}
 
-" tab ,buffer and quickfix {
+" tab ,buffer and quickfix {{{
     noremap <M-h> gT
     noremap <M-l> gt
 
@@ -415,9 +433,9 @@ vnoremap ; :
 
     nnoremap <leader>qo :copen<CR>
     nnoremap <leader>qc :cclose<CR>
-" }
+" }}}
 
-" window manager{
+" window manager{{{
     " window-command
     " split
     nnoremap <leader>ws :split<CR>
@@ -444,9 +462,9 @@ vnoremap ; :
     nnoremap <C-left> <esc>:vertical resize-1<CR>
     nnoremap <C-right> <esc>:vertical resize+1<CR>
     nnoremap <leader>w= <C-w>=
-" }
+" }}}
 
-" find and search{
+" find and search{{{
     " find-search
 
     " /\<the\> : can match chars in "for the vim", but can not match chars in "there"
@@ -459,14 +477,14 @@ vnoremap ; :
     vnoremap <leader>/ "9y<bar>:execute"let g:__str__=getreg('9')"<bar>execute "vimgrep /" . g:__str__ . "/j %"<bar>copen<CR>
     " find word with vimgrep
     nnoremap <leader>fw :execute"let g:__str__=expand(\"<cword>\")"<bar>execute "vimgrep /\\<" . g:__str__ . "\\>/j %"<bar>copen<CR>
-" }
+" }}}
 
-" Run Program map{
+" Run Program map{{{
     " compiling and running
     noremap <F5> <esc>:call F5ComplileFile('')<CR>
     " run with args
     nnoremap <leader>ra :execute"let g:__str__=input('Compile Args: ')"<bar>call F5ComplileFile(g:__str__)<CR>
-" }
+" }}}
 
 
 
@@ -482,25 +500,25 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " user plugins 
 
-" vimcdoc {
+" vimcdoc {{{
     " 中文帮助文档
     Plug 'vimcn/vimcdoc',{'branch' : 'release'}
-" }
+" }}}
 
-" asd2num {
+" asd2num {{{
     " asd数字输入
     Plug 'yehuohan/asd2num'
     inoremap <C-a> <esc>:Asd2NumToggle<CR>a
-" }
+" }}}
 
-" nerd-tree{
+" nerd-tree{{{
     " 目录树导航
     Plug 'scrooloose/nerdtree'          
     let g:NERDTreeShowHidden=1
     noremap <leader>te :NERDTreeToggle<CR>
-" }
+" }}}
 
-" taglist{
+" taglist{{{
     " 代码结构预览
     Plug 'vim-scripts/taglist.vim'
     if IsLinux()
@@ -513,9 +531,9 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let Tlist_Exit_OnlyWindow=1             " 如果taglist窗口是最后一个窗口，则退出vim
     let Tlist_Use_Right_Window=1            " 在右侧窗口中显示taglist窗口
     noremap <leader>tt :TlistToggle<CR>     " 可以 ctags -R 命令自行生成tags
-" }
+" }}}
 
-" YouCompleteMe{
+" YouCompleteMe{{{
     " 自动补全
     " Linux: 
     "   install python-dev, python3-dev, cmake, llvm, clang
@@ -546,9 +564,9 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nnoremap <leader>gs :YcmShowDetailedDiagnostic<CR>
     noremap <F4> :YcmDiags<CR> 
                                                 " 错误列表
-" }
+" }}}
 
-" AsyncRun {
+" AsyncRun {{{
     " 导步运行程序
     Plug 'skywind3000/asyncrun.vim'
     augroup vimrc
@@ -556,9 +574,9 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     augroup END
     nnoremap <leader>rr :AsyncRun 
     nnoremap <leader>rs :AsyncStop<CR>
-" }
+" }}}
 
-" ultisnips{
+" ultisnips{{{
     " 代码片段插入
     Plug 'SirVer/ultisnips'               " snippet insert engine
     Plug 'honza/vim-snippets'             " snippet collection
@@ -567,18 +585,18 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:UltiSnipsExpandTrigger="<tab>"
     let g:UltiSnipsJumpForwardTrigger="<C-o>"
     let g:UltiSnipsJumpBackwardTrigger="<C-p>"
-" }
+" }}}
 
-" nerd-commenter{
+" nerd-commenter{{{
     " 批量注释
     Plug 'scrooloose/nerdcommenter'
     let g:NERDSpaceDelims = 1               " add space after comment
     " <leader>cc for comment
     " <leader>cl/cb for comment aligned
     " <leader>cu for un-comment
-" }
+" }}}
 
-" air-line{
+" air-line{{{
     " 状态栏
     Plug 'vim-airline/vim-airline'
     set laststatus=2
@@ -587,15 +605,15 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
     let g:airline#extensions#ycm#error_symbol = 'E:'
     let g:airline#extensions#ycm#warning_symbol = 'W:'
-" }
+" }}}
 
-" file switch{
+" file switch{{{
     " 文件切换
     Plug 'derekwyatt/vim-fswitch'
     nnoremap <silent> <leader>fh :FSHere<CR>
-" }
+" }}}
 
-" multiple-cursors{
+" multiple-cursors{{{
     " 多光标编辑
     Plug 'terryma/vim-multiple-cursors'
     let g:multi_cursor_use_default_mapping=0 " 取消默认按键
@@ -605,25 +623,25 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:multi_cursor_prev_key='<C-p>'
     let g:multi_cursor_skip_key='<C-x>'
     let g:multi_cursor_quit_key='<esc>'
-" }
+" }}}
 
-" vim-over {
+" vim-over {{{
     " 替换预览
     " substitute preview
     Plug 'osyo-manga/vim-over'
     nnoremap <leader>oc :OverCommandLine<CR>
-" }
+" }}}
 
-" tabular{
+" tabular{{{
     " 代码对齐
     " /:/r2 means align right and insert 2 space before next field
     Plug 'godlygeek/tabular'
     " align map
     vnoremap <leader>a :Tabularize /
     nnoremap <leader>a :Tabularize /
-" }
+" }}}
 
-" surround and repeat{
+" surround and repeat{{{
     " add surroundings
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-repeat'
@@ -636,9 +654,9 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     " surround selected text in visual mode
     vmap s S
     vmap <leader>s gS
-" }
+" }}}
 
-" easy-motion{
+" easy-motion{{{
     " 快速跳
     Plug 'easymotion/vim-easymotion'
     let g:EasyMotion_do_mapping = 0         " 禁止默认map
@@ -657,9 +675,9 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     " nmap <leader>E <plug>(easymotion-E)
     " nmap <leader>gE <plug>(easymotion-gE)
     "
-" }
+" }}}
 
-" ctrl-space{
+" ctrl-space{{{
     " buffer管理
     " <h,o,l,w,b,/,?> for buffer,file,tab,workspace,bookmark,search and help
     Plug 'vim-ctrlspace/vim-ctrlspace'
@@ -677,9 +695,9 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     " 切换按键
     nnoremap <C-Space> :CtrlSpace<CR>
     inoremap <C-Space> <esc>:CtrlSpace<CR>
-" }
+" }}}
 
-" incsearch{
+" incsearch{{{
     " 查找增强
     Plug 'haya14busa/incsearch.vim'
     Plug 'haya14busa/incsearch-fuzzy.vim'
@@ -713,9 +731,9 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nmap <leader>3  <Plug>(incsearch-nohl-#)
     nmap g* <Plug>(incsearch-nohl-g*)
     nmap g# <Plug>(incsearch-nohl-g#)
-" }
+" }}}
 
-" expand-region{
+" expand-region{{{
     " 快速块选择
     Plug 'terryma/vim-expand-region'
     nmap <leader>er <Plug>(expand_region_expand)
@@ -724,9 +742,9 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nmap <C-h> <Plug>(expand_region_shrink)
     vmap <C-l> <Plug>(expand_region_expand)
     vmap <C-h> <Plug>(expand_region_shrink)
-" }
+" }}}
 
-" smooth-scroll{
+" smooth-scroll{{{
     " 平滑滚动
     Plug 'terryma/vim-smooth-scroll'
     nnoremap <silent> <C-u> :call smooth_scroll#up(&scroll, 0, 2)<CR>
@@ -735,15 +753,15 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     " nnoremap <silent> <C-b> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
     nnoremap <silent> <M-j> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
     nnoremap <silent> <M-k> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
-" }
+" }}}
 
-" undo {
+" undo {{{
     " 撤消历史
     Plug 'mbbill/undotree'
     nnoremap <leader>tu :UndotreeToggle<CR>
-" }
+" }}}
 
-" session{
+" session{{{
     " 会话保存
     Plug 'xolox/vim-misc'
     Plug 'xolox/vim-session'
@@ -751,17 +769,17 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:session_autoload='yes'            " 直接打开vim，自动加载default.vim
     noremap <leader>qa :SaveSession!<CR>:qa<CR>
                                             " 关闭所有，且先保存会话
-" }
+" }}}
 
-" indent-line{
+" indent-line{{{
     " 显示缩进标识
     Plug 'Yggdroot/indentLine'          
     "let g:indentLine_char = '|'            " 设置标识符样式
     let g:indentLinet_color_term=200        " 设置标识符颜色
     nnoremap <leader>t\ :IndentLinesToggle<CR>
-" }
+" }}}
 
-" theme {
+" theme {{{
     " gruvbox主题
     Plug 'morhetz/gruvbox'
     set rtp+=$VimPluginPath/bundle/gruvbox/
@@ -778,16 +796,16 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     " hi Search term=reverse ctermfg=white ctermbg=blue guifg=white guibg=#072f95
                                         " 设定高亮行列的颜色
                                         " cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
-" }
+" }}}
 
-" rainbow{
+" rainbow{{{
     " 彩色括号
     Plug 'luochen1990/rainbow'
     let g:rainbow_active = 1 "0 if you want to enable it later via :RainbowToggle
     nnoremap <leader>tr :RainbowToggle<CR>
-" }
+" }}}
 
-" markdown-preview{
+" markdown-preview{{{
     " MarkDown预览 
     Plug 'plasticboy/vim-markdown'
     Plug 'iamcco/mathjax-support-for-mkdp'
@@ -808,25 +826,24 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
             MarkdownPreview
         endif
     endfunction
-" }
+" }}}
 
-" qml {
+" qml {{{
     " qml高亮
     Plug 'crucerucalin/qml.vim'
-" }
+" }}}
 
-" vim-latex{
+" vim-latex{{{
     "Plug 'vim-latex/vim-latex'
     " 暂时不用
-" }
-
+" }}}
 
 
 if IsNVim()
-" neovim gui font {
+" neovim gui font {{{
     " neovim-gui字体设置   
     Plug 'equalsraf/neovim-gui-shim'
-" }
+" }}}
 endif
 
 call plug#end()            " required
