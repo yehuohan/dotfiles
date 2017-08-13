@@ -47,7 +47,7 @@ TEXT
 
 # 时间
 {
-    "full_text" : " ${time %Y - %m - %d %a}" , 
+    "full_text" : " ${time %Y-%m-%d %a}" , 
     "color" : "\#F0F020" 
 },
 { 

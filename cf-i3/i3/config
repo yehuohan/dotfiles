@@ -53,35 +53,43 @@ font pango:WenQuanYi Micro Hei Bold 11
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 
-# new window
+# window operations
 new_window normal
 new_float normal
 popup_during_fullscreen leave_fullscreen
+focus_follows_mouse no
+# 自动跳转到原来的workspace
+workspace_auto_back_and_forth yes
+# 输出到特定显示器，可用命令 xrandr 查看显示器名称
+#workspace 1 output LVDS1
+#workspace 5 output VGA1
 
+# 打开软件时自动移至相应工作区
+assign [class="Thunar"] workspace 1
+assign [class="Gvim"] workspace 2
+
+# 打开软件时，执行特定命令
+for_window [window_role="pop-up"] floating enable
+
+# i3-gaps configuration
+#for_window [class="^.*"] border normal
+for_window [class="^.*"] border pixel 3
+gaps inner 2
+gaps outer 2
+
+# color vairable
+# main color
+set $clr_m 900000 
 # window colors
 # class                 border  backgr. text    indicator child_border
-client.focused          #a000b0 #a000b0 #eeeeee #2e9ef4   #000000
+client.focused          #$clr_m #$clr_m #eeeeee #$clr_m   #$clr_m
 client.focused_inactive #333333 #5f676a #ffffff #484e50   #5f676a
 client.unfocused        #333333 #222222 #888888 #292d2e   #222222
 client.urgent           #2f343a #900000 #ffffff #900000   #900000
 client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
 client.background       #ffffff
 
-# 打开软件时，执行特定命令
-for_window [window_role="pop-up"] floating enable
-for_window [window_role="task_dialog"] floating enable
-#for_window [class="xfce4-terminal"] border normal
-
-# 打开软件时自动移至相应工作区
-assign [class="Thunar"] workspace 1
-assign [class="Gvim"] workspace 2
-
-# i3-gaps configuration
-for_window [class="^.*"] border normal
-# for_window [class="^.*"] border pixel 0
-# gaps inner 5
-# gaps outer 5
-
+# i3bar设置
 bar {
     i3bar_command i3bar -t
     # 调用i3status
@@ -112,7 +120,6 @@ bar {
         binding_mode       #11111155 #900000FF #80F020B0
 	}
 }
-
 
 
 
