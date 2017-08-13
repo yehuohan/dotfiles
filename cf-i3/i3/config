@@ -29,6 +29,8 @@ exec_always --no-startup-id feh --bg-fill ~/Pictures/WallPaper/wp2.jpg
 exec --no-startup-id xfce4-power-manager
 # 网络连接
 exec --no-startup-id nm-applet
+# 音量图标
+exec --no-startup-id volumeicon
 
 # }}}
 
@@ -67,9 +69,6 @@ popup_during_fullscreen leave_fullscreen
 focus_follows_mouse no
 # 自动跳转到原来的workspace
 workspace_auto_back_and_forth yes
-# 输出到特定显示器，可用命令 xrandr 查看显示器名称
-#workspace 1 output LVDS1
-#workspace 5 output VGA1
 
 # 打开软件时自动移至相应工作区
 assign [class="Thunar"] workspace 1
@@ -213,10 +212,10 @@ mode "resize" {
     bindsym l resize grow width 2 px or 2 ppt
 
     # same bindings, but for the arrow keys
-    bindsym Left resize shrink width 5 px or 5 ppt
-    bindsym Down resize grow height 5 px or 5 ppt
-    bindsym Up resize shrink height 5 px or 5 ppt
-    bindsym Right resize grow width 5 px or 5 ppt
+    bindsym Left resize shrink width 10 px or 10 ppt
+    bindsym Down resize grow height 10 px or 10 ppt
+    bindsym Up resize shrink height 10 px or 10 ppt
+    bindsym Right resize grow width 10 px or 10 ppt
 
     # back to normal: Enter or Escape
     bindsym Return mode "default"
@@ -315,11 +314,9 @@ bindsym $mod+d exec dmenu_run
 bindsym $mod+F6 exec ToggleTouchPad
 
 # 音量管理 Fn+Left/Right
-bindsym XF86AudioRaiseVolume exec --no-startup-id amixer set -q Master 5%+
-bindsym XF86AudioLowerVolume exec --no-startup-id amixer set -q Master 5%-
+#bindsym XF86AudioRaiseVolume exec --no-startup-id amixer set -q Master 5%+
+#bindsym XF86AudioLowerVolume exec --no-startup-id amixer set -q Master 5%-
 #bindsym XF86AudioMute exec --no-startup-id amixer -q set Master toggle
-#bindsym $mod+Right exec --no-startup-id amixer set -q Master 5%+
-#bindsym $mod+Left exec --no-startup-id amixer set -q Master 5%-
 bindsym $mod+a exec --no-startup-id amixer -q set Master toggle
 
 # 快速切换窗口
