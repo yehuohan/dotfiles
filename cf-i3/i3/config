@@ -18,7 +18,7 @@ set $mod Mod4
 #===============================================================================
 # auto-start programs
 #===============================================================================
-
+# {{{
 # 输入法
 exec --no-startup-id fcitx
 # 透明效果
@@ -30,10 +30,14 @@ exec --no-startup-id xfce4-power-manager
 # 网络连接
 exec --no-startup-id nm-applet
 
+# }}}
+
 
 #===============================================================================
 # i3 UI
 #===============================================================================
+# 字体
+# {{{
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
 #font pango:monospace 10 
@@ -52,7 +56,10 @@ font pango:WenQuanYi Micro Hei Bold 11
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
+# }}}
 
+# 窗口设置
+# {{{
 # window operations
 new_window normal
 new_float normal
@@ -89,7 +96,10 @@ client.urgent           #2f343a #900000 #ffffff #900000   #900000
 client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
 client.background       #ffffff
 
+# }}}
+
 # i3bar设置
+# {{{
 bar {
     i3bar_command i3bar -t
     # 调用i3status
@@ -97,18 +107,18 @@ bar {
     # 调用conky
     status_command ~/.config/i3/conky.sh
     # 显示位置
-	position top
+    position top
     height 26
 
     # 显示托盘图标的显示器
-	tray_output primary
+    tray_output primary
     # bar显示隐藏设置
-	mode dock
+    mode dock
     # 分隔符
-	#separator_symbol "|"
+    #separator_symbol "|"
     separator_symbol "  "
 
-	colors {
+    colors {
         background #30303000
         statusline #FFFFFF
         separator  #808080
@@ -118,17 +128,21 @@ bar {
         inactive_workspace #11111155 #FFFFFF00 #80F020B0
         urgent_workspace   #FFFFFF00 #FFFFFF00 #80F020FF
         binding_mode       #11111155 #900000FF #80F020B0
-	}
+    }
 }
+
+# }}}
 
 
 
 #===============================================================================
 # key bind for i3 operation
 # mod+Shift : 很少用的按键，或不希望被按误按
-# mod+mod1  : 作为mod的逆功能键
+# mod+mod1  : 作为mod的逆功能键，或是成对按键功能(如移动焦点和移动窗口)
 #===============================================================================
 
+# i3管理键 
+# {{{
 # Power Management
 set $mode_system   Lock(L)  Logout(O)  Reboot(R)  Shutdown(S)  Exit(Esc)
 bindsym $mod+Shift+q mode "$mode_system"
@@ -149,17 +163,19 @@ bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcu
 # restart i3 inplace 
 # preserves your layout/session, can be used to upgrade i3
 bindsym $mod+Shift+r restart
+# }}}
 
-
+# 窗口管理 
+# {{{
 # kill(stop) focused window
 bindsym $mod+s kill
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
 
-# 把当前窗口设为便笺本
+# 把当前窗口放到scratchpad
 bindsym $mod+mod1+p move scratchpad
-# 呼出第一个便笺本，将呼出的窗口设置成平铺才能继续呼出窗口
+# 从scratchpad呼出第一个窗口，将呼出的窗口设置成平铺才能继续呼出窗口
 bindsym $mod+p scratchpad show
 
 # change focus
@@ -168,23 +184,49 @@ bindsym $mod+j focus down
 bindsym $mod+k focus up
 bindsym $mod+l focus right
 
+# focus the parent container
+bindsym $mod+mod1+v focus parent
+# focus the child container
+bindsym $mod+v focus child
+
+# toggle tiling / floating
+bindsym $mod+mod1+space floating toggle
+# change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+
 # move focused window
 bindsym $mod+mod1+h move left
 bindsym $mod+mod1+j move down
 bindsym $mod+mod1+k move up
 bindsym $mod+mod1+l move right
 
-# toggle tiling / floating
-bindsym $mod+mod1+space floating toggle
+# resize window (you can also use the mouse for that)
+bindsym $mod+Left resize shrink width 2 px or 2 ppt
+bindsym $mod+Up resize grow height 2 px or 2 ppt
+bindsym $mod+Down resize shrink height 2 px or 2 ppt
+bindsym $mod+Right resize grow width 2 px or 2 ppt
+bindsym $mod+z mode "resize"
+mode "resize" {
+    bindsym h resize shrink width 2 px or 2 ppt
+    bindsym j resize grow height 2 px or 2 ppt
+    bindsym k resize shrink height 2 px or 2 ppt
+    bindsym l resize grow width 2 px or 2 ppt
 
-# change focus between tiling / floating windows
-bindsym $mod+space focus mode_toggle
+    # same bindings, but for the arrow keys
+    bindsym Left resize shrink width 5 px or 5 ppt
+    bindsym Down resize grow height 5 px or 5 ppt
+    bindsym Up resize shrink height 5 px or 5 ppt
+    bindsym Right resize grow width 5 px or 5 ppt
 
-# change container layout (stacked, tabbed, toggle split)
-#bindsym $mod+u layout stacking
-bindsym $mod+y layout tabbed
-bindsym $mod+u layout toggle split
+    # back to normal: Enter or Escape
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
 
+# }}}
+
+# WorkSpace管理
+# {{{
 # switch to workspace
 bindsym $mod+0 workspace 10
 bindsym $mod+1 workspace 1
@@ -210,38 +252,26 @@ bindsym $mod+mod1+8 move container to workspace 8; workspace 8
 bindsym $mod+mod1+9 move container to workspace 9; workspace 9
 
 # switch to near workspace
-#bindsym $mod+Tab workspace next
-#bindsym mod1+Tab workspace prev
-bindsym $mod+o workspace next
-bindsym $mod+i workspace prev
+bindsym $mod+o workspace next_on_output 
+bindsym $mod+i workspace prev_on_output
+bindsym $mod+mod1+o workspace next
+bindsym $mod+mod1+i workspace prev
 
-# focus the parent container
-bindsym $mod+mod1+m focus parent
-# focus the child container
-bindsym $mod+m focus child
+# Move the current workspace to the next output (effectively toggles when you only have two outputs)
+bindsym $mod+mod1+m move workspace to output right
+# Move the focused window to the next output (use xrandr to see available outputs)
+bindsym $mod+m move container to output right
+# Tggles focus among the outputs
+bindsym $mod+n focus output right
 
-# resize window (you can also use the mouse for that)
-bindsym $mod+Left resize shrink width 2 px or 2 ppt
-bindsym $mod+Up resize grow height 2 px or 2 ppt
-bindsym $mod+Down resize shrink height 2 px or 2 ppt
-bindsym $mod+Right resize grow width 2 px or 2 ppt
-bindsym $mod+z mode "resize"
-mode "resize" {
-    bindsym h resize shrink width 2 px or 2 ppt
-    bindsym j resize grow height 2 px or 2 ppt
-    bindsym k resize shrink height 2 px or 2 ppt
-    bindsym l resize grow width 2 px or 2 ppt
+#}}}
 
-    # same bindings, but for the arrow keys
-    bindsym Left resize shrink width 5 px or 5 ppt
-    bindsym Down resize grow height 5 px or 5 ppt
-    bindsym Up resize shrink height 5 px or 5 ppt
-    bindsym Right resize grow width 5 px or 5 ppt
-
-    # back to normal: Enter or Escape
-    bindsym Return mode "default"
-    bindsym Escape mode "default"
-}
+# 其它设置
+# {{{
+# change container layout (stacked, tabbed, toggle split)
+#bindsym $mod+u layout stacking
+bindsym $mod+y layout tabbed
+bindsym $mod+u layout toggle split
 
 # toggle the border style
 bindsym $mod+b border toggle
@@ -256,13 +286,14 @@ bindsym $mod+b border toggle
 # split in vertical orientation
 #bindsym $mod+v split v
 
+# }}}
 
 
 
 #===============================================================================
 # key bind for starting program
 #===============================================================================
-
+#{{{
 # start a terminal
 bindsym $mod+Return exec xfce4-terminal
 
@@ -304,3 +335,4 @@ bindsym Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -e 'mv $f $scrot_di
 bindsym $mod+Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/'
 bindsym $mod+Shift+Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/ && ristretto $scrot_dir/$f'
 
+# }}}
