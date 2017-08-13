@@ -48,6 +48,8 @@
     "   :s/text\n/text/
     "       查找内容为text，且其后是回车
 " }}}
+" {{{
+" }}}
 
 
 
@@ -391,13 +393,13 @@ vnoremap ; :
 " }}}
 
 " move and goto{{{
+    " 行首和行尾
     nnoremap <S-s> %
     nnoremap <S-l> $
     nnoremap <S-h> ^
-
     vnoremap <S-l> $
     vnoremap <S-h> ^
-
+    " 复制到行首行尾
     nnoremap y<S-l> y$
     nnoremap y<S-h> y^
 
@@ -424,19 +426,19 @@ vnoremap ; :
 " }}}
 
 " tab ,buffer and quickfix {{{
+    " tab切换
     noremap <M-h> gT
     noremap <M-l> gt
-
+    " buffer切换
     nnoremap <leader>bn :bn<CR>
     nnoremap <leader>bp :bp<CR>
     nnoremap <leader>bl :b#<CR>
-
+    " quickfix打开与关闭
     nnoremap <leader>qo :copen<CR>
     nnoremap <leader>qc :cclose<CR>
 " }}}
 
 " window manager{{{
-    " window-command
     " split
     nnoremap <leader>ws :split<CR>
     nnoremap <leader>wv :vsplit<CR>
@@ -465,15 +467,14 @@ vnoremap ; :
 " }}}
 
 " find and search{{{
-    " find-search
-
     " /\<the\> : can match chars in "for the vim", but can not match chars in "there"
     " /the     : can match chars in "for the vim" and also in "there"
     " search selected
     vnoremap / "9y<bar>:execute"let g:__str__=getreg('9')"<bar>execute"/" . g:__str__<CR>
 
-    " vimgrep what input or selected
+    " vimgrep what input
     nnoremap <leader>/ :execute"let g:__str__=input('/')"<bar>execute "vimgrep /" . g:__str__ . "/j %"<bar>copen<CR>
+    " vimgrep what selected
     vnoremap <leader>/ "9y<bar>:execute"let g:__str__=getreg('9')"<bar>execute "vimgrep /" . g:__str__ . "/j %"<bar>copen<CR>
     " find word with vimgrep
     nnoremap <leader>fw :execute"let g:__str__=expand(\"<cword>\")"<bar>execute "vimgrep /\\<" . g:__str__ . "\\>/j %"<bar>copen<CR>
@@ -486,6 +487,21 @@ vnoremap ; :
     nnoremap <leader>ra :execute"let g:__str__=input('Compile Args: ')"<bar>call F5ComplileFile(g:__str__)<CR>
 " }}}
 
+" File diff {{{
+    " 文件比较，自动补全文件和目录
+    nnoremap <leader>ds :execute "let g:__str__=input('File: ', '', 'file')"<bar> execute "diffsplit " . g:__str__<CR>
+    nnoremap <leader>dv :execute "let g:__str__=input('File: ', '', 'file')"<bar> execute "vertical diffsplit " . g:__str__<CR>
+    " 比较当前文件（已经分屏）
+    nnoremap <leader>dt :diffthis<CR>
+    " 应用差异到别一文件
+    nnoremap <leader>dp :diffput<CR>
+    " 拉取差异到当前文件
+    nnoremap <leader>dg :diffget<CR>
+    " 关闭文件比较
+    nnoremap <leader>do :diffoff<CR>
+    " 更新比较结果
+    nnoremap <leader>du :diff<CR>
+" }}}
 
 
 
@@ -500,26 +516,22 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " user plugins 
 
-" vimcdoc {{{
-    " 中文帮助文档
+" vimcdoc {{{ 中文帮助文档
     Plug 'vimcn/vimcdoc',{'branch' : 'release'}
 " }}}
 
-" asd2num {{{
-    " asd数字输入
+" asd2num {{{ asd数字输入
     Plug 'yehuohan/asd2num'
     inoremap <C-a> <esc>:Asd2NumToggle<CR>a
 " }}}
 
-" nerd-tree{{{
-    " 目录树导航
+" nerd-tree{{{ 目录树导航
     Plug 'scrooloose/nerdtree'          
     let g:NERDTreeShowHidden=1
     noremap <leader>te :NERDTreeToggle<CR>
 " }}}
 
-" taglist{{{
-    " 代码结构预览
+" taglist{{{ 代码结构预览
     Plug 'vim-scripts/taglist.vim'
     if IsLinux()
         let Tlist_Ctags_Cmd='/usr/bin/ctags'
@@ -533,8 +545,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     noremap <leader>tt :TlistToggle<CR>     " 可以 ctags -R 命令自行生成tags
 " }}}
 
-" YouCompleteMe{{{
-    " 自动补全
+" YouCompleteMe {{{ 自动补全
     " Linux: 
     "   install python-dev, python3-dev, cmake, llvm, clang
     "   ./install.py --clang-completer --system-libclang
@@ -566,8 +577,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
                                                 " 错误列表
 " }}}
 
-" AsyncRun {{{
-    " 导步运行程序
+" AsyncRun {{{ 导步运行程序
     Plug 'skywind3000/asyncrun.vim'
     augroup vimrc
         autocmd User AsyncRunStart call asyncrun#quickfix_toggle(8, 1)
@@ -576,8 +586,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nnoremap <leader>rs :AsyncStop<CR>
 " }}}
 
-" ultisnips{{{
-    " 代码片段插入
+" ultisnips{{{ 代码片段插入
     Plug 'SirVer/ultisnips'               " snippet insert engine
     Plug 'honza/vim-snippets'             " snippet collection
     let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
@@ -587,8 +596,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:UltiSnipsJumpBackwardTrigger="<C-p>"
 " }}}
 
-" nerd-commenter{{{
-    " 批量注释
+" nerd-commenter {{{ 批量注释
     Plug 'scrooloose/nerdcommenter'
     let g:NERDSpaceDelims = 1               " add space after comment
     " <leader>cc for comment
@@ -596,8 +604,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     " <leader>cu for un-comment
 " }}}
 
-" air-line{{{
-    " 状态栏
+" air-line {{{ 状态栏
     Plug 'vim-airline/vim-airline'
     set laststatus=2
     let g:airline#extensions#ctrlspace#enabled = 1      " support for ctrlspace integration
@@ -607,14 +614,12 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:airline#extensions#ycm#warning_symbol = 'W:'
 " }}}
 
-" file switch{{{
-    " 文件切换
+" file switch {{{ 文件切换
     Plug 'derekwyatt/vim-fswitch'
     nnoremap <silent> <leader>fh :FSHere<CR>
 " }}}
 
-" multiple-cursors{{{
-    " 多光标编辑
+" multiple-cursors{{{ 多光标编辑
     Plug 'terryma/vim-multiple-cursors'
     let g:multi_cursor_use_default_mapping=0 " 取消默认按键
     let g:multi_cursor_start_key='<C-n>'     " 进入Multiple-cursors Model
@@ -625,15 +630,13 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:multi_cursor_quit_key='<esc>'
 " }}}
 
-" vim-over {{{
-    " 替换预览
+" vim-over {{{ 替换预览
     " substitute preview
     Plug 'osyo-manga/vim-over'
     nnoremap <leader>oc :OverCommandLine<CR>
 " }}}
 
-" tabular{{{
-    " 代码对齐
+" tabular {{{ 代码对齐
     " /:/r2 means align right and insert 2 space before next field
     Plug 'godlygeek/tabular'
     " align map
@@ -641,8 +644,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nnoremap <leader>a :Tabularize /
 " }}}
 
-" surround and repeat{{{
-    " add surroundings
+" surround and repeat{{{ 添加包围符
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-repeat'
 
@@ -656,8 +658,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     vmap <leader>s gS
 " }}}
 
-" easy-motion{{{
-    " 快速跳
+" easy-motion {{{ 快速跳转
     Plug 'easymotion/vim-easymotion'
     let g:EasyMotion_do_mapping = 0         " 禁止默认map
     let g:EasyMotion_smartcase = 1          " 不区分大小写
@@ -677,8 +678,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     "
 " }}}
 
-" ctrl-space{{{
-    " buffer管理
+" ctrl-space {{{ buffer管理
     " <h,o,l,w,b,/,?> for buffer,file,tab,workspace,bookmark,search and help
     Plug 'vim-ctrlspace/vim-ctrlspace'
     set nocompatible
@@ -697,8 +697,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     inoremap <C-Space> <esc>:CtrlSpace<CR>
 " }}}
 
-" incsearch{{{
-    " 查找增强
+" incsearch {{{ 查找增强
     Plug 'haya14busa/incsearch.vim'
     Plug 'haya14busa/incsearch-fuzzy.vim'
     let g:incsearch#auto_nohlsearch = 1
@@ -733,8 +732,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nmap g# <Plug>(incsearch-nohl-g#)
 " }}}
 
-" expand-region{{{
-    " 快速块选择
+" expand-region {{{ 快速块选择
     Plug 'terryma/vim-expand-region'
     nmap <leader>er <Plug>(expand_region_expand)
     vmap <leader>er <Plug>(expand_region_expand)
@@ -744,8 +742,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     vmap <C-h> <Plug>(expand_region_shrink)
 " }}}
 
-" smooth-scroll{{{
-    " 平滑滚动
+" smooth-scroll {{{ 平滑滚动
     Plug 'terryma/vim-smooth-scroll'
     nnoremap <silent> <C-u> :call smooth_scroll#up(&scroll, 0, 2)<CR>
     nnoremap <silent> <C-d> :call smooth_scroll#down(&scroll, 0, 2)<CR>
@@ -755,14 +752,12 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nnoremap <silent> <M-k> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
 " }}}
 
-" undo {{{
-    " 撤消历史
+" undo {{{ 撤消历史
     Plug 'mbbill/undotree'
     nnoremap <leader>tu :UndotreeToggle<CR>
 " }}}
 
-" session{{{
-    " 会话保存
+" session {{{ 会话保存
     Plug 'xolox/vim-misc'
     Plug 'xolox/vim-session'
     let g:session_autosave='no'             " 自动保存会话窗口
@@ -771,15 +766,14 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
                                             " 关闭所有，且先保存会话
 " }}}
 
-" indent-line{{{
-    " 显示缩进标识
+" indent-line {{{ 显示缩进标识
     Plug 'Yggdroot/indentLine'          
     "let g:indentLine_char = '|'            " 设置标识符样式
     let g:indentLinet_color_term=200        " 设置标识符颜色
     nnoremap <leader>t\ :IndentLinesToggle<CR>
 " }}}
 
-" theme {{{
+" theme {{{ 主题
     " gruvbox主题
     Plug 'morhetz/gruvbox'
     set rtp+=$VimPluginPath/bundle/gruvbox/
@@ -798,15 +792,13 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
                                         " cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
 " }}}
 
-" rainbow{{{
-    " 彩色括号
+" rainbow {{{ 彩色括号
     Plug 'luochen1990/rainbow'
     let g:rainbow_active = 1 "0 if you want to enable it later via :RainbowToggle
     nnoremap <leader>tr :RainbowToggle<CR>
 " }}}
 
-" markdown-preview{{{
-    " MarkDown预览 
+" markdown-preview {{{ MarkDown预览 
     Plug 'plasticboy/vim-markdown'
     Plug 'iamcco/mathjax-support-for-mkdp'
     Plug 'iamcco/markdown-preview.vim'
@@ -828,20 +820,18 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     endfunction
 " }}}
 
-" qml {{{
-    " qml高亮
+" qml {{{ qml高亮
     Plug 'crucerucalin/qml.vim'
 " }}}
 
-" vim-latex{{{
+" vim-latex {{{
     "Plug 'vim-latex/vim-latex'
     " 暂时不用
 " }}}
 
 
 if IsNVim()
-" neovim gui font {{{
-    " neovim-gui字体设置   
+" neovim gui font {{{ 字体设置   
     Plug 'equalsraf/neovim-gui-shim'
 " }}}
 endif
