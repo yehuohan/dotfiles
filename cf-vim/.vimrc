@@ -127,7 +127,8 @@ endfunction
 function! InvConceallevel()
     if &conceallevel == 0
         set conceallevel=2
-    elseif &conceallevel == 2
+    "elseif &conceallevel == 2
+    else
         set conceallevel=0                  " 显示markdown等格式中的隐藏字符
     endif
 endfunction
@@ -143,6 +144,37 @@ function! InvTransParentBackground()
     else
         hi Normal ctermbg=NONE
         let s:inv_transparent_bg_flg = 1
+    endif
+endfunction
+" }}}
+
+" 切换显示行号
+" {{{
+let s:inv_number_type=1
+function! InvNumberType()
+    if s:inv_number_type == 1
+        let s:inv_number_type = 2
+        set nonumber
+        set norelativenumber
+    elseif s:inv_number_type == 2
+        let s:inv_number_type = 3
+        set number
+        set norelativenumber
+    elseif s:inv_number_type == 3
+        let s:inv_number_type = 1
+        set number
+        set relativenumber
+    endif
+endfunction
+" }}}
+
+" 切换显示折叠列
+" {{{
+function! InvFoldColumeShow()
+    if &foldcolumn == 0
+        set foldcolumn=1
+    else
+        set foldcolumn=0
     endif
 endfunction
 " }}}
@@ -215,10 +247,6 @@ endif
     set cursorline                      " 高亮当前行
     set cursorcolumn                    " 高亮当前列
     set hlsearch                        " 设置高亮显示查找到的文本
-    set autoindent                      " 使用autoindent缩进
-    set foldenable                      " 充许折叠
-    set foldcolumn=1                    " 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
-    set showcmd                         " 显示寄存器命令，宏调用命令@等
     set tabstop=4                       " 设置tab键宽4个空格
     set expandtab                       " 将Tab用Space代替，方便显示缩进标识indentLine
     set softtabstop=4                   " 设置显示的缩进为4,实际Tab可以不是4个格
@@ -226,7 +254,11 @@ endif
     set nowrap                          " 默认关闭折行
     set listchars=eol:$,tab:>-,trail:~,space:.
                                         " 不可见字符显示
+    set showcmd                         " 显示寄存器命令，宏调用命令@等
+    set autoindent                      " 使用autoindent缩进
     set conceallevel=0                  " 显示markdown等格式中的隐藏字符
+    set foldenable                      " 充许折叠
+    set foldcolumn=1                    " 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
     set foldmethod=indent               " 设置折叠，默认为缩进折叠
                                         " manual : 手工定义折叠
                                         " indent : 更多的缩进表示更高级别的折叠
@@ -336,7 +368,7 @@ endif
 
 " 使用Space作为leader
 " Space只在Normal或Command或Visual模式下map，不适合在Insert模式下map
-let mapleader="\<space>"            
+let mapleader="\<space>"
 
 " map语句后别注释，也别留任何空格
 " 特殊键
@@ -372,9 +404,13 @@ vnoremap ; :
     " 显示不可见字符
     nnoremap <leader>il :set invlist<CR>
     " 映射隐藏字符功能，set conceallevel直接设置没交果
-    nnoremap <leader>ih <esc>:call InvConceallevel()<CR>
+    nnoremap <leader>ih :call InvConceallevel()<CR>
     " 更改透明背景
-    nnoremap <leader>it <esc>:call InvTransParentBackground()<CR>
+    nnoremap <leader>it :call InvTransParentBackground()<CR>
+    " 切换行号类型
+    nnoremap <leader>in :call InvNumberType()<CR>
+    " 切换折叠列宽
+    nnoremap <leader>if :call InvFoldColumeShow()<CR>
 " }}}
 
 " copy and paste{{{
