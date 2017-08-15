@@ -48,8 +48,6 @@
     "   :s/text\n/text/
     "       查找内容为text，且其后是回车
 " }}}
-" {{{
-" }}}
 
 
 
@@ -66,10 +64,10 @@
 " linux or win 
 " {{{
     silent function! IsLinux()
-        return has('unix') && !has('macunix') && !has('win32unix')
+        return (has('unix') && !has('macunix') && !has('win32unix'))
     endfunction
     silent function! IsWin()
-        return  (has('win32') || has('win64'))
+        return (has('win32') || has('win64'))
     endfunction
     silent function! IsGw()
         " GNU for windows
@@ -600,8 +598,8 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:ycm_collect_identifiers_from_tags_files = 1 
                                                 " 开启标签补全
     let g:ycm_use_ultisnips_completer = 1       " query UltiSnips for completions
-    let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
-    let g:ycm_key_list_previous_completion = ['<C-m>', '<Up>']
+    let g:ycm_key_list_select_completion = ['<C-j>', '<Down>']
+    let g:ycm_key_list_previous_completion = ['<C-k>', '<Up>']
     let g:ycm_autoclose_preview_window_after_insertion=1
                                                 " 自动关闭预览窗口
     let g:ycm_cache_omnifunc = 0                " 禁止缓存匹配项，每次都重新生成匹配项
@@ -628,8 +626,8 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
                                             " mySnippets is my own snippets collection
     let g:UltiSnipsExpandTrigger="<tab>"
-    let g:UltiSnipsJumpForwardTrigger="<C-o>"
-    let g:UltiSnipsJumpBackwardTrigger="<C-p>"
+    let g:UltiSnipsJumpForwardTrigger="<C-j>"
+    let g:UltiSnipsJumpBackwardTrigger="<C-k>"
 " }}}
 
 " nerd-commenter {{{ 批量注释
