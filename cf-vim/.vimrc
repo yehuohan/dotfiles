@@ -1,15 +1,16 @@
-
-"===============================================================================
-" file   : .vimrc
-" brief  : configuration for vim, gvim, neovim and neovim-qt
-" e-mail : 550034086@qq.com, yehuohan@gmail.com
-" author : yehuohan
-"===============================================================================
+"
+"
+" vimrc, one configuration for vim, gvim, neovim and neovim-qt.
+" yehuohan, <550034086@qq.com>, <yehuohan@gmail.com>
+"
+"
 
 "===============================================================================
 " My Notes
 "===============================================================================
-" 带python编译gvim {{{
+" {{{
+" 带python编译gvim 
+" {{{
     " [x] 设置Make_cyg_ming.mak:
     " DIRECTX=yes                         - 使用DirectX
     " ARCH=i686                           - 使用32位(x86-64为64位)，python也使用32位
@@ -21,13 +22,31 @@
     " 若设置32位选项前编译过一次，清理一次.o文件再编译
     " 若使用64位，只需要添加Python路径和DirectX支持
 " }}}
-" 查看帮助 {{{
+
+" 查看vim帮助 
+" {{{
     " :help       = 查看Vim帮助
     " :help index = 查看帮助列表
     " <S-k>       = 快速查看光标所在cword或选择内容的vim帮助
     " :help *@en  = 指定查看英文(en，cn即为中文)帮助
 " }}}
-" 替换字符串{{{
+
+" 按键映键策略 
+" {{{
+    " - Normal模式下使用<leader>代替<C-?>,<S-?>,<A-?>，
+    " - Insert模式下map带ctrl,alt的快捷键
+    " - 尽量不改变vim原有键位的功能定义
+    " - 尽量一只手不同时按两个键
+    " - 尽量不映射偏远的按键（F1~F12，数字键等）
+    " - 调换Esc和CapsLock键
+    " - map语句后一般别注释，也别留任何空格
+    "
+    "  <leader>t? for plugins toggle command
+    "  <leader>i? for vim "set inv?" command
+"  }}}
+
+" 替换字符串
+" {{{
     "   :%s     - 所有行
     "   :'<,'>s - 所选范圈
     "   :n,$s   - 第n行到最一行
@@ -49,11 +68,13 @@
     "       查找内容为text，且其后是回车
 " }}}
 
+" }}}
 
 
 "===============================================================================
 " Platform
 "===============================================================================
+" {{{
 " vim or nvim 
 " {{{
     silent function! IsNVim()
@@ -88,10 +109,25 @@
     endfunction
 " }}}
 
-" path 
+" }}}
+
+
+"===============================================================================
+" Global settings
+"===============================================================================
+" {{{
+set nocompatible                    " 不兼容vi快捷键
+let mapleader="\<space>"            " 使用Space作为leader
+                                    " Space只在Normal或Command或Visual模式下map，不适合在Insert模式下map
+" 特殊键
+nnoremap ; :
+vnoremap ; :
+
+" Path 
 " {{{
     " vim插件路径统一
     if IsLinux()
+        " root用户和普通用户共用vimrc
         let $VimPluginPath="/home/yehuohanxing/.vim"
     elseif IsWin()
         let $VimPluginPath="C:/MyApps/Vim/vimfiles"
@@ -102,12 +138,45 @@
     elseif IsGw()
         let $VimPluginPath="/c/MyApps/Vim/vimfiles"
     endif
+    set rtp+=$VimPluginPath                     " add .vim or vimfiles to rtp(runtimepath)
+" }}}
+
+" 键码设定 
+" {{{
+set timeout         " 打开映射超时检测
+set ttimeout        " 打开键码超时检测
+set timeoutlen=1000 " 映射超时时间为1000ms
+set ttimeoutlen=70  " 键码超时时间为70ms
+
+" 键码示例 {{{
+    " 终端Alt键映射处理：如 Alt+x，实际连续发送 <esc>x 编码
+    " 以下三种方法都可以使按下 Alt+x 后，执行 CmdTest 命令，但超时检测有区别
+    "<1> set <M-x>=x  " 设置键码，这里的是一个字符，即<esc>的编码，不是^和[放在一起
+                        " 在终端的Insert模式，按Ctrl+v再按Alt+x
+    "    nnoremap <M-x> :CmdTest<CR>  " 按键码超时时间检测
+    "<2> nnoremap <esc>x :CmdTest<CR> " 按映射超时时间检测
+    "<3> nnoremap x  :CmdTest<CR>   " 按映射超时时间检测
+" }}}
+
+" 键码设置 {{{
+if !IsNVim()
+    set encoding=utf-8  " 内部内部需要使用utf-8编码
+    set <M-h>=h
+    set <M-j>=j
+    set <M-k>=k
+    set <M-l>=l
+endif
+" }}}
+
+" }}}
+
 " }}}
 
 
 "===============================================================================
-" Defined functions
+" User Defined functions
 "===============================================================================
+" {{{
 " 扩展名检测
 " {{{
 let s:file_ext=expand("%:e")         
@@ -218,24 +287,422 @@ function! LinuxFcitx2Zh()
 endfunction
 " }}}
 
-
-"===============================================================================
-" Event handle
-"===============================================================================
-" {{{
-if IsGui()
-    autocmd GuiEnter * set t_vb=        " 关闭可视闪铃(即闪屏)
-endif
-if IsLinux()
-    "autocmd InsertLeave * call LinuxFcitx2En()
-    inoremap <esc> <esc>:call LinuxFcitx2En()<CR>
-endif
 " }}}
 
 
 "===============================================================================
-" Settings 
+" Plug and Settings
 "===============================================================================
+" {{{
+call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where install plugins
+
+" user plugins 
+
+" 基本编辑类 
+" {{{
+" asd2num {{{ asd数字输入
+    Plug 'yehuohan/asd2num'
+    inoremap <C-a> <esc>:Asd2NumToggle<CR>a
+" }}}
+
+" easy-motion {{{ 快速跳转
+    Plug 'easymotion/vim-easymotion'
+    let g:EasyMotion_do_mapping = 0         " 禁止默认map
+    let g:EasyMotion_smartcase = 1          " 不区分大小写
+    nmap s <Plug>(easymotion-overwin-f)
+    nmap <leader>ms <plug>(easymotion-overwin-f2)
+                                            " 跨分屏快速跳转到字母，
+    nmap <leader>j <plug>(easymotion-j)
+    nmap <leader>k <plug>(easymotion-k)
+    nmap <leader>mw <plug>(easymotion-w)
+    nmap <leader>mb <plug>(easymotion-b)
+    nmap <leader>me <plug>(easymotion-e)
+    nmap <leader>mg <plug>(easymotion-ge)
+    " nmap <leader>W <plug>(easymotion-W)
+    " nmap <leader>B <plug>(easymotion-B)
+    " nmap <leader>E <plug>(easymotion-E)
+    " nmap <leader>gE <plug>(easymotion-gE)
+    "
+" }}}
+
+" multiple-cursors {{{ 多光标编辑
+    Plug 'terryma/vim-multiple-cursors'
+    let g:multi_cursor_use_default_mapping=0 " 取消默认按键
+    let g:multi_cursor_start_key='<C-n>'     " 进入Multiple-cursors Model
+                                             " 自己选定区域（包括矩形选区），或自动选择当前光标<cword>
+    let g:multi_cursor_next_key='<C-n>'
+    let g:multi_cursor_prev_key='<C-p>'
+    let g:multi_cursor_skip_key='<C-x>'
+    let g:multi_cursor_quit_key='<esc>'
+" }}}
+
+" vim-over {{{ 替换预览
+    " substitute preview
+    Plug 'osyo-manga/vim-over'
+    nnoremap <leader>sp :OverCommandLine<CR>
+" }}}
+
+" incsearch {{{ 查找增强
+    Plug 'haya14busa/incsearch.vim'
+    Plug 'haya14busa/incsearch-fuzzy.vim'
+    let g:incsearch#auto_nohlsearch = 1
+
+    " 设置查找时页面滚动映射
+    augroup incsearch-keymap
+        autocmd!
+        autocmd VimEnter * call s:incsearch_keymap()
+    augroup END
+    function! s:incsearch_keymap()
+        IncSearchNoreMap <C-j> <Over>(incsearch-next)
+        IncSearchNoreMap <C-k> <Over>(incsearch-prev)
+        IncSearchNoreMap <M-j> <Over>(incsearch-scroll-f)
+        IncSearchNoreMap <M-k> <Over>(incsearch-scroll-b)
+    endfunction
+
+    nmap /  <Plug>(incsearch-forward)
+    nmap ?  <Plug>(incsearch-backward)
+    nmap g/ <Plug>(incsearch-stay)
+
+    nmap z/ <Plug>(incsearch-fuzzy-/)
+    nmap z? <Plug>(incsearch-fuzzy-?)
+    nmap zg/ <Plug>(incsearch-fuzzy-stay)
+
+    nmap n  <Plug>(incsearch-nohl-n)
+    nmap N  <Plug>(incsearch-nohl-N)
+    nmap *  <Plug>(incsearch-nohl-*)
+    nmap #  <Plug>(incsearch-nohl-#)
+    nmap <leader>8  <Plug>(incsearch-nohl-*)
+    nmap <leader>3  <Plug>(incsearch-nohl-#)
+    nmap g* <Plug>(incsearch-nohl-g*)
+    nmap g# <Plug>(incsearch-nohl-g#)
+" }}}
+
+" fzf {{{ 模糊查找
+    "Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+    Plug 'junegunn/fzf' 
+    Plug 'junegunn/fzf.vim'
+" }}}
+
+" surround and repeat {{{ 添加包围符
+    Plug 'tpope/vim-surround'
+    Plug 'tpope/vim-repeat'
+
+    " simplify the map
+    nmap <leader>sw ysiw
+    nmap <leader>si ysw
+    nmap <leader>sl yss
+    nmap <leader>sL ySS
+    " surround selected text in visual mode
+    vmap s S
+    vmap <leader>s gS
+" }}}
+
+" tabular {{{ 字符对齐
+    " /:/r2 means align right and insert 2 space before next field
+    Plug 'godlygeek/tabular'
+    " align map
+    vnoremap <leader>a :Tabularize /
+    nnoremap <leader>a :Tabularize /
+" }}}
+
+" undo {{{ 撤消历史
+    Plug 'mbbill/undotree'
+    nnoremap <leader>tu :UndotreeToggle<CR>
+" }}}
+
+" smooth-scroll {{{ 平滑滚动
+    Plug 'terryma/vim-smooth-scroll'
+    nnoremap <silent> <C-u> :call smooth_scroll#up(&scroll, 0, 2)<CR>
+    nnoremap <silent> <C-d> :call smooth_scroll#down(&scroll, 0, 2)<CR>
+    " nnoremap <silent> <C-f> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
+    " nnoremap <silent> <C-b> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
+    nnoremap <silent> <M-j> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
+    nnoremap <silent> <M-k> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
+" }}}
+
+" expand-region {{{ 快速块选择
+    Plug 'terryma/vim-expand-region'
+    nmap <leader>er <Plug>(expand_region_expand)
+    nmap <leader>el <Plug>(expand_region_shrink)
+    vmap <leader>er <Plug>(expand_region_expand)
+    vmap <leader>el <Plug>(expand_region_shrink)
+    nmap <C-l> <Plug>(expand_region_expand)
+    nmap <C-h> <Plug>(expand_region_shrink)
+    vmap <C-l> <Plug>(expand_region_expand)
+    vmap <C-h> <Plug>(expand_region_shrink)
+" }}}
+
+" }}}
+
+" 界面管理类
+" {{{
+" theme {{{ 主题
+    " gruvbox主题
+    Plug 'morhetz/gruvbox'
+    set rtp+=$VimPluginPath/bundle/gruvbox/
+    colorscheme gruvbox 
+    set background=dark                     " dark or light mode
+    let g:gruvbox_contrast_dark='medium'    " dark, medium or soft
+
+    " new-railscasts主题
+    " Plug 'carakan/new-railscasts-theme'
+    " set rtp+=$VimPluginPath/bundle/new-railscasts-theme/
+    " colorscheme new-railscasts          
+    " hi CursorLine   cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
+    " hi CursorColumn cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
+    " hi Search term=reverse ctermfg=white ctermbg=blue guifg=white guibg=#072f95
+                                        " 设定高亮行列的颜色
+                                        " cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
+" }}}
+
+" air-line {{{ 状态栏
+    Plug 'vim-airline/vim-airline'
+    set laststatus=2
+    let g:airline#extensions#ctrlspace#enabled = 1      " support for ctrlspace integration
+    let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()" 
+    let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
+    let g:airline#extensions#ycm#error_symbol = 'E:'
+    let g:airline#extensions#ycm#warning_symbol = 'W:'
+" }}}
+
+" rainbow {{{ 彩色括号
+    Plug 'luochen1990/rainbow'
+    let g:rainbow_active = 1 "0 if you want to enable it later via :RainbowToggle
+    nnoremap <leader>tr :RainbowToggle<CR>
+" }}}
+
+" indent-line {{{ 显示缩进标识
+    Plug 'Yggdroot/indentLine'          
+    "let g:indentLine_char = '|'            " 设置标识符样式
+    let g:indentLinet_color_term=200        " 设置标识符颜色
+    nnoremap <leader>t\ :IndentLinesToggle<CR>
+" }}}
+
+" goyo {{{ 小屏浏览
+    Plug 'junegunn/goyo.vim'
+    nnoremap <leader>tg :Goyo<CR>
+" }}}
+
+" ctrl-space {{{ buffer管理
+    " <h,o,l,w,b,/,?> for buffer,file,tab,workspace,bookmark,search and help
+    Plug 'vim-ctrlspace/vim-ctrlspace'
+    set nocompatible
+    set hidden
+    let g:CtrlSpaceSetDefaultMapping = 1
+    let g:CtrlSpaceProjectRootMarkers = [
+         \ ".git", ".sln", ".pro",
+         \".hg", ".svn", ".bzr", "_darcs", "CVS"]       " Project root markers
+    " 更改配色
+    hi link CtrlSpaceNormal   Special
+    hi link CtrlSpaceSelected Title
+    hi link CtrlSpaceSearch   Search
+    hi link CtrlSpaceStatus   StatusLine
+    " 切换按键
+    nnoremap <C-Space> :CtrlSpace<CR>
+    inoremap <C-Space> <esc>:CtrlSpace<CR>
+" }}}
+
+" vim-startify {{{ vim会话界面
+    Plug 'mhinz/vim-startify'
+    if IsLinux()
+        let g:startify_bookmarks = [ {'c': '~/.vimrc'}, '~/.zshrc', '~/.config/i3/config' ]
+        let g:startify_session_dir = '$VimPluginPath/sessions'
+    elseif IsWin()
+        let g:startify_bookmarks = [ {'c': '$VimPluginPath/../_vimrc'}]
+        let g:startify_session_dir = '$VimPluginPath/sessions'
+    elseif IsGw()
+        let g:startify_session_dir = '~/.vim/sessions'
+    endif
+    let g:startify_files_number = 10
+    let g:startify_list_order = [
+            \ ['   Sessions:']     , 'sessions'  ,
+            \ ['   BookMarks:']    , 'bookmarks' ,
+            \ ['   Recent Files:'] , 'files'     ,
+            \ ['   Recent Dirs:']  , 'dir'       ,
+            \ ['   Commands:']     , 'commands']
+    let g:startify_session_before_save = ['silent! NERDTreeClose']
+    nnoremap <leader>qa :SDelete! default<CR><bar>:SSave default<CR><bar>:qa<CR>
+                                            " 先删除默认的，再保存会话，最后退出所有窗口
+    nnoremap <leader>su :Startify<CR>       " start ui of vim-startify
+" }}}
+
+" }}}
+
+" 代码类
+" {{{
+" nerd-tree{{{ 目录树导航
+    Plug 'scrooloose/nerdtree'          
+    let g:NERDTreeShowHidden=1
+    noremap <leader>te :NERDTreeToggle<CR>
+" }}}
+
+" YouCompleteMe {{{ 自动补全
+    " Linux: 
+    "   install python-dev, python3-dev, cmake, llvm, clang
+    "   ./install.py --clang-completer --system-libclang
+    " Windows: 
+    "   install python, Cmake, VS, 7-zip
+    "   install.py --clang-completer --msvc 14 --build-dir <ycm_build>
+    "   自己指定vs版本，自己指定build路径，编译完成后，可以删除<ycm_build>
+    "   如果已经安装了clang，可以使用--system-libclang参数，就不必再下载clang了
+    Plug 'Valloric/YouCompleteMe'
+    let g:ycm_global_ycm_extra_conf=$VimPluginPath.'/.ycm_extra_conf.py'
+    let g:ycm_enable_diagnostic_signs = 1       " 开启语法检测
+    let g:ycm_max_diagnostics_to_display = 30
+    let g:ycm_warning_symbol = '--'             " warning符号
+    let g:ycm_error_symbol = '>>'               " error符号
+    let g:ycm_seed_identifiers_with_syntax = 1  " 语法关键字补全         
+    let g:ycm_collect_identifiers_from_tags_files = 1 
+                                                " 开启标签补全
+    let g:ycm_use_ultisnips_completer = 1       " query UltiSnips for completions
+    let g:ycm_key_list_select_completion = ['<C-j>', '<Down>']
+    let g:ycm_key_list_previous_completion = ['<C-k>', '<Up>']
+    let g:ycm_autoclose_preview_window_after_insertion=1
+                                                " 自动关闭预览窗口
+    let g:ycm_cache_omnifunc = 0                " 禁止缓存匹配项，每次都重新生成匹配项
+    nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
+    nnoremap <leader>gi :YcmCompleter GoToInclude<CR>
+    nnoremap <leader>gt :YcmCompleter GoTo<CR>
+    nnoremap <leader>gs :YcmShowDetailedDiagnostic<CR>
+    noremap <F4> :YcmDiags<CR> 
+                                                " 错误列表
+" }}}
+
+" ultisnips {{{ 代码片段插入
+    Plug 'SirVer/ultisnips'               " snippet insert engine
+    Plug 'honza/vim-snippets'             " snippet collection
+    let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
+                                            " mySnippets is my own snippets collection
+    let g:UltiSnipsExpandTrigger="<tab>"
+    let g:UltiSnipsJumpForwardTrigger="<C-j>"
+    let g:UltiSnipsJumpBackwardTrigger="<C-k>"
+" }}}
+
+" tagbar {{{ 代码结构预览
+    Plug 'majutsushi/tagbar'
+    if IsLinux()
+        let g:tagbar_ctags_bin='/usr/bin/ctags'
+    elseif IsWin()
+        let g:tagbar_ctags_bin="C:\\MyApps\\Vim\\vim80\\ctags.exe"
+    endif                                   " 设置ctags路径，需要apt-get install ctags
+    let g:tagbar_width=30
+    noremap <leader>tt :TagbarToggle<CR>    " 可以 ctags -R 命令自行生成tags
+" }}}
+
+" nerd-commenter {{{ 批量注释
+    Plug 'scrooloose/nerdcommenter'
+    let g:NERDSpaceDelims = 1               " add space after comment
+    " <leader>cc for comment
+    " <leader>cl/cb for comment aligned
+    " <leader>cu for un-comment
+" }}}
+
+" file switch {{{ c/c++文件切换
+    Plug 'derekwyatt/vim-fswitch'
+    nnoremap <silent> <leader>fh :FSHere<CR>
+" }}}
+
+" AsyncRun {{{ 导步运行程序
+    Plug 'skywind3000/asyncrun.vim'
+    augroup vimrc
+        autocmd User AsyncRunStart call asyncrun#quickfix_toggle(8, 1)
+    augroup END
+    nnoremap <leader>rr :AsyncRun 
+    nnoremap <leader>rs :AsyncStop<CR>
+" }}}
+
+" splitjoin {{{ 行间连接与分割
+    "Plug 'AndrewRadev/splitjoin.vim'
+    "nnoremap <leader>gj gJ
+    "nnoremap <leader>gs gS
+" }}}
+
+" }}}
+
+" 软件辅助类
+" {{{
+" vimcdoc {{{ 中文帮助文档
+    Plug 'vimcn/vimcdoc',{'branch' : 'release'}
+" }}}
+
+" markdown-preview {{{ MarkDown预览 
+    Plug 'plasticboy/vim-markdown'
+    Plug 'iamcco/mathjax-support-for-mkdp'
+    Plug 'iamcco/markdown-preview.vim'
+    if IsWin()
+        let g:mkdp_path_to_chrome = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
+    elseif IsLinux()
+        let g:mkdp_path_to_chrome = "/usr/bin/google-chrome"
+    endif
+    let g:mkdp_auto_start = 0
+    let g:mkdp_auto_close = 1
+    let g:mkdp_refresh_slow = 0         " update preview instant
+    nnoremap <leader>tm :call MarkdownPreviewToggle()<CR>
+    function! MarkdownPreviewToggle()
+        if exists(':MarkdownPreviewStop')
+            MarkdownPreviewStop
+        else
+            MarkdownPreview
+        endif
+    endfunction
+" }}}
+
+" qml {{{ qml高亮
+    Plug 'crucerucalin/qml.vim'
+" }}}
+
+" grammarous {{{ 文字拼写检查
+    "Plug 'rhysd/vim-grammarous'
+    " 中文支持不好
+" }}}
+
+" vim-latex {{{
+    "Plug 'vim-latex/vim-latex'
+    " 暂时不用
+" }}}
+
+" }}}
+
+if IsNVim()
+" neovim gui font {{{ 字体设置   
+    Plug 'equalsraf/neovim-gui-shim'
+" }}}
+endif
+
+call plug#end()            " required
+
+" vim-plug help {{{
+" # Commands
+" | Command                             | Description                                                        |
+" | ----------------------------------- | ------------------------------------------------------------------ |
+" | PlugInstall [name ...] [#threads]   | Install plugins                                                    |
+" | PlugUpdate [name ...] [#threads]    | Install or update plugins                                          |
+" | PlugClean[!]                        | Remove unused directories (bang version will clean without prompt) |
+" | PlugUpgrade                         | Upgrade vim-plug itself                                            |
+" | PlugStatus                          | Check the status of plugins                                        |
+" | PlugDiff                            | Examine changes from the previous update and the pending changes   |
+" | PlugSnapshot[!] [output path]       | Generate script for restoring the current snapshot of the plugins  |
+
+" # Plug options
+" | Option                  | Description                                      |
+" | ----------------------- | ------------------------------------------------ |
+" | branch / tag / commit   | Branch/tag/commit of the repository to use       |
+" | rtp                     | Subdirectory that contains Vim plugin            |
+" | dir                     | Custom directory for the plugin                  |
+" | as                      | Use different name for the plugin                |
+" | do                      | Post-update hook (string or funcref)             |
+" | on                      | On-demand loading: Commands or `<Plug>`-mappings |
+" | for                     | On-demand loading: File types                    |
+" | frozen                  | Do not update unless explicitly specified        |
+" }}}
+
+" }}}
+
+
+"===============================================================================
+" User Setting
+"===============================================================================
+" {{{
 " Term
 " {{{
     set nocompatible                    " 不兼容vi快捷键
@@ -308,6 +775,8 @@ if IsGui()
     set guioptions-=b               " 隐藏底部滚动条
     set guioptions+=0               " 不隐藏Tab栏
 
+    autocmd GuiEnter * set t_vb=    " 关闭可视闪铃(即闪屏)
+
     if IsLinux()
         set lines=20
         set columns=100
@@ -326,54 +795,19 @@ if IsGui()
 endif
 " }}}
 
+" }}}
 
 
 "===============================================================================
-" Key-Map 
-" - Normal模式下使用<leader>代替<C-?>,<S-?>,<A-?>，
-" - Insert模式下map带ctrl,alt的快捷键
-" - 尽量不改变vim原有键位的功能定义
-" - 尽量一只手不同时按两个键
-" - 尽量不映射偏远的按键（F1~F12，数字键等）
-" - 建议调换Esc和CapsLock键
-"
-"  <leader>t? for plugins toggle command
-"  <leader>i? for vim "set inv?" command
+" User Key-Map 
 "===============================================================================
-set timeout         " 打开映射超时检测
-set ttimeout        " 打开键码超时检测
-set timeoutlen=1000 " 映射超时时间为1000ms
-set ttimeoutlen=70  " 键码超时时间为70ms
-
-" 键码示例 {{{
-    " 终端Alt键映射处理：如 Alt+x，实际连续发送 <esc>x 编码
-    " 以下三种方法都可以使按下 Alt+x 后，执行 CmdTest 命令，但超时检测有区别
-    "<1> set <M-x>=x  " 设置键码，这里的是一个字符，即<esc>的编码，不是^和[放在一起
-                        " 在终端的Insert模式，按Ctrl+v再按Alt+x
-    "    nnoremap <M-x> :CmdTest<CR>  " 按键码超时时间检测
-    "<2> nnoremap <esc>x :CmdTest<CR> " 按映射超时时间检测
-    "<3> nnoremap x  :CmdTest<CR>   " 按映射超时时间检测
-" }}}
-
-" 键码设置 {{{
-if !IsNVim()
-    set <M-h>=h
-    set <M-j>=j
-    set <M-k>=k
-    set <M-l>=l
-endif
-" }}}
-
-" 使用Space作为leader
-" Space只在Normal或Command或Visual模式下map，不适合在Insert模式下map
-let mapleader="\<space>"
-
-" map语句后别注释，也别留任何空格
-" 特殊键
-nnoremap ; :
-vnoremap ; :
-
+" {{{
 " 基本编辑 {{{
+    " Linux下自动退出中文输入法
+    if IsLinux()
+        "autocmd InsertLeave * call LinuxFcitx2En()
+        inoremap <esc> <esc>:call LinuxFcitx2En()<CR>
+    endif
     " 查找vim帮助
     if IsNVim()
         " nvim用自己的帮助文件只有英文的
@@ -384,6 +818,9 @@ vnoremap ; :
         " 查找man帮助（linux下可用，windows下仍是查找vim帮助）
         nnoremap <S-m> <S-k>
     endif
+    " j, k 移行
+    nnoremap j gj
+    nnoremap k gk
     " 回退操作
     nnoremap <S-u> <C-r>
     " 大小写转换
@@ -537,363 +974,9 @@ vnoremap ; :
     nnoremap <leader>du :diff<CR>
 " }}}
 
-
-
-"===============================================================================
-" Plug and Settings
-" - 插件设置全写在Plugin下
-" - 安键map写在每个Plugin的最后
-"===============================================================================
-
-set rtp+=$VimPluginPath                     " add .vim or vimfiles to rtp(runtimepath)
-call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where install plugins
-
-" user plugins 
-
-" vimcdoc {{{ 中文帮助文档
-    Plug 'vimcn/vimcdoc',{'branch' : 'release'}
-" }}}
-
-" asd2num {{{ asd数字输入
-    Plug 'yehuohan/asd2num'
-    inoremap <C-a> <esc>:Asd2NumToggle<CR>a
-" }}}
-
-" nerd-tree{{{ 目录树导航
-    Plug 'scrooloose/nerdtree'          
-    let g:NERDTreeShowHidden=1
-    noremap <leader>te :NERDTreeToggle<CR>
-" }}}
-
-" taglist{{{ 代码结构预览
-    Plug 'vim-scripts/taglist.vim'
-    if IsLinux()
-        let Tlist_Ctags_Cmd='/usr/bin/ctags'
-    elseif IsWin()
-        let Tlist_Ctags_Cmd="C:\\MyApps\\Vim\\vim80\\ctags.exe"
-    endif                                   " 设置ctags路径，需要apt-get install ctags
-    let Tlist_Show_One_File=1               " 不同时显示多个文件的tag，只显示当前文件
-    let Tlist_WinWidth = 30                 " 设置taglist的宽度
-    let Tlist_Exit_OnlyWindow=1             " 如果taglist窗口是最后一个窗口，则退出vim
-    let Tlist_Use_Right_Window=1            " 在右侧窗口中显示taglist窗口
-    noremap <leader>tt :TlistToggle<CR>     " 可以 ctags -R 命令自行生成tags
-" }}}
-
-" YouCompleteMe {{{ 自动补全
-    " Linux: 
-    "   install python-dev, python3-dev, cmake, llvm, clang
-    "   ./install.py --clang-completer --system-libclang
-    " Windows: 
-    "   install python, Cmake, VS, 7-zip
-    "   install.py --clang-completer --msvc 14 --build-dir <ycm_build>
-    "   自己指定vs版本，自己指定build路径，编译完成后，可以删除<ycm_build>
-    "   如果已经安装了clang，可以使用--system-libclang参数，就不必再下载clang了
-    Plug 'Valloric/YouCompleteMe'
-    let g:ycm_global_ycm_extra_conf=$VimPluginPath.'/.ycm_extra_conf.py'
-    let g:ycm_enable_diagnostic_signs = 1       " 开启语法检测
-    let g:ycm_max_diagnostics_to_display = 30
-    let g:ycm_warning_symbol = '--'             " warning符号
-    let g:ycm_error_symbol = '>>'               " error符号
-    let g:ycm_seed_identifiers_with_syntax = 1  " 语法关键字补全         
-    let g:ycm_collect_identifiers_from_tags_files = 1 
-                                                " 开启标签补全
-    let g:ycm_use_ultisnips_completer = 1       " query UltiSnips for completions
-    let g:ycm_key_list_select_completion = ['<C-j>', '<Down>']
-    let g:ycm_key_list_previous_completion = ['<C-k>', '<Up>']
-    let g:ycm_autoclose_preview_window_after_insertion=1
-                                                " 自动关闭预览窗口
-    let g:ycm_cache_omnifunc = 0                " 禁止缓存匹配项，每次都重新生成匹配项
-    nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
-    nnoremap <leader>gi :YcmCompleter GoToInclude<CR>
-    nnoremap <leader>gt :YcmCompleter GoTo<CR>
-    nnoremap <leader>gs :YcmShowDetailedDiagnostic<CR>
-    noremap <F4> :YcmDiags<CR> 
-                                                " 错误列表
-" }}}
-
-" AsyncRun {{{ 导步运行程序
-    Plug 'skywind3000/asyncrun.vim'
-    augroup vimrc
-        autocmd User AsyncRunStart call asyncrun#quickfix_toggle(8, 1)
-    augroup END
-    nnoremap <leader>rr :AsyncRun 
-    nnoremap <leader>rs :AsyncStop<CR>
-" }}}
-
-" ultisnips{{{ 代码片段插入
-    Plug 'SirVer/ultisnips'               " snippet insert engine
-    Plug 'honza/vim-snippets'             " snippet collection
-    let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
-                                            " mySnippets is my own snippets collection
-    let g:UltiSnipsExpandTrigger="<tab>"
-    let g:UltiSnipsJumpForwardTrigger="<C-j>"
-    let g:UltiSnipsJumpBackwardTrigger="<C-k>"
-" }}}
-
-" nerd-commenter {{{ 批量注释
-    Plug 'scrooloose/nerdcommenter'
-    let g:NERDSpaceDelims = 1               " add space after comment
-    " <leader>cc for comment
-    " <leader>cl/cb for comment aligned
-    " <leader>cu for un-comment
-" }}}
-
-" air-line {{{ 状态栏
-    Plug 'vim-airline/vim-airline'
-    set laststatus=2
-    let g:airline#extensions#ctrlspace#enabled = 1      " support for ctrlspace integration
-    let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()" 
-    let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
-    let g:airline#extensions#ycm#error_symbol = 'E:'
-    let g:airline#extensions#ycm#warning_symbol = 'W:'
-" }}}
-
-" file switch {{{ 文件切换
-    Plug 'derekwyatt/vim-fswitch'
-    nnoremap <silent> <leader>fh :FSHere<CR>
-" }}}
-
-" multiple-cursors{{{ 多光标编辑
-    Plug 'terryma/vim-multiple-cursors'
-    let g:multi_cursor_use_default_mapping=0 " 取消默认按键
-    let g:multi_cursor_start_key='<C-n>'     " 进入Multiple-cursors Model
-                                             " 自己选定区域（包括矩形选区），或自动选择当前光标<cword>
-    let g:multi_cursor_next_key='<C-n>'
-    let g:multi_cursor_prev_key='<C-p>'
-    let g:multi_cursor_skip_key='<C-x>'
-    let g:multi_cursor_quit_key='<esc>'
-" }}}
-
-" vim-over {{{ 替换预览
-    " substitute preview
-    Plug 'osyo-manga/vim-over'
-    nnoremap <leader>oc :OverCommandLine<CR>
-" }}}
-
-" tabular {{{ 代码对齐
-    " /:/r2 means align right and insert 2 space before next field
-    Plug 'godlygeek/tabular'
-    " align map
-    vnoremap <leader>a :Tabularize /
-    nnoremap <leader>a :Tabularize /
-" }}}
-
-" surround and repeat{{{ 添加包围符
-    Plug 'tpope/vim-surround'
-    Plug 'tpope/vim-repeat'
-
-    " simplify the map
-    nmap <leader>sw ysiw
-    nmap <leader>si ysw
-    nmap <leader>sl yss
-    nmap <leader>sL ySS
-    " surround selected text in visual mode
-    vmap s S
-    vmap <leader>s gS
-" }}}
-
-" easy-motion {{{ 快速跳转
-    Plug 'easymotion/vim-easymotion'
-    let g:EasyMotion_do_mapping = 0         " 禁止默认map
-    let g:EasyMotion_smartcase = 1          " 不区分大小写
-    nmap s <Plug>(easymotion-overwin-f)
-    nmap <leader>ss <plug>(easymotion-overwin-f2)
-                                            " 跨分屏快速跳转到字母，
-    nmap <leader>j <plug>(easymotion-j)
-    nmap <leader>k <plug>(easymotion-k)
-    nmap <leader>mw <plug>(easymotion-w)
-    nmap <leader>mb <plug>(easymotion-b)
-    nmap <leader>me <plug>(easymotion-e)
-    nmap <leader>mg <plug>(easymotion-ge)
-    " nmap <leader>W <plug>(easymotion-W)
-    " nmap <leader>B <plug>(easymotion-B)
-    " nmap <leader>E <plug>(easymotion-E)
-    " nmap <leader>gE <plug>(easymotion-gE)
-    "
-" }}}
-
-" ctrl-space {{{ buffer管理
-    " <h,o,l,w,b,/,?> for buffer,file,tab,workspace,bookmark,search and help
-    Plug 'vim-ctrlspace/vim-ctrlspace'
-    set nocompatible
-    set hidden
-    let g:CtrlSpaceSetDefaultMapping = 1
-    let g:CtrlSpaceProjectRootMarkers = [
-         \ ".git", ".sln", ".pro",
-         \".hg", ".svn", ".bzr", "_darcs", "CVS"]       " Project root markers
-    " 更改配色
-    hi link CtrlSpaceNormal   Special
-    hi link CtrlSpaceSelected Title
-    hi link CtrlSpaceSearch   Search
-    hi link CtrlSpaceStatus   StatusLine
-    " 切换按键
-    nnoremap <C-Space> :CtrlSpace<CR>
-    inoremap <C-Space> <esc>:CtrlSpace<CR>
-" }}}
-
-" incsearch {{{ 查找增强
-    Plug 'haya14busa/incsearch.vim'
-    Plug 'haya14busa/incsearch-fuzzy.vim'
-    let g:incsearch#auto_nohlsearch = 1
-
-    " 设置查找时页面滚动映射
-    augroup incsearch-keymap
-        autocmd!
-        autocmd VimEnter * call s:incsearch_keymap()
-    augroup END
-    function! s:incsearch_keymap()
-        IncSearchNoreMap <C-j> <Over>(incsearch-next)
-        IncSearchNoreMap <C-k> <Over>(incsearch-prev)
-        IncSearchNoreMap <M-j> <Over>(incsearch-scroll-f)
-        IncSearchNoreMap <M-k> <Over>(incsearch-scroll-b)
-    endfunction
-
-    nmap /  <Plug>(incsearch-forward)
-    nmap ?  <Plug>(incsearch-backward)
-    nmap g/ <Plug>(incsearch-stay)
-
-    nmap z/ <Plug>(incsearch-fuzzy-/)
-    nmap z? <Plug>(incsearch-fuzzy-?)
-    nmap zg/ <Plug>(incsearch-fuzzy-stay)
-
-    nmap n  <Plug>(incsearch-nohl-n)
-    nmap N  <Plug>(incsearch-nohl-N)
-    nmap *  <Plug>(incsearch-nohl-*)
-    nmap #  <Plug>(incsearch-nohl-#)
-    nmap <leader>8  <Plug>(incsearch-nohl-*)
-    nmap <leader>3  <Plug>(incsearch-nohl-#)
-    nmap g* <Plug>(incsearch-nohl-g*)
-    nmap g# <Plug>(incsearch-nohl-g#)
-" }}}
-
-" expand-region {{{ 快速块选择
-    Plug 'terryma/vim-expand-region'
-    nmap <leader>er <Plug>(expand_region_expand)
-    vmap <leader>er <Plug>(expand_region_expand)
-    nmap <C-l> <Plug>(expand_region_expand)
-    nmap <C-h> <Plug>(expand_region_shrink)
-    vmap <C-l> <Plug>(expand_region_expand)
-    vmap <C-h> <Plug>(expand_region_shrink)
-" }}}
-
-" smooth-scroll {{{ 平滑滚动
-    Plug 'terryma/vim-smooth-scroll'
-    nnoremap <silent> <C-u> :call smooth_scroll#up(&scroll, 0, 2)<CR>
-    nnoremap <silent> <C-d> :call smooth_scroll#down(&scroll, 0, 2)<CR>
-    " nnoremap <silent> <C-f> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
-    " nnoremap <silent> <C-b> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
-    nnoremap <silent> <M-j> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
-    nnoremap <silent> <M-k> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
-" }}}
-
-" undo {{{ 撤消历史
-    Plug 'mbbill/undotree'
-    nnoremap <leader>tu :UndotreeToggle<CR>
-" }}}
-
-" session {{{ 会话保存
-    Plug 'xolox/vim-misc'
-    Plug 'xolox/vim-session'
-    let g:session_autosave='no'             " 自动保存会话窗口
-    let g:session_autoload='yes'            " 直接打开vim，自动加载default.vim
-    noremap <leader>qa :SaveSession!<CR>:qa<CR>
-                                            " 关闭所有，且先保存会话
-" }}}
-
-" indent-line {{{ 显示缩进标识
-    Plug 'Yggdroot/indentLine'          
-    "let g:indentLine_char = '|'            " 设置标识符样式
-    let g:indentLinet_color_term=200        " 设置标识符颜色
-    nnoremap <leader>t\ :IndentLinesToggle<CR>
-" }}}
-
-" theme {{{ 主题
-    " gruvbox主题
-    Plug 'morhetz/gruvbox'
-    set rtp+=$VimPluginPath/bundle/gruvbox/
-    colorscheme gruvbox 
-    set background=dark                 " dark or light mode
-    let g:gruvbox_contrast='medium'     " dark, medium or soft
-
-    " new-railscasts主题
-    " Plug 'carakan/new-railscasts-theme'
-    " set rtp+=$VimPluginPath/bundle/new-railscasts-theme/
-    " colorscheme new-railscasts          
-    " hi CursorLine   cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
-    " hi CursorColumn cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
-    " hi Search term=reverse ctermfg=white ctermbg=blue guifg=white guibg=#072f95
-                                        " 设定高亮行列的颜色
-                                        " cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
-" }}}
-
-" rainbow {{{ 彩色括号
-    Plug 'luochen1990/rainbow'
-    let g:rainbow_active = 1 "0 if you want to enable it later via :RainbowToggle
-    nnoremap <leader>tr :RainbowToggle<CR>
-" }}}
-
-" markdown-preview {{{ MarkDown预览 
-    Plug 'plasticboy/vim-markdown'
-    Plug 'iamcco/mathjax-support-for-mkdp'
-    Plug 'iamcco/markdown-preview.vim'
-    if IsWin()
-        let g:mkdp_path_to_chrome = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
-    elseif IsLinux()
-        let g:mkdp_path_to_chrome = "/usr/bin/google-chrome"
-    endif
-    let g:mkdp_auto_start = 0
-    let g:mkdp_auto_close = 1
-    let g:mkdp_refresh_slow = 0         " update preview instant
-    nnoremap <leader>tm :call MarkdownPreviewToggle()<CR>
-    function! MarkdownPreviewToggle()
-        if exists(':MarkdownPreviewStop')
-            MarkdownPreviewStop
-        else
-            MarkdownPreview
-        endif
-    endfunction
-" }}}
-
-" qml {{{ qml高亮
-    Plug 'crucerucalin/qml.vim'
-" }}}
-
-" vim-latex {{{
-    "Plug 'vim-latex/vim-latex'
-    " 暂时不用
 " }}}
 
 
-if IsNVim()
-" neovim gui font {{{ 字体设置   
-    Plug 'equalsraf/neovim-gui-shim'
-" }}}
-endif
-
-call plug#end()            " required
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" # Commands
-" | Command                             | Description                                                        |
-" | ----------------------------------- | ------------------------------------------------------------------ |
-" | PlugInstall [name ...] [#threads]   | Install plugins                                                    |
-" | PlugUpdate [name ...] [#threads]    | Install or update plugins                                          |
-" | PlugClean[!]                        | Remove unused directories (bang version will clean without prompt) |
-" | PlugUpgrade                         | Upgrade vim-plug itself                                            |
-" | PlugStatus                          | Check the status of plugins                                        |
-" | PlugDiff                            | Examine changes from the previous update and the pending changes   |
-" | PlugSnapshot[!] [output path]       | Generate script for restoring the current snapshot of the plugins  |
-
-" # Plug options
-" | Option                  | Description                                      |
-" | ----------------------- | ------------------------------------------------ |
-" | branch / tag / commit   | Branch/tag/commit of the repository to use       |
-" | rtp                     | Subdirectory that contains Vim plugin            |
-" | dir                     | Custom directory for the plugin                  |
-" | as                      | Use different name for the plugin                |
-" | do                      | Post-update hook (string or funcref)             |
-" | on                      | On-demand loading: Commands or `<Plug>`-mappings |
-" | for                     | On-demand loading: File types                    |
-" | frozen                  | Do not update unless explicitly specified        |
 

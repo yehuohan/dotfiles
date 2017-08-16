@@ -2,6 +2,13 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170816 - vv2.1.125
+ - 添加startify插件，代替session
+ - 优化替vim-over, expand-region插件的映射
+ - 添加fzf搜索插件
+ - 使用tagbar代替taglist
+ - 将插件加载写在vimrc的前面，防止插件的设置覆盖了自定义设置
+
 ## 20170815 - vv2.1.120
  - 修改Ycm和ultisnips的映射
 
