@@ -490,16 +490,17 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     " <h,o,l,w,b,/,?> for buffer,file,tab,workspace,bookmark,search and help
     Plug 'vim-ctrlspace/vim-ctrlspace'
     set nocompatible
-    set hidden
+    set hidden                                      " 允许在未保存文件时切换buffer
     let g:CtrlSpaceSetDefaultMapping = 1
     let g:CtrlSpaceProjectRootMarkers = [
          \ ".git", ".sln", ".pro",
-         \".hg", ".svn", ".bzr", "_darcs", "CVS"]       " Project root markers
-    " 更改配色
-    hi link CtrlSpaceNormal   Special
-    hi link CtrlSpaceSelected Title
-    hi link CtrlSpaceSearch   Search
-    hi link CtrlSpaceStatus   StatusLine
+         \".hg", ".svn", ".bzr", "_darcs", "CVS"]   " Project root markers
+    let g:CtrlSpaceCacheDir = $VimPluginPath
+    " 更改配色 for new-railscasts theme
+    " hi link CtrlSpaceNormal   Special
+    " hi link CtrlSpaceSelected Title
+    " hi link CtrlSpaceSearch   Search
+    " hi link CtrlSpaceStatus   StatusLine
     " 切换按键
     nnoremap <C-Space> :CtrlSpace<CR>
     inoremap <C-Space> <esc>:CtrlSpace<CR>
@@ -967,14 +968,18 @@ endif
     nnoremap <leader>dv :execute "let g:__str__=input('File: ', '', 'file')"<bar> execute "vertical diffsplit " . g:__str__<CR>
     " 比较当前文件（已经分屏）
     nnoremap <leader>dt :diffthis<CR>
+    " 关闭文件比较，与diffthis互为逆命令
+    nnoremap <leader>do :diffoff<CR>
     " 应用差异到别一文件
     nnoremap <leader>dp :diffput<CR>
     " 拉取差异到当前文件
     nnoremap <leader>dg :diffget<CR>
-    " 关闭文件比较
-    nnoremap <leader>do :diffoff<CR>
     " 更新比较结果
     nnoremap <leader>du :diff<CR>
+    " 下一个diff
+    nnoremap <leader>dj ]c
+    " 前一个diff
+    nnoremap <leader>dk [c
 " }}}
 
 " }}}
