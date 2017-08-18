@@ -9,18 +9,24 @@
 " My Notes
 "===============================================================================
 " {{{
-" 带python编译gvim 
+" Windows带python编译gvim 
 " {{{
     " [x] 设置Make_cyg_ming.mak:
     " DIRECTX=yes                         - 使用DirectX
     " ARCH=i686                           - 使用32位(x86-64为64位)，python也使用32位
+    " TERMINAL=yes                        - 添加terminal特性
     " CC := $(CROSS_COMPILE)gcc -m32      - 32位编绎
     " CXX := $(CROSS_COMPILE)g++ -m32     - 32位编绎
     " WINDRES := windres --target=pe-i386 - 资源文件添加i386编绎
+    "
     " [x] 使用MinGw-x64:
     " mingw32-make -f Make_ming.mak gvim.exe PYTHON3=C:/Python36 DYNAMIC_PYTHON3=yes PYTHON3_VER=36
     " 若设置32位选项前编译过一次，清理一次.o文件再编译
     " 若使用64位，只需要添加Python路径和DirectX支持
+    "
+    " [x] 添加winpty
+    " 如需要termianl特性，下载winpty，且添加到PATH路径，或直接放到gvim.exe的目录中。
+    " https://github.com/rprichard/winpty，到release中下载与gvim对应的32或64位，没有类unix环境就用msvc的即可
 " }}}
 
 " 查看vim帮助 
