@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170818 - vv2.1.126
+ - 添加F5 matlab命令
+
 ## 20170816 - vv2.1.125
  - 添加startify插件，代替session
  - 优化替vim-over, expand-region插件的映射

@@ -179,6 +179,7 @@ endif
 " {{{
 " 扩展名检测
 " {{{
+" 用于vimrc的配置，不用别其它函数中
 let s:file_ext=expand("%:e")         
 function! FileExtIs(ext)
     if a:ext ==? s:file_ext
@@ -249,17 +250,10 @@ endfunction
 " 编译环境函数
 " {{{
 function! F5ComplileFile(argstr)
-    let l:ext=expand("%:e")                         " 扩展名
-    if IsLinux()
-        let l:filename="\"".expand("./%:t")."\""    " 文件名，不带路径，带扩展名 
-        let l:name="\"".expand("./%:t:r")."\""      " 文件名，不带路径，不带扩展名
-    elseif IsWin()
-        let l:filename="\"".expand("%:t")."\""      " 文件名，不带路径，带扩展名 
-        let l:name="\"".expand("%:t:r")."\""        " 文件名，不带路径，不带扩展名
-    endif
-    " 先切换目录
-    exec "cd %:h"
-    " ==? 忽略大小写比较， ==# 进行大小写比较
+    let l:ext=expand("%:e")                             " 扩展名
+    let l:filename='"./' . expand('%:t') . '"'          " 文件名，不带路径，带扩展名 
+    let l:name='"./' . expand('%:t:r') . '"'            " 文件名，不带路径，不带扩展名
+    " 执行命令
     if "c" ==? l:ext
         " c
         execute ":AsyncRun gcc ".a:argstr." -o ".l:name." ".l:filename." && ".l:name
@@ -269,6 +263,8 @@ function! F5ComplileFile(argstr)
     elseif "py" ==? l:ext || "pyw" ==? l:ext
         " python
         execute ":AsyncRun python ".l:filename
+    elseif "m" ==? l:ext
+        execute ":AsyncRun matlab -nosplash -nodesktop -r " . l:name[3:-2]
     endif
 endfunction
 " }}}
