@@ -183,19 +183,6 @@ endif
 " User Defined functions
 "===============================================================================
 " {{{
-" 扩展名检测
-" {{{
-" 用于vimrc的配置，不用别其它函数中
-let s:file_ext=expand("%:e")         
-function! FileExtIs(ext)
-    if a:ext ==? s:file_ext
-        return 1
-    else
-        return 0
-    endif
-endfunction
-" }}}
-
 " 隐藏字符显示
 " {{{
 function! InvConceallevel()
@@ -490,7 +477,8 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " ctrl-space {{{ buffer管理
     " <h,o,l,w,b,/,?> for buffer,file,tab,workspace,bookmark,search and help
-    Plug 'vim-ctrlspace/vim-ctrlspace'
+    "Plug 'vim-ctrlspace/vim-ctrlspace'
+    Plug 'yehuohan/vim-ctrlspace'
     set nocompatible
     set hidden                                      " 允许在未保存文件时切换buffer
     let g:CtrlSpaceSetDefaultMapping = 1
@@ -592,6 +580,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
         let g:tagbar_ctags_bin="C:\\MyApps\\Vim\\vim80\\ctags.exe"
     endif                                   " 设置ctags路径，需要apt-get install ctags
     let g:tagbar_width=30
+    let g:tagbar_map_showproto=''           " 取消tagbar对<Space>的占用
     noremap <leader>tt :TagbarToggle<CR>    " 可以 ctags -R 命令自行生成tags
 " }}}
 
@@ -754,21 +743,11 @@ call plug#end()            " required
     " 终端光标设置
     if IsTermType("xterm") || IsTermType("xterm-256color")
         " compatible for urxvt,st,xterm,gnome-termial
-        " 5,6: 竖线
-        " 3,4: 横线
-        " 1,2: 方块
+        " 5,6: 竖线，  3,4: 横线，  1,2: 方块
         let &t_SI = "\<Esc>[6 q"        " 进入Insert模式
         let &t_EI = "\<Esc>[2 q"        " 退出Insert模式
     endif
 
-    " 针对特殊文件的设置
-    if FileExtIs("c") || FileExtIs("cpp") || FileExtIs("h") || FileExtIs("hpp")
-        set foldmethod=syntax           " 设置语法折叠
-    elseif FileExtIs("")
-        set foldmethod=marker           " 无扩展名的使用标记折叠
-    elseif FileExtIs("tikz")
-        set filetype=tex
-    endif
 " }}}
 
 " Gui
@@ -780,8 +759,6 @@ if IsGui()
     set guioptions-=r               " 隐藏右侧滚动条
     set guioptions-=b               " 隐藏底部滚动条
     set guioptions+=0               " 不隐藏Tab栏
-
-    autocmd GuiEnter * set t_vb=    " 关闭可视闪铃(即闪屏)
 
     if IsLinux()
         set lines=20
@@ -799,6 +776,17 @@ if IsGui()
                                     " gvim全屏快捷键
     endif
 endif
+" }}}
+
+" Auto Command 
+" {{{
+    autocmd! BufEnter *.tikz set filetype=tex
+    autocmd! Filetype vim set foldmethod=marker
+    autocmd! Filetype c set foldmethod=syntax
+    autocmd! Filetype cpp set foldmethod=syntax
+    autocmd! Filetype python set foldmethod=syntax
+
+    autocmd! GuiEnter * set t_vb=                   " 关闭可视闪铃(即闪屏)
 " }}}
 
 " }}}
