@@ -378,8 +378,11 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 " }}}
 
 " fzf {{{ 模糊查找
-    "Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-    Plug 'junegunn/fzf' 
+    " linux下直接pacman -S fzf
+    " win下载fzf.exe放入bundle/fzf/bin/下
+    if IsWin()
+        Plug 'junegunn/fzf'
+    endif
     Plug 'junegunn/fzf.vim'
 " }}}
 
