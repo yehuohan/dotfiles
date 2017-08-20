@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170820 - vv2.1.128
+ - 更改NERDTree,region-expand,goyo插件的按键映射
+
 ## 20170818 - vv2.1.127
  - 用autocmd实现针对不同类型文件的设定
 

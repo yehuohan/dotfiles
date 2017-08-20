@@ -414,10 +414,10 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " expand-region {{{ 快速块选择
     Plug 'terryma/vim-expand-region'
-    nmap <leader>er <Plug>(expand_region_expand)
-    nmap <leader>el <Plug>(expand_region_shrink)
-    vmap <leader>er <Plug>(expand_region_expand)
-    vmap <leader>el <Plug>(expand_region_shrink)
+    nmap <leader>ee <Plug>(expand_region_expand)
+    nmap <leader>es <Plug>(expand_region_shrink)
+    vmap <leader>ee <Plug>(expand_region_expand)
+    vmap <leader>es <Plug>(expand_region_shrink)
     nmap <C-l> <Plug>(expand_region_expand)
     nmap <C-h> <Plug>(expand_region_shrink)
     vmap <C-l> <Plug>(expand_region_expand)
@@ -472,7 +472,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " goyo {{{ 小屏浏览
     Plug 'junegunn/goyo.vim'
-    nnoremap <leader>tg :Goyo<CR>
+    nnoremap <leader>ts :Goyo<CR>
 " }}}
 
 " ctrl-space {{{ buffer管理
@@ -527,7 +527,14 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 " nerd-tree{{{ 目录树导航
     Plug 'scrooloose/nerdtree'          
     let g:NERDTreeShowHidden=1
+    let g:NERDTreeMapPreview = 'go'             " 预览打开
+    let g:NERDTreeMapChangeRoot = 'cd'          " 更改根目录
+    let g:NERDTreeMapChdir = 'CW'               " 更改CWD
+    let g:NERDTreeMapCWD = 'CD'                 " 更改根目录为CWD
+    let g:NERDTreeMapJumpNextSibling = '<C-n>'  " next sibling
+    let g:NERDTreeMapJumpPrevSibling = '<C-p>'  " prev sibling
     noremap <leader>te :NERDTreeToggle<CR>
+
 " }}}
 
 " YouCompleteMe {{{ 自动补全
@@ -656,6 +663,10 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     " 暂时不用
 " }}}
 
+" }}}
+
+" Pop Selection {{{
+    Plug $VimPluginPath.'/bundle/popselection'
 " }}}
 
 if IsNVim()
