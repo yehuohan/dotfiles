@@ -486,6 +486,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
          \ ".git", ".sln", ".pro",
          \".hg", ".svn", ".bzr", "_darcs", "CVS"]   " Project root markers
     let g:CtrlSpaceCacheDir = $VimPluginPath
+    let g:CtrlSpaceSearchTiming = 50
     " 更改配色 for new-railscasts theme
     " hi link CtrlSpaceNormal   Special
     " hi link CtrlSpaceSelected Title
@@ -770,7 +771,7 @@ endif
     autocmd! Filetype vim set foldmethod=marker
     autocmd! Filetype c set foldmethod=syntax
     autocmd! Filetype cpp set foldmethod=syntax
-    autocmd! Filetype python set foldmethod=syntax
+    autocmd! Filetype python set foldmethod=indent
 
     autocmd! GuiEnter * set t_vb=                   " 关闭可视闪铃(即闪屏)
 " }}}
@@ -899,6 +900,7 @@ endif
     nnoremap <leader>wk <C-w>k
     nnoremap <leader>wl <C-w>l
     nnoremap <leader>wp <C-w>p
+    nnoremap <leader>wP <C-w>P
     " move window
     nnoremap <leader>wH <C-w>H
     nnoremap <leader>wJ <C-w>J
