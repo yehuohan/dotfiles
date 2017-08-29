@@ -435,16 +435,6 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     colorscheme gruvbox 
     set background=dark                     " dark or light mode
     let g:gruvbox_contrast_dark='medium'    " dark, medium or soft
-
-    " new-railscasts主题
-    " Plug 'carakan/new-railscasts-theme'
-    " set rtp+=$VimPluginPath/bundle/new-railscasts-theme/
-    " colorscheme new-railscasts          
-    " hi CursorLine   cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
-    " hi CursorColumn cterm=NONE ctermbg=black ctermfg=gray guibg=black guifg=NONE
-    " hi Search term=reverse ctermfg=white ctermbg=blue guifg=white guibg=#072f95
-                                        " 设定高亮行列的颜色
-                                        " cterm:彩色终端，gui:Gvim窗口，fg:前景色，bg:背景色
 " }}}
 
 " air-line {{{ 状态栏
@@ -487,14 +477,21 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
          \".hg", ".svn", ".bzr", "_darcs", "CVS"]   " Project root markers
     let g:CtrlSpaceCacheDir = $VimPluginPath
     let g:CtrlSpaceSearchTiming = 50
-    " 更改配色 for new-railscasts theme
-    " hi link CtrlSpaceNormal   Special
-    " hi link CtrlSpaceSelected Title
-    " hi link CtrlSpaceSearch   Search
-    " hi link CtrlSpaceStatus   StatusLine
     " 切换按键
     nnoremap <C-Space> :CtrlSpace<CR>
     inoremap <C-Space> <esc>:CtrlSpace<CR>
+" }}}
+
+" Pop Selection {{{ 弹出选项
+    Plug 'yehuohan/popset'
+	highlight link PopsetSelected Search
+    let g:Popset_CompleteAll = 0
+    let g:Popset_SelectionData = [
+        \{
+            \ "opt" : ["filetype", "ft"],
+            \ "lst" : ["cpp", "c", "python", "vim", "markdown", "text"],
+            \ "cmd" : "popset#data#SetEqual",
+        \}]
 " }}}
 
 " vim-startify {{{ vim会话界面
@@ -664,10 +661,6 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     " 暂时不用
 " }}}
 
-" }}}
-
-" Pop Selection {{{
-    Plug $VimPluginPath.'/bundle/popselection'
 " }}}
 
 if IsNVim()

@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170830 - vv2.1.129
+ - 添加popset
+
 ## 20170820 - vv2.1.128
  - 更改NERDTree,region-expand,goyo插件的按键映射
 
