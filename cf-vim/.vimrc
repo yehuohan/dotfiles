@@ -489,9 +489,22 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:Popset_SelectionData = [
         \{
             \ "opt" : ["filetype", "ft"],
-            \ "lst" : ["cpp", "c", "python", "vim", "markdown", "text"],
+            \ "lst" : ["cpp", "c", "python", "vim", "markdown", "help", "text"],
+            \ "dic" : {
+                    \ "python" : "Python script file",
+                    \ "vim"    : "Vim script file",
+                    \ "help"   : "Vim help doc"
+                    \},
             \ "cmd" : "popset#data#SetEqual",
+        \},
+        \{
+            \ "opt" : ["colorscheme", "colo"],
+            \ "lst" : ["gruvbox"],
+            \ "dic" : {"gruvbox" : "第三方主题"},
+            \ "cmd" : "",
         \}]
+    " set option with PSet
+    nnoremap <leader>so :PSet 
 " }}}
 
 " vim-startify {{{ vim会话界面

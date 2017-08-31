@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170831 - vv2.1.130
+ - 添加popset options
+
 ## 20170830 - vv2.1.129
  - 添加popset
 
