@@ -467,15 +467,14 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " ctrl-space {{{ buffer管理
     " <h,o,l,w,b,/,?> for buffer,file,tab,workspace,bookmark,search and help
-    "Plug 'vim-ctrlspace/vim-ctrlspace'
     Plug 'yehuohan/vim-ctrlspace'
     set nocompatible
     set hidden                                      " 允许在未保存文件时切换buffer
+    let g:CtrlSpaceCacheDir = $VimPluginPath
     let g:CtrlSpaceSetDefaultMapping = 1
     let g:CtrlSpaceProjectRootMarkers = [
          \ ".git", ".sln", ".pro",
          \".hg", ".svn", ".bzr", "_darcs", "CVS"]   " Project root markers
-    let g:CtrlSpaceCacheDir = $VimPluginPath
     let g:CtrlSpaceSearchTiming = 50
     " 切换按键
     nnoremap <C-Space> :CtrlSpace<CR>
