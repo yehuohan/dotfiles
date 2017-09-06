@@ -394,9 +394,9 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 " }}}
 
 " tabular {{{ 字符对齐
-    " /:/r2 means align right and insert 2 space before next field
     Plug 'godlygeek/tabular'
-    " align map
+    " /:/r2 means align right and insert 2 space before next field
+    " /:\zs to include : character to filed to be tabulared
     vnoremap <leader>a :Tabularize /
     nnoremap <leader>a :Tabularize /
 " }}}
