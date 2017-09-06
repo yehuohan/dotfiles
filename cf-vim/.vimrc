@@ -168,9 +168,11 @@ set ttimeoutlen=70  " 键码超时时间为70ms
 if !IsNVim()
     set encoding=utf-8  " 内部内部需要使用utf-8编码
     set <M-h>=h
+    set <M-i>=i
     set <M-j>=j
     set <M-k>=k
     set <M-l>=l
+    set <M-o>=o
 endif
 " }}}
 
@@ -200,7 +202,7 @@ endfunction
 let s:inv_transparent_bg_flg = 0
 function! InvTransParentBackground()
     if s:inv_transparent_bg_flg == 1
-        hi Normal ctermbg=234
+        hi Normal ctermbg=235
         let s:inv_transparent_bg_flg = 0
     else
         hi Normal ctermbg=NONE
@@ -687,7 +689,7 @@ call plug#end()            " required
 
 
 "===============================================================================
-" User Setting
+" User Settings
 "===============================================================================
 " {{{
 " Term
@@ -787,7 +789,7 @@ endif
 
 
 "===============================================================================
-" User Key-Map 
+" User Key-Maps
 "===============================================================================
 " {{{
 " 基本编辑 {{{
@@ -844,7 +846,9 @@ endif
     nnoremap <leader>p "0p
 
     " 寄存器快速复制与粘贴
-    let s:table_reg_map = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+    let s:table_reg_map = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
+                         \ 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 
+                         \ 'u', 'v', 'w', 'x', 'y', 'z']
     for t in s:table_reg_map
         execute "vnoremap <leader>'" . t . "    \"" . t . "y"
         execute "nnoremap <leader>'" . t . "    \"" . t . "p"
@@ -886,8 +890,8 @@ endif
 
 " tab ,buffer and quickfix {{{
     " tab切换
-    noremap <M-h> gT
-    noremap <M-l> gt
+    nnoremap <M-i> gT
+    nnoremap <M-o> gt
     " buffer切换
     nnoremap <leader>bn :bn<CR>
     nnoremap <leader>bp :bp<CR>

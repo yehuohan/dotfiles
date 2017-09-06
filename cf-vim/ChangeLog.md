@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170906 - vv2.1.133
+ - 改用M-io来切换Tab
+
 ## 20170906 - vv2.1.132
  - 添加NERDTree按键map
 
