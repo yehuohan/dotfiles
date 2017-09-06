@@ -172,6 +172,8 @@ if !IsNVim()
     set <M-j>=j
     set <M-k>=k
     set <M-l>=l
+    set <M-n>=n
+    set <M-m>=m
     set <M-o>=o
 endif
 " }}}
@@ -406,10 +408,12 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " smooth-scroll {{{ 平滑滚动
     Plug 'terryma/vim-smooth-scroll'
-    nnoremap <silent> <C-u> :call smooth_scroll#up(&scroll, 0, 2)<CR>
-    nnoremap <silent> <C-d> :call smooth_scroll#down(&scroll, 0, 2)<CR>
+    " nnoremap <silent> <C-d> :call smooth_scroll#down(&scroll, 0, 2)<CR>
+    " nnoremap <silent> <C-u> :call smooth_scroll#up(&scroll, 0, 2)<CR>
     " nnoremap <silent> <C-f> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
     " nnoremap <silent> <C-b> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
+    nnoremap <silent> <M-n> :call smooth_scroll#down(&scroll, 0, 2)<CR>
+    nnoremap <silent> <M-m> :call smooth_scroll#up(&scroll, 0, 2)<CR>
     nnoremap <silent> <M-j> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
     nnoremap <silent> <M-k> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
 " }}}
