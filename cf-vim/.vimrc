@@ -506,6 +506,19 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nnoremap <leader>so :PSet 
 " }}}
 
+" nerd-tree{{{ 目录树导航
+    Plug 'scrooloose/nerdtree'          
+    let g:NERDTreeShowHidden=1
+    let g:NERDTreeMapPreview = 'go'             " 预览打开
+    let g:NERDTreeMapChangeRoot = 'cd'          " 更改根目录
+    let g:NERDTreeMapChdir = 'CW'               " 更改CWD
+    let g:NERDTreeMapCWD = 'CD'                 " 更改根目录为CWD
+    let g:NERDTreeMapJumpNextSibling = '<C-n>'  " next sibling
+    let g:NERDTreeMapJumpPrevSibling = '<C-p>'  " prev sibling
+    noremap <leader>te :NERDTreeToggle<CR>
+    noremap <leader>tE :NERDTree<CR>
+" }}}
+
 " vim-startify {{{ vim会话界面
     Plug 'mhinz/vim-startify'
     if IsLinux()
@@ -534,19 +547,6 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " 代码类
 " {{{
-" nerd-tree{{{ 目录树导航
-    Plug 'scrooloose/nerdtree'          
-    let g:NERDTreeShowHidden=1
-    let g:NERDTreeMapPreview = 'go'             " 预览打开
-    let g:NERDTreeMapChangeRoot = 'cd'          " 更改根目录
-    let g:NERDTreeMapChdir = 'CW'               " 更改CWD
-    let g:NERDTreeMapCWD = 'CD'                 " 更改根目录为CWD
-    let g:NERDTreeMapJumpNextSibling = '<C-n>'  " next sibling
-    let g:NERDTreeMapJumpPrevSibling = '<C-p>'  " prev sibling
-    noremap <leader>te :NERDTreeToggle<CR>
-
-" }}}
-
 " YouCompleteMe {{{ 自动补全
     " Linux: 
     "   install python-dev, python3-dev, cmake, llvm, clang

@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170906 - vv2.1.132
+ - 添加NERDTree按键map
+
 ## 20170906 - vv2.1.131
  - 添加autocmd：新文件自动设置为unix格式
 
@@ -336,7 +339,7 @@
  - 添加windows下Msys2环境的配置文件
 
 ## 20170429
- - Window添加YCM插件  
+ - Window添加YCM插件
 
 ## 20170428
  - 添加F5程序运行映射
