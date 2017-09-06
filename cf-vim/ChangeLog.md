@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170906 - vv2.1.131
+ - 添加autocmd：新文件自动设置为unix格式
+
 ## 20170831 - vv2.1.130
  - 添加popset options
 

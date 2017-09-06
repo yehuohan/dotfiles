@@ -772,7 +772,9 @@ endif
 
 " Auto Command 
 " {{{
+    autocmd! BufNewFile * set fileformat=unix
     autocmd! BufEnter *.tikz set filetype=tex
+
     autocmd! Filetype vim set foldmethod=marker
     autocmd! Filetype c set foldmethod=syntax
     autocmd! Filetype cpp set foldmethod=syntax
