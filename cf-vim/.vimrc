@@ -253,7 +253,7 @@ function! F5ComplileFile(argstr)
     let l:run = "!"
     if exists(":AsyncRun") == 2
         let l:run = ":AsyncRun "
-    else
+    endif
     " 执行命令
     if "c" ==? l:ext
         execute l:run . "gcc " . a:argstr . " -o " . l:name . " " . l:filename . " && " . l:name
