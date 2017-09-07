@@ -2,6 +2,27 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170907 - vv2.1.143
+ - 去除asd2num插件，将asd2num代码直接添加到vimrc中
+
+## 20170907 - vv2.1.142
+ - vimgrep映射中的copen添加botright参数
+
+## 20170907 - vv2.1.141
+ - 修改diff中的dp和dg的map
+
+## 20170907 - vv2.1.140
+ - 添加水平滚屏map
+
+## 20170907 - vv2.1.139
+ - 移除CCTree
+
+## 20170907 - vv2.1.138
+ - 移除自定义的surrouding map
+ - 更改nerd-commenter map
+ - 添加matchit
+ - 添加CCTree
+
 ## 20170906 - vv2.1.134
  - 添加M-nm为半屏滚动map
 

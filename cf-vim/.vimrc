@@ -247,21 +247,22 @@ endfunction
 " 编译环境函数
 " {{{
 function! F5ComplileFile(argstr)
-    let l:ext=expand("%:e")                             " 扩展名
-    let l:filename='"./' . expand('%:t') . '"'          " 文件名，不带路径，带扩展名 
-    let l:name='"./' . expand('%:t:r') . '"'            " 文件名，不带路径，不带扩展名
+    let l:ext = expand("%:e")                             " 扩展名
+    let l:filename = '"./' . expand('%:t') . '"'          " 文件名，不带路径，带扩展名 
+    let l:name = '"./' . expand('%:t:r') . '"'            " 文件名，不带路径，不带扩展名
+    let l:run = "!"
+    if exists(":AsyncRun") == 2
+        let l:run = ":AsyncRun "
+    else
     " 执行命令
     if "c" ==? l:ext
-        " c
-        execute ":AsyncRun gcc ".a:argstr." -o ".l:name." ".l:filename." && ".l:name
+        execute l:run . "gcc " . a:argstr . " -o " . l:name . " " . l:filename . " && " . l:name
     elseif "cpp" ==? l:ext
-        " c++
-        execute ":AsyncRun g++ -std=c++11 ".a:argstr." -o ".l:name." ".l:filename." && ".l:name
+        execute l:run . "g++ -std=c++11 " . a:argstr . " -o " . l:name . " " . l:filename . " && " . l:name
     elseif "py" ==? l:ext || "pyw" ==? l:ext
-        " python
-        execute ":AsyncRun python ".l:filename
+        execute l:run . "python " . l:filename
     elseif "m" ==? l:ext
-        execute ":AsyncRun matlab -nosplash -nodesktop -r " . l:name[3:-2]
+        execute l:run . "matlab -nosplash -nodesktop -r " . l:name[3:-2]
     endif
 endfunction
 " }}}
@@ -280,6 +281,28 @@ function! LinuxFcitx2Zh()
 endfunction
 " }}}
 
+" asd2num切换
+" {{{
+let s:asd2num_toggle_flg = 0
+let s:asd2num_map_table={
+            \ "a" : "1", "s" : "2", "d" : "3", "f" : "4", "g" : "5",
+            \ "h" : "6", "j" : "7", "k" : "8", "l" : "9", ";" : "0"
+            \ }
+function! Asd2numToggle()
+    if(s:asd2num_toggle_flg)
+        for t in items(s:asd2num_map_table)
+            execute "iunmap " . t[0]
+        endfor
+        let s:asd2num_toggle_flg = 0
+    else
+        for t in items(s:asd2num_map_table)
+            execute "inoremap " . t[0]. " " . t[1]
+        endfor
+        let s:asd2num_toggle_flg = 1
+    endif
+endfunction
+" }}}
+
 " }}}
 
 
@@ -293,11 +316,6 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " 基本编辑类 
 " {{{
-" asd2num {{{ asd数字输入
-    Plug 'yehuohan/asd2num'
-    inoremap <C-a> <esc>:Asd2NumToggle<CR>a
-" }}}
-
 " easy-motion {{{ 快速跳转
     Plug 'easymotion/vim-easymotion'
     let g:EasyMotion_do_mapping = 0         " 禁止默认map
@@ -424,10 +442,6 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nmap <leader>es <Plug>(expand_region_shrink)
     vmap <leader>ee <Plug>(expand_region_expand)
     vmap <leader>es <Plug>(expand_region_shrink)
-    nmap <C-l> <Plug>(expand_region_expand)
-    nmap <C-h> <Plug>(expand_region_shrink)
-    vmap <C-l> <Plug>(expand_region_expand)
-    vmap <C-h> <Plug>(expand_region_shrink)
 " }}}
 
 " }}}
@@ -494,11 +508,13 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:Popset_SelectionData = [
         \{
             \ "opt" : ["filetype", "ft"],
-            \ "lst" : ["cpp", "c", "python", "vim", "markdown", "help", "text"],
+            \ "lst" : ["cpp", "c", "python", "vim", "markdown", "help", "text",
+                     \ "sh"],
             \ "dic" : {
                     \ "python" : "Python script file",
                     \ "vim"    : "Vim script file",
-                    \ "help"   : "Vim help doc"
+                    \ "help"   : "Vim help doc",
+                    \ "sh"     : "Linux shell script",
                     \},
             \ "cmd" : "popset#data#SetEqual",
         \},
@@ -600,7 +616,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     if IsLinux()
         let g:tagbar_ctags_bin='/usr/bin/ctags'
     elseif IsWin()
-        let g:tagbar_ctags_bin="C:\\MyApps\\Vim\\vim80\\ctags.exe"
+        let g:tagbar_ctags_bin=$VIM."\\vim80\\ctags.exe"
     endif                                   " 设置ctags路径，需要apt-get install ctags
     let g:tagbar_width=30
     let g:tagbar_map_showproto=''           " 取消tagbar对<Space>的占用
@@ -609,10 +625,24 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " nerd-commenter {{{ 批量注释
     Plug 'scrooloose/nerdcommenter'
+    let g:NERDCreateDefaultMappings = 1
     let g:NERDSpaceDelims = 1               " add space after comment
-    " <leader>cc for comment
-    " <leader>cl/cb for comment aligned
-    " <leader>cu for un-comment
+    nmap <leader>cc <plug>NERDCommenterComment
+    nmap <leader>cm <plug>NERDCommenterMinimal
+    nmap <leader>cs <plug>NERDCommenterSexy
+    " nmap <leader>cb <plug>NERDCommenterAlignBoth  " there's some problem when it's user's map
+    nmap <leader>cl <plug>NERDCommenterAlignLeft
+    nmap <leader>ci <plug>NERDCommenterInvert
+    nmap <leader>cy <plug>NERDCommenterYank
+    nmap <leader>ce <plug>NERDCommenterToEOL
+    nmap <leader>ca <plug>NERDCommenterAppend
+    nmap <leader>cA <plug>NERDCommenterAltDelims
+    nmap <leader>cu <plug>NERDCommenterUncomment
+" }}}
+
+" matchit {{{ 配对跳转
+    "Plug 'vim-scripts/matchit.zip'
+    runtime macros/matchit.vim
 " }}}
 
 " file switch {{{ c/c++文件切换
@@ -804,7 +834,7 @@ endif
     endif
     " 查找vim帮助
     if IsNVim()
-        " nvim用自己的帮助文件只有英文的
+        " nvim用自己的帮助文件，只有英文的
         nnoremap <S-k> :exec "help " . expand("<cword>"). "@en"<CR>
         nnoremap <S-m> <S-k>
     else
@@ -825,6 +855,8 @@ endif
     " 折叠
     nnoremap <leader>zr zR
     nnoremap <leader>zm zM
+    " Asd2Num
+    inoremap <C-a> <esc>:call Asd2numToggle()<CR>a
 " }}}
 
 " Show Setting{{{
@@ -848,6 +880,7 @@ endif
     inoremap <C-v> <esc>"+pi
     " 粘贴通过y复制的内容
     nnoremap <leader>p "0p
+    nnoremap <leader>P "0P
 
     " 寄存器快速复制与粘贴
     let s:table_reg_map = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
@@ -861,7 +894,8 @@ endif
 
 " move and goto{{{
     " 行首和行尾
-    nnoremap <S-s> %
+    " map recursively for % extended by matchit.vim
+    nmap <S-s> %
     nnoremap <S-l> $
     nnoremap <S-h> ^
     vnoremap <S-l> $
@@ -869,27 +903,13 @@ endif
     " 复制到行首行尾
     nnoremap y<S-l> y$
     nnoremap y<S-h> y^
-
+    " 滚屏
     nnoremap <C-j> <C-e>
     nnoremap <C-k> <C-y>
-" }}}
-
-" surrounding with words{{{
-    " text object: ?i? or ?a?
-    nnoremap <leader>i( viwxi(<esc>pa)<esc>     
-    nnoremap <leader>i< viwxi<<esc>pa><esc>
-    nnoremap <leader>i[ viwxi[<esc>pa]<esc>
-    nnoremap <leader>i{ viwxi{<esc>pa}<esc>
-    nnoremap <leader>i" viwxi"<esc>pa"<esc>
-    nnoremap <leader>i' viwxi'<esc>pa'<esc>
-    nnoremap <leader>i/ viwxi/*<esc>pa*/<esc>
-    vnoremap <leader>i( xi()<esc>hp<esc>     
-    vnoremap <leader>i< xi<><esc>hp<esc>
-    vnoremap <leader>i[ xi[]<esc>hp<esc>
-    vnoremap <leader>i{ xi{}<esc>hp<esc>
-    vnoremap <leader>i" xi""<esc>hp<esc>
-    vnoremap <leader>i' xi''<esc>hp<esc>
-    vnoremap <leader>i/ xi/**/<esc>hhp<esc>
+    nnoremap <C-h> zh
+    nnoremap <C-l> zl
+    nnoremap <M-h> zH
+    nnoremap <M-l> zL
 " }}}
 
 " tab ,buffer and quickfix {{{
@@ -941,11 +961,11 @@ endif
     vnoremap / "9y<bar>:execute"let g:__str__=getreg('9')"<bar>execute"/" . g:__str__<CR>
 
     " vimgrep what input
-    nnoremap <leader>/ :execute"let g:__str__=input('/')"<bar>execute "vimgrep /" . g:__str__ . "/j %"<bar>copen<CR>
+    nnoremap <leader>/ :execute"let g:__str__=input('/')"<bar>execute "vimgrep /" . g:__str__ . "/j %"<bar>botright copen<CR>
     " vimgrep what selected
-    vnoremap <leader>/ "9y<bar>:execute"let g:__str__=getreg('9')"<bar>execute "vimgrep /" . g:__str__ . "/j %"<bar>copen<CR>
+    vnoremap <leader>/ "9y<bar>:execute"let g:__str__=getreg('9')"<bar>execute "vimgrep /" . g:__str__ . "/j %"<bar>botright copen<CR>
     " find word with vimgrep
-    nnoremap <leader>fw :execute"let g:__str__=expand(\"<cword>\")"<bar>execute "vimgrep /\\<" . g:__str__ . "\\>/j %"<bar>copen<CR>
+    nnoremap <leader>fw :execute"let g:__str__=expand(\"<cword>\")"<bar>execute "vimgrep /\\<" . g:__str__ . "\\>/j %"<bar>botright copen<CR>
 " }}}
 
 " Run Program map{{{
@@ -963,12 +983,12 @@ endif
     nnoremap <leader>dt :diffthis<CR>
     " 关闭文件比较，与diffthis互为逆命令
     nnoremap <leader>do :diffoff<CR>
-    " 应用差异到别一文件
-    nnoremap <leader>dp :diffput<CR>
-    " 拉取差异到当前文件
-    nnoremap <leader>dg :diffget<CR>
     " 更新比较结果
-    nnoremap <leader>du :diff<CR>
+    nnoremap <leader>du :diffupdate<CR>
+    " 应用差异到别一文件，[range]<leader>dp，range默认为1行
+    nnoremap <leader>dp :<C-U>execute ".,+" . string(v:count1-1) . "diffput"<CR>
+    " 拉取差异到当前文件，[range]<leader>dg，range默认为1行
+    nnoremap <leader>dg :<C-U>execute ".,+" . string(v:count1-1) . "diffget"<CR>
     " 下一个diff
     nnoremap <leader>dj ]c
     " 前一个diff
@@ -976,8 +996,6 @@ endif
 " }}}
 
 " }}}
-
-
 
 
 
