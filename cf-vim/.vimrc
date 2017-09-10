@@ -303,6 +303,86 @@ function! Asd2numToggle()
 endfunction
 " }}}
 
+" vimgrep搜索
+" {{{
+let s:findvimgrep_nmaps = ["i", "I", "gi", "gI",
+                         \ "w", "W", "gw", "gW",
+                         \ ]
+let s:findvimgrep_vmaps = ["v", "V", "gv", "gV",
+                         \ "s", "S", "gs", "gS",
+                         \ ]
+
+function! GetFindvimgrepCompletion(arglead, cmdline, cursorpos)
+    let l:complete = []
+    let l:al = split(a:arglead, " ")
+
+    " glob hidden and not hidden files
+    for item in split(glob("*") . "\n" . glob("\.[^.]*"), "\n")
+        if item =~ "^" . l:al[-1]
+            if len(l:al) == 1
+                call add(l:complete, item)
+            else
+                call add(l:complete, join(l:al[0:-2], " ") . " " . item)
+            endif
+        endif
+    endfor
+
+    return l:complete
+endfunction
+function! FindVimgrep(type)
+    " i : find input    with user's ignorecase setting or smartcase
+    " w : find word     with user's ignorecase setting or smartcase
+    " v : find visual   with user's ignorecase setting or smartcase
+    " s : find selected with \< \>
+    " I : find input    in case match with force
+    " W : find word     in case match with force
+    " V : find visual   in case match with force
+    " S : find selected in case match with force and \< \>
+    let l:string = ""
+    let l:files = "%"
+
+    if a:type =~? 'i' 
+        let l:string = input(" What to find :")
+        if empty(l:string)
+            return
+        endif
+    elseif a:type =~? 'w'
+        let l:string = expand("<cword>")
+    elseif a:type =~? '[vs]'
+        let l:reg_var = getreg('0', 1)
+        let l:reg_mode = getregtype('0')
+        normal! gv"0y
+        let l:string = getreg('0')
+        call setreg('0', l:reg_var, l:reg_mode)
+    endif
+
+    if a:type =~? 's'
+        let l:string = "\\<" . l:string . "\\>"
+    endif
+
+    if a:type =~# '[IWVS]'
+        let l:string = '\C' . l:string
+    endif
+
+    " g : find global
+    if a:type =~# 'g'
+        "let l:files = input(" Where to find :", "", "customlist,GetFindvimgrepCompletion")
+        let l:files = input(" Where to find :", "", "file")
+        if empty(l:files)
+            let l:files = "%"
+        endif
+    endif
+
+    " vimgrep
+    silent! execute "vimgrep /" . l:string . "/j " . l:files
+    if empty(getqflist())
+        echo "No match: " . l:string
+    else
+        botright copen
+    endif
+endfunction
+" }}}
+
 " }}}
 
 
@@ -329,10 +409,10 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nmap <leader>mb <plug>(easymotion-b)
     nmap <leader>me <plug>(easymotion-e)
     nmap <leader>mg <plug>(easymotion-ge)
-    " nmap <leader>W <plug>(easymotion-W)
-    " nmap <leader>B <plug>(easymotion-B)
-    " nmap <leader>E <plug>(easymotion-E)
-    " nmap <leader>gE <plug>(easymotion-gE)
+    nmap <leader>W <plug>(easymotion-W)
+    nmap <leader>B <plug>(easymotion-B)
+    nmap <leader>E <plug>(easymotion-E)
+    nmap <leader>gE <plug>(easymotion-gE)
     "
 " }}}
 
@@ -353,10 +433,10 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nnoremap <leader>sp :OverCommandLine<CR>
 " }}}
 
-" incsearch {{{ 查找增强
+" incsearch {{{ 页面查找增强
     Plug 'haya14busa/incsearch.vim'
     Plug 'haya14busa/incsearch-fuzzy.vim'
-    let g:incsearch#auto_nohlsearch = 1
+    let g:incsearch#auto_nohlsearch = 1     " 停止搜索时，自动关闭高亮
 
     " 设置查找时页面滚动映射
     augroup incsearch-keymap
@@ -380,12 +460,15 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
     nmap n  <Plug>(incsearch-nohl-n)
     nmap N  <Plug>(incsearch-nohl-N)
+    " *,# with \< \> and g*,g# without \< \>
     nmap *  <Plug>(incsearch-nohl-*)
     nmap #  <Plug>(incsearch-nohl-#)
-    nmap <leader>8  <Plug>(incsearch-nohl-*)
-    nmap <leader>3  <Plug>(incsearch-nohl-#)
     nmap g* <Plug>(incsearch-nohl-g*)
     nmap g# <Plug>(incsearch-nohl-g#)
+    nmap <leader>8  <Plug>(incsearch-nohl-*)
+    nmap <leader>3  <Plug>(incsearch-nohl-#)
+    nmap <leader>g8 <Plug>(incsearch-nohl-g*)
+    nmap <leader>g3 <Plug>(incsearch-nohl-g#)
 " }}}
 
 " fzf {{{ 模糊查找
@@ -395,6 +478,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
         Plug 'junegunn/fzf'
     endif
     Plug 'junegunn/fzf.vim'
+    let g:fzf_command_prefix = 'Fzf'
 " }}}
 
 " surround and repeat {{{ 添加包围符
@@ -912,7 +996,7 @@ endif
     nnoremap <M-l> zL
 " }}}
 
-" tab ,buffer and quickfix {{{
+" tab, buffer, quickfix {{{
     " tab切换
     nnoremap <M-i> gT
     nnoremap <M-o> gt
@@ -920,9 +1004,14 @@ endif
     nnoremap <leader>bn :bn<CR>
     nnoremap <leader>bp :bp<CR>
     nnoremap <leader>bl :b#<CR>
-    " quickfix打开与关闭
+    " location-list : 每个窗口对应一个位置列表
+    " quickfix      : 整个vim对应一个quickfix
+    " quickfix open and close
     nnoremap <leader>qo :copen<CR>
     nnoremap <leader>qc :cclose<CR>
+    " location-list open and close
+    nnoremap <leader>lo :lopen<CR>
+    nnoremap <leader>lc :lclose<CR>
 " }}}
 
 " window manager{{{
@@ -954,20 +1043,6 @@ endif
     nnoremap <leader>w= <C-w>=
 " }}}
 
-" find and search{{{
-    " /\<the\> : can match chars in "for the vim", but can not match chars in "there"
-    " /the     : can match chars in "for the vim" and also in "there"
-    " search selected
-    vnoremap / "9y<bar>:execute"let g:__str__=getreg('9')"<bar>execute"/" . g:__str__<CR>
-
-    " vimgrep what input
-    nnoremap <leader>/ :execute"let g:__str__=input('/')"<bar>execute "vimgrep /" . g:__str__ . "/j %"<bar>botright copen<CR>
-    " vimgrep what selected
-    vnoremap <leader>/ "9y<bar>:execute"let g:__str__=getreg('9')"<bar>execute "vimgrep /" . g:__str__ . "/j %"<bar>botright copen<CR>
-    " find word with vimgrep
-    nnoremap <leader>fw :execute"let g:__str__=expand(\"<cword>\")"<bar>execute "vimgrep /\\<" . g:__str__ . "\\>/j %"<bar>botright copen<CR>
-" }}}
-
 " Run Program map{{{
     " compiling and running
     noremap <F5> <esc>:call F5ComplileFile('')<CR>
@@ -995,7 +1070,21 @@ endif
     nnoremap <leader>dk [c
 " }}}
 
+" find and search{{{
+    " /\<the\> : can match chars in "for the vim", but can not match chars in "there"
+    " /the     : can match chars in "for the vim" and also in "there"
+    " search selected
+    vnoremap / "9y<bar>:execute"let g:__str__=getreg('9')"<bar>execute"/" . g:__str__<CR>
+
+    " fine with vimgrep
+    for item in s:findvimgrep_nmaps
+        execute "nnoremap <leader>f" . item ":call FindVimgrep('" . item . "')<CR>"
+    endfor
+    for item in s:findvimgrep_vmaps
+        execute "vnoremap <leader>f" . item ":call FindVimgrep('" . item . "')<CR>"
+    endfor
 " }}}
 
+" }}}
 
 

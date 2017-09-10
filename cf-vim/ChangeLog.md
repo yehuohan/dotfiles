@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170910 - vv2.1.144
+ - 添加find-vimgrep
+
 ## 20170907 - vv2.1.143
  - 去除asd2num插件，将asd2num代码直接添加到vimrc中
 
