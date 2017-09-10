@@ -312,23 +312,32 @@ let s:findvimgrep_vmaps = ["v", "V", "gv", "gV",
                          \ "s", "S", "gs", "gS",
                          \ ]
 
-function! GetFindvimgrepCompletion(arglead, cmdline, cursorpos)
+function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
     let l:complete = []
-    let l:al = split(a:arglead, " ")
+    let l:arglead_list = [""]
+    let l:arglead_first = ""
+    let l:arglead_glob = ""
+    let l:files_list = []
+
+    " process glob path-string
+    if !empty(a:arglead)
+        let l:arglead_list = split(a:arglead, " ")
+        let l:arglead_first = join(l:arglead_list[0:-2], " ")
+        let l:arglead_glob = l:arglead_list[-1]
+    endif
 
     " glob hidden and not hidden files
-    for item in split(glob("*") . "\n" . glob("\.[^.]*"), "\n")
-        if item =~ "^" . l:al[-1]
-            if len(l:al) == 1
-                call add(l:complete, item)
-            else
-                call add(l:complete, join(l:al[0:-2], " ") . " " . item)
-            endif
-        endif
-    endfor
-
+    let l:files_list = split(glob(l:arglead_glob . "*") . "\n" . glob(l:arglead_glob . "\.[^.]*"), "\n")
+    if len(l:arglead_list) == 1
+        let l:complete = l:files_list
+    else
+        for item in l:files_list
+            call add(l:complete, l:arglead_first . " " . item)
+        endfor
+    endif
     return l:complete
 endfunction
+
 function! FindVimgrep(type)
     " i : find input    with user's ignorecase setting or smartcase
     " w : find word     with user's ignorecase setting or smartcase
@@ -366,15 +375,14 @@ function! FindVimgrep(type)
 
     " g : find global
     if a:type =~# 'g'
-        "let l:files = input(" Where to find :", "", "customlist,GetFindvimgrepCompletion")
-        let l:files = input(" Where to find :", "", "file")
+        let l:files = input(" Where to find :", "", "customlist,GetMultiFilesCompletion")
         if empty(l:files)
             let l:files = "%"
         endif
     endif
 
     " vimgrep
-    silent! execute "vimgrep /" . l:string . "/j " . l:files
+    silent! execute "vimgrep /" . l:string . "/gj " . l:files
     if empty(getqflist())
         echo "No match: " . l:string
     else
@@ -1074,7 +1082,7 @@ endif
     " /\<the\> : can match chars in "for the vim", but can not match chars in "there"
     " /the     : can match chars in "for the vim" and also in "there"
     " search selected
-    vnoremap / "9y<bar>:execute"let g:__str__=getreg('9')"<bar>execute"/" . g:__str__<CR>
+    vnoremap / "*y<bar>:execute"let g:__str__=getreg('*')"<bar>execute"/" . g:__str__<CR>
 
     " fine with vimgrep
     for item in s:findvimgrep_nmaps

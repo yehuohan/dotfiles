@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170910 - vv2.1.145
+ - 完善find-vimgrep
+
 ## 20170910 - vv2.1.144
  - 添加find-vimgrep
 
