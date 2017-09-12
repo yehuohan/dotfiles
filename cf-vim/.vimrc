@@ -605,7 +605,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
         \{
             \ "opt" : ["filetype", "ft"],
             \ "lst" : ["cpp", "c", "python", "vim", "markdown", "help", "text",
-                     \ "sh"],
+                     \ "sh", "matlab"],
             \ "dic" : {
                     \ "python" : "Python script file",
                     \ "vim"    : "Vim script file",
@@ -622,6 +622,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
         \}]
     " set option with PSet
     nnoremap <leader>so :PSet 
+    nnoremap <leader>sa :PSet popset<CR>
 " }}}
 
 " nerd-tree{{{ 目录树导航
