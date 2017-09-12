@@ -8,3 +8,5 @@ BackgroundColour=36,37,38
 Transparency=low
 OpaqueWhenFocused=no
 Term=xterm-256color
+FontWeight=400
+FontSmoothing=full
