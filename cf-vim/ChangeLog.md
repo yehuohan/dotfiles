@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170912 - vv2.1.146
+ - 添加Fzf相关映射
+
 ## 20170910 - vv2.1.145
  - 完善find-vimgrep
 

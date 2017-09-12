@@ -486,7 +486,11 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
         Plug 'junegunn/fzf'
     endif
     Plug 'junegunn/fzf.vim'
+    "Plug 'rking/ag.vim'
     let g:fzf_command_prefix = 'Fzf'
+    nnoremap <leader>fl :FzfLines<CR>
+    nnoremap <leader>fb :FzfBLines<CR>
+    nnoremap <leader>ff :FzfFiles 
 " }}}
 
 " surround and repeat {{{ 添加包围符
