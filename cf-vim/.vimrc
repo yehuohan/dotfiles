@@ -149,10 +149,10 @@ vnoremap ; :
 
 " 键码设定 
 " {{{
-set timeout         " 打开映射超时检测
-set ttimeout        " 打开键码超时检测
-set timeoutlen=1000 " 映射超时时间为1000ms
-set ttimeoutlen=70  " 键码超时时间为70ms
+set timeout                         " 打开映射超时检测
+set ttimeout                        " 打开键码超时检测
+set timeoutlen=1000                 " 映射超时时间为1000ms
+set ttimeoutlen=70                  " 键码超时时间为70ms
 
 " 键码示例 {{{
     " 终端Alt键映射处理：如 Alt+x，实际连续发送 <esc>x 编码
@@ -809,8 +809,8 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 " }}}
 
 if IsNVim()
-" neovim gui font {{{ 字体设置   
-    Plug 'equalsraf/neovim-gui-shim'
+" neovim gui font {{{ 字体设置(已内置)
+    "Plug 'equalsraf/neovim-gui-shim'
 " }}}
 endif
 
