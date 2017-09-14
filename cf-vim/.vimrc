@@ -158,7 +158,7 @@ set ttimeoutlen=70                  " 键码超时时间为70ms
     " 终端Alt键映射处理：如 Alt+x，实际连续发送 <esc>x 编码
     " 以下三种方法都可以使按下 Alt+x 后，执行 CmdTest 命令，但超时检测有区别
     "<1> set <M-x>=x  " 设置键码，这里的是一个字符，即<esc>的编码，不是^和[放在一起
-                        " 在终端的Insert模式，按Ctrl+v再按Alt+x
+                        " 在终端的Insert模式，按Ctrl+v再按Alt+x可输入
     "    nnoremap <M-x> :CmdTest<CR>  " 按键码超时时间检测
     "<2> nnoremap <esc>x :CmdTest<CR> " 按映射超时时间检测
     "<3> nnoremap x  :CmdTest<CR>   " 按映射超时时间检测
@@ -1045,15 +1045,19 @@ endif
     nnoremap <leader>wL <C-w>L
     nnoremap <leader>wT <C-w>T
     " reseize window with C-up/down/left/right
+    nnoremap <leader>w= <C-w>=
     inoremap <C-up> <esc>:resize+1<CR>i
     inoremap <C-down> <esc>:resize-1<CR>i
     inoremap <C-left> <esc>:vertical resize-1<CR>i
     inoremap <C-right> <esc>:vertical resize+1<CR>i
-    nnoremap <C-up> <esc>:resize+1<CR>
-    nnoremap <C-down> <esc>:resize-1<CR>
-    nnoremap <C-left> <esc>:vertical resize-1<CR>
-    nnoremap <C-right> <esc>:vertical resize+1<CR>
-    nnoremap <leader>w= <C-w>=
+    nnoremap <C-up> :resize+1<CR>
+    nnoremap <C-down> :resize-1<CR>
+    nnoremap <C-left> :vertical resize-1<CR>
+    nnoremap <C-right> :vertical resize+1<CR>
+    nnoremap <M-up> :resize+5<CR>
+    nnoremap <M-down> :resize-5<CR>
+    nnoremap <M-left> :vertical resize-5<CR>
+    nnoremap <M-right> :vertical resize+5<CR>
 " }}}
 
 " Run Program map{{{
