@@ -605,12 +605,13 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
         \{
             \ "opt" : ["filetype", "ft"],
             \ "lst" : ["cpp", "c", "python", "vim", "markdown", "help", "text",
-                     \ "sh", "matlab"],
+                     \ "sh", "matlab", "conf"],
             \ "dic" : {
                     \ "python" : "Python script file",
                     \ "vim"    : "Vim script file",
                     \ "help"   : "Vim help doc",
                     \ "sh"     : "Linux shell script",
+                    \ "conf"   : "Config files",
                     \},
             \ "cmd" : "popset#data#SetEqual",
         \},
