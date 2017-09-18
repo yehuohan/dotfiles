@@ -1,7 +1,7 @@
 
 ---
-# LinuxConfigs
- 管理Linux的一些配置文件，包括vim(neovim), zsh, i3, Msys2等配置文件。
+# LinuxConfigs(dotfiles)
+ 管理Linux的一些配置文件，包括vim(neovim), zsh, i3, Msys2等。
 
 
 ---
@@ -17,14 +17,14 @@
 │   ├── i3status
 │   │   └── config         : i3staus配置文件
 │   └── ToggleTouchPad.py  : 触触板控制
-├── cf-msys2               : Win-Msys-config
+├── cf-msys2
 │   └── .minttyrc          : Msys2模拟终端mintty配置文件
-├── cf-vim                 : Vim-config
+├── cf-vim
 │   ├── .vimrc             : vim配置文件
 │   ├── .ycm_extra_conf.py : vim-ycm配置文件
 │   ├── autoload           : vim-plug插件(只有vim-plug)
 │   └── mySnippets         : 自定义snippets
-├── cf-zsh                 : zsh-config
+├── cf-zsh
 │   ├── .zshrc             : zsh配置文件
 │   └── frisk.zsh-theme    : zsh主题文件
 
