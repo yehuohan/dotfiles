@@ -1095,6 +1095,7 @@ endif
     " /the     : can match chars in "for the vim" and also in "there"
     " search selected
     vnoremap / "*y<bar>:execute"let g:__str__=getreg('*')"<bar>execute"/" . g:__str__<CR>
+    nnoremap <leader>/ :execute"let g:__str__=expand(\"<cword>\")"<bar>execute "/" . g:__str__<CR>
 
     " fine with vimgrep
     for item in s:findvimgrep_nmaps
