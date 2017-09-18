@@ -663,6 +663,12 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nnoremap <leader>su :Startify<CR>       " start ui of vim-startify
 " }}}
 
+" neovim gui font {{{ 字体设置(已内置)
+if IsNVim()
+    "Plug 'equalsraf/neovim-gui-shim'
+endif
+" }}}
+
 " }}}
 
 " 代码类
@@ -700,6 +706,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 " }}}
 
 " ultisnips {{{ 代码片段插入
+if !IsNVim() && IsWin()
     Plug 'SirVer/ultisnips'               " snippet insert engine
     Plug 'honza/vim-snippets'             " snippet collection
     let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
@@ -707,6 +714,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:UltiSnipsExpandTrigger="<tab>"
     let g:UltiSnipsJumpForwardTrigger="<C-j>"
     let g:UltiSnipsJumpBackwardTrigger="<C-k>"
+endif
 " }}}
 
 " tagbar {{{ 代码结构预览
@@ -808,12 +816,6 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 " }}}
 
 " }}}
-
-if IsNVim()
-" neovim gui font {{{ 字体设置(已内置)
-    "Plug 'equalsraf/neovim-gui-shim'
-" }}}
-endif
 
 call plug#end()            " required
 
