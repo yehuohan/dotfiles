@@ -706,7 +706,7 @@ endif
 " }}}
 
 " ultisnips {{{ 代码片段插入
-if !IsNVim() && IsWin()
+if !(IsWin() && IsNvim())
     Plug 'SirVer/ultisnips'               " snippet insert engine
     Plug 'honza/vim-snippets'             " snippet collection
     let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
