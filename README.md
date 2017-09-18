@@ -1,11 +1,11 @@
 
 ---
-# LinuxConfigs(dotfiles)
+## LinuxConfigs(dotfiles)
  管理Linux的一些配置文件，包括vim(neovim), zsh, i3, Msys2等。
 
 
 ---
-# Files
+## Files
 
 ```
 .
@@ -32,6 +32,6 @@
 
 
 ---
-# Contributors
+## Contributors
  - yehuohan, yehuohan@qq.com, yehuohan@gmail.com
 
