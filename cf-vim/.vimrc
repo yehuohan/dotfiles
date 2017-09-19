@@ -254,6 +254,7 @@ function! F5ComplileFile(argstr)
     if exists(":AsyncRun") == 2
         let l:run = ":AsyncRun "
     endif
+
     " 执行命令
     if "c" ==? l:ext
         execute l:run . "gcc " . a:argstr . " -o " . l:name . " " . l:filename . " && " . l:name
@@ -312,6 +313,7 @@ let s:findvimgrep_vmaps = ["v", "V", "gv", "gV",
                          \ "s", "S", "gs", "gS",
                          \ ]
 
+" FUNCTION: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{
 function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
     let l:complete = []
     let l:arglead_list = [""]
@@ -337,7 +339,9 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
     endif
     return l:complete
 endfunction
+" }}}
 
+" FUNCTION: FindVimgrep(type) {{{
 function! FindVimgrep(type)
     " i : find input    with user's ignorecase setting or smartcase
     " w : find word     with user's ignorecase setting or smartcase
@@ -389,6 +393,7 @@ function! FindVimgrep(type)
         botright copen
     endif
 endfunction
+" }}}
 " }}}
 
 " }}}
@@ -706,7 +711,7 @@ endif
 " }}}
 
 " ultisnips {{{ 代码片段插入
-if !(IsWin() && IsNvim())
+if !(IsWin() && IsNVim())
     Plug 'SirVer/ultisnips'               " snippet insert engine
     Plug 'honza/vim-snippets'             " snippet collection
     let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
