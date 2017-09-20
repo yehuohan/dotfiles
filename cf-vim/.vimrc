@@ -545,6 +545,35 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     vmap <leader>es <Plug>(expand_region_shrink)
 " }}}
 
+" matchit {{{ 配对跳转
+    "Plug 'vim-scripts/matchit.zip'
+    runtime macros/matchit.vim
+" }}}
+
+" bookmarks {{{ 书签管理
+    Plug 'MattesGroeger/vim-bookmarks'
+    let g:bookmark_sign = '⚑'
+    let g:bookmark_annotation_sign = '☰'
+    let g:bookmark_no_default_key_mappings = 1  " no default key maps
+    let g:bookmark_auto_save = 1
+    let g:bookmark_auto_save_file = $VimPluginPath."/bookmarks"
+    let g:bookmark_save_per_working_dir = 0     " all marks will save to the same one file
+    let g:bookmark_show_toggle_warning = 0      " disable warning when delete annotate mark
+    let g:bookmark_show_warning = 0             " disable wanring when clearing all marks
+    let g:bookmark_location_list = 1            " use location-list but no quickfix
+
+    nnoremap <leader>mm :BookmarkToggle<CR>
+    nnoremap <leader>mi :BookmarkAnnotate<CR>
+    nnoremap <leader>ma :BookmarkShowAll<CR>
+    nnoremap <leader>mj :BookmarkNext<CR>
+    nnoremap <leader>mk :BookmarkPrev<CR>
+    nnoremap <leader>mc :BookmarkClear<CR>
+    " nmap <leader>mx <Plug>BookmarkClearAll
+    " nmap <leader>ml <Plug>BookmarkMoveToLine
+    " nmap <leader>mkk <Plug>BookmarkMoveUp
+    " nmap <leader>mjj <Plug>BookmarkMoveDown
+" }}}
+
 " }}}
 
 " 界面管理类
@@ -604,7 +633,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " Pop Selection {{{ 弹出选项
     Plug 'yehuohan/popset'
-	highlight link PopsetSelected Search
+    highlight link PopsetSelected Search
     let g:Popset_CompleteAll = 0
     let g:Popset_SelectionData = [
         \{
@@ -750,11 +779,6 @@ endif
     nmap <leader>ca <plug>NERDCommenterAppend
     nmap <leader>cA <plug>NERDCommenterAltDelims
     nmap <leader>cu <plug>NERDCommenterUncomment
-" }}}
-
-" matchit {{{ 配对跳转
-    "Plug 'vim-scripts/matchit.zip'
-    runtime macros/matchit.vim
 " }}}
 
 " file switch {{{ c/c++文件切换
@@ -1043,9 +1067,13 @@ endif
     " quickfix open and close
     nnoremap <leader>qo :copen<CR>
     nnoremap <leader>qc :cclose<CR>
+    nnoremap <leader>qj :cnext<CR>
+    nnoremap <leader>qk :cprevious<CR>
     " location-list open and close
     nnoremap <leader>lo :lopen<CR>
     nnoremap <leader>lc :lclose<CR>
+    nnoremap <leader>lj :lnext<CR>
+    nnoremap <leader>lk :lprevious<CR>
 " }}}
 
 " window manager{{{

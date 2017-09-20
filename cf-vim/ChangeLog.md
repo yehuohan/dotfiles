@@ -2,6 +2,10 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170920 - vv2.1.151
+ - 添加bookmark plugin
+ - 添加quickfix和location-list的next,previous映射
+
 ## 20170920 - vv2.1.149
  - 添加quickhl
  - 修改InvConcealLevel映射
