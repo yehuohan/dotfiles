@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170920 - vv2.1.152
+ - FindVimgrep搜索函数添加lvimgrep特性
+
 ## 20170920 - vv2.1.151
  - 添加bookmark plugin
  - 添加quickfix和location-list的next,previous映射

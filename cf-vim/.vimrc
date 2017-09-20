@@ -72,6 +72,10 @@
     "       \r相当于一个回车的效果
     "   :s/text\n/text/
     "       查找内容为text，且其后是回车
+    "
+    " search with match force
+    " /\<the\> : can match chars in "for the vim", but can not match chars in "there"
+    " /the     : can match chars in "for the vim" and also in "there"
 " }}}
 
 " }}}
@@ -306,11 +310,15 @@ endfunction
 
 " vimgrep搜索
 " {{{
-let s:findvimgrep_nmaps = ["i", "I", "gi", "gI",
-                         \ "w", "W", "gw", "gW",
-                         \ ]
-let s:findvimgrep_vmaps = ["v", "V", "gv", "gV",
-                         \ "s", "S", "gs", "gS",
+let s:findvimgrep_nmaps = ["fi", "fgi", "fI", "fgI",
+                         \ "fw", "fgw", "fW", "fgW",
+                         \ "Fi", "Fgi", "FI", "FgI",
+                         \ "Fw", "Fgw", "FW", "FgW",
+                         \ ]                  
+let s:findvimgrep_vmaps = ["fv", "fgv", "fV", "fgV",
+                         \ "fs", "fgs", "fS", "fgS",
+                         \ "Fv", "Fgv", "FV", "FgV",
+                         \ "Fs", "Fgs", "FS", "FgS",
                          \ ]
 
 " FUNCTION: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{
@@ -351,9 +359,16 @@ function! FindVimgrep(type)
     " W : find word     in case match with force
     " V : find visual   in case match with force
     " S : find selected in case match with force and \< \>
+    "
+    " g : find global with inputing path
+    "
+    " f : find with vimgrep and show in quickfix
+    " F : find with lvimgrep and show in location-list
+
     let l:string = ""
     let l:files = "%"
 
+    " get what to vimgrep
     if a:type =~? 'i' 
         let l:string = input(" What to find :")
         if empty(l:string)
@@ -369,15 +384,17 @@ function! FindVimgrep(type)
         call setreg('0', l:reg_var, l:reg_mode)
     endif
 
+    " match force
     if a:type =~? 's'
         let l:string = "\\<" . l:string . "\\>"
     endif
 
+    " match case
     if a:type =~# '[IWVS]'
         let l:string = '\C' . l:string
     endif
 
-    " g : find global
+    " get where to vimgrep
     if a:type =~# 'g'
         let l:files = input(" Where to find :", "", "customlist,GetMultiFilesCompletion")
         if empty(l:files)
@@ -385,12 +402,21 @@ function! FindVimgrep(type)
         endif
     endif
 
-    " vimgrep
-    silent! execute "vimgrep /" . l:string . "/gj " . l:files
-    if empty(getqflist())
-        echo "No match: " . l:string
-    else
-        botright copen
+    " vimgrep or lvimgrep
+    if a:type =~# 'f'
+        silent! execute "vimgrep /" . l:string . "/gj " . l:files
+        if empty(getqflist())
+            echo "No match: " . l:string
+        else
+            botright copen
+        endif
+    elseif a:type =~# 'F'
+        silent! execute "lvimgrep /" . l:string . "/gj " . l:files
+        if empty(getloclist(winnr()))
+            echo "No match: " . l:string
+        else
+            botright lopen
+        endif
     endif
 endfunction
 " }}}
@@ -1137,18 +1163,16 @@ endif
 " }}}
 
 " find and search{{{
-    " /\<the\> : can match chars in "for the vim", but can not match chars in "there"
-    " /the     : can match chars in "for the vim" and also in "there"
     " search selected
     vnoremap / "*y<bar>:execute"let g:__str__=getreg('*')"<bar>execute"/" . g:__str__<CR>
     nnoremap <leader>/ :execute"let g:__str__=expand(\"<cword>\")"<bar>execute "/" . g:__str__<CR>
 
     " fine with vimgrep
     for item in s:findvimgrep_nmaps
-        execute "nnoremap <leader>f" . item ":call FindVimgrep('" . item . "')<CR>"
+        execute "nnoremap <leader>" . item ":call FindVimgrep('" . item . "')<CR>"
     endfor
     for item in s:findvimgrep_vmaps
-        execute "vnoremap <leader>f" . item ":call FindVimgrep('" . item . "')<CR>"
+        execute "vnoremap <leader>" . item ":call FindVimgrep('" . item . "')<CR>"
     endfor
 " }}}
 
