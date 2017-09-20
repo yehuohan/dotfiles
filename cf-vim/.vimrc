@@ -831,6 +831,7 @@ endif
     nmap <leader>hm <Plug>(quickhl-cword-toggle)
     "nmap <leader>ht <Plug>(quickhl-tag-toggle)
     nmap <leader>hc <Plug>(quickhl-manual-reset)
+
     nnoremap <leader>th :QuickhlManualLockWindowToggle<CR>
 " }}}
 
@@ -904,9 +905,9 @@ call plug#end()            " required
     set cursorline                      " 高亮当前行
     set cursorcolumn                    " 高亮当前列
     set hlsearch                        " 设置高亮显示查找到的文本
-    set tabstop=4                       " 设置tab键宽4个空格
     set expandtab                       " 将Tab用Space代替，方便显示缩进标识indentLine
-    set softtabstop=4                   " 设置显示的缩进为4,实际Tab可以不是4个格
+    set tabstop=4                       " 设置tab键宽4个空格
+    set softtabstop=4                   " 设置显示的Tab缩进为4,实际Tab可以不是4个格
     set shiftwidth=4                    " 设置>和<命令移动宽度为4
     set nowrap                          " 默认关闭折行
     set listchars=eol:$,tab:>-,trail:~,space:.
@@ -1139,6 +1140,8 @@ endif
 " Run Program map{{{
     " compiling and running
     noremap <F5> <esc>:call F5ComplileFile('')<CR>
+    nnoremap <leader>rf :call F5ComplileFile('')<CR>
+     
     " run with args
     nnoremap <leader>ra :execute"let g:__str__=input('Compile Args: ')"<bar>call F5ComplileFile(g:__str__)<CR>
 " }}}

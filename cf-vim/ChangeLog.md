@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170921 - vv2.1.155
+ - 添加leader-rf映射
+
 ## 20170920 - vv2.1.154
  - 设置fswitch-fsnonewfiles选项
  - copen和lopen添加botright参数
