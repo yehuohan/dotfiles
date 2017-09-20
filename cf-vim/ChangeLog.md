@@ -2,6 +2,10 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170920 - vv2.1.154
+ - 设置fswitch-fsnonewfiles选项
+ - copen和lopen添加botright参数
+
 ## 20170920 - vv2.1.152
  - FindVimgrep搜索函数添加lvimgrep特性
 

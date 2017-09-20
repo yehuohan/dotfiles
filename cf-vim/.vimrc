@@ -810,6 +810,7 @@ endif
 " file switch {{{ c/c++文件切换
     Plug 'derekwyatt/vim-fswitch'
     nnoremap <silent> <leader>fh :FSHere<CR>
+    let g:fsnonewfiles="on"
 " }}}
 
 " AsyncRun {{{ 导步运行程序
@@ -1091,12 +1092,12 @@ endif
     " location-list : 每个窗口对应一个位置列表
     " quickfix      : 整个vim对应一个quickfix
     " quickfix open and close
-    nnoremap <leader>qo :copen<CR>
+    nnoremap <leader>qo :botright copen<CR>
     nnoremap <leader>qc :cclose<CR>
     nnoremap <leader>qj :cnext<CR>
     nnoremap <leader>qk :cprevious<CR>
     " location-list open and close
-    nnoremap <leader>lo :lopen<CR>
+    nnoremap <leader>lo :botright lopen<CR>
     nnoremap <leader>lc :lclose<CR>
     nnoremap <leader>lj :lnext<CR>
     nnoremap <leader>lk :lprevious<CR>
