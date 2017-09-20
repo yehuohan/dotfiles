@@ -2,6 +2,10 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170920 - vv2.1.149
+ - 添加quickhl
+ - 修改InvConcealLevel映射
+
 ## 20170919 - vv2.1.147
  - 添加popset参数
 

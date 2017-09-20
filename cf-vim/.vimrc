@@ -771,6 +771,18 @@ endif
     nnoremap <leader>rs :AsyncStop<CR>
 " }}}
 
+" vim-quickhl {{{ 单词高亮
+    Plug 't9md/vim-quickhl'
+    nmap <leader>hw <Plug>(quickhl-manual-this)
+    xmap <leader>hw <Plug>(quickhl-manual-this)
+    nmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
+    xmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
+    nmap <leader>hm <Plug>(quickhl-cword-toggle)
+    "nmap <leader>ht <Plug>(quickhl-tag-toggle)
+    nmap <leader>hc <Plug>(quickhl-manual-reset)
+    nnoremap <leader>th :QuickhlManualLockWindowToggle<CR>
+" }}}
+
 " splitjoin {{{ 行间连接与分割
     "Plug 'AndrewRadev/splitjoin.vim'
     "nnoremap <leader>gj gJ
@@ -971,7 +983,7 @@ endif
     " 显示不可见字符
     nnoremap <leader>il :set invlist<CR>
     " 映射隐藏字符功能，set conceallevel直接设置没交果
-    nnoremap <leader>ih :call InvConceallevel()<CR>
+    nnoremap <leader>ic :call InvConceallevel()<CR>
     " 更改透明背景
     nnoremap <leader>it :call InvTransParentBackground()<CR>
     " 切换行号类型
