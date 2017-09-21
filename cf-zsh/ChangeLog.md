@@ -1,6 +1,11 @@
 ---
 # cf-zsh-ChangeLog
 
+## 20170921 - vz0.0.6
+ - 添加.gitconfig
+ - 添加.Xmodmap
+ - 添加.zprofile
+
 ## 20170808 - vz0.0.3
  - 添加自启screenfetch
 

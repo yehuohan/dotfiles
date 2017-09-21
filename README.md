@@ -28,7 +28,10 @@
 │   └── mySnippets         : 自定义snippets
 ├── cf-zsh
 │   ├── .zshrc             : zsh配置文件
-│   └── frisk.zsh-theme    : zsh主题文件
+│   ├── .zprofile
+│   ├── frisk.zsh-theme    : zsh主题文件
+│   ├── .gitconfig         : git配置
+│   └── .Xmodmap           : CapsLock与Esc对调配置
 
 ```
 
