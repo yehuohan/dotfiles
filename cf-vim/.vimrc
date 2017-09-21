@@ -193,8 +193,7 @@ endif
 " User Defined functions
 "===============================================================================
 " {{{
-" 隐藏字符显示
-" {{{
+" 隐藏字符显示 " {{{
 function! InvConceallevel()
     if &conceallevel == 0
         set conceallevel=2
@@ -205,8 +204,7 @@ function! InvConceallevel()
 endfunction
 " }}}
 
-" 透明背影控制（需要系统本身支持透明）
-" {{{
+" 透明背影控制（需要系统本身支持透明） " {{{
 let s:inv_transparent_bg_flg = 0
 function! InvTransParentBackground()
     if s:inv_transparent_bg_flg == 1
@@ -219,8 +217,7 @@ function! InvTransParentBackground()
 endfunction
 " }}}
 
-" 切换显示行号
-" {{{
+" 切换显示行号 " {{{
 let s:inv_number_type=1
 function! InvNumberType()
     if s:inv_number_type == 1
@@ -239,8 +236,7 @@ function! InvNumberType()
 endfunction
 " }}}
 
-" 切换显示折叠列
-" {{{
+" 切换显示折叠列 " {{{
 function! InvFoldColumeShow()
     if &foldcolumn == 0
         set foldcolumn=1
@@ -250,8 +246,7 @@ function! InvFoldColumeShow()
 endfunction
 " }}}
 
-" linux-fcitx输入法切换 
-" {{{
+" linux-fcitx输入法切换 " {{{
 function! LinuxFcitx2En()
     if 2 == system("fcitx-remote")
         let l:t = system("fcitx-remote -c")
@@ -264,8 +259,7 @@ function! LinuxFcitx2Zh()
 endfunction
 " }}}
 
-" asd2num切换
-" {{{
+" asd2num切换 " {{{
 let s:asd2num_toggle_flg = 0
 let s:asd2num_map_table={
             \ "a" : "1", "s" : "2", "d" : "3", "f" : "4", "g" : "5",
@@ -286,8 +280,7 @@ function! Asd2numToggle()
 endfunction
 " }}}
 
-" 编译环境函数
-" {{{
+" 编译环境函数 " {{{
 function! F5ComplileFile(argstr)
     let l:ext = expand("%:e")                             " 扩展名
     let l:filename = '"./' . expand('%:t') . '"'          " 文件名，不带路径，带扩展名 
@@ -310,8 +303,7 @@ function! F5ComplileFile(argstr)
 endfunction
 " }}}
 
-" vimgrep搜索
-" {{{
+" vimgrep搜索 " {{{
 let s:findvimgrep_nmaps = ["fi", "fgi", "fI", "fgI",
                          \ "fw", "fgw", "fW", "fgW",
                          \ "Fi", "Fgi", "FI", "FgI",
