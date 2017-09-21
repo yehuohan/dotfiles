@@ -2,6 +2,10 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170921 - vv2.1.159
+ - 添加quickfix和location-list预览函数
+ - 使用fork的quickhl插件
+
 ## 20170921 - vv2.1.157
  - 添加M-d/f映射，用于书签切换
 

@@ -250,30 +250,6 @@ function! InvFoldColumeShow()
 endfunction
 " }}}
 
-" 编译环境函数
-" {{{
-function! F5ComplileFile(argstr)
-    let l:ext = expand("%:e")                             " 扩展名
-    let l:filename = '"./' . expand('%:t') . '"'          " 文件名，不带路径，带扩展名 
-    let l:name = '"./' . expand('%:t:r') . '"'            " 文件名，不带路径，不带扩展名
-    let l:run = "!"
-    if exists(":AsyncRun") == 2
-        let l:run = ":AsyncRun "
-    endif
-
-    " 执行命令
-    if "c" ==? l:ext
-        execute l:run . "gcc " . a:argstr . " -o " . l:name . " " . l:filename . " && " . l:name
-    elseif "cpp" ==? l:ext
-        execute l:run . "g++ -std=c++11 " . a:argstr . " -o " . l:name . " " . l:filename . " && " . l:name
-    elseif "py" ==? l:ext || "pyw" ==? l:ext
-        execute l:run . "python " . l:filename
-    elseif "m" ==? l:ext
-        execute l:run . "matlab -nosplash -nodesktop -r " . l:name[3:-2]
-    endif
-endfunction
-" }}}
-
 " linux-fcitx输入法切换 
 " {{{
 function! LinuxFcitx2En()
@@ -306,6 +282,30 @@ function! Asd2numToggle()
             execute "inoremap " . t[0]. " " . t[1]
         endfor
         let s:asd2num_toggle_flg = 1
+    endif
+endfunction
+" }}}
+
+" 编译环境函数
+" {{{
+function! F5ComplileFile(argstr)
+    let l:ext = expand("%:e")                             " 扩展名
+    let l:filename = '"./' . expand('%:t') . '"'          " 文件名，不带路径，带扩展名 
+    let l:name = '"./' . expand('%:t:r') . '"'            " 文件名，不带路径，不带扩展名
+    let l:run = "!"
+    if exists(":AsyncRun") == 2
+        let l:run = ":AsyncRun "
+    endif
+
+    " 执行命令
+    if "c" ==? l:ext
+        execute l:run . "gcc " . a:argstr . " -o " . l:name . " " . l:filename . " && " . l:name
+    elseif "cpp" ==? l:ext
+        execute l:run . "g++ -std=c++11 " . a:argstr . " -o " . l:name . " " . l:filename . " && " . l:name
+    elseif "py" ==? l:ext || "pyw" ==? l:ext
+        execute l:run . "python " . l:filename
+    elseif "m" ==? l:ext
+        execute l:run . "matlab -nosplash -nodesktop -r " . l:name[3:-2]
     endif
 endfunction
 " }}}
@@ -422,6 +422,26 @@ function! FindVimgrep(type)
     endif
 endfunction
 " }}}
+
+" }}}
+
+" quickfix预览 {{{
+function! PreviewQuickfix()
+    if &filetype ==# "qf"
+        let l:last_winnr = winnr()
+        execute "crewind " . line(".")
+        normal! zz
+        execute "noautocmd " . l:last_winnr . "wincmd w"
+    endif
+endfunction
+function! PreviewLocationList()
+    if &filetype ==# "qf"
+        let l:last_winnr = winnr()
+        execute "lrewind " . line(".")
+        normal! zz
+        execute "noautocmd " . l:last_winnr . "wincmd w"
+    endif
+endfunction
 " }}}
 
 " }}}
@@ -588,7 +608,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:bookmark_save_per_working_dir = 0     " all marks will save to the same one file
     let g:bookmark_show_toggle_warning = 0      " disable warning when delete annotate mark
     let g:bookmark_show_warning = 0             " disable wanring when clearing all marks
-    let g:bookmark_location_list = 1            " use location-list but no quickfix
+    let g:bookmark_location_list = 0            " use location-list or quickfix
 
     nnoremap <leader>mm :BookmarkToggle<CR>
     nnoremap <leader>mi :BookmarkAnnotate<CR>
@@ -827,7 +847,8 @@ endif
 " }}}
 
 " vim-quickhl {{{ 单词高亮
-    Plug 't9md/vim-quickhl'
+    "Plug 't9md/vim-quickhl'
+    Plug 'yehuohan/vim-quickhl'
     nmap <leader>hw <Plug>(quickhl-manual-this)
     xmap <leader>hw <Plug>(quickhl-manual-this)
     nmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
@@ -930,6 +951,7 @@ call plug#end()            " required
                                         " marker : 对文中的标记折叠，默认使用{{{,}}}标记
 
     set backspace=2                     " Insert模式下使用BackSpace删除
+    set hidden                          " 允许在未保存文件时切换buffer
     set nobackup                        " 不生成备份文件
     set autochdir                       " 自动切换当前目录为当前文件所在的目录
     set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
@@ -1106,11 +1128,14 @@ augroup END
     nnoremap <leader>qc :cclose<CR>
     nnoremap <leader>qj :cnext<CR>
     nnoremap <leader>qk :cprevious<CR>
+    nnoremap <leader>qp :call PreviewQuickfix()<CR>
+    nnoremap <M-space> :call PreviewQuickfix()<CR>
     " location-list open and close
     nnoremap <leader>lo :botright lopen<CR>
     nnoremap <leader>lc :lclose<CR>
     nnoremap <leader>lj :lnext<CR>
     nnoremap <leader>lk :lprevious<CR>
+    nnoremap <leader>lp :call PreviewLocationList()<CR>
 " }}}
 
 " window manager{{{
