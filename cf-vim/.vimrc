@@ -978,15 +978,20 @@ endif
 
 " Auto Command 
 " {{{
-    autocmd! BufNewFile * set fileformat=unix
-    autocmd! BufEnter *.tikz set filetype=tex
+augroup VimVimrc
+    "autocmd[!]  [group]  {event}     {pattern}  {nested}  {cmd}
+    "autocmd              BufNewFile  *                    set fileformat=unix
+    autocmd!
+    autocmd BufNewFile * set fileformat=unix
+    autocmd BufEnter *.tikz set filetype=tex
 
-    autocmd! Filetype vim set foldmethod=marker
-    autocmd! Filetype c set foldmethod=syntax
-    autocmd! Filetype cpp set foldmethod=syntax
-    autocmd! Filetype python set foldmethod=indent
+    autocmd Filetype vim set foldmethod=marker
+    autocmd Filetype c set foldmethod=syntax
+    autocmd Filetype cpp set foldmethod=syntax
+    autocmd Filetype python set foldmethod=indent
 
-    autocmd! GuiEnter * set t_vb=                   " 关闭可视闪铃(即闪屏)
+    autocmd GuiEnter * set t_vb=                   " 关闭可视闪铃(即闪屏)
+augroup END
 " }}}
 
 " }}}
