@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170921 - vv2.1.161
+ - 添加scrolloff参数设置
+
 ## 20170921 - vv2.1.160
  - 添加quickhl leader-hc映射
 

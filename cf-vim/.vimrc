@@ -933,7 +933,6 @@ call plug#end()            " required
     set nowrap                          " 默认关闭折行
     set listchars=eol:$,tab:>-,trail:~,space:.
                                         " 不可见字符显示
-    set showcmd                         " 显示寄存器命令，宏调用命令@等
     set autoindent                      " 使用autoindent缩进
     set conceallevel=0                  " 显示markdown等格式中的隐藏字符
     set foldenable                      " 充许折叠
@@ -945,6 +944,8 @@ call plug#end()            " required
                                         " syntax : 用语法高亮来定义折叠
                                         " diff   : 对没有更改的文本进行折叠
                                         " marker : 对文中的标记折叠，默认使用{{{,}}}标记
+    set scrolloff=1                     " 光标上下保留的行数
+    set showcmd                         " 显示寄存器命令，宏调用命令@等
 
     set backspace=2                     " Insert模式下使用BackSpace删除
     set hidden                          " 允许在未保存文件时切换buffer
