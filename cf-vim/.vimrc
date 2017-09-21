@@ -306,11 +306,15 @@ endfunction
 " vimgrep搜索 " {{{
 let s:findvimgrep_nmaps = ["fi", "fgi", "fI", "fgI",
                          \ "fw", "fgw", "fW", "fgW",
+                         \ "fs", "fgs", "fS", "fgS",
                          \ "Fi", "Fgi", "FI", "FgI",
                          \ "Fw", "Fgw", "FW", "FgW",
+                         \ "Fs", "Fgs", "FS", "FgS",
                          \ ]                  
-let s:findvimgrep_vmaps = ["fv", "fgv", "fV", "fgV",
+let s:findvimgrep_vmaps = ["fi", "fgi", "fI", "fgI",
+                         \ "fv", "fgv", "fV", "fgV",
                          \ "fs", "fgs", "fS", "fgS",
+                         \ "Fi", "Fgi", "FI", "FgI",
                          \ "Fv", "Fgv", "FV", "FgV",
                          \ "Fs", "Fgs", "FS", "FgS",
                          \ ]
@@ -344,38 +348,56 @@ endfunction
 " }}}
 
 " FUNCTION: FindVimgrep(type) {{{
-function! FindVimgrep(type)
-    " i : find input    with user's ignorecase setting or smartcase
-    " w : find word     with user's ignorecase setting or smartcase
-    " v : find visual   with user's ignorecase setting or smartcase
+function! FindVimgrep(type, mode)
+    " {{{
+    " Normal Mode: mode='n'
+    " i : find input
+    " w : find word
+    " s : find word     with \< \>
+    "
+    " Visual Mode: mode='v'
+    " i : find input    with selected
+    " v : find visual   with selected 
     " s : find selected with \< \>
-    " I : find input    in case match with force
-    " W : find word     in case match with force
-    " V : find visual   in case match with force
-    " S : find selected in case match with force and \< \>
     "
-    " g : find global with inputing path
+    " LowerCase: [iwvs] for find with user's ignorecase or smartcase setting 
+    " UpperCase: [IWVS] for find in case match
     "
+    " Other:
     " f : find with vimgrep and show in quickfix
     " F : find with lvimgrep and show in location-list
+    " g : find global with inputing path
+    " }}}
 
     let l:string = ""
     let l:files = "%"
+    let l:selected = ""
 
     " get what to vimgrep
-    if a:type =~? 'i' 
-        let l:string = input(" What to find :")
-        if empty(l:string)
-            return
+    if a:mode ==# 'n'
+        if a:type =~? 'i'
+            let l:string = input(" What to find :")
+        elseif a:type =~? '[ws]'
+            let l:string = expand("<cword>")
         endif
-    elseif a:type =~? 'w'
-        let l:string = expand("<cword>")
-    elseif a:type =~? '[vs]'
+    elseif a:mode ==# 'v'
+        " get selected string in visual mode
         let l:reg_var = getreg('0', 1)
         let l:reg_mode = getregtype('0')
         normal! gv"0y
-        let l:string = getreg('0')
+        let l:selected = getreg('0')
         call setreg('0', l:reg_var, l:reg_mode)
+
+        if a:type =~? 'i'
+            let l:string = input(" What to find :", l:selected)
+        elseif a:type =~? '[vs]'
+            let l:string = l:selected
+        endif
+    endif
+
+    " return when nothing get
+    if empty(l:string)
+        return
     endif
 
     " match force
@@ -1204,10 +1226,10 @@ augroup END
 
     " fine with vimgrep
     for item in s:findvimgrep_nmaps
-        execute "nnoremap <leader>" . item ":call FindVimgrep('" . item . "')<CR>"
+        execute "nnoremap <leader>" . item ":call FindVimgrep('" . item . "', 'n')<CR>"
     endfor
     for item in s:findvimgrep_vmaps
-        execute "vnoremap <leader>" . item ":call FindVimgrep('" . item . "')<CR>"
+        execute "vnoremap <leader>" . item ":call FindVimgrep('" . item . "', 'v')<CR>"
     endfor
 " }}}
 
