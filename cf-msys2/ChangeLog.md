@@ -1,6 +1,10 @@
 ---
 # cf-msys2-ChangeLog
 
+## 20170921 - vm0.0.4
+ - 添加.gitconfig
+ - 添加.zshrc
+
 ## 20170912 - vm0.0.2
  - 修改字体配置
 

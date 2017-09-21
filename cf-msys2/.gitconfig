@@ -1,0 +1,8 @@
+[user]
+	name = yehuohan
+	email = 550034086@qq.com
+[i18n]
+	commitEncoding = utf-8
+	logOutputEncoding = gbk
+[core]
+	quotepath = false

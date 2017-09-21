@@ -13,11 +13,13 @@
 │   ├── i3
 │   │   ├── config         : i3wm配配置文件
 │   │   ├── conkyrc        : conky配置文件，代替i3status
-│   │   └── conky.sh       : cokky配置脚本
+│   │   └── conky.sh       : cokky配置sh脚本
 │   ├── i3status
 │   │   └── config         : i3staus配置文件
-│   └── ToggleTouchPad.py  : 触触板控制
+│   └── ToggleTouchPad.py  : 触触板控制py脚本
 ├── cf-msys2
+│   ├── .zshrc             : Msys2中的zsh配置文件
+│   ├── .gitconfig         : Msys2中的git配置文件
 │   └── .minttyrc          : Msys2模拟终端mintty配置文件
 ├── cf-vim
 │   ├── .vimrc             : vim配置文件
