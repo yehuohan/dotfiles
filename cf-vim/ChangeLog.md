@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170921 - vv2.1.160
+ - 添加quickhl leader-hc映射
+
 ## 20170921 - vv2.1.159
  - 添加quickfix和location-list预览函数
  - 使用fork的quickhl插件

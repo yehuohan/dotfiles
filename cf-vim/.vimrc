@@ -855,7 +855,11 @@ endif
     xmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
     nmap <leader>hm <Plug>(quickhl-cword-toggle)
     "nmap <leader>ht <Plug>(quickhl-tag-toggle)
-    nmap <leader>hc <Plug>(quickhl-manual-reset)
+    "nmap <leader>hc <Plug>(quickhl-manual-clear) 
+    "vmap <leader>hc <Plug>(quickhl-manual-clear) 
+    nnoremap <leader>hc :call quickhl#manual#clear_this('n')<CR>
+    vnoremap <leader>hc :call quickhl#manual#clear_this('v')<CR>
+    nmap <leader>hr <Plug>(quickhl-manual-reset)
 
     nnoremap <leader>th :QuickhlManualLockWindowToggle<CR>
 " }}}
