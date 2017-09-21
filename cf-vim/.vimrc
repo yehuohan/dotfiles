@@ -171,6 +171,8 @@ set ttimeoutlen=70                  " 键码超时时间为70ms
 " 键码设置 {{{
 if !IsNVim()
     set encoding=utf-8  " 内部内部需要使用utf-8编码
+    set <M-d>=d
+    set <M-f>=f
     set <M-h>=h
     set <M-i>=i
     set <M-j>=j
@@ -593,6 +595,8 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nnoremap <leader>ma :BookmarkShowAll<CR>
     nnoremap <leader>mj :BookmarkNext<CR>
     nnoremap <leader>mk :BookmarkPrev<CR>
+    nnoremap <M-d> :BookmarkPrev<CR>
+    nnoremap <M-f> :BookmarkNext<CR>
     nnoremap <leader>mc :BookmarkClear<CR>
     " nmap <leader>mx <Plug>BookmarkClearAll
     " nmap <leader>ml <Plug>BookmarkMoveToLine
