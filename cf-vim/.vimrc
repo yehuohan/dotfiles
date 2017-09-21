@@ -1058,12 +1058,12 @@ augroup END
     nnoremap <leader>P "0P
 
     " 寄存器快速复制与粘贴
-    let s:table_reg_map = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
-                         \ 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 
-                         \ 'u', 'v', 'w', 'x', 'y', 'z']
-    for t in s:table_reg_map
+    let s:lower_chars = split("q w e r t y u i o p a s d f g h j k l z x c v b n m", " ")
+    let s:upper_chars = split("Q W E R T Y U I O P A S D F G H J K L Z X C V B N M", " ")
+    for t in s:lower_chars
         execute "vnoremap <leader>'" . t . "    \"" . t . "y"
         execute "nnoremap <leader>'" . t . "    \"" . t . "p"
+        execute "nnoremap <leader>'" . toupper(t) . "    \"" . t . "P"
     endfor
 " }}}
 
