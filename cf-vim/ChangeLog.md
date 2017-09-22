@@ -2,6 +2,11 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170922 - vv2.1.165
+ - 显示airline-tabline
+ - 使用powerline font
+ - 修改;与:的映射
+
 ## 20170921 - vv2.1.162
  - 完善FindVimgrep函数
 

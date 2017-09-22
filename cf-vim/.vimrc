@@ -131,6 +131,7 @@ let mapleader="\<space>"            " 使用Space作为leader
                                     " Space只在Normal或Command或Visual模式下map，不适合在Insert模式下map
 " 特殊键
 nnoremap ; :
+nnoremap : ;
 vnoremap ; :
 
 " Path 
@@ -654,11 +655,14 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 " air-line {{{ 状态栏
     Plug 'vim-airline/vim-airline'
     set laststatus=2
+    let g:airline_powerline_fonts = 1
+    let g:airline#extensions#tabline#enabled = 1
+
     let g:airline#extensions#ctrlspace#enabled = 1      " support for ctrlspace integration
     let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()" 
-    let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
-    let g:airline#extensions#ycm#error_symbol = 'E:'
-    let g:airline#extensions#ycm#warning_symbol = 'W:'
+    "let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
+    "let g:airline#extensions#ycm#error_symbol = 'E:'
+    "let g:airline#extensions#ycm#warning_symbol = 'W:'
 " }}}
 
 " rainbow {{{ 彩色括号
@@ -967,6 +971,7 @@ call plug#end()            " required
                                         " diff   : 对没有更改的文本进行折叠
                                         " marker : 对文中的标记折叠，默认使用{{{,}}}标记
     set scrolloff=1                     " 光标上下保留的行数
+    set laststatus=2                    " 一直显示状态栏
     set showcmd                         " 显示寄存器命令，宏调用命令@等
 
     set backspace=2                     " Insert模式下使用BackSpace删除
@@ -1012,10 +1017,12 @@ if IsGui()
         set lines=25
         set columns=100
         set renderoptions=type:directx
-        "set guifont=cousine:h12:cANSI
-        set guifont=Consolas:h13:cANSI
-        set guifontwide=Yahei_Mono:h13:cGB2312
-        map <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
+        "set guifont=Consolas:h13:cANSI
+        set guifont=Powerline_Consolas:h13:cANSI
+        set linespace=-1            " required by Powerline_Consolas
+        "set guifont=DejaVu_Sans_Mono_for_Powerline:h11
+        "set guifontwide=Yahei_Mono:h13:cGB2312
+        noremap <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
                                     " gvim全屏快捷键
     endif
 endif
