@@ -6,7 +6,7 @@
 # this file must be in "LinuxConfigs/"
 
 if [ `uname -o` != "Msys" ]; then
-    echo "Is Not Msys."
+    echo "Is Not in Msys."
     exit
 fi
 

@@ -4,6 +4,15 @@
 # cd to LinuxConfigs before execute this file.
 # this file must be in "~/LinuxConfigs/"
 
+if [ `uname` != "Linux" ]; then
+    echo 'Is Not in Linux.'
+    exit
+fi
+
+if [[ $(cd `dirname "$0"`;pwd) != ~/LinuxConfigs ]]; then
+    echo 'Is Not in ~/LinuxConfigs'
+    exit
+fi
 
 # cf-vim
 cp ../.vimrc ./cf-vim/
