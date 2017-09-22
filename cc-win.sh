@@ -5,8 +5,16 @@
 # cd to LinuxConfigs before execute this file.
 # this file must be in "LinuxConfigs/"
 
+if [ `uname -o` != "Msys" ]; then
+    echo "Is Not Msys."
+    exit
+fi
 
 # cf-vim
+if [ ! -d "../Vim" ]; then
+    echo "No Vim."
+    exit
+fi
 cp ../Vim/_vimrc ./cf-vim/.vimrc
 cp ../Vim/vimfiles/.ycm_extra_conf.py ./cf-vim/
 cp -r ../Vim/vimfiles/mySnippets/ ./cf-vim/
