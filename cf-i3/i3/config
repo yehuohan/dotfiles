@@ -298,7 +298,7 @@ bindsym $mod+b border toggle
 #===============================================================================
 #{{{
 # start a terminal
-bindsym $mod+Return exec xfce4-terminal
+bindsym $mod+Return exec xterm
 
 # file manager
 bindsym $mod+e exec thunar

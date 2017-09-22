@@ -1,6 +1,9 @@
 
 # i3
 
+## 20170922 - vi0.2.13
+ - 使用xterm作为默认终端
+
 ## 20170918 - vi0.2.12
  - 添加一个i3 release
  - 添加移动container到相邻workspace的按键映射
