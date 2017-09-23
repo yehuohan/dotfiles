@@ -1039,9 +1039,8 @@ if IsGui()
         set columns=100
         "set guifont=Ubuntu\ Mono\ 13
         "set guifont=DejaVu\ Sans\ Mono\ 13
-        set guifont=DejaVuSansMonoForPowerline\ Nerd\ Font\ Book\ 13
         set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 13
-        set linespace=-2            " required by DejaVuSansMonoForPowerline
+        set linespace=-2            " required by DejaVuSansMono for Powerline
     elseif IsWin()
         set lines=25
         set columns=100
