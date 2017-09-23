@@ -1,6 +1,9 @@
 ---
 # cf-msys2-ChangeLog
 
+## 20170921 - vm0.1.5
+ - 使用Dejavu Powerline字体
+
 ## 20170921 - vm0.0.4
  - 添加.gitconfig
  - 添加.zshrc
