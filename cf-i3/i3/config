@@ -271,23 +271,18 @@ bindsym $mod+n focus output right
 
 # 其它设置
 # {{{
-# change container layout (stacked, tabbed, toggle split)
-#bindsym $mod+u layout stacking
-bindsym $mod+y layout tabbed
-bindsym $mod+u layout toggle split
+# change container layout
+bindsym $mod+y layout toggle all
+
+# split in horizontal/vertical orientation
+bindsym $mod+u split v
+bindsym $mod+mod1+u split h
 
 # toggle the border style
 bindsym $mod+b border toggle
 
-
 # Use Mouse+$mod to drag floating windows to their wanted position
 #floating_modifier $mod
-
-# split in horizontal orientation
-#bindsym $mod+h split h
-
-# split in vertical orientation
-#bindsym $mod+v split v
 
 # }}}
 
