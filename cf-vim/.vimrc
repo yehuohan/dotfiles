@@ -674,7 +674,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:airline_right_sep = "\uE0BA"
     let g:airline_right_alt_sep = "\uE0BB"
 
-    let g:airline#extensions#ctrlspace#enabled = 1      " support for ctrlspace integration
+    let g:airline#extensions#ctrlspace#enabled = 1       " support for ctrlspace integration
     let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()" 
     "let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
     "let g:airline#extensions#ycm#error_symbol = 'E:'

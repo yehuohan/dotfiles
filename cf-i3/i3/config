@@ -273,6 +273,7 @@ bindsym $mod+n focus output right
 # {{{
 # change container layout
 bindsym $mod+y layout toggle all
+bindsym $mod+mod1+y layout toggle split
 
 # split in horizontal/vertical orientation
 bindsym $mod+u split v
