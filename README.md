@@ -22,6 +22,9 @@
 │   ├── .zshrc             : Msys2中的zsh配置
 │   ├── .gitconfig         : Msys2中的git配置
 │   └── .minttyrc          : Msys2模拟终端mintty配置
+├── cf-tmux
+│   ├── .tmux.conf         : tmux配置
+│   └── .tmux-status.conf  : tmux状态栏配置
 ├── cf-vim
 │   ├── .vimrc             : vim配置
 │   ├── .ycm_extra_conf.py : vim-ycm配置
