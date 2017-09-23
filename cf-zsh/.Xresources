@@ -54,8 +54,8 @@ xterm*utf8Title:true
 !===============================================================================
 ! key
 !===============================================================================
-xterm*eightBitInput: false
-xterm*altSendsEscape: true
+!xterm*eightBitInput: false
+!xterm*altSendsEscape: true
 
 ! xterm剪切板
 xterm*selectToClipboard: true
