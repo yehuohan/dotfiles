@@ -1,6 +1,10 @@
-
+2
 ---
 # cf-vim-ChangeLog
+
+## 20170923 - vv2.1.167
+ - Linux下使用powerline字体
+ - 修改VimPluginPath获取方式
 
 ## 20170922 - vv2.1.165
  - 显示airline-tabline

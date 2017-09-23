@@ -136,12 +136,13 @@ vnoremap ; :
 
 " Path 
 " {{{
+    let s:home_path = fnamemodify(resolve(expand("<sfile>:p")), ":h")
     " vim插件路径统一
     if IsLinux()
-        " root用户和普通用户共用vimrc
-        let $VimPluginPath="/home/yehuohanxing/.vim"
+        " 链接root-vimrc到user's vimrc
+        let $VimPluginPath=s:home_path . "/.vim"
     elseif IsWin()
-        let $VimPluginPath="C:/MyApps/Vim/vimfiles"
+        let $VimPluginPath=s:home_path . "\\vimfiles"
         " windows下将HOME设置VIM的安装路径
         let $HOME=$VIM 
         " 未打开文件时，切换到HOME目录
@@ -1012,7 +1013,9 @@ if IsGui()
         set lines=20
         set columns=100
         "set guifont=Ubuntu\ Mono\ 13
-        set guifont=DejaVu\ Sans\ Mono\ 13
+        "set guifont=DejaVu\ Sans\ Mono\ 13
+        set guifont=DejaVuSansMonoForPowerline\ Nerd\ Font\ Book\ 13
+        set linespace=-1            " required by DejaVuSansMonoForPowerline
     elseif IsWin()
         set lines=25
         set columns=100
