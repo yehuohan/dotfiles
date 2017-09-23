@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170923 - vv2.1.172
+ - 修改windows gvim字体
+
 ## 20170923 - vv2.1.171
  - 添加ariline-theme
  - 添加tmuxline

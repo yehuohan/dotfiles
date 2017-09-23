@@ -1039,7 +1039,6 @@ if IsGui()
         set columns=100
         "set guifont=Ubuntu\ Mono\ 13
         "set guifont=DejaVu\ Sans\ Mono\ 13
-        set guifont=DejaVuSansMonoForPowerline\ Nerd\ Font\ Book\ 13
         set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 13
         set linespace=-2            " required by DejaVuSansMonoForPowerline
     elseif IsWin()
@@ -1047,9 +1046,9 @@ if IsGui()
         set columns=100
         set renderoptions=type:directx
         "set guifont=Consolas:h13:cANSI
-        set guifont=Powerline_Consolas:h13:cANSI
-        set linespace=-1            " required by Powerline_Consolas
-        "set guifont=DejaVu_Sans_Mono_for_Powerline:h11
+        "set guifont=Powerline_Consolas:h13:cANSI
+        set guifont=DejaVu_Sans_Mono_for_Powerline:h11.5
+        set linespace=0            " required by PowerlineFont
         "set guifontwide=Yahei_Mono:h13:cGB2312
         noremap <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
                                     " gvim全屏快捷键
