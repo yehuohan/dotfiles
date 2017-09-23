@@ -674,16 +674,16 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:airline_right_sep = "\uE0BA"
     let g:airline_right_alt_sep = "\uE0BB"
 
-if IsLinux()
-    Plug 'edkolev/tmuxline.vim'
-    let g:airline#extensions#tmuxline#enalbed = 1
-    let g:airline#extensions#tmuxline#snapshot_file = "~/.tmux-status.conf"
-endif
     let g:airline#extensions#ctrlspace#enabled = 1      " support for ctrlspace integration
     let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()" 
     "let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
     "let g:airline#extensions#ycm#error_symbol = 'E:'
     "let g:airline#extensions#ycm#warning_symbol = 'W:'
+if IsLinux()
+    "Plug 'edkolev/tmuxline.vim'
+    "let g:airline#extensions#tmuxline#enalbed = 1
+    "let g:airline#extensions#tmuxline#snapshot_file = "~/.tmux-status.conf"
+endif
 " }}}
 
 " rainbow {{{ 彩色括号
