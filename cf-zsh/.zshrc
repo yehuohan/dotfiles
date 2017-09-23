@@ -113,17 +113,6 @@ alias -s png=ristretto
 alias -s jpg=ristretto
 alias -s gif=ristretto
 
-# user path
-export PATH="$PATH:$HOME/MyApps/"
-export PATH="$PATH:$HOME/MyApps/Qt591/5.9.1/gcc_64/bin"
-export PATH="$PATH:$HOME/MyApps/Qt591/Tools/QtCreator/bin"
-export PATH="$PATH:$HOME/MyApps/Qt570/5.7/gcc_64/bin"
-export PATH="$PATH:$HOME/MyApps/Qt570/Tools/QtCreator/bin"
-
-export PATH="$PATH:$HOME/MyApps/bochs268/bin"
-export PATH="$PATH:$HOME/MyApps/nasm212/bin"
-export PATH="$PATH:$HOME/MyApps/node6111/bin"
-
 # auto program
 clear
 screenfetch

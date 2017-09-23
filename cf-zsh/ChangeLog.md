@@ -1,6 +1,11 @@
 ---
 # cf-zsh-ChangeLog
 
+## 20170923 - vz0.1.9
+ - 添加.Xresources
+ - 完善.zprofile和.zshrc
+ - 添加.xinitrc
+
 ## 20170921 - vz0.0.6
  - 添加.gitconfig
  - 添加.Xmodmap
