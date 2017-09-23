@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170923 - vv2.1.169
+ - 修改FindVimgrep，不区分大小写补全路径
+
 ## 20170923 - vv2.1.168
  - 修改airline符号
 

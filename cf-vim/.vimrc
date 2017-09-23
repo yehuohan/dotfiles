@@ -336,8 +336,12 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
         let l:arglead_glob = l:arglead_list[-1]
     endif
 
-    " glob hidden and not hidden files
+    " glob non-hidden and hidden files(but no . and ..) with ignorecase 
+    set wildignorecase
+    set wildignore+=.,..
     let l:files_list = split(glob(l:arglead_glob . "*") . "\n" . glob(l:arglead_glob . "\.[^.]*"), "\n")
+    set wildignore-=.,..
+
     if len(l:arglead_list) == 1
         let l:complete = l:files_list
     else
@@ -423,6 +427,7 @@ function! FindVimgrep(type, mode)
     " vimgrep or lvimgrep
     if a:type =~# 'f'
         silent! execute "vimgrep /" . l:string . "/gj " . l:files
+        echo "Finding..."
         if empty(getqflist())
             echo "No match: " . l:string
         else
@@ -430,6 +435,7 @@ function! FindVimgrep(type, mode)
         endif
     elseif a:type =~# 'F'
         silent! execute "lvimgrep /" . l:string . "/gj " . l:files
+        echo "Finding..."
         if empty(getloclist(winnr()))
             echo "No match: " . l:string
         else
