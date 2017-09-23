@@ -474,8 +474,12 @@ endfunction
 "===============================================================================
 " {{{
 call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where install plugins
+    Plug 'yehuohan/popset'
+call plug#end()            " required
+" }}}
 
-" user plugins 
+" {{{
+call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where install plugins
 
 " 基本编辑类 
 " {{{
@@ -661,13 +665,20 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " air-line {{{ 状态栏
     Plug 'vim-airline/vim-airline'
+    Plug 'vim-airline/vim-airline-themes'
     let g:airline_powerline_fonts = 1
     let g:airline#extensions#tabline#enabled = 1
+    let g:airline_theme='cool'
     let g:airline_left_sep = "\uE0B0"
     let g:airline_left_alt_sep = '\uE0B1'
     let g:airline_right_sep = "\uE0BA"
     let g:airline_right_alt_sep = "\uE0BB"
 
+if IsLinux()
+    Plug 'edkolev/tmuxline.vim'
+    let g:airline#extensions#tmuxline#enalbed = 1
+    let g:airline#extensions#tmuxline#snapshot_file = "~/.tmux-status.conf"
+endif
     let g:airline#extensions#ctrlspace#enabled = 1      " support for ctrlspace integration
     let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()" 
     "let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
@@ -710,7 +721,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 " }}}
 
 " Pop Selection {{{ 弹出选项
-    Plug 'yehuohan/popset'
+    "Plug 'yehuohan/popset'
     highlight link PopsetSelected Search
     let g:Popset_CompleteAll = 0
     let g:Popset_SelectionData = [
@@ -733,6 +744,12 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
             \ "lst" : ["gruvbox"],
             \ "dic" : {"gruvbox" : "第三方主题"},
             \ "cmd" : "",
+        \},
+        \{
+            \ "opt" : ["AirlineTheme"],
+            \ "lst" : popset#data#GetFileList($VimPluginPath.'/bundle/vim-airline-themes/autoload/airline/themes/*.vim'),
+            \ "dic" : {},
+            \ "cmd" : "popset#data#SetExecute",
         \}]
     " set option with PSet
     nnoremap <leader>so :PSet 
@@ -945,7 +962,6 @@ endif
 " }}}
 
 call plug#end()            " required
-
 " }}}
 
 

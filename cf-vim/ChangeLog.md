@@ -2,6 +2,10 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170923 - vv2.1.171
+ - 添加ariline-theme
+ - 添加tmuxline
+
 ## 20170923 - vv2.1.169
  - 修改FindVimgrep，不区分大小写补全路径
 
