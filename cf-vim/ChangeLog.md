@@ -1,6 +1,9 @@
-2
+
 ---
 # cf-vim-ChangeLog
+
+## 20170923 - vv2.1.168
+ - 修改airline符号
 
 ## 20170923 - vv2.1.167
  - Linux下使用powerline字体

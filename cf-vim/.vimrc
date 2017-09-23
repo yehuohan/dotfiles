@@ -655,9 +655,12 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " air-line {{{ 状态栏
     Plug 'vim-airline/vim-airline'
-    set laststatus=2
     let g:airline_powerline_fonts = 1
     let g:airline#extensions#tabline#enabled = 1
+    let g:airline_left_sep = "\uE0B0"
+    let g:airline_left_alt_sep = '\uE0B1'
+    let g:airline_right_sep = "\uE0BA"
+    let g:airline_right_alt_sep = "\uE0BB"
 
     let g:airline#extensions#ctrlspace#enabled = 1      " support for ctrlspace integration
     let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()" 
@@ -1015,7 +1018,7 @@ if IsGui()
         "set guifont=Ubuntu\ Mono\ 13
         "set guifont=DejaVu\ Sans\ Mono\ 13
         set guifont=DejaVuSansMonoForPowerline\ Nerd\ Font\ Book\ 13
-        set linespace=-1            " required by DejaVuSansMonoForPowerline
+        set linespace=-2            " required by DejaVuSansMonoForPowerline
     elseif IsWin()
         set lines=25
         set columns=100
