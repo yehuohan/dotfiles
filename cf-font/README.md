@@ -1,7 +1,7 @@
 
 
 ## Consolas For Powerline
- - **Version :** based on consolas v5.33
+ - **Version :** based on [consolas v5.33](https://en.wikipedia.org/wiki/Consolas)
  - **Characters :**
 
 | Codepoint  | Character                |
