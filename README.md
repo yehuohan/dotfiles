@@ -38,6 +38,7 @@
 │   ├── .Xresources        : xterm配置
 │   ├── .gitconfig         : git配置
 │   └── .xinitrc           : xorg初始化配置(不使用登录管理器时使用)
+├── cf-font                : Consolas For Powerline Font
 
 ```
 

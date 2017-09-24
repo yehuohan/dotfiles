@@ -108,7 +108,7 @@
 
 " gui or term 
 " {{{
-    silent function! IsGui()
+    silent function! IsGvim()
         return has("gui_running")
     endfunction
     function! IsTermType(tt)
@@ -448,20 +448,23 @@ endfunction
 " }}}
 
 " quickfix预览 {{{
-function! PreviewQuickfix()
+function! PreviewQuickfixLine()
+    " location-list : 每个窗口对应一个位置列表
+    " quickfix      : 整个vim对应一个quickfix
     if &filetype ==# "qf"
         let l:last_winnr = winnr()
-        execute "crewind " . line(".")
-        normal! zz
-        execute "noautocmd " . l:last_winnr . "wincmd w"
-    endif
-endfunction
-function! PreviewLocationList()
-    if &filetype ==# "qf"
-        let l:last_winnr = winnr()
-        execute "lrewind " . line(".")
-        normal! zz
-        execute "noautocmd " . l:last_winnr . "wincmd w"
+        let l:dict = getwininfo(win_getid())
+        if len(l:dict) > 0
+            if get(l:dict[0], "quickfix", 0) && !get(l:dict[0], "loclist", 0)
+                execute "crewind " . line(".")
+            elseif get(l:dict[0], "quickfix", 0) && get(l:dict[0], "loclist", 0)
+                execute "lrewind " . line(".")
+            else
+                return
+            endif
+            normal! zz
+            execute "noautocmd " . l:last_winnr . "wincmd w"
+        endif
     endif
 endfunction
 " }}}
@@ -472,12 +475,6 @@ endfunction
 "===============================================================================
 " Plug and Settings
 "===============================================================================
-" {{{
-call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where install plugins
-    Plug 'yehuohan/popset'
-call plug#end()            " required
-" }}}
-
 " {{{
 call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where install plugins
 
@@ -669,14 +666,19 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:airline_powerline_fonts = 1
     let g:airline#extensions#tabline#enabled = 1
     let g:airline_theme='cool'
-    let g:airline_left_sep = "\uE0B0"
-    let g:airline_left_alt_sep = "\uE0B1"
-    let g:airline_right_sep = "\uE0BA"
-    let g:airline_right_alt_sep = "\uE0BB"
+    "                   "
+    let g:airline_left_sep = ""
+    let g:airline_left_alt_sep = ""
+    let g:airline_right_sep = ""
+    let g:airline_right_alt_sep = ""
+    if !exists('g:airline_symbols')
+        let g:airline_symbols = {}
+    endif
+    let g:airline_symbols.linenr = '☰'
 
     let g:airline#extensions#ctrlspace#enabled = 1       " support for ctrlspace integration
     let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()" 
-    "let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
+    "let g:airline#extensions#ycm#enabled = 0            " support for YCM integration
     "let g:airline#extensions#ycm#error_symbol = 'E:'
     "let g:airline#extensions#ycm#warning_symbol = 'W:'
 if IsLinux()
@@ -721,7 +723,7 @@ endif
 " }}}
 
 " Pop Selection {{{ 弹出选项
-    "Plug 'yehuohan/popset'
+    Plug 'yehuohan/popset'
     highlight link PopsetSelected Search
     let g:Popset_CompleteAll = 0
     let g:Popset_SelectionData = [
@@ -744,13 +746,13 @@ endif
             \ "lst" : ["gruvbox"],
             \ "dic" : {"gruvbox" : "第三方主题"},
             \ "cmd" : "",
-        \},
-        \{
-            \ "opt" : ["AirlineTheme"],
-            \ "lst" : popset#data#GetFileList($VimPluginPath.'/bundle/vim-airline-themes/autoload/airline/themes/*.vim'),
-            \ "dic" : {},
-            \ "cmd" : "popset#data#SetExecute",
-        \}]
+        \},]
+        " \{
+        "     \ "opt" : ["AirlineTheme"],
+        "     \ "lst" : popset#data#GetFileList($VimPluginPath.'/bundle/vim-airline-themes/autoload/airline/themes/*.vim'),
+        "     \ "dic" : {},
+        "     \ "cmd" : "popset#data#SetExecute",
+        " \}]
     " set option with PSet
     nnoremap <leader>so :PSet 
     nnoremap <leader>sa :PSet popset<CR>
@@ -1026,7 +1028,7 @@ call plug#end()            " required
 
 " Gui
 " {{{
-if IsGui()
+if IsGvim()
     set guioptions-=m               " 隐藏菜单栏
     set guioptions-=T               " 隐藏工具栏
     set guioptions-=L               " 隐藏左侧滚动条
@@ -1046,10 +1048,9 @@ if IsGui()
         set columns=100
         set renderoptions=type:directx
         "set guifont=Consolas:h13:cANSI
-        set guifont=Powerline_Consolas:h13:cANSI
-        set linespace=-1            " required by Powerline_Consolas
-        "set guifont=DejaVu_Sans_Mono_for_Powerline:h11
-        "set guifontwide=Yahei_Mono:h13:cGB2312
+        set guifont=Consolas_For_Powerline:h13:cANSI
+        set linespace=0            " required by PowerlineFont
+        set guifontwide=Microsoft_YaHei_Mono:h12:cGB2312
         noremap <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
                                     " gvim全屏快捷键
     endif
@@ -1175,21 +1176,19 @@ augroup END
     nnoremap <leader>bn :bn<CR>
     nnoremap <leader>bp :bp<CR>
     nnoremap <leader>bl :b#<CR>
-    " location-list : 每个窗口对应一个位置列表
-    " quickfix      : 整个vim对应一个quickfix
+
     " quickfix open and close
     nnoremap <leader>qo :botright copen<CR>
     nnoremap <leader>qc :cclose<CR>
     nnoremap <leader>qj :cnext<CR>
     nnoremap <leader>qk :cprevious<CR>
-    nnoremap <leader>qp :call PreviewQuickfix()<CR>
-    nnoremap <M-space> :call PreviewQuickfix()<CR>
     " location-list open and close
     nnoremap <leader>lo :botright lopen<CR>
     nnoremap <leader>lc :lclose<CR>
     nnoremap <leader>lj :lnext<CR>
     nnoremap <leader>lk :lprevious<CR>
-    nnoremap <leader>lp :call PreviewLocationList()<CR>
+    " preview quickfix or locallist
+    nnoremap <M-space> :call PreviewQuickfixLine()<CR>
 " }}}
 
 " window manager{{{

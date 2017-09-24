@@ -1,8 +1,8 @@
 BoldAsFont=yes
 Locale=C
 Charset=UTF-8
-Font=Courier 10 Pitch
-FontHeight=12
+Font=DejaVu Sans Mono for Powerline
+FontHeight=11
 CursorType=block
 BackgroundColour=36,37,38
 Transparency=low
