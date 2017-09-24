@@ -108,7 +108,7 @@
 
 " gui or term 
 " {{{
-    silent function! IsGui()
+    silent function! IsGvim()
         return has("gui_running")
     endfunction
     function! IsTermType(tt)
@@ -448,20 +448,23 @@ endfunction
 " }}}
 
 " quickfix预览 {{{
-function! PreviewQuickfix()
+function! PreviewQuickfixLine()
+    " location-list : 每个窗口对应一个位置列表
+    " quickfix      : 整个vim对应一个quickfix
     if &filetype ==# "qf"
         let l:last_winnr = winnr()
-        execute "crewind " . line(".")
-        normal! zz
-        execute "noautocmd " . l:last_winnr . "wincmd w"
-    endif
-endfunction
-function! PreviewLocationList()
-    if &filetype ==# "qf"
-        let l:last_winnr = winnr()
-        execute "lrewind " . line(".")
-        normal! zz
-        execute "noautocmd " . l:last_winnr . "wincmd w"
+        let l:dict = getwininfo(win_getid())
+        if len(l:dict) > 0
+            if get(l:dict[0], "quickfix", 0) && !get(l:dict[0], "loclist", 0)
+                execute "crewind " . line(".")
+            elseif get(l:dict[0], "quickfix", 0) && get(l:dict[0], "loclist", 0)
+                execute "lrewind " . line(".")
+            else
+                return
+            endif
+            normal! zz
+            execute "noautocmd " . l:last_winnr . "wincmd w"
+        endif
     endif
 endfunction
 " }}}
@@ -1025,7 +1028,7 @@ call plug#end()            " required
 
 " Gui
 " {{{
-if IsGui()
+if IsGvim()
     set guioptions-=m               " 隐藏菜单栏
     set guioptions-=T               " 隐藏工具栏
     set guioptions-=L               " 隐藏左侧滚动条
@@ -1173,21 +1176,19 @@ augroup END
     nnoremap <leader>bn :bn<CR>
     nnoremap <leader>bp :bp<CR>
     nnoremap <leader>bl :b#<CR>
-    " location-list : 每个窗口对应一个位置列表
-    " quickfix      : 整个vim对应一个quickfix
+
     " quickfix open and close
     nnoremap <leader>qo :botright copen<CR>
     nnoremap <leader>qc :cclose<CR>
     nnoremap <leader>qj :cnext<CR>
     nnoremap <leader>qk :cprevious<CR>
-    nnoremap <leader>qp :call PreviewQuickfix()<CR>
-    nnoremap <M-space> :call PreviewQuickfix()<CR>
     " location-list open and close
     nnoremap <leader>lo :botright lopen<CR>
     nnoremap <leader>lc :lclose<CR>
     nnoremap <leader>lj :lnext<CR>
     nnoremap <leader>lk :lprevious<CR>
-    nnoremap <leader>lp :call PreviewLocationList()<CR>
+    " preview quickfix or locallist
+    nnoremap <M-space> :call PreviewQuickfixLine()<CR>
 " }}}
 
 " window manager{{{

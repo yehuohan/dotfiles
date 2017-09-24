@@ -2,7 +2,10 @@
 ---
 # cf-vim-ChangeLog
 
-## 20170923 - vv2.1.173
+## 20170924 - vv2.1.174
+ - 修改Quickfix和Local-list预览函数
+
+## 20170924 - vv2.1.173
  - 完善airline设置，使用consolas for powerline字体
 
 ## 20170923 - vv2.1.172
