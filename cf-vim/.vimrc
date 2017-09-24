@@ -1047,7 +1047,7 @@ if IsGui()
         "set guifont=Consolas:h13:cANSI
         set guifont=Consolas_For_Powerline:h13:cANSI
         set linespace=0            " required by PowerlineFont
-        "set guifontwide=Yahei_Mono:h13:cGB2312
+        set guifontwide=Microsoft_YaHei_Mono:h12:cGB2312
         noremap <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
                                     " gvim全屏快捷键
     endif
