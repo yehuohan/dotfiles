@@ -33,7 +33,7 @@ import os
 import ycm_core
 
 
-# ycm_extra_conf.py for c++
+# global ycm_extra_conf.py for c/c++
 
 # User defined path
 WIN_GW_C = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include/'
@@ -66,9 +66,10 @@ flags = [
 
 # For a C project, you would set this to 'c' instead of 'c++'.
 '-x',
+#'c',
 'c++',
 
-# User Defined
+# User's Defined flags
 # search order : "-I >= -isystem >= std"
 '-I',
 '.',
@@ -112,14 +113,16 @@ WIN_GW_CPP + 'x86_64-w64-mingw32',
 WIN_GW_CPP + 'x86_64-w64-mingw32/bits',
 
 '-isystem',
+WIN_QT,
+'-isystem',
 WIN_QT + 'QtCore',
 '-isystem',
 WIN_QT + 'QtGui',
 '-isystem',
 WIN_QT + 'QtWidgets',
-'-isystem',
-WIN_QT + 'QtSerialBus',
 ]
+
+
 
 
 # Set this to the absolute path to the folder (NOT the file!) containing the
