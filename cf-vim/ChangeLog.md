@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170924 - vv2.1.175
+ - 更新ycm_extra_conf
+
 ## 20170924 - vv2.1.174
  - 修改Quickfix和Local-list预览函数
 

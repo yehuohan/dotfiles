@@ -83,10 +83,10 @@ flags = [
 '-isystem',
 '/usr/include/c++/7.1.1/x86_64-pc-linux-gnu/bits'
 
-#  '-isystem',
-#  WIN_GW_C,
-#  '-isystem',
-#  WIN_GW_C + 'ssp',
+'-isystem',
+WIN_GW_C,
+'-isystem',
+WIN_GW_C + 'ssp',
 
 '-isystem',
 WIN_GW_CPP,
