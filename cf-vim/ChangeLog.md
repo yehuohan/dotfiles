@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170923 - vv2.1.173
+ - 完善airline设置，使用consolas for powerline字体
+
 ## 20170923 - vv2.1.172
  - 修改windows gvim字体
 

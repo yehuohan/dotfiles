@@ -474,12 +474,6 @@ endfunction
 "===============================================================================
 " {{{
 call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where install plugins
-    Plug 'yehuohan/popset'
-call plug#end()            " required
-" }}}
-
-" {{{
-call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where install plugins
 
 " 基本编辑类 
 " {{{
@@ -669,14 +663,19 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:airline_powerline_fonts = 1
     let g:airline#extensions#tabline#enabled = 1
     let g:airline_theme='cool'
-    let g:airline_left_sep = "\uE0B0"
-    let g:airline_left_alt_sep = "\uE0B1"
-    let g:airline_right_sep = "\uE0BA"
-    let g:airline_right_alt_sep = "\uE0BB"
+    "                   "
+    let g:airline_left_sep = ""
+    let g:airline_left_alt_sep = ""
+    let g:airline_right_sep = ""
+    let g:airline_right_alt_sep = ""
+    if !exists('g:airline_symbols')
+        let g:airline_symbols = {}
+    endif
+    let g:airline_symbols.linenr = '☰'
 
     let g:airline#extensions#ctrlspace#enabled = 1       " support for ctrlspace integration
     let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()" 
-    "let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
+    "let g:airline#extensions#ycm#enabled = 0            " support for YCM integration
     "let g:airline#extensions#ycm#error_symbol = 'E:'
     "let g:airline#extensions#ycm#warning_symbol = 'W:'
 if IsLinux()
@@ -721,7 +720,7 @@ endif
 " }}}
 
 " Pop Selection {{{ 弹出选项
-    "Plug 'yehuohan/popset'
+    Plug 'yehuohan/popset'
     highlight link PopsetSelected Search
     let g:Popset_CompleteAll = 0
     let g:Popset_SelectionData = [
@@ -744,13 +743,13 @@ endif
             \ "lst" : ["gruvbox"],
             \ "dic" : {"gruvbox" : "第三方主题"},
             \ "cmd" : "",
-        \},
-        \{
-            \ "opt" : ["AirlineTheme"],
-            \ "lst" : popset#data#GetFileList($VimPluginPath.'/bundle/vim-airline-themes/autoload/airline/themes/*.vim'),
-            \ "dic" : {},
-            \ "cmd" : "popset#data#SetExecute",
-        \}]
+        \},]
+        " \{
+        "     \ "opt" : ["AirlineTheme"],
+        "     \ "lst" : popset#data#GetFileList($VimPluginPath.'/bundle/vim-airline-themes/autoload/airline/themes/*.vim'),
+        "     \ "dic" : {},
+        "     \ "cmd" : "popset#data#SetExecute",
+        " \}]
     " set option with PSet
     nnoremap <leader>so :PSet 
     nnoremap <leader>sa :PSet popset<CR>
@@ -1046,8 +1045,7 @@ if IsGui()
         set columns=100
         set renderoptions=type:directx
         "set guifont=Consolas:h13:cANSI
-        "set guifont=Powerline_Consolas:h13:cANSI
-        set guifont=DejaVu_Sans_Mono_for_Powerline:h11.5
+        set guifont=Consolas_For_Powerline:h13:cANSI
         set linespace=0            " required by PowerlineFont
         "set guifontwide=Yahei_Mono:h13:cGB2312
         noremap <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
