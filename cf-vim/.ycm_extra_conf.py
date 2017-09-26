@@ -1,47 +1,95 @@
 # This file is NOT licensed under the GPLv3, which is the license for the rest
-# of YouCompleteMe.
-#
-# Here's the license text for this file:
-#
-# This is free and unencumbered software released into the public domain.
-#
-# Anyone is free to copy, modify, publish, use, compile, sell, or
-# distribute this software, either in source code form or as a compiled
-# binary, for any purpose, commercial or non-commercial, and by any
-# means.
-#
-# In jurisdictions that recognize copyright laws, the author or authors
-# of this software dedicate any and all copyright interest in the
-# software to the public domain. We make this dedication for the benefit
-# of the public at large and to the detriment of our heirs and
-# successors. We intend this dedication to be an overt act of
-# relinquishment in perpetuity of all present and future rights to this
-# software under copyright law.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-# IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-# OTHER DEALINGS IN THE SOFTWARE.
-#
-# For more information, please refer to <http://unlicense.org/>
-
+# of YouCompleteMe. The license text is in the end of this file.
 
 import os
+import platform
 import ycm_core
 
+#===============================================================================
+# project flags
+#===============================================================================
+local_flags = [
+]
 
-# global ycm_extra_conf.py for c/c++
-
-# User defined path
+#===============================================================================
+# global flags
+#===============================================================================
 UNIX_GCC = '/usr/include/c++/7.2.0/'
 UNIX_QT = os.path.expanduser('~/MyApps/Qt591/5.9.1/gcc_64/include/')
 WIN_GW_C = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include/'
 WIN_GW_CPP = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include/c++/'
 WIN_QT = 'D:/Qt/Qt5.7.0/5.7/msvc2015/include/'
 
+# search order : "-I >= -isystem >= std"
+global_flags_unix = [
+    '-I',
+    '.',
+
+    '-isystem',
+    '/usr/include',
+    '-isystem',
+    UNIX_GCC,
+    '-isystem',
+    UNIX_GCC + 'bits',
+    '-isystem',
+    UNIX_GCC + 'parallel',
+    '-isystem',
+    UNIX_GCC + 'x86_64-pc-linux-gnu/bits',
+
+    '-isystem',
+    UNIX_QT,
+    '-isystem',
+    UNIX_QT + 'QtCore',
+    '-isystem',
+    UNIX_QT + 'QtGui',
+    '-isystem',
+    UNIX_QT + 'QtWidgets',
+]
+global_flags_win = [
+    '-I',
+    '.',
+
+    '-isystem',
+    WIN_GW_C,
+    '-isystem',
+    WIN_GW_C + 'ssp',
+
+    '-isystem',
+    WIN_GW_CPP,
+    '-isystem',
+    WIN_GW_CPP + 'backward',
+    '-isystem',
+    WIN_GW_CPP + 'bits',
+    '-isystem',
+    WIN_GW_CPP + 'debug',
+    '-isystem',
+    WIN_GW_CPP + 'decimal',
+    '-isystem',
+    WIN_GW_CPP + 'experimental',
+    '-isystem',
+    WIN_GW_CPP + 'ext',
+    '-isystem',
+    WIN_GW_CPP + 'parallel',
+    '-isystem',
+    WIN_GW_CPP + 'profile',
+    '-isystem',
+    WIN_GW_CPP + 'x86_64-w64-mingw32',
+    '-isystem',
+    WIN_GW_CPP + 'x86_64-w64-mingw32/bits',
+
+    '-isystem',
+    WIN_QT,
+    '-isystem',
+    WIN_QT + 'QtCore',
+    '-isystem',
+    WIN_QT + 'QtGui',
+    '-isystem',
+    WIN_QT + 'QtWidgets',
+]
+
+#===============================================================================
+# defaults flags
+#===============================================================================
 # These are the compilation flags that will be used in case there's no
 # compilation database set (by default, one is not set).
 # CHANGE THIS LIST OF FLAGS. YES, THIS IS THE DROID YOU HAVE BEEN LOOKING FOR.
@@ -70,72 +118,12 @@ flags = [
 '-x',
 #'c',
 'c++',
+] + local_flags
 
-# User's Defined flags
-# search order : "-I >= -isystem >= std"
-'-I',
-'.',
-
-'-isystem',
-'/usr/include',
-'-isystem',
-UNIX_GCC,
-'-isystem',
-UNIX_GCC + 'bits',
-'-isystem',
-UNIX_GCC + 'parallel',
-'-isystem',
-UNIX_GCC + 'x86_64-pc-linux-gnu/bits',
-
-'-isystem',
-UNIX_QT,
-'-isystem',
-UNIX_QT + 'QtCore',
-'-isystem',
-UNIX_QT + 'QtGui',
-'-isystem',
-UNIX_QT + 'QtWidgets',
-
-
-'-isystem',
-WIN_GW_C,
-'-isystem',
-WIN_GW_C + 'ssp',
-
-'-isystem',
-WIN_GW_CPP,
-'-isystem',
-WIN_GW_CPP + 'backward',
-'-isystem',
-WIN_GW_CPP + 'bits',
-'-isystem',
-WIN_GW_CPP + 'debug',
-'-isystem',
-WIN_GW_CPP + 'decimal',
-'-isystem',
-WIN_GW_CPP + 'experimental',
-'-isystem',
-WIN_GW_CPP + 'ext',
-'-isystem',
-WIN_GW_CPP + 'parallel',
-'-isystem',
-WIN_GW_CPP + 'profile',
-'-isystem',
-WIN_GW_CPP + 'x86_64-w64-mingw32',
-'-isystem',
-WIN_GW_CPP + 'x86_64-w64-mingw32/bits',
-
-'-isystem',
-WIN_QT,
-'-isystem',
-WIN_QT + 'QtCore',
-'-isystem',
-WIN_QT + 'QtGui',
-'-isystem',
-WIN_QT + 'QtWidgets',
-]
-
-
+if platform.system() == "Windows":
+  flags.extend(global_flags_win)
+elif platform.system() == "Linux":
+  flags.extend(global_flags_unix)
 
 
 # Set this to the absolute path to the folder (NOT the file!) containing the
@@ -237,3 +225,33 @@ def FlagsForFile( filename, **kwargs ):
     final_flags = MakeRelativePathsInFlagsAbsolute( flags, relative_to )
 
   return { 'flags': final_flags }
+
+
+
+#
+# Here's the license text for this file:
+#
+# This is free and unencumbered software released into the public domain.
+#
+# Anyone is free to copy, modify, publish, use, compile, sell, or
+# distribute this software, either in source code form or as a compiled
+# binary, for any purpose, commercial or non-commercial, and by any
+# means.
+#
+# In jurisdictions that recognize copyright laws, the author or authors
+# of this software dedicate any and all copyright interest in the
+# software to the public domain. We make this dedication for the benefit
+# of the public at large and to the detriment of our heirs and
+# successors. We intend this dedication to be an overt act of
+# relinquishment in perpetuity of all present and future rights to this
+# software under copyright law.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+# For more information, please refer to <http://unlicense.org/>

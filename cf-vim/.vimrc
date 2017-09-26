@@ -879,7 +879,7 @@ endif
 " nerd-commenter {{{ 批量注释
     Plug 'scrooloose/nerdcommenter'
     let g:NERDCreateDefaultMappings = 1
-    let g:NERDSpaceDelims = 1               " add space after comment
+    let g:NERDSpaceDelims = 0               " add space after comment
     nmap <leader>cc <plug>NERDCommenterComment
     nmap <leader>cm <plug>NERDCommenterMinimal
     nmap <leader>cs <plug>NERDCommenterSexy

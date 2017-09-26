@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170926 - vv2.1.178
+ - 修改ycm_extra_conf结构
+
 ## 20170926 - vv2.1.177
  - 添加F5CompileFile-qt选项
 
