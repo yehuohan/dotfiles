@@ -287,21 +287,36 @@ function! F5ComplileFile(argstr)
     let l:ext = expand("%:e")                             " 扩展名
     let l:filename = '"./' . expand('%:t') . '"'          " 文件名，不带路径，带扩展名 
     let l:name = '"./' . expand('%:t:r') . '"'            " 文件名，不带路径，不带扩展名
-    let l:run = "!"
+    let l:exec_str = "!"
     if exists(":AsyncRun") == 2
-        let l:run = ":AsyncRun "
+        let l:exec_str = ":AsyncRun "
     endif
 
-    " 执行命令
+    " Create execute string
     if "c" ==? l:ext
-        execute l:run . "gcc " . a:argstr . " -o " . l:name . " " . l:filename . " && " . l:name
+        let l:exec_str .= "gcc " . a:argstr . " -o " . l:name . " " . l:filename
+        let l:exec_str .= " && " . l:name
     elseif "cpp" ==? l:ext
-        execute l:run . "g++ -std=c++11 " . a:argstr . " -o " . l:name . " " . l:filename . " && " . l:name
+        let l:exec_str .= "g++ -std=c++11 " . a:argstr . " -o " . l:name . " " . l:filename
+        let l:exec_str .= " && " . l:name
     elseif "py" ==? l:ext || "pyw" ==? l:ext
-        execute l:run . "python " . l:filename
+        let l:exec_str .= "python " . l:filename
     elseif "m" ==? l:ext
-        execute l:run . "matlab -nosplash -nodesktop -r " . l:name[3:-2]
+        let l:exec_str .= "matlab -nosplash -nodesktop -r " . l:name[3:-2]
+    elseif "pro" ==? l:ext
+        let l:exec_str .= "qmake " . a:argstr . " -o Makefile " . l:filename
+        if IsLinux()
+            let l:exec_str .= " && make"
+        else
+            return
+        endif
+        let l:exec_str .= " && " . l:name
+    else
+        return
     endif
+
+    " execute shell code
+    execute l:exec_str
 endfunction
 " }}}
 
