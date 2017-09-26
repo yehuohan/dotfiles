@@ -477,6 +477,7 @@ function! PreviewQuickfixLine()
             else
                 return
             endif
+            normal! zO
             normal! zz
             execute "noautocmd " . l:last_winnr . "wincmd w"
         endif
