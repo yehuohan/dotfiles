@@ -36,6 +36,8 @@ import ycm_core
 # global ycm_extra_conf.py for c/c++
 
 # User defined path
+UNIX_GCC = '/usr/include/c++/7.2.0/'
+UNIX_QT = os.path.expanduser('~/MyApps/Qt591/5.9.1/gcc_64/include/')
 WIN_GW_C = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include/'
 WIN_GW_CPP = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include/c++/'
 WIN_QT = 'D:/Qt/Qt5.7.0/5.7/msvc2015/include/'
@@ -73,16 +75,27 @@ flags = [
 # search order : "-I >= -isystem >= std"
 '-I',
 '.',
+
 '-isystem',
 '/usr/include',
 '-isystem',
-'/usr/include/c++/5',
+UNIX_GCC,
 '-isystem',
-'/usr/include/c++/7.1.1',
+UNIX_GCC + 'bits',
 '-isystem',
-'/usr/include/c++/7.1.1/bits'
+UNIX_GCC + 'parallel',
 '-isystem',
-'/usr/include/c++/7.1.1/x86_64-pc-linux-gnu/bits'
+UNIX_GCC + 'x86_64-pc-linux-gnu/bits',
+
+'-isystem',
+UNIX_QT,
+'-isystem',
+UNIX_QT + 'QtCore',
+'-isystem',
+UNIX_QT + 'QtGui',
+'-isystem',
+UNIX_QT + 'QtWidgets',
+
 
 '-isystem',
 WIN_GW_C,

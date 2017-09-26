@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170926 - vv2.1.176
+ - 更新Linux下的ycm_extra_conf
+
 ## 20170924 - vv2.1.175
  - 更新ycm_extra_conf
 
