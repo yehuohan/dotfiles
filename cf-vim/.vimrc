@@ -9,7 +9,7 @@
 " My Notes
 "===============================================================================
 " {{{
-" Windows带python编译gvim 
+" Windows带python编译gvim
 " {{{
     " [x] 设置Make_cyg_ming.mak:
     " DIRECTX=yes                         - 使用DirectX
@@ -29,7 +29,7 @@
     " https://github.com/rprichard/winpty，到release中下载与gvim对应的32或64位，没有类unix环境就用msvc的即可
 " }}}
 
-" 查看vim帮助 
+" 查看vim帮助
 " {{{
     " :help       = 查看Vim帮助
     " :help index = 查看帮助列表
@@ -37,7 +37,7 @@
     " :help *@en  = 指定查看英文(en，cn即为中文)帮助
 " }}}
 
-" 按键映键策略 
+" 按键映键策略
 " {{{
     " - Normal模式下使用<leader>代替<C-?>,<S-?>,<A-?>，
     " - Insert模式下map带ctrl,alt的快捷键
@@ -85,14 +85,14 @@
 " Platform
 "===============================================================================
 " {{{
-" vim or nvim 
+" vim or nvim
 " {{{
     silent function! IsNVim()
         return has('nvim')
     endfunction
 " }}}
 
-" linux or win 
+" linux or win
 " {{{
     silent function! IsLinux()
         return (has('unix') && !has('macunix') && !has('win32unix'))
@@ -106,7 +106,7 @@
     endfunction
 " }}}
 
-" gui or term 
+" gui or term
 " {{{
     silent function! IsGvim()
         return has("gui_running")
@@ -134,7 +134,7 @@ nnoremap ; :
 nnoremap : ;
 vnoremap ; :
 
-" Path 
+" Path
 " {{{
     let s:home_path = fnamemodify(resolve(expand("<sfile>:p")), ":h")
     " vim插件路径统一
@@ -144,16 +144,16 @@ vnoremap ; :
     elseif IsWin()
         let $VimPluginPath=s:home_path . "\\vimfiles"
         " windows下将HOME设置VIM的安装路径
-        let $HOME=$VIM 
+        let $HOME=$VIM
         " 未打开文件时，切换到HOME目录
-        execute "cd $HOME"          
+        execute "cd $HOME"
     elseif IsGw()
         let $VimPluginPath="/c/MyApps/Vim/vimfiles"
     endif
     set rtp+=$VimPluginPath                     " add .vim or vimfiles to rtp(runtimepath)
 " }}}
 
-" 键码设定 
+" 键码设定
 " {{{
 set timeout                         " 打开映射超时检测
 set ttimeout                        " 打开键码超时检测
@@ -285,7 +285,7 @@ endfunction
 " 编译环境函数 " {{{
 function! F5ComplileFile(argstr)
     let l:ext = expand("%:e")                             " 扩展名
-    let l:filename = '"./' . expand('%:t') . '"'          " 文件名，不带路径，带扩展名 
+    let l:filename = '"./' . expand('%:t') . '"'          " 文件名，不带路径，带扩展名
     let l:name = '"./' . expand('%:t:r') . '"'            " 文件名，不带路径，不带扩展名
     let l:exec_str = "!"
     if exists(":AsyncRun") == 2
@@ -327,7 +327,7 @@ let s:findvimgrep_nmaps = ["fi", "fgi", "fI", "fgI",
                          \ "Fi", "Fgi", "FI", "FgI",
                          \ "Fw", "Fgw", "FW", "FgW",
                          \ "Fs", "Fgs", "FS", "FgS",
-                         \ ]                  
+                         \ ]
 let s:findvimgrep_vmaps = ["fi", "fgi", "fI", "fgI",
                          \ "fv", "fgv", "fV", "fgV",
                          \ "fs", "fgs", "fS", "fgS",
@@ -351,7 +351,7 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
         let l:arglead_glob = l:arglead_list[-1]
     endif
 
-    " glob non-hidden and hidden files(but no . and ..) with ignorecase 
+    " glob non-hidden and hidden files(but no . and ..) with ignorecase
     set wildignorecase
     set wildignore+=.,..
     let l:files_list = split(glob(l:arglead_glob . "*") . "\n" . glob(l:arglead_glob . "\.[^.]*"), "\n")
@@ -378,10 +378,10 @@ function! FindVimgrep(type, mode)
     "
     " Visual Mode: mode='v'
     " i : find input    with selected
-    " v : find visual   with selected 
+    " v : find visual   with selected
     " s : find selected with \< \>
     "
-    " LowerCase: [iwvs] for find with user's ignorecase or smartcase setting 
+    " LowerCase: [iwvs] for find with user's ignorecase or smartcase setting
     " UpperCase: [IWVS] for find in case match
     "
     " Other:
@@ -494,7 +494,7 @@ endfunction
 " {{{
 call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where install plugins
 
-" 基本编辑类 
+" 基本编辑类
 " {{{
 " easy-motion {{{ 快速跳转
     Plug 'easymotion/vim-easymotion'
@@ -582,7 +582,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:fzf_command_prefix = 'Fzf'
     nnoremap <leader>fl :FzfLines<CR>
     nnoremap <leader>fb :FzfBLines<CR>
-    nnoremap <leader>ff :FzfFiles 
+    nnoremap <leader>ff :FzfFiles
 " }}}
 
 " surround and repeat {{{ 添加包围符
@@ -671,7 +671,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     " gruvbox主题
     Plug 'morhetz/gruvbox'
     set rtp+=$VimPluginPath/bundle/gruvbox/
-    colorscheme gruvbox 
+    colorscheme gruvbox
     set background=dark                     " dark or light mode
     let g:gruvbox_contrast_dark='medium'    " dark, medium or soft
 " }}}
@@ -687,15 +687,11 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:airline_left_alt_sep = ""
     let g:airline_right_sep = ""
     let g:airline_right_alt_sep = ""
-    if !exists('g:airline_symbols')
-        let g:airline_symbols = {}
-    endif
 
-    let g:airline#extensions#ctrlspace#enabled = 1       " support for ctrlspace integration
-    let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()" 
-    "let g:airline#extensions#ycm#enabled = 0            " support for YCM integration
-    "let g:airline#extensions#ycm#error_symbol = 'E:'
-    "let g:airline#extensions#ycm#warning_symbol = 'W:'
+    let g:airline#extensions#ctrlspace#enabled = 1      " support for ctrlspace integration
+    "let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
+    "let g:airline#extensions#ycm#error_symbol = '✘:'
+    "let g:airline#extensions#ycm#warning_symbol = '⚡:'
 if IsLinux()
     "Plug 'edkolev/tmuxline.vim'
     "let g:airline#extensions#tmuxline#enalbed = 1
@@ -710,7 +706,7 @@ endif
 " }}}
 
 " indent-line {{{ 显示缩进标识
-    Plug 'Yggdroot/indentLine'          
+    Plug 'Yggdroot/indentLine'
     "let g:indentLine_char = '|'            " 设置标识符样式
     let g:indentLinet_color_term=200        " 设置标识符颜色
     nnoremap <leader>t\ :IndentLinesToggle<CR>
@@ -732,6 +728,7 @@ endif
          \ ".git", ".sln", ".pro",
          \".hg", ".svn", ".bzr", "_darcs", "CVS"]   " Project root markers
     let g:CtrlSpaceSearchTiming = 50
+    let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()"
     " 切换按键
     nnoremap <C-Space> :CtrlSpace<CR>
     inoremap <C-Space> <esc>:CtrlSpace<CR>
@@ -769,12 +766,12 @@ endif
         "     \ "cmd" : "popset#data#SetExecute",
         " \}]
     " set option with PSet
-    nnoremap <leader>so :PSet 
+    nnoremap <leader>so :PSet
     nnoremap <leader>sa :PSet popset<CR>
 " }}}
 
 " nerd-tree{{{ 目录树导航
-    Plug 'scrooloose/nerdtree'          
+    Plug 'scrooloose/nerdtree'
     let g:NERDTreeShowHidden=1
     let g:NERDTreeMapPreview = 'go'             " 预览打开
     let g:NERDTreeMapChangeRoot = 'cd'          " 更改根目录
@@ -821,10 +818,10 @@ endif
 " 代码类
 " {{{
 " YouCompleteMe {{{ 自动补全
-    " Linux: 
+    " Linux:
     "   install python-dev, python3-dev, cmake, llvm, clang
     "   ./install.py --clang-completer --system-libclang
-    " Windows: 
+    " Windows:
     "   install python, Cmake, VS, 7-zip
     "   install.py --clang-completer --msvc 14 --build-dir <ycm_build>
     "   自己指定vs版本，自己指定build路径，编译完成后，可以删除<ycm_build>
@@ -833,10 +830,10 @@ endif
     let g:ycm_global_ycm_extra_conf=$VimPluginPath.'/.ycm_extra_conf.py'
     let g:ycm_enable_diagnostic_signs = 1       " 开启语法检测
     let g:ycm_max_diagnostics_to_display = 30
-    let g:ycm_warning_symbol = '⚡'             " warning符号   
+    let g:ycm_warning_symbol = '⚡'             " warning符号
     let g:ycm_error_symbol = '✘'                " error符号
-    let g:ycm_seed_identifiers_with_syntax = 1  " 语法关键字补全         
-    let g:ycm_collect_identifiers_from_tags_files = 1 
+    let g:ycm_seed_identifiers_with_syntax = 1  " 语法关键字补全
+    let g:ycm_collect_identifiers_from_tags_files = 1
                                                 " 开启标签补全
     let g:ycm_use_ultisnips_completer = 1       " query UltiSnips for completions
     let g:ycm_key_list_select_completion = ['<C-j>', '<Down>']
@@ -848,7 +845,7 @@ endif
     nnoremap <leader>gi :YcmCompleter GoToInclude<CR>
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
     nnoremap <leader>gs :YcmShowDetailedDiagnostic<CR>
-    noremap <F4> :YcmDiags<CR> 
+    noremap <F4> :YcmDiags<CR>
                                                 " 错误列表
 " }}}
 
@@ -904,7 +901,7 @@ endif
     augroup vimrc
         autocmd User AsyncRunStart call asyncrun#quickfix_toggle(8, 1)
     augroup END
-    nnoremap <leader>rr :AsyncRun 
+    nnoremap <leader>rr :AsyncRun
     nnoremap <leader>rs :AsyncStop<CR>
 " }}}
 
@@ -917,8 +914,8 @@ endif
     xmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
     nmap <leader>hm <Plug>(quickhl-cword-toggle)
     "nmap <leader>ht <Plug>(quickhl-tag-toggle)
-    "nmap <leader>hc <Plug>(quickhl-manual-clear) 
-    "vmap <leader>hc <Plug>(quickhl-manual-clear) 
+    "nmap <leader>hc <Plug>(quickhl-manual-clear)
+    "vmap <leader>hc <Plug>(quickhl-manual-clear)
     nnoremap <leader>hc :call quickhl#manual#clear_this('n')<CR>
     vnoremap <leader>hc :call quickhl#manual#clear_this('v')<CR>
     nmap <leader>hr <Plug>(quickhl-manual-reset)
@@ -940,7 +937,7 @@ endif
     Plug 'vimcn/vimcdoc',{'branch' : 'release'}
 " }}}
 
-" markdown-preview {{{ MarkDown预览 
+" markdown-preview {{{ MarkDown预览
     Plug 'plasticboy/vim-markdown'
     Plug 'iamcco/mathjax-support-for-mkdp'
     Plug 'iamcco/markdown-preview.vim'
@@ -1072,7 +1069,7 @@ if IsGvim()
 endif
 " }}}
 
-" Auto Command 
+" Auto Command
 " {{{
 augroup VimVimrc
     "autocmd[!]  [group]  {event}     {pattern}  {nested}  {cmd}
@@ -1243,7 +1240,7 @@ augroup END
     " compiling and running
     noremap <F5> <esc>:call F5ComplileFile('')<CR>
     nnoremap <leader>rf :call F5ComplileFile('')<CR>
-     
+
     " run with args
     nnoremap <leader>ra :execute"let g:__str__=input('Compile Args: ')"<bar>call F5ComplileFile(g:__str__)<CR>
 " }}}
