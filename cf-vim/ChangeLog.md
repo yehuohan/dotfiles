@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170927 - vv2.1.181
+ - 不使用directx渲染字体，否则airline显示不正常
+
 ## 20170927 - vv2.1.180
  - 修复PreviewQuickfixLine中的展开折叠问题
  - 修改ycm的warnging和error符号
@@ -158,7 +161,7 @@
 
 ## 20170813 - vv2.1.118
  - 添加diff映射
- 
+
 ## 20170813 - vv2.1.117
  - 优化折叠设置
 
@@ -193,7 +196,7 @@
 
 ## 20170804 - vv2.0.105
  - 添加markdown显示插件
- 
+
 ## 20170804 - vv2.0.104
  - 实现xfce4-terminal光标变化
 
@@ -299,38 +302,38 @@
 
 ## 20170531 - v1.5.47
  - mintty更改背景颜色与透明度
- 
+
 ## 20170531 - v1.5.46
  - 修改F5 map对于py和pyw文件的问题
 
 ## 20170531 - v1.5.45
  - 优化README.md文件列表显示
- 
+
 ## 20170522 - v1.5.44
  - 添加Ycm Goto等命令的映射
  - 添加错误显示信息命令映射，以及设置错误列表窗口大小
  - 开启YCM语法补全和tags补全
-  
+
 ## 20175021 - v1.5.41
  - Linux下gvim字体使用Ubuntu Mono
 
 ## 20170520 - v1.5.40
  - 添加vnoremap下的S-l和S-h的映射
- 
+
 ## 20170519 - v1.5.39
  - 去掉yL对ySS的映射，添加yL和yH的映射
- 
+
 ## 20170516 - v1.5.38
  - 添加leader-wp映射，跳转到preview窗口
- 
+
 ## 20170516 - v1.5.37
  - 添加C-w-HJKLT移动窗口相关映射，以及C-w-=等宽高映射
  - 改成leader-qa来关闭所有窗口，并保存会话
- 
+
 ## 20170516 - v1.5.35
  - 去掉对viw的映射
  - 显示相对行号
- 
+
 ## 20170516 - v1.5.33
  - 关闭normal模式下按esc的声音及闪屏
 
@@ -353,7 +356,7 @@
  - 添加fswitch插件，使用leader-fh切换
  - 使用leader-t?作为toggle命令前缀
  - 添加rainbow插件
- - vimgrep查打当前单词改用leader-fw 
+ - vimgrep查打当前单词改用leader-fw
  - map L to $ and H to ^ and S to %
  - 取消ysw,ysiw,yss,ySS的映射
 
@@ -395,7 +398,7 @@
  - 修复多行block surrounding问题
  - highlight search的guifg改成white
  - nerdcommenter注释后添加space
- 
+
 ## 20170507 - v1.0.2
  - Win下gvim使用cousine字体
 
@@ -424,7 +427,7 @@
  - 添加ultisnips和snippets插件，同时将自定义mySnippets添加到仓库
  - YCM添加mingw头文件库
  - YCM设置error和warning提示符
- 
+
 ## 20170504
  - 添加Courier 10 Pitch字体到仓库
  - 改用new-railscasts theme，改用Courier 10 Pitch字体
@@ -432,7 +435,7 @@
  - airline添加ctrlspace和ycm支持
  - windows下HOME路径改成VIM安装路径
  - vim内部使用utf-8编码，ctrlspace需要utf-8编码
- 
+
 ## 20170504
  - 添加vim-ctrlspace插件
  - 去除powerline，改用airline，设置成非分屏时同样显示
@@ -447,7 +450,7 @@
 
 ## 20170502
  - F5编译时，文件名添加引号，防止文件名有空格
- 
+
 ## 20170502
  - 使用SaveSession!，强制保存会话
 
@@ -505,7 +508,7 @@
 
 ## 20170320
  - 取消C-a映射，对调capslock和esc键
- 
+
 ## 20170315
  - 修改KeyMap段注释
  - 将C-a映射imap成esc
@@ -518,13 +521,13 @@
 ## 20170314
  - 添加zshrc配置，关于命令记录的命令
  - 添加vim按键Map，使用;作为大写字母开头命令，添加“行”快速选择
- 
+
 ## 20170312
  - 添加.ycm_extra_conf.py
  - .vimrc添加到display, keymap, vundel三部分
  - .zshrc添加ctrl-z返回vim
  - 添加cc.sh，将需要git的文件copy到文件侠LinuxCongifs中
- 
+
 ## 20170311
  - 添加git仓
  - 添加zsh和vim基本配置

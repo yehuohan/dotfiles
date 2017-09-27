@@ -679,6 +679,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 " air-line {{{ 状态栏
     Plug 'vim-airline/vim-airline'
     Plug 'vim-airline/vim-airline-themes'
+    set renderoptions=                                  " required by airline for showing unicode
     let g:airline_powerline_fonts = 1
     let g:airline#extensions#tabline#enabled = 1
     let g:airline_theme='cool'
@@ -720,7 +721,6 @@ endif
 " ctrl-space {{{ buffer管理
     " <h,o,l,w,b,/,?> for buffer,file,tab,workspace,bookmark,search and help
     Plug 'yehuohan/vim-ctrlspace'
-    set nocompatible
     set hidden                                      " 允许在未保存文件时切换buffer
     let g:CtrlSpaceCacheDir = $VimPluginPath
     let g:CtrlSpaceSetDefaultMapping = 1
@@ -1058,7 +1058,6 @@ if IsGvim()
     elseif IsWin()
         set lines=25
         set columns=100
-        set renderoptions=type:directx
         "set guifont=Consolas:h13:cANSI
         set guifont=Consolas_For_Powerline:h13:cANSI
         set linespace=0            " required by PowerlineFont
