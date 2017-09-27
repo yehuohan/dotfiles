@@ -199,7 +199,6 @@ endif
 function! InvConceallevel()
     if &conceallevel == 0
         set conceallevel=2
-    "elseif &conceallevel == 2
     else
         set conceallevel=0                  " 显示markdown等格式中的隐藏字符
     endif
@@ -729,6 +728,7 @@ endif
          \".hg", ".svn", ".bzr", "_darcs", "CVS"]   " Project root markers
     let g:CtrlSpaceSearchTiming = 50
     let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()"
+    let g:CtrlSpaceSymbols = { "CS": "⌘"}
     " 切换按键
     nnoremap <C-Space> :CtrlSpace<CR>
     inoremap <C-Space> <esc>:CtrlSpace<CR>

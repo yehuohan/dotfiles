@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170927 - vv2.1.182
+ - 修改ctrlspace CS图标
+
 ## 20170927 - vv2.1.181
  - 不使用directx渲染字体，否则airline显示不正常
 
