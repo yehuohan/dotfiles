@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170927 - vv2.1.183
+ - 修改linux下qt-pro的编译函数
+
 ## 20170927 - vv2.1.182
  - 修改ctrlspace CS图标
 

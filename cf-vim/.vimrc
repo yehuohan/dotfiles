@@ -303,8 +303,9 @@ function! F5ComplileFile(argstr)
     elseif "m" ==? l:ext
         let l:exec_str .= "matlab -nosplash -nodesktop -r " . l:name[3:-2]
     elseif "pro" ==? l:ext
-        let l:exec_str .= "qmake " . a:argstr . " -o Makefile " . l:filename
+        let l:exec_str .= "qmake " . a:argstr . " -o ./DebugV/Makefile " . l:filename
         if IsLinux()
+            let l:exec_str .= " && cd ./DebugV"
             let l:exec_str .= " && make"
         else
             return
