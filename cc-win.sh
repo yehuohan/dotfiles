@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # copy all the <config-files> to <cf-dir>
