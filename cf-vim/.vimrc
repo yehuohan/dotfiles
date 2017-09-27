@@ -477,7 +477,7 @@ function! PreviewQuickfixLine()
             else
                 return
             endif
-            normal! zO
+            silent! normal! zO
             normal! zz
             execute "noautocmd " . l:last_winnr . "wincmd w"
         endif
@@ -690,7 +690,6 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     if !exists('g:airline_symbols')
         let g:airline_symbols = {}
     endif
-    let g:airline_symbols.linenr = '☰'
 
     let g:airline#extensions#ctrlspace#enabled = 1       " support for ctrlspace integration
     let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()" 
@@ -834,8 +833,8 @@ endif
     let g:ycm_global_ycm_extra_conf=$VimPluginPath.'/.ycm_extra_conf.py'
     let g:ycm_enable_diagnostic_signs = 1       " 开启语法检测
     let g:ycm_max_diagnostics_to_display = 30
-    let g:ycm_warning_symbol = '--'             " warning符号
-    let g:ycm_error_symbol = '>>'               " error符号
+    let g:ycm_warning_symbol = '⚡'             " warning符号   
+    let g:ycm_error_symbol = '✘'                " error符号
     let g:ycm_seed_identifiers_with_syntax = 1  " 语法关键字补全         
     let g:ycm_collect_identifiers_from_tags_files = 1 
                                                 " 开启标签补全

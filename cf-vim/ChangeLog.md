@@ -2,6 +2,10 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170927 - vv2.1.180
+ - 修复PreviewQuickfixLine中的展开折叠问题
+ - 修改ycm的warnging和error符号
+
 ## 20170926 - vv2.1.178
  - 修改ycm_extra_conf结构
 
