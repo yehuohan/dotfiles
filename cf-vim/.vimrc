@@ -308,7 +308,7 @@ function! F5ComplileFile(argstr)
             let l:exec_str .= "qmake " . a:argstr . " -r -o ./DebugV/Makefile " . l:filename
             let l:exec_str .= " && cd ./DebugV"
             let l:exec_str .= " && make"
-        else if IsWin()
+        else
             let l:exec_str .= " mkdir DebugV"
             let l:exec_str .= " & cd DebugV"
             " Attetion: here shouls be <qmake ../file.pro>
@@ -316,8 +316,6 @@ function! F5ComplileFile(argstr)
             let l:exec_str .= " && vcvars32.bat"
             let l:exec_str .= " && nmake -f Makefile.Debug"
             let l:exec_str .= " && cd ./debug"
-        else
-            return
         endif
         let l:exec_str .= " && " . l:name
     else

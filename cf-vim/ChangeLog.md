@@ -2,9 +2,6 @@
 ---
 # cf-vim-ChangeLog
 
-## 20170928 - vv2.1.188
- - 修复F5ComplileFile中的Bug
-
 ## 20170928 - vv2.1.187
  - 完成windows下qmake骗译
  - 添加Quickfix转码函数
