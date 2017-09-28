@@ -80,7 +80,6 @@
 
 " }}}
 
-
 "===============================================================================
 " Platform
 "===============================================================================
@@ -248,6 +247,7 @@ endfunction
 " }}}
 
 " linux-fcitx输入法切换 " {{{
+if IsLinux()
 function! LinuxFcitx2En()
     if 2 == system("fcitx-remote")
         let l:t = system("fcitx-remote -c")
@@ -258,6 +258,7 @@ function! LinuxFcitx2Zh()
         let l:t = system("fcitx-remote -o")
     endif
 endfunction
+endif
 " }}}
 
 " asd2num切换 " {{{
@@ -266,7 +267,7 @@ let s:asd2num_map_table={
             \ "a" : "1", "s" : "2", "d" : "3", "f" : "4", "g" : "5",
             \ "h" : "6", "j" : "7", "k" : "8", "l" : "9", ";" : "0"
             \ }
-function! Asd2numToggle()
+function! ToggleAsd2num()
     if(s:asd2num_toggle_flg)
         for t in items(s:asd2num_map_table)
             execute "iunmap " . t[0]
@@ -303,12 +304,18 @@ function! F5ComplileFile(argstr)
     elseif "m" ==? l:ext
         let l:exec_str .= "matlab -nosplash -nodesktop -r " . l:name[3:-2]
     elseif "pro" ==? l:ext
-        let l:exec_str .= "qmake " . a:argstr . " -o ./DebugV/Makefile " . l:filename
         if IsLinux()
+            let l:exec_str .= "qmake " . a:argstr . " -r -o ./DebugV/Makefile " . l:filename
             let l:exec_str .= " && cd ./DebugV"
             let l:exec_str .= " && make"
         else
-            return
+            let l:exec_str .= " mkdir DebugV"
+            let l:exec_str .= " & cd DebugV"
+            " Attetion: here shouls be <qmake ../file.pro>
+            let l:exec_str .= " && qmake " . a:argstr . " -r ." . l:filename
+            let l:exec_str .= " && vcvars32.bat"
+            let l:exec_str .= " && nmake -f Makefile.Debug"
+            let l:exec_str .= " && cd ./debug"
         endif
         let l:exec_str .= " && " . l:name
     else
@@ -462,7 +469,19 @@ endfunction
 
 " }}}
 
-" quickfix预览 {{{
+" quickfix相关函数 {{{
+" 编码转换 {{{
+"function! ConvQuickfix(type, if, it)
+"    " type: 1 for quickfix, 0 for location-list
+"    let qflist = (a:type) ? getqflist() : getloclist(winnr())
+"    for i in qflist
+"       let i.text = iconv(i.text, a:if , a:it)
+"    endfor
+"    call setqflist(qflist)
+"endfunction
+" }}}
+
+" 预览 {{{
 function! PreviewQuickfixLine()
     " location-list : 每个窗口对应一个位置列表
     " quickfix      : 整个vim对应一个quickfix
@@ -481,6 +500,26 @@ function! PreviewQuickfixLine()
             normal! zz
             execute "noautocmd " . l:last_winnr . "wincmd w"
         endif
+    endif
+endfunction
+" }}}
+
+" }}}
+
+" Window最大化 {{{
+let s:is_max = 0
+function! ToggleWindowZoom()
+    if s:is_max
+        let s:is_max = 0
+        execute "normal! " . s:last_tab . "gt"
+        execute "noautocmd " . s:last_winnr . "wincmd w"
+        silent! execute "tabclose " . s:this_tab
+    else
+        let s:is_max = 1
+        let s:last_winnr = winnr()
+        let s:last_tab = tabpagenr()
+        execute "tabedit " . expand("%")
+        let s:this_tab = tabpagenr()
     endif
 endfunction
 " }}}
@@ -808,7 +847,7 @@ endif
     nnoremap <leader>su :Startify<CR>       " start ui of vim-startify
 " }}}
 
-" neovim gui font {{{ 字体设置(已内置)
+" neovim gui font {{{ 字体设置(neovim已内置)
 if IsNVim()
     "Plug 'equalsraf/neovim-gui-shim'
 endif
@@ -899,11 +938,15 @@ endif
 
 " AsyncRun {{{ 导步运行程序
     Plug 'skywind3000/asyncrun.vim'
-    augroup vimrc
-        autocmd User AsyncRunStart call asyncrun#quickfix_toggle(8, 1)
-    augroup END
+    if IsWin()
+        let g:asyncrun_encs = 'cp936'       " equal to 'gbk'
+    endif
     nnoremap <leader>rr :AsyncRun
     nnoremap <leader>rs :AsyncStop<CR>
+
+augroup vimrc
+    autocmd User AsyncRunStart call asyncrun#quickfix_toggle(8, 1)
+augroup END
 " }}}
 
 " vim-quickhl {{{ 单词高亮
@@ -998,6 +1041,7 @@ call plug#end()            " required
     set softtabstop=4                   " 设置显示的Tab缩进为4,实际Tab可以不是4个格
     set shiftwidth=4                    " 设置>和<命令移动宽度为4
     set nowrap                          " 默认关闭折行
+    set textwidth=0                     " 关闭自动换行
     set listchars=eol:$,tab:>-,trail:~,space:.
                                         " 不可见字符显示
     set autoindent                      " 使用autoindent缩进
@@ -1036,7 +1080,6 @@ call plug#end()            " required
         let &t_SI = "\<Esc>[6 q"        " 进入Insert模式
         let &t_EI = "\<Esc>[2 q"        " 退出Insert模式
     endif
-
 " }}}
 
 " Gui
@@ -1124,7 +1167,7 @@ augroup END
     nnoremap <leader>zr zR
     nnoremap <leader>zm zM
     " Asd2Num
-    inoremap <C-a> <esc>:call Asd2numToggle()<CR>a
+    inoremap <C-a> <esc>:call ToggleAsd2num()<CR>a
 " }}}
 
 " Show Setting{{{
@@ -1221,6 +1264,7 @@ augroup END
     nnoremap <leader>wL <C-w>L
     nnoremap <leader>wT <C-w>T
     " reseize window with C-up/down/left/right
+    nnoremap <leader>wz :call ToggleWindowZoom()<CR>
     nnoremap <leader>w= <C-w>=
     inoremap <C-up> <esc>:resize+1<CR>i
     inoremap <C-down> <esc>:resize-1<CR>i

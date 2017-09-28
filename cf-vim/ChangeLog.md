@@ -2,6 +2,12 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170928 - vv2.1.187
+ - 完成windows下qmake骗译
+ - 添加Quickfix转码函数
+ - 添加窗口最大化函数
+ - asyncrun插件添加转置设置
+
 ## 20170927 - vv2.1.183
  - 修改linux下qt-pro的编译函数
 
