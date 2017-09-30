@@ -1,5 +1,67 @@
 
 #===============================================================================
+# qt project
+#===============================================================================
+snippet qmain "qt main function fot gui"
+#include "${1:mainwindow}.h"
+#include <QApplication>
+
+int main(int argc, char *argv[])
+{
+	QApplication a(argc, argv);
+	${2:MainWindow} w;
+	w.show();
+
+	return a.exec();
+}
+endsnippet
+
+snippet qmainc "qt main function for console"
+#include <QCoreApplication>
+
+int main(int argc, char *argv[])
+{
+	QCoreApplication a(argc, argv);
+
+	return a.exec();
+}
+endsnippet
+
+snippet qwin "qt inherit QMainWindow class" 
+#include <QMainWindow>
+
+class ${1:MainWindow} : public QMainWindow
+{
+	Q_OBJECT
+public:
+	explicit $1(QWidget *parent = 0):QMainWindow(parent) {}
+	~$1() {}
+
+signals:
+
+public slots:
+};
+endsnippet
+
+snippet qobj "qt inherit Obeject class" 
+#include <QObject>
+
+class ${1:Object} : public QObject
+{
+	Q_OBJECT
+public:
+	explicit $1(QObject *parent = nullptr):QObject(parent) {}
+	~$1() {}
+
+signals:
+
+public slots:
+};
+endsnippet
+
+
+
+#===============================================================================
 # doxygen style for c/c++
 #===============================================================================
 

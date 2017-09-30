@@ -2,6 +2,10 @@
 ---
 # cf-vim-ChangeLog
 
+## 20170930 - vv2.1.190
+ - 添加qt相关snippet
+ - 添加makefile相关snippet
+
 ## 20170928 - vv2.1.188
  - 修复F5ComplileFile中的Bug
 

@@ -1,4 +1,89 @@
 
+#===============================================================================
+# qt project
+#===============================================================================
+snippet qpro "qmake pro file"
+
+QT += core gui
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+CONFIG  += c++11
+TEMPLATE = app
+#DESTDIR = $$(PWD)
+
+# debug, release, debug_and_release
+CONFIG += debug
+debug{
+	TARGET = $1_d
+}
+release {
+	TARGET = ${1:project-name}
+}
+
+#INCLUDEPATH +=
+#LIBS        +=
+unix {
+	#CONFIG    += link_pkgconfig
+	#PKGCONFIG +=
+}
+
+SOURCES   += \
+	main.cpp
+#HEADERS   += .h
+#FORMS     += .ui
+#RESOURCES += .qrc
+
+endsnippet
+
+
+
+#===============================================================================
+# makefile
+#===============================================================================
+snippet makf "makefile template"
+
+DIR_INC = ./inc
+DIR_SRC = ./src
+DIR_OBJ = ./obj
+DIR_BIN = ./
+DIR_3RD = ./3party
+DIR_LIB = ./lib
+
+CC = ${1:g++}
+TARGET = ${2:main}
+
+ifeq ($(CC), g++)
+CC_SUF = cpp
+endif
+ifeq ($(CC), gcc)
+CC_SUF = c
+endif
+
+SRC = $(wildcard ${DIR_SRC}/*.${CC_SUF})
+OBJ = $(patsubst %.${CC_SUF},${DIR_OBJ}/%.o,$(notdir ${SRC}))
+
+BIN_TARGET = ${DIR_BIN}/${TARGET}
+LDFLAGS = -L${DIR_LIB}
+LIBS =
+#-lopencv_core -lpthread
+PKGFLAGS =
+#\`pkg-config opencv --cflags` `pkg-config opencv --libs\`
+CXXFLAGS = -g -Wall -I${DIR_INC} -I${DIR_SRC} -I${DIR_3RD} ${PKGFLAGS}
+
+
+${BIN_TARGET} : ${OBJ}
+	$(CC) $(OBJ) -o $@ $(LDFLAGS) $(LIBS)
+
+${DIR_OBJ}/%.o:${DIR_SRC}/%.${CC_SUF}
+	$(CC) $(CXXFLAGS) -c $< -o $@
+
+.phony:clean
+clean:
+	rm ${OBJ}
+
+endsnippet
+
+
 
 #===============================================================================
 # block comment
