@@ -253,12 +253,12 @@ bindsym $mod+mod1+9 move container to workspace 9; workspace 9
 # switch to near workspace
 bindsym $mod+o workspace next_on_output 
 bindsym $mod+i workspace prev_on_output
-bindsym $mod+Shift+o workspace next
-bindsym $mod+Shift+i workspace prev
+bindsym $mod+mod1+o workspace next
+bindsym $mod+mod1+i workspace prev
 
 # move container to near workspace 
-bindsym $mod+mod1+o move container to workspace next
-bindsym $mod+mod1+i move container to workspace prev
+bindsym $mod+Shift+o move container to workspace next
+bindsym $mod+Shift+i move container to workspace prev
 
 # Move the current workspace to the next output (effectively toggles when you only have two outputs)
 bindsym $mod+mod1+m move workspace to output right
@@ -295,6 +295,7 @@ bindsym $mod+b border toggle
 #{{{
 # start a terminal
 bindsym $mod+Return exec xterm
+bindsym $mod+mod1+Return exec xfce4-terminal
 
 # file manager
 bindsym $mod+e exec thunar

@@ -1,6 +1,10 @@
 
 # i3
 
+## 20170930 - vi0.2.16
+ - 修改移动container的到相邻workspace的按键
+ - 添加xfce4终端按键映射
+
 ## 20170923 - vi0.2.14
  - 添加split h和split v按键
 
