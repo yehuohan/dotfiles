@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20171001 - vv2.1.191
+ - 添加qwinui snippet
+
 ## 20170930 - vv2.1.190
  - 添加qt相关snippet
  - 添加makefile相关snippet
