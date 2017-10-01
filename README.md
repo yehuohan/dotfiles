@@ -1,7 +1,7 @@
 
 ---
 ## LinuxConfigs(dotfiles)
- 管理Linux的一些配置文件，包括vim(neovim), zsh, i3, Msys2等。
+ 管理linux下的一些配置文件，包括vim, neovim, zsh, i3, msys2等。
 
 
 ---
@@ -19,9 +19,9 @@
 │   │   └── config         : i3staus配置
 │   └── ToggleTouchPad.py  : 触触板控制py脚本
 ├── cf-msys2
-│   ├── .zshrc             : Msys2中的zsh配置
-│   ├── .gitconfig         : Msys2中的git配置
-│   └── .minttyrc          : Msys2模拟终端mintty配置
+│   ├── .zshrc             : msys2中的zsh配置
+│   ├── .gitconfig         : msys2中的git配置
+│   └── .minttyrc          : msys2模拟终端mintty配置
 ├── cf-tmux
 │   ├── .tmux.conf         : tmux配置
 │   └── .tmux-status.conf  : tmux状态栏配置
