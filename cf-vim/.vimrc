@@ -1059,7 +1059,7 @@ call plug#end()            " required
                                         " syntax : 用语法高亮来定义折叠
                                         " diff   : 对没有更改的文本进行折叠
                                         " marker : 对文中的标记折叠，默认使用{{{,}}}标记
-    set scrolloff=1                     " 光标上下保留的行数
+    set scrolloff=3                     " 光标上下保留的行数
     set laststatus=2                    " 一直显示状态栏
     set showcmd                         " 显示寄存器命令，宏调用命令@等
 
