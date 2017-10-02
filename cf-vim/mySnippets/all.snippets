@@ -14,10 +14,10 @@ TEMPLATE = app
 # debug, release, debug_and_release
 CONFIG += debug
 debug{
-	TARGET = $1_d
+	TARGET = ${1:project-name}
 }
 release {
-	TARGET = ${1:project-name}
+	TARGET = $1
 }
 
 #INCLUDEPATH +=
