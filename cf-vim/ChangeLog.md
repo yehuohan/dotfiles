@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20171009 - vv2.1.192
+ - 完善quickfix和loaction-list的next, previous按键映射
+
 ## 20171001 - vv2.1.191
  - 添加qwinui snippet
 

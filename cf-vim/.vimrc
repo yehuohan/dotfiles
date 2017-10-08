@@ -315,7 +315,8 @@ function! F5ComplileFile(argstr)
             let l:exec_str .= " && qmake " . a:argstr . " -r ." . l:filename
             let l:exec_str .= " && vcvars32.bat"
             let l:exec_str .= " && nmake -f Makefile.Debug"
-            let l:exec_str .= " && cd ./debug"
+            " Attention: executed file must be in the same directory with .pro file
+            let l:exec_str .= " && cd .."
         else
             return
         endif
@@ -1239,13 +1240,13 @@ augroup END
     " quickfix open and close
     nnoremap <leader>qo :botright copen<CR>
     nnoremap <leader>qc :cclose<CR>
-    nnoremap <leader>qj :cnext<CR>
-    nnoremap <leader>qk :cprevious<CR>
+    nnoremap <leader>qj :cnext<bar>execute"silent! normal! zO"<bar>execute"normal! zz"<CR>
+    nnoremap <leader>qk :cprevious<bar>execute"silent! normal! zO"<bar>execute"normal! zz"<CR>
     " location-list open and close
     nnoremap <leader>lo :botright lopen<CR>
     nnoremap <leader>lc :lclose<CR>
-    nnoremap <leader>lj :lnext<CR>
-    nnoremap <leader>lk :lprevious<CR>
+    nnoremap <leader>lj :lnext<bar>execute"silent! normal! zO"<bar>execute"normal! zz"<CR>
+    nnoremap <leader>lk :lprevious<bar>execute"silent! normal! zO"<bar>execute"normal! zz"<CR>
     " preview quickfix or locallist
     nnoremap <M-space> :call PreviewQuickfixLine()<CR>
 " }}}
