@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20171009 - vv2.1.193
+ - 添加easy-aling插件
+
 ## 20171009 - vv2.1.192
  - 完善quickfix和loaction-list的next, previous按键映射
 

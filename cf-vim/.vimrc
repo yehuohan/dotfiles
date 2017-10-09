@@ -643,10 +643,19 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " tabular {{{ 字符对齐
     Plug 'godlygeek/tabular'
-    " /:/r2 means align right and insert 2 space before next field
-    " /:\zs to include : character to filed to be tabulared
+    " /,/r2l0   -   第1个field使用第1个对齐符（右对齐），再插入2个空格
+    "               第2个field使用第2个对齐符（左对齐），再插入0个空格
+    "               第3个field又重新从第1个对齐符开始（对齐符可以有多个，循环使用）
+    "               这样就相当于：需对齐的field使用第1个对齐符，分割符(,)field使用第2个对齐符
+    " /,\zs     -   将分割符(,)作为对齐内容field里的字符
     vnoremap <leader>a :Tabularize /
     nnoremap <leader>a :Tabularize /
+" }}}
+
+" easy-align {{{ 字符对齐
+    Plug 'junegunn/vim-easy-align'
+    xmap ga <Plug>(EasyAlign)
+    nmap ga <Plug>(EasyAlign)
 " }}}
 
 " undo {{{ 撤消历史
