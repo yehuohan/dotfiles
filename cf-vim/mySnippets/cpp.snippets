@@ -87,10 +87,10 @@ public slots:
 endsnippet
 
 
-
 #===============================================================================
 # doxygen style for c/c++
 #===============================================================================
+
 
 snippet dmpage"doxygen c/c++ mainpage"
 //==============================================================================
@@ -114,7 +114,6 @@ snippet dspage"doxygen c/c++ subpage"
  * @subpage ${1:name} "${2:text}"
 endsnippet
 
-
 snippet dfile "doxygen c/c++ file"
 //==============================================================================
 /*!
@@ -129,14 +128,12 @@ snippet dfile "doxygen c/c++ file"
 //==============================================================================
 endsnippet
 
-
 snippet dbrief "doxygen c/c++ brief for class etc."
 /*!
  * @brief ${0}
  *
  */
 endsnippet
-
 
 snippet dfunc "doxygen c/c++ function"
 /*!
@@ -148,8 +145,16 @@ snippet dfunc "doxygen c/c++ function"
  */
 endsnippet
 
+snippet dmod "doxygen c/c++ module define"
+/*!
+ * @defgroup ${1:label} ${2:name}
+ * ${0}
+ * @{
+ * @}
+ */
+endsnippet
 
-snippet dmod "doxygen c/c++ module"
+snippet dmod1 "doxygen c/c++ module"
 /*!
  * @defgroup ${1:label} ${2:name}
  * ${0}
@@ -158,7 +163,6 @@ snippet dmod "doxygen c/c++ module"
 
 /*! @} */
 endsnippet
-
 
 snippet damod "doxygen c/c++ addtomodule"
 /*!
@@ -169,7 +173,6 @@ snippet damod "doxygen c/c++ addtomodule"
 
 /*! @} */
 endsnippet
-
 
 snippet dblock "doxygen c/c++ block"
 /*!

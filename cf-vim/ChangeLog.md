@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20171010 - vv2.1.194
+ - 修改dmod snippet
+
 ## 20171009 - vv2.1.193
  - 添加easy-aling插件
 
