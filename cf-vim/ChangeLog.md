@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20171010 - vv2.1.195
+ - 修改easy-align按键映射
+
 ## 20171010 - vv2.1.194
  - 修改dmod snippet
 

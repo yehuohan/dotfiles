@@ -654,8 +654,8 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " easy-align {{{ 字符对齐
     Plug 'junegunn/vim-easy-align'
-    xmap ga <Plug>(EasyAlign)
-    nmap ga <Plug>(EasyAlign)
+    xmap <leader>ga <Plug>(EasyAlign)
+    nmap <leader>ga <Plug>(EasyAlign)
 " }}}
 
 " undo {{{ 撤消历史
