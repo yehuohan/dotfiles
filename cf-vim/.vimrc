@@ -72,6 +72,8 @@
     "       \r相当于一个回车的效果
     "   :s/text\n/text/
     "       查找内容为text，且其后是回车
+    "   :s/\s\+$//g
+    "       去除尾部空格
     "
     " search with match force
     " /\<the\> : can match chars in "for the vim", but can not match chars in "there"
@@ -1334,8 +1336,10 @@ augroup END
 
 " terminal {{{
 if IsNVim()
+    nnoremap <leader>tz :terminal zsh<CR>
     tnoremap <esc> <C-\><C-n>
 else
+    nnoremap <leader>tz :terminal zsh<CR>
     set termkey=<C-w>
     tnoremap <esc> <C-w>N
     packadd termdebug
