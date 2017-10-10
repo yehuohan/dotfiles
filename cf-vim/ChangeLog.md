@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20171010 - vv2.1.196
+ - 添加terminal配置
+
 ## 20171010 - vv2.1.195
  - 修改easy-align按键映射
 

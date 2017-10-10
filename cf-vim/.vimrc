@@ -86,36 +86,36 @@
 " {{{
 " vim or nvim
 " {{{
-    silent function! IsNVim()
-        return has('nvim')
-    endfunction
+silent function! IsNVim()
+    return has('nvim')
+endfunction
 " }}}
 
 " linux or win
 " {{{
-    silent function! IsLinux()
-        return (has('unix') && !has('macunix') && !has('win32unix'))
-    endfunction
-    silent function! IsWin()
-        return (has('win32') || has('win64'))
-    endfunction
-    silent function! IsGw()
-        " GNU for windows
-        return (has('win32unix'))
-    endfunction
+silent function! IsLinux()
+    return (has('unix') && !has('macunix') && !has('win32unix'))
+endfunction
+silent function! IsWin()
+    return (has('win32') || has('win64'))
+endfunction
+silent function! IsGw()
+    " GNU for windows
+    return (has('win32unix'))
+endfunction
 " }}}
 
 " gui or term
 " {{{
-    silent function! IsGvim()
-        return has("gui_running")
-    endfunction
-    function! IsTermType(tt)
-        if &term ==? a:tt
-            return 1
-        else
-            return 0
-    endfunction
+silent function! IsGvim()
+    return has("gui_running")
+endfunction
+function! IsTermType(tt)
+    if &term ==? a:tt
+        return 1
+    else
+        return 0
+endfunction
 " }}}
 
 " }}}
@@ -681,11 +681,6 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nmap <leader>es <Plug>(expand_region_shrink)
     vmap <leader>ee <Plug>(expand_region_expand)
     vmap <leader>es <Plug>(expand_region_shrink)
-" }}}
-
-" matchit {{{ 配对跳转
-    "Plug 'vim-scripts/matchit.zip'
-    runtime macros/matchit.vim
 " }}}
 
 " bookmarks {{{ 书签管理
@@ -1335,6 +1330,23 @@ augroup END
     for item in s:findvimgrep_vmaps
         execute "vnoremap <leader>" . item ":call FindVimgrep('" . item . "', 'v')<CR>"
     endfor
+" }}}
+
+" terminal {{{
+if IsNVim()
+    tnoremap <esc> <C-\><C-n>
+else
+    set termkey=<C-w>
+    tnoremap <esc> <C-w>N
+    packadd termdebug
+endif
+" }}}
+
+" matchit {{{
+if !IsNVim()
+    "runtime macros/matchit.vim
+    packadd matchit
+endif
 " }}}
 
 " }}}
