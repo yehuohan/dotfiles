@@ -17,7 +17,7 @@ fi
 cp ../Vim/_vimrc ./cf-vim/.vimrc
 cp ../Vim/vimfiles/.ycm_extra_conf.py ./cf-vim/
 cp -r ../Vim/vimfiles/mySnippets/ ./cf-vim/
-cp -r ../Vim/vimfiles/autoload/ ./cf-vim/
+cp -r ../Vim/vimfiles/autoload/*.vim ./cf-vim/autoload/
 
 # cf-msys2
 cp ~/.minttyrc ./cf-msys2/
