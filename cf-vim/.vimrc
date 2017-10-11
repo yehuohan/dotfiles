@@ -726,13 +726,14 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " air-line {{{ 状态栏
     Plug 'vim-airline/vim-airline'
-    Plug 'vim-airline/vim-airline-themes'
+    "Plug 'vim-airline/vim-airline-themes'
 if !IsNVim()
     set renderoptions=                                  " required by airline for showing unicode
 endif
     let g:airline_powerline_fonts = 1
     let g:airline#extensions#tabline#enabled = 1
-    let g:airline_theme='cool'
+    "let g:airline_theme='cool'
+    let g:airline_theme='gruvbox'
     "                   "
     let g:airline_left_sep = ""
     let g:airline_left_alt_sep = ""

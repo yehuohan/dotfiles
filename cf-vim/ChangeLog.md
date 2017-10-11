@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20171010 - vv2.1.197
+ - airline使用gruvbox主题
+
 ## 20171010 - vv2.1.196
  - 添加terminal配置
 
