@@ -1335,6 +1335,7 @@ augroup END
 " }}}
 
 " terminal {{{
+if has('terminal')
 if IsNVim()
     nnoremap <leader>tz :terminal zsh<CR>
     tnoremap <esc> <C-\><C-n>
@@ -1343,6 +1344,7 @@ else
     set termkey=<C-w>
     tnoremap <esc> <C-w>N
     packadd termdebug
+endif
 endif
 " }}}
 
