@@ -727,6 +727,9 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 " air-line {{{ 状态栏
     Plug 'vim-airline/vim-airline'
     "Plug 'vim-airline/vim-airline-themes'
+if IsLinux()
+    "Plug 'edkolev/tmuxline.vim'
+endif
 if !IsNVim()
     set renderoptions=                                  " required by airline for showing unicode
 endif
@@ -1109,7 +1112,7 @@ if IsGvim()
         set columns=100
         "set guifont=Ubuntu\ Mono\ 13
         "set guifont=DejaVu\ Sans\ Mono\ 13
-        set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 13
+        set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 12
         set linespace=-2            " required by DejaVuSansMono for Powerline
     elseif IsWin()
         set lines=25
