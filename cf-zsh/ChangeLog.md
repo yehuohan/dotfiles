@@ -1,6 +1,9 @@
 ---
 # cf-zsh-ChangeLog
 
+## 20171012 - vz0.1.10
+ - 设置xmodmap只加载一次
+
 ## 20170923 - vz0.1.9
  - 添加.Xresources
  - 完善.zprofile和.zshrc

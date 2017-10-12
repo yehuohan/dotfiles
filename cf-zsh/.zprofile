@@ -11,8 +11,12 @@ if [ -f "$userresources" ]; then
     xrdb -merge "$userresources"
 fi
 
-if [ -f "$usermodmap" ]; then
-    xmodmap "$usermodmap"
+if [ ! -n "${USER_MODMAP_LOADED+1}" ]; then
+    if [ -f "$usermodmap" ]; then
+        xmodmap "$usermodmap"
+        export USER_MODMAP_LOADED="yes"
+        readonly USER_MODMAP_LOADED
+    fi
 fi
 
 
