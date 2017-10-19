@@ -8,11 +8,11 @@ snippet qmain "qt main function fot gui"
 
 int main(int argc, char *argv[])
 {
-	QApplication a(argc, argv);
-	${2:MainWindow} w;
-	w.show();
+    QApplication a(argc, argv);
+    ${2:MainWindow} w;
+    w.show();
 
-	return a.exec();
+    return a.exec();
 }
 endsnippet
 
@@ -21,21 +21,21 @@ snippet qmainc "qt main function for console"
 
 int main(int argc, char *argv[])
 {
-	QCoreApplication a(argc, argv);
+    QCoreApplication a(argc, argv);
 
-	return a.exec();
+    return a.exec();
 }
 endsnippet
 
-snippet qwin "qt inherit QMainWindow class" 
+snippet qwin "qt inherit QMainWindow class"
 #include <QMainWindow>
 
 class ${1:MainWindow} : public QMainWindow
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit $1(QWidget *parent = 0):QMainWindow(parent) {}
-	~$1() {}
+    explicit $1(QWidget *parent = 0):QMainWindow(parent) {}
+    ~$1() {}
 
 signals:
 
@@ -53,32 +53,32 @@ class $1;
 
 class ${1:MainWindow} : public QMainWindow
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit $1(QWidget *parent = 0);
-	~$1();
+    explicit $1(QWidget *parent = 0);
+    ~$1();
 
 private:
-	Ui::$1* ui;
+    Ui::$1* ui;
 };
 
 $1::$1(QWidget *parent) :
-	QMainWindow(parent),
-	ui(new Ui::$1)
+    QMainWindow(parent),
+    ui(new Ui::$1)
 {
-	ui->setupUi(this);
+    ui->setupUi(this);
 }
 endsnippet
 
-snippet qobj "qt inherit Obeject class" 
+snippet qobj "qt inherit Obeject class"
 #include <QObject>
 
 class ${1:Object} : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit $1(QObject *parent = nullptr):QObject(parent) {}
-	~$1() {}
+    explicit $1(QObject *parent = nullptr):QObject(parent) {}
+    ~$1() {}
 
 signals:
 

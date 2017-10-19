@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20171019 - vv2.1.199
+ - style(cf-vim/mySnippets): 使用空格代替tab
+
 ## 20171019 - vv2.1.198
  - feat(cf-vim): 添加FastFold插件
 
