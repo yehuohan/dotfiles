@@ -2,6 +2,9 @@
 ---
 # cf-vim-ChangeLog
 
+## 20171019 - vv2.1.198
+ - feat(cf-vim): 添加FastFold插件
+
 ## 20171010 - vv2.1.197
  - airline使用gruvbox主题
 

@@ -685,30 +685,13 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     vmap <leader>es <Plug>(expand_region_shrink)
 " }}}
 
-" bookmarks {{{ 书签管理
-    Plug 'MattesGroeger/vim-bookmarks'
-    let g:bookmark_sign = '⚑'
-    let g:bookmark_annotation_sign = '☰'
-    let g:bookmark_no_default_key_mappings = 1  " no default key maps
-    let g:bookmark_auto_save = 1
-    let g:bookmark_auto_save_file = $VimPluginPath."/bookmarks"
-    let g:bookmark_save_per_working_dir = 0     " all marks will save to the same one file
-    let g:bookmark_show_toggle_warning = 0      " disable warning when delete annotate mark
-    let g:bookmark_show_warning = 0             " disable wanring when clearing all marks
-    let g:bookmark_location_list = 0            " use location-list or quickfix
-
-    nnoremap <leader>mm :BookmarkToggle<CR>
-    nnoremap <leader>mi :BookmarkAnnotate<CR>
-    nnoremap <leader>ma :BookmarkShowAll<CR>
-    nnoremap <leader>mj :BookmarkNext<CR>
-    nnoremap <leader>mk :BookmarkPrev<CR>
-    nnoremap <M-d> :BookmarkPrev<CR>
-    nnoremap <M-f> :BookmarkNext<CR>
-    nnoremap <leader>mc :BookmarkClear<CR>
-    " nmap <leader>mx <Plug>BookmarkClearAll
-    " nmap <leader>ml <Plug>BookmarkMoveToLine
-    " nmap <leader>mkk <Plug>BookmarkMoveUp
-    " nmap <leader>mjj <Plug>BookmarkMoveDown
+" FastFold {{{ 更新折叠
+    Plug 'Konfekt/FastFold'
+    nmap zu <Plug>(FastFoldUpdate)
+    let g:fastfold_savehook = 0         " Update folds manually only
+    "let g:fastfold_fold_command_suffixes =  ['x','X','a','A','o','O','c','C']
+    "let g:fastfold_fold_movement_commands = [']z', '[z', 'zj', 'zk']
+                                        " Update folds commands
 " }}}
 
 " }}}
@@ -860,6 +843,32 @@ endif
     nnoremap <leader>qa :SDelete! default<CR><bar>:SSave default<CR><bar>:qa<CR>
                                             " 先删除默认的，再保存会话，最后退出所有窗口
     nnoremap <leader>su :Startify<CR>       " start ui of vim-startify
+" }}}
+
+" bookmarks {{{ 书签管理
+    Plug 'MattesGroeger/vim-bookmarks'
+    let g:bookmark_sign = '⚑'
+    let g:bookmark_annotation_sign = '☰'
+    let g:bookmark_no_default_key_mappings = 1  " no default key maps
+    let g:bookmark_auto_save = 1
+    let g:bookmark_auto_save_file = $VimPluginPath."/bookmarks"
+    let g:bookmark_save_per_working_dir = 0     " all marks will save to the same one file
+    let g:bookmark_show_toggle_warning = 0      " disable warning when delete annotate mark
+    let g:bookmark_show_warning = 0             " disable wanring when clearing all marks
+    let g:bookmark_location_list = 0            " use location-list or quickfix
+
+    nnoremap <leader>mm :BookmarkToggle<CR>
+    nnoremap <leader>mi :BookmarkAnnotate<CR>
+    nnoremap <leader>ma :BookmarkShowAll<CR>
+    nnoremap <leader>mj :BookmarkNext<CR>
+    nnoremap <leader>mk :BookmarkPrev<CR>
+    nnoremap <M-d> :BookmarkPrev<CR>
+    nnoremap <M-f> :BookmarkNext<CR>
+    nnoremap <leader>mc :BookmarkClear<CR>
+    " nmap <leader>mx <Plug>BookmarkClearAll
+    " nmap <leader>ml <Plug>BookmarkMoveToLine
+    " nmap <leader>mkk <Plug>BookmarkMoveUp
+    " nmap <leader>mjj <Plug>BookmarkMoveDown
 " }}}
 
 " neovim gui font {{{ 字体设置(neovim已内置)
@@ -1152,7 +1161,7 @@ augroup END
 " User Key-Maps
 "===============================================================================
 " {{{
-" 基本编辑 {{{
+" Basic Edit {{{
     " Linux下自动退出中文输入法
     if IsLinux()
         "autocmd InsertLeave * call LinuxFcitx2En()
