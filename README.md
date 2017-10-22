@@ -1,6 +1,6 @@
 
 ---
-## LinuxConfigs(dotfiles)
+## LinuxConfigs(dotconfigs)
  管理linux下的一些配置文件，包括vim, neovim, zsh, i3, msys2等。
 
 
@@ -17,7 +17,6 @@
 │   │   └── conky.sh       : cokky配置sh脚本
 │   ├── i3status
 │   │   └── config         : i3staus配置
-│   └── ToggleTouchPad.py  : 触触板控制py脚本
 ├── cf-msys2
 │   ├── .zshrc             : msys2中的zsh配置
 │   ├── .gitconfig         : msys2中的git配置
@@ -38,7 +37,10 @@
 │   ├── .Xresources        : xterm配置
 │   ├── .gitconfig         : git配置
 │   └── .xinitrc           : xorg初始化配置(不使用登录管理器时使用)
-├── cf-font                : Consolas For Powerline Font
+├── cf-misc
+│   └── ToggleTouchPad.py  : 触触板控制py脚本
+└── cf-font                : Consolas For Powerline Font
+
 
 ```
 

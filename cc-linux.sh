@@ -31,8 +31,10 @@ cp ../.xinitrc    ./cf-zsh/
 # cf-i3
 cp ../.config/i3/*             ./cf-i3/i3/
 cp ../.config/i3status/config  ./cf-i3/i3status/
-cp ../MyApps/ToggleTouchPad.py ./cf-i3/
 
 # cf-tmux
 cp ../.tmux.conf        ./cf-tmux/
 cp ../.tmux-status.conf ./cf-tmux/
+
+# cf-misc
+cp ../MyApps/ToggleTouchPad.py ./cf-misc/
