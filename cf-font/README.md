@@ -1,7 +1,11 @@
 
 
 ## Consolas For Powerline
- - **Version :** based on [consolas v5.33](https://en.wikipedia.org/wiki/Consolas)
+ - **Introduction:** This font work nice with gvim in my windows.
+
+![example](./example.png)
+
+ - **Version :** Based on [consolas v5.33](https://en.wikipedia.org/wiki/Consolas)
  - **Characters :**
 
 | Codepoint  | Character                |
