@@ -915,10 +915,10 @@ endif
 
 " ultisnips {{{ 代码片段插入
 if !(IsWin() && IsNVim())
-    Plug 'SirVer/ultisnips'               " snippet insert engine
-    Plug 'honza/vim-snippets'             " snippet collection
+    Plug 'SirVer/ultisnips'               " snippet插入引擎
+    Plug 'honza/vim-snippets'             " snippet合集
     let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
-                                            " mySnippets is my own snippets collection
+                                          " 自定义mySnippets合集
     let g:UltiSnipsExpandTrigger="<tab>"
     let g:UltiSnipsJumpForwardTrigger="<C-j>"
     let g:UltiSnipsJumpBackwardTrigger="<C-k>"
@@ -940,7 +940,7 @@ endif
 " nerd-commenter {{{ 批量注释
     Plug 'scrooloose/nerdcommenter'
     let g:NERDCreateDefaultMappings = 1
-    let g:NERDSpaceDelims = 0               " add space after comment
+    let g:NERDSpaceDelims = 0               " 在Comment后添加Space
     nmap <leader>cc <plug>NERDCommenterComment
     nmap <leader>cm <plug>NERDCommenterMinimal
     nmap <leader>cs <plug>NERDCommenterSexy
@@ -1226,6 +1226,10 @@ augroup END
 
 " move and goto{{{
     " 行首和行尾
+if !IsNVim()
+    "runtime macros/matchit.vim
+    packadd matchit
+endif
     " map recursively for % extended by matchit.vim
     nmap <S-s> %
     nnoremap <S-l> $
@@ -1358,13 +1362,6 @@ else
     tnoremap <esc> <C-w>N
     packadd termdebug
 endif
-endif
-" }}}
-
-" matchit {{{
-if !IsNVim()
-    "runtime macros/matchit.vim
-    packadd matchit
 endif
 " }}}
 
