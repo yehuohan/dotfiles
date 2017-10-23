@@ -303,8 +303,6 @@ function! F5ComplileFile(argstr)
         let l:exec_str .= " && " . l:name
     elseif "py" ==? l:ext || "pyw" ==? l:ext
         let l:exec_str .= "python " . l:filename
-    elseif "m" ==? l:ext
-        let l:exec_str .= "matlab -nosplash -nodesktop -r " . l:name[3:-2]
     elseif "pro" ==? l:ext
         if IsLinux()
             let l:exec_str .= "qmake " . a:argstr . " -r -o ./DebugV/Makefile " . l:filename
@@ -323,6 +321,20 @@ function! F5ComplileFile(argstr)
             return
         endif
         let l:exec_str .= " && " . l:name
+    elseif "m" ==? l:ext
+        let l:exec_str .= "matlab -nosplash -nodesktop -r " . l:name[3:-2]
+    elseif "sh" ==? l:ext
+        if IsLinux() || IsGw()
+            let l:exec_str .= " ./" . l:filename
+        else
+            return
+        endif
+    elseif "bat" ==? l:ext
+        if IsWin()
+            let l:exec_str .= " " . l:filename
+        else
+            return
+        endif
     else
         return
     endif
