@@ -1177,9 +1177,6 @@ augroup END
         " 查找man帮助（linux下可用，windows下仍是查找vim帮助）
         nnoremap <S-m> <S-k>
     endif
-    " j, k 移行
-    nnoremap j gj
-    nnoremap k gk
     " 回退操作
     nnoremap <S-u> <C-r>
     " 大小写转换
@@ -1238,13 +1235,16 @@ augroup END
     " 复制到行首行尾
     nnoremap y<S-l> y$
     nnoremap y<S-h> y^
+    " j, k 移行
+    nnoremap j gj
+    nnoremap k gk
     " 滚屏
     nnoremap <C-j> <C-e>
     nnoremap <C-k> <C-y>
     nnoremap <C-h> zh
     nnoremap <C-l> zl
-    nnoremap <M-h> zH
-    nnoremap <M-l> zL
+    nnoremap <M-h> 16zh
+    nnoremap <M-l> 16zl
 " }}}
 
 " tab, buffer, quickfix {{{
