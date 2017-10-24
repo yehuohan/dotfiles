@@ -285,6 +285,7 @@ endfunction
 " }}}
 
 " 编译环境函数 " {{{
+" 编译 " {{{
 function! F5ComplileFile(argstr)
     let l:ext = expand("%:e")                             " 扩展名
     let l:filename = '"./' . expand('%:t') . '"'          " 文件名，不带路径，带扩展名
@@ -342,6 +343,16 @@ function! F5ComplileFile(argstr)
     " execute shell code
     execute l:exec_str
 endfunction
+" }}}
+
+" 附加参数 " {{{
+function! F5ComplileFileArgs(sopt, arg)
+    if a:arg ==# "charset"
+        call F5ComplileFile('-finput-charset=utf-8 -fexec-charset=gbk')
+    endif
+endfunction
+" }}}
+
 " }}}
 
 " vimgrep搜索 " {{{
@@ -808,6 +819,14 @@ endif
             \ "lst" : ["gruvbox"],
             \ "dic" : {"gruvbox" : "第三方主题"},
             \ "cmd" : "",
+        \},
+        \{
+            \ "opt" : ["cppargs"],
+            \ "lst" : ["charset"],
+            \ "dic" : {
+                    \ "charset" : "-finput-charset=utf-8 -fexec-charset=gbk",
+                    \},
+            \ "cmd" : "F5ComplileFileArgs",
         \},]
         " \{
         "     \ "opt" : ["AirlineTheme"],
