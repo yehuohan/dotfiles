@@ -749,7 +749,7 @@ endif
     let g:airline#extensions#ctrlspace#enabled = 1      " support for ctrlspace integration
     "let g:airline#extensions#ycm#enabled = 1            " support for YCM integration
     "let g:airline#extensions#ycm#error_symbol = '✘:'
-    "let g:airline#extensions#ycm#warning_symbol = '⚡:'
+    "let g:airline#extensions#ycm#warning_symbol = '►:'
 if IsLinux()
     "Plug 'edkolev/tmuxline.vim'
     "let g:airline#extensions#tmuxline#enalbed = 1
@@ -922,7 +922,8 @@ endif
     let g:ycm_global_ycm_extra_conf=$VimPluginPath.'/.ycm_extra_conf.py'
     let g:ycm_enable_diagnostic_signs = 1       " 开启语法检测
     let g:ycm_max_diagnostics_to_display = 30
-    let g:ycm_warning_symbol = '⚡'             " warning符号
+    let g:ycm_warning_symbol = '►'              " warning符号
+
     let g:ycm_error_symbol = '✘'                " error符号
     let g:ycm_seed_identifiers_with_syntax = 1  " 语法关键字补全
     let g:ycm_collect_identifiers_from_tags_files = 1
