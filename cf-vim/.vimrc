@@ -409,7 +409,7 @@ function! FindVimgrep(type, mode)
     " Normal Mode: mode='n'
     " i : find input
     " w : find word
-    " s : find word     with \< \>
+    " s : find word with \< \>
     "
     " Visual Mode: mode='v'
     " i : find input    with selected
@@ -451,7 +451,7 @@ function! FindVimgrep(type, mode)
         endif
     endif
 
-    " return when nothing get
+    " return when nothing was got
     if empty(l:string)
         return
     endif
@@ -470,7 +470,7 @@ function! FindVimgrep(type, mode)
     if a:type =~# 'g'
         let l:files = input(" Where to find :", "", "customlist,GetMultiFilesCompletion")
         if empty(l:files)
-            let l:files = "%"
+            return
         endif
     endif
 
@@ -480,17 +480,23 @@ function! FindVimgrep(type, mode)
         echo "Finding..."
         if empty(getqflist())
             echo "No match: " . l:string
-        else
-            botright copen
+            return
         endif
     elseif a:type =~# 'F'
         silent! execute "lvimgrep /" . l:string . "/gj " . l:files
         echo "Finding..."
         if empty(getloclist(winnr()))
             echo "No match: " . l:string
-        else
-            botright lopen
+            return
         endif
+    endif
+
+    " display search results
+    if a:type =~# 'g'
+        vertical botright copen
+        wincmd =
+    else
+        botright copen
     endif
 endfunction
 " }}}
