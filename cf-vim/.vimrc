@@ -600,7 +600,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nnoremap <leader>sp :OverCommandLine<CR>
 " }}}
 
-" incsearch {{{ 页面查找增强
+" incsearch {{{ 查找预览
     Plug 'haya14busa/incsearch.vim'
     Plug 'haya14busa/incsearch-fuzzy.vim'
     let g:incsearch#auto_nohlsearch = 1     " 停止搜索时，自动关闭高亮
@@ -650,6 +650,10 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nnoremap <leader>fl :FzfLines<CR>
     nnoremap <leader>fb :FzfBLines<CR>
     nnoremap <leader>ff :FzfFiles
+" }}}
+
+" far {{{ 查找与替换
+    Plug 'brooth/far.vim'
 " }}}
 
 " surround and repeat {{{ 添加包围符
