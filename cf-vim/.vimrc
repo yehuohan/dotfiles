@@ -662,6 +662,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
 " far {{{ 查找与替换
     Plug 'brooth/far.vim'
+    let g:far#file_mask_favorites = ['%', '*.txt']
 " }}}
 
 " surround and repeat {{{ 添加包围符
