@@ -481,6 +481,14 @@ function! FindVimgrep(type, mode)
         if empty(getqflist())
             echo "No match: " . l:string
             return
+        else
+            " display search results
+            if a:type =~# 'g'
+                vertical botright copen
+                wincmd =
+            else
+                botright copen
+            endif
         endif
     elseif a:type =~# 'F'
         silent! execute "lvimgrep /" . l:string . "/gj " . l:files
@@ -488,15 +496,15 @@ function! FindVimgrep(type, mode)
         if empty(getloclist(winnr()))
             echo "No match: " . l:string
             return
+        else
+            " display search results
+            if a:type =~# 'g'
+                vertical botright lopen
+                wincmd =
+            else
+                botright lopen
+            endif
         endif
-    endif
-
-    " display search results
-    if a:type =~# 'g'
-        vertical botright copen
-        wincmd =
-    else
-        botright copen
     endif
 endfunction
 " }}}
