@@ -1322,7 +1322,7 @@ endif
     " Buffer切换
     nnoremap <leader>bn :bn<CR>
     nnoremap <leader>bp :bp<CR>
-    nnoremap <leader>bl :b#<CR>
+    nnoremap <leader>bl :b#<bar>execute "set buflisted"<CR>
 
     " 打开/关闭Quickfix
     nnoremap <leader>qo :botright copen<CR>
