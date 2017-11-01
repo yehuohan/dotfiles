@@ -1153,6 +1153,7 @@ call plug#end()                         " required
     set fileformat=unix                 " 以unix格式保存文本文件，即CR作为换行符
     set ignorecase                      " 不区别大小写搜索
     set smartcase                       " 有大写字母时才区别大小写搜索
+    set noimdisable                     " 切换Normal模式时，自动换成英文输入法
     set noerrorbells                    " 关闭错误信息响铃
     set vb t_vb=                        " 关闭响铃(vb)和可视闪铃(t_vb，即闪屏)，即normal模式时按esc会有响铃
     set helplang=cn,en                  " 优先查找中文帮助
