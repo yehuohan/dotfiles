@@ -476,7 +476,7 @@ function! FindVimgrep(type, mode)
 
     " vimgrep or lvimgrep
     if a:type =~# 'f'
-        silent! execute "vimgrep /" . l:string . "/gj " . l:files
+        silent! execute "vimgrep /" . l:string . "/j " . l:files
         echo "Finding..."
         if empty(getqflist())
             echo "No match: " . l:string
@@ -491,7 +491,7 @@ function! FindVimgrep(type, mode)
             endif
         endif
     elseif a:type =~# 'F'
-        silent! execute "lvimgrep /" . l:string . "/gj " . l:files
+        silent! execute "lvimgrep /" . l:string . "/j " . l:files
         echo "Finding..."
         if empty(getloclist(winnr()))
             echo "No match: " . l:string
