@@ -1091,6 +1091,10 @@ augroup END
     Plug 'crucerucalin/qml.vim'
 " }}}
 
+" DrawIt {{{ 画图
+    "Plug 'vim-scripts/DrawIt'
+" }}}
+
 " grammarous {{{ 文字拼写检查
     "Plug 'rhysd/vim-grammarous'
     " 中文支持不好
