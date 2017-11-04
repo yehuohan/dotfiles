@@ -82,6 +82,7 @@
 
 " }}}
 
+
 "===============================================================================
 " Platform
 "===============================================================================
@@ -104,6 +105,9 @@ endfunction
 silent function! IsGw()
     " GNU for windows
     return (has('win32unix'))
+endfunction
+silent function! IsMac()
+    return (has('mac'))
 endfunction
 " }}}
 
@@ -150,6 +154,8 @@ vnoremap ; :
         execute "cd $HOME"
     elseif IsGw()
         let $VimPluginPath="/c/MyApps/Vim/vimfiles"
+    elseif IsMac()
+        let $VimPluginPath=s:home_path . "/.vim"
     endif
     set rtp+=$VimPluginPath             " add .vim or vimfiles to rtp(runtimepath)
 " }}}
@@ -885,6 +891,9 @@ endif
         let g:startify_session_dir = '$VimPluginPath/sessions'
     elseif IsGw()
         let g:startify_session_dir = '~/.vim/sessions'
+    elseif IsMac()
+        let g:startify_bookmarks = [ {'c': '~/.vimrc'}, '~/.zshrc']
+        let g:startify_session_dir = '$VimPluginPath/sessions'
     endif
     let g:startify_files_number = 10
     let g:startify_list_order = [
@@ -1197,6 +1206,10 @@ if IsGvim()
         set guifontwide=Microsoft_YaHei_Mono:h12:cGB2312
         noremap <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
                                     " gvim全屏快捷键
+    elseif IsMac()
+        set lines=30
+        set columns=100
+        set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h15
     endif
 endif
 " }}}
