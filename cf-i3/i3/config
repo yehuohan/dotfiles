@@ -200,10 +200,10 @@ bindsym $mod+mod1+k move up
 bindsym $mod+mod1+l move right
 
 # resize window (you can also use the mouse for that)
-bindsym $mod+Left resize shrink width 10 px or 2 ppt
-bindsym $mod+Up resize grow height 10 px or 2 ppt
-bindsym $mod+Down resize shrink height 10 px or 2 ppt
-bindsym $mod+Right resize grow width 10 px or 2 ppt
+bindsym $mod+Shift+h resize shrink width 10 px or 2 ppt
+bindsym $mod+Shift+k resize grow height 10 px or 2 ppt
+bindsym $mod+Shift+j resize shrink height 10 px or 2 ppt
+bindsym $mod+Shift+l resize grow width 10 px or 2 ppt
 bindsym $mod+z mode "resize"
 mode "resize" {
     bindsym h resize shrink width 10 px or 2 ppt
@@ -212,10 +212,10 @@ mode "resize" {
     bindsym l resize grow width 10 px or 2 ppt
 
     # same bindings, but for the arrow keys
-    bindsym Left resize shrink width 50 px or 10 ppt
-    bindsym Up resize grow height 50 px or 10 ppt
-    bindsym Down resize shrink height 50 px or 10 ppt
-    bindsym Right resize grow width 50 px or 10 ppt
+    bindsym $mod+h resize shrink width 50 px or 10 ppt
+    bindsym $mod+k resize grow height 50 px or 10 ppt
+    bindsym $mod+j resize shrink height 50 px or 10 ppt
+    bindsym $mod+l resize grow width 50 px or 10 ppt
 
     # back to normal: Enter or Escape
     bindsym Return mode "default"
