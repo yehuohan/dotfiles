@@ -190,6 +190,8 @@ if !IsNVim()
     set <M-n>=n
     set <M-m>=m
     set <M-o>=o
+    set <M-p>=p
+    set <M-u>=u
 endif
 " }}}
 
@@ -1361,8 +1363,10 @@ endif
     nnoremap <M-o> gt
 
     " Buffer切换
-    nnoremap <leader>bn :bn<CR>
-    nnoremap <leader>bp :bp<CR>
+    nnoremap <M-p> :bnext<CR>
+    nnoremap <M-u> :bprevious<CR>
+    nnoremap <leader>bn :bnext<CR>
+    nnoremap <leader>bp :bprevious<CR>
     nnoremap <leader>bl :b#<bar>execute "set buflisted"<CR>
 
     " 打开/关闭Quickfix
