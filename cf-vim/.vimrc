@@ -1006,10 +1006,11 @@ endif
 
 " auto-pairs {{{ 自动括号
     Plug 'jiangmiao/auto-pairs'
-    let g:AutoPairsShortcutToggle='<leader>tp'
+    let g:AutoPairsShortcutToggle=''
     let g:AutoPairsShortcutFastWrap=''
     let g:AutoPairsShortcutJump=''
     let g:AutoPairsShortcutFastBackInsert=''
+    nnoremap <leader>tp :call AutoPairsToggle()<CR>
 "}}}
 
 " tagbar {{{ 代码结构预览
