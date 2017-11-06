@@ -817,6 +817,9 @@ endif
     let g:CtrlSpaceSearchTiming = 50
     let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()"
     let g:CtrlSpaceSymbols = { "CS": "⌘"}
+    if executable("ag")
+        let g:CtrlSpaceGlobCommand = 'ag -l --nocolor -g ""'
+    endif
     " 切换按键
     nnoremap <C-Space> :CtrlSpace<CR>
     inoremap <C-Space> <esc>:CtrlSpace<CR>

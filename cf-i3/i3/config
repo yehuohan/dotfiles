@@ -1,5 +1,5 @@
 #==============================================================================
-# i3-config 
+# i3-config
 # yehuohan@gmail.com, yehuohan@qq.com
 #
 # Should you change your keyboard layout some time, delete
@@ -24,7 +24,7 @@ exec --no-startup-id fcitx
 # 透明效果
 exec --no-startup-id compton
 # 背景
-exec_always --no-startup-id feh --bg-fill ~/Pictures/WallPaper/wp3.jpg
+exec_always --no-startup-id feh --bg-fill ~/Pictures/WallPaper/wp6.jpg
 # 电池管理，包括亮度调节(可以使用Fn+亮度调节键)
 exec --no-startup-id xfce4-power-manager
 # 网络连接
@@ -42,7 +42,7 @@ exec --no-startup-id volumeicon
 # {{{
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-#font pango:monospace 10 
+#font pango:monospace 10
 font pango:WenQuanYi Micro Hei Bold 11
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
@@ -78,14 +78,14 @@ workspace_auto_back_and_forth yes
 for_window [window_role="pop-up"] floating enable
 
 # i3-gaps configuration
-#for_window [class="^.*"] border normal
-for_window [class="^.*"] border pixel 3
+set $bp 3
+for_window [class="^.*"] border pixel $bp
 gaps inner 2
 gaps outer 2
 
 # color vairable
 # main color
-set $clr_m 107090 
+set $clr_m 107090
 # window colors
 # class                 border  backgr. text    indicator child_border
 client.focused          #$clr_m #$clr_m #eeeeee #$clr_m   #$clr_m
@@ -140,7 +140,7 @@ bar {
 # mod+mod1  : 作为mod的逆功能键，或是成对按键功能(如移动焦点和移动窗口)
 #===============================================================================
 
-# i3管理键 
+# i3管理键
 # {{{
 # Power Management
 set $mode_system   Lock(L)  Logout(O)  Reboot(R)  Shutdown(S)  Exit(Esc)
@@ -159,12 +159,12 @@ bindsym $mod+Shift+w reload
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
-# restart i3 inplace 
+# restart i3 inplace
 # preserves your layout/session, can be used to upgrade i3
 bindsym $mod+Shift+r restart
 # }}}
 
-# 窗口管理 
+# 窗口管理
 # {{{
 # kill(stop) focused window
 bindsym $mod+s kill
@@ -189,7 +189,7 @@ bindsym $mod+mod1+v focus parent
 bindsym $mod+v focus child
 
 # toggle tiling / floating
-bindsym $mod+mod1+space floating toggle
+bindsym $mod+mod1+space floating toggle; [floating] border normal; [tiling] border pixel $bp
 # change focus between tiling / floating windows
 bindsym $mod+space focus mode_toggle
 
@@ -200,10 +200,10 @@ bindsym $mod+mod1+k move up
 bindsym $mod+mod1+l move right
 
 # resize window (you can also use the mouse for that)
-bindsym $mod+Left resize shrink width 10 px or 2 ppt
-bindsym $mod+Up resize grow height 10 px or 2 ppt
-bindsym $mod+Down resize shrink height 10 px or 2 ppt
-bindsym $mod+Right resize grow width 10 px or 2 ppt
+bindsym $mod+Shift+h resize shrink width 10 px or 2 ppt
+bindsym $mod+Shift+k resize grow height 10 px or 2 ppt
+bindsym $mod+Shift+j resize shrink height 10 px or 2 ppt
+bindsym $mod+Shift+l resize grow width 10 px or 2 ppt
 bindsym $mod+z mode "resize"
 mode "resize" {
     bindsym h resize shrink width 10 px or 2 ppt
@@ -212,10 +212,10 @@ mode "resize" {
     bindsym l resize grow width 10 px or 2 ppt
 
     # same bindings, but for the arrow keys
-    bindsym Left resize shrink width 50 px or 10 ppt
-    bindsym Up resize grow height 50 px or 10 ppt
-    bindsym Down resize shrink height 50 px or 10 ppt
-    bindsym Right resize grow width 50 px or 10 ppt
+    bindsym $mod+h resize shrink width 50 px or 10 ppt
+    bindsym $mod+k resize grow height 50 px or 10 ppt
+    bindsym $mod+j resize shrink height 50 px or 10 ppt
+    bindsym $mod+l resize grow width 50 px or 10 ppt
 
     # back to normal: Enter or Escape
     bindsym Return mode "default"
@@ -249,16 +249,15 @@ bindsym $mod+mod1+6 move container to workspace 6; workspace 6
 bindsym $mod+mod1+7 move container to workspace 7; workspace 7
 bindsym $mod+mod1+8 move container to workspace 8; workspace 8
 bindsym $mod+mod1+9 move container to workspace 9; workspace 9
+# move container to near workspace
+bindsym $mod+Shift+o move container to workspace next_on_output; workspace next_on_output
+bindsym $mod+Shift+i move container to workspace prev_on_output; workspace prev_on_output
 
 # switch to near workspace
-bindsym $mod+o workspace next_on_output 
+bindsym $mod+o workspace next_on_output
 bindsym $mod+i workspace prev_on_output
 bindsym $mod+mod1+o workspace next
 bindsym $mod+mod1+i workspace prev
-
-# move container to near workspace 
-bindsym $mod+Shift+o move container to workspace next
-bindsym $mod+Shift+i move container to workspace prev
 
 # Move the current workspace to the next output (effectively toggles when you only have two outputs)
 bindsym $mod+mod1+m move workspace to output right
