@@ -679,20 +679,6 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:far#file_mask_favorites = ['%', '*.txt']
 " }}}
 
-" surround and repeat {{{ 添加包围符
-    Plug 'tpope/vim-surround'
-    Plug 'tpope/vim-repeat'
-
-    " 重新映射surround按键
-    nmap <leader>sw ysiw
-    nmap <leader>si ysw
-    nmap <leader>sl yss
-    nmap <leader>sL ySS
-    " 重新映射Visual Mode下的surround按键
-    vmap s S
-    vmap <leader>s gS
-" }}}
-
 " tabular {{{ 字符对齐
     Plug 'godlygeek/tabular'
     " /,/r2l0   -   第1个field使用第1个对齐符（右对齐），再插入2个空格
@@ -708,11 +694,6 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     Plug 'junegunn/vim-easy-align'
     xmap <leader>ga <Plug>(EasyAlign)
     nmap <leader>ga <Plug>(EasyAlign)
-" }}}
-
-" undo {{{ 撤消历史
-    Plug 'mbbill/undotree'
-    nnoremap <leader>tu :UndotreeToggle<CR>
 " }}}
 
 " smooth-scroll {{{ 平滑滚动
@@ -940,6 +921,11 @@ endif
     " nmap <leader>mjj <Plug>BookmarkMoveDown
 " }}}
 
+" undo {{{ 撤消历史
+    Plug 'mbbill/undotree'
+    nnoremap <leader>tu :UndotreeToggle<CR>
+" }}}
+
 " neovim gui font {{{ 字体设置(neovim已内置)
 if IsNVim()
     "Plug 'equalsraf/neovim-gui-shim'
@@ -996,6 +982,28 @@ if !(IsWin() && IsNVim())
     let g:UltiSnipsJumpBackwardTrigger="<C-k>"
 endif
 " }}}
+
+" surround and repeat {{{ 添加包围符
+    Plug 'tpope/vim-surround'
+    Plug 'tpope/vim-repeat'
+
+    " 重新映射surround按键
+    nmap <leader>sw ysiw
+    nmap <leader>si ysw
+    nmap <leader>sl yss
+    nmap <leader>sL ySS
+    " 重新映射Visual Mode下的surround按键
+    vmap s S
+    vmap <leader>s gS
+" }}}
+
+" auto-pairs {{{ 自动括号
+    Plug 'jiangmiao/auto-pairs'
+    let g:AutoPairsShortcutToggle='<leader>tp'
+    let g:AutoPairsShortcutFastWrap=''
+    let g:AutoPairsShortcutJump=''
+    let g:AutoPairsShortcutFastBackInsert=''
+"}}}
 
 " tagbar {{{ 代码结构预览
     Plug 'majutsushi/tagbar'
