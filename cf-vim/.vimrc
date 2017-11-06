@@ -679,11 +679,14 @@ if executable('ag')
     " https://github.com/ggreer/the_silver_searcher
     let g:ag_prg="ag --vimgrep --smart-case"
 endif
-" }}} 
+" }}}
 
 " far {{{ 查找与替换
     Plug 'brooth/far.vim'
     let g:far#file_mask_favorites = ['%', '*.txt']
+    nnoremap <leader>sr :Farp<CR>
+                                        " Search and Replace, 使用Fardo和Farundo来更改替换结果
+    nnoremap <leader>sf :F
 " }}}
 
 " tabular {{{ 字符对齐
