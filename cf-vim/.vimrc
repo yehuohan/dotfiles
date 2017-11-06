@@ -667,12 +667,19 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
         Plug 'junegunn/fzf'
     endif
     Plug 'junegunn/fzf.vim'
-    "Plug 'rking/ag.vim'
     let g:fzf_command_prefix = 'Fzf'
     nnoremap <leader>fl :FzfLines<CR>
     nnoremap <leader>fb :FzfBLines<CR>
     nnoremap <leader>ff :FzfFiles
 " }}}
+
+" ag {{{ Ag大范围查找
+if executable('ag')
+    Plug 'rking/ag.vim'
+    " https://github.com/ggreer/the_silver_searcher
+    let g:ag_prg="ag --vimgrep --smart-case"
+endif
+" }}} 
 
 " far {{{ 查找与替换
     Plug 'brooth/far.vim'
@@ -1207,16 +1214,17 @@ if IsGvim()
         "set guifont=Ubuntu\ Mono\ 13
         "set guifont=DejaVu\ Sans\ Mono\ 13
         set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 12
-        set linespace=-2            " required by DejaVuSansMono for Powerline
+                                        " https://github.com/powerline/fonts
+        set linespace=-2                " required by DejaVuSansMono for Powerline
     elseif IsWin()
         set lines=25
         set columns=100
         "set guifont=Consolas:h13:cANSI
         set guifont=Consolas_For_Powerline:h13:cANSI
-        set linespace=0            " required by PowerlineFont
+        set linespace=0                 " required by PowerlineFont
         set guifontwide=Microsoft_YaHei_Mono:h12:cGB2312
         noremap <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
-                                    " gvim全屏快捷键
+                                        " gvim全屏快捷键
     elseif IsMac()
         set lines=30
         set columns=100
