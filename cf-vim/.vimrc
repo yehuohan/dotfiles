@@ -978,7 +978,8 @@ endif
     nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
     nnoremap <leader>gi :YcmCompleter GoToInclude<CR>
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
-    nnoremap <leader>gs :YcmShowDetailedDiagnostic<CR>
+    nnoremap <leader>yd :YcmShowDetailedDiagnostic<CR>
+    nnoremap <leader>yf :YcmCompleter FixIt<CR>
     noremap <F4> :YcmDiags<CR>
                                         " 错误列表
 " }}}
