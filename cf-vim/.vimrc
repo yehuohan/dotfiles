@@ -519,6 +519,32 @@ endfunction
 
 " }}}
 
+" 查找关键字 {{{
+function! GotoKeyword(mode)
+    let l:ext = expand("%:e")           " 扩展名
+    let l:word = expand("<cword>")
+    let l:exec_str = "help "
+
+    if a:mode ==# 'v'
+        " get selected string in visual mode
+        let l:reg_var = getreg('0', 1)
+        let l:reg_mode = getregtype('0')
+        normal! gv"0y
+        let l:word = getreg('0')
+        call setreg('0', l:reg_var, l:reg_mode)
+    endif
+
+    " 添加关键字
+    let l:exec_str .= l:word
+    if IsNVim()
+        " nvim用自己的帮助文件，只有英文的
+        let l:exec_str .= "@en"
+    endif
+
+    silent! execute l:exec_str
+endfunction
+" }}}
+
 " Quickfix相关函数 {{{
 " 编码转换 {{{
 "function! ConvQuickfix(type, if, it)
@@ -825,7 +851,7 @@ endif
     let g:Popset_SelectionData = [
         \{
             \ "opt" : ["filetype", "ft"],
-            \ "lst" : ["cpp", "c", "python", "vim", "markdown", "help", "text",
+            \ "lst" : ["cpp", "c", "python", "vim", "go", "markdown", "help", "text",
                      \ "sh", "matlab", "conf", "make"],
             \ "dic" : {
                     \ "python" : "Python script file",
@@ -983,6 +1009,15 @@ endif
     noremap <F4> :YcmDiags<CR>
                                         " 错误列表
 " }}}
+
+" vim-go {{{ Go开发环境
+    Plug 'fatih/vim-go'
+    " +YCM : 支持Go实时补全
+    let g:go_doc_keywordprg_enabled=0   " 取消对K的映射
+    let g:go_def_mapping_enabled=0      " 取消默认的按键映射
+    let g:go_textobj_enabled=1          " 使用TextObject的映射
+    let g:go_fmt_autosave = 0           " 禁用auto GoFmt
+"}}}
 
 " ultisnips {{{ 代码片段插入
 if !(IsWin() && IsNVim())
@@ -1246,15 +1281,29 @@ augroup VimVimrc
     "autocmd[!]  [group]  {event}     {pattern}  {nested}  {cmd}
     "autocmd              BufNewFile  *                    set fileformat=unix
     autocmd!
-    autocmd BufNewFile * set fileformat=unix
+
+    " auto-setting
+    autocmd BufNewFile *    set fileformat=unix
+    autocmd GuiEnter *      set t_vb=   " 关闭可视闪铃(即闪屏)
     autocmd BufEnter *.tikz set filetype=tex
 
-    autocmd Filetype vim set foldmethod=marker
-    autocmd Filetype c set foldmethod=syntax
-    autocmd Filetype cpp set foldmethod=syntax
-    autocmd Filetype python set foldmethod=indent
+    autocmd Filetype vim    setlocal foldmethod=marker
+    autocmd Filetype c      setlocal foldmethod=syntax
+    autocmd Filetype cpp    setlocal foldmethod=syntax
+    autocmd Filetype python setlocal foldmethod=indent
+    autocmd FileType go     setlocal expandtab
 
-    autocmd GuiEnter * set t_vb=        " 关闭可视闪铃(即闪屏)
+    " map
+    autocmd Filetype vim nnoremap <buffer>          <S-k> :call GotoKeyword('n')<CR>
+    autocmd Filetype vim vnoremap <buffer>          <S-k> :call GotoKeyword('v')<CR>
+if -1 != match(g:plugs_order, "^vim-go$")
+    autocmd FileType go  nnoremap <buffer> <silent> <leader>gc :execute ":GoDoc " . expand("<cword>")<CR>
+    autocmd FileType go  nnoremap <buffer> <silent> <leader>gb :GoBuild<CR>
+    autocmd FileType go  nnoremap <buffer> <silent> <leader>gd :GoDef<CR>
+    autocmd FileType go  nnoremap <buffer> <silent> <leader>gr :GoRun<CR>
+    autocmd FileType go  nnoremap <buffer>          <leader>rf :GoRun<CR>
+    autocmd FileType go  nnoremap <buffer>          <F5> :GoRun<CR>
+endif
 augroup END
 " }}}
 
@@ -1266,21 +1315,6 @@ augroup END
 "===============================================================================
 " {{{
 " Basic Edit {{{
-    " Linux下自动退出中文输入法
-    if IsLinux()
-        "autocmd InsertLeave * call LinuxFcitx2En()
-        inoremap <esc> <esc>:call LinuxFcitx2En()<CR>
-    endif
-    " 查找vim帮助
-    if IsNVim()
-        " nvim用自己的帮助文件，只有英文的
-        nnoremap <S-k> :exec "help " . expand("<cword>"). "@en"<CR>
-        nnoremap <S-m> <S-k>
-    else
-        nnoremap <S-k> :exec "help " . expand("<cword>")<CR>
-        " 查找man帮助（linux下可用，windows下仍是查找vim帮助）
-        nnoremap <S-m> <S-k>
-    endif
     " 回退操作
     nnoremap <S-u> <C-r>
     " 大小写转换
@@ -1293,6 +1327,11 @@ augroup END
     nnoremap <leader>zm zM
     " Asd2Num
     inoremap <C-a> <esc>:call ToggleAsd2num()<CR>a
+    " Linux下自动退出中文输入法
+    if IsLinux()
+        "autocmd InsertLeave * call LinuxFcitx2En()
+        inoremap <esc> <esc>:call LinuxFcitx2En()<CR>
+    endif
 " }}}
 
 " Show Setting{{{
