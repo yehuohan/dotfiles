@@ -728,12 +728,6 @@ endif
     nnoremap <leader>a :Tabularize /
 " }}}
 
-" easy-align {{{ 字符对齐
-    Plug 'junegunn/vim-easy-align'
-    xmap <leader>ga <Plug>(EasyAlign)
-    nmap <leader>ga <Plug>(EasyAlign)
-" }}}
-
 " smooth-scroll {{{ 平滑滚动
     Plug 'terryma/vim-smooth-scroll'
     " nnoremap <silent> <C-d> :call smooth_scroll#down(&scroll, 0, 2)<CR>
@@ -964,12 +958,6 @@ endif
     nnoremap <leader>tu :UndotreeToggle<CR>
 " }}}
 
-" neovim gui font {{{ 字体设置(neovim已内置)
-if IsNVim()
-    "Plug 'equalsraf/neovim-gui-shim'
-endif
-" }}}
-
 " }}}
 
 " 代码类
@@ -1120,12 +1108,6 @@ augroup END
     nnoremap <leader>th :QuickhlManualLockWindowToggle<CR>
 " }}}
 
-" splitjoin {{{ 行间连接与分割
-    "Plug 'AndrewRadev/splitjoin.vim'
-    "nnoremap <leader>gj gJ
-    "nnoremap <leader>gs gS
-" }}}
-
 " }}}
 
 " 软件辅助类
@@ -1158,6 +1140,29 @@ augroup END
 
 " qml {{{ qml高亮
     Plug 'crucerucalin/qml.vim'
+" }}}
+
+" }}}
+
+" Disabled Plugins
+" {{{
+
+" easy-align {{{ 字符对齐
+    "Plug 'junegunn/vim-easy-align'
+    "xmap <leader>ga <Plug>(EasyAlign)
+    "nmap <leader>ga <Plug>(EasyAlign)
+" }}}
+
+" neovim gui font {{{ 字体设置(neovim已内置)
+if IsNVim()
+    "Plug 'equalsraf/neovim-gui-shim'
+endif
+" }}}
+
+" splitjoin {{{ 行间连接与分割
+    "Plug 'AndrewRadev/splitjoin.vim'
+    "nnoremap <leader>gj gJ
+    "nnoremap <leader>gs gS
 " }}}
 
 " DrawIt {{{ 画图
@@ -1219,6 +1224,7 @@ call plug#end()                         " required
     set backspace=2                     " Insert模式下使用BackSpace删除
     set hidden                          " 允许在未保存文件时切换buffer
     set nobackup                        " 不生成备份文件
+    set nowritebackup                   " 不生成备份文件
     set autochdir                       " 自动切换当前目录为当前文件所在的目录
     set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
                                         " 尝试解码序列
