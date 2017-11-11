@@ -175,7 +175,7 @@ bindsym $mod+f fullscreen toggle
 # 把当前窗口放到scratchpad
 bindsym $mod+mod1+p move scratchpad
 # 从scratchpad呼出第一个窗口，将呼出的窗口设置成平铺才能继续呼出窗口
-bindsym $mod+p scratchpad show
+bindsym $mod+p scratchpad show; [floating] border normal; [tiling] border pixel $bp
 
 # change focus
 bindsym $mod+h focus left
