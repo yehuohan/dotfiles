@@ -330,6 +330,8 @@ function! F5ComplileFile(argstr)
             return
         endif
         let l:exec_str .= " && " . l:name
+    elseif "go" ==? l:ext
+        let l:exec_str .= " -raw=1 go run " . l:filename
     elseif "m" ==? l:ext
         let l:exec_str .= "matlab -nosplash -nodesktop -r " . l:name[3:-2]
     elseif "sh" ==? l:ext
@@ -521,7 +523,6 @@ endfunction
 
 " 查找关键字 {{{
 function! GotoKeyword(mode)
-    let l:ext = expand("%:e")           " 扩展名
     let l:word = expand("<cword>")
     let l:exec_str = "help "
 
@@ -1307,9 +1308,9 @@ if -1 != match(g:plugs_order, "^vim-go$")
     autocmd FileType go  nnoremap <buffer> <silent> <leader>gc :execute ":GoDoc " . expand("<cword>")<CR>
     autocmd FileType go  nnoremap <buffer> <silent> <leader>gb :GoBuild<CR>
     autocmd FileType go  nnoremap <buffer> <silent> <leader>gd :GoDef<CR>
-    autocmd FileType go  nnoremap <buffer> <silent> <leader>gr :GoRun<CR>
-    autocmd FileType go  nnoremap <buffer>          <leader>rf :GoRun<CR>
-    autocmd FileType go  nnoremap <buffer>          <F5> :GoRun<CR>
+    "autocmd FileType go  nnoremap <buffer> <silent> <leader>gr :GoRun<CR>
+    "autocmd FileType go  nnoremap <buffer>          <leader>rf :GoRun<CR>
+    "autocmd FileType go  nnoremap <buffer>          <F5> :GoRun<CR>
 endif
 augroup END
 " }}}
