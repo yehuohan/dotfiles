@@ -293,8 +293,12 @@ endfunction
 " }}}
 
 " 编译环境函数 " {{{
-" 编译 " {{{
-function! F5ComplileFile(argstr)
+" Set autochdir is required.
+set autochdir
+
+" FUNCTION: ComplileFile(argstr) {{{
+" @param argstr: 想要传递的命令参数
+function! ComplileFile(argstr)
     let l:ext = expand("%:e")                       " 扩展名
     let l:filename = '"./' . expand('%:t') . '"'    " 文件名，不带路径，带扩展名
     let l:name = '"./' . expand('%:t:r') . '"'      " 文件名，不带路径，不带扩展名
@@ -355,13 +359,68 @@ function! F5ComplileFile(argstr)
 endfunction
 " }}}
 
-" 附加参数 " {{{
-function! F5ComplileFileArgs(sopt, arg)
+" FUNCTION: ComplileFileArgs(sopt, arg) {{{
+function! ComplileFileArgs(sopt, arg)
     if a:arg ==# "charset"
-        call F5ComplileFile('-finput-charset=utf-8 -fexec-charset=gbk')
+        call ComplileFile('-finput-charset=utf-8 -fexec-charset=gbk')
     endif
 endfunction
 " }}}
+
+" FUNCTION: FindProjectFile(...) {{{
+" @param 1: 工程文件，如*.pro
+" @param 2: 查找起始目录，默认从当前目录向上查找到根目录
+function! FindProjectFile(...)
+    if a:0 == 0
+        return ""
+    endif
+    let l:marker = a:1
+    let l:dir = (a:0 >= 2) ? a:2 : "."
+    let l:prj_dir      = fnamemodify(l:dir, ":p:h")
+    let l:prj_dir_last = ""
+    let l:prj_file     = ""
+
+    while l:prj_dir != l:prj_dir_last
+        let l:prj_file = glob(l:prj_dir . '/' . l:marker)
+        if !empty(l:prj_file)
+            break
+        endif
+
+        let l:prj_dir_last = l:prj_dir
+        let l:prj_dir = fnamemodify(l:prj_dir, ":p:h:h")
+    endwhile
+
+    return split(l:prj_file, "\n")
+endfunction
+" }}}
+
+" FUNCTION: ComplileProject(str) {{{
+" @param str: 工程文件名，可用通配符，如*.pro
+" @param fn: 编译工程文件的函数，需要采用popset插件
+function! ComplileProject(str, fn)
+    let l:prj = FindProjectFile(a:str)
+    if len(l:prj) == 1
+        let Fn = function(a:fn)
+        call Fn('', l:prj[0])
+    elseif len(l:prj) > 1
+        call PopSelection({
+            \ 'opt' : ['Please Select your project file'],
+            \ 'lst' : l:prj,
+            \ 'dic' : {},
+            \ 'cmd' : a:fn,
+            \}, 0)
+    endif
+endfunction
+" }}}
+
+" FUNCTION: ComplileProjectQmake(sopt, sel) {{{
+function! ComplileProjectQmake(sopt, sel)
+    echo a:sel
+endfunction
+" }}}
+
+" Run compliler
+let RCQmake = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'])
 
 " }}}
 
@@ -825,8 +884,7 @@ endif
     let g:CtrlSpaceCacheDir = $VimPluginPath
     let g:CtrlSpaceSetDefaultMapping = 1
     let g:CtrlSpaceProjectRootMarkers = [
-         \ ".git", ".sln", ".pro",
-         \".hg", ".svn", ".bzr", "_darcs", "CVS"]
+         \ ".git", ".hg", ".svn", ".bzr", "_darcs", "CVS"]
                                         " Project root markers
     let g:CtrlSpaceSearchTiming = 50
     let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()"
@@ -870,7 +928,7 @@ endif
             \ "dic" : {
                     \ "charset" : "-finput-charset=utf-8 -fexec-charset=gbk",
                     \},
-            \ "cmd" : "F5ComplileFileArgs",
+            \ "cmd" : "ComplileFileArgs",
         \},]
         " \{
         "     \ "opt" : ["AirlineTheme"],
@@ -1469,11 +1527,11 @@ endif
 
 " Run Program map{{{
     " 编译运行当前文件
-    noremap <F5> <esc>:call F5ComplileFile('')<CR>
-    nnoremap <leader>rf :call F5ComplileFile('')<CR>
+    noremap <F5> <esc>:call ComplileFile('')<CR>
+    nnoremap <leader>rf :call ComplileFile('')<CR>
 
     " 编译运行（输入参数）当前文件
-    nnoremap <leader>ra :execute"let g:__str__=input('Compile Args: ')"<bar>call F5ComplileFile(g:__str__)<CR>
+    nnoremap <leader>ra :execute"let g:__str__=input('Compile Args: ')"<bar>call ComplileFile(g:__str__)<CR>
 " }}}
 
 " File diff {{{
