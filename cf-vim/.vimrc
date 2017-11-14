@@ -331,7 +331,7 @@ function! F5ComplileFile(argstr)
         endif
         let l:exec_str .= " && " . l:name
     elseif "go" ==? l:ext
-        let l:exec_str .= " -raw=1 go run " . l:filename
+        let l:exec_str .= " go run " . l:filename
     elseif "m" ==? l:ext
         let l:exec_str .= "matlab -nosplash -nodesktop -r " . l:name[3:-2]
     elseif "sh" ==? l:ext
@@ -1305,6 +1305,8 @@ augroup VimVimrc
     autocmd Filetype vim nnoremap <buffer>          <S-k> :call GotoKeyword('n')<CR>
     autocmd Filetype vim vnoremap <buffer>          <S-k> :call GotoKeyword('v')<CR>
 if -1 != match(g:plugs_order, "^vim-go$")
+    " g:plugs_order是vim-plug中的变量
+    autocmd FileType go setlocal errorformat&
     autocmd FileType go  nnoremap <buffer> <silent> <leader>gc :execute ":GoDoc " . expand("<cword>")<CR>
     autocmd FileType go  nnoremap <buffer> <silent> <leader>gb :GoBuild<CR>
     autocmd FileType go  nnoremap <buffer> <silent> <leader>gd :GoDef<CR>
