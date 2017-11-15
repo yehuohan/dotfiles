@@ -775,6 +775,8 @@ endif
     nnoremap <leader>sr :Farp<CR>
                                         " Search and Replace, 使用Fardo和Farundo来更改替换结果
     nnoremap <leader>sf :F
+    nnoremap <leader>fd :Fardo<CR>
+    nnoremap <leader>fu :Farundo<CR>
 " }}}
 
 " tabular {{{ 字符对齐
