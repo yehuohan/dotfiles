@@ -256,6 +256,16 @@ function! InvFoldColumeShow()
 endfunction
 " }}}
 
+" 切换显示标志列 {{{
+function! InvSigncolumn()
+    if &signcolumn == "auto"
+        set signcolumn=no
+    else
+        set signcolumn=auto
+    endif
+endfunction
+" }}}
+
 " linux-fcitx输入法切换 " {{{
 if IsLinux()
 function! LinuxFcitx2En()
@@ -1417,6 +1427,8 @@ augroup END
     nnoremap <leader>in :call InvNumberType()<CR>
     " 切换折叠列宽
     nnoremap <leader>if :call InvFoldColumeShow()<CR>
+    " 切换显示标志列
+    nnoremap <leader>is :call InvSigncolumn()<CR>
 " }}}
 
 " Copy and paste{{{
