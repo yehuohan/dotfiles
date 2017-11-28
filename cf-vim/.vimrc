@@ -404,7 +404,7 @@ function! FindProjectFile(...)
 endfunction
 " }}}
 
-" FUNCTION: ComplileProject(str) {{{
+" FUNCTION: ComplileProject(str, fn) {{{
 " @param str: 工程文件名，可用通配符，如*.pro
 " @param fn: 编译工程文件的函数，需要采用popset插件
 function! ComplileProject(str, fn)
@@ -425,12 +425,45 @@ endfunction
 
 " FUNCTION: ComplileProjectQmake(sopt, sel) {{{
 function! ComplileProjectQmake(sopt, sel)
-    echo a:sel
+    let l:filename = '"./' . fnamemodify(a:sel, ":p:t") . '"'
+    let l:name = '"./' . fnamemodify(a:sel, ":t:r") . '"'
+    let l:filedir = fnameescape(fnamemodify(a:sel, ":p:h"))
+    let l:olddir = fnameescape(getcwd())
+    let l:exec_str = "!"
+    if exists(":AsyncRun") == 2
+        let l:exec_str = ":AsyncRun "
+    endif
+
+    " change cwd
+    execute "lcd " . l:filedir
+
+    " execute shell code
+    if IsLinux()
+        let l:exec_str .= "qmake " . " -r -o ./DebugV/Makefile " . l:filename
+        let l:exec_str .= " && cd ./DebugV"
+        let l:exec_str .= " && make"
+    elseif IsWin()
+        let l:exec_str .= " mkdir DebugV"
+        let l:exec_str .= " & cd DebugV"
+        " Attetion: here shouls be <qmake ../file.pro>
+        let l:exec_str .= " && qmake " . " -r ." . l:filename
+        let l:exec_str .= " && vcvars32.bat"
+        let l:exec_str .= " && nmake -f Makefile.Debug"
+        " Attention: executed file must be in the same directory with .pro file
+        let l:exec_str .= " && cd .."
+    else
+        return
+    endif
+    let l:exec_str .= " && " . l:name
+    execute l:exec_str
+
+    " change back cwd
+    execute "lcd " . l:olddir
 endfunction
 " }}}
 
 " Run compliler
-let RCQmake = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'])
+let RC_Qmake = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'])
 
 " }}}
 
