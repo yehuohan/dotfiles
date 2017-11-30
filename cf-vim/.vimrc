@@ -281,27 +281,6 @@ endfunction
 endif
 " }}}
 
-" asd2num切换 " {{{
-let s:asd2num_toggle_flg = 0
-let s:asd2num_map_table={
-            \ "a" : "1", "s" : "2", "d" : "3", "f" : "4", "g" : "5",
-            \ "h" : "6", "j" : "7", "k" : "8", "l" : "9", ";" : "0"
-            \ }
-function! ToggleAsd2num()
-    if(s:asd2num_toggle_flg)
-        for t in items(s:asd2num_map_table)
-            execute "iunmap " . t[0]
-        endfor
-        let s:asd2num_toggle_flg = 0
-    else
-        for t in items(s:asd2num_map_table)
-            execute "inoremap " . t[0]. " " . t[1]
-        endfor
-        let s:asd2num_toggle_flg = 1
-    endif
-endfunction
-" }}}
-
 " 编译环境函数 " {{{
 " Set autochdir is required.
 set autochdir
@@ -623,7 +602,7 @@ endfunction
 
 " }}}
 
-" 查找关键字 {{{
+" 查找Vim关键字 {{{
 function! GotoKeyword(mode)
     let l:word = expand("<cword>")
     let l:exec_str = "help "
@@ -683,6 +662,27 @@ function! PreviewQuickfixLine()
 endfunction
 " }}}
 
+" }}}
+
+" asd2num切换 " {{{
+let s:asd2num_toggle_flg = 0
+let s:asd2num_map_table={
+            \ "a" : "1", "s" : "2", "d" : "3", "f" : "4", "g" : "5",
+            \ "h" : "6", "j" : "7", "k" : "8", "l" : "9", ";" : "0"
+            \ }
+function! ToggleAsd2num()
+    if(s:asd2num_toggle_flg)
+        for t in items(s:asd2num_map_table)
+            execute "iunmap " . t[0]
+        endfor
+        let s:asd2num_toggle_flg = 0
+    else
+        for t in items(s:asd2num_map_table)
+            execute "inoremap " . t[0]. " " . t[1]
+        endfor
+        let s:asd2num_toggle_flg = 1
+    endif
+endfunction
 " }}}
 
 " 最大化Window {{{
@@ -1242,10 +1242,14 @@ augroup END
     endfunction
 " }}}
 
-" qml {{{ qml高亮
-    Plug 'crucerucalin/qml.vim'
 " }}}
 
+" 游戏
+" {{{
+    "Plug 'johngrib/vim-game-code-break'
+    " VimGameCodeBreak
+    "Plug 'johngrib/vim-game-snake'
+    " VimGameSnake
 " }}}
 
 " Disabled Plugins
@@ -1257,10 +1261,14 @@ augroup END
     "nmap <leader>ga <Plug>(EasyAlign)
 " }}}
 
+" autoformat {{{ 代码格式化
+    "Plugin 'Chiel92/vim-autoformat'
+" }}}
+
 " neovim gui font {{{ 字体设置(neovim已内置)
-if IsNVim()
-    "Plug 'equalsraf/neovim-gui-shim'
-endif
+    "if IsNVim()
+    "    Plug 'equalsraf/neovim-gui-shim'
+    "endif
 " }}}
 
 " splitjoin {{{ 行间连接与分割
@@ -1280,7 +1288,10 @@ endif
 
 " vim-latex {{{
     "Plug 'vim-latex/vim-latex'
-    " 暂时不用
+" }}}
+
+" qml {{{ qml高亮
+    "Plug 'crucerucalin/qml.vim'
 " }}}
 
 " }}}
