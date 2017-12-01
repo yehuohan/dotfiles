@@ -34,7 +34,7 @@ if [ `uname` == "Linux" ]; then
     cp ../.tmux-status.conf ./cf-tmux/
 
     # cf-misc
-    cp ../MyApps/ToggleTouchPad.py ./cf-misc/
+    cp ../MyApps/ToggleTouchPad.py ./misc/
 
     echo "Linux: Copy configs was completed!"
 
