@@ -108,6 +108,13 @@ setopt complete_in_word
 # alias
 alias wiconv='iconv -f gbk -t utf-8'
 alias gitlog='git log | wiconv | less'
+alias gitadd='git add'
+alias gitcommit='git commit'
+alias gitstatus='git status'
+alias gitdiff='git diff'
+alias gitpush='git push'
+alias gitpull='git pull'
+alias gitfetch='git fetch'
 
 
 # export MANPATH="/usr/local/man:$MANPATH"

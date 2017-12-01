@@ -113,6 +113,15 @@ alias -s png=ristretto
 alias -s jpg=ristretto
 alias -s gif=ristretto
 
+alias gitstatus='git status'
+alias gitadd='git add'
+alias gitcommit='git commit'
+alias gitdiff='git diff'
+alias gitlog='git log'
+alias gitpush='git push'
+alias gitpull='git pull'
+alias gitfetch='git fetch'
+
 # auto program
 clear
 screenfetch
