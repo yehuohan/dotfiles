@@ -446,7 +446,8 @@ let RC_Qmake = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'])
 
 " }}}
 
-" vimgrep搜索 " {{{
+" FindVimgrep搜索 " {{{
+" FindVimgrep map-keys {{{
 let s:findvimgrep_nmaps = ["fi", "fgi", "fI", "fgI",
                          \ "fw", "fgw", "fW", "fgW",
                          \ "fs", "fgs", "fS", "fgS",
@@ -461,6 +462,7 @@ let s:findvimgrep_vmaps = ["fi", "fgi", "fI", "fgI",
                          \ "Fv", "Fgv", "FV", "FgV",
                          \ "Fs", "Fgs", "FS", "FgS",
                          \ ]
+" }}}
 
 " FUNCTION: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{
 function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
@@ -1476,6 +1478,7 @@ augroup END
 " }}}
 
 " Copy and paste{{{
+    vnoremap <leader>y ygv
     vnoremap <C-c> "+y
     nnoremap <C-v> "+p
     inoremap <C-v> <esc>"+pi
