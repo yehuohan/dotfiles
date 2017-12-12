@@ -142,7 +142,7 @@ vnoremap ; :
 " Path
 " {{{
     let s:home_path = fnamemodify(resolve(expand("<sfile>:p")), ":h")
-    " vim插件路径统一
+    " vim插件路径
     if IsLinux()
         " 链接root-vimrc到user's vimrc
         let $VimPluginPath=s:home_path . "/.vim"
@@ -158,6 +158,14 @@ vnoremap ; :
         let $VimPluginPath=s:home_path . "/.vim"
     endif
     set rtp+=$VimPluginPath             " add .vim or vimfiles to rtp(runtimepath)
+
+    " 浏览器路径
+    let s:path_browser = ""
+    if IsWin()
+        let s:path_browser = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
+    elseif IsLinux()
+        let s:path_browser = "/usr/bin/google-chrome"
+    endif
 " }}}
 
 " 键码设定
@@ -1226,11 +1234,7 @@ augroup END
     Plug 'plasticboy/vim-markdown'
     Plug 'iamcco/mathjax-support-for-mkdp'
     Plug 'iamcco/markdown-preview.vim'
-    if IsWin()
-        let g:mkdp_path_to_chrome = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
-    elseif IsLinux()
-        let g:mkdp_path_to_chrome = "/usr/bin/google-chrome"
-    endif
+    let g:mkdp_path_to_chrome = s:path_browser
     let g:mkdp_auto_start = 0
     let g:mkdp_auto_close = 1
     let g:mkdp_refresh_slow = 0         " 即时预览MarkDown
@@ -1242,6 +1246,12 @@ augroup END
             MarkdownPreview
         endif
     endfunction
+" }}}
+
+" riv {{{ reStructruedText预览
+    Plug 'Rykka/riv.vim'
+    Plug 'Rykka/InstantRst'
+    let g:instant_rst_browser = s:path_browser
 " }}}
 
 " }}}
