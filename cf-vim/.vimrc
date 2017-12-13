@@ -274,6 +274,16 @@ function! InvSigncolumn()
 endfunction
 " }}}
 
+" 切换高亮 {{{
+function! InvHighLight()
+    if exists("g:syntax_on")
+        syntax off
+    else
+        syntax on
+    endif
+endfunction
+" }}}
+
 " linux-fcitx输入法切换 " {{{
 if IsLinux()
 function! LinuxFcitx2En()
@@ -1485,6 +1495,8 @@ augroup END
     nnoremap <leader>if :call InvFoldColumeShow()<CR>
     " 切换显示标志列
     nnoremap <leader>is :call InvSigncolumn()<CR>
+    " 切换高亮
+    nnoremap <leader>ih :call InvHighLight()<CR>
 " }}}
 
 " Copy and paste{{{
