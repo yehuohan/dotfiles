@@ -925,9 +925,17 @@ endif
 " }}}
 
 " rainbow {{{ 彩色括号
-    Plug 'luochen1990/rainbow'
-    let g:rainbow_active = 1
-    nnoremap <leader>tr :RainbowToggle<CR>
+    "Plug 'luochen1990/rainbow'
+    "let g:rainbow_active = 1
+    "nnoremap <leader>tr :RainbowToggle<CR>
+
+    Plug 'kien/rainbow_parentheses.vim'
+    nnoremap <leader>tr :RainbowParenthesesToggleAll<CR>
+    "autocmd VimEnter * RainbowParenthesesToggleAll
+    "autocmd Syntax * RainbowParenthesesLoadRound
+    "autocmd Syntax * RainbowParenthesesLoadSquare
+    "autocmd Syntax * RainbowParenthesesLoadBraces
+    "autocmd Syntax * RainbowParenthesesLoadChevrons 
 " }}}
 
 " indent-line {{{ 显示缩进标识
