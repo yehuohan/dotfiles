@@ -1447,8 +1447,6 @@ if -1 != match(g:plugs_order, "^vim-go$")
     autocmd FileType go  nnoremap <buffer> <silent> <leader>gb :GoBuild<CR>
     autocmd FileType go  nnoremap <buffer> <silent> <leader>gd :GoDef<CR>
     "autocmd FileType go  nnoremap <buffer> <silent> <leader>gr :GoRun<CR>
-    "autocmd FileType go  nnoremap <buffer>          <leader>rf :GoRun<CR>
-    "autocmd FileType go  nnoremap <buffer>          <F5> :GoRun<CR>
 endif
 augroup END
 " }}}
@@ -1611,6 +1609,7 @@ endif
     " 编译运行当前文件
     noremap <F5> <esc>:call ComplileFile('')<CR>
     nnoremap <leader>rf :call ComplileFile('')<CR>
+    nnoremap <leader>rq :call RC_Qmake()<CR>
 
     " 编译运行（输入参数）当前文件
     nnoremap <leader>ra :execute"let g:__str__=input('Compile Args: ')"<bar>call ComplileFile(g:__str__)<CR>
