@@ -1240,7 +1240,7 @@ augroup END
     Plug 'vimcn/vimcdoc',{'branch' : 'release'}
 " }}}
 
-" markdown-preview {{{ MarkDown预览
+" MarkDown {{{
     Plug 'plasticboy/vim-markdown'
     Plug 'iamcco/mathjax-support-for-mkdp'
     Plug 'iamcco/markdown-preview.vim'
@@ -1248,6 +1248,7 @@ augroup END
     let g:mkdp_auto_start = 0
     let g:mkdp_auto_close = 1
     let g:mkdp_refresh_slow = 0         " 即时预览MarkDown
+    let g:mkdp_command_for_global = 0   " 只有markdown文件可以预览
     nnoremap <leader>tm :call MarkdownPreviewToggle()<CR>
     function! MarkdownPreviewToggle()
         if exists(':MarkdownPreviewStop')
@@ -1258,7 +1259,7 @@ augroup END
     endfunction
 " }}}
 
-" riv {{{ reStructruedText预览
+" reStructruedText {{{
     Plug 'Rykka/riv.vim'
     Plug 'Rykka/InstantRst'
     let g:instant_rst_browser = s:path_browser
@@ -1357,7 +1358,7 @@ call plug#end()                         " required
     set scrolloff=3                     " 光标上下保留的行数
     set laststatus=2                    " 一直显示状态栏
     set showcmd                         " 显示寄存器命令，宏调用命令@等
-
+    set completeopt=menuone,preview     " 补全显示设置
     set backspace=2                     " Insert模式下使用BackSpace删除
     set hidden                          " 允许在未保存文件时切换buffer
     set nobackup                        " 不生成备份文件
