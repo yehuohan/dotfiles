@@ -162,9 +162,9 @@ vnoremap ; :
     " 浏览器路径
     let s:path_browser = ""
     if IsWin()
-        let s:path_browser = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
+        let s:path_browser = '"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"'
     elseif IsLinux()
-        let s:path_browser = "/usr/bin/google-chrome"
+        let s:path_browser = '"/usr/bin/google-chrome"'
     endif
 " }}}
 
@@ -1249,20 +1249,33 @@ augroup END
     let g:mkdp_auto_close = 1
     let g:mkdp_refresh_slow = 0         " 即时预览MarkDown
     let g:mkdp_command_for_global = 0   " 只有markdown文件可以预览
-    nnoremap <leader>tm :call MarkdownPreviewToggle()<CR>
-    function! MarkdownPreviewToggle()
+    nnoremap <leader>vm :call PreViewMarkdown()<CR>
+    function! PreViewMarkdown() abort
         if exists(':MarkdownPreviewStop')
             MarkdownPreviewStop
+            echo "MarkdownPreviewStop"
         else
             MarkdownPreview
+            echo "MarkdownPreview"
         endif
     endfunction
 " }}}
 
 " reStructruedText {{{
+    " 需要安装https://github.com/Rykka/instant-rst.py
     Plug 'Rykka/riv.vim'
     Plug 'Rykka/InstantRst'
     let g:instant_rst_browser = s:path_browser
+    nnoremap <leader>vr :call PreViewRst()<CR>
+    function! PreViewRst() abort
+        if g:_instant_rst_daemon_started
+            StopInstantRst
+            echo "StopInstantRst"
+        else
+            InstantRst
+        endif
+    endfunction
+
 " }}}
 
 " }}}
@@ -1372,7 +1385,7 @@ call plug#end()                         " required
     set smartcase                       " 有大写字母时才区别大小写搜索
     set noimdisable                     " 切换Normal模式时，自动换成英文输入法
     set noerrorbells                    " 关闭错误信息响铃
-    set vb t_vb=                        " 关闭响铃(vb)和可视闪铃(t_vb，即闪屏)，即normal模式时按esc会有响铃
+    set vb t_vb=                        " 关闭响铃(vb, visualbell)和可视闪铃(t_vb，即闪屏)，即normal模式时按esc会有响铃
     set helplang=cn,en                  " 优先查找中文帮助
 
     " 终端光标设置
