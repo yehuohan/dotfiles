@@ -42,7 +42,7 @@ elif [ `uname -o` == "Msys" ]; then
 
     # cf-vim
     if [ ! -d "../Vim" ]; then
-        echo "../Vim is existed."
+        echo "../Vim is not existed."
         exit
     fi
     cp ../Vim/_vimrc                      ./cf-vim/.vimrc
