@@ -1262,11 +1262,16 @@ augroup END
 " }}}
 
 " reStructruedText {{{
-    " 需要安装https://github.com/Rykka/instant-rst.py
+    " 需要安装 https://github.com/Rykka/instant-rst.py
     Plug 'Rykka/riv.vim'
     Plug 'Rykka/InstantRst'
     let g:instant_rst_browser = s:path_browser
+if IsWin()
+    " 需要安装 https://github.com/mgedmin/restview
+    nnoremap <leader>vr :execute "AsyncRun restview " . expand("%:p:t")<bar>cclose<CR>
+else
     nnoremap <leader>vr :call PreViewRst()<CR>
+endif
     function! PreViewRst() abort
         if g:_instant_rst_daemon_started
             StopInstantRst
@@ -1275,7 +1280,6 @@ augroup END
             InstantRst
         endif
     endfunction
-
 " }}}
 
 " }}}
