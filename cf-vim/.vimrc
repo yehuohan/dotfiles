@@ -295,7 +295,7 @@ function! InvHighLight()
 endfunction
 " }}}
 
-" linux-fcitx输入法切换 " {{{
+" Linux-Fcitx输入法切换 " {{{
 if IsLinux()
 function! LinuxFcitx2En()
     if 2 == system("fcitx-remote")
@@ -308,6 +308,17 @@ function! LinuxFcitx2Zh()
     endif
 endfunction
 endif
+" }}}
+
+" 获取选区内容 {{{
+function! GetSelectedContent()
+    let l:reg_var = getreg('0', 1)
+    let l:reg_mode = getregtype('0')
+    normal! gv"0y
+    let l:word = getreg('0')
+    call setreg('0', l:reg_var, l:reg_mode)
+    return l:word
+endfunction
 " }}}
 
 " 编译环境函数 " {{{
@@ -639,12 +650,7 @@ function! GotoKeyword(mode)
     let l:exec_str = "help "
 
     if a:mode ==# 'v'
-        " get selected string in visual mode
-        let l:reg_var = getreg('0', 1)
-        let l:reg_mode = getregtype('0')
-        normal! gv"0y
-        let l:word = getreg('0')
-        call setreg('0', l:reg_var, l:reg_mode)
+        let l:word = GetSelectedContent()
     endif
 
     " 添加关键字
@@ -822,7 +828,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     nmap <leader>g3 <Plug>(incsearch-nohl-g#)
 " }}}
 
-" fzf {{{ 模糊查找
+" Fzf {{{ 模糊查找
     " linux下直接pacman -S fzf
     " win下载fzf.exe放入bundle/fzf/bin/下
     if IsWin()
