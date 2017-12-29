@@ -1,7 +1,7 @@
 "
 "
 " vimrc, one configuration for vim, gvim, neovim and neovim-qt.
-" yehuohan, <550034086@qq.com>, <yehuohan@gmail.com>
+" yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
 "
 "
 
@@ -11,73 +11,84 @@
 " {{{
 " Windows带python编译gvim
 " {{{
-    " [x] 设置Make_cyg_ming.mak:
-    " DIRECTX=yes                         - 使用DirectX
-    " ARCH=i686                           - 使用32位(x86-64为64位)，python也使用32位
-    " TERMINAL=yes                        - 添加terminal特性
-    " CC := $(CROSS_COMPILE)gcc -m32      - 32位编绎
-    " CXX := $(CROSS_COMPILE)g++ -m32     - 32位编绎
-    " WINDRES := windres --target=pe-i386 - 资源文件添加i386编绎
-    "
-    " [x] 使用MinGw-x64:
-    " mingw32-make -f Make_ming.mak gvim.exe PYTHON3=C:/Python36 DYNAMIC_PYTHON3=yes PYTHON3_VER=36
-    " 若设置32位选项前编译过一次，清理一次.o文件再编译
-    " 若使用64位，只需要添加Python路径和DirectX支持
-    "
-    " [x] 添加winpty
-    " 如需要termianl特性，下载winpty，且添加到PATH路径，或直接放到gvim.exe的目录中。
-    " https://github.com/rprichard/winpty，到release中下载与gvim对应的32或64位，没有类unix环境就用msvc的即可
+" [x] 设置Make_cyg_ming.mak:
+" DIRECTX=yes                         - 使用DirectX
+" ARCH=i686                           - 使用32位(x86-64为64位)，python也使用32位
+" TERMINAL=yes                        - 添加terminal特性
+" CC := $(CROSS_COMPILE)gcc -m32      - 32位编绎
+" CXX := $(CROSS_COMPILE)g++ -m32     - 32位编绎
+" WINDRES := windres --target=pe-i386 - 资源文件添加i386编绎
+"
+" [x] 使用MinGw-x64:
+" mingw32-make -f Make_ming.mak gvim.exe PYTHON3=C:/Python36 DYNAMIC_PYTHON3=yes PYTHON3_VER=36
+" 若设置32位选项前编译过一次，清理一次.o文件再编译
+" 若使用64位，只需要添加Python路径和DirectX支持
+"
+" [x] 添加winpty
+" 如需要termianl特性，下载winpty，且添加到PATH路径，或直接放到gvim.exe的目录中。
+" https://github.com/rprichard/winpty，到release中下载与gvim对应的32或64位，没有类unix环境就用msvc的即可
 " }}}
 
 " 查看vim帮助
 " {{{
-    " :help       = 查看Vim帮助
-    " :help index = 查看帮助列表
-    " <S-k>       = 快速查看光标所在cword或选择内容的vim帮助
-    " :help *@en  = 指定查看英文(en，cn即为中文)帮助
+" :help       = 查看Vim帮助
+" :help index = 查看帮助列表
+" <S-k>       = 快速查看光标所在cword或选择内容的vim帮助
+" :help *@en  = 指定查看英文(en，cn即为中文)帮助
 " }}}
 
 " 按键映键策略
 " {{{
-    " - Normal模式下使用<leader>代替<C-?>,<S-?>,<A-?>，
-    " - Insert模式下map带ctrl,alt的快捷键
-    " - 尽量不改变vim原有键位的功能定义
-    " - 尽量一只手不同时按两个键
-    " - 尽量不映射偏远的按键（F1~F12，数字键等）
-    " - 调换Esc和CapsLock键
-    " - map语句后一般别注释，也别留任何空格
-    "
-    "  <leader>t? for plugins toggle command
-    "  <leader>i? for vim "set inv?" command
+" - Normal模式下使用<leader>代替<C-?>,<S-?>,<A-?>，
+" - Insert模式下map带ctrl,alt的快捷键
+" - 尽量不改变vim原有键位的功能定义
+" - 尽量一只手不同时按两个键
+" - 尽量不映射偏远的按键（F1~F12，数字键等）
+" - 调换Esc和CapsLock键
+" - map语句后一般别注释，也别留任何空格
+"
+"  <leader>t? for plugins toggle command
+"  <leader>i? for vim "set inv?" command
 "  }}}
 
 " 替换字符串
 " {{{
-    "   :%s     - 所有行
-    "   :'<,'>s - 所选范圈
-    "   :n,$s   - 第n行到最一行
-    "   :.,ns   - 当前行到第n行
-    "   :.,+30s - 从当前行开始的30行
-    "   :'s,'es - 从ms标记到me标记的范围
-    "   :s//g   - 替换一行中所有找到的字符串
-    "   :s//c   - 替换前要确认
-    "
-    "   :s/ar\[i\]/\*(ar+i)/
-    "       ar[i] 替换成 *(ar+)，注意：对于 * . / \ [ ] 需要转义
-    "   :s/"\([A-J]\)"/"Group \1"/
-    "       将"X" 替换成 "Group X"，其中X可为A-J， \( \) 表示后面用 \1 引用 () 的内容
-    "   :s/"\(.*\)"/set("\1")/
-    "       将“*" 替换成 set("*") ，其中 .* 为任意字符
-    "   :s/text/\rtext/
-    "       \r相当于一个回车的效果
-    "   :s/text\n/text/
-    "       查找内容为text，且其后是回车
-    "   :s/\s\+$//g
-    "       去除尾部空格
-    "
-    " search with match force
-    " /\<the\> : can match chars in "for the vim", but can not match chars in "there"
-    " /the     : can match chars in "for the vim" and also in "there"
+"   :%s     - 所有行
+"   :'<,'>s - 所选范圈
+"   :n,$s   - 第n行到最一行
+"   :.,ns   - 当前行到第n行
+"   :.,+30s - 从当前行开始的30行
+"   :'s,'es - 从ms标记到me标记的范围
+"   :s//g   - 替换一行中所有找到的字符串
+"   :s//c   - 替换前要确认
+"
+"   :s/ar\[i\]/\*(ar+i)/
+"       ar[i] 替换成 *(ar+)，注意：对于 * . / \ [ ] 需要转义
+"   :s/"\([A-J]\)"/"Group \1"/
+"       将"X" 替换成 "Group X"，其中X可为A-J， \( \) 表示后面用 \1 引用 () 的内容
+"   :s/"\(.*\)"/set("\1")/
+"       将“*" 替换成 set("*") ，其中 .* 为任意字符
+"   :s/text/\rtext/
+"       \r相当于一个回车的效果
+"   :s/text\n/text/
+"       查找内容为text，且其后是回车
+"   :s/\s\+$//g
+"       去除尾部空格
+"
+" search with match force
+" /\<the\> : can match chars in "for the vim", but can not match chars in "there"
+" /the     : can match chars in "for the vim" and also in "there"
+" }}}
+
+" 第三方软件
+" {{{
+" Python      : 需要在vim编译时添加Python支持
+" LLVM(Clang) : YouCompleteMe补全
+" Ctags       : 查找创建标签
+" Fzf         : Fzf模糊查找
+" Ag          : Ag文本查找
+" Chrome      : Markdown,ReStructruedText等标记文本预览
+" Fcitx       : Linux下的输入法
 " }}}
 
 " }}}
