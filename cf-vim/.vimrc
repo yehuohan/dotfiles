@@ -1299,6 +1299,33 @@ endif
     endfunction
 " }}}
 
+" open-browser.vim {{{ 浏览器相关
+    Plug 'tyru/open-browser.vim'
+    "nmap <leader>bu <Plug>(openbrowser-open)
+    "vmap <leader>bu <Plug>(openbrowser-open)
+    "nmap <leader>bw <Plug>(openbrowser-search)
+    "vmap <leader>bw <Plug>(openbrowser-search)
+    nmap <leader>bs <Plug>(openbrowser-smart-search)
+    vmap <leader>bs <Plug>(openbrowser-smart-search)
+    " search funtion - google, baidu, github
+    function! OpenBrowserSearchInGoogle(engine, mode)
+        if a:mode ==# 'n'
+            execute ":OpenBrowserSearch -". a:engine . " " . expand("<cword>")
+        elseif a:mode ==# 'v'
+            execute ":OpenBrowserSearch -". a:engine . " " . GetSelectedContent()
+        endif
+    endfunction
+    nnoremap <leader>big :OpenBrowserSearch -google
+    nnoremap <leader>bg  :call OpenBrowserSearchInGoogle('google', 'n')<CR>
+    vnoremap <leader>bg  :call OpenBrowserSearchInGoogle('google', 'v')<CR>
+    nnoremap <leader>bib :OpenBrowserSearch -baidu
+    nnoremap <leader>bb  :call OpenBrowserSearchInGoogle('baidu', 'n')<CR>
+    vnoremap <leader>bb  :call OpenBrowserSearchInGoogle('baidu', 'v')<CR>
+    nnoremap <leader>bih :OpenBrowserSearch -github
+    nnoremap <leader>bh  :call OpenBrowserSearchInGoogle('github', 'n')<CR>
+    vnoremap <leader>bh  :call OpenBrowserSearchInGoogle('github', 'v')<CR>
+"}}}
+
 " }}}
 
 " 游戏
