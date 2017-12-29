@@ -1461,9 +1461,11 @@ if IsGvim()
         "set guifont=Ubuntu\ Mono\ 13
         "set guifont=DejaVu\ Sans\ Mono\ 13
         set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 12
-                                        " https://github.com/powerline/fonts
         set linespace=0                 " required by DejaVuSansMono for Powerline
         set guifontwide=WenQuanYi\ Micro\ Hei\ Mono\ 12
+        "set guifont=Consolas\ For\ Powerline\ 13.5
+        "set linespace=1                 " required by PowerlineFont
+        "set guifontwide=Microsoft\ YaHei\ Mono\ 13
     elseif IsWin()
         set lines=25
         set columns=100
