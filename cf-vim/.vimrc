@@ -646,10 +646,10 @@ endfunction
 
 " 查找Vim关键字 {{{
 function! GotoKeyword(mode)
-    let l:word = expand("<cword>")
     let l:exec_str = "help "
-
-    if a:mode ==# 'v'
+    if a:mode ==# 'n'
+        let l:word = expand("<cword>")
+    elseif a:mode ==# 'v'
         let l:word = GetSelectedContent()
     endif
 
@@ -701,13 +701,13 @@ endfunction
 
 " }}}
 
-" asd2num切换 " {{{
+" Asd2Num切换 " {{{
 let s:asd2num_toggle_flg = 0
 let s:asd2num_map_table={
             \ "a" : "1", "s" : "2", "d" : "3", "f" : "4", "g" : "5",
             \ "h" : "6", "j" : "7", "k" : "8", "l" : "9", ";" : "0"
             \ }
-function! ToggleAsd2num()
+function! ToggleAsd2Num()
     if(s:asd2num_toggle_flg)
         for t in items(s:asd2num_map_table)
             execute "iunmap " . t[0]
@@ -1534,7 +1534,7 @@ augroup END
     nnoremap <leader>zr zR
     nnoremap <leader>zm zM
     " Asd2Num
-    inoremap <C-a> <esc>:call ToggleAsd2num()<CR>a
+    inoremap <C-a> <esc>:call ToggleAsd2Num()<CR>a
     " Linux下自动退出中文输入法
     if IsLinux()
         "autocmd InsertLeave * call LinuxFcitx2En()
