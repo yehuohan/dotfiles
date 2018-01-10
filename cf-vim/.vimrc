@@ -323,6 +323,8 @@ endfunction
 
 " 编译环境函数 " {{{
 " Set autochdir is required.
+" （因为执行编译时，是以当前文件为目标文件；
+" 若禁用自动切换当前目录，会导致当前编辑的文件不一定是目标文件）
 set autochdir
 
 " FUNCTION: ComplileFile(argstr) {{{
@@ -389,6 +391,7 @@ endfunction
 " }}}
 
 " FUNCTION: ComplileFileArgs(sopt, arg) {{{
+" 用于popset的函数。
 function! ComplileFileArgs(sopt, arg)
     if a:arg ==# "charset"
         call ComplileFile('-finput-charset=utf-8 -fexec-charset=gbk')
@@ -399,6 +402,7 @@ endfunction
 " FUNCTION: FindProjectFile(...) {{{
 " @param 1: 工程文件，如*.pro
 " @param 2: 查找起始目录，默认从当前目录向上查找到根目录
+" @return 返回找到的文件路径列表
 function! FindProjectFile(...)
     if a:0 == 0
         return ""
@@ -424,6 +428,7 @@ endfunction
 " }}}
 
 " FUNCTION: ComplileProject(str, fn) {{{
+" 当找到多个Project File时，会弹出选项以供选择。
 " @param str: 工程文件名，可用通配符，如*.pro
 " @param fn: 编译工程文件的函数，需要采用popset插件
 function! ComplileProject(str, fn)
@@ -443,6 +448,9 @@ endfunction
 " }}}
 
 " FUNCTION: ComplileProjectQmake(sopt, sel) {{{
+" 用于popset的函数，用于编译qmake工程并运行生成的可执行文件。
+" @param sopt: 参数信息，未用到，只是传入popset的函数需要
+" @param sel: pro文件路径
 function! ComplileProjectQmake(sopt, sel)
     let l:filename = '"./' . fnamemodify(a:sel, ":p:t") . '"'
     let l:name = '"./' . fnamemodify(a:sel, ":t:r") . '"'
