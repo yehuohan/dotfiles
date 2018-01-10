@@ -1169,6 +1169,8 @@ endif
     nmap <leader>si ysw
     nmap <leader>sl yss
     nmap <leader>sL ySS
+    nmap <leader>sc cs
+    nmap <leader>sd ds
     " 重新映射Visual Mode下的surround按键
     vmap s S
     vmap <leader>s gS
