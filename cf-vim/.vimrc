@@ -1679,14 +1679,14 @@ endif
     nnoremap <M-right> :vertical resize+5<CR>
 " }}}
 
-" Run Program map{{{
+" Run Program {{{
     " 编译运行当前文件
     noremap <F5> <esc>:call ComplileFile('')<CR>
     nnoremap <leader>rf :call ComplileFile('')<CR>
     nnoremap <leader>rq :call RC_Qmake()<CR>
 
     " 编译运行（输入参数）当前文件
-    nnoremap <leader>ra :execute"let g:__str__=input('Compile Args: ')"<bar>call ComplileFile(g:__str__)<CR>
+    nnoremap <leader>ra :execute"let g:__str__=input('Compile Args: ', '', 'customlist,GetMultiFilesCompletion')"<bar>call ComplileFile(g:__str__)<CR>
 " }}}
 
 " File diff {{{
