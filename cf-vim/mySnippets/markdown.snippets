@@ -35,8 +35,13 @@ endsnippet
 
 snippet mspan "span in markdown"
 <span id = "${1:id}"></span>
+[${2:name}](#$1)
 endsnippet
 
-snippet mimg "span in markdown"
+snippet mimg "image in markdown"
 <img alt="${1:name}" src="${2:jpg}" height="70%" width="70%">
+endsnippet
+
+snippet mhref "href in markdown"
+<a href="${1:url}" target="_blank">${2:name}</a>
 endsnippet
