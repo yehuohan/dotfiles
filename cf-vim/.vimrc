@@ -1268,7 +1268,13 @@ augroup END
 " }}}
 
 " MarkDown {{{
-    Plug 'plasticboy/vim-markdown'
+    Plug 'gabrielelana/vim-markdown'
+    let g:markdown_include_jekyll_support = 0 
+    let g:markdown_enable_mappings = 0
+    let g:markdown_enable_spell_checking = 0
+    let g:markdown_enable_folding = 1   " 感觉MarkDown折叠引起卡顿时，关闭此项
+    let g:markdown_enable_conceal = 1   " 在Vim中显示MarkDown预览
+
     Plug 'iamcco/mathjax-support-for-mkdp'
     Plug 'iamcco/markdown-preview.vim'
     let g:mkdp_path_to_chrome = s:path_browser
