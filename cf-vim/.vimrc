@@ -796,6 +796,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     " substitute preview
     Plug 'osyo-manga/vim-over'
     nnoremap <leader>sp :OverCommandLine<CR>
+    vnoremap <leader>sp :OverCommandLine<CR>
 " }}}
 
 " incsearch {{{ 查找预览
@@ -1172,16 +1173,23 @@ endif
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-repeat'
 
-    " 重新映射surround按键
+    let g:surround_no_mappings = 1      " 取消默认映射
+    " 修改和删除Surround
+    nmap <leader>sd <Plug>Dsurround
+    nmap <leader>sc <Plug>Csurround
+    nmap <leader>sC <Plug>CSurround
+    " 给Text Object添加Surround
+    nmap ys <Plug>Ysurround
+    nmap yS <Plug>YSurround
     nmap <leader>sw ysiw
     nmap <leader>si ysw
-    nmap <leader>sl yss
-    nmap <leader>sL ySS
-    nmap <leader>sc cs
-    nmap <leader>sd ds
-    " 重新映射Visual Mode下的surround按键
-    vmap s S
-    vmap <leader>s gS
+    nmap <leader>sW ySiw
+    nmap <leader>sI ySw
+    " 给行添加Surround
+    nmap <leader>sl <Plug>Yssurround
+    nmap <leader>sL <Plug>YSsurround
+    xmap s <Plug>VSurround
+    xmap S <Plug>VgSurround
 " }}}
 
 " auto-pairs {{{ 自动括号
@@ -1269,7 +1277,7 @@ augroup END
 
 " MarkDown {{{
     Plug 'gabrielelana/vim-markdown'
-    let g:markdown_include_jekyll_support = 0 
+    let g:markdown_include_jekyll_support = 0
     let g:markdown_enable_mappings = 0
     let g:markdown_enable_spell_checking = 0
     let g:markdown_enable_folding = 1   " 感觉MarkDown折叠引起卡顿时，关闭此项
