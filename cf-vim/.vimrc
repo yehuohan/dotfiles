@@ -772,7 +772,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     Plug 'easymotion/vim-easymotion'
     let g:EasyMotion_do_mapping = 0     " 禁止默认map
     let g:EasyMotion_smartcase = 1      " 不区分大小写
-    nmap s <Plug>(easymotion-overwin-f)
+    nmap s <plug>(easymotion-overwin-f)
     nmap <leader>ms <plug>(easymotion-overwin-f2)
                                         " 跨分屏快速跳转到字母
     nmap <leader>j <plug>(easymotion-j)
@@ -800,6 +800,34 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:multi_cursor_skip_key='<C-x>'
     let g:multi_cursor_quit_key='<esc>'
 " }}}
+
+" textmanip {{{ 块编辑
+    Plug 't9md/vim-textmanip'
+    let g:textmanip_enable_mappings = 0
+    function! SetTextmanipMode(mode)
+        let g:textmanip_current_mode = a:mode
+        echo "textmanip mode: " . g:textmanip_current_mode
+    endfunction
+
+    " 切换Insert/Replace Mode
+    nmap <F10> <plug>(textmanip-toggle-mode)
+    xmap <F10> <plug>(textmanip-toggle-mode)
+    xnoremap <M-i> :<C-u>call SetTextmanipMode('insert')<CR>gv
+    xnoremap <M-o> :<C-u>call SetTextmanipMode('replace')<CR>gv
+    " C-i 与 <Tab>等价
+    xnoremap <C-i> :<C-u>call SetTextmanipMode('insert')<CR>gv
+    xnoremap <C-o> :<C-u>call SetTextmanipMode('replace')<CR>gv
+    " 更据Mode使用Move-Insert或Move-Replace
+    xmap <C-j> <plug>(textmanip-move-down)
+    xmap <C-k> <plug>(textmanip-move-up)
+    xmap <C-h> <plug>(textmanip-move-left)
+    xmap <C-l> <plug>(textmanip-move-right)
+    " 更据Mode使用Duplicate-Insert或Duplicate-Replace
+    xmap <M-j> <plug>(textmanip-duplicate-down)
+    xmap <M-k> <plug>(textmanip-duplicate-up)
+    xmap <M-h> <plug>(textmanip-duplicate-left)
+    xmap <M-l> <plug>(textmanip-duplicate-right)
+"}}}
 
 " vim-over {{{ 替换预览
     " substitute preview
@@ -1157,6 +1185,21 @@ endif
                                         " 错误列表
 " }}}
 
+" ultisnips {{{ 代码片段插入
+if !(IsWin() && IsNVim())
+    Plug 'yehuohan/ultisnips'           " snippet插入引擎
+    Plug 'honza/vim-snippets'           " snippet合集
+    " 使用:UltiSnipsEdit编辑g:UltiSnipsSnippetsDir中的snippet文件
+    let g:UltiSnipsSnippetsDir = $VimPluginPath . "/mySnippets"
+    let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
+                                        " 自定义mySnippets合集
+    let g:UltiSnipsExpandTrigger="<tab>"
+    let g:UltiSnipsListSnippets = "<c-tab>"
+    let g:UltiSnipsJumpForwardTrigger="<C-j>"
+    let g:UltiSnipsJumpBackwardTrigger="<C-k>"
+endif
+" }}}
+
 " vim-go {{{ Go开发环境
     Plug 'fatih/vim-go'
     " +YCM : 支持Go实时补全
@@ -1165,18 +1208,6 @@ endif
     let g:go_textobj_enabled=1          " 使用TextObject的映射
     let g:go_fmt_autosave = 0           " 禁用auto GoFmt
 "}}}
-
-" ultisnips {{{ 代码片段插入
-if !(IsWin() && IsNVim())
-    Plug 'SirVer/ultisnips'             " snippet插入引擎
-    Plug 'honza/vim-snippets'           " snippet合集
-    let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
-                                        " 自定义mySnippets合集
-    let g:UltiSnipsExpandTrigger="<tab>"
-    let g:UltiSnipsJumpForwardTrigger="<C-j>"
-    let g:UltiSnipsJumpBackwardTrigger="<C-k>"
-endif
-" }}}
 
 " surround and repeat {{{ 添加包围符
     Plug 'tpope/vim-surround'
