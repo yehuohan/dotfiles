@@ -1343,6 +1343,7 @@ augroup END
 " }}}
 
 " reStructruedText {{{
+if !(IsWin() && IsNVim())
     " 需要安装 https://github.com/Rykka/instant-rst.py
     Plug 'Rykka/riv.vim'
     Plug 'Rykka/InstantRst'
@@ -1361,6 +1362,7 @@ endif
             InstantRst
         endif
     endfunction
+endif
 " }}}
 
 " open-browser.vim {{{ 浏览器相关
