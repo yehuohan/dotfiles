@@ -152,7 +152,7 @@ endfunction
 "===============================================================================
 " {{{
 set nocompatible                        " 不兼容vi快捷键
-let mapleader="\<space>"                " 使用Space作为leader
+let mapleader="\<Space>"                " 使用Space作为leader
                                         " Space只在Normal或Command或Visual模式下map，不适合在Insert模式下map
 " 特殊键
 nnoremap ; :
@@ -196,12 +196,12 @@ set timeoutlen=1000                     " 映射超时时间为1000ms
 set ttimeoutlen=70                      " 键码超时时间为70ms
 
 " 键码示例 {{{
-    " 终端Alt键映射处理：如 Alt+x，实际连续发送 <esc>x 编码
+    " 终端Alt键映射处理：如 Alt+x，实际连续发送 <Esc>x 编码
     " 以下三种方法都可以使按下 Alt+x 后，执行 CmdTest 命令，但超时检测有区别
-    "<1> set <M-x>=x  " 设置键码，这里的是一个字符，即<esc>的编码，不是^和[放在一起
+    "<1> set <M-x>=x  " 设置键码，这里的是一个字符，即<Esc>的编码，不是^和[放在一起
                         " 在终端的Insert模式，按Ctrl+v再按Alt+x可输入
     "    nnoremap <M-x> :CmdTest<CR>    " 按键码超时时间检测
-    "<2> nnoremap <esc>x :CmdTest<CR>   " 按映射超时时间检测
+    "<2> nnoremap <Esc>x :CmdTest<CR>   " 按映射超时时间检测
     "<3> nnoremap x  :CmdTest<CR>     " 按映射超时时间检测
 " }}}
 
@@ -772,19 +772,19 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     Plug 'easymotion/vim-easymotion'
     let g:EasyMotion_do_mapping = 0     " 禁止默认map
     let g:EasyMotion_smartcase = 1      " 不区分大小写
-    nmap s <plug>(easymotion-overwin-f)
-    nmap <leader>ms <plug>(easymotion-overwin-f2)
+    nmap s <Plug>(easymotion-overwin-f)
+    nmap <leader>ms <Plug>(easymotion-overwin-f2)
                                         " 跨分屏快速跳转到字母
-    nmap <leader>j <plug>(easymotion-j)
-    nmap <leader>k <plug>(easymotion-k)
-    nmap <leader>mw <plug>(easymotion-w)
-    nmap <leader>mb <plug>(easymotion-b)
-    nmap <leader>me <plug>(easymotion-e)
-    nmap <leader>mg <plug>(easymotion-ge)
-    nmap <leader>W <plug>(easymotion-W)
-    nmap <leader>B <plug>(easymotion-B)
-    nmap <leader>E <plug>(easymotion-E)
-    nmap <leader>gE <plug>(easymotion-gE)
+    nmap <leader>j <Plug>(easymotion-j)
+    nmap <leader>k <Plug>(easymotion-k)
+    nmap <leader>mw <Plug>(easymotion-w)
+    nmap <leader>mb <Plug>(easymotion-b)
+    nmap <leader>me <Plug>(easymotion-e)
+    nmap <leader>mg <Plug>(easymotion-ge)
+    nmap <leader>W <Plug>(easymotion-W)
+    nmap <leader>B <Plug>(easymotion-B)
+    nmap <leader>E <Plug>(easymotion-E)
+    nmap <leader>gE <Plug>(easymotion-gE)
     "
 " }}}
 
@@ -798,7 +798,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     let g:multi_cursor_next_key='<C-n>'
     let g:multi_cursor_prev_key='<C-p>'
     let g:multi_cursor_skip_key='<C-x>'
-    let g:multi_cursor_quit_key='<esc>'
+    let g:multi_cursor_quit_key='<Esc>'
 " }}}
 
 " textmanip {{{ 块编辑
@@ -810,23 +810,23 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
     endfunction
 
     " 切换Insert/Replace Mode
-    nmap <F10> <plug>(textmanip-toggle-mode)
-    xmap <F10> <plug>(textmanip-toggle-mode)
+    nmap <F10> <Plug>(textmanip-toggle-mode)
+    xmap <F10> <Plug>(textmanip-toggle-mode)
     xnoremap <M-i> :<C-u>call SetTextmanipMode('insert')<CR>gv
     xnoremap <M-o> :<C-u>call SetTextmanipMode('replace')<CR>gv
     " C-i 与 <Tab>等价
     xnoremap <C-i> :<C-u>call SetTextmanipMode('insert')<CR>gv
     xnoremap <C-o> :<C-u>call SetTextmanipMode('replace')<CR>gv
     " 更据Mode使用Move-Insert或Move-Replace
-    xmap <C-j> <plug>(textmanip-move-down)
-    xmap <C-k> <plug>(textmanip-move-up)
-    xmap <C-h> <plug>(textmanip-move-left)
-    xmap <C-l> <plug>(textmanip-move-right)
+    xmap <C-j> <Plug>(textmanip-move-down)
+    xmap <C-k> <Plug>(textmanip-move-up)
+    xmap <C-h> <Plug>(textmanip-move-left)
+    xmap <C-l> <Plug>(textmanip-move-right)
     " 更据Mode使用Duplicate-Insert或Duplicate-Replace
-    xmap <M-j> <plug>(textmanip-duplicate-down)
-    xmap <M-k> <plug>(textmanip-duplicate-up)
-    xmap <M-h> <plug>(textmanip-duplicate-left)
-    xmap <M-l> <plug>(textmanip-duplicate-right)
+    xmap <M-j> <Plug>(textmanip-duplicate-down)
+    xmap <M-k> <Plug>(textmanip-duplicate-up)
+    xmap <M-h> <Plug>(textmanip-duplicate-left)
+    xmap <M-l> <Plug>(textmanip-duplicate-right)
 "}}}
 
 " vim-over {{{ 替换预览
@@ -1022,7 +1022,7 @@ endif
     endif
     " 切换按键
     nnoremap <C-Space> :CtrlSpace<CR>
-    inoremap <C-Space> <esc>:CtrlSpace<CR>
+    inoremap <C-Space> <Esc>:CtrlSpace<CR>
 " }}}
 
 " Pop Selection {{{ 弹出选项
@@ -1106,7 +1106,7 @@ endif
             \ ['   Recent Dirs:']  , 'dir'       ,
             \ ['   Commands:']     , 'commands']
     let g:startify_session_before_save = ['silent! NERDTreeClose']
-    nnoremap <leader>qa :SDelete! default<CR><bar>:SSave default<CR><bar>:qa<CR>
+    nnoremap <leader>qa :SDelete! default<CR><Bar>:SSave default<CR><Bar>:qa<CR>
                                         " 先删除默认的，再保存会话，最后退出所有窗口
     nnoremap <leader>su :Startify<CR>   " start ui of vim-startify
 " }}}
@@ -1193,8 +1193,8 @@ if !(IsWin() && IsNVim())
     let g:UltiSnipsSnippetsDir = $VimPluginPath . "/mySnippets"
     let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
                                         " 自定义mySnippets合集
-    let g:UltiSnipsExpandTrigger="<tab>"
-    let g:UltiSnipsListSnippets = "<c-tab>"
+    let g:UltiSnipsExpandTrigger="<Tab>"
+    let g:UltiSnipsListSnippets = "<C-Tab>"
     let g:UltiSnipsJumpForwardTrigger="<C-j>"
     let g:UltiSnipsJumpBackwardTrigger="<C-k>"
 endif
@@ -1258,17 +1258,17 @@ endif
     Plug 'scrooloose/nerdcommenter'
     let g:NERDCreateDefaultMappings = 1
     let g:NERDSpaceDelims = 0           " 在Comment后添加Space
-    nmap <leader>cc <plug>NERDCommenterComment
-    nmap <leader>cm <plug>NERDCommenterMinimal
-    nmap <leader>cs <plug>NERDCommenterSexy
-    " nmap <leader>cb <plug>NERDCommenterAlignBoth  " 在vimrc中nmap有问题
-    nmap <leader>cl <plug>NERDCommenterAlignLeft
-    nmap <leader>ci <plug>NERDCommenterInvert
-    nmap <leader>cy <plug>NERDCommenterYank
-    nmap <leader>ce <plug>NERDCommenterToEOL
-    nmap <leader>ca <plug>NERDCommenterAppend
-    nmap <leader>cA <plug>NERDCommenterAltDelims
-    nmap <leader>cu <plug>NERDCommenterUncomment
+    nmap <leader>cc <Plug>NERDCommenterComment
+    nmap <leader>cm <Plug>NERDCommenterMinimal
+    nmap <leader>cs <Plug>NERDCommenterSexy
+    " nmap <leader>cb <Plug>NERDCommenterAlignBoth  " 在vimrc中nmap有问题
+    nmap <leader>cl <Plug>NERDCommenterAlignLeft
+    nmap <leader>ci <Plug>NERDCommenterInvert
+    nmap <leader>cy <Plug>NERDCommenterYank
+    nmap <leader>ce <Plug>NERDCommenterToEOL
+    nmap <leader>ca <Plug>NERDCommenterAppend
+    nmap <leader>cA <Plug>NERDCommenterAltDelims
+    nmap <leader>cu <Plug>NERDCommenterUncomment
 " }}}
 
 " file switch {{{ c/c++文件切换
@@ -1349,7 +1349,7 @@ augroup END
     let g:instant_rst_browser = s:path_browser
 if IsWin()
     " 需要安装 https://github.com/mgedmin/restview
-    nnoremap <leader>vr :execute "AsyncRun restview " . expand("%:p:t")<bar>cclose<CR>
+    nnoremap <leader>vr :execute "AsyncRun restview " . expand("%:p:t")<Bar>cclose<CR>
 else
     nnoremap <leader>vr :call PreViewRst()<CR>
 endif
@@ -1537,7 +1537,7 @@ if IsGvim()
         set guifont=Consolas_For_Powerline:h13:cANSI
         set linespace=0                 " required by PowerlineFont
         set guifontwide=Microsoft_YaHei_Mono:h12:cGB2312
-        noremap <F11> <esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
+        noremap <F11> <Esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
                                         " gvim全屏快捷键
     elseif IsMac()
         set lines=30
@@ -1598,11 +1598,11 @@ augroup END
     nnoremap <leader>zr zR
     nnoremap <leader>zm zM
     " Asd2Num
-    inoremap <C-a> <esc>:call ToggleAsd2Num()<CR>a
+    inoremap <C-a> <Esc>:call ToggleAsd2Num()<CR>a
     " Linux下自动退出中文输入法
     if IsLinux()
         "autocmd InsertLeave * call LinuxFcitx2En()
-        inoremap <esc> <esc>:call LinuxFcitx2En()<CR>
+        inoremap <Esc> <Esc>:call LinuxFcitx2En()<CR>
     endif
 " }}}
 
@@ -1629,7 +1629,7 @@ augroup END
     vnoremap <leader>y ygv
     vnoremap <C-c> "+y
     nnoremap <C-v> "+p
-    inoremap <C-v> <esc>"+pi
+    inoremap <C-v> <Esc>"+pi
     " 粘贴通过y复制的内容
     nnoremap <leader>p "0p
     nnoremap <leader>P "0P
@@ -1683,20 +1683,20 @@ endif
     nnoremap <M-u> :bprevious<CR>
     nnoremap <leader>bn :bnext<CR>
     nnoremap <leader>bp :bprevious<CR>
-    nnoremap <leader>bl :b#<bar>execute "set buflisted"<CR>
+    nnoremap <leader>bl :b#<Bar>execute "set buflisted"<CR>
 
     " 打开/关闭Quickfix
     nnoremap <leader>qo :botright copen<CR>
     nnoremap <leader>qc :cclose<CR>
-    nnoremap <leader>qj :cnext<bar>execute"silent! normal! zO"<bar>execute"normal! zz"<CR>
-    nnoremap <leader>qk :cprevious<bar>execute"silent! normal! zO"<bar>execute"normal! zz"<CR>
+    nnoremap <leader>qj :cnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
+    nnoremap <leader>qk :cprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     " 打开/关闭Location-list
     nnoremap <leader>lo :botright lopen<CR>
     nnoremap <leader>lc :lclose<CR>
-    nnoremap <leader>lj :lnext<bar>execute"silent! normal! zO"<bar>execute"normal! zz"<CR>
-    nnoremap <leader>lk :lprevious<bar>execute"silent! normal! zO"<bar>execute"normal! zz"<CR>
+    nnoremap <leader>lj :lnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
+    nnoremap <leader>lk :lprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     " 预览Quickfix和Location-list
-    nnoremap <M-space> :call PreviewQuickfixLine()<CR>
+    nnoremap <M-Space> :call PreviewQuickfixLine()<CR>
 " }}}
 
 " Window manager{{{
@@ -1719,34 +1719,34 @@ endif
     nnoremap <leader>wz :call ToggleWindowZoom()<CR>
     " 修改尺寸
     nnoremap <leader>w= <C-w>=
-    inoremap <C-up> <esc>:resize+1<CR>i
-    inoremap <C-down> <esc>:resize-1<CR>i
-    inoremap <C-left> <esc>:vertical resize-1<CR>i
-    inoremap <C-right> <esc>:vertical resize+1<CR>i
-    nnoremap <C-up> :resize+1<CR>
-    nnoremap <C-down> :resize-1<CR>
-    nnoremap <C-left> :vertical resize-1<CR>
-    nnoremap <C-right> :vertical resize+1<CR>
-    nnoremap <M-up> :resize+5<CR>
-    nnoremap <M-down> :resize-5<CR>
-    nnoremap <M-left> :vertical resize-5<CR>
-    nnoremap <M-right> :vertical resize+5<CR>
+    inoremap <C-Up> <Esc>:resize+1<CR>i
+    inoremap <C-Down> <Esc>:resize-1<CR>i
+    inoremap <C-Left> <Esc>:vertical resize-1<CR>i
+    inoremap <C-Right> <Esc>:vertical resize+1<CR>i
+    nnoremap <C-Up> :resize+1<CR>
+    nnoremap <C-Down> :resize-1<CR>
+    nnoremap <C-Left> :vertical resize-1<CR>
+    nnoremap <C-Right> :vertical resize+1<CR>
+    nnoremap <M-Up> :resize+5<CR>
+    nnoremap <M-Down> :resize-5<CR>
+    nnoremap <M-Left> :vertical resize-5<CR>
+    nnoremap <M-Right> :vertical resize+5<CR>
 " }}}
 
 " Run Program {{{
     " 编译运行当前文件
-    noremap <F5> <esc>:call ComplileFile('')<CR>
+    noremap <F5> <Esc>:call ComplileFile('')<CR>
     nnoremap <leader>rf :call ComplileFile('')<CR>
     nnoremap <leader>rq :call RC_Qmake()<CR>
 
     " 编译运行（输入参数）当前文件
-    nnoremap <leader>ra :execute"let g:__str__=input('Compile Args: ', '', 'customlist,GetMultiFilesCompletion')"<bar>call ComplileFile(g:__str__)<CR>
+    nnoremap <leader>ra :execute"let g:__str__=input('Compile Args: ', '', 'customlist,GetMultiFilesCompletion')"<Bar>call ComplileFile(g:__str__)<CR>
 " }}}
 
 " File diff {{{
     " 文件比较，自动补全文件和目录
-    nnoremap <leader>ds :execute "let g:__str__=input('File: ', '', 'file')"<bar> execute "diffsplit " . g:__str__<CR>
-    nnoremap <leader>dv :execute "let g:__str__=input('File: ', '', 'file')"<bar> execute "vertical diffsplit " . g:__str__<CR>
+    nnoremap <leader>ds :execute "let g:__str__=input('File: ', '', 'file')"<Bar> execute "diffsplit " . g:__str__<CR>
+    nnoremap <leader>dv :execute "let g:__str__=input('File: ', '', 'file')"<Bar> execute "vertical diffsplit " . g:__str__<CR>
     " 比较当前文件（已经分屏）
     nnoremap <leader>dt :diffthis<CR>
     " 关闭文件比较，与diffthis互为逆命令
@@ -1765,9 +1765,9 @@ endif
 
 " Find and search{{{
     " 查找选择的内容
-    vnoremap / "*y<bar>:execute"let g:__str__=getreg('*')"<bar>execute"/" . g:__str__<CR>
+    vnoremap / "*y<Bar>:execute"let g:__str__=getreg('*')"<Bar>execute"/" . g:__str__<CR>
     " 查找当前光标下的内容
-    nnoremap <leader>/ :execute"let g:__str__=expand(\"<cword>\")"<bar>execute "/" . g:__str__<CR>
+    nnoremap <leader>/ :execute"let g:__str__=expand(\"<cword>\")"<Bar>execute "/" . g:__str__<CR>
 
     " 使用FindVimgrep查找
     for item in s:findvimgrep_nmaps
@@ -1782,11 +1782,11 @@ endif
 if has('terminal')
 if IsNVim()
     nnoremap <leader>tz :terminal zsh<CR>
-    tnoremap <esc> <C-\><C-n>
+    tnoremap <Esc> <C-\><C-n>
 else
     nnoremap <leader>tz :terminal zsh<CR>
     set termkey=<C-w>
-    tnoremap <esc> <C-w>N
+    tnoremap <Esc> <C-w>N
     packadd termdebug
 endif
 endif
