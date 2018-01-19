@@ -349,14 +349,22 @@ function! ComplileFile(argstr)
 
     " Create execute string
     if "c" ==? l:ext
+    "{{{
         let l:exec_str .= "gcc " . a:argstr . " -o " . l:name . " " . l:filename
         let l:exec_str .= " && " . l:name
+    "}}}
     elseif "cpp" ==? l:ext
+    "{{{
         let l:exec_str .= "g++ -std=c++11 " . a:argstr . " -o " . l:name . " " . l:filename
         let l:exec_str .= " && " . l:name
+    "}}}
     elseif "py" ==? l:ext || "pyw" ==? l:ext
+    "{{{
         let l:exec_str .= "python " . l:filename
+        let l:exec_str .= " " . a:argstr
+    "}}}
     elseif "pro" ==? l:ext
+    "{{{
         if IsLinux()
             let l:exec_str .= "qmake " . a:argstr . " -r -o ./DebugV/Makefile " . l:filename
             let l:exec_str .= " && cd ./DebugV"
@@ -374,22 +382,37 @@ function! ComplileFile(argstr)
             return
         endif
         let l:exec_str .= " && " . l:name
+    "}}}
     elseif "go" ==? l:ext
+    "{{{
         let l:exec_str .= " go run " . l:filename
+    "}}}
     elseif "m" ==? l:ext
+    "{{{
         let l:exec_str .= "matlab -nosplash -nodesktop -r " . l:name[3:-2]
+    "}}}
     elseif "sh" ==? l:ext
+    "{{{
         if IsLinux() || IsGw()
             let l:exec_str .= " ./" . l:filename
+            let l:exec_str .= " " . a:argstr
         else
             return
         endif
+    "}}}
     elseif "bat" ==? l:ext
+    "{{{
         if IsWin()
             let l:exec_str .= " " . l:filename
+            let l:exec_str .= " " . a:argstr
         else
             return
         endif
+    "}}}
+    elseif "html" ==? l:ext
+    "{{{
+        let l:exec_str .= s:path_browser . " " . l:filename
+    "}}}
     else
         return
     endif
@@ -499,7 +522,7 @@ endfunction
 " }}}
 
 " Run compliler
-let RC_Qmake = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'])
+let RC_Qmake    = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'])
 
 " }}}
 
