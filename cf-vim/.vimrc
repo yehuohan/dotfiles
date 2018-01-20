@@ -339,13 +339,10 @@ set autochdir
 " FUNCTION: ComplileFile(argstr) {{{
 " @param argstr: 想要传递的命令参数
 function! ComplileFile(argstr)
-    let l:ext = expand("%:e")                       " 扩展名
+    let l:ext      = expand("%:e")                  " 扩展名
     let l:filename = '"./' . expand('%:t') . '"'    " 文件名，不带路径，带扩展名
-    let l:name = '"./' . expand('%:t:r') . '"'      " 文件名，不带路径，不带扩展名
-    let l:exec_str = "!"
-    if exists(":AsyncRun") == 2
-        let l:exec_str = ":AsyncRun "
-    endif
+    let l:name     = '"./' . expand('%:t:r') . '"'  " 文件名，不带路径，不带扩展名
+    let l:exec_str = (exists(":AsyncRun") == 2) ? ":AsyncRun " : "!"
 
     " Create execute string
     if "c" ==? l:ext
@@ -485,13 +482,10 @@ endfunction
 " @param sel: pro文件路径
 function! ComplileProjectQmake(sopt, sel)
     let l:filename = '"./' . fnamemodify(a:sel, ":p:t") . '"'
-    let l:name = '"./' . fnamemodify(a:sel, ":t:r") . '"'
-    let l:filedir = fnameescape(fnamemodify(a:sel, ":p:h"))
-    let l:olddir = fnameescape(getcwd())
-    let l:exec_str = "!"
-    if exists(":AsyncRun") == 2
-        let l:exec_str = ":AsyncRun "
-    endif
+    let l:name     = '"./' . fnamemodify(a:sel, ":t:r") . '"'
+    let l:filedir  = fnameescape(fnamemodify(a:sel, ":p:h"))
+    let l:olddir   = fnameescape(getcwd())
+    let l:exec_str = (exists(":AsyncRun") == 2) ? ":AsyncRun " : "!"
 
     " change cwd
     execute "lcd " . l:filedir
@@ -521,8 +515,20 @@ function! ComplileProjectQmake(sopt, sel)
 endfunction
 " }}}
 
+" FUNCTION: ComplileProjectHtml(sopt, sel) {{{
+" 用于popset的函数，用于打开index.html
+" @param sopt: 参数信息，未用到，只是传入popset的函数需要
+" @param sel: index.html路径
+function! ComplileProjectHtml(sopt, sel)
+    let l:exec_str = (exists(":AsyncRun") == 2) ? ":AsyncRun " : "!"
+    let l:exec_str .= s:path_browser . " " . a:sel
+    execute l:exec_str
+endfunction
+" }}}
+
 " Run compliler
-let RC_Qmake    = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'])
+let RC_Qmake = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'])
+let RC_Html  = function('ComplileProject', ['index.html', 'ComplileProjectHtml'])
 
 " }}}
 
@@ -1763,6 +1769,7 @@ endif
     noremap <F5> <Esc>:call ComplileFile('')<CR>
     nnoremap <leader>rf :call ComplileFile('')<CR>
     nnoremap <leader>rq :call RC_Qmake()<CR>
+    nnoremap <leader>rh :call RC_Html()<CR>
 
     " 编译运行（输入参数）当前文件
     nnoremap <leader>ra :execute"let g:__str__=input('Compile Args: ', '', 'customlist,GetMultiFilesCompletion')"<Bar>call ComplileFile(g:__str__)<CR>
