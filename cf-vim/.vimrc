@@ -1595,6 +1595,7 @@ augroup VimVimrc
     autocmd Filetype cpp    setlocal foldmethod=syntax
     autocmd Filetype python setlocal foldmethod=indent
     autocmd FileType go     setlocal expandtab
+    autocmd FileType javascript setlocal foldmethod=syntax
 
     " map
     autocmd Filetype vim nnoremap <buffer>          <S-k> :call GotoKeyword('n')<CR>
