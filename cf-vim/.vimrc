@@ -999,10 +999,10 @@ endif
     let g:airline_right_sep = ""
     let g:airline_right_alt_sep = ""
 
+    " 添加插件集成: ctrlspace, ale, ycm
     let g:airline#extensions#ctrlspace#enabled = 1
-                                        " 添加ctrlspace支持
+    let g:airline#extensions#ale#enabled = 1
     "let g:airline#extensions#ycm#enabled = 1
-                                        " 添加YCM支持
     "let g:airline#extensions#ycm#error_symbol = '✘:'
     "let g:airline#extensions#ycm#warning_symbol = '►:'
 if IsLinux()
@@ -1180,39 +1180,69 @@ endif
 " 代码类
 " {{{
 " YouCompleteMe {{{ 自动补全
-    " Linux:
-    "   install python-dev, python3-dev, cmake, llvm, clang
-    "   ./install.py --clang-completer --system-libclang
-    " Windows:
-    "   install python, Cmake, VS, 7-zip
-    "   install.py --clang-completer --msvc 14 --build-dir <ycm_build>
+    " Completion Params: install.py安装参数
+    "   --clang-completer : C-famlily，基于Clang补全
+    "   --go-completer    : Go，基本Gocode/Godef补全
+    "   --js-completer    : Javascript，基于Tern补全
+    " Linux: 使用install.py安装
+    "   先安装python-dev, python3-dev, cmake, llvm, clang
+    "   "./install.py --clang-completer --go-completer --js-completer --system-libclang"
+    " Windows: 使用install.py安装
+    "   先安装python, Cmake, VS, 7-zip
+    "   "install.py --clang-completer --go-completer --js-completer --msvc 14 --build-dir <ycm_build>"
     "   自己指定vs版本，自己指定build路径，编译完成后，可以删除<ycm_build>
     "   如果已经安装了clang，可以使用--system-libclang参数，就不必再下载clang了
     Plug 'Valloric/YouCompleteMe'
     let g:ycm_global_ycm_extra_conf=$VimPluginPath.'/.ycm_extra_conf.py'
-    let g:ycm_enable_diagnostic_signs = 1
-                                        " 开启语法检测
+                                                                " C-family补全路径
+    let g:ycm_enable_diagnostic_signs = 1                       " 开启语法检测
     let g:ycm_max_diagnostics_to_display = 30
-    let g:ycm_warning_symbol = '►'      " Warning符号
-    let g:ycm_error_symbol = '✘'        " Error符号
-    let g:ycm_seed_identifiers_with_syntax = 1
-                                        " 语法关键字补全
-    let g:ycm_collect_identifiers_from_tags_files = 1
-                                        " 开启标签补全
-    let g:ycm_use_ultisnips_completer = 1
-                                        " 开启UltiSnips补全
+    let g:ycm_warning_symbol = '►'                              " Warning符号
+    let g:ycm_error_symbol = '✘'                                " Error符号
+    let g:ycm_auto_start_csharp_server = 0                      " 禁止C#补全
+    let g:ycm_cache_omnifunc = 0                                " 禁止缓存匹配项，每次都重新生成匹配项
+    let g:ycm_complete_in_strings = 1                           " 开启对字符串补全
+    let g:ycm_complete_in_comments = 0                          " 禁止对注释补全
+    let g:ycm_collect_identifiers_from_comments_and_strings = 0 " 收集注释和字符串补全
+    let g:ycm_collect_identifiers_from_tags_files = 1           " 收集标签补全
+    let g:ycm_seed_identifiers_with_syntax = 1                  " 收集语法关键字补全
+    let g:ycm_use_ultisnips_completer = 1                       " 收集UltiSnips补全
+    let g:ycm_autoclose_preview_window_after_insertion=1        " 自动关闭预览窗口
+    let g:ycm_key_invoke_completion = ''                        " 默认<C-Space>
     let g:ycm_key_list_select_completion = ['<C-j>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-k>', '<Up>']
-    let g:ycm_autoclose_preview_window_after_insertion=1
-                                        " 自动关闭预览窗口
-    let g:ycm_cache_omnifunc = 0        " 禁止缓存匹配项，每次都重新生成匹配项
-    nnoremap <leader>gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
-    nnoremap <leader>gi :YcmCompleter GoToInclude<CR>
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
+    nnoremap <leader>gi :YcmCompleter GoToInclude<CR>
+    nnoremap <leader>gd :YcmCompleter GoToDefinition<CR>
+    nnoremap <leader>gD :YcmCompleter GoToDeclaration<CR>
+    nnoremap <leader>gr :YcmCompleter GoToReferences<CR>
+    nnoremap <leader>gp :YcmCompleter GetParent<CR>
+    nnoremap <leader>gk :YcmCompleter GetDoc<CR>
+    nnoremap <leader>gy :YcmCompleter GetType<CR>
+    nnoremap <leader>gf :YcmCompleter FixIt<CR>
+    nnoremap <leader>gc :YcmCompleter ClearCompilationFlagCache<CR>
+    nnoremap <leader>gs :YcmCompleter RestartServer
+    nnoremap <leader>yr :YcmRestartServer<CR>
     nnoremap <leader>yd :YcmShowDetailedDiagnostic<CR>
-    nnoremap <leader>yf :YcmCompleter FixIt<CR>
+    nnoremap <leader>yc :call YcmCreateCppConf()<CR>
+    nnoremap <leader>yj :call YcmCreateJsConf()<CR>
     noremap <F4> :YcmDiags<CR>
-                                        " 错误列表
+    function! YcmCreateCppConf()
+        " 在当前目录下创建.ycm_extra_conf.py
+        if !filereadable('.ycm_extra_conf.py')
+            let l:file = readfile(g:ycm_global_ycm_extra_conf)
+            call writefile(l:file, '.ycm_extra_conf.py')
+        endif
+        execute 'edit .ycm_extra_conf.py'
+    endfunction
+    function! YcmCreateJsConf()
+        " 在当前目录下创建.tern-project
+        if !filereadable('.tern-project')
+            let l:file = readfile($VimPluginPath.'/.tern-project')
+            call writefile(l:file, '.tern-project')
+        endif
+        execute 'edit .tern-project'
+    endfunction
 " }}}
 
 " ultisnips {{{ 代码片段插入
@@ -1229,15 +1259,6 @@ if !(IsWin() && IsNVim())
     let g:UltiSnipsJumpBackwardTrigger="<C-k>"
 endif
 " }}}
-
-" vim-go {{{ Go开发环境
-    Plug 'fatih/vim-go'
-    " +YCM : 支持Go实时补全
-    let g:go_doc_keywordprg_enabled=0   " 取消对K的映射
-    let g:go_def_mapping_enabled=0      " 取消默认的按键映射
-    let g:go_textobj_enabled=1          " 使用TextObject的映射
-    let g:go_fmt_autosave = 0           " 禁用auto GoFmt
-"}}}
 
 " surround and repeat {{{ 添加包围符
     Plug 'tpope/vim-surround'
@@ -1599,16 +1620,8 @@ augroup VimVimrc
     autocmd FileType javascript setlocal foldmethod=syntax
 
     " map
-    autocmd Filetype vim nnoremap <buffer>          <S-k> :call GotoKeyword('n')<CR>
-    autocmd Filetype vim vnoremap <buffer>          <S-k> :call GotoKeyword('v')<CR>
-if -1 != match(g:plugs_order, "^vim-go$")
-    " g:plugs_order是vim-plug中的变量
-    autocmd FileType go setlocal errorformat&
-    autocmd FileType go  nnoremap <buffer> <silent> <leader>gc :execute ":GoDoc " . expand("<cword>")<CR>
-    autocmd FileType go  nnoremap <buffer> <silent> <leader>gb :GoBuild<CR>
-    autocmd FileType go  nnoremap <buffer> <silent> <leader>gd :GoDef<CR>
-    "autocmd FileType go  nnoremap <buffer> <silent> <leader>gr :GoRun<CR>
-endif
+    autocmd Filetype vim nnoremap <buffer> <S-k> :call GotoKeyword('n')<CR>
+    autocmd Filetype vim vnoremap <buffer> <S-k> :call GotoKeyword('v')<CR>
 augroup END
 " }}}
 
