@@ -1269,6 +1269,17 @@ if !(IsWin() && IsNVim())
 endif
 " }}}
 
+" ale {{{ 语法检测
+    Plug 'w0rp/ale'
+    " 语法引擎:
+    "   VimScript : vint
+    let g:ale_completion_enabled = 0    " 使能ale补全(只支持TypeScript)
+    let g:ale_sign_error = '✘'
+    let g:ale_sign_warning = '►'
+    let g:ale_set_loclist = 1
+    let g:ale_set_quickfix = 0
+" }}}
+
 " surround and repeat {{{ 添加包围符
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-repeat'
