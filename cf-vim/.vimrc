@@ -617,11 +617,7 @@ function! FindVimgrep(type, mode)
         endif
     elseif a:mode ==# 'v'
         " get selected string in visual mode
-        let l:reg_var = getreg('0', 1)
-        let l:reg_mode = getregtype('0')
-        normal! gv"0y
-        let l:selected = getreg('0')
-        call setreg('0', l:reg_var, l:reg_mode)
+        let l:selected = GetSelectedContent()
 
         if a:type =~? 'i'
             let l:string = input(" What to find :", l:selected)
