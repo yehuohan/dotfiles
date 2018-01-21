@@ -141,6 +141,7 @@ function! IsTermType(tt)
         return 1
     else
         return 0
+    endif
 endfunction
 " }}}
 
@@ -1229,7 +1230,7 @@ endif
     nnoremap <leader>gy :YcmCompleter GetType<CR>
     nnoremap <leader>gf :YcmCompleter FixIt<CR>
     nnoremap <leader>gc :YcmCompleter ClearCompilationFlagCache<CR>
-    nnoremap <leader>gs :YcmCompleter RestartServer
+    nnoremap <leader>gs :YcmCompleter RestartServer<CR>
     nnoremap <leader>yr :YcmRestartServer<CR>
     nnoremap <leader>yd :YcmShowDetailedDiagnostic<CR>
     nnoremap <leader>yc :call YcmCreateCppConf()<CR>
