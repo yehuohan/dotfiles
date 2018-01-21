@@ -236,8 +236,10 @@ endif
 function! InvConceallevel()
     if &conceallevel == 0
         set conceallevel=2
+        echo "conceallevel = 2"
     else
         set conceallevel=0              " 显示markdown等格式中的隐藏字符
+        echo "conceallevel = 0"
     endif
 endfunction
 " }}}
@@ -278,8 +280,10 @@ endfunction
 function! InvFoldColumeShow()
     if &foldcolumn == 0
         set foldcolumn=1
+        echo "foldcolumn = 1"
     else
         set foldcolumn=0
+        echo "foldcolumn = 0"
     endif
 endfunction
 " }}}
@@ -288,8 +292,10 @@ endfunction
 function! InvSigncolumn()
     if &signcolumn == "auto"
         set signcolumn=no
+        echo "signcolumn = no"
     else
         set signcolumn=auto
+        echo "signcolumn = auto"
     endif
 endfunction
 " }}}
@@ -298,8 +304,10 @@ endfunction
 function! InvHighLight()
     if exists("g:syntax_on")
         syntax off
+        echo "syntax off"
     else
         syntax on
+        echo "syntax on"
     endif
 endfunction
 " }}}
