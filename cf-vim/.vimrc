@@ -1067,7 +1067,7 @@ endif
         \{
             \ "opt" : ["filetype", "ft"],
             \ "lst" : ["cpp", "c", "python", "vim", "go", "markdown", "help", "text",
-                     \ "sh", "matlab", "conf", "make", "javascript"],
+                     \ "sh", "matlab", "conf", "make", "javascript", "html"],
             \ "dic" : {
                     \ "cpp"        : "C++ file",
                     \ "c"          : "C file",
@@ -1080,6 +1080,7 @@ endif
                     \ "conf"       : "Config file",
                     \ "make"       : "Makefile of .mak file",
                     \ "javascript" : "JavaScript file",
+                    \ "html"       : "Html file",
                     \},
             \ "cmd" : "popset#data#SetEqual",
         \},
