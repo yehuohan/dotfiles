@@ -38,6 +38,7 @@
 │   ├── .gitconfig         : git配置
 │   └── .xinitrc           : xorg初始化配置(不使用登录管理器时使用)
 ├── font                   : Consolas For Powerline Font
+├── sddm                   : sddm登录管理器配置
 └── misc
     └── ToggleTouchPad.py  : 触触板控制py脚本
 

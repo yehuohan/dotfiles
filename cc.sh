@@ -37,6 +37,9 @@ if [ `uname` == "Linux" ]; then
     # cf-misc
     cp ../MyApps/ToggleTouchPad.py ./misc/
 
+    # sddm
+    cp /etc/sddm.conf ./sddm
+
     echo "Linux: Copy configs was completed!"
 
 elif [ `uname -o` == "Msys" ]; then
