@@ -41,5 +41,5 @@ export PATH="$PATH:$HOME/MyApps/Qt570/Tools/QtCreator/bin"
 
 export PATH="$PATH:$HOME/MyApps/bochs268/bin"
 export PATH="$PATH:$HOME/MyApps/nasm212/bin"
-export PATH="$PATH:$HOME/MyApps/node6111/bin"
+export PATH="$PATH:$HOME/MyApps/nodejs/bin"
 export PATH="$PATH:$HOME/MyApps/XXNet"
