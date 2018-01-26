@@ -1701,12 +1701,15 @@ augroup END
     nnoremap <leader>p "0p
     nnoremap <leader>P "0P
 
-    " 寄存器快速复制与粘贴
     let s:lower_chars = split("q w e r t y u i o p a s d f g h j k l z x c v b n m", " ")
     for t in s:lower_chars
-        execute "vnoremap <leader>'" . t . "    \"" . t . "y"
-        execute "nnoremap <leader>'" . t . "    \"" . t . "p"
-        execute "nnoremap <leader>'" . toupper(t) . "    \"" . t . "P"
+        " 寄存器快速复制与粘贴
+        nnoremap <leader>'a "ap
+        execute "vnoremap <leader>'" . t          . ' "' . t . 'y'
+        execute "nnoremap <leader>'" . t          . ' "' . t . 'p'
+        execute "nnoremap <leader>'" . toupper(t) . ' "' . t . 'P'
+        " 快速执行宏
+        execute "nnoremap <leader>2" . t          . ' @' . t
     endfor
 " }}}
 
