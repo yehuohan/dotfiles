@@ -528,8 +528,8 @@ endfunction
 " @param sopt: 参数信息，未用到，只是传入popset的函数需要
 " @param sel: index.html路径
 function! ComplileProjectHtml(sopt, sel)
-    let l:exec_str = (exists(":AsyncRun") == 2) ? ":AsyncRun " : "!"
-    let l:exec_str .= s:path_browser . " " . a:sel
+    let l:exec_str = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
+    let l:exec_str .= s:path_browser . ' ' . '"' . a:sel . '"'
     execute l:exec_str
 endfunction
 " }}}
