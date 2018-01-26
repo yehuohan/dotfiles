@@ -478,7 +478,6 @@ function! ComplileProject(str, fn)
         call PopSelection({
             \ 'opt' : ['Please Select your project file'],
             \ 'lst' : l:prj,
-            \ 'dic' : {},
             \ 'cmd' : a:fn,
             \}, 0)
     endif
@@ -1065,44 +1064,45 @@ endif
     let g:Popset_CompleteAll = 0
     let g:Popset_SelectionData = [
         \{
-            \ "opt" : ["filetype", "ft"],
-            \ "lst" : ["cpp", "c", "python", "vim", "go", "markdown", "help", "text",
-                     \ "sh", "matlab", "conf", "make", "javascript", "html"],
-            \ "dic" : {
-                    \ "cpp"        : "C++ file",
-                    \ "c"          : "C file",
-                    \ "python"     : "Python script file",
-                    \ "vim"        : "Vim script file",
-                    \ "go"         : "Go Language",
-                    \ "markdown"   : "MarkDown file",
-                    \ "help"       : "Vim help doc",
-                    \ "sh"         : "Linux shell script",
-                    \ "conf"       : "Config file",
-                    \ "make"       : "Makefile of .mak file",
-                    \ "javascript" : "JavaScript file",
-                    \ "html"       : "Html file",
+            \ 'opt' : ['filetype', 'ft'],
+            \ 'dsr' : 'When this option is set, the FileType autocommand event is triggered.',
+            \ 'lst' : ['cpp', 'c', 'python', 'vim', 'go', 'markdown', 'help', 'text',
+                     \ 'sh', 'matlab', 'conf', 'make', 'javascript', 'html'],
+            \ 'dic' : {
+                    \ 'cpp'        : 'Cpp file',
+                    \ 'c'          : 'C file',
+                    \ 'python'     : 'Python script file',
+                    \ 'vim'        : 'Vim script file',
+                    \ 'go'         : 'Go Language',
+                    \ 'markdown'   : 'MarkDown file',
+                    \ 'help'       : 'Vim help doc',
+                    \ 'sh'         : 'Linux shell script',
+                    \ 'conf'       : 'Config file',
+                    \ 'make'       : 'Makefile of .mak file',
+                    \ 'javascript' : 'JavaScript file',
+                    \ 'html'       : 'Html file',
                     \},
-            \ "cmd" : "popset#data#SetEqual",
+            \ 'cmd' : 'popset#data#SetEqual',
         \},
         \{
-            \ "opt" : ["colorscheme", "colo"],
-            \ "lst" : ["gruvbox"],
-            \ "dic" : {"gruvbox" : "第三方主题"},
-            \ "cmd" : "",
+            \ 'opt' : ['colorscheme', 'colo'],
+            \ 'lst' : ['gruvbox'],
+            \ 'dic' : {'gruvbox' : '第三方主题'},
+            \ 'cmd' : '',
         \},
         \{
-            \ "opt" : ["cppargs"],
-            \ "lst" : ["charset"],
-            \ "dic" : {
-                    \ "charset" : "-finput-charset=utf-8 -fexec-charset=gbk",
+            \ 'opt' : ['cppargs'],
+            \ 'dsr' : 'Cpp compliled args.',
+            \ 'lst' : ['charset'],
+            \ 'dic' : {
+                    \ 'charset' : '-finput-charset=utf-8 -fexec-charset=gbk',
                     \},
-            \ "cmd" : "ComplileFileArgs",
+            \ 'cmd' : 'ComplileFileArgs',
         \},]
         " \{
-        "     \ "opt" : ["AirlineTheme"],
-        "     \ "lst" : popset#data#GetFileList($VimPluginPath.'/bundle/vim-airline-themes/autoload/airline/themes/*.vim'),
-        "     \ "dic" : {},
-        "     \ "cmd" : "popset#data#SetExecute",
+        "     \ 'opt' : ['AirlineTheme'],
+        "     \ 'lst' : popset#data#GetFileList($VimPluginPath.'/bundle/vim-airline-themes/autoload/airline/themes/*.vim'),
+        "     \ 'cmd' : 'popset#data#SetExecute',
         " \}]
     " set option with PSet
     nnoremap <leader>so :PSet
