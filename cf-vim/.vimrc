@@ -328,17 +328,6 @@ endfunction
 endif
 " }}}
 
-" 获取选区内容 {{{
-function! GetSelectedContent()
-    let l:reg_var = getreg('0', 1)
-    let l:reg_mode = getregtype('0')
-    normal! gv"0y
-    let l:word = getreg('0')
-    call setreg('0', l:reg_var, l:reg_mode)
-    return l:word
-endfunction
-" }}}
-
 " 编译环境函数 " {{{
 " Set autochdir is required.
 " （因为执行编译时，是以当前文件为目标文件；
@@ -558,7 +547,18 @@ let s:findvimgrep_vmaps = ["fi", "fgi", "fI", "fgI",
                          \ ]
 " }}}
 
-" FUNCTION: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{
+" FUNCTION: GetSelectedContent() {{{ 获取选区内容
+function! GetSelectedContent()
+    let l:reg_var = getreg('0', 1)
+    let l:reg_mode = getregtype('0')
+    normal! gv"0y
+    let l:word = getreg('0')
+    call setreg('0', l:reg_var, l:reg_mode)
+    return l:word
+endfunction
+" }}}
+
+" FUNCTION: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{ 多文件自动补全
 function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
     let l:complete = []
     let l:arglead_list = [""]
@@ -694,26 +694,6 @@ endfunction
 
 " }}}
 
-" 查找Vim关键字 {{{
-function! GotoKeyword(mode)
-    let l:exec_str = "help "
-    if a:mode ==# 'n'
-        let l:word = expand("<cword>")
-    elseif a:mode ==# 'v'
-        let l:word = GetSelectedContent()
-    endif
-
-    " 添加关键字
-    let l:exec_str .= l:word
-    if IsNVim()
-        " nvim用自己的帮助文件，只有英文的
-        let l:exec_str .= "@en"
-    endif
-
-    silent! execute l:exec_str
-endfunction
-" }}}
-
 " Quickfix相关函数 {{{
 " 编码转换 {{{
 "function! ConvQuickfix(type, if, it)
@@ -751,6 +731,54 @@ endfunction
 
 " }}}
 
+" 杂项 {{{
+
+" 查找Vim关键字 {{{
+function! GotoKeyword(mode)
+    let l:exec_str = "help "
+    if a:mode ==# 'n'
+        let l:word = expand("<cword>")
+    elseif a:mode ==# 'v'
+        let l:word = GetSelectedContent()
+    endif
+
+    " 添加关键字
+    let l:exec_str .= l:word
+    if IsNVim()
+        " nvim用自己的帮助文件，只有英文的
+        let l:exec_str .= "@en"
+    endif
+
+    silent! execute l:exec_str
+endfunction
+" }}}
+
+" 去除尾部空白 {{{
+function! RemoveTrailingSpace()
+    let l:save = winsaveview()
+    %s/\s\+$//e
+    call winrestview(l:save)
+endfunction
+" }}}
+
+" 最大化Window {{{
+let s:is_max = 0
+function! ToggleWindowZoom()
+    if s:is_max
+        let s:is_max = 0
+        execute "normal! " . s:last_tab . "gt"
+        execute "noautocmd " . s:last_winnr . "wincmd w"
+        silent! execute "tabclose " . s:this_tab
+    else
+        let s:is_max = 1
+        let s:last_winnr = winnr()
+        let s:last_tab = tabpagenr()
+        execute "tabedit " . expand("%")
+        let s:this_tab = tabpagenr()
+    endif
+endfunction
+" }}}
+
 " Asd2Num切换 " {{{
 let s:asd2num_toggle_flg = 0
 let s:asd2num_map_table={
@@ -772,22 +800,6 @@ function! ToggleAsd2Num()
 endfunction
 " }}}
 
-" 最大化Window {{{
-let s:is_max = 0
-function! ToggleWindowZoom()
-    if s:is_max
-        let s:is_max = 0
-        execute "normal! " . s:last_tab . "gt"
-        execute "noautocmd " . s:last_winnr . "wincmd w"
-        silent! execute "tabclose " . s:this_tab
-    else
-        let s:is_max = 1
-        let s:last_winnr = winnr()
-        let s:last_tab = tabpagenr()
-        execute "tabedit " . expand("%")
-        let s:this_tab = tabpagenr()
-    endif
-endfunction
 " }}}
 
 " }}}
@@ -1664,6 +1676,8 @@ augroup END
     " 折叠
     nnoremap <leader>zr zR
     nnoremap <leader>zm zM
+    " 去除尾部空白
+    nnoremap <leader>rt :call RemoveTrailingSpace()<CR>
     " Asd2Num
     inoremap <C-a> <Esc>:call ToggleAsd2Num()<CR>a
     " Linux下自动退出中文输入法
