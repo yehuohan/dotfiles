@@ -1276,7 +1276,7 @@ if !(IsWin() && IsNVim())
     let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
                                         " 自定义mySnippets合集
     let g:UltiSnipsExpandTrigger="<Tab>"
-    let g:UltiSnipsListSnippets = "<C-Tab>"
+    let g:UltiSnipsListSnippets="<C-Tab>"
     let g:UltiSnipsJumpForwardTrigger="<C-j>"
     let g:UltiSnipsJumpBackwardTrigger="<C-k>"
 endif
