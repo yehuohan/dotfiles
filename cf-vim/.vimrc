@@ -1132,8 +1132,8 @@ endif
                                         " 下一个Sibling
     let g:NERDTreeMapJumpPrevSibling = '<C-p>'
                                         " 前一个Sibling
-    noremap <leader>te :NERDTreeToggle<CR>
-    noremap <leader>tE :NERDTree<CR>
+    nnoremap <leader>te :NERDTreeToggle<CR>
+    nnoremap <leader>tE :NERDTree<CR>
 " }}}
 
 " vim-startify {{{ vim会话界面
@@ -1291,6 +1291,10 @@ endif
     let g:ale_sign_warning = '►'
     let g:ale_set_loclist = 1
     let g:ale_set_quickfix = 0
+    let g:ale_echo_delay = 10           " 显示语文错误的延时时间
+    let g:ale_lint_delay = 300          " 文本更改后的延时检测时间
+    let g:ale_enabled = 1               " 可以使用ALEToggle切换
+    nnoremap <leader>ta :execute "ALEToggle"<Bar>echo "toggle:" . g:ale_enabled<CR> 
 " }}}
 
 " surround and repeat {{{ 添加包围符
@@ -1334,7 +1338,7 @@ endif
     endif                               " 设置ctags路径，需要安装ctags
     let g:tagbar_width=30
     let g:tagbar_map_showproto=''       " 取消tagbar对<Space>的占用
-    noremap <leader>tt :TagbarToggle<CR>
+    nnoremap <leader>tt :TagbarToggle<CR>
                                         " 可以 ctags -R 命令自行生成tags
 " }}}
 
@@ -1717,16 +1721,19 @@ augroup END
 
     let s:lower_chars = split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
     let s:digital_chars = split('1 2 3 4 5 6 7 8 9 0', ' ')
-    let s:reg_chars = s:lower_chars + s:digital_chars
-    for t in s:reg_chars
-        " 寄存器快速复制与粘贴
-        nnoremap <leader>'a "ap
+
+    " 寄存器快速复制与粘贴
+    for t in s:lower_chars
         execute "vnoremap <leader>'" . t          . ' "' . t . 'y'
         execute "nnoremap <leader>'" . t          . ' "' . t . 'p'
         execute "nnoremap <leader>'" . toupper(t) . ' "' . t . 'P'
     endfor
+    for t in s:digital_chars
+        execute "vnoremap <leader>'" . t          . ' "' . t . 'y'
+        execute "nnoremap <leader>'" . t          . ' "' . t . 'p'
+    endfor
+    " 快速执行宏
     for t in s:lower_chars
-        " 快速执行宏
         execute "nnoremap <leader>2" . t          . ' @' . t
     endfor
 " }}}
