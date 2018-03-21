@@ -1688,7 +1688,7 @@ augroup END
     " 去除尾部空白
     nnoremap <leader>rt :call RemoveTrailingSpace()<CR>
     " Asd2Num
-    inoremap <C-a> <Esc>:call ToggleAsd2Num()<CR>a
+    noremap <C-a> <Esc>:call ToggleAsd2Num()<CR>a
     " Linux下自动退出中文输入法
     if IsLinux()
         "autocmd InsertLeave * call LinuxFcitx2En()
@@ -1746,7 +1746,6 @@ augroup END
 " Move and goto{{{
     " 扩展匹配(%)功能
 if !IsNVim()
-    "runtime macros/matchit.vim
     packadd matchit
 endif
     " map recursively for % extended by matchit.vim
