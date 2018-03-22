@@ -14,7 +14,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG  += c++11
 TEMPLATE = app
-#DESTDIR = $$(PWD)
+DESTDIR = ../
 TRANSLATIONS += lang/lang_zh_cn.ts	\
                 lang/lang_en.ts
 
@@ -57,7 +57,7 @@ QT -= gui
 
 CONFIG  += c++11 console
 TEMPLATE = app
-#DESTDIR = $$(PWD)
+DESTDIR = ../
 
 # debug, release, debug_and_release
 CONFIG += debug
@@ -84,6 +84,42 @@ SOURCES   += \
 
 endsnippet
 
+snippet qcpp "qmake pro only for c/c++"
+#-------------------------------------------------
+#
+# Project created by Vim `!v strftime("%Y-%m-%d %X")`
+#
+#-------------------------------------------------
+
+
+TEMPLATE = app
+CONFIG  -= qt
+CONFIG  -= app_bundle
+CONFIG  += c++11 console
+DESTDIR = ../
+
+# debug, release, debug_and_release
+CONFIG += debug
+CONFIG -= release
+debug{
+    TARGET = ${1:project-name}
+}
+release {
+    TARGET = $1
+}
+
+#INCLUDEPATH +=
+#LIBS        +=
+unix {
+    #CONFIG    += link_pkgconfig
+    #PKGCONFIG +=
+}
+
+SOURCES   += \
+    main.cpp
+#HEADERS   += .h
+
+endsnippet
 
 
 #===============================================================================
