@@ -1,6 +1,7 @@
 "
 "
 " vimrc, one configuration for vim, gvim, neovim and neovim-qt.
+" set the path of Global settings before using this vimrc.
 " yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
 "
 "
@@ -25,7 +26,7 @@
     " PYTHON3=C:/MyApps/Python36          - 没置Python3路径
     "
     " [*] 使用MinGw-x64:
-    " mingw32-make -f Make_ming.mak gvim.exe 
+    " mingw32-make -f Make_ming.mak gvim.exe
     " 若设置32位选项前编译过一次，清理一次.o文件再编译
     " 若使用64位，只需要添加Python路径和DirectX支持
     "
@@ -185,6 +186,20 @@ vnoremap ; :
     endif
     set rtp+=$VimPluginPath             " add .vim or vimfiles to rtp(runtimepath)
 
+    if IsWin()
+        " VC++ namke路径
+        let s:path_vcvars32 = '"D:/Microsoft Visual Studio 14.0/VC/bin/vcvars32.bat"'
+        let s:path_vcvars64 = '"D:/Microsoft Visual Studio 14.0/VC/bin/amd64/vcvars64.bat"'
+        let s:path_nmake_x86 = '"D:/Microsoft Visual Studio 14.0/VC/bin/nmake.exe"'
+        let s:path_nmake_x64 = '"D:/Microsoft Visual Studio 14.0/VC/bin/amd64/nmake.exe"'
+        let s:path_vcvars = s:path_vcvars32
+        let s:path_nmake = s:path_nmake_x86
+        " qmake路径（基于msvc）
+        let s:path_qmake_x86 = '"D:/Qt/Qt5.7.0/5.7/msvc2015/bin/qmake.exe"'
+        let s:path_qmake_x64 = '"D:/Qt/Qt5.7.0/5.7/msvc2015_64/bin/qmake.exe"'
+        let s:path_qmake = s:path_qmake_x86
+    endif
+
     " 浏览器路径
     let s:path_browser = ""
     if IsWin()
@@ -339,6 +354,27 @@ endif
 " 若禁用自动切换当前目录，会导致当前编辑的文件不一定是目标文件）
 set autochdir
 
+" FUNCTION: ToggleComplileX86X64() "{{{
+" 切换成x86或x64编译环境
+let s:complile_type = 'x86'
+function! ToggleComplileX86X64()
+    if IsWin()
+        if 'x86' ==? s:complile_type
+            let s:complile_type = 'x64'
+            let s:path_vcvars = s:path_vcvars64
+            let s:path_nmake = s:path_nmake_x64
+            let s:path_qmake = s:path_qmake_x64
+        else
+            let s:complile_type = 'x86'
+            let s:path_vcvars = s:path_vcvars32
+            let s:path_nmake = s:path_nmake_x86
+            let s:path_qmake = s:path_qmake_x86
+        endif
+        echo 'Complile Type: ' . s:complile_type
+    endif
+endfunction
+" }}}
+
 " FUNCTION: ComplileFile(argstr) {{{
 " @param argstr: 想要传递的命令参数
 function! ComplileFile(argstr)
@@ -366,22 +402,22 @@ function! ComplileFile(argstr)
     elseif "pro" ==? l:ext
     "{{{
         if IsLinux()
-            let l:exec_str .= "qmake " . a:argstr . " -r -o ./DebugV/Makefile " . l:filename
-            let l:exec_str .= " && cd ./DebugV"
-            let l:exec_str .= " && make"
+            let l:exec_str .= 'qmake ' . a:argstr . ' -r -o ./DebugV/Makefile ' . l:filename
+            let l:exec_str .= ' && cd ./DebugV'
+            let l:exec_str .= ' && make'
         elseif IsWin()
-            let l:exec_str .= " mkdir DebugV"
-            let l:exec_str .= " & cd DebugV"
+            let l:exec_str .= ' mkdir DebugV'
+            let l:exec_str .= ' & cd DebugV'
             " Attetion: here shouls be <qmake ../file.pro>
-            let l:exec_str .= " && qmake " . a:argstr . " -r ." . l:filename
-            let l:exec_str .= " && vcvars32.bat"
-            let l:exec_str .= " && nmake -f Makefile.Debug"
+            let l:exec_str .= ' && ' . s:path_qmake . a:argstr . ' -r .' . l:filename
+            let l:exec_str .= ' && ' . s:path_vcvars
+            let l:exec_str .= ' && ' . s:path_nmake . ' -f Makefile.Debug'
             " Attention: executed file must be in the same directory with .pro file
-            let l:exec_str .= " && cd .."
+            let l:exec_str .= ' && cd ..'
         else
             return
         endif
-        let l:exec_str .= " && " . l:name
+        let l:exec_str .= ' && ' . l:name
     "}}}
     elseif "go" ==? l:ext
     "{{{
@@ -494,22 +530,22 @@ function! ComplileProjectQmake(sopt, sel)
 
     " execute shell code
     if IsLinux()
-        let l:exec_str .= "qmake " . " -r -o ./DebugV/Makefile " . l:filename
-        let l:exec_str .= " && cd ./DebugV"
-        let l:exec_str .= " && make"
+        let l:exec_str .= 'qmake ' . ' -r -o ./DebugV/Makefile ' . l:filename
+        let l:exec_str .= ' && cd ./DebugV'
+        let l:exec_str .= ' && make'
     elseif IsWin()
-        let l:exec_str .= " mkdir DebugV"
-        let l:exec_str .= " & cd DebugV"
+        let l:exec_str .= ' mkdir DebugV'
+        let l:exec_str .= ' & cd DebugV'
         " Attetion: here shouls be <qmake ../file.pro>
-        let l:exec_str .= " && qmake " . " -r ." . l:filename
-        let l:exec_str .= " && vcvars32.bat"
-        let l:exec_str .= " && nmake -f Makefile.Debug"
+        let l:exec_str .= ' && ' . s:path_qmake . " -r ." . l:filename
+        let l:exec_str .= ' && ' . s:path_vcvars
+        let l:exec_str .= ' && ' . s:path_nmake . ' -f Makefile.Debug'
         " Attention: executed file must be in the same directory with .pro file
         let l:exec_str .= " && cd .."
     else
         return
     endif
-    let l:exec_str .= " && " . l:name
+    let l:exec_str .= ' && ' . l:name
     execute l:exec_str
 
     " change back cwd
@@ -1299,7 +1335,7 @@ endif
     let g:ale_echo_delay = 10           " 显示语文错误的延时时间
     let g:ale_lint_delay = 300          " 文本更改后的延时检测时间
     let g:ale_enabled = 1               " 可以使用ALEToggle切换
-    nnoremap <leader>ta :execute "ALEToggle"<Bar>echo "toggle:" . g:ale_enabled<CR> 
+    nnoremap <leader>ta :execute "ALEToggle"<Bar>echo "toggle:" . g:ale_enabled<CR>
 " }}}
 
 " surround and repeat {{{ 添加包围符
@@ -1838,6 +1874,7 @@ endif
     nnoremap <leader>rf :call ComplileFile('')<CR>
     nnoremap <leader>rq :call RC_Qmake()<CR>
     nnoremap <leader>rh :call RC_Html()<CR>
+    nnoremap <leader>tc :call ToggleComplileX86X64()<CR>
 
     " 编译运行（输入参数）当前文件
     nnoremap <leader>ra :execute"let g:__str__=input('Compile Args: ', '', 'customlist,GetMultiFilesCompletion')"<Bar>call ComplileFile(g:__str__)<CR>
