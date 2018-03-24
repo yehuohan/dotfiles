@@ -384,22 +384,22 @@ function! ComplileFile(argstr)
     let l:exec_str = (exists(":AsyncRun") == 2) ? ":AsyncRun " : "!"
 
     " Create execute string
-    if "c" ==? l:ext
+    if 'c' ==? l:ext
     "{{{
-        let l:exec_str .= "gcc " . a:argstr . " -o " . l:name . " " . l:filename
-        let l:exec_str .= " && " . l:name
+        let l:exec_str .= 'gcc ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
+        let l:exec_str .= ' && ' . l:name
     "}}}
-    elseif "cpp" ==? l:ext
+    elseif 'cpp' ==? l:ext
     "{{{
-        let l:exec_str .= "g++ -std=c++11 " . a:argstr . " -o " . l:name . " " . l:filename
-        let l:exec_str .= " && " . l:name
+        let l:exec_str .= 'g++ -std=c++11 ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
+        let l:exec_str .= ' && ' . l:name
     "}}}
-    elseif "py" ==? l:ext || "pyw" ==? l:ext
+    elseif 'py' ==? l:ext || 'pyw' ==? l:ext
     "{{{
-        let l:exec_str .= "python " . l:filename
-        let l:exec_str .= " " . a:argstr
+        let l:exec_str .= 'python ' . l:filename
+        let l:exec_str .= ' ' . a:argstr
     "}}}
-    elseif "pro" ==? l:ext
+    elseif 'pro' ==? l:ext
     "{{{
         if IsLinux()
             let l:exec_str .= 'qmake ' . a:argstr . ' -r -o ./DebugV/Makefile ' . l:filename
@@ -419,35 +419,35 @@ function! ComplileFile(argstr)
         endif
         let l:exec_str .= ' && ' . l:name
     "}}}
-    elseif "go" ==? l:ext
+    elseif 'go' ==? l:ext
     "{{{
-        let l:exec_str .= " go run " . l:filename
+        let l:exec_str .= ' go run ' . l:filename
     "}}}
-    elseif "m" ==? l:ext
+    elseif 'm' ==? l:ext
     "{{{
-        let l:exec_str .= "matlab -nosplash -nodesktop -r " . l:name[3:-2]
+        let l:exec_str .= 'matlab -nosplash -nodesktop -r ' . l:name[3:-2]
     "}}}
-    elseif "sh" ==? l:ext
+    elseif 'sh' ==? l:ext
     "{{{
         if IsLinux() || IsGw()
-            let l:exec_str .= " ./" . l:filename
-            let l:exec_str .= " " . a:argstr
+            let l:exec_str .= ' ./' . l:filename
+            let l:exec_str .= ' ' . a:argstr
         else
             return
         endif
     "}}}
-    elseif "bat" ==? l:ext
+    elseif 'bat' ==? l:ext
     "{{{
         if IsWin()
-            let l:exec_str .= " " . l:filename
-            let l:exec_str .= " " . a:argstr
+            let l:exec_str .= ' ' . l:filename
+            let l:exec_str .= ' ' . a:argstr
         else
             return
         endif
     "}}}
-    elseif "html" ==? l:ext
+    elseif 'html' ==? l:ext
     "{{{
-        let l:exec_str .= s:path_browser . " " . l:filename
+        let l:exec_str .= s:path_browser . ' ' . l:filename
     "}}}
     else
         return
@@ -461,7 +461,7 @@ endfunction
 " FUNCTION: ComplileFileArgs(sopt, arg) {{{
 " 用于popset的函数。
 function! ComplileFileArgs(sopt, arg)
-    if a:arg ==# "charset"
+    if a:arg ==# 'charset'
         call ComplileFile('-finput-charset=utf-8 -fexec-charset=gbk')
     endif
 endfunction
@@ -473,13 +473,13 @@ endfunction
 " @return 返回找到的文件路径列表
 function! FindProjectFile(...)
     if a:0 == 0
-        return ""
+        return ''
     endif
     let l:marker = a:1
     let l:dir = (a:0 >= 2) ? a:2 : "."
     let l:prj_dir      = fnamemodify(l:dir, ":p:h")
-    let l:prj_dir_last = ""
-    let l:prj_file     = ""
+    let l:prj_dir_last = ''
+    let l:prj_file     = ''
 
     while l:prj_dir != l:prj_dir_last
         let l:prj_file = glob(l:prj_dir . '/' . l:marker)
@@ -523,10 +523,10 @@ function! ComplileProjectQmake(sopt, sel)
     let l:name     = '"./' . fnamemodify(a:sel, ":t:r") . '"'
     let l:filedir  = fnameescape(fnamemodify(a:sel, ":p:h"))
     let l:olddir   = fnameescape(getcwd())
-    let l:exec_str = (exists(":AsyncRun") == 2) ? ":AsyncRun " : "!"
+    let l:exec_str = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
 
     " change cwd
-    execute "lcd " . l:filedir
+    execute 'lcd ' . l:filedir
 
     " execute shell code
     if IsLinux()
@@ -549,7 +549,7 @@ function! ComplileProjectQmake(sopt, sel)
     execute l:exec_str
 
     " change back cwd
-    execute "lcd " . l:olddir
+    execute 'lcd ' . l:olddir
 endfunction
 " }}}
 
