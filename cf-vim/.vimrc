@@ -1724,7 +1724,7 @@ augroup END
     " 去除尾部空白
     nnoremap <leader>rt :call RemoveTrailingSpace()<CR>
     " Asd2Num
-    noremap <C-a> <Esc>:call ToggleAsd2Num()<CR>a
+    inoremap <C-a> <Esc>:call ToggleAsd2Num()<CR>a
     " Linux下自动退出中文输入法
     if IsLinux()
         "autocmd InsertLeave * call LinuxFcitx2En()
