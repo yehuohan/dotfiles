@@ -574,19 +574,19 @@ let RC_Html  = function('ComplileProject', ['index.html', 'ComplileProjectHtml']
 
 " FindVimgrep搜索 " {{{
 " FindVimgrep map-keys {{{
-let s:findvimgrep_nmaps = ["fi", "fgi", "fI", "fgI",
-                         \ "fw", "fgw", "fW", "fgW",
-                         \ "fs", "fgs", "fS", "fgS",
-                         \ "Fi", "Fgi", "FI", "FgI",
-                         \ "Fw", "Fgw", "FW", "FgW",
-                         \ "Fs", "Fgs", "FS", "FgS",
+let s:findvimgrep_nmaps = ['fi', 'fgi', 'fI', 'fgI',
+                         \ 'fw', 'fgw', 'fW', 'fgW',
+                         \ 'fs', 'fgs', 'fS', 'fgS',
+                         \ 'Fi', 'Fgi', 'FI', 'FgI',
+                         \ 'Fw', 'Fgw', 'FW', 'FgW',
+                         \ 'Fs', 'Fgs', 'FS', 'FgS',
                          \ ]
-let s:findvimgrep_vmaps = ["fi", "fgi", "fI", "fgI",
-                         \ "fv", "fgv", "fV", "fgV",
-                         \ "fs", "fgs", "fS", "fgS",
-                         \ "Fi", "Fgi", "FI", "FgI",
-                         \ "Fv", "Fgv", "FV", "FgV",
-                         \ "Fs", "Fgs", "FS", "FgS",
+let s:findvimgrep_vmaps = ['fi', 'fgi', 'fI', 'fgI',
+                         \ 'fv', 'fgv', 'fV', 'fgV',
+                         \ 'fs', 'fgs', 'fS', 'fgS',
+                         \ 'Fi', 'Fgi', 'FI', 'FgI',
+                         \ 'Fv', 'Fgv', 'FV', 'FgV',
+                         \ 'Fs', 'Fgs', 'FS', 'FgS',
                          \ ]
 " }}}
 
@@ -604,15 +604,15 @@ endfunction
 " FUNCTION: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{ 多文件自动补全
 function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
     let l:complete = []
-    let l:arglead_list = [""]
-    let l:arglead_first = ""
-    let l:arglead_glob = ""
+    let l:arglead_list = ['']
+    let l:arglead_first = ''
+    let l:arglead_glob = ''
     let l:files_list = []
 
     " process glob path-string
     if !empty(a:arglead)
-        let l:arglead_list = split(a:arglead, " ")
-        let l:arglead_first = join(l:arglead_list[0:-2], " ")
+        let l:arglead_list = split(a:arglead, ' ')
+        let l:arglead_first = join(l:arglead_list[0:-2], ' ')
         let l:arglead_glob = l:arglead_list[-1]
     endif
 
@@ -626,7 +626,7 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
         let l:complete = l:files_list
     else
         for item in l:files_list
-            call add(l:complete, l:arglead_first . " " . item)
+            call add(l:complete, l:arglead_first . ' ' . item)
         endfor
     endif
     return l:complete
@@ -655,52 +655,38 @@ function! FindVimgrep(type, mode)
     " g : find global with inputing path
     " }}}
 
-    let l:string = ""
-    let l:files = "%"
-    let l:selected = ""
+    let l:string = ''
+    let l:files = '%'
+    let l:selected = ''
 
-    " get what to vimgrep
+    " 设置查找内容
     if a:mode ==# 'n'
         if a:type =~? 'i'
-            let l:string = input(" What to find :")
+            let l:string = input(' What to find :')
         elseif a:type =~? '[ws]'
-            let l:string = expand("<cword>")
+            let l:string = expand('<cword>')
         endif
     elseif a:mode ==# 'v'
-        " get selected string in visual mode
         let l:selected = GetSelectedContent()
-
         if a:type =~? 'i'
-            let l:string = input(" What to find :", l:selected)
+            let l:string = input(' What to find :', l:selected)
         elseif a:type =~? '[vs]'
             let l:string = l:selected
         endif
     endif
+    if empty(l:string) | return | endif
 
-    " return when nothing was got
-    if empty(l:string)
-        return
-    endif
+    " 设置查找选项
+    if a:type =~? 's'      | let l:string = '\<' . l:string . '\>' | endif
+    if a:type =~# '[IWVS]' | let l:string = '\C' . l:string        | endif
 
-    " match force
-    if a:type =~? 's'
-        let l:string = "\\<" . l:string . "\\>"
-    endif
-
-    " match case
-    if a:type =~# '[IWVS]'
-        let l:string = '\C' . l:string
-    endif
-
-    " get where to vimgrep
+    " 设置查找范围
     if a:type =~# 'g'
         let l:files = input(" Where to find :", "", "customlist,GetMultiFilesCompletion")
-        if empty(l:files)
-            return
-        endif
+        if empty(l:files) | return | endif
     endif
 
-    " vimgrep or lvimgrep
+    " 使用vimgrep或lvimgrep查找
     if a:type =~# 'f'
         silent! execute "vimgrep /" . l:string . "/j " . l:files
         echo "Finding..."
@@ -708,7 +694,6 @@ function! FindVimgrep(type, mode)
             echo "No match: " . l:string
             return
         else
-            " display search results
             if a:type =~# 'g'
                 vertical botright copen
                 wincmd =
@@ -723,7 +708,6 @@ function! FindVimgrep(type, mode)
             echo "No match: " . l:string
             return
         else
-            " display search results
             if a:type =~# 'g'
                 vertical botright lopen
                 wincmd =
