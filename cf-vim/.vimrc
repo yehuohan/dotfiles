@@ -184,7 +184,7 @@ vnoremap ; :
     elseif IsMac()
         let $VimPluginPath=s:home_path . "/.vim"
     endif
-    set rtp+=$VimPluginPath             " add .vim or vimfiles to rtp(runtimepath)
+    set rtp+=$VimPluginPath             " 添加 .vim 和 vimfiles 到 rtp(runtimepath)
 
     if IsWin()
         " VC++ namke路径
@@ -383,7 +383,7 @@ function! ComplileFile(argstr)
     let l:name     = '"./' . expand('%:t:r') . '"'  " 文件名，不带路径，不带扩展名
     let l:exec_str = (exists(":AsyncRun") == 2) ? ":AsyncRun " : "!"
 
-    " Create execute string
+    " 生成可执行字符串
     if 'c' ==? l:ext
     "{{{
         let l:exec_str .= 'gcc ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
@@ -453,7 +453,6 @@ function! ComplileFile(argstr)
         return
     endif
 
-    " execute shell code
     execute l:exec_str
 endfunction
 " }}}
@@ -631,7 +630,7 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
 endfunction
 " }}}
 
-" FUNCTION: FindVimgrep(type) {{{
+" FUNCTION: FindVimgrep(type, mode) {{{ 快速查找
 function! FindVimgrep(type, mode)
     " {{{
     " Normal Mode: mode='n'
@@ -850,7 +849,7 @@ endfunction
 " Plug and Settings
 "===============================================================================
 " {{{
-call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where install plugins
+call plug#begin($VimPluginPath."/bundle")   " 可选设置，可以指定插件安装位置
 
 " 基本编辑类
 " {{{
@@ -916,7 +915,6 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 "}}}
 
 " vim-over {{{ 替换预览
-    " substitute preview
     Plug 'osyo-manga/vim-over'
     nnoremap <leader>sp :OverCommandLine<CR>
     vnoremap <leader>sp :OverCommandLine<CR>
@@ -949,7 +947,7 @@ call plug#begin($VimPluginPath."/bundle")   " alternatively, pass a path where i
 
     nmap n  <Plug>(incsearch-nohl-n)
     nmap N  <Plug>(incsearch-nohl-N)
-    " *,# with \< \> and g*,g# without \< \>
+    " *,#使用\< \>，而g*,g# 不使用\< \>
     nmap *  <Plug>(incsearch-nohl-*)
     nmap #  <Plug>(incsearch-nohl-#)
     nmap g* <Plug>(incsearch-nohl-g*)
@@ -1048,7 +1046,7 @@ endif
     Plug 'vim-airline/vim-airline'
     "Plug 'vim-airline/vim-airline-themes'
 if !IsNVim()
-    set renderoptions=                  " Required by airline for showing unicode
+    set renderoptions=                  " 此设置使airline正常显示unicode字符
 endif
     let g:airline_powerline_fonts = 1
     let g:airline#extensions#tabline#enabled = 1
@@ -1092,7 +1090,7 @@ endif
 " }}}
 
 " ctrl-space {{{ buffer管理
-    " <h,o,l,w,b,/,?> for buffer,file,tab,workspace,bookmark,search and help
+    " h,o,l,w,b,/,? 对应于 buffer,file,tab,workspace,bookmark,search,help
     Plug 'yehuohan/vim-ctrlspace'
     set hidden                          " 允许在未保存文件时切换buffer
     let g:CtrlSpaceCacheDir = $VimPluginPath
@@ -1523,16 +1521,16 @@ endif
 
 " }}}
 
-" 游戏
+
+" Disabled Plugins
 " {{{
+
+" {{{ 游戏
     "Plug 'johngrib/vim-game-code-break'
     " VimGameCodeBreak
     "Plug 'johngrib/vim-game-snake'
     " VimGameSnake
 " }}}
-
-" Disabled Plugins
-" {{{
 
 " easy-align {{{ 字符对齐
     "Plug 'junegunn/vim-easy-align'
@@ -1544,12 +1542,6 @@ endif
     "Plugin 'Chiel92/vim-autoformat'
 " }}}
 
-" neovim gui font {{{ 字体设置(neovim已内置)
-    "if IsNVim()
-    "    Plug 'equalsraf/neovim-gui-shim'
-    "endif
-" }}}
-
 " splitjoin {{{ 行间连接与分割
     "Plug 'AndrewRadev/splitjoin.vim'
     "nnoremap <leader>gj gJ
@@ -1558,11 +1550,6 @@ endif
 
 " DrawIt {{{ 画图
     "Plug 'vim-scripts/DrawIt'
-" }}}
-
-" grammarous {{{ 文字拼写检查
-    "Plug 'rhysd/vim-grammarous'
-    " 中文支持不好
 " }}}
 
 " vim-latex {{{
@@ -1633,7 +1620,7 @@ call plug#end()                         " required
 
     " 终端光标设置
     if IsTermType("xterm") || IsTermType("xterm-256color")
-        " compatible for urxvt,st,xterm,gnome-termial
+        " 适用于urxvt,st,xterm,gnome-termial
         " 5,6: 竖线，  3,4: 横线，  1,2: 方块
         let &t_SI = "\<Esc>[6 q"        " 进入Insert模式
         let &t_EI = "\<Esc>[2 q"        " 退出Insert模式
@@ -1685,7 +1672,6 @@ augroup VimVimrc
     "autocmd              BufNewFile  *                    set fileformat=unix
     autocmd!
 
-    " auto-setting
     autocmd BufNewFile *    set fileformat=unix
     autocmd GuiEnter *      set t_vb=   " 关闭可视闪铃(即闪屏)
     autocmd BufEnter *.tikz set filetype=tex
@@ -1780,13 +1766,12 @@ augroup END
 " }}}
 
 " Move and goto{{{
-    " 扩展匹配(%)功能
+    " 扩展匹配符(%)功能
 if !IsNVim()
     packadd matchit
 endif
-    " map recursively for % extended by matchit.vim
+    " 嵌套映射匹配符(%)
     nmap <S-s> %
-
     " 行首和行尾
     nnoremap <S-l> $
     nnoremap <S-h> ^
@@ -1795,7 +1780,6 @@ endif
     " 复制到行首行尾
     nnoremap y<S-l> y$
     nnoremap y<S-h> y^
-
     " j, k 移行
     nnoremap j gj
     nnoremap k gk
@@ -1930,5 +1914,4 @@ endif
 " }}}
 
 " }}}
-
 
