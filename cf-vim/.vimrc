@@ -235,15 +235,15 @@ if IsVim()
     set <M-d>=d
     set <M-f>=f
     set <M-h>=h
-    set <M-i>=i
     set <M-j>=j
     set <M-k>=k
     set <M-l>=l
-    set <M-n>=n
-    set <M-m>=m
+    set <M-u>=u
+    set <M-i>=i
     set <M-o>=o
     set <M-p>=p
-    set <M-u>=u
+    set <M-n>=n
+    set <M-m>=m
 endif
 " }}}
 
@@ -1779,6 +1779,13 @@ endif
     nnoremap <C-l> zl
     nnoremap <M-h> 16zh
     nnoremap <M-l> 16zl
+    " 命令行移动
+    cnoremap <M-h> <Left>
+    cnoremap <M-l> <Right>
+    cnoremap <M-k> <C-Left>
+    cnoremap <M-j> <C-Right>
+    cnoremap <M-i> <C-B>
+    cnoremap <M-o> <C-E>
 " }}}
 
 " Tab, Buffer, Quickfix {{{
