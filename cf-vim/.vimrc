@@ -116,7 +116,10 @@
 " vim or nvim
 " {{{
 silent function! IsNVim()
-    return has('nvim')
+    return (has('nvim'))
+endfunction
+silent function! IsVim()
+    return !(has('nvim'))
 endfunction
 " }}}
 
@@ -227,7 +230,7 @@ set ttimeoutlen=70                      " 键码超时时间为70ms
 " }}}
 
 " 键码设置 {{{
-if !IsNVim()
+if IsVim()
     set encoding=utf-8                  " 内部内部需要使用utf-8编码
     set <M-d>=d
     set <M-f>=f
@@ -1045,7 +1048,7 @@ endif
 " air-line {{{ 状态栏
     Plug 'vim-airline/vim-airline'
     "Plug 'vim-airline/vim-airline-themes'
-if !IsNVim()
+if IsVim()
     set renderoptions=                  " 此设置使airline正常显示unicode字符
 endif
     let g:airline_powerline_fonts = 1
@@ -1769,7 +1772,7 @@ augroup END
 
 " Move and goto{{{
     " 扩展匹配符(%)功能
-if !IsNVim()
+if IsVim()
     packadd matchit
 endif
     " 嵌套映射匹配符(%)
@@ -1903,14 +1906,14 @@ endif
 
 " Terminal {{{
 if has('terminal')
-if IsNVim()
-    nnoremap <leader>tz :terminal zsh<CR>
-    tnoremap <Esc> <C-\><C-n>
-else
+if IsVim()
     nnoremap <leader>tz :terminal zsh<CR>
     set termkey=<C-w>
     tnoremap <Esc> <C-w>N
     packadd termdebug
+else
+    nnoremap <leader>tz :terminal zsh<CR>
+    tnoremap <Esc> <C-\><C-n>
 endif
 endif
 " }}}
