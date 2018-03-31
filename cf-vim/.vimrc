@@ -1229,9 +1229,9 @@ endif
 " {{{
 " YouCompleteMe {{{ 自动补全
     " Completion Params: install.py安装参数
-    "   --clang-completer : C-famlily，基于Clang补全
-    "   --go-completer    : Go，基本Gocode/Godef补全
-    "   --js-completer    : Javascript，基于Tern补全
+    "   --clang-completer : C-famlily，基于Clang补全，需要安装Clang
+    "   --go-completer    : Go，基本Gocode/Godef补全，需要安装Go
+    "   --js-completer    : Javascript，基于Tern补全，需要安装node和npm
     " Linux: 使用install.py安装
     "   先安装python-dev, python3-dev, cmake, llvm, clang
     "   "./install.py --clang-completer --go-completer --js-completer --system-libclang"
@@ -1255,8 +1255,9 @@ endif
     let g:ycm_collect_identifiers_from_tags_files = 1           " 收集标签补全
     let g:ycm_seed_identifiers_with_syntax = 1                  " 收集语法关键字补全
     let g:ycm_use_ultisnips_completer = 1                       " 收集UltiSnips补全
-    let g:ycm_autoclose_preview_window_after_insertion=1        " 自动关闭预览窗口
-    let g:ycm_key_invoke_completion = ''                        " 默认<C-Space>
+    let g:ycm_autoclose_preview_window_after_insertion = 1      " 自动关闭预览窗口
+    let g:ycm_key_list_stop_completion = ['<C-y>']              " 关闭补全menu
+    let g:ycm_key_invoke_completion = '<C-l>'                   " 显示补全内容
     let g:ycm_key_list_select_completion = ['<C-j>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-k>', '<Up>']
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
@@ -1295,7 +1296,7 @@ endif
 
 " ultisnips {{{ 代码片段插入
 if !(IsWin() && IsNVim())
-    Plug 'yehuohan/ultisnips'           " snippet插入引擎
+    Plug 'yehuohan/ultisnips'           " snippet插入引擎（自己Fork的移除了对ExpandTrigger键vmap的映射）
     Plug 'honza/vim-snippets'           " snippet合集
     " 使用:UltiSnipsEdit编辑g:UltiSnipsSnippetsDir中的snippet文件
     let g:UltiSnipsSnippetsDir = $VimPluginPath . "/mySnippets"
