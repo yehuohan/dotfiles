@@ -1,74 +1,12 @@
 
 #===============================================================================
-# doxygeb style for python
+# ReStructuredText docstring style for python
 #===============================================================================
 
-snippet dmpage "doxygen python mainpage"
-##@mainpage ${1:title}
-#${0:markdown}
-endsnippet
-
-snippet dpage "doxygen python page"
-##@page ${1:name} ${2:title}
-#${0:markdown}
-endsnippet
-
-snippet dspage "doxygen python subpage"
-# @subpage ${1:name} "${2:text}"
-endsnippet
-
-
-snippet dfile "doxygen python file"
-## @file ${0}
-#  @brief
-#
-#  @date
-#  @version
-#  @author
-#  @copyright
-endsnippet
-
-
-snippet dbrief "doxygen python brief for class etc."
-## @brief ${0}
-#
-endsnippet
-
-
-snippet dfunc "doxygen python function"
-## @brief ${0}
-#
-#  @param None
-#  @return
-#  @retval None
-endsnippet
-
-
-snippet dmod "doxygen python module"
-## @defgroup ${1:label} ${2:name}
-#  ${0}
-#  @{
-
-## @}
-endsnippet
-
-
-snippet damod "doxygen python addtomodule"
-## @addtogroup ${1:label}
-#  ${0}
-#  @{
-
-## @}
-endsnippet
-
-
-snippet dblock "doxygen python block"
-## @name ${0}
-#  @{
-
-## @}
-endsnippet
-
-snippet dline "doxygen python line"
-## ${0}
+snippet pfunc "python function"
+"""${0:rst}
+:Parameters:
+:Returns:
+:Raises:
+"""
 endsnippet
