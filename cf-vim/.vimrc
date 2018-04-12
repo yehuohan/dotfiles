@@ -1568,8 +1568,8 @@ call plug#end()                         " required
     set cursorcolumn                    " 高亮当前列
     set hlsearch                        " 设置高亮显示查找到的文本
     set expandtab                       " 将Tab用Space代替，方便显示缩进标识indentLine
-    set tabstop=4                       " 设置tab键宽4个空格
-    set softtabstop=4                   " 设置显示的Tab缩进为4,实际Tab可以不是4个格
+    set tabstop=4                       " 设置Tab键宽4个空格
+    set softtabstop=4                   " 设置按<Tab>或<BS>移动的空格数
     set shiftwidth=4                    " 设置>和<命令移动宽度为4
     set nowrap                          " 默认关闭折行
     set textwidth=0                     " 关闭自动换行
