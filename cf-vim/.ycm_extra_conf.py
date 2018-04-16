@@ -17,9 +17,9 @@ local_flags = [
 #===============================================================================
 UNIX_GCC = '/usr/include/c++/7.2.0/'
 UNIX_QT = os.path.expanduser('~/MyApps/Qt591/5.9.1/gcc_64/include/')
-WIN_GW_C = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include/'
-WIN_GW_CPP = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/6.2.0/include/c++/'
-WIN_QT = 'D:/Qt/Qt5.7.0/5.7/msvc2015/include/'
+WIN_GW_C = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/'
+WIN_GW_CPP = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/'
+WIN_QT = 'D:/Qt/5.10.1/msvc2017_64/include/'
 
 # search order : "-I >= -isystem >= std"
 global_flags_unix = [

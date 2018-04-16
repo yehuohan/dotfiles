@@ -15,7 +15,7 @@
     " [*] 设置Make_cyg_ming.mak:
     " DIRECTX=yes                         - 使用DirectX
     " ARCH=i686                           - 使用32位(x86-64为64位)，python也使用32位
-    " TERMINAL=yes                        - 添加terminal特性
+    " TERMINAL=yes                        - 添加terminal特性(最新已经添加winpty)
     " CC := $(CROSS_COMPILE)gcc -m32      - 32位编绎
     " CXX := $(CROSS_COMPILE)g++ -m32     - 32位编绎
     " WINDRES := windres --target=pe-i386 - 资源文件添加i386编绎
@@ -29,10 +29,6 @@
     " mingw32-make -f Make_ming.mak gvim.exe
     " 若设置32位选项前编译过一次，清理一次.o文件再编译
     " 若使用64位，只需要添加Python路径和DirectX支持
-    "
-    " [*] 添加winpty
-    " 如需要termianl特性，下载winpty，且添加到PATH路径，或直接放到gvim.exe的目录中。
-    " https://github.com/rprichard/winpty，到release中下载与gvim对应的32或64位，没有类unix环境就用msvc的即可
 " }}}
 
 " 查看vim帮助
@@ -191,16 +187,17 @@ vnoremap ; :
 
     if IsWin()
         " VC++ namke路径
-        let s:path_vcvars32 = '"D:/Microsoft Visual Studio 14.0/VC/bin/vcvars32.bat"'
-        let s:path_vcvars64 = '"D:/Microsoft Visual Studio 14.0/VC/bin/amd64/vcvars64.bat"'
-        let s:path_nmake_x86 = '"D:/Microsoft Visual Studio 14.0/VC/bin/nmake.exe"'
-        let s:path_nmake_x64 = '"D:/Microsoft Visual Studio 14.0/VC/bin/amd64/nmake.exe"'
-        let s:path_vcvars = s:path_vcvars32
-        let s:path_nmake = s:path_nmake_x86
+        let s:path_vcvars32 = '"D:/VS2017/VC/Auxiliary/Build/vcvars32.bat"'
+        let s:path_vcvars64 = '"D:/VS2017/VC/Auxiliary/Build/vcvars64.bat"'
+        let s:path_nmake_x86 = '"D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx86/x86/nmake.exe"'
+        let s:path_nmake_x64 = '"D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx64/x64/nmake.exe"'
+        let s:path_vcvars = s:path_vcvars64
+        let s:path_nmake = s:path_nmake_x64
         " qmake路径（基于msvc）
-        let s:path_qmake_x86 = '"D:/Qt/Qt5.7.0/5.7/msvc2015/bin/qmake.exe"'
-        let s:path_qmake_x64 = '"D:/Qt/Qt5.7.0/5.7/msvc2015_64/bin/qmake.exe"'
-        let s:path_qmake = s:path_qmake_x86
+        let s:path_qmake_x64 = '"D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe"'
+        let s:path_jom_x64 = '"D:/Qt/Tools/QtCreator/bin/jom.exe"'
+        let s:path_qmake = s:path_qmake_x64
+        let s:path_jom = s:path_jom_x64
     endif
 
     " 浏览器路径
@@ -357,21 +354,20 @@ endif
 " 若禁用自动切换当前目录，会导致当前编辑的文件不一定是目标文件）
 set autochdir
 
+
 " FUNCTION: ToggleComplileX86X64() "{{{
 " 切换成x86或x64编译环境
-let s:complile_type = 'x86'
+let s:complile_type = 'x64'
 function! ToggleComplileX86X64()
     if IsWin()
         if 'x86' ==? s:complile_type
             let s:complile_type = 'x64'
             let s:path_vcvars = s:path_vcvars64
             let s:path_nmake = s:path_nmake_x64
-            let s:path_qmake = s:path_qmake_x64
         else
             let s:complile_type = 'x86'
             let s:path_vcvars = s:path_vcvars32
             let s:path_nmake = s:path_nmake_x86
-            let s:path_qmake = s:path_qmake_x86
         endif
         echo 'Complile Type: ' . s:complile_type
     endif
@@ -401,26 +397,6 @@ function! ComplileFile(argstr)
     "{{{
         let l:exec_str .= 'python ' . l:filename
         let l:exec_str .= ' ' . a:argstr
-    "}}}
-    elseif 'pro' ==? l:ext
-    "{{{
-        if IsLinux()
-            let l:exec_str .= 'qmake ' . a:argstr . ' -r -o ./DebugV/Makefile ' . l:filename
-            let l:exec_str .= ' && cd ./DebugV'
-            let l:exec_str .= ' && make'
-        elseif IsWin()
-            let l:exec_str .= ' mkdir DebugV'
-            let l:exec_str .= ' & cd DebugV'
-            " Attetion: here shouls be <qmake ../file.pro>
-            let l:exec_str .= ' && ' . s:path_qmake . a:argstr . ' -r .' . l:filename
-            let l:exec_str .= ' && ' . s:path_vcvars
-            let l:exec_str .= ' && ' . s:path_nmake . ' -f Makefile.Debug'
-            " Attention: executed file must be in the same directory with .pro file
-            let l:exec_str .= ' && cd ..'
-        else
-            return
-        endif
-        let l:exec_str .= ' && ' . l:name
     "}}}
     elseif 'go' ==? l:ext
     "{{{
