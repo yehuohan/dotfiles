@@ -17,11 +17,11 @@ TEXT
     "color": "\#800000"
 },
 { 
-    "full_text" : ${if_up eno1} "  ${upspeed eno1}/s  ${downspeed eno1}/s" ${else} ""${endif},
+    "full_text" : ${if_up eno1} "${upspeed eno1}/s ${downspeed eno1}/s" ${else} ""${endif},
     "color" : "\#800000" 
 },
 { 
-    "full_text" : ${if_up wlo1} "  ${upspeed wlo1}/s  ${downspeed wlo1}/s" ${else} ""${endif},
+    "full_text" : ${if_up wlo1} "${upspeed wlo1}/s ${downspeed wlo1}/s" ${else} ""${endif},
     "color" : "\#800000" 
 },
 
