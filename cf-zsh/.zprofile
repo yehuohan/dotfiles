@@ -31,15 +31,5 @@ export XMODIFIERS=@im=fcitx
 #===============================================================================
 # user path
 #===============================================================================
-export PATH="$PATH:$HOME/MyApps/"
-
-export PATH="$PATH:$HOME/MyApps/Qt591/5.9.1/gcc_64/bin"
-export PATH="$PATH:$HOME/MyApps/Qt591/Tools/QtCreator/bin"
-
-export PATH="$PATH:$HOME/MyApps/Qt570/5.7/gcc_64/bin"
-export PATH="$PATH:$HOME/MyApps/Qt570/Tools/QtCreator/bin"
-
-export PATH="$PATH:$HOME/MyApps/bochs268/bin"
-export PATH="$PATH:$HOME/MyApps/nasm212/bin"
-export PATH="$PATH:$HOME/MyApps/nodejs/bin"
-export PATH="$PATH:$HOME/MyApps/XXNet"
+export PATH="$PATH:$HOME/my-apps/"
+export PATH="$PATH:$HOME/my-apps/XXNet"

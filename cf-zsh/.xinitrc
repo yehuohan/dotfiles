@@ -43,21 +43,21 @@ export XMODIFIERS=@im=fcitx
 
 #===============================================================================
 # xterm
-# twm &
-# xclock -geometry 50x50-1+1 &
-# xterm -geometry 80x50+494+51 &
-# xterm -geometry 80x20+494-0 &
-# exec xterm -geometry 80x66+0+0 -name login
+#twm &
+#xclock -geometry 50x50-1+1 &
+#xterm -geometry 80x50+494+51 &
+#xterm -geometry 80x20+494-0 &
+#exec xterm -geometry 80x66+0+0 -name login
 
 
 #===============================================================================
 exec i3
 
 #===============================================================================
-# exec awesome
+#exec awesome
 
 #===============================================================================
-# exec startxfce4
+#exec startxfce4
 
 
 
