@@ -1,4 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+linked this file to /usr/local/bin with 'ln -s'
+"""
 
 import os
 
