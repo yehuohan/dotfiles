@@ -6,7 +6,7 @@
 
 if [ `uname` == "Linux" ]; then
 
-    if [[ $(cd `dirname "$0"`;pwd) != ~/LinuxConfigs ]]; then
+    if [[ $(cd `dirname "$0"`;pwd) != ~/dotconfigs ]]; then
         echo 'Is Not in ~/LinuxConfigs'
         exit
     fi
@@ -35,7 +35,7 @@ if [ `uname` == "Linux" ]; then
     cp ../.tmux-status.conf ./cf-tmux/
 
     # cf-misc
-    cp ../MyApps/ToggleTouchPad.py ./misc/
+    cp ../my-apps/ToggleTouchPad.py ./misc/
 
     # sddm
     cp /etc/sddm.conf ./sddm
