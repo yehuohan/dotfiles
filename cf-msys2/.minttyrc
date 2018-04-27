@@ -1,7 +1,7 @@
 BoldAsFont=yes
 Locale=C
 Charset=UTF-8
-Font=DejaVu Sans Mono for Powerline
+Font=Microsoft YaHei Mono
 FontHeight=11
 CursorType=block
 BackgroundColour=36,37,38
