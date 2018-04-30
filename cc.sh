@@ -2,45 +2,55 @@
 
 # copy all the <config-files> to <cf-dir>
 # cd to LinuxConfigs before execute this file.
-# this file must be in "~/LinuxConfigs/"
+# this file must be in "~/dotconfigs/"
+
+
 
 if [ `uname` == "Linux" ]; then
 
     if [[ $(cd `dirname "$0"`;pwd) != ~/dotconfigs ]]; then
-        echo 'Is Not in ~/LinuxConfigs'
+        echo 'Is Not in ~/dotconfigs'
         exit
     fi
 
-    # cf-vim
-    cp ../.vimrc                  ./cf-vim/
-    cp ../.vim/.ycm_extra_conf.py ./cf-vim/
-    cp ../.vim/.tern-project      ./cf-vim/
-    cp ../.vim/mySnippets/*       ./cf-vim/mySnippets/
-    cp ../.vim/autoload/*         ./cf-vim/autoload/
+    LNAME=`uname -r`
+    if [[ "$LNAME" =~ "ARCH" ]]; then
+        cf_dir="cf-arch"
+    elif [[ "$LNAME" =~ "UBUNTU" ]]; then
+        cf_dir="cf-ubuntu"
+    else
+        echo "Failed to copy"
+        exit
+    fi
 
-    # cf-zsh
-    cp ../.zshrc      ./cf-zsh/
-    cp ../.zprofile   ./cf-zsh/
-    cp ../.Xmodmap    ./cf-zsh/
-    cp ../.Xresources ./cf-zsh/
-    cp ../.gitconfig  ./cf-zsh/
-    cp ../.xinitrc    ./cf-zsh/
+    # vim
+    cp ../.vimrc                  ./vim/
+    cp ../.vim/.ycm_extra_conf.py ./vim/
+    cp ../.vim/.tern-project      ./vim/
+    cp -r ../.vim/mySnippets      ./vim/
+    cp -r ../.vim/autoload        ./vim/
 
-    # cf-i3
-    cp ../.config/i3/*             ./cf-i3/i3/
-    cp ../.config/i3status/config  ./cf-i3/i3status/
+    # arch config
+    # zsh
+    cp ../.zshrc                $cf_dir/
+    cp ../.zprofile             $cf_dir/
+    cp ../.Xmodmap              $cf_dir/
+    cp ../.Xresources           $cf_dir/
+    cp ../.gitconfig            $cf_dir/
+    cp ../.xinitrc              $cf_dir/
+    # .config
+    cp -r ../.config/i3         $cf_dir/.config/
+    cp -r ../.config/i3status   $cf_dir/.config/
+    cp -r ../.config/rofi       $cf_dir/.config/
+    # tmux
+    cp ../.tmux.conf            $cf_dir/
+    cp ../.tmux-status.conf     $cf_dir/
 
-    # cf-tmux
-    cp ../.tmux.conf        ./cf-tmux/
-    cp ../.tmux-status.conf ./cf-tmux/
-
-    # cf-misc
+    # misc
     cp ../my-apps/ToggleTouchPad.py ./misc/
+    cp /etc/sddm.conf               ./misc/sddm/
 
-    # sddm
-    cp /etc/sddm.conf ./sddm
-
-    echo "Linux: Copy configs was completed!"
+    echo "Linux: Copy was completed!"
 
 elif [ `uname -o` == "Msys" ]; then
 
@@ -49,18 +59,17 @@ elif [ `uname -o` == "Msys" ]; then
         echo "../Vim is not existed."
         exit
     fi
-    cp ../Vim/_vimrc                      ./cf-vim/.vimrc
-    cp ../Vim/vimfiles/.ycm_extra_conf.py ./cf-vim/
-    cp ../Vim/vimfiles/.tern-project      ./cf-vim/
-    cp -r ../Vim/vimfiles/mySnippets/     ./cf-vim/
-    cp -r ../Vim/vimfiles/autoload/*.vim  ./cf-vim/autoload/
+    cp ../Vim/_vimrc                      ./vim/.vimrc
+    cp ../Vim/vimfiles/.ycm_extra_conf.py ./vim/
+    cp ../Vim/vimfiles/.tern-project      ./vim/
+    cp -r ../Vim/vimfiles/mySnippets      ./vim/
+    cp -r ../Vim/vimfiles/autoload        ./vim/
 
     # cf-msys2
     cp ~/.minttyrc  ./cf-msys2/
     cp ~/.gitconfig ./cf-msys2/
     cp ~/.zshrc     ./cf-msys2/
 
-    echo "Msys: Copy configs was completed!"
-
+    echo "Msys: Copy was completed!"
 fi
 

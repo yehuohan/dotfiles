@@ -293,17 +293,22 @@ bindsym $mod+b border toggle
 #===============================================================================
 #{{{
 # start a terminal
-bindsym $mod+Return exec xterm
+bindsym $mod+Return exec xterm || xfce4-terminal
 bindsym $mod+mod1+Return exec xfce4-terminal
 
 # file manager
 bindsym $mod+e exec thunar
 
 # file manager
-bindsym $mod+g exec google-chrome-stable
+bindsym $mod+g exec google-chrome-stable || firefox
 
-# start dmenu (a program launcher)
-bindsym $mod+d exec dmenu_run
+# 快速切换窗口
+bindsym $mod+c exec rofi -show window
+bindsym $mod+mod1+c exec rofi -show ssh
+
+# 程序启动器
+bindsym $mod+d exec rofi -show run
+bindsym $mod+mod1+d exec dmenu_run
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
@@ -314,20 +319,16 @@ bindsym $mod+d exec dmenu_run
 bindsym $mod+x exec ToggleTouchPad
 
 # 音量管理 Fn+Left/Right
-#bindsym XF86AudioRaiseVolume exec --no-startup-id amixer set -q Master 5%+
-#bindsym XF86AudioLowerVolume exec --no-startup-id amixer set -q Master 5%-
-#bindsym XF86AudioMute exec --no-startup-id amixer -q set Master toggle
+bindsym XF86AudioRaiseVolume exec --no-startup-id amixer set -q Master 5%+
+bindsym XF86AudioLowerVolume exec --no-startup-id amixer set -q Master 5%-
+bindsym XF86AudioMute exec --no-startup-id amixer -q set Master toggle
 bindsym $mod+a exec --no-startup-id amixer -q set Master toggle
-
-# 快速切换窗口
-bindsym $mod+c exec quickswitch
-bindsym $mod+mod1+c exec quickswitch -s
 
 # 截图
 # -u : focused windows
 # -s : selected window
 # -e : execute
-set $scrot_dir ~/pictures/scrot
+set $scrot_dir ~/Pictures/scrot
 bindsym Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -e 'mv $f $scrot_dir/'
 bindsym $mod+Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/'
 bindsym $mod+Shift+Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/ && ristretto $scrot_dir/$f'
