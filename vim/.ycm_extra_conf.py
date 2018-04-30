@@ -15,7 +15,11 @@ local_flags = [
 #===============================================================================
 # global flags
 #===============================================================================
-UNIX_GCC = '/usr/include/c++/7.2.0/'
+cpp_dir = os.listdir('/usr/include/c++')
+if len(cpp_dir) == 1:
+    UNIX_GCC = '/usr/include/c++/' + cpp_dir[0] + '/'
+else:
+    UNIX_GCC = '/usr/include/c++/7.3.1/'
 UNIX_QT = os.path.expanduser('~/MyApps/Qt591/5.9.1/gcc_64/include/')
 WIN_GW_C = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/'
 WIN_GW_CPP = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/'
