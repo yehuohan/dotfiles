@@ -16,7 +16,7 @@ local_flags = [
 # global flags
 #===============================================================================
 cpp_dir = os.listdir('/usr/include/c++')
-if len(cpp_dir) == 1:
+if len(cpp_dir) >= 1:
     UNIX_GCC = '/usr/include/c++/' + cpp_dir[0] + '/'
 else:
     UNIX_GCC = '/usr/include/c++/7.3.1/'

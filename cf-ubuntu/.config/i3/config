@@ -1,0 +1,337 @@
+#==============================================================================
+# i3-config
+# yehuohan@gmail.com, yehuohan@qq.com
+#
+# Should you change your keyboard layout some time, delete
+# this file and re-run i3-config-wizard(1).
+#===============================================================================
+
+#===============================================================================
+# mod key setting
+#===============================================================================
+# mod1 = alt
+# mod4 = win
+set $mod Mod4
+
+
+
+#===============================================================================
+# auto-start programs
+#===============================================================================
+# {{{
+# 输入法
+exec --no-startup-id fcitx
+# 透明效果
+exec --no-startup-id compton
+# 背景
+exec_always --no-startup-id feh --bg-fill ~/Pictures/wall-paper/wp.jpg
+# 电池管理，包括亮度调节(可以使用Fn+亮度调节键)
+exec --no-startup-id gnome-power-manager
+# 网络连接
+exec --no-startup-id nm-applet
+# 音量图标
+exec --no-startup-id volumeicon
+#exec pulseaudio
+
+# }}}
+
+
+#===============================================================================
+# i3 UI
+#===============================================================================
+# 字体
+# {{{
+# Font for window titles. Will also be used by the bar unless a different font
+# is used in the bar {} block below.
+#font pango:Monospace 12
+font pango:WenQuanYi Micro Hei 12
+#font pango:DejaVu Sans Mono 12
+
+# This font is widely installed, provides lots of unicode glyphs, right-to-left
+# text rendering and scalability on retina/hidpi displays (thanks to pango).
+#font pango:DejaVu Sans Mono 8
+
+# Before i3 v4.8, we used to recommend this one as the default:
+# font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+# The font above is very space-efficient, that is, it looks good, sharp and
+# clear in small sizes. However, its unicode glyph coverage is limited, the old
+# X core fonts rendering does not support right-to-left and this being a bitmap
+# font, it doesn’t scale on retina/hidpi displays.
+
+# Start i3bar to display a workspace bar (plus the system information i3status
+# finds out, if available)
+# }}}
+
+# 窗口设置
+# {{{
+# window operations
+new_window normal
+new_float normal
+popup_during_fullscreen leave_fullscreen
+focus_follows_mouse no
+# 自动跳转到原来的workspace
+workspace_auto_back_and_forth yes
+
+# 打开软件时自动移至相应工作区
+#assign [class="Thunar"] workspace 1
+#assign [class="Gvim"] workspace 2
+
+# 打开软件时，执行特定命令
+for_window [window_role="pop-up"] floating enable
+
+# i3-gaps configuration
+set $bp 3
+for_window [class="^.*"] border pixel $bp
+
+# error
+gaps inner 2
+gaps outer 2
+
+# color vairable
+# main color
+set $clr_m 107090
+# window colors
+# class                 border  backgr. text    indicator child_border
+client.focused          #$clr_m #$clr_m #eeeeee #$clr_m   #$clr_m
+client.focused_inactive #333333 #5f676a #ffffff #484e50   #5f676a
+client.unfocused        #333333 #222222 #888888 #292d2e   #222222
+client.urgent           #2f343a #900000 #ffffff #900000   #900000
+client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
+client.background       #ffffff
+
+# }}}
+
+# i3bar设置
+# {{{
+bar {
+    i3bar_command i3bar -t
+    # 调用i3status
+    status_command i3status
+    # 调用conky
+    status_command ~/.config/i3/conky.sh
+    # 显示位置
+    position top
+
+    # error
+    height 26
+
+    # 显示托盘图标的显示器
+    tray_output primary
+    # bar显示隐藏设置
+    mode dock
+    # 分隔符
+    #separator_symbol "|"
+    separator_symbol ""
+
+    colors {
+        background #30303000
+        statusline #FFFFFF
+        separator  #808080
+        # 工作区颜色       边框      背景      文字
+        focused_workspace  #A000B0FF #444444AA #80F020FF
+        active_workspace   #FFFFFF00 #FFFFFF00 #80F020FF
+        inactive_workspace #11111155 #FFFFFF00 #80F020B0
+        urgent_workspace   #FFFFFF00 #FFFFFF00 #80F020FF
+        binding_mode       #11111155 #900000FF #80F020B0
+    }
+}
+
+# }}}
+
+
+
+#===============================================================================
+# key bind for i3 operation
+# mod+Shift : 很少用的按键，或不希望被按误按
+# mod+mod1  : 作为mod的逆功能键，或是成对按键功能(如移动焦点和移动窗口)
+#===============================================================================
+
+# i3管理键
+# {{{
+# Power Management
+set $mode_system   Lock(L)  Logout(O)  Reboot(R)  Shutdown(S)  Exit(Esc)
+bindsym $mod+Shift+q mode "$mode_system"
+mode "$mode_system" {
+    bindsym l exec --no-startup-id i3lock -c '#000000', mode "default"
+    bindsym o exec --no-startup-id i3-msg exit, mode "default"
+    bindsym r exec --no-startup-id systemctl reboot, mode "default"
+    bindsym s exec --no-startup-id systemctl poweroff, mode "default"
+    bindsym Escape mode "default"
+}
+
+# reload the configuration file
+bindsym $mod+Shift+w reload
+
+# exit i3 (logs you out of your X session)
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
+# restart i3 inplace
+# preserves your layout/session, can be used to upgrade i3
+bindsym $mod+Shift+r restart
+# }}}
+
+# 窗口管理
+# {{{
+# kill(stop) focused window
+bindsym $mod+s kill
+
+# enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen toggle
+
+# 把当前窗口放到scratchpad
+bindsym $mod+mod1+p move scratchpad
+# 从scratchpad呼出第一个窗口，将呼出的窗口设置成平铺才能继续呼出窗口
+bindsym $mod+p scratchpad show; [floating] border normal; [tiling] border pixel $bp
+
+# change focus
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
+# focus the parent container
+bindsym $mod+mod1+v focus parent
+# focus the child container
+bindsym $mod+v focus child
+
+# toggle tiling / floating
+bindsym $mod+mod1+space floating toggle; [floating] border normal; [tiling] border pixel $bp
+# change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+
+# move focused window
+bindsym $mod+mod1+h move left
+bindsym $mod+mod1+j move down
+bindsym $mod+mod1+k move up
+bindsym $mod+mod1+l move right
+
+# resize window (you can also use the mouse for that)
+bindsym $mod+Shift+h resize shrink width 10 px or 2 ppt
+bindsym $mod+Shift+k resize grow height 10 px or 2 ppt
+bindsym $mod+Shift+j resize shrink height 10 px or 2 ppt
+bindsym $mod+Shift+l resize grow width 10 px or 2 ppt
+bindsym $mod+z mode "resize"
+mode "resize" {
+    bindsym h resize shrink width 10 px or 2 ppt
+    bindsym k resize grow height 10 px or 2 ppt
+    bindsym j resize shrink height 10 px or 2 ppt
+    bindsym l resize grow width 10 px or 2 ppt
+
+    # same bindings, but for the arrow keys
+    bindsym $mod+h resize shrink width 50 px or 10 ppt
+    bindsym $mod+k resize grow height 50 px or 10 ppt
+    bindsym $mod+j resize shrink height 50 px or 10 ppt
+    bindsym $mod+l resize grow width 50 px or 10 ppt
+
+    # back to normal: Enter or Escape
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+
+# }}}
+
+# WorkSpace管理
+# {{{
+# switch to workspace
+bindsym $mod+0 workspace 10
+bindsym $mod+1 workspace 1
+bindsym $mod+2 workspace 2
+bindsym $mod+3 workspace 3
+bindsym $mod+4 workspace 4
+bindsym $mod+5 workspace 5
+bindsym $mod+6 workspace 6
+bindsym $mod+7 workspace 7
+bindsym $mod+8 workspace 8
+bindsym $mod+9 workspace 9
+
+# move focused container to workspace
+bindsym $mod+mod1+0 move container to workspace 10; workspace 10
+bindsym $mod+mod1+1 move container to workspace 1; workspace 1
+bindsym $mod+mod1+2 move container to workspace 2; workspace 2
+bindsym $mod+mod1+3 move container to workspace 3; workspace 3
+bindsym $mod+mod1+4 move container to workspace 4; workspace 4
+bindsym $mod+mod1+5 move container to workspace 5; workspace 5
+bindsym $mod+mod1+6 move container to workspace 6; workspace 6
+bindsym $mod+mod1+7 move container to workspace 7; workspace 7
+bindsym $mod+mod1+8 move container to workspace 8; workspace 8
+bindsym $mod+mod1+9 move container to workspace 9; workspace 9
+# move container to near workspace
+bindsym $mod+Shift+o move container to workspace next_on_output; workspace next_on_output
+bindsym $mod+Shift+i move container to workspace prev_on_output; workspace prev_on_output
+
+# switch to near workspace
+bindsym $mod+o workspace next_on_output
+bindsym $mod+i workspace prev_on_output
+bindsym $mod+mod1+o workspace next
+bindsym $mod+mod1+i workspace prev
+
+# Move the current workspace to the next output (effectively toggles when you only have two outputs)
+bindsym $mod+mod1+m move workspace to output right
+# Move the focused window to the next output (use xrandr to see available outputs)
+bindsym $mod+m move container to output right
+# Tggles focus among the outputs
+bindsym $mod+n focus output right
+
+#}}}
+
+# 其它设置
+# {{{
+# change container layout
+bindsym $mod+y layout toggle all
+bindsym $mod+mod1+y layout toggle split
+
+# split in horizontal/vertical orientation
+bindsym $mod+u split v
+bindsym $mod+mod1+u split h
+
+# toggle the border style
+bindsym $mod+b border toggle
+
+# Use Mouse+$mod to drag floating windows to their wanted position
+#floating_modifier $mod
+
+# }}}
+
+
+
+#===============================================================================
+# key bind for starting program
+#===============================================================================
+#{{{
+# start a terminal
+bindsym $mod+Return exec gnome-terminal
+bindsym $mod+mod1+Return exec gnome-terminal
+
+# file manager
+bindsym $mod+e exec nautilus
+
+# file manager
+bindsym $mod+g exec google-chrome-stable || firefox
+
+# 快速切换窗口
+bindsym $mod+c exec rofi -show window
+bindsym $mod+mod1+c exec rofi -show ssh
+
+# 程序启动器
+bindsym $mod+d exec rofi -show run
+
+# enable or disable touchpad
+# ToggleTouchPad should be linked to /usr/local/bin by 'ln -s'
+bindsym $mod+x exec ToggleTouchPad
+
+# 音量管理 Fn+Left/Right
+bindsym XF86AudioRaiseVolume exec --no-startup-id amixer set -q Master 5%+
+bindsym XF86AudioLowerVolume exec --no-startup-id amixer set -q Master 5%-
+bindsym XF86AudioMute exec --no-startup-id amixer -q set Master toggle
+bindsym $mod+a exec --no-startup-id amixer -q set Master toggle
+
+# 截图
+# -u : focused windows
+# -s : selected window
+# -e : execute
+set $scrot_dir ~/Pictures/scrot
+bindsym Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -e 'mv $f $scrot_dir/'
+bindsym $mod+Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/'
+bindsym $mod+Shift+Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/ && ristretto $scrot_dir/$f'
+
+# }}}

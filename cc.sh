@@ -13,44 +13,68 @@ if [ `uname` == "Linux" ]; then
         exit
     fi
 
-    LNAME=`uname -r`
-    if [[ "$LNAME" =~ "ARCH" ]]; then
+    if [[ `uname -r` =~ "ARCH" ]]; then
         cf_dir="cf-arch"
-    elif [[ "$LNAME" =~ "UBUNTU" ]]; then
-        cf_dir="cf-ubuntu"
-    else
-        echo "Failed to copy"
-        exit
+
+        # vim
+        cp ../.vimrc                  ./vim/
+        cp ../.vim/.ycm_extra_conf.py ./vim/
+        cp ../.vim/.tern-project      ./vim/
+        cp -r ../.vim/mySnippets      ./vim/
+        cp -r ../.vim/autoload        ./vim/
+
+        # arch config
+        # zsh
+        cp ../.zshrc                $cf_dir/
+        cp ../.zprofile             $cf_dir/
+        cp ../.Xmodmap              $cf_dir/
+        cp ../.Xresources           $cf_dir/
+        cp ../.gitconfig            $cf_dir/
+        cp ../.xinitrc              $cf_dir/
+        # .config
+        cp -r ../.config/i3         $cf_dir/.config/
+        cp -r ../.config/i3status   $cf_dir/.config/
+        cp -r ../.config/rofi       $cf_dir/.config/
+        # tmux
+        cp ../.tmux.conf            $cf_dir/
+        cp ../.tmux-status.conf     $cf_dir/
+
+        # misc
+        cp ../my-apps/ToggleTouchPad.py ./misc/
+        #cp /etc/sddm.conf               ./misc/sddm/
+
+        echo "Arch: Copy was completed!"
     fi
 
-    # vim
-    cp ../.vimrc                  ./vim/
-    cp ../.vim/.ycm_extra_conf.py ./vim/
-    cp ../.vim/.tern-project      ./vim/
-    cp -r ../.vim/mySnippets      ./vim/
-    cp -r ../.vim/autoload        ./vim/
+    if [[ `uname -v` =~ "Ubuntu" ]]; then
+        cf_dir="cf-ubuntu"
 
-    # arch config
-    # zsh
-    cp ../.zshrc                $cf_dir/
-    cp ../.zprofile             $cf_dir/
-    cp ../.Xmodmap              $cf_dir/
-    cp ../.Xresources           $cf_dir/
-    cp ../.gitconfig            $cf_dir/
-    cp ../.xinitrc              $cf_dir/
-    # .config
-    cp -r ../.config/i3         $cf_dir/.config/
-    cp -r ../.config/i3status   $cf_dir/.config/
-    cp -r ../.config/rofi       $cf_dir/.config/
-    # tmux
-    cp ../.tmux.conf            $cf_dir/
-    cp ../.tmux-status.conf     $cf_dir/
+        # vim
+        cp ../.vimrc                  ./vim/
+        cp ../.vim/.ycm_extra_conf.py ./vim/
+        cp ../.vim/.tern-project      ./vim/
+        cp -r ../.vim/mySnippets      ./vim/
+        cp -r ../.vim/autoload        ./vim/
 
-    # misc
-    cp ../my-apps/ToggleTouchPad.py ./misc/
-    cp /etc/sddm.conf               ./misc/sddm/
+        # arch config
+        # zsh
+        cp ../.zshrc                $cf_dir/
+        cp ../.zprofile             $cf_dir/
+        cp ../.Xmodmap              $cf_dir/
+        cp ../.gitconfig            $cf_dir/
+        # .config
+        cp -r ../.config/i3         $cf_dir/.config/
+        cp -r ../.config/i3status   $cf_dir/.config/
+        cp -r ../.config/rofi       $cf_dir/.config/
+        # tmux
+        #cp ../.tmux.conf            $cf_dir/
+        #cp ../.tmux-status.conf     $cf_dir/
 
-    echo "Linux: Copy was completed!"
+        # misc
+        cp ../my-apps/ToggleTouchPad.py ./misc/
+
+        echo "Ubuntu: Copy was completed!"
+    fi
 
 elif [ `uname -o` == "Msys" ]; then
 

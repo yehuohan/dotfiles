@@ -1211,6 +1211,7 @@ endif
     " Linux: 使用install.py安装
     "   先安装python-dev, python3-dev, cmake, llvm, clang
     "   "./install.py --clang-completer --go-completer --js-completer --system-libclang"
+    "   ycm使用python命令指向的版本(如2.7或3.6)
     " Windows: 使用install.py安装
     "   先安装python, Cmake, VS, 7-zip
     "   "install.py --clang-completer --go-completer --js-completer --msvc 14 --build-dir <ycm_build>"
