@@ -1618,9 +1618,9 @@ if IsGvim()
         set lines=25
         set columns=100
         "set guifont=Consolas:h13:cANSI
-        set guifont=Consolas_For_Powerline:h13:cANSI
+        set guifont=Consolas_For_Powerline:h12:cANSI
         set linespace=0                 " required by PowerlineFont
-        set guifontwide=Microsoft_YaHei_Mono:h12:cGB2312
+        set guifontwide=Microsoft_YaHei_Mono:h11:cGB2312
         noremap <F11> <Esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
                                         " gvim全屏快捷键
     elseif IsMac()
