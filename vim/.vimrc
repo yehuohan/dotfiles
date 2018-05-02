@@ -98,7 +98,7 @@
     " Ctags       : 查找创建标签
     " Fzf         : Fzf模糊查找
     " Ag          : Ag文本查找
-    " Chrome      : Markdown,ReStructruedText等标记文本预览
+    " FireFox     : Markdown,ReStructruedText等标记文本预览
     " Fcitx       : Linux下的输入法
 " }}}
 
@@ -203,9 +203,9 @@ vnoremap ; :
     " 浏览器路径
     let s:path_browser = ""
     if IsWin()
-        let s:path_browser = '"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"'
+        let s:path_browser = '"D:/Mozilla Firefox/firefox.exe"'
     elseif IsLinux()
-        let s:path_browser = '"/usr/bin/google-chrome"'
+        let s:path_browser = '"/usr/bin/firefox"'
     endif
 " }}}
 
