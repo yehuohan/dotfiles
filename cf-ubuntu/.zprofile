@@ -27,3 +27,4 @@ export XMODIFIERS=@im=fcitx
 # user path
 #===============================================================================
 export PATH="$PATH:$HOME/my-apps"
+export PATH="$PATH:$HOME/my-apps/XXNet"
