@@ -24,7 +24,7 @@ exec --no-startup-id fcitx
 # 透明效果
 exec --no-startup-id compton
 # 背景
-exec_always --no-startup-id feh --bg-fill ~/Pictures/wall-paper/wp.jpg
+exec_always --no-startup-id feh --bg-fill ~/Picture/wall-paper/wp.jpg
 # 电池管理，包括亮度调节(可以使用Fn+亮度调节键)
 exec --no-startup-id xfce4-power-manager
 # 网络连接
@@ -300,7 +300,7 @@ bindsym $mod+mod1+Return exec xfce4-terminal
 bindsym $mod+e exec thunar
 
 # file manager
-bindsym $mod+g exec google-chrome-stable || firefox
+bindsym $mod+g exec firefox || google-chrome-stable
 
 # 快速切换窗口
 bindsym $mod+c exec rofi -show window
