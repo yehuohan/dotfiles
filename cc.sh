@@ -39,6 +39,8 @@ if [ `uname` == "Linux" ]; then
         # tmux
         cp ../.tmux.conf            $cf_dir/
         cp ../.tmux-status.conf     $cf_dir/
+        # ect
+        cp /etc/X11/xorg.conf       $cf_dir/etc/X11/
 
         # misc
         cp ../my-apps/ToggleTouchPad.py ./misc/
