@@ -42,22 +42,7 @@ exec --no-startup-id volumeicon
 # {{{
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-#font pango:monospace 10
 font pango:WenQuanYi Micro Hei 12
-
-# This font is widely installed, provides lots of unicode glyphs, right-to-left
-# text rendering and scalability on retina/hidpi displays (thanks to pango).
-#font pango:DejaVu Sans Mono 8
-
-# Before i3 v4.8, we used to recommend this one as the default:
-# font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
-# The font above is very space-efficient, that is, it looks good, sharp and
-# clear in small sizes. However, its unicode glyph coverage is limited, the old
-# X core fonts rendering does not support right-to-left and this being a bitmap
-# font, it doesn’t scale on retina/hidpi displays.
-
-# Start i3bar to display a workspace bar (plus the system information i3status
-# finds out, if available)
 # }}}
 
 # 窗口设置
@@ -84,16 +69,21 @@ gaps inner 2
 gaps outer 2
 
 # color vairable
-# main color
-set $clr_m 107090
+# M-main, T-text, D-default
+set $CLR_M 903080
+set $CLR_T 303030
+set $CLR_D 222222
+set $CLR_MB 903080FF
+set $CLR_TB 303030FF
+
 # window colors
 # class                 border  backgr. text    indicator child_border
-client.focused          #$clr_m #$clr_m #eeeeee #$clr_m   #$clr_m
-client.focused_inactive #333333 #5f676a #ffffff #484e50   #5f676a
-client.unfocused        #333333 #222222 #888888 #292d2e   #222222
-client.urgent           #2f343a #900000 #ffffff #900000   #900000
-client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
-client.background       #ffffff
+client.focused          #$CLR_M #$CLR_M #$CLR_T #$CLR_M   #$CLR_M
+client.unfocused        #$CLR_D #$CLR_D #808080 #$CLR_D   #$CLR_D
+client.focused_inactive #$CLR_D #$CLR_D #808080 #$CLR_D   #$CLR_D
+client.urgent           #$CLR_D #$CLR_D #$CLR_T #$CLR_D   #$CLR_D
+client.placeholder      #$CLR_D #$CLR_D #$CLR_T #$CLR_D   #$CLR_D
+client.background       #$CLR_D
 
 # }}}
 
@@ -122,11 +112,11 @@ bar {
         statusline #FFFFFF
         separator  #808080
         # 工作区颜色       边框      背景      文字
-        focused_workspace  #A000B0FF #444444AA #80F020FF
-        active_workspace   #FFFFFF00 #FFFFFF00 #80F020FF
-        inactive_workspace #11111155 #FFFFFF00 #80F020B0
-        urgent_workspace   #FFFFFF00 #FFFFFF00 #80F020FF
-        binding_mode       #11111155 #900000FF #80F020B0
+        focused_workspace  #00000000 #$CLR_MB  #$CLR_TB
+        active_workspace   #00000000 #FFFFFF55 #$CLR_TB
+        inactive_workspace #22222288 #55555555 #$CLR_TB
+        urgent_workspace   #00000000 #A00000AA #$CLR_TB
+        binding_mode       #00000000 #$CLR_MB  #$CLR_TB
     }
 }
 
@@ -297,7 +287,7 @@ bindsym $mod+Return exec xterm || xfce4-terminal
 bindsym $mod+mod1+Return exec xfce4-terminal
 
 # file manager
-bindsym $mod+e exec thunar
+bindsym $mod+e exec nautilus
 
 # file manager
 bindsym $mod+g exec firefox || google-chrome-stable
@@ -328,7 +318,7 @@ bindsym $mod+a exec --no-startup-id amixer -q set Master toggle
 # -u : focused windows
 # -s : selected window
 # -e : execute
-set $scrot_dir ~/Pictures/scrot
+set $scrot_dir ~/Picture/scrot
 bindsym Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -e 'mv $f $scrot_dir/'
 bindsym $mod+Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/'
 bindsym $mod+Shift+Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/ && ristretto $scrot_dir/$f'
