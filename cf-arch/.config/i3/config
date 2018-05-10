@@ -26,7 +26,7 @@ exec --no-startup-id compton
 # 背景
 exec_always --no-startup-id feh --bg-fill ~/Picture/wall-paper/wp.jpg
 # 电池管理，包括亮度调节(可以使用Fn+亮度调节键)
-exec --no-startup-id xfce4-power-manager
+exec --no-startup-id mate-power-manager
 # 网络连接
 exec --no-startup-id nm-applet
 # 音量图标

@@ -35,7 +35,6 @@ if [ `uname` == "Linux" ]; then
         cp -r ../.config/i3         $cf_dir/.config/
         cp -r ../.config/i3status   $cf_dir/.config/
         cp -r ../.config/rofi       $cf_dir/.config/
-        cp -r ../.config/libinput-gestures.conf     $cf_dir/.config/
         # tmux
         cp ../.tmux.conf            $cf_dir/
         cp ../.tmux-status.conf     $cf_dir/
