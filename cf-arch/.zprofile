@@ -34,3 +34,5 @@ export XMODIFIERS=@im=fcitx
 export PATH="$PATH:$HOME/my-apps/"
 export PATH="$PATH:$HOME/my-apps/XXNet"
 export PATH="$PATH:$HOME/my-apps/firefox"
+
+export PATH="$PATH:/opt/cuda/bin"
