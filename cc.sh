@@ -41,6 +41,7 @@ if [ `uname` == "Linux" ]; then
         # ect
         cp /etc/X11/xorg.conf       $cf_dir/etc/X11/
         cp /etc/systemd/logind.conf $cf_dir/etc/systemd/
+        cp /etc/pacman.conf         $cf_dir/etc/
 
         # misc
         cp ../my-apps/ToggleTouchPad.py ./misc/
