@@ -43,6 +43,7 @@ if [ `uname` == "Linux" ]; then
         cp /etc/X11/xorg.conf       $cf_dir/etc/X11/
         cp /etc/systemd/logind.conf $cf_dir/etc/systemd/
         cp /etc/pacman.conf         $cf_dir/etc/
+        cp /etc/modprobe.d/blacklist-nouveau.conf $cf_dir/etc/modprobe.d/
 
         # misc
         cp ../my-apps/ToggleTouchPad.py ./misc/
