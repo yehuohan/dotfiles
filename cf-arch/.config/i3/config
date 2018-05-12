@@ -11,6 +11,16 @@
 # mod4 = win
 set $mod Mod4
 
+set $WS1 1|
+set $WS2 2|
+set $WS3 3|
+set $WS4 4
+set $WS5 5
+set $WS6 6
+set $WS7 7
+set $WS8 8
+set $WS9 9
+set $WS0 10
 
 
 #===============================================================================
@@ -54,8 +64,9 @@ focus_follows_mouse no
 workspace_auto_back_and_forth yes
 
 # 打开软件时自动移至相应工作区
-#assign [class="Thunar"] workspace 1
-#assign [class="Gvim"] workspace 2
+assign [class="Nautilus"] workspace $WS1
+assign [class="Firefox"] workspace $WS2
+assign [class="Google-chrome"] workspace $WS3
 
 # 打开软件时，执行特定命令
 for_window [window_role="pop-up"] floating enable
@@ -119,7 +130,6 @@ bar {
 }
 
 # }}}
-
 
 
 #===============================================================================
@@ -215,28 +225,28 @@ mode "resize" {
 # WorkSpace管理
 # {{{
 # switch to workspace
-bindsym $mod+0 workspace 10
-bindsym $mod+1 workspace 1
-bindsym $mod+2 workspace 2
-bindsym $mod+3 workspace 3
-bindsym $mod+4 workspace 4
-bindsym $mod+5 workspace 5
-bindsym $mod+6 workspace 6
-bindsym $mod+7 workspace 7
-bindsym $mod+8 workspace 8
-bindsym $mod+9 workspace 9
+bindsym $mod+0 workspace $WS0
+bindsym $mod+1 workspace $WS1
+bindsym $mod+2 workspace $WS2
+bindsym $mod+3 workspace $WS3
+bindsym $mod+4 workspace $WS4
+bindsym $mod+5 workspace $WS5
+bindsym $mod+6 workspace $WS6
+bindsym $mod+7 workspace $WS7
+bindsym $mod+8 workspace $WS8
+bindsym $mod+9 workspace $WS9
 
 # move focused container to workspace
-bindsym $mod+mod1+0 move container to workspace 10; workspace 10
-bindsym $mod+mod1+1 move container to workspace 1; workspace 1
-bindsym $mod+mod1+2 move container to workspace 2; workspace 2
-bindsym $mod+mod1+3 move container to workspace 3; workspace 3
-bindsym $mod+mod1+4 move container to workspace 4; workspace 4
-bindsym $mod+mod1+5 move container to workspace 5; workspace 5
-bindsym $mod+mod1+6 move container to workspace 6; workspace 6
-bindsym $mod+mod1+7 move container to workspace 7; workspace 7
-bindsym $mod+mod1+8 move container to workspace 8; workspace 8
-bindsym $mod+mod1+9 move container to workspace 9; workspace 9
+bindsym $mod+mod1+0 move container to workspace $WS0; workspace $WS0
+bindsym $mod+mod1+1 move container to workspace $WS1; workspace $WS1
+bindsym $mod+mod1+2 move container to workspace $WS2; workspace $WS2
+bindsym $mod+mod1+3 move container to workspace $WS3; workspace $WS3
+bindsym $mod+mod1+4 move container to workspace $WS4; workspace $WS4
+bindsym $mod+mod1+5 move container to workspace $WS5; workspace $WS5
+bindsym $mod+mod1+6 move container to workspace $WS6; workspace $WS6
+bindsym $mod+mod1+7 move container to workspace $WS7; workspace $WS7
+bindsym $mod+mod1+8 move container to workspace $WS8; workspace $WS8
+bindsym $mod+mod1+9 move container to workspace $WS9; workspace $WS9
 # move container to near workspace
 bindsym $mod+Shift+o move container to workspace next_on_output; workspace next_on_output
 bindsym $mod+Shift+i move container to workspace prev_on_output; workspace prev_on_output
@@ -273,7 +283,6 @@ bindsym $mod+b border toggle
 #floating_modifier $mod
 
 # }}}
-
 
 
 #===============================================================================
