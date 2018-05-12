@@ -120,6 +120,8 @@ alias gitpush='git push'
 alias gitpull='git pull'
 alias gitfetch='git fetch'
 
+alias nvrun='optirun'
+
 # auto program
 clear
 screenfetch
