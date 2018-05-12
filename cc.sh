@@ -31,6 +31,7 @@ if [ `uname` == "Linux" ]; then
         cp ../.Xresources           $cf_dir/
         cp ../.gitconfig            $cf_dir/
         cp ../.xinitrc              $cf_dir/
+        cp ../.inputrc              $cf_dir/
         # .config
         cp -r ../.config/i3         $cf_dir/.config/
         cp -r ../.config/i3status   $cf_dir/.config/
