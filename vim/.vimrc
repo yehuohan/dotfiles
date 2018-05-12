@@ -1872,13 +1872,11 @@ endif
 
 " Terminal {{{
 if has('terminal')
-if IsVim()
     nnoremap <leader>tz :terminal zsh<CR>
-    set termkey=<C-w>
+if IsVim()
     tnoremap <Esc> <C-w>N
     packadd termdebug
 else
-    nnoremap <leader>tz :terminal zsh<CR>
     tnoremap <Esc> <C-\><C-n>
 endif
 endif
