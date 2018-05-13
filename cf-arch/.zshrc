@@ -122,6 +122,9 @@ alias qvim=nvim-qt
 alias -s png=ristretto
 alias -s jpg=ristretto
 alias -s gif=ristretto
+alias -s PNG=ristretto
+alias -s JPG=ristretto
+alias -s GIF=ristretto
 
 alias gitstatus='git status'
 alias gitadd='git add'
