@@ -19,20 +19,6 @@ if [ ! -n "${USER_MODMAP_LOADED+1}" ]; then
     fi
 fi
 
-#===============================================================================
-# pip zsh completion
-#===============================================================================
-function _pip_completion {
-  local words cword
-  read -Ac words
-  read -cn cword
-  reply=( $( COMP_WORDS="$words[*]" \
-             COMP_CWORD=$(( cword-1 )) \
-             PIP_AUTO_COMPLETE=1 $words[1] ) )
-}
-compctl -K _pip_completion pip
-compctl -K _pip_completion pip3
-
 
 
 #===============================================================================
@@ -46,8 +32,8 @@ export XMODIFIERS=@im=fcitx
 #===============================================================================
 # user path
 #===============================================================================
-export PATH="$PATH:$HOME/my-apps/"
-export PATH="$PATH:$HOME/my-apps/XXNet"
-export PATH="$PATH:$HOME/my-apps/firefox"
+export PATH=$PATH:$HOME/my-apps/
+export PATH=$PATH:$HOME/my-apps/XXNet
+export PATH=$PATH:$HOME/my-apps/firefox
 
-export PATH="$PATH:/opt/cuda/bin"
+export PATH=$PATH:/opt/cuda/bin

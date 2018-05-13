@@ -61,9 +61,9 @@ plugins=(git)
 source $ZSH/oh-my-zsh.sh
 
 
-################################################################################
+#===============================================================================
 # User configuration
-################################################################################
+#===============================================================================
 
 #键绑定, 设置 [DEL]键 为向后删除
 #bindkey "\e[3~" delete-char
@@ -105,6 +105,18 @@ setopt HIST_IGNORE_SPACE
 #扩展路径, /v/c/p/p => /var/cache/pacman/pkg
 setopt complete_in_word
 
+# pip zsh completion
+function _pip_completion {
+  local words cword
+  read -Ac words
+  read -cn cword
+  reply=( $( COMP_WORDS="$words[*]" \
+             COMP_CWORD=$(( cword-1 )) \
+             PIP_AUTO_COMPLETE=1 $words[1] ) )
+}
+compctl -K _pip_completion pip
+compctl -K _pip_completion pip3
+
 # alias
 alias qvim=nvim-qt
 alias -s png=ristretto
@@ -121,6 +133,7 @@ alias gitpull='git pull'
 alias gitfetch='git fetch'
 
 alias nvrun='optirun'
+alias xxx='startx'
 
 # auto program
 clear
