@@ -11,16 +11,16 @@
 # mod4 = win
 set $mod Mod4
 
-set $WS1 1|
-set $WS2 2|
-set $WS3 3|
-set $WS4 4
-set $WS5 5
-set $WS6 6
-set $WS7 7
-set $WS8 8
-set $WS9 9
-set $WS0 10
+set $WS1 "1|"
+set $WS2 "2|"
+set $WS3 "3|"
+set $WS4 "4"
+set $WS5 "5"
+set $WS6 "6"
+set $WS7 "7"
+set $WS8 "8"
+set $WS9 "9"
+set $WS0 "10"
 
 
 #===============================================================================
@@ -99,14 +99,15 @@ client.background       #$CLR_D
 # i3bar设置
 # {{{
 bar {
+    # 显示
+    position top
+    height 26
+    font pango:monospace 12, Font Awesome 12
     i3bar_command i3bar -t
     # 调用i3status
     #status_command i3status
     # 调用conky
     status_command ~/.config/i3/conky.sh
-    # 显示位置
-    position top
-    height 26
 
     # 显示托盘图标的显示器
     tray_output primary
@@ -289,14 +290,14 @@ bindsym $mod+b border toggle
 # key bind for starting program
 #===============================================================================
 #{{{
-# start a terminal
+# terminal
 bindsym $mod+Return exec xterm || xfce4-terminal
 bindsym $mod+mod1+Return exec xfce4-terminal
 
 # file manager
 bindsym $mod+e exec nautilus
 
-# file manager
+# browser
 bindsym $mod+g exec firefox || google-chrome-stable
 bindsym $mod+mod1+g exec google-chrome-stable
 
