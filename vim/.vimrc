@@ -508,8 +508,7 @@ function! ComplileProjectQmake(sopt, sel)
 
     " execute shell code
     if IsLinux()
-        let l:exec_str .= 'qmake ' . ' -r -o ./DebugV/Makefile ' . l:filename
-        let l:exec_str .= ' && cd ./DebugV'
+        let l:exec_str .= 'qmake ' . l:filename
         let l:exec_str .= ' && make'
     elseif IsWin()
         let l:exec_str .= ' mkdir DebugV'
