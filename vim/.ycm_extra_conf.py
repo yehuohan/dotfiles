@@ -8,89 +8,62 @@ import ycm_core
 #===============================================================================
 # project flags
 #===============================================================================
-LOC = os.getcwd() + '/'
+LOC_DIR = os.path.dirname(os.path.relpath(__file__))[0] + '/'
 local_flags = [
+    '-isystem', LOC_DIR,
 ]
 
 #===============================================================================
 # global flags
 #===============================================================================
-cpp_dir = os.listdir('/usr/include/c++')
-if len(cpp_dir) >= 1:
-    UNIX_GCC = '/usr/include/c++/' + cpp_dir[0] + '/'
-else:
-    UNIX_GCC = '/usr/include/c++/8.1.0/'
-UNIX_QT = '/usr/include/qt/'
-WIN_GW_C = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/'
-WIN_GW_CPP = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/'
-WIN_QT = 'D:/Qt/5.10.1/msvc2017_64/include/'
+if platform.system() == "Linux":
+    cpp_dir = os.listdir('/usr/include/c++')
+    if len(cpp_dir) >= 1:
+        GCC_DIR = '/usr/include/c++/' + cpp_dir[0] + '/'
+    else:
+        GCC_DIR = '/usr/include/c++/8.1.0/'
+    QT_DIR = '/usr/include/qt/'
+    global_flags_gcc = [
+        '-isystem', '/usr/include'                      ,
+        '-isystem', GCC_DIR                             ,
+        '-isystem', GCC_DIR + 'bits'                    ,
+        '-isystem', GCC_DIR + 'parallel'                ,
+        '-isystem', GCC_DIR + 'x86_64-pc-linux-gnu/bits',
+    ]
+elif platform.system() == "Windows":
+    cpp_dir = os.listdir('C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32')
+    if len(cpp_dir) >= 1:
+        GCC_DIR = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/' + cpp_dir[0] + '/include/'
+    else:
+        GCC_DIR = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/'
+    QT_DIR  = 'D:/Qt/5.10.1/msvc2017_64/include/'
+    global_flags_gcc = [
+        '-isystem', GCC_DIR                                ,
+        '-isystem', GCC_DIR + 'ssp'                        ,
+        '-isystem', GCC_DIR + 'c++'                        ,
+        '-isystem', GCC_DIR + 'c++/backward'               ,
+        '-isystem', GCC_DIR + 'c++/bits'                   ,
+        '-isystem', GCC_DIR + 'c++/debug'                  ,
+        '-isystem', GCC_DIR + 'c++/decimal'                ,
+        '-isystem', GCC_DIR + 'c++/experimental'           ,
+        '-isystem', GCC_DIR + 'c++/ext'                    ,
+        '-isystem', GCC_DIR + 'c++/parallel'               ,
+        '-isystem', GCC_DIR + 'c++/profile'                ,
+        '-isystem', GCC_DIR + 'c++/x86_64-w64-mingw32'     ,
+        '-isystem', GCC_DIR + 'c++/x86_64-w64-mingw32/bits',
+    ]
 
 # search order : "-I >= -isystem >= std"
-global_flags_unix = [
-    '-I',
-    '.',
-
-    '-isystem',
-    '/usr/include',
-    '-isystem',
-    UNIX_GCC,
-    '-isystem',
-    UNIX_GCC + 'bits',
-    '-isystem',
-    UNIX_GCC + 'parallel',
-    '-isystem',
-    UNIX_GCC + 'x86_64-pc-linux-gnu/bits',
-
-    '-isystem',
-    UNIX_QT,
-    '-isystem',
-    UNIX_QT + 'QtCore',
-    '-isystem',
-    UNIX_QT + 'QtGui',
-    '-isystem',
-    UNIX_QT + 'QtWidgets',
+global_flags_qt = [
+    '-isystem', QT_DIR              ,
+    '-isystem', QT_DIR + 'QtCore'   ,
+    '-isystem', QT_DIR + 'QtGui'    ,
+    '-isystem', QT_DIR + 'QtWidgets',
 ]
-global_flags_win = [
-    '-I',
-    '.',
+global_flags = ['-I', '.']
+global_flags.extend(global_flags_qt)
+global_flags.extend(global_flags_gcc)
 
-    '-isystem',
-    WIN_GW_C,
-    '-isystem',
-    WIN_GW_C + 'ssp',
-
-    '-isystem',
-    WIN_GW_CPP,
-    '-isystem',
-    WIN_GW_CPP + 'backward',
-    '-isystem',
-    WIN_GW_CPP + 'bits',
-    '-isystem',
-    WIN_GW_CPP + 'debug',
-    '-isystem',
-    WIN_GW_CPP + 'decimal',
-    '-isystem',
-    WIN_GW_CPP + 'experimental',
-    '-isystem',
-    WIN_GW_CPP + 'ext',
-    '-isystem',
-    WIN_GW_CPP + 'parallel',
-    '-isystem',
-    WIN_GW_CPP + 'profile',
-    '-isystem',
-    WIN_GW_CPP + 'x86_64-w64-mingw32',
-    '-isystem',
-    WIN_GW_CPP + 'x86_64-w64-mingw32/bits',
-
-    '-isystem',
-    WIN_QT,
-    '-isystem',
-    WIN_QT + 'QtCore',
-    '-isystem',
-    WIN_QT + 'QtGui',
-    '-isystem',
-    WIN_QT + 'QtWidgets',
-]
 
 #===============================================================================
 # defaults flags
@@ -125,10 +98,7 @@ flags = [
 'c++',
 ] + local_flags
 
-if platform.system() == "Windows":
-  flags.extend(global_flags_win)
-elif platform.system() == "Linux":
-  flags.extend(global_flags_unix)
+flags.extend(global_flags)
 
 
 # Set this to the absolute path to the folder (NOT the file!) containing the
