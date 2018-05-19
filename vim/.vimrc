@@ -1,9 +1,8 @@
+
 "
-"
-" vimrc, one configuration for vim, gvim, neovim and neovim-qt.
-" set the path of Global settings before using this vimrc.
+" vimrc configuration for vim, gvim, neovim and neovim-qt.
+" set the path of 'Global settings' before using this vimrc.
 " yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
-"
 "
 
 "===============================================================================
@@ -437,13 +436,18 @@ endif
 
 " 界面管理类
 " {{{
-" theme {{{ gruvbox主题
+" theme {{{ Vim主题
     Plug 'morhetz/gruvbox'
     set rtp+=$VimPluginPath/bundle/gruvbox/
-    colorscheme gruvbox
-    set background=dark                 " 选项：dark, light
-    let g:gruvbox_contrast_dark='medium'
-                                        " 选项：dark, medium, soft
+    let g:gruvbox_contrast_dark='medium'" 选项：dark, medium, soft
+
+    Plug 'junegunn/seoul256.vim'
+    set rtp+=$VimPluginPath/bundle/seoul256.vim/
+    let g:seoul256_background=236       " 233(暗) ~ 239(亮)
+    let g:seoul256_light_background=256 " 252(暗) ~ 256(亮)
+
+    set background=dark
+    colorscheme seoul256
 " }}}
 
 " air-line {{{ 状态栏
@@ -541,8 +545,7 @@ endif
         \},
         \{
             \ 'opt' : ['colorscheme', 'colo'],
-            \ 'lst' : ['gruvbox'],
-            \ 'dic' : {'gruvbox' : '第三方主题'},
+            \ 'lst' : ['gruvbox', 'seoul256', 'seoul256-light'],
             \ 'cmd' : '',
         \},]
         " \{
