@@ -511,14 +511,9 @@ function! ComplileProjectQmake(sopt, sel)
         let l:exec_str .= 'qmake ' . l:filename
         let l:exec_str .= ' && make'
     elseif IsWin()
-        let l:exec_str .= ' mkdir DebugV'
-        let l:exec_str .= ' & cd DebugV'
-        " Attetion: here shouls be <qmake ../file.pro>
-        let l:exec_str .= ' && ' . s:path_qmake . " -r ." . l:filename
+        let l:exec_str .= s:path_qmake . " -r " . l:filename
         let l:exec_str .= ' && ' . s:path_vcvars
         let l:exec_str .= ' && ' . s:path_nmake . ' -f Makefile.Debug'
-        " Attention: executed file must be in the same directory with .pro file
-        let l:exec_str .= " && cd .."
     else
         return
     endif
