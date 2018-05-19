@@ -250,559 +250,6 @@ endif
 
 
 "===============================================================================
-" User Defined functions
-"===============================================================================
-" {{{
-" 隐藏字符显示 " {{{
-function! InvConceallevel()
-    if &conceallevel == 0
-        set conceallevel=2
-        echo "conceallevel = 2"
-    else
-        set conceallevel=0              " 显示markdown等格式中的隐藏字符
-        echo "conceallevel = 0"
-    endif
-endfunction
-" }}}
-
-" 透明背影控制（需要系统本身支持透明） " {{{
-let s:inv_transparent_bg_flg = 0
-function! InvTransParentBackground()
-    if s:inv_transparent_bg_flg == 1
-        hi Normal ctermbg=235
-        let s:inv_transparent_bg_flg = 0
-    else
-        hi Normal ctermbg=NONE
-        let s:inv_transparent_bg_flg = 1
-    endif
-endfunction
-" }}}
-
-" 切换显示行号 " {{{
-let s:inv_number_type=1
-function! InvNumberType()
-    if s:inv_number_type == 1
-        let s:inv_number_type = 2
-        set nonumber
-        set norelativenumber
-    elseif s:inv_number_type == 2
-        let s:inv_number_type = 3
-        set number
-        set norelativenumber
-    elseif s:inv_number_type == 3
-        let s:inv_number_type = 1
-        set number
-        set relativenumber
-    endif
-endfunction
-" }}}
-
-" 切换显示折叠列 " {{{
-function! InvFoldColumeShow()
-    if &foldcolumn == 0
-        set foldcolumn=1
-        echo "foldcolumn = 1"
-    else
-        set foldcolumn=0
-        echo "foldcolumn = 0"
-    endif
-endfunction
-" }}}
-
-" 切换显示标志列 {{{
-function! InvSigncolumn()
-    if &signcolumn == "auto"
-        set signcolumn=no
-        echo "signcolumn = no"
-    else
-        set signcolumn=auto
-        echo "signcolumn = auto"
-    endif
-endfunction
-" }}}
-
-" 切换高亮 {{{
-function! InvHighLight()
-    if exists("g:syntax_on")
-        syntax off
-        echo "syntax off"
-    else
-        syntax on
-        echo "syntax on"
-    endif
-endfunction
-" }}}
-
-" Linux-Fcitx输入法切换 " {{{
-if IsLinux()
-function! LinuxFcitx2En()
-    if 2 == system("fcitx-remote")
-        let l:t = system("fcitx-remote -c")
-    endif
-endfunction
-function! LinuxFcitx2Zh()
-    if 1 == system("fcitx-remote")
-        let l:t = system("fcitx-remote -o")
-    endif
-endfunction
-endif
-" }}}
-
-" 编译环境函数 " {{{
-" Set autochdir is required.
-" （因为执行编译时，是以当前文件为目标文件；
-" 若禁用自动切换当前目录，会导致当前编辑的文件不一定是目标文件）
-set autochdir
-
-
-" FUNCTION: ToggleComplileX86X64() "{{{
-" 切换成x86或x64编译环境
-let s:complile_type = 'x64'
-function! ToggleComplileX86X64()
-    if IsWin()
-        if 'x86' ==? s:complile_type
-            let s:complile_type = 'x64'
-            let s:path_vcvars = s:path_vcvars64
-            let s:path_nmake = s:path_nmake_x64
-        else
-            let s:complile_type = 'x86'
-            let s:path_vcvars = s:path_vcvars32
-            let s:path_nmake = s:path_nmake_x86
-        endif
-        echo 'Complile Type: ' . s:complile_type
-    endif
-endfunction
-" }}}
-
-" FUNCTION: ComplileFile(argstr) {{{
-" @param argstr: 想要传递的命令参数
-function! ComplileFile(argstr)
-    let l:ext      = expand("%:e")                  " 扩展名
-    let l:filename = '"./' . expand('%:t') . '"'    " 文件名，不带路径，带扩展名
-    let l:name     = '"./' . expand('%:t:r') . '"'  " 文件名，不带路径，不带扩展名
-    let l:exec_str = (exists(":AsyncRun") == 2) ? ":AsyncRun " : "!"
-
-    " 生成可执行字符串
-    if 'c' ==? l:ext
-    "{{{
-        let l:exec_str .= 'gcc ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
-        let l:exec_str .= ' && ' . l:name
-    "}}}
-    elseif 'cpp' ==? l:ext
-    "{{{
-        let l:exec_str .= 'g++ -std=c++11 ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
-        let l:exec_str .= ' && ' . l:name
-    "}}}
-    elseif 'py' ==? l:ext || 'pyw' ==? l:ext
-    "{{{
-        let l:exec_str .= 'python ' . l:filename
-        let l:exec_str .= ' ' . a:argstr
-    "}}}
-    elseif 'go' ==? l:ext
-    "{{{
-        let l:exec_str .= ' go run ' . l:filename
-    "}}}
-    elseif 'm' ==? l:ext
-    "{{{
-        let l:exec_str .= 'matlab -nosplash -nodesktop -r ' . l:name[3:-2]
-    "}}}
-    elseif 'sh' ==? l:ext
-    "{{{
-        if IsLinux() || IsGw()
-            let l:exec_str .= ' ./' . l:filename
-            let l:exec_str .= ' ' . a:argstr
-        else
-            return
-        endif
-    "}}}
-    elseif 'bat' ==? l:ext
-    "{{{
-        if IsWin()
-            let l:exec_str .= ' ' . l:filename
-            let l:exec_str .= ' ' . a:argstr
-        else
-            return
-        endif
-    "}}}
-    elseif 'html' ==? l:ext
-    "{{{
-        let l:exec_str .= s:path_browser . ' ' . l:filename
-    "}}}
-    else
-        return
-    endif
-
-    execute l:exec_str
-endfunction
-" }}}
-
-" FUNCTION: ComplileFileArgs(sopt, arg) {{{
-" 用于popset的函数。
-function! ComplileFileArgs(sopt, arg)
-    if a:arg ==# 'charset'
-        call ComplileFile('-finput-charset=utf-8 -fexec-charset=gbk')
-    endif
-endfunction
-" }}}
-
-" FUNCTION: FindProjectFile(...) {{{
-" @param 1: 工程文件，如*.pro
-" @param 2: 查找起始目录，默认从当前目录向上查找到根目录
-" @return 返回找到的文件路径列表
-function! FindProjectFile(...)
-    if a:0 == 0
-        return ''
-    endif
-    let l:marker = a:1
-    let l:dir = (a:0 >= 2) ? a:2 : "."
-    let l:prj_dir      = fnamemodify(l:dir, ":p:h")
-    let l:prj_dir_last = ''
-    let l:prj_file     = ''
-
-    while l:prj_dir != l:prj_dir_last
-        let l:prj_file = glob(l:prj_dir . '/' . l:marker)
-        if !empty(l:prj_file)
-            break
-        endif
-
-        let l:prj_dir_last = l:prj_dir
-        let l:prj_dir = fnamemodify(l:prj_dir, ":p:h:h")
-    endwhile
-
-    return split(l:prj_file, "\n")
-endfunction
-" }}}
-
-" FUNCTION: ComplileProject(str, fn) {{{
-" 当找到多个Project File时，会弹出选项以供选择。
-" @param str: 工程文件名，可用通配符，如*.pro
-" @param fn: 编译工程文件的函数，需要采用popset插件
-function! ComplileProject(str, fn)
-    let l:prj = FindProjectFile(a:str)
-    if len(l:prj) == 1
-        let Fn = function(a:fn)
-        call Fn('', l:prj[0])
-    elseif len(l:prj) > 1
-        call PopSelection({
-            \ 'opt' : ['Please Select your project file'],
-            \ 'lst' : l:prj,
-            \ 'cmd' : a:fn,
-            \}, 0)
-    endif
-endfunction
-" }}}
-
-" FUNCTION: ComplileProjectQmake(sopt, sel) {{{
-" 用于popset的函数，用于编译qmake工程并运行生成的可执行文件。
-" @param sopt: 参数信息，未用到，只是传入popset的函数需要
-" @param sel: pro文件路径
-function! ComplileProjectQmake(sopt, sel)
-    let l:filename = '"./' . fnamemodify(a:sel, ":p:t") . '"'
-    let l:name     = '"./' . fnamemodify(a:sel, ":t:r") . '"'
-    let l:filedir  = fnameescape(fnamemodify(a:sel, ":p:h"))
-    let l:olddir   = fnameescape(getcwd())
-    let l:exec_str = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
-
-    " change cwd
-    execute 'lcd ' . l:filedir
-
-    " execute shell code
-    if IsLinux()
-        let l:exec_str .= 'qmake ' . l:filename
-        let l:exec_str .= ' && make'
-    elseif IsWin()
-        let l:exec_str .= s:path_qmake . " -r " . l:filename
-        let l:exec_str .= ' && ' . s:path_vcvars
-        let l:exec_str .= ' && ' . s:path_nmake . ' -f Makefile.Debug'
-    else
-        return
-    endif
-    let l:exec_str .= ' && ' . l:name
-    execute l:exec_str
-
-    " change back cwd
-    execute 'lcd ' . l:olddir
-endfunction
-" }}}
-
-" FUNCTION: ComplileProjectHtml(sopt, sel) {{{
-" 用于popset的函数，用于打开index.html
-" @param sopt: 参数信息，未用到，只是传入popset的函数需要
-" @param sel: index.html路径
-function! ComplileProjectHtml(sopt, sel)
-    let l:exec_str = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
-    let l:exec_str .= s:path_browser . ' ' . '"' . a:sel . '"'
-    execute l:exec_str
-endfunction
-" }}}
-
-" Run compliler
-let RC_Qmake = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'])
-let RC_Html  = function('ComplileProject', ['index.html', 'ComplileProjectHtml'])
-
-" }}}
-
-" FindVimgrep搜索 " {{{
-" FindVimgrep map-keys {{{
-let s:findvimgrep_nmaps = ['fi', 'fgi', 'fI', 'fgI',
-                         \ 'fw', 'fgw', 'fW', 'fgW',
-                         \ 'fs', 'fgs', 'fS', 'fgS',
-                         \ 'Fi', 'Fgi', 'FI', 'FgI',
-                         \ 'Fw', 'Fgw', 'FW', 'FgW',
-                         \ 'Fs', 'Fgs', 'FS', 'FgS',
-                         \ ]
-let s:findvimgrep_vmaps = ['fi', 'fgi', 'fI', 'fgI',
-                         \ 'fv', 'fgv', 'fV', 'fgV',
-                         \ 'fs', 'fgs', 'fS', 'fgS',
-                         \ 'Fi', 'Fgi', 'FI', 'FgI',
-                         \ 'Fv', 'Fgv', 'FV', 'FgV',
-                         \ 'Fs', 'Fgs', 'FS', 'FgS',
-                         \ ]
-" }}}
-
-" FUNCTION: GetSelectedContent() {{{ 获取选区内容
-function! GetSelectedContent()
-    let l:reg_var = getreg('0', 1)
-    let l:reg_mode = getregtype('0')
-    normal! gv"0y
-    let l:word = getreg('0')
-    call setreg('0', l:reg_var, l:reg_mode)
-    return l:word
-endfunction
-" }}}
-
-" FUNCTION: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{ 多文件自动补全
-function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
-    let l:complete = []
-    let l:arglead_list = ['']
-    let l:arglead_first = ''
-    let l:arglead_glob = ''
-    let l:files_list = []
-
-    " process glob path-string
-    if !empty(a:arglead)
-        let l:arglead_list = split(a:arglead, ' ')
-        let l:arglead_first = join(l:arglead_list[0:-2], ' ')
-        let l:arglead_glob = l:arglead_list[-1]
-    endif
-
-    " glob non-hidden and hidden files(but no . and ..) with ignorecase
-    set wildignorecase
-    set wildignore+=.,..
-    let l:files_list = split(glob(l:arglead_glob . "*") . "\n" . glob(l:arglead_glob . "\.[^.]*"), "\n")
-    set wildignore-=.,..
-
-    if len(l:arglead_list) == 1
-        let l:complete = l:files_list
-    else
-        for item in l:files_list
-            call add(l:complete, l:arglead_first . ' ' . item)
-        endfor
-    endif
-    return l:complete
-endfunction
-" }}}
-
-" FUNCTION: FindVimgrep(type, mode) {{{ 快速查找
-function! FindVimgrep(type, mode)
-    " {{{
-    " Normal Mode: mode='n'
-    " i : find input
-    " w : find word
-    " s : find word with \< \>
-    "
-    " Visual Mode: mode='v'
-    " i : find input    with selected
-    " v : find visual   with selected
-    " s : find selected with \< \>
-    "
-    " LowerCase: [iwvs] for find with user's ignorecase or smartcase setting
-    " UpperCase: [IWVS] for find in case match
-    "
-    " Other:
-    " f : find with vimgrep and show in quickfix
-    " F : find with lvimgrep and show in location-list
-    " g : find global with inputing path
-    " }}}
-
-    let l:string = ''
-    let l:files = '%'
-    let l:selected = ''
-
-    " 设置查找内容
-    if a:mode ==# 'n'
-        if a:type =~? 'i'
-            let l:string = input(' What to find :')
-        elseif a:type =~? '[ws]'
-            let l:string = expand('<cword>')
-        endif
-    elseif a:mode ==# 'v'
-        let l:selected = GetSelectedContent()
-        if a:type =~? 'i'
-            let l:string = input(' What to find :', l:selected)
-        elseif a:type =~? '[vs]'
-            let l:string = l:selected
-        endif
-    endif
-    if empty(l:string) | return | endif
-
-    " 设置查找选项
-    if a:type =~? 's'      | let l:string = '\<' . l:string . '\>' | endif
-    if a:type =~# '[IWVS]' | let l:string = '\C' . l:string        | endif
-
-    " 设置查找范围
-    if a:type =~# 'g'
-        let l:files = input(" Where to find :", "", "customlist,GetMultiFilesCompletion")
-        if empty(l:files) | return | endif
-    endif
-
-    " 使用vimgrep或lvimgrep查找
-    if a:type =~# 'f'
-        silent! execute "vimgrep /" . l:string . "/j " . l:files
-        echo "Finding..."
-        if empty(getqflist())
-            echo "No match: " . l:string
-            return
-        else
-            if a:type =~# 'g'
-                vertical botright copen
-                wincmd =
-            else
-                botright copen
-            endif
-        endif
-    elseif a:type =~# 'F'
-        silent! execute "lvimgrep /" . l:string . "/j " . l:files
-        echo "Finding..."
-        if empty(getloclist(winnr()))
-            echo "No match: " . l:string
-            return
-        else
-            if a:type =~# 'g'
-                vertical botright lopen
-                wincmd =
-            else
-                botright lopen
-            endif
-        endif
-    endif
-endfunction
-" }}}
-
-" }}}
-
-" Quickfix相关函数 {{{
-" 编码转换 {{{
-"function! ConvQuickfix(type, if, it)
-"    " type: 1 for quickfix, 0 for location-list
-"    let qflist = (a:type) ? getqflist() : getloclist(winnr())
-"    for i in qflist
-"       let i.text = iconv(i.text, a:if , a:it)
-"    endfor
-"    call setqflist(qflist)
-"endfunction
-" }}}
-
-" 预览 {{{
-function! PreviewQuickfixLine()
-    " location-list : 每个窗口对应一个位置列表
-    " quickfix      : 整个vim对应一个quickfix
-    if &filetype ==# "qf"
-        let l:last_winnr = winnr()
-        let l:dict = getwininfo(win_getid())
-        if len(l:dict) > 0
-            if get(l:dict[0], "quickfix", 0) && !get(l:dict[0], "loclist", 0)
-                execute "crewind " . line(".")
-            elseif get(l:dict[0], "quickfix", 0) && get(l:dict[0], "loclist", 0)
-                execute "lrewind " . line(".")
-            else
-                return
-            endif
-            silent! normal! zO
-            normal! zz
-            execute "noautocmd " . l:last_winnr . "wincmd w"
-        endif
-    endif
-endfunction
-" }}}
-
-" }}}
-
-" 杂项 {{{
-
-" 查找Vim关键字 {{{
-function! GotoKeyword(mode)
-    let l:exec_str = "help "
-    if a:mode ==# 'n'
-        let l:word = expand("<cword>")
-    elseif a:mode ==# 'v'
-        let l:word = GetSelectedContent()
-    endif
-
-    " 添加关键字
-    let l:exec_str .= l:word
-    if IsNVim()
-        " nvim用自己的帮助文件，只有英文的
-        let l:exec_str .= "@en"
-    endif
-
-    silent! execute l:exec_str
-endfunction
-" }}}
-
-" 去除尾部空白 {{{
-function! RemoveTrailingSpace()
-    let l:save = winsaveview()
-    %s/\s\+$//e
-    call winrestview(l:save)
-endfunction
-" }}}
-
-" 最大化Window {{{
-let s:is_max = 0
-function! ToggleWindowZoom()
-    if s:is_max
-        let s:is_max = 0
-        execute "normal! " . s:last_tab . "gt"
-        execute "noautocmd " . s:last_winnr . "wincmd w"
-        silent! execute "tabclose " . s:this_tab
-    else
-        let s:is_max = 1
-        let s:last_winnr = winnr()
-        let s:last_tab = tabpagenr()
-        execute "tabedit " . expand("%")
-        let s:this_tab = tabpagenr()
-    endif
-endfunction
-" }}}
-
-" Asd2Num切换 " {{{
-let s:asd2num_toggle_flg = 0
-let s:asd2num_map_table={
-            \ "a" : "1", "s" : "2", "d" : "3", "f" : "4", "g" : "5",
-            \ "h" : "6", "j" : "7", "k" : "8", "l" : "9", ";" : "0"
-            \ }
-function! ToggleAsd2Num()
-    if(s:asd2num_toggle_flg)
-        for t in items(s:asd2num_map_table)
-            execute "iunmap " . t[0]
-        endfor
-        let s:asd2num_toggle_flg = 0
-    else
-        for t in items(s:asd2num_map_table)
-            execute "inoremap " . t[0]. " " . t[1]
-        endfor
-        let s:asd2num_toggle_flg = 1
-    endif
-endfunction
-" }}}
-
-" }}}
-
-" }}}
-
-
-"===============================================================================
 " Plug and Settings
 "===============================================================================
 " {{{
@@ -923,9 +370,9 @@ call plug#begin($VimPluginPath."/bundle")   " 可选设置，可以指定插件�
     endif
     Plug 'junegunn/fzf.vim'
     let g:fzf_command_prefix = 'Fzf'
+    nnoremap <leader>ff :FzfFiles
     nnoremap <leader>fl :FzfLines<CR>
     nnoremap <leader>fb :FzfBLines<CR>
-    nnoremap <leader>ff :FzfFiles
 " }}}
 
 " ag {{{ Ag大范围查找
@@ -1097,15 +544,6 @@ endif
             \ 'lst' : ['gruvbox'],
             \ 'dic' : {'gruvbox' : '第三方主题'},
             \ 'cmd' : '',
-        \},
-        \{
-            \ 'opt' : ['cppargs'],
-            \ 'dsr' : 'Cpp compliled args.',
-            \ 'lst' : ['charset'],
-            \ 'dic' : {
-                    \ 'charset' : '-finput-charset=utf-8 -fexec-charset=gbk',
-                    \},
-            \ 'cmd' : 'ComplileFileArgs',
         \},]
         " \{
         "     \ 'opt' : ['AirlineTheme'],
@@ -1526,6 +964,565 @@ call plug#end()                         " required
 
 
 "===============================================================================
+" User Defined functions
+"===============================================================================
+" {{{
+" 隐藏字符显示 " {{{
+function! InvConceallevel()
+    if &conceallevel == 0
+        set conceallevel=2
+        echo "conceallevel = 2"
+    else
+        set conceallevel=0              " 显示markdown等格式中的隐藏字符
+        echo "conceallevel = 0"
+    endif
+endfunction
+" }}}
+
+" 透明背影控制（需要系统本身支持透明） " {{{
+let s:inv_transparent_bg_flg = 0
+function! InvTransParentBackground()
+    if s:inv_transparent_bg_flg == 1
+        hi Normal ctermbg=235
+        let s:inv_transparent_bg_flg = 0
+    else
+        hi Normal ctermbg=NONE
+        let s:inv_transparent_bg_flg = 1
+    endif
+endfunction
+" }}}
+
+" 切换显示行号 " {{{
+let s:inv_number_type=1
+function! InvNumberType()
+    if s:inv_number_type == 1
+        let s:inv_number_type = 2
+        set nonumber
+        set norelativenumber
+    elseif s:inv_number_type == 2
+        let s:inv_number_type = 3
+        set number
+        set norelativenumber
+    elseif s:inv_number_type == 3
+        let s:inv_number_type = 1
+        set number
+        set relativenumber
+    endif
+endfunction
+" }}}
+
+" 切换显示折叠列 " {{{
+function! InvFoldColumeShow()
+    if &foldcolumn == 0
+        set foldcolumn=1
+        echo "foldcolumn = 1"
+    else
+        set foldcolumn=0
+        echo "foldcolumn = 0"
+    endif
+endfunction
+" }}}
+
+" 切换显示标志列 {{{
+function! InvSigncolumn()
+    if &signcolumn == "auto"
+        set signcolumn=no
+        echo "signcolumn = no"
+    else
+        set signcolumn=auto
+        echo "signcolumn = auto"
+    endif
+endfunction
+" }}}
+
+" 切换高亮 {{{
+function! InvHighLight()
+    if exists("g:syntax_on")
+        syntax off
+        echo "syntax off"
+    else
+        syntax on
+        echo "syntax on"
+    endif
+endfunction
+" }}}
+
+" Linux-Fcitx输入法切换 " {{{
+if IsLinux()
+function! LinuxFcitx2En()
+    if 2 == system("fcitx-remote")
+        let l:t = system("fcitx-remote -c")
+    endif
+endfunction
+function! LinuxFcitx2Zh()
+    if 1 == system("fcitx-remote")
+        let l:t = system("fcitx-remote -o")
+    endif
+endfunction
+endif
+" }}}
+
+" 编译环境函数 " {{{
+" Set autochdir is required.
+" （因为执行编译时，是以当前文件为目标文件；
+" 若禁用自动切换当前目录，会导致当前编辑的文件不一定是目标文件）
+set autochdir
+
+
+" FUNCTION: ToggleComplileX86X64() "{{{
+" 切换成x86或x64编译环境
+let s:complile_type = 'x64'
+function! ToggleComplileX86X64()
+    if IsWin()
+        if 'x86' ==? s:complile_type
+            let s:complile_type = 'x64'
+            let s:path_vcvars = s:path_vcvars64
+            let s:path_nmake = s:path_nmake_x64
+        else
+            let s:complile_type = 'x86'
+            let s:path_vcvars = s:path_vcvars32
+            let s:path_nmake = s:path_nmake_x86
+        endif
+        echo 'Complile Type: ' . s:complile_type
+    endif
+endfunction
+" }}}
+
+" FUNCTION: ComplileFile(argstr) {{{
+" @param argstr: 想要传递的命令参数
+function! ComplileFile(argstr)
+    let l:ext      = expand("%:e")                  " 扩展名
+    let l:filename = '"./' . expand('%:t') . '"'    " 文件名，不带路径，带扩展名
+    let l:name     = '"./' . expand('%:t:r') . '"'  " 文件名，不带路径，不带扩展名
+    let l:exec_str = (exists(":AsyncRun") == 2) ? ":AsyncRun " : "!"
+
+    " 生成可执行字符串
+    if 'c' ==? l:ext
+    "{{{
+        let l:exec_str .= 'gcc ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
+        let l:exec_str .= ' && ' . l:name
+    "}}}
+    elseif 'cpp' ==? l:ext
+    "{{{
+        let l:exec_str .= 'g++ -std=c++11 ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
+        let l:exec_str .= ' && ' . l:name
+    "}}}
+    elseif 'py' ==? l:ext || 'pyw' ==? l:ext
+    "{{{
+        let l:exec_str .= 'python ' . l:filename
+        let l:exec_str .= ' ' . a:argstr
+    "}}}
+    elseif 'go' ==? l:ext
+    "{{{
+        let l:exec_str .= ' go run ' . l:filename
+    "}}}
+    elseif 'm' ==? l:ext
+    "{{{
+        let l:exec_str .= 'matlab -nosplash -nodesktop -r ' . l:name[3:-2]
+    "}}}
+    elseif 'sh' ==? l:ext
+    "{{{
+        if IsLinux() || IsGw()
+            let l:exec_str .= ' ./' . l:filename
+            let l:exec_str .= ' ' . a:argstr
+        else
+            return
+        endif
+    "}}}
+    elseif 'bat' ==? l:ext
+    "{{{
+        if IsWin()
+            let l:exec_str .= ' ' . l:filename
+            let l:exec_str .= ' ' . a:argstr
+        else
+            return
+        endif
+    "}}}
+    elseif 'html' ==? l:ext
+    "{{{
+        let l:exec_str .= s:path_browser . ' ' . l:filename
+    "}}}
+    else
+        return
+    endif
+
+    execute l:exec_str
+endfunction
+" }}}
+
+" FUNCTION: ComplileFileArgs(sopt, arg) {{{
+function! ComplileFileArgs(sopt, arg)
+    if a:arg ==# 'charset'
+        call ComplileFile('-finput-charset=utf-8 -fexec-charset=gbk')
+    endif
+endfunction
+let g:complile_args = {
+    \ 'opt' : ['cppargs'],
+    \ 'lst' : ['charset'],
+    \ 'dic' : {
+            \ 'charset' : '-finput-charset=utf-8 -fexec-charset=gbk',
+            \},
+    \ 'cmd' : 'ComplileFileArgs'}
+" }}}
+
+" FUNCTION: FindProjectFile(...) {{{
+" @param 1: 工程文件，如*.pro
+" @param 2: 查找起始目录，默认从当前目录向上查找到根目录
+" @return 返回找到的文件路径列表
+function! FindProjectFile(...)
+    if a:0 == 0
+        return ''
+    endif
+    let l:marker = a:1
+    let l:dir = (a:0 >= 2) ? a:2 : "."
+    let l:prj_dir      = fnamemodify(l:dir, ":p:h")
+    let l:prj_dir_last = ''
+    let l:prj_file     = ''
+
+    while l:prj_dir != l:prj_dir_last
+        let l:prj_file = glob(l:prj_dir . '/' . l:marker)
+        if !empty(l:prj_file)
+            break
+        endif
+
+        let l:prj_dir_last = l:prj_dir
+        let l:prj_dir = fnamemodify(l:prj_dir, ":p:h:h")
+    endwhile
+
+    return split(l:prj_file, "\n")
+endfunction
+" }}}
+
+" FUNCTION: ComplileProject(str, fn) {{{
+" 当找到多个Project File时，会弹出选项以供选择。
+" @param str: 工程文件名，可用通配符，如*.pro
+" @param fn: 编译工程文件的函数，需要采用popset插件
+function! ComplileProject(str, fn)
+    let l:prj = FindProjectFile(a:str)
+    if len(l:prj) == 1
+        let Fn = function(a:fn)
+        call Fn('', l:prj[0])
+    elseif len(l:prj) > 1
+        call PopSelection({
+            \ 'opt' : ['Please Select your project file'],
+            \ 'lst' : l:prj,
+            \ 'cmd' : a:fn,
+            \}, 0)
+    endif
+endfunction
+" }}}
+
+" FUNCTION: ComplileProjectQmake(sopt, sel) {{{
+" 用于popset的函数，用于编译qmake工程并运行生成的可执行文件。
+" @param sopt: 参数信息，未用到，只是传入popset的函数需要
+" @param sel: pro文件路径
+function! ComplileProjectQmake(sopt, sel)
+    let l:filename = '"./' . fnamemodify(a:sel, ":p:t") . '"'
+    let l:name     = '"./' . fnamemodify(a:sel, ":t:r") . '"'
+    let l:filedir  = fnameescape(fnamemodify(a:sel, ":p:h"))
+    let l:olddir   = fnameescape(getcwd())
+    let l:exec_str = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
+
+    " change cwd
+    execute 'lcd ' . l:filedir
+
+    " execute shell code
+    if IsLinux()
+        let l:exec_str .= 'qmake ' . l:filename
+        let l:exec_str .= ' && make'
+    elseif IsWin()
+        let l:exec_str .= s:path_qmake . " -r " . l:filename
+        let l:exec_str .= ' && ' . s:path_vcvars
+        let l:exec_str .= ' && ' . s:path_nmake . ' -f Makefile.Debug'
+    else
+        return
+    endif
+    let l:exec_str .= ' && ' . l:name
+    execute l:exec_str
+
+    " change back cwd
+    execute 'lcd ' . l:olddir
+endfunction
+" }}}
+
+" FUNCTION: ComplileProjectHtml(sopt, sel) {{{
+" 用于popset的函数，用于打开index.html
+" @param sopt: 参数信息，未用到，只是传入popset的函数需要
+" @param sel: index.html路径
+function! ComplileProjectHtml(sopt, sel)
+    let l:exec_str = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
+    let l:exec_str .= s:path_browser . ' ' . '"' . a:sel . '"'
+    execute l:exec_str
+endfunction
+" }}}
+
+" Run compliler
+let RC_Qmake = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'])
+let RC_Html  = function('ComplileProject', ['index.html', 'ComplileProjectHtml'])
+
+" }}}
+
+" FindVimgrep搜索 " {{{
+" FindVimgrep map-keys {{{
+let s:findvimgrep_nmaps = ['fi', 'fgi', 'fI', 'fgI',
+                         \ 'fw', 'fgw', 'fW', 'fgW',
+                         \ 'fs', 'fgs', 'fS', 'fgS',
+                         \ 'Fi', 'Fgi', 'FI', 'FgI',
+                         \ 'Fw', 'Fgw', 'FW', 'FgW',
+                         \ 'Fs', 'Fgs', 'FS', 'FgS',
+                         \ ]
+let s:findvimgrep_vmaps = ['fi', 'fgi', 'fI', 'fgI',
+                         \ 'fv', 'fgv', 'fV', 'fgV',
+                         \ 'fs', 'fgs', 'fS', 'fgS',
+                         \ 'Fi', 'Fgi', 'FI', 'FgI',
+                         \ 'Fv', 'Fgv', 'FV', 'FgV',
+                         \ 'Fs', 'Fgs', 'FS', 'FgS',
+                         \ ]
+" }}}
+
+" FUNCTION: GetSelectedContent() {{{ 获取选区内容
+function! GetSelectedContent()
+    let l:reg_var = getreg('0', 1)
+    let l:reg_mode = getregtype('0')
+    normal! gv"0y
+    let l:word = getreg('0')
+    call setreg('0', l:reg_var, l:reg_mode)
+    return l:word
+endfunction
+" }}}
+
+" FUNCTION: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{ 多文件自动补全
+function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
+    let l:complete = []
+    let l:arglead_list = ['']
+    let l:arglead_first = ''
+    let l:arglead_glob = ''
+    let l:files_list = []
+
+    " process glob path-string
+    if !empty(a:arglead)
+        let l:arglead_list = split(a:arglead, ' ')
+        let l:arglead_first = join(l:arglead_list[0:-2], ' ')
+        let l:arglead_glob = l:arglead_list[-1]
+    endif
+
+    " glob non-hidden and hidden files(but no . and ..) with ignorecase
+    set wildignorecase
+    set wildignore+=.,..
+    let l:files_list = split(glob(l:arglead_glob . "*") . "\n" . glob(l:arglead_glob . "\.[^.]*"), "\n")
+    set wildignore-=.,..
+
+    if len(l:arglead_list) == 1
+        let l:complete = l:files_list
+    else
+        for item in l:files_list
+            call add(l:complete, l:arglead_first . ' ' . item)
+        endfor
+    endif
+    return l:complete
+endfunction
+" }}}
+
+" FUNCTION: FindVimgrep(type, mode) {{{ 快速查找
+function! FindVimgrep(type, mode)
+    " {{{
+    " Normal Mode: mode='n'
+    " i : find input
+    " w : find word
+    " s : find word with \< \>
+    "
+    " Visual Mode: mode='v'
+    " i : find input    with selected
+    " v : find visual   with selected
+    " s : find selected with \< \>
+    "
+    " LowerCase: [iwvs] for find with user's ignorecase or smartcase setting
+    " UpperCase: [IWVS] for find in case match
+    "
+    " Other:
+    " f : find with vimgrep and show in quickfix
+    " F : find with lvimgrep and show in location-list
+    " g : find global with inputing path
+    " }}}
+
+    let l:string = ''
+    let l:files = '%'
+    let l:selected = ''
+
+    " 设置查找内容
+    if a:mode ==# 'n'
+        if a:type =~? 'i'
+            let l:string = input(' What to find :')
+        elseif a:type =~? '[ws]'
+            let l:string = expand('<cword>')
+        endif
+    elseif a:mode ==# 'v'
+        let l:selected = GetSelectedContent()
+        if a:type =~? 'i'
+            let l:string = input(' What to find :', l:selected)
+        elseif a:type =~? '[vs]'
+            let l:string = l:selected
+        endif
+    endif
+    if empty(l:string) | return | endif
+
+    " 设置查找选项
+    if a:type =~? 's'      | let l:string = '\<' . l:string . '\>' | endif
+    if a:type =~# '[IWVS]' | let l:string = '\C' . l:string        | endif
+
+    " 设置查找范围
+    if a:type =~# 'g'
+        let l:files = input(" Where to find :", "", "customlist,GetMultiFilesCompletion")
+        if empty(l:files) | return | endif
+    endif
+
+    " 使用vimgrep或lvimgrep查找
+    if a:type =~# 'f'
+        silent! execute "vimgrep /" . l:string . "/j " . l:files
+        echo "Finding..."
+        if empty(getqflist())
+            echo "No match: " . l:string
+            return
+        else
+            if a:type =~# 'g'
+                vertical botright copen
+                wincmd =
+            else
+                botright copen
+            endif
+        endif
+    elseif a:type =~# 'F'
+        silent! execute "lvimgrep /" . l:string . "/j " . l:files
+        echo "Finding..."
+        if empty(getloclist(winnr()))
+            echo "No match: " . l:string
+            return
+        else
+            if a:type =~# 'g'
+                vertical botright lopen
+                wincmd =
+            else
+                botright lopen
+            endif
+        endif
+    endif
+endfunction
+" }}}
+
+" }}}
+
+" Quickfix相关函数 {{{
+" 编码转换 {{{
+"function! ConvQuickfix(type, if, it)
+"    " type: 1 for quickfix, 0 for location-list
+"    let qflist = (a:type) ? getqflist() : getloclist(winnr())
+"    for i in qflist
+"       let i.text = iconv(i.text, a:if , a:it)
+"    endfor
+"    call setqflist(qflist)
+"endfunction
+" }}}
+
+" 预览 {{{
+function! PreviewQuickfixLine()
+    " location-list : 每个窗口对应一个位置列表
+    " quickfix      : 整个vim对应一个quickfix
+    if &filetype ==# "qf"
+        let l:last_winnr = winnr()
+        let l:dict = getwininfo(win_getid())
+        if len(l:dict) > 0
+            if get(l:dict[0], "quickfix", 0) && !get(l:dict[0], "loclist", 0)
+                execute "crewind " . line(".")
+            elseif get(l:dict[0], "quickfix", 0) && get(l:dict[0], "loclist", 0)
+                execute "lrewind " . line(".")
+            else
+                return
+            endif
+            silent! normal! zO
+            normal! zz
+            execute "noautocmd " . l:last_winnr . "wincmd w"
+        endif
+    endif
+endfunction
+" }}}
+
+" }}}
+
+" 杂项 {{{
+
+" 查找Vim关键字 {{{
+function! GotoKeyword(mode)
+    let l:exec_str = "help "
+    if a:mode ==# 'n'
+        let l:word = expand("<cword>")
+    elseif a:mode ==# 'v'
+        let l:word = GetSelectedContent()
+    endif
+
+    " 添加关键字
+    let l:exec_str .= l:word
+    if IsNVim()
+        " nvim用自己的帮助文件，只有英文的
+        let l:exec_str .= "@en"
+    endif
+
+    silent! execute l:exec_str
+endfunction
+" }}}
+
+" 去除尾部空白 {{{
+function! RemoveTrailingSpace()
+    let l:save = winsaveview()
+    %s/\s\+$//e
+    call winrestview(l:save)
+endfunction
+" }}}
+
+" 最大化Window {{{
+let s:is_max = 0
+function! ToggleWindowZoom()
+    if s:is_max
+        let s:is_max = 0
+        execute "normal! " . s:last_tab . "gt"
+        execute "noautocmd " . s:last_winnr . "wincmd w"
+        silent! execute "tabclose " . s:this_tab
+    else
+        let s:is_max = 1
+        let s:last_winnr = winnr()
+        let s:last_tab = tabpagenr()
+        execute "tabedit " . expand("%")
+        let s:this_tab = tabpagenr()
+    endif
+endfunction
+" }}}
+
+" Asd2Num切换 " {{{
+let s:asd2num_toggle_flg = 0
+let s:asd2num_map_table={
+            \ "a" : "1", "s" : "2", "d" : "3", "f" : "4", "g" : "5",
+            \ "h" : "6", "j" : "7", "k" : "8", "l" : "9", ";" : "0"
+            \ }
+function! ToggleAsd2Num()
+    if(s:asd2num_toggle_flg)
+        for t in items(s:asd2num_map_table)
+            execute "iunmap " . t[0]
+        endfor
+        let s:asd2num_toggle_flg = 0
+    else
+        for t in items(s:asd2num_map_table)
+            execute "inoremap " . t[0]. " " . t[1]
+        endfor
+        let s:asd2num_toggle_flg = 1
+    endif
+endfunction
+" }}}
+
+" }}}
+
+" }}}
+
+
+"===============================================================================
 " User Settings
 "===============================================================================
 " {{{
@@ -1824,9 +1821,8 @@ endif
     nnoremap <leader>rq :call RC_Qmake()<CR>
     nnoremap <leader>rh :call RC_Html()<CR>
     nnoremap <leader>tc :call ToggleComplileX86X64()<CR>
-
-    " 编译运行（输入参数）当前文件
-    nnoremap <leader>ra :execute"let g:__str__=input('Compile Args: ', '', 'customlist,GetMultiFilesCompletion')"<Bar>call ComplileFile(g:__str__)<CR>
+    nnoremap <leader>ra :call PopSelection(g:complile_args, 0)<CR>
+    nnoremap <leader>ri :execute"let g:__str__=input('Compile Args: ', '', 'customlist,GetMultiFilesCompletion')"<Bar>call ComplileFile(g:__str__)<CR>
 " }}}
 
 " File diff {{{
