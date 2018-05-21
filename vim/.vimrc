@@ -1602,9 +1602,9 @@ if IsGvim()
         set lines=20
         set columns=100
         "set guifont=DejaVu\ Sans\ Mono\ 13
-        set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 13
+        set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 13.5
         set linespace=0                 " required by DejaVuSansMono for Powerline
-        set guifontwide=WenQuanYi\ Micro\ Hei\ Mono\ 13
+        set guifontwide=WenQuanYi\ Micro\ Hei\ Mono\ 13.5
     elseif IsWin()
         set lines=25
         set columns=100

@@ -33,7 +33,7 @@ xterm.termName: xterm-256color
 ! font
 xterm*faceName: DejaVu Sans Mono for Powerline
 xterm*faceNameDoublesize: WenQuanYi Micro Hei Mono
-xterm*faceSize: 12
+xterm*faceSize: 13
 xterm*scaleHeight: 1.0
 
 
