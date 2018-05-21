@@ -8,9 +8,9 @@ import ycm_core
 #===============================================================================
 # project flags
 #===============================================================================
-LOC_DIR = os.path.dirname(os.path.relpath(__file__))[0] + '/'
+# LOC_DIR = os.path.dirname(os.path.relpath(__file__))[0] + '/'
 local_flags = [
-    '-isystem', LOC_DIR,
+    # '-isystem', LOC_DIR,
 ]
 
 #===============================================================================
@@ -60,9 +60,7 @@ global_flags_qt = [
     '-isystem', QT_DIR + 'QtGui'    ,
     '-isystem', QT_DIR + 'QtWidgets',
 ]
-global_flags = ['-I', '.']
-global_flags.extend(global_flags_qt)
-global_flags.extend(global_flags_gcc)
+global_flags = ['-I', '.'] + global_flags_qt + global_flags_gcc
 
 
 #===============================================================================
@@ -96,9 +94,7 @@ flags = [
 '-x',
 #'c',
 'c++',
-] + local_flags
-
-flags.extend(global_flags)
+] + local_flags + global_flags
 
 
 # Set this to the absolute path to the folder (NOT the file!) containing the
