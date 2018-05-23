@@ -733,7 +733,7 @@ endif
     let g:ale_echo_delay = 10           " 显示语文错误的延时时间
     let g:ale_lint_delay = 300          " 文本更改后的延时检测时间
     let g:ale_enabled = 1               " 可以使用ALEToggle切换
-    nnoremap <leader>ta :execute "ALEToggle"<Bar>echo "toggle:" . g:ale_enabled<CR>
+    nnoremap <leader>ta :execute "ALEToggle"<Bar>echo "AleToggle:" . g:ale_enabled<CR>
 " }}}
 
 " surround and repeat {{{ 添加包围符
