@@ -4,6 +4,7 @@
 import os
 import platform
 import ycm_core
+import re
 
 #===============================================================================
 # project flags
@@ -16,26 +17,26 @@ local_flags = [
 #===============================================================================
 # global flags
 #===============================================================================
+cpp_verpat = re.compile(r'^\d{1,2}\.\d{1,2}\.\d{1,2}$')
 if platform.system() == "Linux":
     cpp_dir = os.listdir('/usr/include/c++')
-    if len(cpp_dir) >= 1:
-        GCC_DIR = '/usr/include/c++/' + cpp_dir[0] + '/'
-    else:
-        GCC_DIR = '/usr/include/c++/8.1.0/'
+    GCC_DIR = '/usr/include/c++/8.1.0/'
+    for d in cpp_dir:
+        if cpp_verpat.match(d):
+            GCC_DIR = '/usr/include/c++/' + d + '/'
     QT_DIR = '/usr/include/qt/'
     global_flags_gcc = [
         '-isystem', '/usr/include'                      ,
         '-isystem', GCC_DIR                             ,
         '-isystem', GCC_DIR + 'bits'                    ,
         '-isystem', GCC_DIR + 'parallel'                ,
-        '-isystem', GCC_DIR + 'x86_64-pc-linux-gnu/bits',
     ]
 elif platform.system() == "Windows":
+    GCC_DIR = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/'
     cpp_dir = os.listdir('C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32')
-    if len(cpp_dir) >= 1:
-        GCC_DIR = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/' + cpp_dir[0] + '/include/'
-    else:
-        GCC_DIR = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/'
+    for d in cpp_dir:
+        if cpp_verpat.match(d):
+            GCC_DIR = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/' + d + '/include/'
     QT_DIR  = 'D:/Qt/5.10.1/msvc2017_64/include/'
     global_flags_gcc = [
         '-isystem', GCC_DIR                                ,
@@ -49,8 +50,6 @@ elif platform.system() == "Windows":
         '-isystem', GCC_DIR + 'c++/ext'                    ,
         '-isystem', GCC_DIR + 'c++/parallel'               ,
         '-isystem', GCC_DIR + 'c++/profile'                ,
-        '-isystem', GCC_DIR + 'c++/x86_64-w64-mingw32'     ,
-        '-isystem', GCC_DIR + 'c++/x86_64-w64-mingw32/bits',
     ]
 
 # search order : "-I >= -isystem >= std"
