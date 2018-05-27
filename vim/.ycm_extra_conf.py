@@ -30,7 +30,6 @@ if platform.system() == "Linux":
         '-isystem', GCC_DIR                             ,
         '-isystem', GCC_DIR + 'bits'                    ,
         '-isystem', GCC_DIR + 'parallel'                ,
-        '-isystem', GCC_DIR + 'x86_64-pc-linux-gnu/bits',
     ]
 elif platform.system() == "Windows":
     GCC_DIR = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/'
