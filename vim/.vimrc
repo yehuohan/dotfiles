@@ -1196,6 +1196,25 @@ function! FindProjectFile(...)
 endfunction
 " }}}
 
+" FUNCTION: FindProjectTarget(str, type) {{{
+" @param str: 工程文件路径，如*.pro
+" @param type: 工程文件类型，如qmake, make
+function! FindProjectTarget(str, type)
+    let l:target = '"./' . fnamemodify(a:str, ":t:r") . '"'
+    if a:type == 'qmake' || a:type == 'make'
+		for line in readfile(a:str)
+		    if line =~? '^\s*TARGET\s*='
+                let l:target = split(line, '=')[1]
+                let l:target = substitute(l:target, '^\s\+', '', 'g')
+                let l:target = substitute(l:target, '\s\+$', '', 'g')
+                let l:target = '"./' . l:target . '"'
+            endif
+		endfor
+    endif
+    return l:target
+endfunction
+" }}}
+
 " FUNCTION: ComplileProject(str, fn) {{{
 " 当找到多个Project File时，会弹出选项以供选择。
 " @param str: 工程文件名，可用通配符，如*.pro
@@ -1221,7 +1240,7 @@ endfunction
 " @param sel: pro文件路径
 function! ComplileProjectQmake(sopt, sel)
     let l:filename = '"./' . fnamemodify(a:sel, ":p:t") . '"'
-    let l:name     = '"./' . fnamemodify(a:sel, ":t:r") . '"'
+    let l:name     = FindProjectTarget(a:sel, 'qmake')
     let l:filedir  = fnameescape(fnamemodify(a:sel, ":p:h"))
     let l:olddir   = fnameescape(getcwd())
     let l:exec_str = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
@@ -1248,6 +1267,30 @@ function! ComplileProjectQmake(sopt, sel)
 endfunction
 " }}}
 
+" FUNCTION: ComplileProjectMakefile(sopt, sel) {{{
+" 用于popset的函数，用于编译makefile工程并运行生成的可执行文件。
+" @param sopt: 参数信息，未用到，只是传入popset的函数需要
+" @param sel: makefile文件路径
+function! ComplileProjectMakefile(sopt, sel)
+    let l:filename = '"./' . fnamemodify(a:sel, ":p:t") . '"'
+    let l:name     = FindProjectTarget(a:sel, 'make')
+    let l:filedir  = fnameescape(fnamemodify(a:sel, ":p:h"))
+    let l:olddir   = fnameescape(getcwd())
+    let l:exec_str = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
+
+    " change cwd
+    execute 'lcd ' . l:filedir
+
+    " execute shell code
+    let l:exec_str .= 'make'
+    let l:exec_str .= ' && ' . l:name
+    execute l:exec_str
+
+    " change back cwd
+    execute 'lcd ' . l:olddir
+endfunction
+"}}}
+
 " FUNCTION: ComplileProjectHtml(sopt, sel) {{{
 " 用于popset的函数，用于打开index.html
 " @param sopt: 参数信息，未用到，只是传入popset的函数需要
@@ -1262,6 +1305,7 @@ endfunction
 " Run compliler
 let RC_Qmake = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'])
 let RC_Html  = function('ComplileProject', ['index.html', 'ComplileProjectHtml'])
+let RC_Make  = function('ComplileProject', ['makefile', 'ComplileProjectMakefile'])
 
 " }}}
 
@@ -1822,6 +1866,7 @@ endif
     noremap <F5> <Esc>:call ComplileFile('')<CR>
     nnoremap <leader>rf :call ComplileFile('')<CR>
     nnoremap <leader>rq :call RC_Qmake()<CR>
+    nnoremap <leader>rm :call RC_Make()<CR>
     nnoremap <leader>rh :call RC_Html()<CR>
     nnoremap <leader>tc :call ToggleComplileX86X64()<CR>
     nnoremap <leader>ra :call PopSelection(g:complile_args, 0)<CR>
