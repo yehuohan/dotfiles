@@ -10,3 +10,4 @@ OpaqueWhenFocused=no
 Term=xterm-256color
 FontWeight=400
 FontSmoothing=full
+BellType=0
