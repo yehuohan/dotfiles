@@ -1202,14 +1202,14 @@ endfunction
 function! FindProjectTarget(str, type)
     let l:target = '"./' . fnamemodify(a:str, ":t:r") . '"'
     if a:type == 'qmake' || a:type == 'make'
-		for line in readfile(a:str)
-		    if line =~? '^\s*TARGET\s*='
+        for line in readfile(a:str)
+            if line =~? '^\s*TARGET\s*='
                 let l:target = split(line, '=')[1]
                 let l:target = substitute(l:target, '^\s\+', '', 'g')
                 let l:target = substitute(l:target, '\s\+$', '', 'g')
                 let l:target = '"./' . l:target . '"'
             endif
-		endfor
+        endfor
     endif
     return l:target
 endfunction
