@@ -119,12 +119,12 @@ compctl -K _pip_completion pip3
 
 # alias
 alias qvim=nvim-qt
-alias -s png=ristretto
-alias -s jpg=ristretto
-alias -s gif=ristretto
-alias -s PNG=ristretto
-alias -s JPG=ristretto
-alias -s GIF=ristretto
+alias -s png=eog
+alias -s jpg=eog
+alias -s gif=eog
+alias -s PNG=eog
+alias -s JPG=eog
+alias -s GIF=eog
 
 alias gitstatus='git status'
 alias gitadd='git add'
