@@ -269,10 +269,10 @@ call plug#begin($VimPluginPath."/bundle")   " 可选设置，可以指定插件�
     nmap <leader>mb <Plug>(easymotion-b)
     nmap <leader>me <Plug>(easymotion-e)
     nmap <leader>mg <Plug>(easymotion-ge)
-    nmap <leader>W <Plug>(easymotion-W)
-    nmap <leader>B <Plug>(easymotion-B)
-    nmap <leader>E <Plug>(easymotion-E)
-    nmap <leader>gE <Plug>(easymotion-gE)
+    nmap <leader>mW <Plug>(easymotion-W)
+    nmap <leader>mB <Plug>(easymotion-B)
+    nmap <leader>mE <Plug>(easymotion-E)
+    nmap <leader>mG <Plug>(easymotion-gE)
     "
 " }}}
 
@@ -685,9 +685,9 @@ endif
     nnoremap <leader>gs :YcmCompleter RestartServer<CR>
     nnoremap <leader>yr :YcmRestartServer<CR>
     nnoremap <leader>yd :YcmShowDetailedDiagnostic<CR>
+    nnoremap <leader>yD :YcmDiags<CR>
     nnoremap <leader>yc :call YcmCreateCppConf()<CR>
     nnoremap <leader>yj :call YcmCreateJsConf()<CR>
-    noremap <F4> :YcmDiags<CR>
     function! YcmCreateCppConf()
         " 在当前目录下创建.ycm_extra_conf.py
         if !filereadable('.ycm_extra_conf.py')
@@ -1656,7 +1656,7 @@ if IsGvim()
         set guifont=Consolas_For_Powerline:h12:cANSI
         set linespace=0                 " required by PowerlineFont
         set guifontwide=Microsoft_YaHei_Mono:h11:cGB2312
-        noremap <F11> <Esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
+        nnoremap <leader>tf <Esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
                                         " gvim全屏快捷键
     elseif IsMac()
         set lines=30
@@ -1685,8 +1685,8 @@ augroup VimVimrc
     autocmd FileType javascript setlocal foldmethod=syntax
 
     " map
-    autocmd Filetype vim nnoremap <buffer> <S-k> :call GotoKeyword('n')<CR>
-    autocmd Filetype vim vnoremap <buffer> <S-k> :call GotoKeyword('v')<CR>
+    autocmd Filetype vim,help nnoremap <buffer> <S-k> :call GotoKeyword('n')<CR>
+    autocmd Filetype vim,help vnoremap <buffer> <S-k> :call GotoKeyword('v')<CR>
 augroup END
 " }}}
 
@@ -1861,9 +1861,21 @@ endif
     nnoremap <M-Right> :vertical resize+5<CR>
 " }}}
 
+" Terminal {{{
+if has('terminal')
+    nnoremap <leader>tz :terminal zsh<CR>
+    set termwinkey=<C-l>
+if IsVim()
+    tnoremap <Esc> <C-l>N
+    packadd termdebug
+else
+    tnoremap <Esc> <C-\><C-n>
+endif
+endif
+" }}}
+
 " Run Program {{{
     " 编译运行当前文件
-    noremap <F5> <Esc>:call ComplileFile('')<CR>
     nnoremap <leader>rf :call ComplileFile('')<CR>
     nnoremap <leader>rq :call RC_Qmake()<CR>
     nnoremap <leader>rm :call RC_Make()<CR>
@@ -1871,6 +1883,30 @@ endif
     nnoremap <leader>tc :call ToggleComplileX86X64()<CR>
     nnoremap <leader>ra :call PopSelection(g:complile_args, 0)<CR>
     nnoremap <leader>ri :execute"let g:__str__=input('Compile Args: ', '', 'customlist,GetMultiFilesCompletion')"<Bar>call ComplileFile(g:__str__)<CR>
+    nnoremap <leader>rd :Termdebug<CR>
+
+    let g:termdebug_wide = 150
+    tnoremap <F1> <C-l>:Gdb<CR>
+    tnoremap <F2> <C-l>:Program<CR>
+    tnoremap <F3> <C-l>:Source<CR>
+    nnoremap <F1> :Gdb<CR>
+    nnoremap <F2> :Program<CR>
+    nnoremap <F3> :Source<CR>
+
+    nnoremap <F4> :Stop<CR>
+    nnoremap <F5> :Run<CR>
+    nnoremap <F6> :Continue<CR>
+
+    " Termdebug模式下，K会自动map成Evaluate
+    nnoremap <leader>ge :Evaluate<CR>
+    vnoremap <leader>ge :Evaluate<CR>
+    nnoremap <F7> :Evaluate<CR>
+    vnoremap <F7> :Evaluate<CR>
+    nnoremap <F8> :Clear<CR>
+    nnoremap <F9> :Break<CR>
+    nnoremap <F10> :Over<CR>
+    nnoremap <F11> :Step<CR>
+
 " }}}
 
 " File diff {{{
@@ -1906,18 +1942,6 @@ endif
     for item in s:findvimgrep_vmaps
         execute "vnoremap <leader>" . item ":call FindVimgrep('" . item . "', 'v')<CR>"
     endfor
-" }}}
-
-" Terminal {{{
-if has('terminal')
-    nnoremap <leader>tz :terminal zsh<CR>
-if IsVim()
-    tnoremap <Esc> <C-w>N
-    packadd termdebug
-else
-    tnoremap <Esc> <C-\><C-n>
-endif
-endif
 " }}}
 
 " }}}
