@@ -16,6 +16,7 @@ if (IsLinux() || IsMac())
     set rtp^=~/.vim
     set rtp+=~/.vim/after
     let &packpath = &rtp
+    source ~/.vimrc
 elseif IsWin()
     set rtp^=C:/MyApps/vim/vimfiles
     set rtp+=C:/MyApps/vim/vimfiles/after
