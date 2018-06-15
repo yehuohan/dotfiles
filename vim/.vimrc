@@ -670,8 +670,8 @@ endif
     let g:ycm_autoclose_preview_window_after_insertion = 1      " 自动关闭预览窗口
     let g:ycm_key_list_stop_completion = ['<C-y>']              " 关闭补全menu
     let g:ycm_key_invoke_completion = '<C-l>'                   " 显示补全内容
-    let g:ycm_key_list_select_completion = ['<C-j>', '<Down>']
-    let g:ycm_key_list_previous_completion = ['<C-k>', '<Up>']
+    let g:ycm_key_list_select_completion = ['<C-j>', '<C-n>', '<Down>']
+    let g:ycm_key_list_previous_completion = ['<C-k>', '<C-p>', '<Up>']
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
     nnoremap <leader>gi :YcmCompleter GoToInclude<CR>
     nnoremap <leader>gd :YcmCompleter GoToDefinition<CR>
