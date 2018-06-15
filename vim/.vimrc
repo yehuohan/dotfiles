@@ -1219,26 +1219,29 @@ endfunction
 " 当找到多个Project File时，会弹出选项以供选择。
 " @param str: 工程文件名，可用通配符，如*.pro
 " @param fn: 编译工程文件的函数，需要采用popset插件
-function! ComplileProject(str, fn)
+" @param args: 编译工程文件函数的附加参数，需要采用popset插件
+function! ComplileProject(str, fn, ...)
     let l:prj = FindProjectFile(a:str)
+    let l:args = (a:0 >= 1) ? a:1 : []
     if len(l:prj) == 1
         let Fn = function(a:fn)
-        call Fn('', l:prj[0])
+        call Fn('', l:prj[0], l:args)
     elseif len(l:prj) > 1
         call PopSelection({
             \ 'opt' : ['Please Select your project file'],
             \ 'lst' : l:prj,
             \ 'cmd' : a:fn,
-            \}, 0)
+            \}, 0, l:args)
     endif
 endfunction
 " }}}
 
-" FUNCTION: ComplileProjectQmake(sopt, sel) {{{
+" FUNCTION: ComplileProjectQmake(sopt, sel, args) {{{
 " 用于popset的函数，用于编译qmake工程并运行生成的可执行文件。
 " @param sopt: 参数信息，未用到，只是传入popset的函数需要
 " @param sel: pro文件路径
-function! ComplileProjectQmake(sopt, sel)
+" @param args: make命令附加参数列表
+function! ComplileProjectQmake(sopt, sel, args)
     let l:filename = '"./' . fnamemodify(a:sel, ":p:t") . '"'
     let l:name     = FindProjectTarget(a:sel, 'qmake')
     let l:filedir  = fnameescape(fnamemodify(a:sel, ":p:h"))
@@ -1259,7 +1262,11 @@ function! ComplileProjectQmake(sopt, sel)
     else
         return
     endif
-    let l:exec_str .= ' && ' . l:name
+    if empty(a:args)
+        let l:exec_str .= ' && ' . l:name
+    else
+        let l:exec_str .= ' ' . join(a:args)
+    endif
     execute l:exec_str
 
     " change back cwd
@@ -1267,11 +1274,12 @@ function! ComplileProjectQmake(sopt, sel)
 endfunction
 " }}}
 
-" FUNCTION: ComplileProjectMakefile(sopt, sel) {{{
+" FUNCTION: ComplileProjectMakefile(sopt, sel, args) {{{
 " 用于popset的函数，用于编译makefile工程并运行生成的可执行文件。
 " @param sopt: 参数信息，未用到，只是传入popset的函数需要
 " @param sel: makefile文件路径
-function! ComplileProjectMakefile(sopt, sel)
+" @param args: make命令附加参数列表
+function! ComplileProjectMakefile(sopt, sel, args)
     let l:filename = '"./' . fnamemodify(a:sel, ":p:t") . '"'
     let l:name     = FindProjectTarget(a:sel, 'make')
     let l:filedir  = fnameescape(fnamemodify(a:sel, ":p:h"))
@@ -1283,7 +1291,11 @@ function! ComplileProjectMakefile(sopt, sel)
 
     " execute shell code
     let l:exec_str .= 'make'
-    let l:exec_str .= ' && ' . l:name
+    if empty(a:args)
+        let l:exec_str .= ' && ' . l:name
+    else
+        let l:exec_str .= ' ' . join(a:args)
+    endif
     execute l:exec_str
 
     " change back cwd
@@ -1303,9 +1315,11 @@ endfunction
 " }}}
 
 " Run compliler
-let RC_Qmake = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'])
-let RC_Html  = function('ComplileProject', ['index.html', 'ComplileProjectHtml'])
-let RC_Make  = function('ComplileProject', ['makefile', 'ComplileProjectMakefile'])
+let RC_Qmake      = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'])
+let RC_QmakeClean = function('ComplileProject', ['*.pro', 'ComplileProjectQmake', ['clean']])
+let RC_Make       = function('ComplileProject', ['makefile', 'ComplileProjectMakefile'])
+let RC_MakeClean  = function('ComplileProject', ['makefile', 'ComplileProjectMakefile', ['clean']])
+let RC_Html       = function('ComplileProject', ['index.html', 'ComplileProjectHtml'])
 
 " }}}
 
@@ -1879,6 +1893,8 @@ endif
     nnoremap <leader>rf :call ComplileFile('')<CR>
     nnoremap <leader>rq :call RC_Qmake()<CR>
     nnoremap <leader>rm :call RC_Make()<CR>
+    nnoremap <leader>rcq :call RC_QmakeClean()<CR>
+    nnoremap <leader>rcm :call RC_MakeClean()<CR>
     nnoremap <leader>rh :call RC_Html()<CR>
     nnoremap <leader>tc :call ToggleComplileX86X64()<CR>
     nnoremap <leader>ra :call PopSelection(g:complile_args, 0)<CR>
