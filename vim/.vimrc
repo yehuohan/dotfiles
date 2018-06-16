@@ -1317,9 +1317,9 @@ endfunction
 " Run compliler
 let RC_Qmake      = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'])
 let RC_QmakeClean = function('ComplileProject', ['*.pro', 'ComplileProjectQmake', ['clean']])
-let RC_Make       = function('ComplileProject', ['makefile', 'ComplileProjectMakefile'])
-let RC_MakeClean  = function('ComplileProject', ['makefile', 'ComplileProjectMakefile', ['clean']])
-let RC_Html       = function('ComplileProject', ['index.html', 'ComplileProjectHtml'])
+let RC_Make       = function('ComplileProject', ['[mM]akefile', 'ComplileProjectMakefile'])
+let RC_MakeClean  = function('ComplileProject', ['[mM]akefile', 'ComplileProjectMakefile', ['clean']])
+let RC_Html       = function('ComplileProject', ['[iI]ndex.html', 'ComplileProjectHtml'])
 
 " }}}
 
