@@ -200,7 +200,7 @@ vnoremap ; :
     endif
 
     " 浏览器路径
-    if IsWin()
+    if (IsWin() || IsGw())
         let s:path_browser_chrome = '"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"'
         let s:path_browser_firefox = '"D:/Mozilla Firefox/firefox.exe"'
     elseif IsLinux()
@@ -709,7 +709,6 @@ endif
 " }}}
 
 " ultisnips {{{ 代码片段插入
-if !(IsWin() && IsNVim())
     Plug 'yehuohan/ultisnips'           " snippet插入引擎（自己Fork的移除了对ExpandTrigger键vmap的映射）
     Plug 'honza/vim-snippets'           " snippet合集
     " 使用:UltiSnipsEdit编辑g:UltiSnipsSnippetsDir中的snippet文件
@@ -720,7 +719,6 @@ if !(IsWin() && IsNVim())
     let g:UltiSnipsListSnippets="<C-Tab>"
     let g:UltiSnipsJumpForwardTrigger="<C-j>"
     let g:UltiSnipsJumpBackwardTrigger="<C-k>"
-endif
 " }}}
 
 " ale {{{ 语法检测
