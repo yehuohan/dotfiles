@@ -200,12 +200,14 @@ vnoremap ; :
     endif
 
     " 浏览器路径
-    let s:path_browser = ""
     if IsWin()
-        let s:path_browser = '"D:/Mozilla Firefox/firefox.exe"'
+        let s:path_browser_chrome = '"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"'
+        let s:path_browser_firefox = '"D:/Mozilla Firefox/firefox.exe"'
     elseif IsLinux()
-        let s:path_browser = '"/usr/bin/firefox"'
+        let s:path_browser_chrome = '"/usr/bin/google-stable-chrome"'
+        let s:path_browser_firefox = '"/usr/bin/firefox"'
     endif
+    let s:path_browser = s:path_browser_firefox
 " }}}
 
 " 键码设定
@@ -858,6 +860,7 @@ augroup END
     let g:mkdp_refresh_slow = 0         " 即时预览MarkDown
     let g:mkdp_command_for_global = 0   " 只有markdown文件可以预览
     nnoremap <leader>vm :call PreViewMarkdown()<CR>
+    nnoremap <leader>tb :call ToggleBrowserPath()<CR>
     function! PreViewMarkdown() abort
         if exists(':MarkdownPreviewStop')
             MarkdownPreviewStop
@@ -866,6 +869,15 @@ augroup END
             MarkdownPreview
             echo "MarkdownPreview"
         endif
+    endfunction
+    function! ToggleBrowserPath()
+        if s:path_browser ==# s:path_browser_firefox
+            let s:path_browser = s:path_browser_chrome
+        else
+            let s:path_browser = s:path_browser_firefox
+        endif
+        let g:mkdp_path_to_chrome = s:path_browser
+        echo 'Browser Path: ' . s:path_browser
     endfunction
 " }}}
 
@@ -920,7 +932,6 @@ endif
 "}}}
 
 " }}}
-
 
 " Disabled Plugins
 " {{{
@@ -1050,7 +1061,7 @@ function! InvHighLight()
 endfunction
 " }}}
 
-" Linux-Fcitx输入法切换 " {{{
+" Linux-Fcitx输入法切换  {{{
 if IsLinux()
 function! LinuxFcitx2En()
     if 2 == system("fcitx-remote")
@@ -1071,13 +1082,12 @@ endif
 " 若禁用自动切换当前目录，会导致当前编辑的文件不一定是目标文件）
 set autochdir
 
-
 " FUNCTION: ToggleComplileX86X64() "{{{
 " 切换成x86或x64编译环境
 let s:complile_type = 'x64'
 function! ToggleComplileX86X64()
     if IsWin()
-        if 'x86' ==? s:complile_type
+        if 'x86' ==# s:complile_type
             let s:complile_type = 'x64'
             let s:path_vcvars = s:path_vcvars64
             let s:path_nmake = s:path_nmake_x64
@@ -1727,14 +1737,9 @@ augroup END
     nnoremap <leader>rt :call RemoveTrailingSpace()<CR>
     " Asd2Num
     inoremap <C-a> <Esc>:call ToggleAsd2Num()<CR>a
-    " Linux下自动退出中文输入法
-    if IsLinux()
-        "autocmd InsertLeave * call LinuxFcitx2En()
-        inoremap <Esc> <Esc>:call LinuxFcitx2En()<CR>
-    endif
 " }}}
 
-" Show Setting{{{
+" Toggle Setting {{{
     " 显示折行
     nnoremap <leader>iw :set invwrap<CR>
     " 显示不可见字符
@@ -1751,6 +1756,11 @@ augroup END
     nnoremap <leader>is :call InvSigncolumn()<CR>
     " 切换高亮
     nnoremap <leader>ih :call InvHighLight()<CR>
+    " Linux下自动切换中文输入法
+    if IsLinux()
+        "autocmd InsertLeave * call LinuxFcitx2En()
+        inoremap <Esc> <Esc>:call LinuxFcitx2En()<CR>
+    endif
 " }}}
 
 " Copy and paste{{{
