@@ -121,9 +121,11 @@ compctl -K _pip_completion pip3
 alias qvim=nvim-qt
 alias -s png=eog
 alias -s jpg=eog
+alias -s jpeg=eog
 alias -s gif=eog
 alias -s PNG=eog
 alias -s JPG=eog
+alias -s JPEG=eog
 alias -s GIF=eog
 
 alias gitstatus='git status'
