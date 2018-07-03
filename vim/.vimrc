@@ -976,7 +976,7 @@ call plug#end()                         " required
 
 
 "===============================================================================
-" User Defined functions
+" User functions
 "===============================================================================
 " {{{
 " 隐藏字符显示 " {{{
@@ -991,7 +991,7 @@ function! InvConceallevel()
 endfunction
 " }}}
 
-" 透明背影控制（需要系统本身支持透明） " {{{
+" 切换透明背影（需要系统本身支持透明） " {{{
 let s:inv_transparent_bg_flg = 0
 function! InvTransParentBackground()
     if s:inv_transparent_bg_flg == 1
@@ -1098,6 +1098,25 @@ function! ToggleComplileX86X64()
     endif
 endfunction
 " }}}
+
+" FUNCTION: EditTempFile(suffix, ntab) "{{{
+" 编辑临时文件
+" @param suffix: 临时文件附加后缀
+" @param ntab: 在新tab中打开
+function EditTempFile(suffix, ntab)
+    let l:tempfile = fnamemodify(tempname(), ':r')
+    if empty(a:suffix)
+        let l:tempfile .= '.tmp'
+    else
+        let l:tempfile .= '.' . a:suffix
+    endif
+    if a:ntab
+        execute 'tabedit ' . l:tempfile
+    else
+        execute 'edit ' . l:tempfile
+    endif
+endfunction
+"}}}
 
 " FUNCTION: ComplileFile(argstr) {{{
 " @param argstr: 想要传递的命令参数
@@ -1240,6 +1259,8 @@ function! ComplileProject(str, fn, ...)
             \ 'lst' : l:prj,
             \ 'cmd' : a:fn,
             \}, 0, l:args)
+    else
+        echo 'None of ' . a:str . ' was found!'
     endif
 endfunction
 " }}}
@@ -1515,6 +1536,21 @@ function! PreviewQuickfixLine()
 endfunction
 " }}}
 
+" }}}
+
+" 文件比较 {{{
+" @param mode: 垂直分屏或水平分屏
+function ExecDiffFile(mode)
+    let l:filename = input('File: ', '', 'customlist,GetMultiFilesCompletion')
+    if empty(l:filename)
+        return
+    endif
+    if a:mode == 's'
+        execute "diffsplit " . l:filename
+    elseif a:mode == 'v'
+        execute "vertical diffsplit " . l:filename
+    endif
+endfunction
 " }}}
 
 " 杂项 {{{
@@ -1897,6 +1933,22 @@ endif
 " }}}
 
 " Run Program {{{
+    " 建立临时文件
+    nnoremap <leader>ei :execute"let g:__str__=input('TempFile Suffix: ', '')"<Bar>call EditTempFile(g:__str__, 0)<CR>
+    nnoremap <leader>en :call EditTempFile (''   , 0)<CR>
+    nnoremap <leader>ec :call EditTempFile ('c'  , 0)<CR>
+    nnoremap <leader>ea :call EditTempFile ('cpp', 0)<CR>
+    nnoremap <leader>ep :call EditTempFile ('py' , 0)<CR>
+    nnoremap <leader>eg :call EditTempFile ('go' , 0)<CR>
+    nnoremap <leader>em :call EditTempFile ('m'  , 0)<CR>
+    nnoremap <leader>eti :execute"let g:__str__=input('TempFile Suffix: ', '')"<Bar>call EditTempFile(g:__str__, 1)<CR>
+    nnoremap <leader>etn :call EditTempFile(''   , 1)<CR>
+    nnoremap <leader>etc :call EditTempFile('c'  , 1)<CR>
+    nnoremap <leader>eta :call EditTempFile('cpp', 1)<CR>
+    nnoremap <leader>etp :call EditTempFile('py' , 1)<CR>
+    nnoremap <leader>etg :call EditTempFile('go' , 1)<CR>
+    nnoremap <leader>etm :call EditTempFile('m'  , 1)<CR>
+
     " 编译运行当前文件
     nnoremap <leader>rf :call ComplileFile('')<CR>
     nnoremap <leader>rq :call RC_Qmake()<CR>
@@ -1935,8 +1987,8 @@ endif
 
 " File diff {{{
     " 文件比较，自动补全文件和目录
-    nnoremap <leader>ds :execute "let g:__str__=input('File: ', '', 'file')"<Bar> execute "diffsplit " . g:__str__<CR>
-    nnoremap <leader>dv :execute "let g:__str__=input('File: ', '', 'file')"<Bar> execute "vertical diffsplit " . g:__str__<CR>
+    nnoremap <leader>ds :call ExecDiffFile('s')<CR>
+    nnoremap <leader>dv :call ExecDiffFile('v')<CR>
     " 比较当前文件（已经分屏）
     nnoremap <leader>dt :diffthis<CR>
     " 关闭文件比较，与diffthis互为逆命令
