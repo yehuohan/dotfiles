@@ -300,8 +300,6 @@ call plug#begin($VimPluginPath."/bundle")   " 可选设置，可以指定插件�
     endfunction
 
     " 切换Insert/Replace Mode
-    nmap <F10> <Plug>(textmanip-toggle-mode)
-    xmap <F10> <Plug>(textmanip-toggle-mode)
     xnoremap <M-i> :<C-u>call SetTextmanipMode('insert')<CR>gv
     xnoremap <M-o> :<C-u>call SetTextmanipMode('replace')<CR>gv
     " C-i 与 <Tab>等价
@@ -709,7 +707,7 @@ endif
 " }}}
 
 " ultisnips {{{ 代码片段插入
-    Plug 'yehuohan/ultisnips'           " snippet插入引擎（自己Fork的移除了对ExpandTrigger键vmap的映射）
+    Plug 'yehuohan/ultisnips'           " snippet插入引擎（vmap的映射，与vim-textmanip的<C-i>有冲突）
     Plug 'honza/vim-snippets'           " snippet合集
     " 使用:UltiSnipsEdit编辑g:UltiSnipsSnippetsDir中的snippet文件
     let g:UltiSnipsSnippetsDir = $VimPluginPath . "/mySnippets"
