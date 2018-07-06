@@ -86,6 +86,171 @@ public slots:
 };
 endsnippet
 
+
+#===============================================================================
+# algorithm for c/c++
+#===============================================================================
+snippet aquick-sort "quick sort in c/c++"
+int partition(int* pdata, int lo, int hi)
+{
+    int pivot = pdata[lo];
+    while(lo < hi)
+    {
+        while(lo < hi && pdata[hi] >= pivot) hi--;
+        pdata[lo] = pdata[hi];
+        while(lo < hi && pdata[lo] <= pivot) lo++;
+        pdata[hi] = pdata[lo];
+    }
+    pdata[lo] = pivot;
+    return lo;
+}
+void quick_sort(int* pdata, int lo, int hi)
+{
+    if (hi - lo < 2)
+        return;
+    int mi = partition(pdata, lo, hi-1);
+    quick_sort(pdata, lo, mi);
+    quick_sort(pdata, mi + 1, hi);
+}
+endsnippet
+
+snippet ainsert-sort "insertion sort in c/c++"
+void insertion_sort(int* pdata, int lo, int hi)
+{
+    for (int k = lo + 1; k < hi; k ++)
+    {
+        int n = k;
+        int tmp = pdata[n];
+        while (n > lo && tmp < pdata[n-1])
+        {
+            pdata[n] = pdata[n-1];
+            n--;
+        }
+        pdata[n] = tmp;
+    }
+}
+endsnippet
+
+snippet apre-order "pre-order sort in c/c++"
+typedef struct node_s
+{
+    int data;
+    struct node_s* parent;
+    struct node_s* left;
+    struct node_s* right;
+}node_t;
+void traverse_preorder(node_t* root, void (*visit)(node_t*))
+{
+    node_t* d = root;
+    std::stack<node_t*> s;
+    s.push(d);
+    while (!s.empty())
+    {
+        d = s.top(); s.pop();
+        while (d)
+        {
+            visit(d);
+            s.push(d->right);
+            d = d->left;
+        }
+    }
+}
+endsnippet
+
+snippet ain-order "in-order sort in c/c++"
+typedef struct node_s
+{
+    int data;
+    struct node_s* parent;
+    struct node_s* left;
+    struct node_s* right;
+}node_t;
+void traverse_inorder(node_t* root, void (*visit)(node_t*))
+{
+    node_t* d = root;
+    std::stack<node_t*> s;
+    while (true)
+    {
+        while (d)
+        {
+            s.push(d);
+            d = d->left;
+        }
+        if (s.empty()) break;
+        else
+        {
+            d = s.top(); s.pop();
+            visit(d);
+            d = d->right;
+        }
+    }
+}
+endsnippet
+
+snippet apost-order "post-order sort in c/c++"
+typedef struct node_s
+{
+    int data;
+    struct node_s* parent;
+    struct node_s* left;
+    struct node_s* right;
+}node_t;
+void traverse_postorder(node_t* root, void (*visit)(node_t*))
+{
+    node_t* d = root;
+    node_t* last = nullptr;
+    std::stack<node_t*> s;
+    while (true)
+    {
+        while (d)
+        {
+            s.push(d);
+            d = d->left;
+        }
+        while (!s.empty())
+        {
+            d = s.top(); s.pop();
+            if (!d->right || last == d->right)
+            {
+                visit(d);
+                last = d;
+            }
+            else
+            {
+                s.push(d);
+                d = d->right;
+                break;
+            }
+        }
+        if (s.empty()) break;
+    }
+}
+endsnippet
+
+snippet alayer-order "layer-order sort in c/c++"
+typedef struct node_s
+{
+    int data;
+    struct node_s* parent;
+    struct node_s* left;
+    struct node_s* right;
+}node_t;
+void traverse_layerorder(node_t* root, void (*visit)(node_t*))
+{
+    node_t* d = root;
+    std::queue<node_t*> q;
+    q.push(d);
+    while (!q.empty())
+    {
+        d = q.front(); q.pop();
+        visit(d);
+        if (d->left) q.push(d->left);
+        if (d->right) q.push(d->right);
+    }
+}
+endsnippet
+
+
 #===============================================================================
 # doxygen style for c/c++
 #===============================================================================
