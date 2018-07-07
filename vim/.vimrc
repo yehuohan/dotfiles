@@ -399,8 +399,8 @@ endif
     "               第3个field又重新从第1个对齐符开始（对齐符可以有多个，循环使用）
     "               这样就相当于：需对齐的field使用第1个对齐符，分割符(,)field使用第2个对齐符
     " /,\zs     -   将分割符(,)作为对齐内容field里的字符
-    vnoremap <leader>a :Tabularize /
-    nnoremap <leader>a :Tabularize /
+    vnoremap <leader>al :Tabularize /
+    nnoremap <leader>al :Tabularize /
 " }}}
 
 " smooth-scroll {{{ 平滑滚动
@@ -1696,6 +1696,7 @@ endfunction
     set ignorecase                      " 不区别大小写搜索
     set smartcase                       " 有大写字母时才区别大小写搜索
     set notildeop                       " 使切换大小写的~，类似于c,y,d等操作符
+    set nrformats=bin,octal,hex,alpha   " CTRL-A-X支持数字和字母
     set noimdisable                     " 切换Normal模式时，自动换成英文输入法
     set noerrorbells                    " 关闭错误信息响铃
     set vb t_vb=                        " 关闭响铃(vb, visualbell)和可视闪铃(t_vb，即闪屏)，即normal模式时按esc会有响铃
@@ -1787,6 +1788,13 @@ augroup END
     " 折叠
     nnoremap <leader>zr zR
     nnoremap <leader>zm zM
+    " 加减序号
+    nnoremap <leader>aj <C-x>
+    vnoremap <leader>aj <C-x>
+    vnoremap <leader>agj g<C-x>
+    nnoremap <leader>ak <C-a>
+    vnoremap <leader>ak <C-a>
+    vnoremap <leader>agk g<C-a>
     " 去除尾部空白
     nnoremap <leader>rt :call RemoveTrailingSpace()<CR>
     " Asd2Num
