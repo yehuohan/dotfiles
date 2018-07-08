@@ -1785,9 +1785,8 @@ augroup END
     nnoremap <leader>gu g~
     " 矩形选择
     nnoremap vv <C-v>
-    " 折叠
-    nnoremap <leader>zr zR
-    nnoremap <leader>zm zM
+    vnoremap vv <C-v>
+    vnoremap vl V
     " 加减序号
     nnoremap <leader>aj <C-x>
     vnoremap <leader>aj <C-x>
@@ -1871,6 +1870,12 @@ endif
     " j, k 移行
     nnoremap j gj
     nnoremap k gk
+    " 折叠
+    nnoremap <leader>za zA
+    nnoremap <leader>zr zR
+    nnoremap <leader>zm zM
+    nnoremap <leader>zc zC
+    nnoremap <leader>zo zO
     " 滚屏
     nnoremap <C-j> <C-e>
     nnoremap <C-k> <C-y>
