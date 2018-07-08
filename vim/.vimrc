@@ -194,9 +194,7 @@ vnoremap ; :
         let s:path_nmake = s:path_nmake_x64
         " qmake路径（基于msvc）
         let s:path_qmake_x64 = '"D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe"'
-        let s:path_jom_x64 = '"D:/Qt/Tools/QtCreator/bin/jom.exe"'
         let s:path_qmake = s:path_qmake_x64
-        let s:path_jom = s:path_jom_x64
     endif
 
     " 浏览器路径
