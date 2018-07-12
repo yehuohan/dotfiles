@@ -40,16 +40,7 @@ elif platform.system() == "Windows":
     global_flags_gcc = [
         '-isystem', VS_DIR,
         # '-isystem', GCC_DIR                                ,
-        # '-isystem', GCC_DIR + 'ssp'                        ,
         # '-isystem', GCC_DIR + 'c++'                        ,
-        # '-isystem', GCC_DIR + 'c++/backward'               ,
-        # '-isystem', GCC_DIR + 'c++/bits'                   ,
-        # '-isystem', GCC_DIR + 'c++/debug'                  ,
-        # '-isystem', GCC_DIR + 'c++/decimal'                ,
-        # '-isystem', GCC_DIR + 'c++/experimental'           ,
-        # '-isystem', GCC_DIR + 'c++/ext'                    ,
-        # '-isystem', GCC_DIR + 'c++/parallel'               ,
-        # '-isystem', GCC_DIR + 'c++/profile'                ,
     ]
 
 # search order : "-I >= -isystem >= std"
