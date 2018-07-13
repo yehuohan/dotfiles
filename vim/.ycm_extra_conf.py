@@ -26,10 +26,8 @@ if platform.system() == "Linux":
             GCC_DIR = '/usr/include/c++/' + d + '/'
     QT_DIR = '/usr/include/qt/'
     global_flags_gcc = [
-        '-isystem', '/usr/include'                      ,
+        # '-isystem', '/usr/include'                      ,
         '-isystem', GCC_DIR                             ,
-        '-isystem', GCC_DIR + 'bits'                    ,
-        '-isystem', GCC_DIR + 'parallel'                ,
     ]
 elif platform.system() == "Windows":
     GCC_DIR = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/'
@@ -37,19 +35,21 @@ elif platform.system() == "Windows":
     for d in cpp_dir:
         if cpp_verpat.match(d):
             GCC_DIR = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/' + d + '/include/'
+    VS_DIR = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/include/'
     QT_DIR  = 'D:/Qt/5.10.1/msvc2017_64/include/'
     global_flags_gcc = [
-        '-isystem', GCC_DIR                                ,
-        '-isystem', GCC_DIR + 'ssp'                        ,
-        '-isystem', GCC_DIR + 'c++'                        ,
-        '-isystem', GCC_DIR + 'c++/backward'               ,
-        '-isystem', GCC_DIR + 'c++/bits'                   ,
-        '-isystem', GCC_DIR + 'c++/debug'                  ,
-        '-isystem', GCC_DIR + 'c++/decimal'                ,
-        '-isystem', GCC_DIR + 'c++/experimental'           ,
-        '-isystem', GCC_DIR + 'c++/ext'                    ,
-        '-isystem', GCC_DIR + 'c++/parallel'               ,
-        '-isystem', GCC_DIR + 'c++/profile'                ,
+        '-isystem', VS_DIR,
+        # '-isystem', GCC_DIR                                ,
+        # '-isystem', GCC_DIR + 'ssp'                        ,
+        # '-isystem', GCC_DIR + 'c++'                        ,
+        # '-isystem', GCC_DIR + 'c++/backward'               ,
+        # '-isystem', GCC_DIR + 'c++/bits'                   ,
+        # '-isystem', GCC_DIR + 'c++/debug'                  ,
+        # '-isystem', GCC_DIR + 'c++/decimal'                ,
+        # '-isystem', GCC_DIR + 'c++/experimental'           ,
+        # '-isystem', GCC_DIR + 'c++/ext'                    ,
+        # '-isystem', GCC_DIR + 'c++/parallel'               ,
+        # '-isystem', GCC_DIR + 'c++/profile'                ,
     ]
 
 # search order : "-I >= -isystem >= std"
@@ -89,9 +89,8 @@ flags = [
 # 'c++11'.
 '-std=c++11',
 
-# For a C project, you would set this to 'c' instead of 'c++'.
+# Set language: 'c', 'c++', 'objc', 'cuda',
 '-x',
-#'c',
 'c++',
 ] + local_flags + global_flags
 
