@@ -39,10 +39,11 @@ if [ `uname` == "Linux" ]; then
         cp ../.tmux.conf            $cf_dir/
         cp ../.tmux-status.conf     $cf_dir/
         # ect
-        cp /etc/X11/xorg.conf       $cf_dir/etc/X11/
-        cp /etc/systemd/logind.conf $cf_dir/etc/systemd/
-        cp /etc/pacman.conf         $cf_dir/etc/
-        cp /etc/modprobe.d/blacklist-nouveau.conf $cf_dir/etc/modprobe.d/
+        cp /etc/X11/xorg.conf                       $cf_dir/etc/X11/
+        cp /etc/X11/xorg.conf.d/30-touchpad.conf    $cf_dir/etc/X11/xorg.conf.d
+        cp /etc/systemd/logind.conf                 $cf_dir/etc/systemd/
+        cp /etc/pacman.conf                         $cf_dir/etc/
+        cp /etc/modprobe.d/blacklist-nouveau.conf   $cf_dir/etc/modprobe.d/
 
         # misc
         cp ../my-apps/ToggleTouchPad.py ./misc/
