@@ -68,8 +68,13 @@ assign [class="Nautilus"] workspace $WS1
 assign [class="Firefox"] workspace $WS2
 assign [class="Google-chrome"] workspace $WS3
 
-# 打开软件时，执行特定命令
+# 对特定窗口，执行特定命令
 for_window [window_role="pop-up"] floating enable
+# Touchpad Off|On
+set $TPadOff "XTerm|Xfce4-terminal|Gvim"
+set $TPadOn  "^(?!((XTerm)|(Xfce4-terminal)|(Gvim)))"
+for_window [class=$TPadOff] exec ToggleTouchPad off
+for_window [class=$TPadOn] exec ToggleTouchPad on
 
 # i3-gaps configuration
 set $bp 3
