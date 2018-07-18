@@ -1,5 +1,17 @@
 
 #===============================================================================
+# python's code snippets of matplotlib
+#===============================================================================
+
+snippet mpl-key "matplotlib key event"
+def on_key(event:${1:mpl}.backend_bases.KeyEvent):
+    if event.key == 'escape':
+        ${2:plt}.close()
+${0}
+endsnippet
+
+
+#===============================================================================
 # ReStructuredText docstring style for python
 #===============================================================================
 
