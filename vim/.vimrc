@@ -599,32 +599,36 @@ endif
 " }}}
 
 " bookmarks {{{ 书签管理
-    Plug 'MattesGroeger/vim-bookmarks'
-    let g:bookmark_sign = '⚑'
-    let g:bookmark_annotation_sign = '☰'
-    let g:bookmark_no_default_key_mappings = 1
-                                        " 禁用默认key-maps
-    let g:bookmark_auto_save = 1
-    let g:bookmark_auto_save_file = $VimPluginPath."/bookmarks"
-    let g:bookmark_save_per_working_dir = 0
-                                        " 将所在标签保存在同一个文件
-    let g:bookmark_show_toggle_warning = 0
-                                        " 取消删除annotate标签的警告
-    let g:bookmark_show_warning = 0     " 取消删除所有标签的警告
-    let g:bookmark_location_list = 0    " 使用Location-list或Quickfix
-
-    nnoremap <leader>mm :BookmarkToggle<CR>
-    nnoremap <leader>mi :BookmarkAnnotate<CR>
-    nnoremap <leader>ma :BookmarkShowAll<CR>
-    nnoremap <leader>mj :BookmarkNext<CR>
-    nnoremap <leader>mk :BookmarkPrev<CR>
-    nnoremap <M-d> :BookmarkPrev<CR>
-    nnoremap <M-f> :BookmarkNext<CR>
-    nnoremap <leader>mc :BookmarkClear<CR>
-    " nmap <leader>mx <Plug>BookmarkClearAll
-    " nmap <leader>ml <Plug>BookmarkMoveToLine
-    " nmap <leader>mkk <Plug>BookmarkMoveUp
-    " nmap <leader>mjj <Plug>BookmarkMoveDown
+    Plug 'kshenoy/vim-signature'
+    let g:SignatureMap = {
+        \ 'Leader'             :  "m",
+        \ 'PlaceNextMark'      :  "m,",
+        \ 'ToggleMarkAtLine'   :  "m.",
+        \ 'PurgeMarksAtLine'   :  "m-",
+        \ 'DeleteMark'         :  "dm",
+        \ 'PurgeMarks'         :  "m<Space>",
+        \ 'PurgeMarkers'       :  "m<BS>",
+        \ 'GotoNextLineAlpha'  :  "']",
+        \ 'GotoPrevLineAlpha'  :  "'[",
+        \ 'GotoNextSpotAlpha'  :  "`]",
+        \ 'GotoPrevSpotAlpha'  :  "`[",
+        \ 'GotoNextLineByPos'  :  "]'",
+        \ 'GotoPrevLineByPos'  :  "['",
+        \ 'GotoNextSpotByPos'  :  "]`",
+        \ 'GotoPrevSpotByPos'  :  "[`",
+        \ 'GotoNextMarker'     :  "]-",
+        \ 'GotoPrevMarker'     :  "[-",
+        \ 'GotoNextMarkerAny'  :  "]=",
+        \ 'GotoPrevMarkerAny'  :  "[=",
+        \ 'ListBufferMarks'    :  "m/",
+        \ 'ListBufferMarkers'  :  "m?"
+    \ }
+    nnoremap <leader>tm :SignatureToggleSigns<CR>
+    nnoremap <leader>ma :SignatureListBufferMarks<CR>
+    nnoremap <leader>mc :<C-U>call signature#mark#Purge("all")<CR>
+    nnoremap <leader>mx :<C-U>call signature#marker#Purge()<CR>
+    nnoremap <M-d> :<C-U>call signature#mark#Goto("prev", "line", "pos")<CR>
+    nnoremap <M-f> :<C-U>call signature#mark#Goto("next", "line", "pos")<CR>
 " }}}
 
 " undo {{{ 撤消历史
@@ -959,10 +963,6 @@ endif
 
 " vim-latex {{{
     "Plug 'vim-latex/vim-latex'
-" }}}
-
-" qml {{{ qml高亮
-    "Plug 'crucerucalin/qml.vim'
 " }}}
 
 " }}}
