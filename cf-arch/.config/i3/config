@@ -74,7 +74,7 @@ for_window [window_role="pop-up"] floating enable
 set $TPadOff "XTerm|Xfce4-terminal|Gvim"
 set $TPadOn  "^(?!((XTerm)|(Xfce4-terminal)|(Gvim)))"
 for_window [class=$TPadOff] exec ToggleTouchPad off
-for_window [class=$TPadOn] exec ToggleTouchPad on
+#for_window [class=$TPadOn] exec ToggleTouchPad on
 
 # i3-gaps configuration
 set $bp 3
