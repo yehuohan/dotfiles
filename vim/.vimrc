@@ -202,7 +202,7 @@ vnoremap ; :
         let s:path_browser_chrome = '"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"'
         let s:path_browser_firefox = '"D:/Mozilla Firefox/firefox.exe"'
     elseif IsLinux()
-        let s:path_browser_chrome = '"/usr/bin/google-stable-chrome"'
+        let s:path_browser_chrome = '"/usr/bin/chrome"'
         let s:path_browser_firefox = '"/usr/bin/firefox"'
     endif
     let s:path_browser = s:path_browser_firefox
