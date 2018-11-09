@@ -77,7 +77,7 @@ flags = [
 # headers will be compiled as C headers. You don't want that so ALWAYS specify
 # a "-std=<something>".
 # For a C project, you would set this to something like 'c99' instead of 'c++11'.
-# '-std=c++11',
+'-std=c++11',
 
 # Set language: 'c', 'c++', 'objc', 'cuda',
 '-x',
