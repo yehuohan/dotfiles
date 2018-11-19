@@ -269,7 +269,7 @@ ${BIN_TARGET} : ${OBJ}
 	$(CC) $(OBJ) -o $@ $(LDFLAGS) $(LIBS)
 
 ${DIR_OBJ}/%.o:${DIR_SRC}/%.${CC_SUF}
-	@[ -d ${DIR_OBJ} ] || mkdir -p ${DIR_OBJ}
+	mkdir -p ${DIR_OBJ}
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
 .phony:clean
