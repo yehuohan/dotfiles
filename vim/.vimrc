@@ -100,9 +100,7 @@
     " FireFox     : Markdown,ReStructruedText等标记文本预览
     " Fcitx       : Linux下的输入法
 " }}}
-
 " }}}
-
 
 "===============================================================================
 " Platform
@@ -148,9 +146,7 @@ function! IsTermType(tt)
     endif
 endfunction
 " }}}
-
 " }}}
-
 
 "===============================================================================
 " Global settings
@@ -244,9 +240,7 @@ endif
 " }}}
 
 " }}}
-
 " }}}
-
 
 "===============================================================================
 " Plug and Settings
@@ -556,7 +550,7 @@ endif
     nnoremap <leader>sa :PSet popset<CR>
 " }}}
 
-" nerd-tree{{{ 目录树导航
+" nerd-tree {{{ 目录树导航
     Plug 'scrooloose/nerdtree'
     let g:NERDTreeShowHidden=1
     let g:NERDTreeMapPreview = 'go'     " 预览打开
@@ -970,12 +964,13 @@ endif
 call plug#end()                         " required
 " }}}
 
-
 "===============================================================================
 " User functions
 "===============================================================================
 " {{{
-" 隐藏字符显示 " {{{
+" 基本设置 {{{
+
+" 隐藏字符显示 {{{
 function! InvConceallevel()
     if &conceallevel == 0
         set conceallevel=2
@@ -987,7 +982,7 @@ function! InvConceallevel()
 endfunction
 " }}}
 
-" 切换透明背影（需要系统本身支持透明） " {{{
+" 切换透明背影（需要系统本身支持透明） {{{
 let s:inv_transparent_bg_flg = 0
 function! InvTransParentBackground()
     if s:inv_transparent_bg_flg == 1
@@ -1000,7 +995,7 @@ function! InvTransParentBackground()
 endfunction
 " }}}
 
-" 切换显示行号 " {{{
+" 切换显示行号 {{{
 let s:inv_number_type=1
 function! InvNumberType()
     if s:inv_number_type == 1
@@ -1019,7 +1014,7 @@ function! InvNumberType()
 endfunction
 " }}}
 
-" 切换显示折叠列 " {{{
+" 切换显示折叠列 {{{
 function! InvFoldColumeShow()
     if &foldcolumn == 0
         set foldcolumn=1
@@ -1070,7 +1065,9 @@ endfunction
 endif
 " }}}
 
-" 编译环境函数 " {{{
+" }}}
+
+" 编译环境 {{{
 " Set autochdir is required.
 " （因为执行编译时，是以当前文件为目标文件；
 " 若禁用自动切换当前目录，会导致当前编辑的文件不一定是目标文件）
@@ -1385,7 +1382,7 @@ endfunction
 
 " }}}
 
-" FindVimgrep搜索 " {{{
+" FindVimgrep搜索 {{{
 " FindVimgrep map-keys {{{
 let s:findvimgrep_nmaps = ['fi', 'fgi', 'fI', 'fgI',
                          \ 'fw', 'fgw', 'fW', 'fgW',
@@ -1619,7 +1616,7 @@ function! ToggleWindowZoom()
 endfunction
 " }}}
 
-" Asd2Num切换 " {{{
+" Asd2Num切换 {{{
 let s:asd2num_toggle_flg = 0
 let s:asd2num_map_table={
             \ "a" : "1", "s" : "2", "d" : "3", "f" : "4", "g" : "5",
@@ -1641,9 +1638,7 @@ endfunction
 " }}}
 
 " }}}
-
 " }}}
-
 
 "===============================================================================
 " User Settings
@@ -1766,9 +1761,7 @@ augroup VimVimrc
     autocmd Filetype vim,help vnoremap <buffer> <S-k> :call GotoKeyword('v')<CR>
 augroup END
 " }}}
-
 " }}}
-
 
 "===============================================================================
 " User Key-Maps
@@ -2052,6 +2045,5 @@ endif
         execute "vnoremap <leader>" . item ":call FindVimgrep('" . item . "', 'v')<CR>"
     endfor
 " }}}
-
 " }}}
 
