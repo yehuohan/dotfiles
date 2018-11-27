@@ -197,7 +197,7 @@ vnoremap ; :
             let s:path_browser_chrome = '"/usr/bin/chrome"'
             let s:path_browser_firefox = '"/usr/bin/firefox"'
         endif
-    elseif hostname() ==# "lenovo"
+    elseif hostname() ==# "LENOVO"
         if IsWin()
             let s:path_vcvars32 = '"D:/Microsoft Visual Studio 14.0/VC/bin/vcvars32.bat"'
             let s:path_vcvars64 = '"D:/Microsoft Visual Studio 14.0/VC/bin/amd64/vcvars64.bat"'
@@ -215,9 +215,11 @@ vnoremap ; :
             let s:path_browser_firefox = '"/usr/bin/firefox"'
         endif
     endif
-    let s:path_vcvars  = s:path_vcvars64
-    let s:path_nmake   = s:path_nmake_x64
-    let s:path_qmake   = s:path_qmake_x64
+    if IsWin()
+        let s:path_vcvars  = s:path_vcvars64
+        let s:path_nmake   = s:path_nmake_x64
+        let s:path_qmake   = s:path_qmake_x64
+    endif
     let s:path_browser = s:path_browser_firefox
 " }}}
 
