@@ -1640,6 +1640,8 @@ function! ToggleAsd2Num()
 endfunction
 " }}}
 
+
+
 " }}}
 
 " }}}
@@ -1784,7 +1786,6 @@ augroup END
     " 矩形选择
     nnoremap vv <C-v>
     vnoremap vv <C-v>
-    vnoremap vl V
     " 加减序号
     nnoremap <leader>aj <C-x>
     vnoremap <leader>aj <C-x>
