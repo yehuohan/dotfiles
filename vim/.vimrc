@@ -1640,8 +1640,6 @@ function! ToggleAsd2Num()
 endfunction
 " }}}
 
-
-
 " }}}
 
 " }}}
@@ -1797,6 +1795,9 @@ augroup END
     nnoremap <leader>rt :call RemoveTrailingSpace()<CR>
     " Asd2Num
     inoremap <C-a> <Esc>:call ToggleAsd2Num()<CR>a
+    " HEX编辑
+    nnoremap <leader>xx :%!xxd<CR>
+    nnoremap <leader>xr :%!xxd -r<CR>
 " }}}
 
 " Toggle Setting {{{
