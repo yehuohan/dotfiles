@@ -180,7 +180,7 @@ vnoremap ; :
     endif
     set rtp+=$VimPluginPath             " 添加 .vim 和 vimfiles 到 rtp(runtimepath)
 
-    if hostname() ==# "hp"
+    if hostname() ==? "hp"
         if IsWin()
             let s:path_vcvars32 = '"D:/VS2017/VC/Auxiliary/Build/vcvars32.bat"'
             let s:path_vcvars64 = '"D:/VS2017/VC/Auxiliary/Build/vcvars64.bat"'
@@ -197,7 +197,7 @@ vnoremap ; :
             let s:path_browser_chrome = '"/usr/bin/chrome"'
             let s:path_browser_firefox = '"/usr/bin/firefox"'
         endif
-    elseif hostname() ==# "LENOVO"
+    elseif hostname() ==? "lenovo"
         if IsWin()
             let s:path_vcvars32 = '"D:/Microsoft Visual Studio 14.0/VC/bin/vcvars32.bat"'
             let s:path_vcvars64 = '"D:/Microsoft Visual Studio 14.0/VC/bin/amd64/vcvars64.bat"'
