@@ -180,40 +180,20 @@ vnoremap ; :
     endif
     set rtp+=$VimPluginPath             " 添加 .vim 和 vimfiles 到 rtp(runtimepath)
 
-    if hostname() ==? "hp"
-        if IsWin()
-            let s:path_vcvars32 = '"D:/VS2017/VC/Auxiliary/Build/vcvars32.bat"'
-            let s:path_vcvars64 = '"D:/VS2017/VC/Auxiliary/Build/vcvars64.bat"'
-            let s:path_nmake_x86 = '"D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx86/x86/nmake.exe"'
-            let s:path_nmake_x64 = '"D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx64/x64/nmake.exe"'
-            let s:path_qmake_x86 = '"D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe"'
-            let s:path_qmake_x64 = '"D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe"'
-        endif
-
-        if (IsWin() || IsGw())
-            let s:path_browser_chrome = '"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"'
-            let s:path_browser_firefox = '"D:/Mozilla Firefox/firefox.exe"'
-        elseif IsLinux()
-            let s:path_browser_chrome = '"/usr/bin/chrome"'
-            let s:path_browser_firefox = '"/usr/bin/firefox"'
-        endif
-    elseif hostname() ==? "lenovo"
-        if IsWin()
-            let s:path_vcvars32 = '"D:/Microsoft Visual Studio 14.0/VC/bin/vcvars32.bat"'
-            let s:path_vcvars64 = '"D:/Microsoft Visual Studio 14.0/VC/bin/amd64/vcvars64.bat"'
-            let s:path_nmake_x86 = '"D:/Microsoft Visual Studio 14.0/VC/bin/nmake.exe"'
-            let s:path_nmake_x64 = '"D:/Microsoft Visual Studio 14.0/VC/bin/amd64/nmake.exe"'
-            let s:path_qmake_x86 = '"D:/Qt/Qt5.7.0/5.7/msvc2015/bin/qmake.exe"'
-            let s:path_qmake_x64 = '"D:/Qt/Qt5.7.0/5.7/msvc2015_64/bin/qmake.exe"'
-        endif
-
-        if (IsWin() || IsGw())
-            let s:path_browser_chrome = '"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"'
-            let s:path_browser_firefox = '"D:/Mozilla Firefox/firefox.exe"'
-        elseif IsLinux()
-            let s:path_browser_chrome = '"/usr/bin/google-stable-chrome"'
-            let s:path_browser_firefox = '"/usr/bin/firefox"'
-        endif
+    if IsWin()
+        let s:path_vcvars32 = '"D:/VS2017/VC/Auxiliary/Build/vcvars32.bat"'
+        let s:path_vcvars64 = '"D:/VS2017/VC/Auxiliary/Build/vcvars64.bat"'
+        let s:path_nmake_x86 = '"D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx86/x86/nmake.exe"'
+        let s:path_nmake_x64 = '"D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx64/x64/nmake.exe"'
+        let s:path_qmake_x86 = '"D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe"'
+        let s:path_qmake_x64 = '"D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe"'
+    endif
+    if (IsWin() || IsGw())
+        let s:path_browser_chrome = '"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"'
+        let s:path_browser_firefox = '"D:/Mozilla Firefox/firefox.exe"'
+    elseif IsLinux()
+        let s:path_browser_chrome = '"/usr/bin/chrome"'
+        let s:path_browser_firefox = '"/usr/bin/firefox"'
     endif
     if IsWin()
         let s:path_vcvars  = s:path_vcvars64
