@@ -65,6 +65,8 @@ flags = [
 '-Werror',
 '-Wno-long-long',
 '-Wno-variadic-macros',
+# '-Wno-unused-variable',
+'-Wno-unused-parameter'
 '-fexceptions',
 '-DNDEBUG',
 
