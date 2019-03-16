@@ -92,14 +92,15 @@
 
 " 第三方软件
 " {{{
-    " Python      : 需要在vim编译时添加Python支持
-    " LLVM(Clang) : YouCompleteMe补全
-    " Ctags       : 查找创建标签
-    " Fzf         : Fzf模糊查找
-    " Ripgrep     : Rg文本查找
-    " Ag          : Ag文本查找
-    " FireFox     : Markdown,ReStructruedText等标记文本预览
-    " Fcitx       : Linux下的输入法
+    " Python                      : 需要在vim编译时添加Python支持
+    " LLVM(Clang)                 : YouCompleteMe补全
+    " fzf                         : Fzf模糊查找
+    " ripgrep                     : Rg文本查找
+    " ag                          : Ag文本查找
+    " ctags                       : tags生成
+    " global, gtags, gtags-cscope : tags查找
+    " fireFox                     : Markdown,ReStructruedText等标记文本预览
+    " fcitx                       : Linux下的输入法
 " }}}
 " }}}
 
@@ -206,8 +207,12 @@ vnoremap ; :
 
 " Exe
 " {{{
-if !executable('rg') | echo "Warning: No ripgerp(rg.exe)" | endif
-if !executable("ag") | echo "Warning: No ag.exe" | endif
+if !executable('rg')           | echo "Warning: No ripgerp(rg.exe)"   | endif
+if !executable("ag")           | echo "Warning: No ag.exe"            | endif
+if !executable('ctags')        | echo "Warning: No ctags.exe)"        | endif
+if !executable('gtags')        | echo "Warning: No gtags.exe)"        | endif
+if !executable('global')       | echo "Warning: No global.exe)"       | endif
+if !executable('gtags-cscope') | echo "Warning: No gtags-csocpe.exe)" | endif
 " }}}
 
 " 键码设定
@@ -765,7 +770,28 @@ endif
     nnoremap <leader>tp :call AutoPairsToggle()<CR>
 "}}}
 
-" tagbar {{{ 代码结构预览
+" gutentags {{{ 工程结构查看
+    Plug 'ludovicchabant/vim-gutentags'
+    Plug 'skywind3000/gutentags_plus'
+    let g:gutentags_project_root = ['.root', '.svn', '.git', '.project']
+    "let g:gutentags_ctags_tagfile = '.tags'
+    "let g:gutentags_cache_dir = $VimPluginPath."/.cache/.tags"
+    let g:gutentags_modules = ['ctags', 'gtags_cscope']
+    let g:gutentags_plus_nomap = 1
+    noremap <silent> <leader>fcu :GutentagsUpdate<CR>
+    noremap <silent> <leader>fcU :GutentagsUpdate!<CR>
+    noremap <silent> <leader>fcs :GscopeFind s <C-R><C-W><CR>
+    noremap <silent> <leader>fcd :GscopeFind g <C-R><C-W><CR>
+    "noremap <silent> <leader>fcd :GscopeFind d <C-R><C-W><CR>
+    noremap <silent> <leader>fcc :GscopeFind c <C-R><C-W><CR>
+    "noremap <silent> <leader>fct :GscopeFind t <C-R><C-W><CR>
+    "noremap <silent> <leader>fce :GscopeFind e <C-R><C-W><CR>
+    noremap <silent> <leader>fcf :GscopeFind f <C-R>=expand("<cfile>")<CR><CR>
+    noremap <silent> <leader>fci :GscopeFind i <C-R>=expand("<cfile>")<CR><CR>
+    noremap <silent> <leader>fca :GscopeFind a <C-R><C-W><CR>
+" }}}
+
+" tagbar {{{ 代码结构查看
     Plug 'majutsushi/tagbar'
     if IsLinux()
         let g:tagbar_ctags_bin='/usr/bin/ctags'
@@ -884,7 +910,7 @@ if !(IsWin() && IsNVim())
     let g:instant_rst_browser = s:path_browser
 if IsWin()
     " 需要安装 https://github.com/mgedmin/restview
-    nnoremap <leader>vr :execute "AsyncRun restview " . expand("%:p:t")<Bar>cclose<CR>
+    nnoremap <leader>vr :execute ":AsyncRun restview " . expand("%:p:t")<Bar>cclose<CR>
 else
     nnoremap <leader>vr :call PreViewRst()<CR>
 endif
@@ -1445,7 +1471,9 @@ endfunction
 " FUNCTION! FindWorkingFzfFile() {{{ 工程文件查找
 function! FindWorkingFzfFile()
     if empty(s:working_root)
-        call UpdateWorkingInfo(0)
+        if !UpdateWorkingInfo(0)
+            return
+        endif
     endif
     silent execute(':FzfFiles ' . s:working_root)
 endfunction
