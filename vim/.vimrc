@@ -96,6 +96,7 @@
     " LLVM(Clang) : YouCompleteMe补全
     " Ctags       : 查找创建标签
     " Fzf         : Fzf模糊查找
+    " Ripgrep     : Rg文本查找
     " Ag          : Ag文本查找
     " FireFox     : Markdown,ReStructruedText等标记文本预览
     " Fcitx       : Linux下的输入法
@@ -201,6 +202,12 @@ vnoremap ; :
         let s:path_qmake   = s:path_qmake_x64
     endif
     let s:path_browser = s:path_browser_firefox
+" }}}
+
+" Exe
+" {{{
+if !executable('rg') | echo "Warning: No ripgerp(rg.exe)" | endif
+if !executable("ag") | echo "Warning: No ag.exe" | endif
 " }}}
 
 " 键码设定
@@ -360,16 +367,16 @@ call plug#begin($VimPluginPath."/bundle")   " 可选设置，可以指定插件�
     endif
     Plug 'junegunn/fzf.vim'
     let g:fzf_command_prefix = 'Fzf'
-    nnoremap <leader>ff :FzfFiles
+    nnoremap <leader>fF :FzfFiles
     nnoremap <leader>fl :FzfLines<CR>
     nnoremap <leader>fb :FzfBLines<CR>
 " }}}
 
-" ag {{{ Ag大范围查找
-if executable('ag')
-    Plug 'rking/ag.vim'
-    " https://github.com/ggreer/the_silver_searcher
-    let g:ag_prg="ag --vimgrep --smart-case"
+" grep {{{ 大范围查找
+if IsVim()
+    Plug 'yegappan/grep'
+    "let g:Ag_Path = "$VIM."\\vim81\\ag.exe"
+    "let g:Rg_Path = "$VIM."\\vim81\\rg.exe"
 endif
 " }}}
 
@@ -378,7 +385,6 @@ endif
     let g:far#file_mask_favorites = ['%', '*.txt']
     nnoremap <leader>sr :Farp<CR>
                                         " Search and Replace, 使用Fardo和Farundo来更改替换结果
-    nnoremap <leader>sf :F
     nnoremap <leader>fd :Fardo<CR>
     nnoremap <leader>fu :Farundo<CR>
 " }}}
@@ -500,9 +506,7 @@ endif
     let g:CtrlSpaceSearchTiming = 50
     let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()"
     let g:CtrlSpaceSymbols = { "CS": "⌘"}
-    if executable("ag")
-        let g:CtrlSpaceGlobCommand = 'ag -l --nocolor -g ""'
-    endif
+    let g:CtrlSpaceGlobCommand = 'ag -l --nocolor -g ""'
     " 切换按键
     nnoremap <C-Space> :CtrlSpace<CR>
     inoremap <C-Space> <Esc>:CtrlSpace<CR>
@@ -570,7 +574,7 @@ endif
         let g:startify_bookmarks = [ {'c': '~/.vimrc'}, '~/.zshrc', '~/.config/i3/config' ]
         let g:startify_session_dir = '$VimPluginPath/sessions'
     elseif IsWin()
-        let g:startify_bookmarks = [ {'c': '$VimPluginPath/../_vimrc'}]
+        let g:startify_bookmarks = [ {'c': '$VimPluginPath/../_vimrc'}, '$VimPluginPath/../vimfiles/.ycm_extra_conf.py']
         let g:startify_session_dir = '$VimPluginPath/sessions'
     elseif IsGw()
         let g:startify_session_dir = '~/.vim/sessions'
@@ -944,12 +948,6 @@ endif
     "Plugin 'Chiel92/vim-autoformat'
 " }}}
 
-" splitjoin {{{ 行间连接与分割
-    "Plug 'AndrewRadev/splitjoin.vim'
-    "nnoremap <leader>gj gJ
-    "nnoremap <leader>gs gS
-" }}}
-
 " DrawIt {{{ 画图
     "Plug 'vim-scripts/DrawIt'
 " }}}
@@ -962,6 +960,7 @@ endif
 
 call plug#end()                         " required
 " }}}
+
 
 "===============================================================================
 " User functions
@@ -1383,24 +1382,7 @@ endfunction
 
 " }}}
 
-" FindVimgrep搜索 {{{
-" FindVimgrep map-keys {{{
-let s:findvimgrep_nmaps = ['fi', 'fgi', 'fI', 'fgI',
-                         \ 'fw', 'fgw', 'fW', 'fgW',
-                         \ 'fs', 'fgs', 'fS', 'fgS',
-                         \ 'Fi', 'Fgi', 'FI', 'FgI',
-                         \ 'Fw', 'Fgw', 'FW', 'FgW',
-                         \ 'Fs', 'Fgs', 'FS', 'FgS',
-                         \ ]
-let s:findvimgrep_vmaps = ['fi', 'fgi', 'fI', 'fgI',
-                         \ 'fv', 'fgv', 'fV', 'fgV',
-                         \ 'fs', 'fgs', 'fS', 'fgS',
-                         \ 'Fi', 'Fgi', 'FI', 'FgI',
-                         \ 'Fv', 'Fgv', 'FV', 'FgV',
-                         \ 'Fs', 'Fgs', 'FS', 'FgS',
-                         \ ]
-" }}}
-
+" 搜索 {{{
 " FUNCTION: GetSelectedContent() {{{ 获取选区内容
 function! GetSelectedContent()
     let l:reg_var = getreg('0', 1)
@@ -1444,28 +1426,116 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
 endfunction
 " }}}
 
-" FUNCTION: FindVimgrep(type, mode) {{{ 快速查找
-function! FindVimgrep(type, mode)
+" FUNCTION: UpdateWorkingInfo(flt) {{{ 更新working信息
+let s:working_root = ''
+let s:working_filter = ''
+function! UpdateWorkingInfo(flt)
+    let l:root = input(" Where (root) to find :", "", "customlist,GetMultiFilesCompletion")
+    if empty(l:root)
+        return 0
+    endif
+    let s:working_root = fnamemodify(l:root, ':p')
+    if a:flt
+        let s:working_filter = input(" Which (filter) to find :", "")
+    endif
+    return 1
+endfunction
+" }}}
+
+" FUNCTION! FindWorkingFzfFile() {{{ 工程文件查找
+function! FindWorkingFzfFile()
+    if empty(s:working_root)
+        call UpdateWorkingInfo(0)
+    endif
+    silent execute(':FzfFiles ' . s:working_root)
+endfunction
+" }}}
+
+" FUNCTION: FindRggrep(type, mode) {{{ 工程快速查找
+let s:fkrggrep_nvmaps = ['fi', 'fgi', 'fri', 'fRi', 'fI', 'fgI', 'frI', 'fRI',
+                       \ 'fw', 'fgw', 'frw', 'fRw', 'fW', 'fgW', 'frW', 'fRW',
+                       \ 'fs', 'fgs', 'frs', 'fRs', 'fS', 'fgS', 'frS', 'fRS',
+                       \ ]
+
+function! FindWorkingRggrep(type, mode)
     " {{{
+    " Option: [f][grR][IiWwSs]
     " Normal Mode: mode='n'
     " i : find input
     " w : find word
-    " s : find word with \< \>
+    " s : find word with boundaries
     "
     " Visual Mode: mode='v'
     " i : find input    with selected
-    " v : find visual   with selected
-    " s : find selected with \< \>
+    " w : find visual   with selected
+    " s : find selected with boundaries
     "
-    " LowerCase: [iwvs] for find with user's ignorecase or smartcase setting
-    " UpperCase: [IWVS] for find in case match
+    " LowerCase: [iwvs] find in ignorecase
+    " UpperCase: [IWVS] find in case match
     "
-    " Other:
-    " f : find with vimgrep and show in quickfix
-    " F : find with lvimgrep and show in location-list
-    " g : find global with inputing path
+    " Working:
+    " g : find with inputing path
+    " r : find with working root and filter
+    " R : find with inputing working root and filter
     " }}}
 
+    let l:command = ":Rg"
+    let l:options = ""
+    let l:pattern = ""
+    let l:location = "%"
+
+    " 设置查找内容
+    if a:mode ==# 'n'
+        if a:type =~? 'i'
+            let l:pattern = input(' What to find :')
+        elseif a:type =~? '[ws]'
+            let l:pattern = expand('<cword>')
+        endif
+    elseif a:mode ==# 'v'
+        let l:selected = GetSelectedContent()
+        if a:type =~? 'i'
+            let l:pattern = input(' What to find :', l:selected)
+        elseif a:type =~? '[ws]'
+            let l:pattern = l:selected
+        endif
+    endif
+    if empty(l:pattern) | return | endif
+
+    " 设置查找范围
+    if a:type =~# 'g'
+        let l:location = input(" Where to find :", "", "customlist,GetMultiFilesCompletion")
+    elseif a:type =~# 'R'
+        if !UpdateWorkingInfo(1) | return | endif
+        let l:location = s:working_root
+    elseif a:type =~# 'r'
+        if empty(s:working_root)
+            if !UpdateWorkingInfo(1) | return | endif
+        endif
+        let l:location = s:working_root
+    endif
+    if empty(l:location) | return | endif
+
+    " 设置查找选项
+    if a:type =~? 's'     | let l:options .= "-w " | endif
+    if a:type =~# '[iws]' | let l:options .= "-i " | endif
+    if !empty(s:working_filter)
+        let l:options .= '-g "*.{' . s:working_filter . '}"'
+    endif
+
+    " 使用Rg查找
+    if a:type =~# 'f'
+        silent execute(l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options)
+    endif
+endfunction
+" }}}
+
+if IsNVim()
+" FUNCTION: FindVimgrep(type, mode) {{{ 快速查找
+let s:findvimgrep_nvmaps = ['vi', 'vgi', 'vI', 'vgI',
+                          \ 'vw', 'vgw', 'vW', 'vgW',
+                          \ 'vs', 'vgs', 'vS', 'vgS',
+                          \ ]
+function! FindVimgrep(type, mode)
     let l:string = ''
     let l:files = '%'
     let l:selected = ''
@@ -1481,15 +1551,15 @@ function! FindVimgrep(type, mode)
         let l:selected = GetSelectedContent()
         if a:type =~? 'i'
             let l:string = input(' What to find :', l:selected)
-        elseif a:type =~? '[vs]'
+        elseif a:type =~? '[ws]'
             let l:string = l:selected
         endif
     endif
     if empty(l:string) | return | endif
 
     " 设置查找选项
-    if a:type =~? 's'      | let l:string = '\<' . l:string . '\>' | endif
-    if a:type =~# '[IWVS]' | let l:string = '\C' . l:string        | endif
+    if a:type =~? 's'     | let l:string = '\<' . l:string . '\>' | endif
+    if a:type =~# '[IWS]' | let l:string = '\C' . l:string        | endif
 
     " 设置查找范围
     if a:type =~# 'g'
@@ -1498,37 +1568,28 @@ function! FindVimgrep(type, mode)
     endif
 
     " 使用vimgrep或lvimgrep查找
-    if a:type =~# 'f'
-        silent! execute "vimgrep /" . l:string . "/j " . l:files
+    if a:type =~# 'v'
+        silent execute "vimgrep /" . l:string . "/j " . l:files
         echo "Finding..."
         if empty(getqflist())
             echo "No match: " . l:string
             return
         else
-            if a:type =~# 'g'
-                vertical botright copen
-                wincmd =
-            else
-                botright copen
-            endif
+            botright copen
         endif
-    elseif a:type =~# 'F'
-        silent! execute "lvimgrep /" . l:string . "/j " . l:files
+    elseif a:type =~# 'V'
+        silent execute "lvimgrep /" . l:string . "/j " . l:files
         echo "Finding..."
         if empty(getloclist(winnr()))
             echo "No match: " . l:string
             return
         else
-            if a:type =~# 'g'
-                vertical botright lopen
-                wincmd =
-            else
-                botright lopen
-            endif
+            botright lopen
         endif
     endif
 endfunction
 " }}}
+endif
 
 " }}}
 
@@ -2039,12 +2100,21 @@ endif
     nnoremap <leader>/ :execute"let g:__str__=expand(\"<cword>\")"<Bar>execute "/" . g:__str__<CR>
 
     " 使用FindVimgrep查找
-    for item in s:findvimgrep_nmaps
+    for item in s:fkrggrep_nvmaps
+        execute "nnoremap <leader>" . item ":call FindWorkingRggrep('" . item . "', 'n')<CR>"
+    endfor
+    for item in s:fkrggrep_nvmaps
+        execute "vnoremap <leader>" . item ":call FindWorkingRggrep('" . item . "', 'v')<CR>"
+    endfor
+    nnoremap <leader>ff :call FindWorkingFzfFile()<CR>
+if IsNVim()
+    for item in s:findvimgrep_nvmaps
         execute "nnoremap <leader>" . item ":call FindVimgrep('" . item . "', 'n')<CR>"
     endfor
-    for item in s:findvimgrep_vmaps
+    for item in s:findvimgrep_nvmaps
         execute "vnoremap <leader>" . item ":call FindVimgrep('" . item . "', 'v')<CR>"
     endfor
+endif
 " }}}
 " }}}
 
