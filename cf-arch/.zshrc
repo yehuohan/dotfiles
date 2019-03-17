@@ -151,7 +151,7 @@ alias gitpush='git push'
 alias gitpull='git pull'
 alias gitfetch='git fetch'
 
-alias nvrun='optirun'
+alias nxxx='nvidia-xrun'
 alias xxx='startx'
 
 # auto program

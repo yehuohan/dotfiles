@@ -13,7 +13,7 @@ if [ `uname` == "Linux" ]; then
         exit
     fi
 
-    if [[ `uname -r` =~ "ARCH" ]]; then
+    if [[ `uname -r` =~ "lts" ]]; then
         cf_dir="cf-arch"
 
         # vim
@@ -31,6 +31,7 @@ if [ `uname` == "Linux" ]; then
         cp ../.Xresources           $cf_dir/
         cp ../.gitconfig            $cf_dir/
         cp ../.xinitrc              $cf_dir/
+        cp ../.nvidia-xinitrc       $cf_dir/
         cp ../.inputrc              $cf_dir/
         # .config
         cp -r ../.config/i3         $cf_dir/.config/
@@ -42,9 +43,12 @@ if [ `uname` == "Linux" ]; then
         # ect
         cp /etc/X11/xorg.conf                       $cf_dir/etc/X11/
         cp /etc/X11/xorg.conf.d/30-touchpad.conf    $cf_dir/etc/X11/xorg.conf.d
+        cp /etc/X11/nvidia-xorg.conf                $cf_dir/etc/X11/
+        cp -r /etc/X11/nvidia-xorg.conf.d           $cf_dir/etc/X11/
         cp /etc/systemd/logind.conf                 $cf_dir/etc/systemd/
         cp /etc/pacman.conf                         $cf_dir/etc/
-        cp /etc/modprobe.d/blacklist-nouveau.conf   $cf_dir/etc/modprobe.d/
+        cp -r /etc/modprobe.d                       $cf_dir/etc/
+        cp -r /etc/modules-load.d                   $cf_dir/etc/
 
         # misc
         cp ../my-apps/ToggleTouchPad.py ./misc/
