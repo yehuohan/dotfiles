@@ -773,9 +773,9 @@ endif
 " gutentags {{{ 工程结构查看
     Plug 'ludovicchabant/vim-gutentags'
     Plug 'skywind3000/gutentags_plus'
+    let g:gutentags_enabled = 0
     let g:gutentags_project_root = ['.root', '.svn', '.git', '.project']
-    "let g:gutentags_ctags_tagfile = '.tags'
-    "let g:gutentags_cache_dir = $VimPluginPath."/.cache/.tags"
+    let g:gutentags_cache_dir = $VimPluginPath."/.tag_cache"
     let g:gutentags_modules = ['ctags', 'gtags_cscope']
     let g:gutentags_plus_nomap = 1
     noremap <silent> <leader>fcu :GutentagsUpdate<CR>
