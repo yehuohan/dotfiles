@@ -957,13 +957,6 @@ endif
 " Disabled Plugins
 " {{{
 
-" {{{ 游戏
-    "Plug 'johngrib/vim-game-code-break'
-    " VimGameCodeBreak
-    "Plug 'johngrib/vim-game-snake'
-    " VimGameSnake
-" }}}
-
 " easy-align {{{ 字符对齐
     "Plug 'junegunn/vim-easy-align'
     "xmap <leader>ga <Plug>(EasyAlign)
@@ -972,14 +965,6 @@ endif
 
 " autoformat {{{ 代码格式化
     "Plugin 'Chiel92/vim-autoformat'
-" }}}
-
-" DrawIt {{{ 画图
-    "Plug 'vim-scripts/DrawIt'
-" }}}
-
-" vim-latex {{{
-    "Plug 'vim-latex/vim-latex'
 " }}}
 
 " }}}
@@ -1627,19 +1612,9 @@ endif
 
 " }}}
 
-" Quickfix相关函数 {{{
-" 编码转换 {{{
-"function! ConvQuickfix(type, if, it)
-"    " type: 1 for quickfix, 0 for location-list
-"    let qflist = (a:type) ? getqflist() : getloclist(winnr())
-"    for i in qflist
-"       let i.text = iconv(i.text, a:if , a:it)
-"    endfor
-"    call setqflist(qflist)
-"endfunction
-" }}}
+" 杂项 {{{
 
-" 预览 {{{
+" Quickfix预览 {{{
 function! PreviewQuickfixLine()
     " location-list : 每个窗口对应一个位置列表
     " quickfix      : 整个vim对应一个quickfix
@@ -1661,10 +1636,6 @@ function! PreviewQuickfixLine()
     endif
 endfunction
 " }}}
-
-" }}}
-
-" 杂项 {{{
 
 " 查找Vim关键字 {{{
 function! GotoKeyword(mode)
