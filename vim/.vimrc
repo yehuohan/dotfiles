@@ -1408,7 +1408,7 @@ endfunction
 
 " }}}
 
-" 搜索 {{{
+" 查找 {{{
 " FUNCTION: GetSelectedContent() {{{ 获取选区内容
 function! GetSelectedContent()
     let l:reg_var = getreg('0', 1)
@@ -1480,9 +1480,13 @@ endfunction
 " }}}
 
 " FUNCTION: FindRggrep(type, mode) {{{ 工程快速查找
-let s:fkrggrep_nvmaps = ['fi', 'fgi', 'fri', 'fRi', 'fI', 'fgI', 'frI', 'fRI',
+let s:fkrggrep_nvmaps = [
+                       \ 'fi', 'fgi', 'fri', 'fRi', 'fI', 'fgI', 'frI', 'fRI',
                        \ 'fw', 'fgw', 'frw', 'fRw', 'fW', 'fgW', 'frW', 'fRW',
                        \ 'fs', 'fgs', 'frs', 'fRs', 'fS', 'fgS', 'frS', 'fRS',
+                       \ 'Fi', 'Fgi', 'Fri', 'FRi', 'FI', 'FgI', 'FrI', 'FRI',
+                       \ 'Fw', 'Fgw', 'Frw', 'FRw', 'FW', 'FgW', 'FrW', 'FRW',
+                       \ 'Fs', 'Fgs', 'Frs', 'FRs', 'FS', 'FgS', 'FrS', 'FRS',
                        \ ]
 
 function! FindWorkingRggrep(type, mode)
@@ -1498,13 +1502,14 @@ function! FindWorkingRggrep(type, mode)
     " w : find visual   with selected
     " s : find selected with boundaries
     "
-    " LowerCase: [iwvs] find in ignorecase
-    " UpperCase: [IWVS] find in case match
+    " LowerCase: [iws] find in ignorecase
+    " UpperCase: [IWS] find in case match
     "
     " Working:
     " g : find with inputing path
     " r : find with working root and filter
     " R : find with inputing working root and filter
+    " F : find with no regexp match
     " }}}
 
     let l:command = ":Rg"
@@ -1547,13 +1552,14 @@ function! FindWorkingRggrep(type, mode)
     if a:type =~? 's'     | let l:options .= "-w " | endif
     if a:type =~# '[iws]' | let l:options .= "-i " | endif
     if !empty(s:working_filter)
-        let l:options .= '-g "*.{' . s:working_filter . '}"'
+        let l:options .= '-g "*.{' . s:working_filter . '}" '
+    endif
+    if a:type =~# 'F'
+        let l:options .= "-F"
     endif
 
     " 使用Rg查找
-    if a:type =~# 'f'
-        silent execute(l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options)
-    endif
+    silent execute(l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options)
 endfunction
 " }}}
 
