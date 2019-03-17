@@ -207,12 +207,12 @@ vnoremap ; :
 
 " Exe
 " {{{
-if !executable('rg')           | echo "Warning: No ripgerp(rg.exe)"   | endif
-if !executable("ag")           | echo "Warning: No ag.exe"            | endif
-if !executable('ctags')        | echo "Warning: No ctags.exe)"        | endif
-if !executable('gtags')        | echo "Warning: No gtags.exe)"        | endif
-if !executable('global')       | echo "Warning: No global.exe)"       | endif
-if !executable('gtags-cscope') | echo "Warning: No gtags-csocpe.exe)" | endif
+if !executable('rg')           | echo "Warning: No ripgerp(rg)"   | endif
+if !executable("ag")           | echo "Warning: No ag"            | endif
+if !executable('ctags')        | echo "Warning: No ctags"         | endif
+if !executable('gtags')        | echo "Warning: No gtags"         | endif
+if !executable('global')       | echo "Warning: No global"        | endif
+if !executable('gtags-cscope') | echo "Warning: No gtags-csocpe)" | endif
 " }}}
 
 " 键码设定
