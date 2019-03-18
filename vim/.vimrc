@@ -373,8 +373,6 @@ call plug#begin($VimPluginPath."/bundle")   " 可选设置，可以指定插件�
     Plug 'junegunn/fzf.vim'
     let g:fzf_command_prefix = 'Fzf'
     nnoremap <leader>fF :FzfFiles
-    nnoremap <leader>fl :FzfLines<CR>
-    nnoremap <leader>fb :FzfBLines<CR>
 " }}}
 
 " grep {{{ 大范围查找
@@ -983,11 +981,10 @@ call plug#end()                         " required
 function! InvConceallevel()
     if &conceallevel == 0
         set conceallevel=2
-        echo "conceallevel = 2"
     else
         set conceallevel=0              " 显示markdown等格式中的隐藏字符
-        echo "conceallevel = 0"
     endif
+    echo "conceallevel = " . &conceallevel
 endfunction
 " }}}
 
@@ -1027,11 +1024,10 @@ endfunction
 function! InvFoldColumeShow()
     if &foldcolumn == 0
         set foldcolumn=1
-        echo "foldcolumn = 1"
     else
         set foldcolumn=0
-        echo "foldcolumn = 0"
     endif
+    echo "foldcolumn = " . &foldcolumn
 endfunction
 " }}}
 
@@ -1039,11 +1035,10 @@ endfunction
 function! InvSigncolumn()
     if &signcolumn == "auto"
         set signcolumn=no
-        echo "signcolumn = no"
     else
         set signcolumn=auto
-        echo "signcolumn = auto"
     endif
+    echo "signcolumn = " . &signcolumn
 endfunction
 " }}}
 
@@ -1082,10 +1077,10 @@ endif
 " 若禁用自动切换当前目录，会导致当前编辑的文件不一定是目标文件）
 set autochdir
 
-" FUNCTION: ToggleComplileX86X64() "{{{
+" FUNCTION: ComplileToggleX86X64() "{{{
 " 切换成x86或x64编译环境
 let s:complile_type = 'x64'
-function! ToggleComplileX86X64()
+function! ComplileToggleX86X64()
     if IsWin()
         if 'x86' ==# s:complile_type
             let s:complile_type = 'x64'
@@ -1337,7 +1332,7 @@ let RC_Html       = function('ComplileProject', ['[iI]ndex.html', 'ComplileProje
 
 " }}}
 
-" 带参运行函数 {{{
+" 带参函数执行 {{{
 
 " FUNCTION: ExecFuncInput(prompt, text, cmpl, fn, ...) {{{
 " @param prompt: input的提示信息
@@ -1437,10 +1432,10 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
 endfunction
 " }}}
 
-" FUNCTION: UpdateWorkingInfo(flt) {{{ 更新working信息
+" FUNCTION: FindWorkingUpdateInfo(flt) {{{ 更新working信息
 let s:working_root = ''
 let s:working_filter = ''
-function! UpdateWorkingInfo(flt)
+function! FindWorkingUpdateInfo(flt)
     let l:root = input(" Where (root) to find :", "", "customlist,GetMultiFilesCompletion")
     if empty(l:root)
         return 0
@@ -1456,7 +1451,7 @@ endfunction
 " FUNCTION! FindWorkingFzfFile() {{{ 工程文件查找
 function! FindWorkingFzfFile()
     if empty(s:working_root)
-        if !UpdateWorkingInfo(0)
+        if !FindWorkingUpdateInfo(0)
             return
         endif
     endif
@@ -1464,43 +1459,56 @@ function! FindWorkingFzfFile()
 endfunction
 " }}}
 
-" FUNCTION: FindRggrep(type, mode) {{{ 工程快速查找
-let s:fkrggrep_nvmaps = [
-                       \ 'fi', 'fgi', 'fri', 'fRi', 'fI', 'fgI', 'frI', 'fRI',
-                       \ 'fw', 'fgw', 'frw', 'fRw', 'fW', 'fgW', 'frW', 'fRW',
-                       \ 'fs', 'fgs', 'frs', 'fRs', 'fS', 'fgS', 'frS', 'fRS',
-                       \ 'Fi', 'Fgi', 'Fri', 'FRi', 'FI', 'FgI', 'FrI', 'FRI',
-                       \ 'Fw', 'Fgw', 'Frw', 'FRw', 'FW', 'FgW', 'FrW', 'FRW',
-                       \ 'Fs', 'Fgs', 'Frs', 'FRs', 'FS', 'FgS', 'FrS', 'FRS',
-                       \ ]
+" FUNCTION: FindWorkingToggleDefault() {{{ 工程默认查找切换
+let s:fkregrep_default = 'r'
+function FindWorkingToggleDefault()
+    if s:fkregrep_default ==# 'r'
+        let s:fkregrep_default = 'l'
+    elseif s:fkregrep_default ==# 'l'
+        let s:fkregrep_default = 'r'
+    endif
+    echo "FindWorking default:" . s:fkregrep_default
+endfunction
+" }}}
 
+" FUNCTION: FindWorkingRggrep(type, mode) {{{ 工程快速查找
+let s:fkrggrep_nvmaps = [
+                       \ 'fi', 'fli', 'fLi', 'fri', 'fRi', 'fI', 'flI', 'fLI', 'frI', 'fRI',
+                       \ 'fw', 'flw', 'fLw', 'frw', 'fRw', 'fW', 'flW', 'fLW', 'frW', 'fRW',
+                       \ 'fs', 'fls', 'fLs', 'frs', 'fRs', 'fS', 'flS', 'fLS', 'frS', 'fRS',
+                       \ 'Fi', 'Fli', 'FLi', 'Fri', 'FRi', 'FI', 'FlI', 'FLI', 'FrI', 'FRI',
+                       \ 'Fw', 'Flw', 'FLw', 'Frw', 'FRw', 'FW', 'FlW', 'FLW', 'FrW', 'FRW',
+                       \ 'Fs', 'Fls', 'FLs', 'Frs', 'FRs', 'FS', 'FlS', 'FLS', 'FrS', 'FRS',
+                       \ ]
 function! FindWorkingRggrep(type, mode)
     " {{{
-    " Option: [f][grR][IiWwSs]
-    " Normal Mode: mode='n'
-    " i : find input
-    " w : find word
-    " s : find word with boundaries
-    "
-    " Visual Mode: mode='v'
-    " i : find input    with selected
-    " w : find visual   with selected
-    " s : find selected with boundaries
-    "
-    " LowerCase: [iws] find in ignorecase
-    " UpperCase: [IWS] find in case match
-    "
-    " Working:
-    " g : find with inputing path
-    " r : find with working root and filter
-    " R : find with inputing working root and filter
-    " F : find with no regexp match
+    " Option: [fF][lLrR][IiWwSs]
+    "         [%1][ %2 ][  3%  ]
+    " Working: %1
+    "   F : find with no regexp match
+    " Path: %2
+    "   l : find with %
+    "   L : find with inputing path
+    "   r : find with working root and filter
+    "   R : find with inputing working root and filter
+    "   The %2 is 'r' in default. Toggle default to 'l' by FindWorkingToggleDefault()
+    " Pattern: %3
+    "   Normal Mode: mode='n'
+    "   i : find input
+    "   w : find word
+    "   s : find word with boundaries
+    "   Visual Mode: mode='v'
+    "   i : find input    with selected
+    "   w : find visual   with selected
+    "   s : find selected with boundaries
+    "   LowerCase: [iws] find in ignorecase
+    "   UpperCase: [IWS] find in case match
     " }}}
 
     let l:command = ":Rg"
     let l:options = ""
     let l:pattern = ""
-    let l:location = "%"
+    let l:location = ""
 
     " 设置查找内容
     if a:mode ==# 'n'
@@ -1520,14 +1528,20 @@ function! FindWorkingRggrep(type, mode)
     if empty(l:pattern) | return | endif
 
     " 设置查找范围
-    if a:type =~# 'g'
+    let l:path_type = a:type
+    if a:type !~? '[lLrR]'
+        let l:path_type = a:type . s:fkregrep_default
+    endif
+    if l:path_type =~# 'l'
+        let l:location = "%"
+    elseif l:path_type =~# 'L'
         let l:location = input(" Where to find :", "", "customlist,GetMultiFilesCompletion")
-    elseif a:type =~# 'R'
-        if !UpdateWorkingInfo(1) | return | endif
+    elseif l:path_type =~# 'R'
+        if !FindWorkingUpdateInfo(1) | return | endif
         let l:location = s:working_root
-    elseif a:type =~# 'r'
+    elseif l:path_type =~# 'r'
         if empty(s:working_root)
-            if !UpdateWorkingInfo(1) | return | endif
+            if !FindWorkingUpdateInfo(1) | return | endif
         endif
         let l:location = s:working_root
     endif
@@ -2049,7 +2063,7 @@ endif
     nnoremap <leader>rcq :call RC_QmakeClean()<CR>
     nnoremap <leader>rcm :call RC_MakeClean()<CR>
     nnoremap <leader>rh :call RC_Html()<CR>
-    nnoremap <leader>tc :call ToggleComplileX86X64()<CR>
+    nnoremap <leader>tc :call ComplileToggleX86X64()<CR>
     nnoremap <leader>ra :call PopSelection(g:complile_args, 0)<CR>
     nnoremap <leader>ri :call ExecFuncInput('Compile Args: ', '', 'customlist,GetMultiFilesCompletion', 'ComplileFile')<CR>
     nnoremap <leader>rd :Termdebug<CR>
@@ -2111,6 +2125,7 @@ endif
     for item in s:fkrggrep_nvmaps
         execute "vnoremap <leader>" . item ":call FindWorkingRggrep('" . item . "', 'v')<CR>"
     endfor
+    nnoremap <leader>ftd :call FindWorkingToggleDefault()<CR>
     nnoremap <leader>ff :call FindWorkingFzfFile()<CR>
 if IsNVim()
     for item in s:findvimgrep_nvmaps
