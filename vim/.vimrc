@@ -643,15 +643,16 @@ endif
 " YouCompleteMe {{{ 自动补全
     " Completion Params: install.py安装参数
     "   --clang-completer : C-famlily，基于Clang补全，需要安装Clang
-    "   --go-completer    : Go，基本Gocode/Godef补全，需要安装Go
+    "   --go-completer    : Go，基于Gocode/Godef补全，需要安装Go
     "   --js-completer    : Javascript，基于Tern补全，需要安装node和npm
+    "   --java-completer  : Java补全，需要安装JDK8
     " Linux: 使用install.py安装
     "   先安装python-dev, python3-dev, cmake, llvm, clang
-    "   "./install.py --clang-completer --go-completer --js-completer --system-libclang"
+    "   "./install.py --clang-completer --go-completer --js-completer --java-completer --system-libclang"
     "   ycm使用python命令指向的版本(如2.7或3.6)
     " Windows: 使用install.py安装
     "   先安装python, Cmake, VS, 7-zip
-    "   "install.py --clang-completer --go-completer --js-completer --msvc 14 --build-dir <ycm_build>"
+    "   "install.py --clang-completer --go-completer --js-completer --java-completer --msvc 14 --build-dir <ycm_build>"
     "   自己指定vs版本，自己指定build路径，编译完成后，可以删除<ycm_build>
     "   如果已经安装了clang，可以使用--system-libclang参数，就不必再下载clang了
     Plug 'Valloric/YouCompleteMe'
@@ -726,13 +727,14 @@ endif
     " 语法引擎:
     "   VimScript : vint
     let g:ale_completion_enabled = 0    " 使能ale补全(只支持TypeScript)
+    let g:ale_linters = {'java' : []}   " 禁用Java检测
     let g:ale_sign_error = '✘'
     let g:ale_sign_warning = '►'
     let g:ale_set_loclist = 1
     let g:ale_set_quickfix = 0
     let g:ale_echo_delay = 10           " 显示语文错误的延时时间
     let g:ale_lint_delay = 300          " 文本更改后的延时检测时间
-    let g:ale_enabled = 1               " 可以使用ALEToggle切换
+    let g:ale_enabled = 0               " 默认关闭ALE检测
     nnoremap <leader>ta :execute "ALEToggle"<Bar>echo "AleToggle:" . g:ale_enabled<CR>
 " }}}
 
@@ -1102,19 +1104,19 @@ endfunction
 " @param argstr: 想要传递的命令参数
 function! ComplileFile(argstr)
     let l:ext      = expand("%:e")                  " 扩展名
-    let l:filename = '"./' . expand('%:t') . '"'    " 文件名，不带路径，带扩展名
-    let l:name     = '"./' . expand('%:t:r') . '"'  " 文件名，不带路径，不带扩展名
+    let l:filename = '"' . expand('%:t') . '"'    " 文件名，不带路径，带扩展名
+    let l:name     = '"' . expand('%:t:r') . '"'  " 文件名，不带路径，不带扩展名
     let l:exec_str = (exists(":AsyncRun") == 2) ? ":AsyncRun " : "!"
 
     " 生成可执行字符串
     if 'c' ==? l:ext
     "{{{
-        let l:exec_str .= 'gcc ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
+        let l:exec_str .= 'gcc -static' . a:argstr . ' -o ' . l:name . ' ' . l:filename
         let l:exec_str .= ' && ' . l:name
     "}}}
     elseif 'cpp' ==? l:ext
     "{{{
-        let l:exec_str .= 'g++ -std=c++11 ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
+        let l:exec_str .= 'g++ -std=c++11 -static ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
         let l:exec_str .= ' && ' . l:name
     "}}}
     elseif 'py' ==? l:ext || 'pyw' ==? l:ext
@@ -1125,6 +1127,11 @@ function! ComplileFile(argstr)
     elseif 'go' ==? l:ext
     "{{{
         let l:exec_str .= ' go run ' . l:filename
+    "}}}
+    elseif 'java' ==? l:ext
+    "{{{
+        let l:exec_str .= 'javac ' . l:filename
+        let l:exec_str .= ' && java ' . l:name
     "}}}
     elseif 'm' ==? l:ext
     "{{{
