@@ -1951,7 +1951,9 @@ endif
     nnoremap y<S-h> y^
     " j, k 移行
     nnoremap j gj
+    vnoremap j gj
     nnoremap k gk
+    vnoremap k gk
     " 折叠
     nnoremap <leader>za zA
     nnoremap <leader>zr zR
