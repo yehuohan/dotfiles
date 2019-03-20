@@ -778,6 +778,7 @@ endif
     let g:gutentags_cache_dir = $VimPluginPath."/.tag_cache"
     let g:gutentags_modules = ['ctags', 'gtags_cscope']
     let g:gutentags_plus_nomap = 1
+    let g:gutentags_plus_switch = 1
     noremap <silent> <leader>fcu :GutentagsUpdate<CR>
     noremap <silent> <leader>fcU :GutentagsUpdate!<CR>
     noremap <silent> <leader>fcs :GscopeFind s <C-R><C-W><CR>
