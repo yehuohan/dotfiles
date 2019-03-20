@@ -1534,6 +1534,7 @@ function! FindWorkingRggrep(type, mode)
         endif
     endif
     if empty(l:pattern) | return | endif
+    let l:pattern = substitute(l:pattern, ' ', '\\ ', 'g')   " 转义所有空格
 
     " 设置查找范围
     let l:path_type = a:type
@@ -1579,7 +1580,6 @@ let s:findvimgrep_nvmaps = ['vi', 'vgi', 'vI', 'vgI',
 function! FindVimgrep(type, mode)
     let l:string = ''
     let l:files = '%'
-    let l:selected = ''
 
     " 设置查找内容
     if a:mode ==# 'n'
