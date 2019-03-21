@@ -6,85 +6,123 @@ import platform
 import ycm_core
 import re
 
-#===============================================================================
-# project flags
-#===============================================================================
-# LOC_DIR = os.path.dirname(os.path.relpath(__file__))[0] + '/'
-local_flags = [
-    # '-isystem', LOC_DIR,
-]
+def NewWalk(top, suffixs, exdirs):
+    """
+    NotImplement new walk function with suffix and dir filter.
+    """
+    top = os.fspath(top)
+    dirs = []
+    nondirs = []
+
+    # We have read permission to our project obviously.
+    scandir_it = os.scandir(top)
+    with scandir_it:
+        while True:
+            try:
+                try:
+                    entry = next(scandir_it)
+                except StopIteration:
+                    break
+            except OSError as error:
+                return
+
+            try:
+                is_dir = entry.is_dir()
+            except OSError:
+                # If is_dir() raises an OSError, consider that the entry is not
+                # a directory, same behaviour than os.path.isdir().
+                is_dir = False
+
+            if is_dir:
+                # 'entry is not is exdirs'
+                if entry.name not in exdirs:
+                    dirs.append(entry.name)
+            else:
+                # 'suffixs is empty' or 'entry is in suffix'
+                if not suffixs or os.path.splitext(entry.name)[1] in suffixs:
+                    nondirs.append(entry.name)
+
+    yield top, dirs, nondirs
+
+    # Recurse into sub-directories
+    islink, join = os.path.islink, os.path.join
+    for dirname in dirs:
+        new_path = join(top, dirname)
+        if not islink(new_path):
+            yield from NewWalk(new_path, suffixs, exdirs)
+
+def GetDirsRecursive(flag, paths, suffixs=[], exdirs=[]):
+    """
+    Get dirs recursive with suffix and dir filter.
+    """
+    flags = []
+    for path in paths:
+        for root, dirs, files in NewWalk(path, suffixs, exdirs):
+            # files is not empty
+            if files:
+                flags.append(flag)
+                flags.append(root)
+    return flags
+
+
+LOC_DIR = os.path.dirname(os.path.abspath(__file__))
+log_out = False
+if log_out:
+    flog = open(os.path.join(LOC_DIR, "log.txt"), 'w+')
 
 #===============================================================================
-# global flags
-#===============================================================================
-cpp_verpat = re.compile(r'^\d{1,2}\.\d{1,2}\.\d{1,2}$')
-if platform.system() == "Linux":
-    cpp_dir = os.listdir('/usr/include/c++')
-    GCC_DIR = '/usr/include/c++/8.1.0/'
-    for d in cpp_dir:
-        if cpp_verpat.match(d):
-            GCC_DIR = '/usr/include/c++/' + d + '/'
-    QT_DIR = '/usr/include/qt/'
-    global_flags_gcc = [
-        # '-isystem', '/usr/include',
-        '-isystem', GCC_DIR,
-    ]
-elif platform.system() == "Windows":
-    GCC_DIR = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/'
-    cpp_dir = os.listdir('C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32')
-    for d in cpp_dir:
-        if cpp_verpat.match(d):
-            GCC_DIR = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/' + d + '/include/'
-    VS_DIR = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/include/'
-    QT_DIR  = 'D:/Qt/5.10.1/msvc2017_64/include/'
-    global_flags_gcc = [
-        '-isystem', VS_DIR,
-        # '-isystem', GCC_DIR,
-        # '-isystem', GCC_DIR + 'c++',
-    ]
-
+# user flags
 # search order : "-I >= -isystem >= std"
-global_flags_qt = [
-    '-isystem', QT_DIR              ,
-    '-isystem', QT_DIR + 'QtCore'   ,
-    '-isystem', QT_DIR + 'QtGui'    ,
-    '-isystem', QT_DIR + 'QtWidgets',
-]
-global_flags = ['-I', '.'] + global_flags_qt + global_flags_gcc
+#===============================================================================
+project_flags = [
+    # '-Werror',                # Take all errors as warnings
+    # '-Wno-unused-variable',   # Show warning of unused variable
+    # '-Wno-unused-parameter',  # Show warning of unused parameter
+    '-std=c++11',               # std parameter with 'c++11', 'c99',
+    '-xc++',                    # Set language: 'c', 'c++', 'objc', 'cuda',
+    # '-DXX=XX'                 # define macro to elimate some errors
+    ]
+
+local_flags = GetDirsRecursive('-isystem',
+    [
+        # os.path.join(LOC_DIR, ''),
+    ], ['.c', '.cpp', '.h', '.hpp' ], ['sample'])
+
+if platform.system() == "Linux":
+    GCC_DIR = os.path.join('/usr/include/c++',
+        list(filter(lambda dir: re.compile(r'^\d{1,2}\.\d{1,2}\.\d{1,2}$').match(dir),
+                    os.listdir('/usr/include/c++')))[0])
+    QT_DIR = '/usr/include/qt/'
+elif platform.system() == "Windows":
+    # GCC_DIR = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include'
+    GCC_DIR = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/include/'
+    QT_DIR  = 'D:/Qt/5.10.1/msvc2017_64/include/'
+
+global_flags = ['-isystem', GCC_DIR] + \
+    GetDirsRecursive('-isystem',
+    [
+        # QT_DIR,
+    ])
+
+user_flags = project_flags + local_flags + global_flags
+if log_out:
+    flog.write("Size: {}\n".format(len(user_flags)))
+    for k in range(len(user_flags)):
+        flog.write(user_flags[k] + '\n')
+    flog.close()
 
 
 #===============================================================================
 # defaults flags
 #===============================================================================
-# These are the compilation flags that will be used in case there's no
-# compilation database set (by default, one is not set).
-# CHANGE THIS LIST OF FLAGS. YES, THIS IS THE DROID YOU HAVE BEEN LOOKING FOR.
 flags = [
 '-Wall',
 '-Wextra',
-'-Werror',
 '-Wno-long-long',
 '-Wno-variadic-macros',
-# '-Wno-unused-variable',
-'-Wno-unused-parameter'
 '-fexceptions',
 '-DNDEBUG',
-
-# You 100% do NOT need -DUSE_CLANG_COMPLETER in your flags; only the YCM
-# source code needs it.
-#'-DUSE_CLANG_COMPLETER',
-
-# THIS IS IMPORTANT! Without a "-std=<something>" flag, clang won't know which
-# language to use when compiling headers. So it will guess. Badly. So C++
-# headers will be compiled as C headers. You don't want that so ALWAYS specify
-# a "-std=<something>".
-# For a C project, you would set this to something like 'c99' instead of 'c++11'.
-'-std=c++11',
-
-# Set language: 'c', 'c++', 'objc', 'cuda',
-'-x',
-'c++',
-] + local_flags + global_flags
+] + user_flags
 
 
 # Set this to the absolute path to the folder (NOT the file!) containing the
