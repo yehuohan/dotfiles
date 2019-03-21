@@ -154,6 +154,8 @@ alias gitfetch='git fetch'
 alias nxxx='nvidia-xrun'
 alias xxx='startx'
 
+alias ndkmake='ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk NDK_APPLICATION_MK=Application.mk'
+
 # auto program
 clear
 screenfetch
