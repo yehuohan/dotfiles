@@ -35,9 +35,11 @@ export XMODIFIERS=@im=fcitx
 export PATH=$PATH:$HOME/my-apps/
 export PATH=$PATH:$HOME/my-apps/XXNet
 export PATH=$PATH:$HOME/my-apps/firefox
-
 export PATH=$PATH:/opt/cuda/bin
+
 export PATH=$PATH:$HOME/my-apps/android-studio/bin
-export PATH=$PATH:$HOME/my-apps/Android/SDK/platform-tools
-export PATH=$PATH:$HOME/my-apps/Android/SDK/ndk-bundle
-export PATH=$PATH:$HOME/my-apps/Android/SDK/emulator
+export ANDROID_HOME=$HOME/my-apps/Android/SDK
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH=$PATH:$ANDROID_HOME/ndk-bundle
+export PATH=$PATH:$ANDROID_HOME/emulator
+
