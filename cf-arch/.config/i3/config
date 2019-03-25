@@ -7,8 +7,11 @@
 #===============================================================================
 # mod key setting
 #===============================================================================
-# mod1 = alt
-# mod4 = win
+# mod1      = alt
+# mod4      = win
+# semicolon = ;
+# comma     = ,
+# period    = .
 set $mod Mod4
 
 set $WS1 "1|"
@@ -264,11 +267,13 @@ bindsym $mod+mod1+o workspace next
 bindsym $mod+mod1+i workspace prev
 
 # Move the current workspace to the next output (effectively toggles when you only have two outputs)
-bindsym $mod+mod1+m move workspace to output right
+bindsym $mod+mod1+comma move workspace to output left
+bindsym $mod+mod1+period move workspace to output right
 # Move the focused window to the next output (use xrandr to see available outputs)
-bindsym $mod+m move container to output right
+bindsym $mod+comma move container to output left
+bindsym $mod+period move container to output right
 # Tggles focus among the outputs
-bindsym $mod+n focus output right
+bindsym $mod+m focus output right
 
 #}}}
 
@@ -323,6 +328,10 @@ bindsym XF86AudioRaiseVolume exec --no-startup-id amixer set -q Master 5%+
 bindsym XF86AudioLowerVolume exec --no-startup-id amixer set -q Master 5%-
 bindsym XF86AudioMute exec --no-startup-id amixer -q set Master toggle
 bindsym $mod+a exec --no-startup-id amixer -q set Master toggle
+
+# 输入法fcitx切换
+bindsym $mod+n exec fcitx-remote -t
+bindsym $mod+mod1+n exec fcitx-remote -c
 
 # 截图
 # -u : focused windows
