@@ -319,8 +319,7 @@ bindsym $mod+mod1+c exec rofi -show ssh
 bindsym $mod+d exec rofi -show run
 bindsym $mod+mod1+d exec dmenu_run
 
-# enable or disable touchpad
-# ToggleTouchPad should be linked to /usr/local/bin by 'ln -s'
+# 切换Touchpad
 bindsym $mod+x exec ToggleTouchPad
 
 # 音量管理 Fn+Left/Right
@@ -330,8 +329,8 @@ bindsym XF86AudioMute exec --no-startup-id amixer -q set Master toggle
 bindsym $mod+a exec --no-startup-id amixer -q set Master toggle
 
 # 输入法fcitx切换
-bindsym $mod+n exec fcitx-remote -t
-bindsym $mod+mod1+n exec fcitx-remote -c
+bindsym --release $mod+n exec fcitx-remote -t
+bindsym --release $mod+mod1+n exec fcitx-remote -c
 
 # 截图
 # -u : focused windows
