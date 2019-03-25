@@ -67,8 +67,6 @@ def GetDirsRecursive(flag, paths, suffixs=[], exdirs=[]):
 
 LOC_DIR = os.path.dirname(os.path.abspath(__file__))
 log_out = False
-if log_out:
-    flog = open(os.path.join(LOC_DIR, "log.txt"), 'w+')
 
 #===============================================================================
 # user flags
@@ -106,10 +104,11 @@ global_flags = ['-isystem', GCC_DIR] + \
 
 user_flags = project_flags + local_flags + global_flags
 if log_out:
-    flog.write("Size: {}\n".format(len(user_flags)))
-    for k in range(len(user_flags)):
-        flog.write(user_flags[k] + '\n')
-    flog.close()
+    with open(os.path.join(LOC_DIR, "log.txt"), 'w+') as flog:
+        flog.write("Try to use :YcmDiags(<leader>yD) to find out where's the error!\n")
+        flog.write("Size: {}\n".format(len(user_flags)))
+        for k in range(len(user_flags)):
+            flog.write(user_flags[k] + '\n')
 
 
 #===============================================================================
