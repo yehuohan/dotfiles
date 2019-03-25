@@ -98,7 +98,6 @@
     " ripgrep                     : Rg文本查找
     " ag                          : Ag文本查找
     " ctags                       : tags生成
-    " global, gtags, gtags-cscope : tags查找
     " fireFox                     : Markdown,ReStructruedText等标记文本预览
     " fcitx                       : Linux下的输入法
 " }}}
@@ -207,12 +206,9 @@ vnoremap ; :
 
 " Exe
 " {{{
-if !executable('rg')           | echo "Warning: No ripgerp(rg)"   | endif
-if !executable("ag")           | echo "Warning: No ag"            | endif
-if !executable('ctags')        | echo "Warning: No ctags"         | endif
-if !executable('gtags')        | echo "Warning: No gtags"         | endif
-if !executable('global')       | echo "Warning: No global"        | endif
-if !executable('gtags-cscope') | echo "Warning: No gtags-csocpe)" | endif
+if !executable('rg')    | echo "Warning: No ripgerp(rg)" | endif
+if !executable("ag")    | echo "Warning: No ag"          | endif
+if !executable('ctags') | echo "Warning: No ctags"       | endif
 " }}}
 
 " 键码设定
@@ -769,28 +765,6 @@ endif
     let g:AutoPairsShortcutFastBackInsert=''
     nnoremap <leader>tp :call AutoPairsToggle()<CR>
 "}}}
-
-" gutentags {{{ 工程结构查看
-    Plug 'ludovicchabant/vim-gutentags'
-    Plug 'skywind3000/gutentags_plus'
-    let g:gutentags_enabled = 0
-    let g:gutentags_project_root = ['.root', '.svn', '.git', '.project']
-    let g:gutentags_cache_dir = $VimPluginPath."/.tag_cache"
-    let g:gutentags_modules = ['ctags', 'gtags_cscope']
-    let g:gutentags_plus_nomap = 1
-    let g:gutentags_plus_switch = 1
-    noremap <silent> <leader>fcu :GutentagsUpdate<CR>
-    noremap <silent> <leader>fcU :GutentagsUpdate!<CR>
-    noremap <silent> <leader>fcs :GscopeFind s <C-R><C-W><CR>
-    noremap <silent> <leader>fcd :GscopeFind g <C-R><C-W><CR>
-    "noremap <silent> <leader>fcd :GscopeFind d <C-R><C-W><CR>
-    noremap <silent> <leader>fcc :GscopeFind c <C-R><C-W><CR>
-    "noremap <silent> <leader>fct :GscopeFind t <C-R><C-W><CR>
-    "noremap <silent> <leader>fce :GscopeFind e <C-R><C-W><CR>
-    noremap <silent> <leader>fcf :GscopeFind f <C-R>=expand("<cfile>")<CR><CR>
-    noremap <silent> <leader>fci :GscopeFind i <C-R>=expand("<cfile>")<CR><CR>
-    noremap <silent> <leader>fca :GscopeFind a <C-R><C-W><CR>
-" }}}
 
 " tagbar {{{ 代码结构查看
     Plug 'majutsushi/tagbar'
@@ -2147,4 +2121,3 @@ if IsNVim()
 endif
 " }}}
 " }}}
-
