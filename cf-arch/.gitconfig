@@ -5,3 +5,5 @@
 	commitEncoding = utf-8
 [core]
 	editor = vim
+[color]
+	ui = auto
