@@ -39,6 +39,7 @@ export PATH=$PATH:/opt/cuda/bin
 
 export PATH=$PATH:$HOME/my-apps/android-studio/bin
 export ANDROID_HOME=$HOME/my-apps/Android/SDK
+export PATH=$PATH:$ANDROID_HOME
 export PATH=$PATH:$ANDROID_HOME/platform-tools
 export PATH=$PATH:$ANDROID_HOME/ndk-bundle
 export PATH=$PATH:$ANDROID_HOME/emulator
