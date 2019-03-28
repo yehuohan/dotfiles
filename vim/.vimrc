@@ -1079,20 +1079,20 @@ endfunction
 " @param argstr: 想要传递的命令参数
 function! ComplileFile(argstr)
     let l:ext      = expand("%:e")                  " 扩展名
-    let l:filename = '"' . expand('%:t') . '"'    " 文件名，不带路径，带扩展名
-    let l:name     = '"' . expand('%:t:r') . '"'  " 文件名，不带路径，不带扩展名
+    let l:filename = '"' . expand('%:t') . '"'      " 文件名，不带路径，带扩展名
+    let l:name     = '"' . expand('%:t:r') . '"'    " 文件名，不带路径，不带扩展名
     let l:exec_str = (exists(":AsyncRun") == 2) ? ":AsyncRun " : "!"
 
     " 生成可执行字符串
     if 'c' ==? l:ext
     "{{{
         let l:exec_str .= 'gcc -static' . a:argstr . ' -o ' . l:name . ' ' . l:filename
-        let l:exec_str .= ' && ' . l:name
+        let l:exec_str .= ' && ./' . l:name
     "}}}
     elseif 'cpp' ==? l:ext
     "{{{
         let l:exec_str .= 'g++ -std=c++11 -static ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
-        let l:exec_str .= ' && ' . l:name
+        let l:exec_str .= ' && ./' . l:name
     "}}}
     elseif 'py' ==? l:ext || 'pyw' ==? l:ext
     "{{{
