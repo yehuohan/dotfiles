@@ -1,14 +1,28 @@
-# This file is NOT licensed under the GPLv3, which is the license for the rest
-# of YouCompleteMe. The license text is in the end of this file.
+
+"""
+.ycm_extra_conf.py for YouCompleteMe.vim
+
+:Author: yehuohan, yehuohan@gmail.com, yehuohan@qq.com
+:Ref:
+    - https://github.com/Valloric/ycmd
+    - https://github.com/Valloric/YouCompleteMe
+"""
 
 import os
 import platform
-import ycm_core
 import re
+import ycm_core
 
+LOC_DIR = os.path.dirname(
+        os.path.abspath(__file__))  # Local working path
+log_out = False                     # Print log or not
+
+#===============================================================================
+# cfamily flags 
+#===============================================================================
 def NewWalk(top, suffixs, exdirs):
     """
-    NotImplement new walk function with suffix and dir filter.
+    Implement new walk function with suffix and diretory filter.
     """
     top = os.fspath(top)
     dirs = []
@@ -29,8 +43,6 @@ def NewWalk(top, suffixs, exdirs):
             try:
                 is_dir = entry.is_dir()
             except OSError:
-                # If is_dir() raises an OSError, consider that the entry is not
-                # a directory, same behaviour than os.path.isdir().
                 is_dir = False
 
             if is_dir:
@@ -64,160 +76,85 @@ def GetDirsRecursive(flag, paths, suffixs=[], exdirs=[]):
                 flags.append(root)
     return flags
 
-
-LOC_DIR = os.path.dirname(os.path.abspath(__file__))
-log_out = False
-
-#===============================================================================
-# user flags
-# search order : "-I >= -isystem >= std"
-#===============================================================================
-project_flags = [
-    # '-Werror',                # Take all errors as warnings
-    # '-Wno-unused-variable',   # Show warning of unused variable
-    # '-Wno-unused-parameter',  # Show warning of unused parameter
-    '-std=c++11',               # std parameter with 'c++11', 'c99',
-    '-xc++',                    # Set language: 'c', 'c++', 'objc', 'cuda',
-    # '-DXX=XX'                 # define macro to elimate some errors
+def GetCfamilyFlags():
+    """
+    Collect all cfamily flags.
+    All the header file should be in absolute path.
+    """
+    project_flags = [
+        '-Wall',
+        '-Wextra',
+        '-Wno-long-long',
+        '-Wno-variadic-macros',
+        '-fexceptions',
+        '-DNDEBUG',
+        # '-Werror',                # Take all errors as warnings
+        # '-Wno-unused-variable',   # Show warning of unused variable
+        # '-Wno-unused-parameter',  # Show warning of unused parameter
+        '-std=c++11',               # std parameter with 'c++11', 'c99',
+        '-xc++',                    # Set language: 'c', 'c++', 'objc', 'cuda',
+        # '-DXX=XX'                 # define macro to elimate some errors
     ]
 
-local_flags = GetDirsRecursive('-isystem',
-    [
-        # os.path.join(LOC_DIR, ''),
-    ], ['.c', '.cpp', '.h', '.hpp' ], ['sample'])
+    local_flags = GetDirsRecursive('-isystem',
+        [
+            # os.path.join(LOC_DIR, ''),
+        ], ['.c', '.cpp', '.h', '.hpp' ], ['sample'])
 
-if platform.system() == "Linux":
-    GCC_DIR = os.path.join('/usr/include/c++',
-        list(filter(lambda dir: re.compile(r'^\d{1,2}\.\d{1,2}\.\d{1,2}$').match(dir),
-                    os.listdir('/usr/include/c++')))[0])
-    QT_DIR = '/usr/include/qt/'
-elif platform.system() == "Windows":
-    # GCC_DIR = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include'
-    GCC_DIR = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/include/'
-    QT_DIR  = 'D:/Qt/5.10.1/msvc2017_64/include/'
+    if platform.system() == "Linux":
+        GCC_DIR = os.path.join('/usr/include/c++',
+                    list(filter(lambda dir: re.compile(r'^\d{1,2}\.\d{1,2}\.\d{1,2}$').match(dir),
+                        os.listdir('/usr/include/c++')))[0])
+        QT_DIR = '/usr/include/qt/'
+    elif platform.system() == "Windows":
+        # GCC_DIR = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include'
+        GCC_DIR = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/include/'
+        QT_DIR  = 'D:/Qt/5.10.1/msvc2017_64/include/'
 
-global_flags = ['-isystem', GCC_DIR] + \
-    GetDirsRecursive('-isystem',
-    [
-        # QT_DIR,
-    ])
+    global_flags = GetDirsRecursive('-isystem',
+        [
+            GCC_DIR,
+            # QT_DIR,
+        ])
 
-user_flags = project_flags + local_flags + global_flags
-if log_out:
-    with open(os.path.join(LOC_DIR, "log.txt"), 'w+') as flog:
-        flog.write("Try to use :YcmDiags(<leader>yD) to find out where's the error!\n")
-        flog.write("Size: {}\n".format(len(user_flags)))
-        for k in range(len(user_flags)):
-            flog.write(user_flags[k] + '\n')
+    flags_cfamily = project_flags + local_flags + global_flags
 
+    if log_out:
+        with open(os.path.join(LOC_DIR, "log.txt"), 'w+') as flog:
+            flog.write("Try to use :YcmDiags(<leader>yD) to find out where's the error!\n")
+            for k in range(len(flags_cfamily)):
+                flog.write(flags_cfamily[k] + '\n')
+
+    return flags_cfamily
 
 #===============================================================================
-# defaults flags
+# Python flags
 #===============================================================================
-flags = [
-'-Wall',
-'-Wextra',
-'-Wno-long-long',
-'-Wno-variadic-macros',
-'-fexceptions',
-'-DNDEBUG',
-] + user_flags
+def GerPythonPath():
+    if platform.system() == "Linux":
+        return '/usr/bin/python'
+    elif platform.system() == "Windows":
+        return 'C:/MyApps/Python37/python.exe'
+
+#===============================================================================
+# Settings function called by ycmd to return language flags.
+#===============================================================================
+def Settings( **kwargs ):
+    language = kwargs[ 'language' ]
+    if language == 'cfamily':
+        return {
+            'flags': GetCfamilyFlags(),
+            }
+    elif language == 'python':
+        return {
+            # 'interpreter_path': GerPythonPath(),
+            # 'sys_path': [LOC_DIR, ],
+            }
+    return {}
 
 
-# Set this to the absolute path to the folder (NOT the file!) containing the
-# compile_commands.json file to use that instead of 'flags'. See here for
-# more details: http://clang.llvm.org/docs/JSONCompilationDatabase.html
-#
-# You can get CMake to generate this file for you by adding:
-#   set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )
-# to your CMakeLists.txt file.
-#
-# Most projects will NOT need to set this to anything; you can just change the
-# 'flags' list of compilation flags. Notice that YCM itself uses that approach.
-compilation_database_folder = ''
-
-if os.path.exists( compilation_database_folder ):
-  database = ycm_core.CompilationDatabase( compilation_database_folder )
-else:
-  database = None
-
-SOURCE_EXTENSIONS = [ '.cpp', '.cxx', '.cc', '.c', '.m', '.mm' ]
-
-def DirectoryOfThisScript():
-  return os.path.dirname( os.path.abspath( __file__ ) )
-
-
-def MakeRelativePathsInFlagsAbsolute( flags, working_directory ):
-  if not working_directory:
-    return list( flags )
-  new_flags = []
-  make_next_absolute = False
-  path_flags = [ '-isystem', '-I', '-iquote', '--sysroot=' ]
-  for flag in flags:
-    new_flag = flag
-
-    if make_next_absolute:
-      make_next_absolute = False
-      if not flag.startswith( '/' ):
-        new_flag = os.path.join( working_directory, flag )
-
-    for path_flag in path_flags:
-      if flag == path_flag:
-        make_next_absolute = True
-        break
-
-      if flag.startswith( path_flag ):
-        path = flag[ len( path_flag ): ]
-        new_flag = path_flag + os.path.join( working_directory, path )
-        break
-
-    if new_flag:
-      new_flags.append( new_flag )
-  return new_flags
-
-
-def IsHeaderFile( filename ):
-  extension = os.path.splitext( filename )[ 1 ]
-  return extension in [ '.h', '.hxx', '.hpp', '.hh' ]
-
-
-def GetCompilationInfoForFile( filename ):
-  # The compilation_commands.json file generated by CMake does not have entries
-  # for header files. So we do our best by asking the db for flags for a
-  # corresponding source file, if any. If one exists, the flags for that file
-  # should be good enough.
-  if IsHeaderFile( filename ):
-    basename = os.path.splitext( filename )[ 0 ]
-    for extension in SOURCE_EXTENSIONS:
-      replacement_file = basename + extension
-      if os.path.exists( replacement_file ):
-        compilation_info = database.GetCompilationInfoForFile(
-          replacement_file )
-        if compilation_info.compiler_flags_:
-          return compilation_info
-    return None
-  return database.GetCompilationInfoForFile( filename )
-
-
-def FlagsForFile( filename, **kwargs ):
-  if database:
-    # Bear in mind that compilation_info.compiler_flags_ does NOT return a
-    # python list, but a "list-like" StringVec object
-    compilation_info = GetCompilationInfoForFile( filename )
-    if not compilation_info:
-      return None
-
-    final_flags = MakeRelativePathsInFlagsAbsolute(
-      compilation_info.compiler_flags_,
-      compilation_info.compiler_working_dir_ )
-
-  else:
-    relative_to = DirectoryOfThisScript()
-    final_flags = MakeRelativePathsInFlagsAbsolute( flags, relative_to )
-
-  return { 'flags': final_flags }
-
-
+# This file is NOT licensed under the GPLv3, which is the license for the rest
+# of YouCompleteMe.
 #
 # Here's the license text for this file:
 #
