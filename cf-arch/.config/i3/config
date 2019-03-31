@@ -208,8 +208,8 @@ bindsym $mod+mod1+l move right
 
 # resize window (you can also use the mouse for that)
 bindsym $mod+Shift+h resize shrink width 10 px or 2 ppt
-bindsym $mod+Shift+k resize grow height 10 px or 2 ppt
-bindsym $mod+Shift+j resize shrink height 10 px or 2 ppt
+bindsym $mod+Shift+k resize shrink height 10 px or 2 ppt
+bindsym $mod+Shift+j resize grow height 10 px or 2 ppt
 bindsym $mod+Shift+l resize grow width 10 px or 2 ppt
 bindsym $mod+z mode "resize"
 mode "resize" {
