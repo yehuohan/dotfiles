@@ -174,7 +174,7 @@ bindsym $mod+Shift+r restart
 # 窗口管理
 # {{{
 # kill(stop) focused window
-bindsym $mod+s kill
+bindsym --release $mod+s kill
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
