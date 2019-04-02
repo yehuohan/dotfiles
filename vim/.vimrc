@@ -1968,12 +1968,12 @@ endif
 
     " 打开/关闭Quickfix
     nnoremap <leader>qo :botright copen<CR>
-    nnoremap <leader>qc :cclose<CR>
+    nnoremap <leader>qc :cclose<Bar>wincmd p<CR>
     nnoremap <leader>qj :cnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     nnoremap <leader>qk :cprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     " 打开/关闭Location-list
     nnoremap <leader>lo :botright lopen<CR>
-    nnoremap <leader>lc :lclose<CR>
+    nnoremap <leader>lc :lclose<Bar>wincmd p<CR>
     nnoremap <leader>lj :lnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     nnoremap <leader>lk :lprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     " 预览Quickfix和Location-list
