@@ -442,6 +442,9 @@ endif
     let g:seoul256_background=236       " 233(暗) ~ 239(亮)
     let g:seoul256_light_background=256 " 252(暗) ~ 256(亮)
 
+    Plug 'altercation/vim-colors-solarized'
+    set rtp+=$VimPluginPath/bundle/vim-colors-solarized/
+
     set background=dark
     colorscheme seoul256
 " }}}
@@ -539,7 +542,7 @@ endif
         \},
         \{
             \ 'opt' : ['colorscheme', 'colo'],
-            \ 'lst' : ['gruvbox', 'seoul256', 'seoul256-light'],
+            \ 'lst' : ['gruvbox', 'seoul256', 'seoul256-light', 'solarized'],
             \ 'cmd' : '',
         \},]
         " \{
