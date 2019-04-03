@@ -1913,10 +1913,12 @@ endif
     vnoremap k gk
     " 折叠
     nnoremap <leader>za zA
-    nnoremap <leader>zr zR
-    nnoremap <leader>zm zM
     nnoremap <leader>zc zC
     nnoremap <leader>zo zO
+    nnoremap <leader>zm zM
+    nnoremap <leader>zn zN
+    nnoremap <leader>zr zR
+    nnoremap <leader>zx zX
     " 滚屏
     nnoremap <C-j> <C-e>
     nnoremap <C-k> <C-y>
