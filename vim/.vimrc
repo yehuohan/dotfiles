@@ -956,8 +956,7 @@ call plug#end()                         " required
 "===============================================================================
 " {{{
 " 基本设置 {{{
-
-" 隐藏字符显示 {{{
+" 切换显示隐藏字符 {{{
 function! InvConceallevel()
     if &conceallevel == 0
         set conceallevel=2
@@ -1031,6 +1030,17 @@ function! InvHighLight()
         syntax on
         echo "syntax on"
     endif
+endfunction
+" }}}
+
+" 切换滚屏bind {{{
+function! InvScrollBind()
+    if &scrollbind == 1
+        set noscrollbind
+    else
+        set scrollbind
+    endif
+    echo "scrollbind = " . &scrollbind
 endfunction
 " }}}
 
@@ -1319,7 +1329,6 @@ let RC_Html       = function('ComplileProject', ['[iI]ndex.html', 'ComplileProje
 " }}}
 
 " 带参函数执行 {{{
-
 " FUNCTION: ExecFuncInput(prompt, text, cmpl, fn, ...) {{{
 " @param prompt: input的提示信息
 " @param text: input的缺省输入
@@ -1613,7 +1622,6 @@ endif
 " }}}
 
 " 杂项 {{{
-
 " Quickfix预览 {{{
 function! PreviewQuickfixLine()
     " location-list : 每个窗口对应一个位置列表
@@ -1679,27 +1687,6 @@ function! ToggleWindowZoom()
         let s:last_tab = tabpagenr()
         execute "tabedit " . expand("%")
         let s:this_tab = tabpagenr()
-    endif
-endfunction
-" }}}
-
-" Asd2Num切换 {{{
-let s:asd2num_toggle_flg = 0
-let s:asd2num_map_table={
-            \ "a" : "1", "s" : "2", "d" : "3", "f" : "4", "g" : "5",
-            \ "h" : "6", "j" : "7", "k" : "8", "l" : "9", ";" : "0"
-            \ }
-function! ToggleAsd2Num()
-    if(s:asd2num_toggle_flg)
-        for t in items(s:asd2num_map_table)
-            execute "iunmap " . t[0]
-        endfor
-        let s:asd2num_toggle_flg = 0
-    else
-        for t in items(s:asd2num_map_table)
-            execute "inoremap " . t[0]. " " . t[1]
-        endfor
-        let s:asd2num_toggle_flg = 1
     endif
 endfunction
 " }}}
@@ -1853,8 +1840,6 @@ augroup END
     vnoremap <leader>agk g<C-a>
     " 去除尾部空白
     nnoremap <leader>rt :call RemoveTrailingSpace()<CR>
-    " Asd2Num
-    inoremap <C-a> <Esc>:call ToggleAsd2Num()<CR>a
     " HEX编辑
     nnoremap <leader>xx :%!xxd<CR>
     nnoremap <leader>xr :%!xxd -r<CR>
@@ -1865,19 +1850,13 @@ augroup END
     nnoremap <leader>iw :set invwrap<CR>
     " 显示不可见字符
     nnoremap <leader>il :set invlist<CR>
-    " 映射隐藏字符功能，set conceallevel直接设置没交果
     nnoremap <leader>ic :call InvConceallevel()<CR>
-    " 更改透明背景
     nnoremap <leader>it :call InvTransParentBackground()<CR>
-    " 切换行号类型
     nnoremap <leader>in :call InvNumberType()<CR>
-    " 切换折叠列宽
     nnoremap <leader>if :call InvFoldColumeShow()<CR>
-    " 切换显示标志列
     nnoremap <leader>is :call InvSigncolumn()<CR>
-    " 切换高亮
     nnoremap <leader>ih :call InvHighLight()<CR>
-    " Linux下自动切换中文输入法
+    nnoremap <leader>ib :call InvScrollBind()<CR>
     if IsLinux()
         "autocmd InsertLeave * call LinuxFcitx2En()
         inoremap <Esc> <Esc>:call LinuxFcitx2En()<CR>
@@ -1898,17 +1877,17 @@ augroup END
 
     " 寄存器快速复制与粘贴
     for t in s:lower_chars
-        execute "vnoremap <leader>'" . t          . ' "' . t . 'y'
-        execute "nnoremap <leader>'" . t          . ' "' . t . 'p'
-        execute "nnoremap <leader>'" . toupper(t) . ' "' . t . 'P'
+        execute "vnoremap <leader>'" . t            .   ' "' . t . 'y'
+        execute "nnoremap <leader>'" . t            .   ' "' . t . 'p'
+        execute "nnoremap <leader>'" . toupper(t)   .   ' "' . t . 'P'
     endfor
     for t in s:digital_chars
-        execute "vnoremap <leader>'" . t          . ' "' . t . 'y'
-        execute "nnoremap <leader>'" . t          . ' "' . t . 'p'
+        execute "vnoremap <leader>'" . t            .   ' "' . t . 'y'
+        execute "nnoremap <leader>'" . t            .   ' "' . t . 'p'
     endfor
     " 快速执行宏
     for t in s:lower_chars
-        execute "nnoremap <leader>2" . t          . ' @' . t
+        execute "nnoremap <leader>2" . t            .   ' @' . t
     endfor
 " }}}
 
