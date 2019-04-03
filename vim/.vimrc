@@ -1546,7 +1546,7 @@ function! FindWorkingRggrep(type, mode)
     " 设置查找选项
     if a:type =~? 's'     | let l:options .= "-w " | endif
     if a:type =~# '[iws]' | let l:options .= "-i " | endif
-    if !empty(s:working_filter)
+    if !empty(s:working_filter) && l:path_type =~? '[rR]'
         let l:options .= '-g "*.{' . s:working_filter . '}" '
     endif
     if a:type =~# 'F'
