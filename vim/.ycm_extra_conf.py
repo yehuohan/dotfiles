@@ -111,8 +111,9 @@ def GetCfamilyFlags():
         GCC_DIR = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/include/'
         QT_DIR  = 'D:/Qt/5.10.1/msvc2017_64/include/'
 
-    global_flags = ['-system', GCC_DIR] + GetDirsRecursive('-isystem',
+    global_flags = GetDirsRecursive('-isystem',
         [
+            GCC_DIR,
             # QT_DIR,
         ])
 
