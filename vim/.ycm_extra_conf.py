@@ -102,20 +102,17 @@ def GetCfamilyFlags():
         ], ['.c', '.cpp', '.h', '.hpp' ], ['sample'])
 
     if platform.system() == "Linux":
-        UNIX_DIR = '/usr/include'
         GCC_DIR = os.path.join('/usr/include/c++',
                     list(filter(lambda dir: re.compile(r'^\d{1,2}\.\d{1,2}\.\d{1,2}$').match(dir),
                         os.listdir('/usr/include/c++')))[0])
         QT_DIR = '/usr/include/qt/'
     elif platform.system() == "Windows":
-        UNIX_DIR = 'C:/MyApps/cygwin64/usr/include'
-        GCC_DIR = 'C:/MyApps/cygwin64/lib/gcc/x86_64-pc-cygwin/7.4.0/include'
-        # GCC_DIR = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/include/'
+        # GCC_DIR = 'C:/MyApps/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include'
+        GCC_DIR = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/include/'
         QT_DIR  = 'D:/Qt/5.10.1/msvc2017_64/include/'
 
-    global_flags = ['-isystem', GCC_DIR] + GetDirsRecursive('-isystem',
+    global_flags = GetDirsRecursive('-isystem',
         [
-            UNIX_DIR,
             GCC_DIR,
             # QT_DIR,
         ])
