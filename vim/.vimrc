@@ -175,7 +175,7 @@ vnoremap ; :
         " 未打开文件时，切换到HOME目录
         execute "cd $HOME"
     elseif IsGw()
-        let $VimPluginPath="/c/MyApps/Vim/vimfiles"
+        let $VimPluginPath="/cygdrive/c/MyApps/Vim/vimfiles"
     elseif IsMac()
         let $VimPluginPath=s:home_path . "/.vim"
     endif
@@ -664,7 +664,7 @@ endif
     let g:ycm_auto_start_csharp_server = 0                      " 禁止C#补全
     let g:ycm_cache_omnifunc = 0                                " 禁止缓存匹配项，每次都重新生成匹配项
     let g:ycm_complete_in_strings = 1                           " 开启对字符串补全
-    let g:ycm_complete_in_comments = 0                          " 禁止对注释补全
+    let g:ycm_complete_in_comments = 1                          " 开启对注释补全
     let g:ycm_collect_identifiers_from_comments_and_strings = 0 " 收集注释和字符串补全
     let g:ycm_collect_identifiers_from_tags_files = 1           " 收集标签补全
     let g:ycm_seed_identifiers_with_syntax = 1                  " 收集语法关键字补全

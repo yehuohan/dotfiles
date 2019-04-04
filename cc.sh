@@ -89,9 +89,9 @@ if [ `uname` == "Linux" ]; then
         echo "Ubuntu: Copy was completed!"
     fi
 
-elif [ `uname -o` == "Msys" ]; then
+elif [ `uname -o` == "Cygwin" ]; then
 
-    # cf-vim
+    # vim
     if [ ! -d "../Vim" ]; then
         echo "../Vim is not existed."
         exit
@@ -103,10 +103,10 @@ elif [ `uname -o` == "Msys" ]; then
     cp -r ../Vim/vimfiles/autoload        ./vim/
 
     # cf-msys2
-    cp ~/.minttyrc  ./cf-msys2/
-    cp ~/.gitconfig ./cf-msys2/
-    cp ~/.zshrc     ./cf-msys2/
+    cp ~/.minttyrc  ./cf-gw/
+    cp ~/.gitconfig ./cf-gw/
+    cp ~/.zshrc     ./cf-gw/
 
-    echo "Msys: Copy was completed!"
+    echo "Cygwin: Copy was completed!"
 fi
 
