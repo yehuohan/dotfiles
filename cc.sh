@@ -23,7 +23,6 @@ if [ `uname` == "Linux" ]; then
         cp -r ../.vim/mySnippets      ./vim/
         cp -r ../.vim/autoload        ./vim/
 
-        # arch config
         # zsh
         cp ../.zshrc                $cf_dir/
         cp ../.zprofile             $cf_dir/
@@ -52,7 +51,6 @@ if [ `uname` == "Linux" ]; then
 
         # misc
         cp ../my-apps/ToggleTouchPad.py ./misc/
-        #cp /etc/sddm.conf               ./misc/sddm/
 
         echo "Arch: Copy was completed!"
     fi
@@ -67,7 +65,6 @@ if [ `uname` == "Linux" ]; then
         cp -r ../.vim/mySnippets      ./vim/
         cp -r ../.vim/autoload        ./vim/
 
-        # arch config
         # zsh
         cp ../.zshrc                $cf_dir/
         cp ../.zprofile             $cf_dir/
