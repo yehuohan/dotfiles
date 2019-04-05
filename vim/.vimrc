@@ -1521,7 +1521,7 @@ function! FindWorkingRggrep(type, mode)
         endif
     endif
     if empty(l:pattern) | return | endif
-    let l:pattern = escape(l:pattern, ' ')      " 转义所有空格
+    let l:pattern = escape(l:pattern, ' #%')      " 转义Space,#,%
 
     " 设置查找范围
     let l:path_type = a:type
