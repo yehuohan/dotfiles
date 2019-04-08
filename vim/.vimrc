@@ -413,10 +413,10 @@ endif
 
 " expand-region {{{ 快速块选择
     Plug 'terryma/vim-expand-region'
-    nmap <leader>ee <Plug>(expand_region_expand)
-    nmap <leader>es <Plug>(expand_region_shrink)
-    vmap <leader>ee <Plug>(expand_region_expand)
-    vmap <leader>es <Plug>(expand_region_shrink)
+    nmap <C-u> <Plug>(expand_region_expand)
+    vmap <C-u> <Plug>(expand_region_expand)
+    nmap <C-p> <Plug>(expand_region_shrink)
+    vmap <C-p> <Plug>(expand_region_shrink)
 " }}}
 
 " FastFold {{{ 更新折叠
