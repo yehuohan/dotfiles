@@ -18,7 +18,7 @@ LOC_DIR = os.path.dirname(
 log_out = False                     # Print log or not
 
 #===============================================================================
-# cfamily flags 
+# cfamily flags
 #===============================================================================
 def NewWalk(top, suffixs, exdirs):
     """

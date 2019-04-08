@@ -1622,26 +1622,63 @@ endif
 " }}}
 
 " 杂项 {{{
-" Quickfix预览 {{{
-function! PreviewQuickfixLine()
+" Quickfix类型与编号 {{{
+function! QuickfixGet()
     " location-list : 每个窗口对应一个位置列表
     " quickfix      : 整个vim对应一个quickfix
+    let l:type = ''
+    let l:line = 0
     if &filetype ==# "qf"
-        let l:last_winnr = winnr()
         let l:dict = getwininfo(win_getid())
         if len(l:dict) > 0
             if get(l:dict[0], "quickfix", 0) && !get(l:dict[0], "loclist", 0)
-                execute "crewind " . line(".")
+                let l:type = 'q'
             elseif get(l:dict[0], "quickfix", 0) && get(l:dict[0], "loclist", 0)
-                execute "lrewind " . line(".")
-            else
-                return
+                let l:type = 'l'
             endif
-            silent! normal! zO
-            normal! zz
-            execute "noautocmd " . l:last_winnr . "wincmd w"
+            let l:line = line(".")
         endif
     endif
+    return [l:type, l:line]
+endfunction
+" }}}
+
+" Quickfix新建Tab打开窗口 {{{
+function! QuickfixTabEdit()
+    let [l:type, l:line] = QuickfixGet()
+    if empty(l:type)
+        return
+    endif
+
+    set switchbuf+=newtab
+    if l:type ==# 'q'
+        execute 'crewind ' . l:line
+        execute 'botright copen'
+        execute
+    elseif l:type ==# 'l'
+        execute 'lrewind ' . l:line
+        execute 'botright lopen'
+    endif
+    set switchbuf-=newtab
+endfunction
+" }}}
+
+" Quickfix预览 {{{
+function! QuickfixPreview()
+    let [l:type, l:line] = QuickfixGet()
+    if empty(l:type)
+        return
+    endif
+
+    let l:last_winnr = winnr()
+    if l:type ==# 'q'
+        execute "crewind " . l:line
+    elseif l:type ==# 'l'
+        execute "lrewind " . l:line
+    endif
+    silent! normal! zO
+    normal! zz
+    execute "noautocmd " . l:last_winnr . "wincmd w"
 endfunction
 " }}}
 
@@ -1958,14 +1995,17 @@ endif
     nnoremap <leader>lj :lnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     nnoremap <leader>lk :lprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     " 预览Quickfix和Location-list
-    nnoremap <M-Space> :call PreviewQuickfixLine()<CR>
+    nnoremap <leader>qt :call QuickfixTabEdit()<CR>
+    nnoremap <leader>lt :call QuickfixTabEdit()<CR>
+    nnoremap <M-Space> :call QuickfixPreview()<CR>
 " }}}
 
 " Window manager{{{
     " 分割窗口
-    nnoremap <leader>ws :split<CR>
-    nnoremap <leader>wv :vsplit<CR>
+    nnoremap <leader>ws <C-w>s
+    nnoremap <leader>wv <C-W>v
     " 移动焦点
+    nnoremap <leader>wc <C-w>c
     nnoremap <leader>wh <C-w>h
     nnoremap <leader>wj <C-w>j
     nnoremap <leader>wk <C-w>k
