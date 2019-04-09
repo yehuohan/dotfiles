@@ -9,8 +9,7 @@
 " My Notes
 "===============================================================================
 " {{{
-" Windows带python编译gvim
-" {{{
+" Gvim Complilation(Windows) {{{
     " [*] 设置Make_cyg_ming.mak:
     " DIRECTX=yes                         - 使用DirectX
     " ARCH=i686                           - 使用32位(x86-64为64位)，python也使用32位
@@ -30,30 +29,23 @@
     " 若使用64位，只需要添加Python路径和DirectX支持
 " }}}
 
-" 查看vim帮助
-" {{{
+" Help {{{
     " :help       = 查看Vim帮助
     " :help index = 查看帮助列表
     " <S-k>       = 快速查看光标所在cword或选择内容的vim帮助
     " :help *@en  = 指定查看英文(en，cn即为中文)帮助
 " }}}
 
-" 按键映键策略
-" {{{
+" Map {{{
     " - Normal模式下使用<leader>代替<C-?>,<S-?>,<A-?>，
     " - Insert模式下map带ctrl,alt的快捷键
     " - 尽量不改变vim原有键位的功能定义
     " - 尽量一只手不同时按两个键
-    " - 尽量不映射偏远的按键（F1~F12，数字键等）
+    " - 尽量不映射偏远的按键（F1~F12，数字键等），且集中于'j,k,i,o'键位附近
     " - 调换Esc和CapsLock键
-    " - map语句后一般别注释，也别留任何空格
-    "
-    "  <leader>t? for plugins toggle command
-    "  <leader>i? for vim "set inv?" command
 "  }}}
 
-" 替换字符串
-" {{{
+" Substitute {{{
 "   :%s     - 所有行
 "   :'<,'>s - 所选范圈
 "   :n,$s   - 第n行到最一行
@@ -79,8 +71,7 @@
 "       匹配整个单词(如可以匹配 "the str is"，但不能匹配 "string")
 " }}}
 
-" 可视区域操作
-" {{{
+" Visual {{{
     " c/r/y : 修改/替换/复制
     " I/A   : 在选择区域前面/后面输入
     " d/x   : 直接删除，不输入
@@ -90,8 +81,7 @@
     " !     : 按外部命令过滤所选内容
 " }}}
 
-" 第三方软件
-" {{{
+" Software {{{
     " Python                      : 需要在vim编译时添加Python支持
     " LLVM(Clang)                 : YouCompleteMe补全
     " fzf                         : Fzf模糊查找
@@ -101,6 +91,7 @@
     " fireFox                     : Markdown,ReStructruedText等标记文本预览
     " fcitx                       : Linux下的输入法
 " }}}
+
 " }}}
 
 "===============================================================================
@@ -489,11 +480,6 @@ endif
     "let g:indentLine_char = '|'        " 设置标识符样式
     let g:indentLinet_color_term=200    " 设置标识符颜色
     nnoremap <leader>t\ :IndentLinesToggle<CR>
-" }}}
-
-" goyo {{{ 小屏浏览
-    Plug 'junegunn/goyo.vim'
-    nnoremap <leader>ts :Goyo<CR>
 " }}}
 
 " ctrl-space {{{ buffer管理
@@ -949,7 +935,6 @@ endif
 
 call plug#end()                         " required
 " }}}
-
 
 "===============================================================================
 " User functions
@@ -1450,7 +1435,7 @@ function! FindWorkingFzfFile()
             return
         endif
     endif
-    silent execute(':FzfFiles ' . s:working_root)
+    execute(':FzfFiles ' . s:working_root)
 endfunction
 " }}}
 
@@ -1554,7 +1539,7 @@ function! FindWorkingRggrep(type, mode)
     endif
 
     " 使用Rg查找
-    silent execute(l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options)
+    execute(l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options)
 endfunction
 " }}}
 
@@ -1597,7 +1582,7 @@ function! FindVimgrep(type, mode)
 
     " 使用vimgrep或lvimgrep查找
     if a:type =~# 'v'
-        silent execute "vimgrep /" . l:string . "/j " . l:files
+        execute "vimgrep /" . l:string . "/j " . l:files
         echo "Finding..."
         if empty(getqflist())
             echo "No match: " . l:string
@@ -1606,7 +1591,7 @@ function! FindVimgrep(type, mode)
             botright copen
         endif
     elseif a:type =~# 'V'
-        silent execute "lvimgrep /" . l:string . "/j " . l:files
+        execute "lvimgrep /" . l:string . "/j " . l:files
         echo "Finding..."
         if empty(getloclist(winnr()))
             echo "No match: " . l:string
@@ -1676,7 +1661,7 @@ function! QuickfixPreview()
     elseif l:type ==# 'l'
         execute "lrewind " . l:line
     endif
-    silent! normal! zO
+    normal! zO
     normal! zz
     execute "noautocmd " . l:last_winnr . "wincmd w"
 endfunction
@@ -1698,7 +1683,7 @@ function! GotoKeyword(mode)
         let l:exec_str .= "@en"
     endif
 
-    silent! execute l:exec_str
+    execute l:exec_str
 endfunction
 " }}}
 
@@ -1717,7 +1702,7 @@ function! ToggleWindowZoom()
         let s:is_max = 0
         execute "normal! " . s:last_tab . "gt"
         execute "noautocmd " . s:last_winnr . "wincmd w"
-        silent! execute "tabclose " . s:this_tab
+        execute "tabclose " . s:this_tab
     else
         let s:is_max = 1
         let s:last_winnr = winnr()
@@ -1987,13 +1972,13 @@ endif
     " 打开/关闭Quickfix
     nnoremap <leader>qo :botright copen<CR>
     nnoremap <leader>qc :cclose<Bar>wincmd p<CR>
-    nnoremap <leader>qj :cnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
-    nnoremap <leader>qk :cprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
+    nnoremap <leader>qj :cnext<Bar>execute"normal! zO"<Bar>execute"normal! zz"<CR>
+    nnoremap <leader>qk :cprevious<Bar>execute"normal! zO"<Bar>execute"normal! zz"<CR>
     " 打开/关闭Location-list
     nnoremap <leader>lo :botright lopen<CR>
     nnoremap <leader>lc :lclose<Bar>wincmd p<CR>
-    nnoremap <leader>lj :lnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
-    nnoremap <leader>lk :lprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
+    nnoremap <leader>lj :lnext<Bar>execute"normal! zO"<Bar>execute"normal! zz"<CR>
+    nnoremap <leader>lk :lprevious<Bar>execute"normal! zO"<Bar>execute"normal! zz"<CR>
     " 预览Quickfix和Location-list
     nnoremap <leader>qt :call QuickfixTabEdit()<CR>
     nnoremap <leader>lt :call QuickfixTabEdit()<CR>
