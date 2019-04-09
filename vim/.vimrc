@@ -770,18 +770,18 @@ endif
 
 " nerd-commenter {{{ 批量注释
     Plug 'scrooloose/nerdcommenter'
-    let g:NERDCreateDefaultMappings = 1
+    let g:NERDCreateDefaultMappings = 0
     let g:NERDSpaceDelims = 0           " 在Comment后添加Space
     nmap <leader>cc <Plug>NERDCommenterComment
     nmap <leader>cm <Plug>NERDCommenterMinimal
     nmap <leader>cs <Plug>NERDCommenterSexy
-    " nmap <leader>cb <Plug>NERDCommenterAlignBoth  " 在vimrc中nmap有问题
+    nmap <leader>cb <Plug>NERDCommenterAlignBoth
     nmap <leader>cl <Plug>NERDCommenterAlignLeft
     nmap <leader>ci <Plug>NERDCommenterInvert
     nmap <leader>cy <Plug>NERDCommenterYank
     nmap <leader>ce <Plug>NERDCommenterToEOL
     nmap <leader>ca <Plug>NERDCommenterAppend
-    nmap <leader>cA <Plug>NERDCommenterAltDelims
+    nmap <leader>ct <Plug>NERDCommenterAltDelims
     nmap <leader>cu <Plug>NERDCommenterUncomment
 " }}}
 
@@ -1545,9 +1545,13 @@ endfunction
 
 if IsNVim()
 " FUNCTION: FindVimgrep(type, mode) {{{ 快速查找
-let s:findvimgrep_nvmaps = ['vi', 'vgi', 'vI', 'vgI',
+let s:findvimgrep_nvmaps = [
+                          \ 'vi', 'vgi', 'vI', 'vgI',
                           \ 'vw', 'vgw', 'vW', 'vgW',
                           \ 'vs', 'vgs', 'vS', 'vgS',
+                          \ 'Vi', 'Vgi', 'VI', 'VgI',
+                          \ 'Vw', 'Vgw', 'VW', 'VgW',
+                          \ 'Vs', 'Vgs', 'VS', 'VgS',
                           \ ]
 function! FindVimgrep(type, mode)
     let l:string = ''
@@ -1615,14 +1619,12 @@ function! QuickfixGet()
     let l:line = 0
     if &filetype ==# "qf"
         let l:dict = getwininfo(win_getid())
-        if len(l:dict) > 0
-            if get(l:dict[0], "quickfix", 0) && !get(l:dict[0], "loclist", 0)
-                let l:type = 'q'
-            elseif get(l:dict[0], "quickfix", 0) && get(l:dict[0], "loclist", 0)
-                let l:type = 'l'
-            endif
-            let l:line = line(".")
+        if l:dict[0].quickfix && !l:dict[0].loclist
+            let l:type = 'q'
+        elseif l:dict[0].quickfix && l:dict[0].loclist
+            let l:type = 'l'
         endif
+        let l:line = line(".")
     endif
     return [l:type, l:line]
 endfunction
