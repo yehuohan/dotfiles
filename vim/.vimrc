@@ -404,10 +404,10 @@ endif
 
 " expand-region {{{ 快速块选择
     Plug 'terryma/vim-expand-region'
-    nmap <C-u> <Plug>(expand_region_expand)
-    vmap <C-u> <Plug>(expand_region_expand)
-    nmap <C-p> <Plug>(expand_region_shrink)
-    vmap <C-p> <Plug>(expand_region_shrink)
+    nmap <C-p> <Plug>(expand_region_expand)
+    vmap <C-p> <Plug>(expand_region_expand)
+    nmap <C-u> <Plug>(expand_region_shrink)
+    vmap <C-u> <Plug>(expand_region_shrink)
 " }}}
 
 " FastFold {{{ 更新折叠
@@ -1044,7 +1044,6 @@ function! LinuxFcitx2Zh()
 endfunction
 endif
 " }}}
-
 " }}}
 
 " 编译环境 {{{
@@ -1311,7 +1310,6 @@ let RC_QmakeClean = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'
 let RC_Make       = function('ComplileProject', ['[mM]akefile', 'ComplileProjectMakefile'])
 let RC_MakeClean  = function('ComplileProject', ['[mM]akefile', 'ComplileProjectMakefile', ['clean']])
 let RC_Html       = function('ComplileProject', ['[iI]ndex.html', 'ComplileProjectHtml'])
-
 " }}}
 
 " 带参函数执行 {{{
@@ -1366,7 +1364,6 @@ function FuncDiffFile(filename, mode)
     endif
 endfunction
 " }}}
-
 " }}}
 
 " 查找 {{{
@@ -1547,6 +1544,7 @@ function! FindWorkingRggrep(type, mode)
 
     " 使用Rg查找
     execute l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options
+    execute 'syntax match IncSearch /' . l:pattern . '/'
 endfunction
 " }}}
 
@@ -1611,14 +1609,12 @@ function! FindVimgrep(type, mode)
             botright lopen
         endif
     endif
+    execute 'syntax match IncSearch /' . l:string . '/'
 endfunction
 " }}}
 endif
 
-" }}}
-
-" 杂项 {{{
-" Quickfix类型与编号 {{{
+" FUNCTION: QuickfixGet() {{{ 类型与编号
 function! QuickfixGet()
     " location-list : 每个窗口对应一个位置列表
     " quickfix      : 整个vim对应一个quickfix
@@ -1637,7 +1633,7 @@ function! QuickfixGet()
 endfunction
 " }}}
 
-" Quickfix新建Tab打开窗口 {{{
+" FUNCTION: QuickfixTabEdit() {{{ 新建Tab打开窗口
 function! QuickfixTabEdit()
     let [l:type, l:line] = QuickfixGet()
     if empty(l:type)
@@ -1653,10 +1649,12 @@ function! QuickfixTabEdit()
         execute 'botright lopen'
     endif
     set switchbuf-=newtab
+    silent! normal! zO
+    silent! normal! zz
 endfunction
 " }}}
 
-" Quickfix预览 {{{
+" FUNCTION: QuickfixPreview() {{{ 预览
 function! QuickfixPreview()
     let [l:type, l:line] = QuickfixGet()
     if empty(l:type)
@@ -1674,7 +1672,9 @@ function! QuickfixPreview()
     execute 'noautocmd ' . l:last_winnr . 'wincmd w'
 endfunction
 " }}}
+" }}}
 
+" 杂项 {{{
 " 查找Vim关键字 {{{
 function! GotoKeyword(mode)
     let l:exec_str = 'help '
@@ -1720,7 +1720,6 @@ function! ToggleWindowZoom()
     endif
 endfunction
 " }}}
-
 " }}}
 " }}}
 
@@ -1748,7 +1747,7 @@ endfunction
     set autoindent                      " 使用autoindent缩进
     set conceallevel=0                  " 显示markdown等格式中的隐藏字符
     set foldenable                      " 充许折叠
-    set foldcolumn=1                    " 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
+    set foldcolumn=0                    " 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
     set foldmethod=indent               " 设置折叠，默认为缩进折叠
                                         " manual : 手工定义折叠
                                         " indent : 更多的缩进表示更高级别的折叠
@@ -1936,8 +1935,8 @@ endif
     vnoremap <S-l> $
     vnoremap <S-h> ^
     " 复制到行首行尾
-    nnoremap y<S-l> y$
-    nnoremap y<S-h> y^
+    nnoremap yl y$
+    nnoremap yh y^
     " j, k 移行
     nnoremap j gj
     vnoremap j gj
@@ -1954,15 +1953,15 @@ endif
     " 滚屏
     nnoremap <C-j> <C-e>
     nnoremap <C-k> <C-y>
-    nnoremap <C-h> zh
-    nnoremap <C-l> zl
+    nnoremap <C-h> zt
+    nnoremap <C-l> zb
     nnoremap <M-h> 16zh
     nnoremap <M-l> 16zl
     " 命令行移动
     cnoremap <M-h> <Left>
     cnoremap <M-l> <Right>
-    cnoremap <M-k> <C-Left>
-    cnoremap <M-j> <C-Right>
+    cnoremap <M-k> <C-Right>
+    cnoremap <M-j> <C-Left>
     cnoremap <M-i> <C-B>
     cnoremap <M-o> <C-E>
 " }}}
