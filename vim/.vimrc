@@ -1648,7 +1648,6 @@ function! QuickfixTabEdit()
     if l:type ==# 'q'
         execute 'crewind ' . l:line
         execute 'botright copen'
-        execute
     elseif l:type ==# 'l'
         execute 'lrewind ' . l:line
         execute 'botright lopen'
@@ -1825,7 +1824,7 @@ endif
 
 " Auto Command
 " {{{
-augroup VimVimrc
+augroup MyVimVimrc
     "autocmd[!]  [group]  {event}     {pattern}  {nested}  {cmd}
     "autocmd              BufNewFile  *                    set fileformat=unix
     autocmd!
@@ -1841,9 +1840,11 @@ augroup VimVimrc
     autocmd FileType go     setlocal expandtab
     autocmd FileType javascript setlocal foldmethod=syntax
 
-    " map
+    " Help keys
     autocmd Filetype vim,help nnoremap <buffer> <S-k> :call GotoKeyword('n')<CR>
     autocmd Filetype vim,help vnoremap <buffer> <S-k> :call GotoKeyword('v')<CR>
+    " 预览Quickfix和Location-list
+    autocmd Filetype qf       nnoremap <buffer> <M-Space> :call QuickfixPreview()<CR>
 augroup END
 " }}}
 " }}}
@@ -1988,10 +1989,9 @@ endif
     nnoremap <leader>lc :lclose<Bar>wincmd p<CR>
     nnoremap <leader>lj :lnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     nnoremap <leader>lk :lprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
-    " 预览Quickfix和Location-list
+    " 在新Tab中打开列表项
     nnoremap <leader>qt :call QuickfixTabEdit()<CR>
     nnoremap <leader>lt :call QuickfixTabEdit()<CR>
-    nnoremap <M-Space> :call QuickfixPreview()<CR>
 " }}}
 
 " Window manager{{{
