@@ -128,7 +128,7 @@ endfunction
 " gui or term
 " {{{
 silent function! IsGvim()
-    return has("gui_running")
+    return has('gui_running')
 endfunction
 function! IsTermType(tt)
     if &term ==? a:tt
@@ -154,21 +154,21 @@ vnoremap ; :
 
 " Path
 " {{{
-    let s:home_path = fnamemodify(resolve(expand("<sfile>:p")), ":h")
+    let s:home_path = fnamemodify(resolve(expand('<sfile>:p')), ':h')
     " vim插件路径
     if IsLinux()
         " 链接root-vimrc到user's vimrc
-        let $VimPluginPath=s:home_path . "/.vim"
+        let $VimPluginPath=s:home_path . '/.vim'
     elseif IsWin()
-        let $VimPluginPath=s:home_path . "\\vimfiles"
+        let $VimPluginPath=s:home_path . '\vimfiles'
         " windows下将HOME设置VIM的安装路径
         let $HOME=$VIM
         " 未打开文件时，切换到HOME目录
-        execute "cd $HOME"
+        execute 'cd $HOME'
     elseif IsGw()
-        let $VimPluginPath="/cygdrive/c/MyApps/Vim/vimfiles"
+        let $VimPluginPath='/cygdrive/c/MyApps/Vim/vimfiles'
     elseif IsMac()
-        let $VimPluginPath=s:home_path . "/.vim"
+        let $VimPluginPath=s:home_path . '/.vim'
     endif
     set rtp+=$VimPluginPath             " 添加 .vim 和 vimfiles 到 rtp(runtimepath)
 
@@ -197,9 +197,9 @@ vnoremap ; :
 
 " Exe
 " {{{
-if !executable('rg')    | echo "Warning: No ripgerp(rg)" | endif
-if !executable("ag")    | echo "Warning: No ag"          | endif
-if !executable('ctags') | echo "Warning: No ctags"       | endif
+if !executable('rg')    | echo 'Warning: No ripgerp(rg)' | endif
+if !executable('ag')    | echo 'Warning: No ag'          | endif
+if !executable('ctags') | echo 'Warning: No ctags'       | endif
 " }}}
 
 " 键码设定
@@ -241,10 +241,10 @@ endif
 " }}}
 
 "===============================================================================
-" Plug and Settings
+" Plug Settings
 "===============================================================================
 " {{{
-call plug#begin($VimPluginPath."/bundle")   " 可选设置，可以指定插件安装位置
+call plug#begin($VimPluginPath.'/bundle')   " 可选设置，可以指定插件安装位置
 
 " 基本编辑类
 " {{{
@@ -365,8 +365,8 @@ call plug#begin($VimPluginPath."/bundle")   " 可选设置，可以指定插件�
 " grep {{{ 大范围查找
 if IsVim()
     Plug 'yegappan/grep'
-    "let g:Ag_Path = "$VIM."\\vim81\\ag.exe"
-    "let g:Rg_Path = "$VIM."\\vim81\\rg.exe"
+    "let g:Ag_Path = '$VIM.'\\vim81\\ag.exe"
+    "let g:Rg_Path = '$VIM.'\\vim81\\rg.exe"
 endif
 " }}}
 
@@ -426,7 +426,8 @@ endif
 " theme {{{ Vim主题
     Plug 'morhetz/gruvbox'
     set rtp+=$VimPluginPath/bundle/gruvbox/
-    let g:gruvbox_contrast_dark='medium'" 选项：dark, medium, soft
+    " 背景选项：dark, medium, soft
+    let g:gruvbox_contrast_dark='medium'
 
     Plug 'junegunn/seoul256.vim'
     set rtp+=$VimPluginPath/bundle/seoul256.vim/
@@ -451,10 +452,10 @@ endif
     "let g:airline_theme='cool'
     let g:airline_theme='gruvbox'
     "                   "
-    let g:airline_left_sep = ""
-    let g:airline_left_alt_sep = ""
-    let g:airline_right_sep = ""
-    let g:airline_right_alt_sep = ""
+    let g:airline_left_sep = ''
+    let g:airline_left_alt_sep = ''
+    let g:airline_right_sep = ''
+    let g:airline_right_alt_sep = ''
 
     " 添加插件集成: ctrlspace, ale, ycm
     let g:airline#extensions#ctrlspace#enabled = 1
@@ -465,7 +466,7 @@ endif
 if IsLinux()
     "Plug 'edkolev/tmuxline.vim'
     "let g:airline#extensions#tmuxline#enalbed = 1
-    "let g:airline#extensions#tmuxline#snapshot_file = "~/.tmux-status.conf"
+    "let g:airline#extensions#tmuxline#snapshot_file = '~/.tmux-status.conf'
 endif
 " }}}
 
@@ -489,11 +490,11 @@ endif
     let g:CtrlSpaceCacheDir = $VimPluginPath
     let g:CtrlSpaceSetDefaultMapping = 1
     let g:CtrlSpaceProjectRootMarkers = [
-         \ ".git", ".hg", ".svn", ".bzr", "_darcs", "CVS"]
+         \ '.git', '.hg', '.svn', '.bzr', '_darcs', 'CVS']
                                         " Project root markers
     let g:CtrlSpaceSearchTiming = 50
-    let g:CtrlSpaceStatuslineFunction = "airline#extensions#ctrlspace#statusline()"
-    let g:CtrlSpaceSymbols = { "CS": "⌘"}
+    let g:CtrlSpaceStatuslineFunction = 'airline#extensions#ctrlspace#statusline()'
+    let g:CtrlSpaceSymbols = { 'CS': '⌘'}
     let g:CtrlSpaceGlobCommand = 'ag -l --nocolor -g ""'
     " 切换按键
     nnoremap <C-Space> :CtrlSpace<CR>
@@ -698,13 +699,13 @@ endif
     Plug 'yehuohan/ultisnips'           " snippet插入引擎（vmap的映射，与vim-textmanip的<C-i>有冲突）
     Plug 'honza/vim-snippets'           " snippet合集
     " 使用:UltiSnipsEdit编辑g:UltiSnipsSnippetsDir中的snippet文件
-    let g:UltiSnipsSnippetsDir = $VimPluginPath . "/mySnippets"
-    let g:UltiSnipsSnippetDirectories=["UltiSnips", "mySnippets"]
+    let g:UltiSnipsSnippetsDir = $VimPluginPath . '/mySnippets'
+    let g:UltiSnipsSnippetDirectories=['UltiSnips', 'mySnippets']
                                         " 自定义mySnippets合集
-    let g:UltiSnipsExpandTrigger="<Tab>"
-    let g:UltiSnipsListSnippets="<C-Tab>"
-    let g:UltiSnipsJumpForwardTrigger="<C-j>"
-    let g:UltiSnipsJumpBackwardTrigger="<C-k>"
+    let g:UltiSnipsExpandTrigger='<Tab>'
+    let g:UltiSnipsListSnippets='<C-Tab>'
+    let g:UltiSnipsJumpForwardTrigger='<C-j>'
+    let g:UltiSnipsJumpBackwardTrigger='<C-k>'
 " }}}
 
 " ale {{{ 语法检测
@@ -720,7 +721,7 @@ endif
     let g:ale_echo_delay = 10           " 显示语文错误的延时时间
     let g:ale_lint_delay = 300          " 文本更改后的延时检测时间
     let g:ale_enabled = 0               " 默认关闭ALE检测
-    nnoremap <leader>ta :execute "ALEToggle"<Bar>echo "AleToggle:" . g:ale_enabled<CR>
+    nnoremap <leader>ta :execute ':ALEToggle'<Bar>echo 'AleToggle:' . g:ale_enabled<CR>
 " }}}
 
 " surround and repeat {{{ 添加包围符
@@ -760,7 +761,7 @@ endif
     if IsLinux()
         let g:tagbar_ctags_bin='/usr/bin/ctags'
     elseif IsWin()
-        let g:tagbar_ctags_bin=$VIM."\\vim81\\ctags.exe"
+        let g:tagbar_ctags_bin=$VIM.'\vim81\ctags.exe'
     endif                               " 设置ctags路径，需要安装ctags
     let g:tagbar_width=30
     let g:tagbar_map_showproto=''       " 取消tagbar对<Space>的占用
@@ -788,7 +789,7 @@ endif
 " file switch {{{ c/c++文件切换
     Plug 'derekwyatt/vim-fswitch'
     nnoremap <silent> <leader>fh :FSHere<CR>
-    let g:fsnonewfiles="on"
+    let g:fsnonewfiles='on'
 " }}}
 
 " AsyncRun {{{ 导步运行程序
@@ -849,10 +850,10 @@ augroup END
     function! PreViewMarkdown() abort
         if exists(':MarkdownPreviewStop')
             MarkdownPreviewStop
-            echo "MarkdownPreviewStop"
+            echo 'MarkdownPreviewStop'
         else
             MarkdownPreview
-            echo "MarkdownPreview"
+            echo 'MarkdownPreview'
         endif
     endfunction
     function! ToggleBrowserPath()
@@ -874,14 +875,14 @@ if !(IsWin() && IsNVim())
     let g:instant_rst_browser = s:path_browser
 if IsWin()
     " 需要安装 https://github.com/mgedmin/restview
-    nnoremap <leader>vr :execute ":AsyncRun restview " . expand("%:p:t")<Bar>cclose<CR>
+    nnoremap <leader>vr :execute ':AsyncRun restview ' . expand('%:p:t')<Bar>cclose<CR>
 else
     nnoremap <leader>vr :call PreViewRst()<CR>
 endif
     function! PreViewRst() abort
         if g:_instant_rst_daemon_started
             StopInstantRst
-            echo "StopInstantRst"
+            echo 'StopInstantRst'
         else
             InstantRst
         endif
@@ -900,9 +901,9 @@ endif
     " search funtion - google, baidu, github
     function! OpenBrowserSearchInGoogle(engine, mode)
         if a:mode ==# 'n'
-            execute ":OpenBrowserSearch -". a:engine . " " . expand("<cword>")
+            execute ':OpenBrowserSearch -'. a:engine . ' ' . expand('<cword>')
         elseif a:mode ==# 'v'
-            execute ":OpenBrowserSearch -". a:engine . " " . GetSelectedContent()
+            execute ':OpenBrowserSearch -'. a:engine . ' ' . GetSelectedContent()
         endif
     endfunction
     nnoremap <leader>big :OpenBrowserSearch -google
@@ -997,23 +998,23 @@ endfunction
 
 " 切换显示标志列 {{{
 function! InvSigncolumn()
-    if &signcolumn == "auto"
+    if &signcolumn == 'auto'
         set signcolumn=no
     else
         set signcolumn=auto
     endif
-    echo "signcolumn = " . &signcolumn
+    echo 'signcolumn = ' . &signcolumn
 endfunction
 " }}}
 
 " 切换高亮 {{{
 function! InvHighLight()
-    if exists("g:syntax_on")
+    if exists('g:syntax_on')
         syntax off
-        echo "syntax off"
+        echo 'syntax off'
     else
         syntax on
-        echo "syntax on"
+        echo 'syntax on'
     endif
 endfunction
 " }}}
@@ -1025,20 +1026,20 @@ function! InvScrollBind()
     else
         set scrollbind
     endif
-    echo "scrollbind = " . &scrollbind
+    echo 'scrollbind = ' . &scrollbind
 endfunction
 " }}}
 
 " Linux-Fcitx输入法切换  {{{
 if IsLinux()
 function! LinuxFcitx2En()
-    if 2 == system("fcitx-remote")
-        let l:t = system("fcitx-remote -c")
+    if 2 == system('fcitx-remote')
+        let l:t = system('fcitx-remote -c')
     endif
 endfunction
 function! LinuxFcitx2Zh()
-    if 1 == system("fcitx-remote")
-        let l:t = system("fcitx-remote -o")
+    if 1 == system('fcitx-remote')
+        let l:t = system('fcitx-remote -o')
     endif
 endfunction
 endif
@@ -1076,10 +1077,10 @@ endfunction
 " FUNCTION: ComplileFile(argstr) {{{
 " @param argstr: 想要传递的命令参数
 function! ComplileFile(argstr)
-    let l:ext      = expand("%:e")      " 扩展名
+    let l:ext      = expand('%:e')      " 扩展名
     let l:filename = expand('%:t')      " 文件名，不带路径，带扩展名
     let l:name     = expand('%:t:r')    " 文件名，不带路径，不带扩展名
-    let l:exec_str = (exists(":AsyncRun") == 2) ? ":AsyncRun " : "!"
+    let l:exec_str = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
 
 
     " 生成可执行字符串
@@ -1166,7 +1167,7 @@ function! FindProjectFile(...)
     endif
     let l:marker = a:1
     let l:dir = (a:0 >= 2) ? a:2 : "."
-    let l:prj_dir      = fnamemodify(l:dir, ":p:h")
+    let l:prj_dir      = fnamemodify(l:dir, ':p:h')
     let l:prj_dir_last = ''
     let l:prj_file     = ''
 
@@ -1177,10 +1178,10 @@ function! FindProjectFile(...)
         endif
 
         let l:prj_dir_last = l:prj_dir
-        let l:prj_dir = fnamemodify(l:prj_dir, ":p:h:h")
+        let l:prj_dir = fnamemodify(l:prj_dir, ':p:h:h')
     endwhile
 
-    return split(l:prj_file, "\n")
+    return split(l:prj_file, '\n')
 endfunction
 " }}}
 
@@ -1188,7 +1189,7 @@ endfunction
 " @param str: 工程文件路径，如*.pro
 " @param type: 工程文件类型，如qmake, make
 function! FindProjectTarget(str, type)
-    let l:target = '"./' . fnamemodify(a:str, ":t:r") . '"'
+    let l:target = '"./' . fnamemodify(a:str, ':t:r') . '"'
     if a:type == 'qmake' || a:type == 'make'
         for line in readfile(a:str)
             if line =~? '^\s*TARGET\s*='
@@ -1232,7 +1233,7 @@ endfunction
 " @param sel: pro文件路径
 " @param args: make命令附加参数列表
 function! ComplileProjectQmake(sopt, sel, args)
-    let l:filename = '"./' . fnamemodify(a:sel, ":p:t") . '"'
+    let l:filename = '"./' . fnamemodify(a:sel, ':p:t') . '"'
     let l:name     = FindProjectTarget(a:sel, 'qmake')
     let l:filedir  = fnameescape(fnamemodify(a:sel, ":p:h"))
     let l:olddir   = fnameescape(getcwd())
@@ -1270,9 +1271,9 @@ endfunction
 " @param sel: makefile文件路径
 " @param args: make命令附加参数列表
 function! ComplileProjectMakefile(sopt, sel, args)
-    let l:filename = '"./' . fnamemodify(a:sel, ":p:t") . '"'
+    let l:filename = '"./' . fnamemodify(a:sel, ':p:t') . '"'
     let l:name     = FindProjectTarget(a:sel, 'make')
-    let l:filedir  = fnameescape(fnamemodify(a:sel, ":p:h"))
+    let l:filedir  = fnameescape(fnamemodify(a:sel, ':p:h'))
     let l:olddir   = fnameescape(getcwd())
     let l:exec_str = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
 
@@ -1359,9 +1360,9 @@ endfunction
 " FUNCTION: FuncDiffFile(filename, mode) {{{
 function FuncDiffFile(filename, mode)
     if a:mode == 's'
-        execute "diffsplit " . a:filename
+        execute 'diffsplit ' . a:filename
     elseif a:mode == 'v'
-        execute "vertical diffsplit " . a:filename
+        execute 'vertical diffsplit ' . a:filename
     endif
 endfunction
 " }}}
@@ -1416,13 +1417,13 @@ endfunction
 let s:working_root = ''
 let s:working_filter = ''
 function! FindWorkingUpdateInfo(flt)
-    let l:root = input(" Where (root) to find :", "", "customlist,GetMultiFilesCompletion")
+    let l:root = input(' Where (root) to find :', '', 'customlist,GetMultiFilesCompletion')
     if empty(l:root)
         return 0
     endif
     let s:working_root = fnamemodify(l:root, ':p')
     if a:flt
-        let s:working_filter = input(" Which (filter) to find :", "")
+        let s:working_filter = input(' Which (filter) to find :', '')
     endif
     return 1
 endfunction
@@ -1435,7 +1436,7 @@ function! FindWorkingFzfFile()
             return
         endif
     endif
-    execute(':FzfFiles ' . s:working_root)
+    execute ':FzfFiles ' . s:working_root
 endfunction
 " }}}
 
@@ -1456,14 +1457,16 @@ let s:fkrggrep_nvmaps = [
                        \ 'fi', 'fli', 'fLi', 'fri', 'fRi', 'fI', 'flI', 'fLI', 'frI', 'fRI',
                        \ 'fw', 'flw', 'fLw', 'frw', 'fRw', 'fW', 'flW', 'fLW', 'frW', 'fRW',
                        \ 'fs', 'fls', 'fLs', 'frs', 'fRs', 'fS', 'flS', 'fLS', 'frS', 'fRS',
+                       \ 'f=', 'fl=', 'fL=', 'fr=', 'fR=', 'f=', 'fl=', 'fL=', 'fr=', 'fR=',
                        \ 'Fi', 'Fli', 'FLi', 'Fri', 'FRi', 'FI', 'FlI', 'FLI', 'FrI', 'FRI',
                        \ 'Fw', 'Flw', 'FLw', 'Frw', 'FRw', 'FW', 'FlW', 'FLW', 'FrW', 'FRW',
                        \ 'Fs', 'Fls', 'FLs', 'Frs', 'FRs', 'FS', 'FlS', 'FLS', 'FrS', 'FRS',
+                       \ 'F=', 'Fl=', 'FL=', 'Fr=', 'FR=', 'F=', 'Fl=', 'FL=', 'Fr=', 'FR=',
                        \ ]
 function! FindWorkingRggrep(type, mode)
     " {{{
-    " Option: [fF][lLrR][IiWwSs]
-    "         [%1][ %2 ][  3%  ]
+    " Option: [fF][lLrR][IiWwSs=]
+    "         [%1][ %2 ][  3%   ]
     " Working: %1
     "   F : find with no regexp match
     " Path: %2
@@ -1473,6 +1476,7 @@ function! FindWorkingRggrep(type, mode)
     "   R : find with inputing working root and filter
     "   The %2 is 'r' in default. Toggle default to 'l' by FindWorkingToggleDefault()
     " Pattern: %3
+    "   = : find text from clipboard
     "   Normal Mode: mode='n'
     "   i : find input
     "   w : find word
@@ -1485,10 +1489,10 @@ function! FindWorkingRggrep(type, mode)
     "   UpperCase: [IWS] find in case match
     " }}}
 
-    let l:command = ":Rg"
-    let l:options = ""
-    let l:pattern = ""
-    let l:location = ""
+    let l:command = ':Rg'
+    let l:options = ''
+    let l:pattern = ''
+    let l:location = ''
 
     " 设置查找内容
     if a:mode ==# 'n'
@@ -1505,6 +1509,9 @@ function! FindWorkingRggrep(type, mode)
             let l:pattern = l:selected
         endif
     endif
+    if a:type =~ '='
+        let l:pattern = getreg('+')
+    endif
     if empty(l:pattern) | return | endif
     let l:pattern = escape(l:pattern, ' #%')      " 转义Space,#,%
 
@@ -1514,9 +1521,9 @@ function! FindWorkingRggrep(type, mode)
         let l:path_type = a:type . s:fkregrep_default
     endif
     if l:path_type =~# 'l'
-        let l:location = "%"
+        let l:location = '%'
     elseif l:path_type =~# 'L'
-        let l:location = input(" Where to find :", "", "customlist,GetMultiFilesCompletion")
+        let l:location = input(' Where to find :', '', 'customlist,GetMultiFilesCompletion')
     elseif l:path_type =~# 'R'
         if !FindWorkingUpdateInfo(1) | return | endif
         let l:location = s:working_root
@@ -1529,17 +1536,17 @@ function! FindWorkingRggrep(type, mode)
     if empty(l:location) | return | endif
 
     " 设置查找选项
-    if a:type =~? 's'     | let l:options .= "-w " | endif
-    if a:type =~# '[iws]' | let l:options .= "-i " | endif
+    if a:type =~? 's'     | let l:options .= '-w ' | endif
+    if a:type =~# '[iws]' | let l:options .= '-i ' | endif
     if !empty(s:working_filter) && l:path_type =~? '[rR]'
         let l:options .= '-g "*.{' . s:working_filter . '}" '
     endif
     if a:type =~# 'F'
-        let l:options .= "-F"
+        let l:options .= '-F'
     endif
 
     " 使用Rg查找
-    execute(l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options)
+    execute l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options
 endfunction
 " }}}
 
@@ -1580,25 +1587,25 @@ function! FindVimgrep(type, mode)
 
     " 设置查找范围
     if a:type =~# 'g'
-        let l:files = input(" Where to find :", "", "customlist,GetMultiFilesCompletion")
+        let l:files = input(' Where to find :', '', 'customlist,GetMultiFilesCompletion')
         if empty(l:files) | return | endif
     endif
 
     " 使用vimgrep或lvimgrep查找
     if a:type =~# 'v'
-        execute "vimgrep /" . l:string . "/j " . l:files
-        echo "Finding..."
+        execute 'vimgrep /' . l:string . '/j ' . l:files
+        echo 'Finding...'
         if empty(getqflist())
-            echo "No match: " . l:string
+            echo 'No match: ' . l:string
             return
         else
             botright copen
         endif
     elseif a:type =~# 'V'
-        execute "lvimgrep /" . l:string . "/j " . l:files
-        echo "Finding..."
+        execute 'lvimgrep /' . l:string . '/j ' . l:files
+        echo 'Finding...'
         if empty(getloclist(winnr()))
-            echo "No match: " . l:string
+            echo 'No match: ' . l:string
             return
         else
             botright lopen
@@ -1617,7 +1624,7 @@ function! QuickfixGet()
     " quickfix      : 整个vim对应一个quickfix
     let l:type = ''
     let l:line = 0
-    if &filetype ==# "qf"
+    if &filetype ==# 'qf'
         let l:dict = getwininfo(win_getid())
         if l:dict[0].quickfix && !l:dict[0].loclist
             let l:type = 'q'
@@ -1659,21 +1666,21 @@ function! QuickfixPreview()
 
     let l:last_winnr = winnr()
     if l:type ==# 'q'
-        execute "crewind " . l:line
+        execute 'crewind ' . l:line
     elseif l:type ==# 'l'
-        execute "lrewind " . l:line
+        execute 'lrewind ' . l:line
     endif
-    normal! zO
-    normal! zz
-    execute "noautocmd " . l:last_winnr . "wincmd w"
+    silent! normal! zO
+    silent! normal! zz
+    execute 'noautocmd ' . l:last_winnr . 'wincmd w'
 endfunction
 " }}}
 
 " 查找Vim关键字 {{{
 function! GotoKeyword(mode)
-    let l:exec_str = "help "
+    let l:exec_str = 'help '
     if a:mode ==# 'n'
-        let l:word = expand("<cword>")
+        let l:word = expand('<cword>')
     elseif a:mode ==# 'v'
         let l:word = GetSelectedContent()
     endif
@@ -1682,7 +1689,7 @@ function! GotoKeyword(mode)
     let l:exec_str .= l:word
     if IsNVim()
         " nvim用自己的帮助文件，只有英文的
-        let l:exec_str .= "@en"
+        let l:exec_str .= '@en'
     endif
 
     execute l:exec_str
@@ -1702,14 +1709,14 @@ let s:is_max = 0
 function! ToggleWindowZoom()
     if s:is_max
         let s:is_max = 0
-        execute "normal! " . s:last_tab . "gt"
-        execute "noautocmd " . s:last_winnr . "wincmd w"
-        execute "tabclose " . s:this_tab
+        execute 'normal! ' . s:last_tab . 'gt'
+        execute 'noautocmd ' . s:last_winnr . 'wincmd w'
+        execute 'tabclose ' . s:this_tab
     else
         let s:is_max = 1
         let s:last_winnr = winnr()
         let s:last_tab = tabpagenr()
-        execute "tabedit " . expand("%")
+        execute 'tabedit ' . expand('%')
         let s:this_tab = tabpagenr()
     endif
 endfunction
@@ -1974,13 +1981,13 @@ endif
     " 打开/关闭Quickfix
     nnoremap <leader>qo :botright copen<CR>
     nnoremap <leader>qc :cclose<Bar>wincmd p<CR>
-    nnoremap <leader>qj :cnext<Bar>execute"normal! zO"<Bar>execute"normal! zz"<CR>
-    nnoremap <leader>qk :cprevious<Bar>execute"normal! zO"<Bar>execute"normal! zz"<CR>
+    nnoremap <leader>qj :cnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
+    nnoremap <leader>qk :cprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     " 打开/关闭Location-list
     nnoremap <leader>lo :botright lopen<CR>
     nnoremap <leader>lc :lclose<Bar>wincmd p<CR>
-    nnoremap <leader>lj :lnext<Bar>execute"normal! zO"<Bar>execute"normal! zz"<CR>
-    nnoremap <leader>lk :lprevious<Bar>execute"normal! zO"<Bar>execute"normal! zz"<CR>
+    nnoremap <leader>lj :lnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
+    nnoremap <leader>lk :lprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     " 预览Quickfix和Location-list
     nnoremap <leader>qt :call QuickfixTabEdit()<CR>
     nnoremap <leader>lt :call QuickfixTabEdit()<CR>
@@ -2116,19 +2123,19 @@ endif
 
     " 使用FindVimgrep查找
     for item in s:fkrggrep_nvmaps
-        execute "nnoremap <leader>" . item ":call FindWorkingRggrep('" . item . "', 'n')<CR>"
+        execute 'nnoremap <leader>' . item ':call FindWorkingRggrep("' . item . '", "n")<CR>'
     endfor
     for item in s:fkrggrep_nvmaps
-        execute "vnoremap <leader>" . item ":call FindWorkingRggrep('" . item . "', 'v')<CR>"
+        execute 'vnoremap <leader>' . item ':call FindWorkingRggrep("' . item . '", "v")<CR>'
     endfor
     nnoremap <leader>ftd :call FindWorkingToggleDefault()<CR>
     nnoremap <leader>ff :call FindWorkingFzfFile()<CR>
 if IsNVim()
     for item in s:findvimgrep_nvmaps
-        execute "nnoremap <leader>" . item ":call FindVimgrep('" . item . "', 'n')<CR>"
+        execute 'nnoremap <leader>' . item ':call FindVimgrep("' . item . '", "n")<CR>'
     endfor
     for item in s:findvimgrep_nvmaps
-        execute "vnoremap <leader>" . item ":call FindVimgrep('" . item . "', 'v')<CR>"
+        execute 'vnoremap <leader>' . item ':call FindVimgrep("' . item . '", "v")<CR>'
     endfor
 endif
 " }}}
