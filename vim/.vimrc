@@ -1867,11 +1867,9 @@ augroup END
     vnoremap vv <C-v>
     " 加减序号
     nnoremap <C-h> <C-x>
-    vnoremap <C-h> <C-x>
-    vnoremap g<C-h> g<C-x>
+    vnoremap <leader><C-h> g<C-x>
     nnoremap <C-l> <C-a>
-    vnoremap <C-l> <C-a>
-    vnoremap g<C-l> g<C-a>
+    vnoremap <leader><C-l> g<C-a>
     " 去除尾部空白
     nnoremap <leader>rt :call RemoveTrailingSpace()<CR>
     " HEX编辑
