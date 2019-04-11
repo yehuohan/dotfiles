@@ -1533,7 +1533,7 @@ function! FindWorkingRggrep(type, mode)
 
     " 使用Rg查找
     execute l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options
-    execute 'syntax match IncSearch /' . l:pattern . '/'
+    call QuickfixHighlight(l:pattern)
 endfunction
 " }}}
 
@@ -1599,6 +1599,7 @@ function! FindVimgrep(type, mode)
         endif
     endif
     execute 'syntax match IncSearch /' . l:string . '/'
+    call QuickfixHighlight(l:string)
 endfunction
 " }}}
 endif
@@ -1622,6 +1623,17 @@ function! QuickfixGet()
 endfunction
 " }}}
 
+" FUNCTION: QuickfixHighlight(str) {{{ 高亮字符串
+function! QuickfixHighlight(...)
+    if a:0 >= 1
+        let s:hl_str = a:1
+    endif
+    if exists('s:hl_str') && getline(1) =~# s:hl_str
+        execute 'syntax match IncSearch /' . s:hl_str . '/'
+    endif
+endfunction
+" }}}
+
 " FUNCTION: QuickfixTabEdit() {{{ 新建Tab打开窗口
 function! QuickfixTabEdit()
     let [l:type, l:line] = QuickfixGet()
@@ -1641,6 +1653,7 @@ function! QuickfixTabEdit()
         silent! normal! zz
         execute 'botright lopen'
     endif
+    call QuickfixHighlight()
 endfunction
 " }}}
 
@@ -1967,12 +1980,12 @@ endif
     nnoremap <leader>bp :bprevious<CR>
     nnoremap <leader>bl :b#<Bar>execute "set buflisted"<CR>
     " 打开/关闭Quickfix
-    nnoremap <leader>qo :botright copen<CR>
+    nnoremap <leader>qo :botright copen<Bar>call QuickfixHighlight()<CR>
     nnoremap <leader>qc :cclose<Bar>wincmd p<CR>
     nnoremap <leader>qj :cnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     nnoremap <leader>qk :cprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     " 打开/关闭Location-list
-    nnoremap <leader>lo :botright lopen<CR>
+    nnoremap <leader>lo :botright lopen<Bar>call QuickfixHighlight()<CR>
     nnoremap <leader>lc :lclose<Bar>wincmd p<CR>
     nnoremap <leader>lj :lnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     nnoremap <leader>lk :lprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
