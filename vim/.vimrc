@@ -1629,17 +1629,18 @@ function! QuickfixTabEdit()
         return
     endif
 
-    set switchbuf+=newtab
+    execute 'tabedit'
     if l:type ==# 'q'
         execute 'crewind ' . l:line
+        silent! normal! zO
+        silent! normal! zz
         execute 'botright copen'
     elseif l:type ==# 'l'
         execute 'lrewind ' . l:line
+        silent! normal! zO
+        silent! normal! zz
         execute 'botright lopen'
     endif
-    set switchbuf-=newtab
-    silent! normal! zO
-    silent! normal! zz
 endfunction
 " }}}
 
