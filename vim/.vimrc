@@ -40,7 +40,7 @@
     " - Normal模式下使用<leader>代替<C-?>,<S-?>,<A-?>，
     " - Insert模式下map带ctrl,alt的快捷键
     " - 尽量不改变vim原有键位的功能定义
-    " - 尽量一只手不同时按两个键
+    " - 尽量一只手不同时按两个键，且连续按键相隔尽量近
     " - 尽量不映射偏远的按键（F1~F12，数字键等），且集中于'j,k,i,o'键位附近
     " - 调换Esc和CapsLock键
 "  }}}
@@ -418,7 +418,6 @@ endif
     "let g:fastfold_fold_movement_commands = [']z', '[z', 'zj', 'zk']
                                         " 允许指定的命令更新folds
 " }}}
-
 " }}}
 
 " 界面管理类
@@ -427,7 +426,7 @@ endif
     Plug 'morhetz/gruvbox'
     set rtp+=$VimPluginPath/bundle/gruvbox/
     " 背景选项：dark, medium, soft
-    let g:gruvbox_contrast_dark='medium'
+    let g:gruvbox_contrast_dark='soft'
 
     Plug 'junegunn/seoul256.vim'
     set rtp+=$VimPluginPath/bundle/seoul256.vim/
@@ -437,8 +436,7 @@ endif
     Plug 'altercation/vim-colors-solarized'
     set rtp+=$VimPluginPath/bundle/vim-colors-solarized/
 
-    set background=dark
-    colorscheme seoul256
+    colorscheme gruvbox
 " }}}
 
 " air-line {{{ 状态栏
@@ -480,7 +478,7 @@ endif
     Plug 'Yggdroot/indentLine'
     "let g:indentLine_char = '|'        " 设置标识符样式
     let g:indentLinet_color_term=200    " 设置标识符颜色
-    nnoremap <leader>t\ :IndentLinesToggle<CR>
+    nnoremap <leader>ti :IndentLinesToggle<CR>
 " }}}
 
 " ctrl-space {{{ buffer管理
@@ -621,7 +619,6 @@ endif
     Plug 'mbbill/undotree'
     nnoremap <leader>tu :UndotreeToggle<CR>
 " }}}
-
 " }}}
 
 " 代码类
@@ -821,13 +818,12 @@ augroup END
 
     nnoremap <leader>th :QuickhlManualLockWindowToggle<CR>
 " }}}
-
 " }}}
 
 " 软件辅助类
 " {{{
 " vimcdoc {{{ 中文帮助文档
-    Plug 'vimcn/vimcdoc',{'branch' : 'release'}
+    Plug 'yianwillis/vimcdoc'
 " }}}
 
 " MarkDown {{{
@@ -890,12 +886,8 @@ endif
 endif
 " }}}
 
-" open-browser.vim {{{ 浏览器相关
+" open-browser.vim {{{ 在线搜索
     Plug 'tyru/open-browser.vim'
-    "nmap <leader>bu <Plug>(openbrowser-open)
-    "vmap <leader>bu <Plug>(openbrowser-open)
-    "nmap <leader>bw <Plug>(openbrowser-search)
-    "vmap <leader>bw <Plug>(openbrowser-search)
     nmap <leader>bs <Plug>(openbrowser-smart-search)
     vmap <leader>bs <Plug>(openbrowser-smart-search)
     " search funtion - google, baidu, github
@@ -916,12 +908,10 @@ endif
     nnoremap <leader>bh  :call OpenBrowserSearchInGoogle('github', 'n')<CR>
     vnoremap <leader>bh  :call OpenBrowserSearchInGoogle('github', 'v')<CR>
 "}}}
-
 " }}}
 
 " Disabled Plugins
 " {{{
-
 " easy-align {{{ 字符对齐
     "Plug 'junegunn/vim-easy-align'
     "xmap <leader>ga <Plug>(EasyAlign)
@@ -931,7 +921,6 @@ endif
 " autoformat {{{ 代码格式化
     "Plugin 'Chiel92/vim-autoformat'
 " }}}
-
 " }}}
 
 call plug#end()                         " required
@@ -1863,12 +1852,12 @@ augroup END
     nnoremap vv <C-v>
     vnoremap vv <C-v>
     " 加减序号
-    nnoremap <leader>aj <C-x>
-    vnoremap <leader>aj <C-x>
-    vnoremap <leader>agj g<C-x>
-    nnoremap <leader>ak <C-a>
-    vnoremap <leader>ak <C-a>
-    vnoremap <leader>agk g<C-a>
+    nnoremap <C-h> <C-x>
+    vnoremap <C-h> <C-x>
+    vnoremap g<C-h> g<C-x>
+    nnoremap <C-l> <C-a>
+    vnoremap <C-l> <C-a>
+    vnoremap g<C-l> g<C-a>
     " 去除尾部空白
     nnoremap <leader>rt :call RemoveTrailingSpace()<CR>
     " HEX编辑
@@ -1953,8 +1942,8 @@ endif
     " 滚屏
     nnoremap <C-j> <C-e>
     nnoremap <C-k> <C-y>
-    nnoremap <C-h> zt
-    nnoremap <C-l> zb
+    nnoremap zh zt
+    nnoremap zl zb
     nnoremap <M-h> 16zh
     nnoremap <M-l> 16zl
     " 命令行移动
@@ -1970,14 +1959,12 @@ endif
     " Tab切换
     nnoremap <M-i> gT
     nnoremap <M-o> gt
-
     " Buffer切换
     nnoremap <M-p> :bnext<CR>
     nnoremap <M-u> :bprevious<CR>
     nnoremap <leader>bn :bnext<CR>
     nnoremap <leader>bp :bprevious<CR>
     nnoremap <leader>bl :b#<Bar>execute "set buflisted"<CR>
-
     " 打开/关闭Quickfix
     nnoremap <leader>qo :botright copen<CR>
     nnoremap <leader>qc :cclose<Bar>wincmd p<CR>
@@ -2077,11 +2064,9 @@ endif
     nnoremap <F1> :Gdb<CR>
     nnoremap <F2> :Program<CR>
     nnoremap <F3> :Source<CR>
-
     nnoremap <F4> :Stop<CR>
     nnoremap <F5> :Run<CR>
     nnoremap <F6> :Continue<CR>
-
     " Termdebug模式下，K会自动map成Evaluate
     nnoremap <leader>ge :Evaluate<CR>
     vnoremap <leader>ge :Evaluate<CR>
@@ -2091,7 +2076,6 @@ endif
     nnoremap <F9> :Break<CR>
     nnoremap <F10> :Over<CR>
     nnoremap <F11> :Step<CR>
-
 " }}}
 
 " File diff {{{
