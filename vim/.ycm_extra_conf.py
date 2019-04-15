@@ -69,7 +69,7 @@ def GetDirsRecursive(flag, paths, suffixs=[], exdirs=[]):
     """
     flags = []
     for path in paths:
-        for root, dirs, files in NewWalk(path, suffixs, exdirs):
+        for root, dirs, files in NewWalk(os.path.expanduser(path), suffixs, exdirs):
             # files or dirs is not empty
             if files or dirs:
                 flags.append(flag)
