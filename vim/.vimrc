@@ -436,6 +436,7 @@ endif
     Plug 'altercation/vim-colors-solarized'
     set rtp+=$VimPluginPath/bundle/vim-colors-solarized/
 
+    set background=dark
     colorscheme gruvbox
 " }}}
 
