@@ -1867,9 +1867,11 @@ augroup END
     vnoremap vv <C-v>
     " 加减序号
     nnoremap <C-h> <C-x>
-    vnoremap <leader><C-h> g<C-x>
     nnoremap <C-l> <C-a>
-    vnoremap <leader><C-l> g<C-a>
+    vnoremap <leader>aj <C-x>
+    vnoremap <leader>ak <C-a>
+    vnoremap <leader>agj g<C-x>
+    vnoremap <leader>agk g<C-a>
     " 去除尾部空白
     nnoremap <leader>rt :call RemoveTrailingSpace()<CR>
     " HEX编辑
@@ -1936,8 +1938,8 @@ endif
     vnoremap <S-l> $
     vnoremap <S-h> ^
     " 复制到行首行尾
-    nnoremap yl y$
-    nnoremap yh y^
+    nnoremap yL y$
+    nnoremap yH y^
     " j, k 移行
     nnoremap j gj
     vnoremap j gj
