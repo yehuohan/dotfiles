@@ -722,6 +722,12 @@ endif
     nnoremap <leader>ta :execute ':ALEToggle'<Bar>echo 'AleToggle:' . g:ale_enabled<CR>
 " }}}
 
+" autoformat {{{ 代码格式化
+    Plug 'Chiel92/vim-autoformat'
+    nnoremap <leader>fc :Autoformat<CR>
+    vnoremap <leader>fc :Autoformat<CR>
+" }}}
+
 " surround and repeat {{{ 添加包围符
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-repeat'
@@ -917,10 +923,6 @@ endif
     "Plug 'junegunn/vim-easy-align'
     "xmap <leader>ga <Plug>(EasyAlign)
     "nmap <leader>ga <Plug>(EasyAlign)
-" }}}
-
-" autoformat {{{ 代码格式化
-    "Plugin 'Chiel92/vim-autoformat'
 " }}}
 " }}}
 
@@ -1707,21 +1709,23 @@ function! RemoveTrailingSpace()
 endfunction
 " }}}
 
-" 最大化Window {{{
-let s:is_max = 0
-function! ToggleWindowZoom()
-    if s:is_max
-        let s:is_max = 0
-        execute 'normal! ' . s:last_tab . 'gt'
-        execute 'noautocmd ' . s:last_winnr . 'wincmd w'
-        execute 'tabclose ' . s:this_tab
-    else
-        let s:is_max = 1
-        let s:last_winnr = winnr()
-        let s:last_tab = tabpagenr()
-        execute 'tabedit ' . expand('%')
-        let s:this_tab = tabpagenr()
-    endif
+" 添加空格分隔 {{{
+function! DivideSpace(pos)
+    let l:line = getline('.')
+    let l:chars = split(input('Divide ' . toupper(a:pos) . ' Space(split with '',''): '), ',')
+
+    for ch in l:chars
+        let l:pch = escape(ch, '~*\.$^') . '\C'
+        if a:pos == 'h'
+            let l:sch = ' ' . escape(ch, '&\')
+        elseif a:pos == 'c'
+            let l:sch = ' ' . escape(ch, '&\') . ' '
+        elseif a:pos == 'l'
+            let l:sch = escape(ch, '&\') . ' '
+        endif
+        let l:line = substitute(l:line, l:pch, l:sch, 'g')
+    endfor
+    call setline('.', l:line)
 endfunction
 " }}}
 " }}}
@@ -1878,9 +1882,10 @@ augroup END
     " HEX编辑
     nnoremap <leader>xx :%!xxd<CR>
     nnoremap <leader>xr :%!xxd -r<CR>
-" }}}
-
-" Toggle Setting {{{
+    " 空格分隔
+    nnoremap <leader>dh :call DivideSpace('h')<CR>
+    nnoremap <leader>dc :call DivideSpace('c')<CR>
+    nnoremap <leader>dl :call DivideSpace('l')<CR>
     " 显示折行
     nnoremap <leader>iw :set invwrap<CR>
     " 显示不可见字符
@@ -2013,7 +2018,6 @@ endif
     nnoremap <leader>wK <C-w>K
     nnoremap <leader>wL <C-w>L
     nnoremap <leader>wT <C-w>T
-    nnoremap <leader>wz :call ToggleWindowZoom()<CR>
     " 修改尺寸
     nnoremap <leader>w= <C-w>=
     inoremap <C-Up> <Esc>:resize+1<CR>i
