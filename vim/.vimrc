@@ -1709,19 +1709,23 @@ function! RemoveTrailingSpace()
 endfunction
 " }}}
 
-" 添加空格分隔 {{{
+" 添加分隔符 {{{
 function! DivideSpace(pos)
     let l:line = getline('.')
     let l:chars = split(input('Divide ' . toupper(a:pos) . ' Space(split with '',''): '), ',')
+    if empty(l:chars)
+        return
+    endif
 
+    let l:fie = ' '
     for ch in l:chars
-        let l:pch = escape(ch, '~*\.$^') . '\C'
+        let l:pch = '\s*' . escape(ch, '~*\.$^') . '\s*\C'
         if a:pos == 'h'
-            let l:sch = ' ' . escape(ch, '&\')
+            let l:sch = l:fie . escape(ch, '&\')
         elseif a:pos == 'c'
-            let l:sch = ' ' . escape(ch, '&\') . ' '
+            let l:sch = l:fie . escape(ch, '&\') . l:fie
         elseif a:pos == 'l'
-            let l:sch = escape(ch, '&\') . ' '
+            let l:sch = escape(ch, '&\') . l:fie
         endif
         let l:line = substitute(l:line, l:pch, l:sch, 'g')
     endfor
