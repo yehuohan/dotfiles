@@ -62,6 +62,6 @@ TEXT
 },
 {
     "full_text" : "${time %H:%M}" ,
-    "color" : "\#F0A0F0"
+    "color" : "\#D02070"
 }
 ],
