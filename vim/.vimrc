@@ -1629,7 +1629,7 @@ endfunction
 " FUNCTION: QuickfixHighlight(str) {{{ 高亮字符串
 function! QuickfixHighlight(...)
     if a:0 >= 1
-        let s:hl_str = a:1
+        let s:hl_str = escape(a:1, '/*')
     endif
     if exists('s:hl_str') && getline(1) =~# s:hl_str
         execute 'syntax match IncSearch /' . s:hl_str . '/'
@@ -1712,7 +1712,7 @@ endfunction
 " 添加分隔符 {{{
 function! DivideSpace(pos)
     let l:line = getline('.')
-    let l:chars = split(input('Divide ' . toupper(a:pos) . ' Space(split with '',''): '), ',')
+    let l:chars = split(input('Divide ' . toupper(a:pos) . ' Space(split with space): '), ' ')
     if empty(l:chars)
         return
     endif
