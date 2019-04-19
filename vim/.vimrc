@@ -941,7 +941,18 @@ function! InvConceallevel()
     else
         set conceallevel=0              " 显示markdown等格式中的隐藏字符
     endif
-    echo "conceallevel = " . &conceallevel
+    echo 'conceallevel = ' . &conceallevel
+endfunction
+" }}}
+
+" 切换虚拟编辑 {{{
+function! InvVirtualedit()
+    if &virtualedit == ''
+        set virtualedit=all
+    else
+        set virtualedit=""
+    endif
+    echo 'virtualedit = ' . &virtualedit
 endfunction
 " }}}
 
@@ -984,7 +995,7 @@ function! InvFoldColumeShow()
     else
         set foldcolumn=0
     endif
-    echo "foldcolumn = " . &foldcolumn
+    echo 'foldcolumn =' . &foldcolumn
 endfunction
 " }}}
 
@@ -1894,6 +1905,7 @@ augroup END
     nnoremap <leader>iw :set invwrap<CR>
     " 显示不可见字符
     nnoremap <leader>il :set invlist<CR>
+    nnoremap <leader>iv :call InvVirtualedit()<CR>
     nnoremap <leader>ic :call InvConceallevel()<CR>
     nnoremap <leader>it :call InvTransParentBackground()<CR>
     nnoremap <leader>in :call InvNumberType()<CR>
@@ -1909,6 +1921,7 @@ augroup END
 
 " Copy and paste{{{
     vnoremap <leader>y ygv
+    vnoremap <leader>c "+y
     vnoremap <C-c> "+y
     nnoremap <C-v> "+p
     inoremap <C-v> <Esc>"+pi
