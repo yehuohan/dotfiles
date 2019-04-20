@@ -9,12 +9,12 @@
 ```text
 .
 │
-├── cf-arch   : arch config
-├── cf-ubuntu : ubuntu config
-├── cf-msys2  : msys2 config
-├── vim       : vim config
+├── cf-arch   : Arch config
+├── cf-ubuntu : Ubuntu config
+├── cf-gw     : GNU-Win config
+├── vim       : Vim config
 ├── font      : Consolas For Powerline Font
-└── misc      : others
+└── misc      : Others
 ```
 
 ---

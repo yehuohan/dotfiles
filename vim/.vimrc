@@ -724,6 +724,9 @@ endif
 
 " autoformat {{{ 代码格式化
     Plug 'Chiel92/vim-autoformat'
+    let g:formatdef_cfamily = '"astyle --style=allman"'
+    let g:formatters_c = ['cfamily']
+    let g:formatters_cpp = ['cfamily']
     nnoremap <leader>fc :Autoformat<CR>
     vnoremap <leader>fc :Autoformat<CR>
 " }}}
@@ -1997,8 +2000,6 @@ endif
     nnoremap <M-i> gT
     nnoremap <M-o> gt
     " Buffer切换
-    nnoremap <M-p> :bnext<CR>
-    nnoremap <M-u> :bprevious<CR>
     nnoremap <leader>bn :bnext<CR>
     nnoremap <leader>bp :bprevious<CR>
     nnoremap <leader>bl :b#<Bar>execute "set buflisted"<CR>
