@@ -722,13 +722,27 @@ endif
     nnoremap <leader>ta :execute ':ALEToggle'<Bar>echo 'AleToggle:' . g:ale_enabled<CR>
 " }}}
 
-" autoformat {{{ 代码格式化
-    Plug 'Chiel92/vim-autoformat'
-    let g:formatdef_cfamily = '"astyle --style=allman"'
-    let g:formatters_c = ['cfamily']
-    let g:formatters_cpp = ['cfamily']
-    nnoremap <leader>fc :Autoformat<CR>
-    vnoremap <leader>fc :Autoformat<CR>
+" neoformat {{{ 代码格式化
+    Plug 'sbdchd/neoformat'
+    let g:neoformat_basic_format_align = 1
+    let g:neoformat_basic_format_retab = 1
+    let g:neoformat_basic_format_trim = 1
+    let g:neoformat_c_astyle = {
+        \ 'exe' : 'astyle',
+        \ 'args' : ['--style=allman'],
+        \ 'stdin' : 1,
+        \ }
+    let g:neoformat_cpp_astyle = g:neoformat_c_astyle
+    let g:neoformat_java_astyle = {
+        \ 'exe' : 'astyle',
+        \ 'args' : ['--mode=java --style=google'],
+        \ 'stdin' : 1,
+        \ }
+    let g:neoformat_enabled_c = ['astyle']
+    let g:neoformat_enabled_cpp = ['astyle']
+    let g:neoformat_enabled_java = ['astyle']
+    nnoremap <leader>fc :Neoformat<CR>
+    vnoremap <leader>fc :Neoformat<CR>
 " }}}
 
 " surround and repeat {{{ 添加包围符
