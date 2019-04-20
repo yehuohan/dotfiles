@@ -795,7 +795,9 @@ endif
 
 " file switch {{{ c/c++文件切换
     Plug 'derekwyatt/vim-fswitch'
-    nnoremap <silent> <leader>fh :FSHere<CR>
+    nnoremap <silent> <Leader>of :FSHere<CR>
+    nnoremap <silent> <Leader>ow :FSRight<CR>
+    nnoremap <silent> <Leader>os :FSSplitRight<CR>
     let g:fsnonewfiles='on'
 " }}}
 
@@ -819,9 +821,6 @@ augroup END
     nmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
     xmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
     nmap <leader>hm <Plug>(quickhl-cword-toggle)
-    "nmap <leader>ht <Plug>(quickhl-tag-toggle)
-    "nmap <leader>hc <Plug>(quickhl-manual-clear)
-    "vmap <leader>hc <Plug>(quickhl-manual-clear)
     nnoremap <leader>hc :call quickhl#manual#clear_this('n')<CR>
     vnoremap <leader>hc :call quickhl#manual#clear_this('v')<CR>
     nmap <leader>hr <Plug>(quickhl-manual-reset)
