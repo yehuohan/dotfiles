@@ -246,7 +246,7 @@ endif
 " {{{
 call plug#begin($VimPluginPath.'/bundle')   " 可选设置，可以指定插件安装位置
 
-" 基本编辑类
+" 基本编辑
 " {{{
 " easy-motion {{{ 快速跳转
     Plug 'easymotion/vim-easymotion'
@@ -420,7 +420,7 @@ endif
 " }}}
 " }}}
 
-" 界面管理类
+" 界面管理
 " {{{
 " theme {{{ Vim主题
     Plug 'morhetz/gruvbox'
@@ -622,7 +622,7 @@ endif
 " }}}
 " }}}
 
-" 代码类
+" 代码编写
 " {{{
 " YouCompleteMe {{{ 自动补全
     " Completion Params: install.py安装参数
@@ -843,7 +843,7 @@ augroup END
 " }}}
 " }}}
 
-" 软件辅助类
+" 软件辅助
 " {{{
 " vimcdoc {{{ 中文帮助文档
     Plug 'yianwillis/vimcdoc'
@@ -1066,11 +1066,6 @@ endif
 " }}}
 
 " 编译环境 {{{
-" Set autochdir is required.
-" （因为执行编译时，是以当前文件为目标文件；
-" 若禁用自动切换当前目录，会导致当前编辑的文件不一定是目标文件）
-set autochdir
-
 " FUNCTION: ComplileToggleX86X64() "{{{
 " 切换成x86或x64编译环境
 let s:complile_type = 'x64'
@@ -1099,7 +1094,6 @@ function! ComplileFile(argstr)
     let l:filename = expand('%:t')      " 文件名，不带路径，带扩展名
     let l:name     = expand('%:t:r')    " 文件名，不带路径，不带扩展名
     let l:exec_str = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
-
 
     " 生成可执行字符串
     if 'c' ==? l:ext
@@ -1796,7 +1790,7 @@ endfunction
                                         " marker : 对文中的标记折叠，默认使用{{{,}}}标记
     set scrolloff=3                     " 光标上下保留的行数
     set laststatus=2                    " 一直显示状态栏
-    set showcmd                         " 显示寄存器命令，宏调用命令@等
+    set noshowmode                      " 命令行栏不显示VISUAL等字样
     set completeopt=menuone,preview     " 补全显示设置
     set backspace=2                     " Insert模式下使用BackSpace删除
     set hidden                          " 允许在未保存文件时切换buffer
