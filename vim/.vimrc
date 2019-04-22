@@ -442,31 +442,17 @@ endif
 
 " air-line {{{ 状态栏
     Plug 'vim-airline/vim-airline'
-    "Plug 'vim-airline/vim-airline-themes'
 if IsVim()
     set renderoptions=                  " 此设置使airline正常显示unicode字符
 endif
     let g:airline_powerline_fonts = 1
     let g:airline#extensions#tabline#enabled = 1
-    "let g:airline_theme='cool'
     let g:airline_theme='gruvbox'
-    "                   "
     let g:airline_left_sep = ''
     let g:airline_left_alt_sep = ''
     let g:airline_right_sep = ''
     let g:airline_right_alt_sep = ''
-
-    " 添加插件集成: ctrlspace, ale, ycm
     let g:airline#extensions#ctrlspace#enabled = 1
-    let g:airline#extensions#ale#enabled = 1
-    "let g:airline#extensions#ycm#enabled = 1
-    "let g:airline#extensions#ycm#error_symbol = '✘:'
-    "let g:airline#extensions#ycm#warning_symbol = '►:'
-if IsLinux()
-    "Plug 'edkolev/tmuxline.vim'
-    "let g:airline#extensions#tmuxline#enalbed = 1
-    "let g:airline#extensions#tmuxline#snapshot_file = '~/.tmux-status.conf'
-endif
 " }}}
 
 " rainbow {{{ 彩色括号
@@ -531,11 +517,6 @@ endif
             \ 'lst' : ['gruvbox', 'seoul256', 'seoul256-light', 'solarized'],
             \ 'cmd' : '',
         \},]
-        " \{
-        "     \ 'opt' : ['AirlineTheme'],
-        "     \ 'lst' : popset#data#GetFileList($VimPluginPath.'/bundle/vim-airline-themes/autoload/airline/themes/*.vim'),
-        "     \ 'cmd' : 'popset#data#SetExecute',
-        " \}]
     " set option with PSet
     nnoremap <leader>so :PSet
     nnoremap <leader>sa :PSet popset<CR>
@@ -949,7 +930,7 @@ call plug#end()                         " required
 " User functions
 "===============================================================================
 " {{{
-" 基本设置 {{{
+" Basic {{{
 " 切换显示隐藏字符 {{{
 function! InvConceallevel()
     if &conceallevel == 0
@@ -1065,7 +1046,7 @@ endif
 " }}}
 " }}}
 
-" 编译环境 {{{
+" Project Run {{{
 " FUNCTION: ComplileToggleX86X64() "{{{
 " 切换成x86或x64编译环境
 let s:complile_type = 'x64'
@@ -1325,7 +1306,7 @@ let RC_MakeClean  = function('ComplileProject', ['[mM]akefile', 'ComplileProject
 let RC_Html       = function('ComplileProject', ['[iI]ndex.html', 'ComplileProjectHtml'])
 " }}}
 
-" 带参函数执行 {{{
+" Function Run {{{
 " FUNCTION: ExecFuncInput(prompt, text, cmpl, fn, ...) {{{
 " @param prompt: input的提示信息
 " @param text: input的缺省输入
@@ -1379,7 +1360,7 @@ endfunction
 " }}}
 " }}}
 
-" 查找 {{{
+" Search {{{
 " FUNCTION: GetSelectedContent() {{{ 获取选区内容
 function! GetSelectedContent()
     let l:reg_var = getreg('0', 1)
@@ -1701,7 +1682,7 @@ endfunction
 " }}}
 " }}}
 
-" 杂项 {{{
+" Misc {{{
 " 查找Vim关键字 {{{
 function! GotoKeyword(mode)
     let l:exec_str = 'help '
@@ -1731,26 +1712,30 @@ endfunction
 " }}}
 
 " 添加分隔符 {{{
-function! DivideSpace(pos)
-    let l:line = getline('.')
+function! DivideSpace(pos) range
     let l:chars = split(input('Divide ' . toupper(a:pos) . ' Space(split with space): '), ' ')
     if empty(l:chars)
         return
     endif
 
-    let l:fie = ' '
-    for ch in l:chars
-        let l:pch = '\s*' . escape(ch, '~*\.$^') . '\s*\C'
-        if a:pos == 'h'
-            let l:sch = l:fie . escape(ch, '&\')
-        elseif a:pos == 'c'
-            let l:sch = l:fie . escape(ch, '&\') . l:fie
-        elseif a:pos == 'l'
-            let l:sch = escape(ch, '&\') . l:fie
-        endif
-        let l:line = substitute(l:line, l:pch, l:sch, 'g')
+    for k in range(a:firstline, a:lastline)
+        let l:line = getline(k)
+        let l:fie = ' '
+        for ch in l:chars
+            let l:pch = '\s*' . escape(ch, '~*\.$^') . '\s*\C'
+            if a:pos == 'h'
+                let l:sch = l:fie . escape(ch, '&\')
+            elseif a:pos == 'c'
+                let l:sch = l:fie . escape(ch, '&\') . l:fie
+            elseif a:pos == 'l'
+                let l:sch = escape(ch, '&\') . l:fie
+            elseif a:pos == 'd'
+                let l:sch = escape(ch, '&\')
+            endif
+            let l:line = substitute(l:line, l:pch, l:sch, 'g')
+        endfor
+        call setline(k, l:line)
     endfor
-    call setline('.', l:line)
 endfunction
 " }}}
 " }}}
@@ -1828,7 +1813,7 @@ if IsGvim()
     set guioptions-=L                   " 隐藏左侧滚动条
     set guioptions-=r                   " 隐藏右侧滚动条
     set guioptions-=b                   " 隐藏底部滚动条
-    set guioptions+=0                   " 不隐藏Tab栏
+    set guioptions-=e                   " 不使用GUI标签
 
     if IsLinux()
         set lines=20
@@ -1911,6 +1896,7 @@ augroup END
     nnoremap <leader>dh :call DivideSpace('h')<CR>
     nnoremap <leader>dc :call DivideSpace('c')<CR>
     nnoremap <leader>dl :call DivideSpace('l')<CR>
+    nnoremap <leader>dd :call DivideSpace('d')<CR>
     " 显示折行
     nnoremap <leader>iw :set invwrap<CR>
     " 显示不可见字符
@@ -2133,9 +2119,9 @@ endif
     " 更新比较结果
     nnoremap <leader>du :diffupdate<CR>
     " 应用差异到别一文件，[range]<leader>dp，range默认为1行
-    nnoremap <leader>dp :<C-U>execute ".,+" . string(v:count1-1) . "diffput"<CR>
+    nnoremap <leader>dp :<C-U>execute '.,+' . string(v:count1-1) . 'diffput'<CR>
     " 拉取差异到当前文件，[range]<leader>dg，range默认为1行
-    nnoremap <leader>dg :<C-U>execute ".,+" . string(v:count1-1) . "diffget"<CR>
+    nnoremap <leader>dg :<C-U>execute '.,+' . string(v:count1-1) . 'diffget'<CR>
     " 下一个diff
     nnoremap <leader>dj ]c
     " 前一个diff
