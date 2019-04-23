@@ -412,6 +412,16 @@ endif
 
 " vim-textobj-user {{{ 文本对象
     Plug 'kana/vim-textobj-user'
+    Plug 'kana/vim-textobj-indent'
+    let g:textobj_indent_no_default_key_mappings=1
+    omap aI <Plug>(textobj-indent-a)
+    omap iI <Plug>(textobj-indent-i)
+    omap ai <Plug>(textobj-indent-same-a)
+    omap ii <Plug>(textobj-indent-same-i)
+    vmap aI <Plug>(textobj-indent-a)
+    vmap iI <Plug>(textobj-indent-i)
+    vmap ai <Plug>(textobj-indent-same-a)
+    vmap ii <Plug>(textobj-indent-same-i)
 " }}}
 " }}}
 
