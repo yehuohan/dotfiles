@@ -822,6 +822,10 @@ augroup END
 
     nnoremap <leader>th :QuickhlManualLockWindowToggle<CR>
 " }}}
+
+" vim-cpp-enhanced-highlight {{{ c++语法高亮
+    Plug 'octol/vim-cpp-enhanced-highlight'
+" }}}
 " }}}
 
 " 软件辅助
