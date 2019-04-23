@@ -410,13 +410,8 @@ endif
     vmap <C-u> <Plug>(expand_region_shrink)
 " }}}
 
-" FastFold {{{ 更新折叠
-    Plug 'Konfekt/FastFold'
-    nmap zu <Plug>(FastFoldUpdate)
-    let g:fastfold_savehook = 0         " 只允许手动更新folds
-    "let g:fastfold_fold_command_suffixes =  ['x','X','a','A','o','O','c','C']
-    "let g:fastfold_fold_movement_commands = [']z', '[z', 'zj', 'zk']
-                                        " 允许指定的命令更新folds
+" vim-textobj-user {{{ 文本对象
+    Plug 'kana/vim-textobj-user'
 " }}}
 " }}}
 
@@ -620,7 +615,20 @@ endif
     "   "install.py --clang-completer --go-completer --js-completer --java-completer --msvc 14 --build-dir <ycm_build>"
     "   自己指定vs版本，自己指定build路径，编译完成后，可以删除<ycm_build>
     "   如果已经安装了clang，可以使用--system-libclang参数，就不必再下载clang了
-    Plug 'Valloric/YouCompleteMe'
+    function! YcmBuild(info)
+        " info is a dictionary with 3 fields
+        " - name:   name of the plugin
+        " - status: 'installed', 'updated', or 'unchanged'
+        " - force:  set on PlugInstall! or PlugUpdate!
+        if a:info.status == 'installed' || a:info.force
+            if IsLinux()
+                !./install.py --clang-completer --go-completer --java-completer --system-libclang
+            elseif IsWin()
+                !./install.py --clang-completer --go-completer --js-completer --java-completer --msvc 14 --build-dir ycm_build
+            endif
+        endif
+    endfunction
+    Plug 'Valloric/YouCompleteMe', { 'do': function('YcmBuild') }
     let g:ycm_global_ycm_extra_conf=$VimPluginPath.'/.ycm_extra_conf.py'
                                                                 " C-family补全路径
     let g:ycm_enable_diagnostic_signs = 1                       " 开启语法检测
@@ -791,7 +799,6 @@ endif
 " file switch {{{ c/c++文件切换
     Plug 'derekwyatt/vim-fswitch'
     nnoremap <silent> <Leader>of :FSHere<CR>
-    nnoremap <silent> <Leader>ow :FSRight<CR>
     nnoremap <silent> <Leader>os :FSSplitRight<CR>
     let g:fsnonewfiles='on'
 " }}}
@@ -821,6 +828,15 @@ augroup END
     nmap <leader>hr <Plug>(quickhl-manual-reset)
 
     nnoremap <leader>th :QuickhlManualLockWindowToggle<CR>
+" }}}
+
+" FastFold {{{ 更新折叠
+    Plug 'Konfekt/FastFold'
+    nmap zu <Plug>(FastFoldUpdate)
+    let g:fastfold_savehook = 0         " 只允许手动更新folds
+    "let g:fastfold_fold_command_suffixes =  ['x','X','a','A','o','O','c','C']
+    "let g:fastfold_fold_movement_commands = [']z', '[z', 'zj', 'zk']
+                                        " 允许指定的命令更新folds
 " }}}
 
 " vim-cpp-enhanced-highlight {{{ c++语法高亮
