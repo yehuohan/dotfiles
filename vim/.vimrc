@@ -445,19 +445,59 @@ endif
     colorscheme gruvbox
 " }}}
 
-" air-line {{{ 状态栏
-    Plug 'vim-airline/vim-airline'
+" lightline {{{ 状态栏
+    Plug 'itchyny/lightline.vim'
+    "                    
+    " ► ✘ ⌘ ▫ ▪ ★ ☆ • ≡ ፨ ♥
 if IsVim()
-    set renderoptions=                  " 此设置使airline正常显示unicode字符
+    set renderoptions=                  " 设置正常显示unicode字符
 endif
-    let g:airline_powerline_fonts = 1
-    let g:airline#extensions#tabline#enabled = 1
-    let g:airline_theme='gruvbox'
-    let g:airline_left_sep = ''
-    let g:airline_left_alt_sep = ''
-    let g:airline_right_sep = ''
-    let g:airline_right_alt_sep = ''
-    let g:airline#extensions#ctrlspace#enabled = 1
+    let g:lightline = {
+        \ 'enable'              : {'statusline': 1, 'tabline': 0},
+        \ 'colorscheme'         : 'gruvbox',
+        \ 'separator'           : {'left': '', 'right': ''},
+        \ 'subseparator'        : {'left': '', 'right': ''},
+        \ 'tabline_separator'   : {'left': '', 'right': ''},
+        \ 'tabline_subseparator': {'left': '', 'right': ''},
+        \ 'active': {
+                \ 'left' : [['mode', 'paste'],
+                \           ['popc_segr'],
+                \           ['all_fileinfo', 'absolutepath']],
+                \ 'right': [['all_lineinfo'],
+                \           ['all_format']],
+                \ },
+        \ 'inactive': {
+                \ 'left' : [['absolutepath']],
+                \ 'right': [['all_lineinfo']],
+                \ },
+        \ 'tabline' : {
+                \ 'left' : [['tabs']],
+                \ 'right': [['close']],
+                \ },
+        \ 'component': {
+                \ 'all_lineinfo': '0X%02B ≡%3p%%   %04l/%L  %-2v',
+                \ 'all_fileinfo': '%{winnr()},%-3n%{&ro?"":""}%M',
+                \ 'all_format'  : '%{&ft!=#""?&ft." • ":""}%{&fenc!=#""?&fenc:&enc}[%{&ff}]',
+                \ 'popc_segl'   : '%{&ft==#"Popc"?popc#ui#GetStatusLineSegments("l")[0]:""}',
+                \ 'popc_segc'   : '%{&ft==#"Popc"?popc#ui#GetStatusLineSegments("c")[0]:""}',
+                \ 'popc_segr'   : '%{&ft==#"Popc"?popc#ui#GetStatusLineSegments("r")[0]:""}',
+                \ },
+        \ 'component_function': {
+                \ 'mode'        : 'LightlineMode',
+                \ },
+        \ 'component_expand': {
+                \},
+        \ 'component_type': {
+                \ },
+        \ }
+    function! LightlineMode()
+        let fname = expand('%:t')
+        return fname == '__Tagbar__' ? 'Tagbar' :
+            \ fname =~ 'NERD_tree' ? 'NERDTree' :
+            \ &ft ==# 'Popc' ? popc#ui#GetStatusLineSegments('l')[0] :
+            \ &ft ==# 'startify' ? 'Startify' :
+            \ winwidth(0) > 60 ? lightline#mode() : ''
+    endfunction
 " }}}
 
 " rainbow {{{ 彩色括号
@@ -473,6 +513,23 @@ endif
     nnoremap <leader>ti :IndentLinesToggle<CR>
 " }}}
 
+" popc {{{ buffer管理
+    Plug 'yehuohan/popc'
+    set hidden
+    let g:Popc_jsonPath = $VimPluginPath
+    let g:Popc_useTabline = 1
+    let g:Popc_useStatusline = 1
+    let g:Popc_usePowerFont = 1
+    let g:Popc_separator = {'left' : '', 'right': ''}
+    let g:Popc_subSeparator = {'left' : '', 'right': ''}
+    nnoremap <M-Space> :Popc<CR>
+    inoremap <M-Space> <Esc>:Popc<CR>
+    nnoremap <leader><leader>h :PopcBuffer<CR>
+    nnoremap <M-u> :PopcBufferSwitchLeft<CR>
+    nnoremap <M-p> :PopcBufferSwitchRight<CR>
+    nnoremap <leader><leader>b :PopcBookmark<CR>
+" }}}
+
 " ctrl-space {{{ buffer管理
     " h,o,l,w,b,/,? 对应于 buffer,file,tab,workspace,bookmark,search,help
     Plug 'yehuohan/vim-ctrlspace'
@@ -486,6 +543,7 @@ endif
     let g:CtrlSpaceStatuslineFunction = 'airline#extensions#ctrlspace#statusline()'
     let g:CtrlSpaceSymbols = { 'CS': '⌘'}
     let g:CtrlSpaceGlobCommand = 'ag -l --nocolor -g ""'
+    let g:CtrlSpaceUseTabline = 0
     " 切换按键
     nnoremap <C-Space> :CtrlSpace<CR>
     inoremap <C-Space> <Esc>:CtrlSpace<CR>
@@ -1109,7 +1167,7 @@ function! ComplileFile(argstr)
     " 生成可执行字符串
     if 'c' ==? l:ext
     "{{{
-        let l:exec_str .= 'gcc -static' . a:argstr . ' -o ' . l:name . ' ' . l:filename
+        let l:exec_str .= 'gcc -static ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
         let l:exec_str .= ' && "./' . l:name . '"'
     "}}}
     elseif 'cpp' ==? l:ext
