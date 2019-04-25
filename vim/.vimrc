@@ -319,7 +319,7 @@ call plug#begin($VimPluginPath.'/bundle')   " 可选设置，可以指定插件�
     let g:incsearch#auto_nohlsearch = 1 " 停止搜索时，自动关闭高亮
 
     " 设置查找时页面滚动映射
-    augroup incsearch-keymap
+    augroup PluginIncsearch
         autocmd!
         autocmd VimEnter * call s:incsearch_keymap()
     augroup END
@@ -463,7 +463,7 @@ endif
                 \ 'left' : [['mode', 'paste'],
                 \           ['popc_segr'],
                 \           ['all_fileinfo', 'absolutepath']],
-                \ 'right': [['all_lineinfo'],
+                \ 'right': [['all_lineinfo', 'indent', 'trailing'],
                 \           ['all_format']],
                 \ },
         \ 'inactive': {
@@ -484,6 +484,8 @@ endif
                 \ },
         \ 'component_function': {
                 \ 'mode'        : 'LightlineMode',
+                \ 'indent'      : 'LightlineCheckMixedIndent',
+                \ 'trailing'    : 'LightlineCheckTrailing',
                 \ },
         \ 'component_expand': {
                 \},
@@ -497,6 +499,14 @@ endif
             \ &ft ==# 'Popc' ? popc#ui#GetStatusLineSegments('l')[0] :
             \ &ft ==# 'startify' ? 'Startify' :
             \ winwidth(0) > 60 ? lightline#mode() : ''
+    endfunction
+    function! LightlineCheckMixedIndent()
+        let l:ret = search('\t', 'nw')
+        return (l:ret == 0) ? '' : 'I:'.string(l:ret)
+    endfunction
+    function! LightlineCheckTrailing()
+        let ret = search('\s\+$', 'nw')
+        return (l:ret == 0) ? '' : 'T:'.string(l:ret)
     endfunction
 " }}}
 
@@ -879,9 +889,10 @@ endif
     nnoremap <leader>rr :AsyncRun
     nnoremap <leader>rs :AsyncStop<CR>
 
-augroup vimrc
-    autocmd User AsyncRunStart call asyncrun#quickfix_toggle(8, 1)
-augroup END
+    augroup PluginAsyncrun
+        autocmd!
+        autocmd User AsyncRunStart call asyncrun#quickfix_toggle(8, 1)
+    augroup END
 " }}}
 
 " vim-quickhl {{{ 单词高亮
@@ -1929,7 +1940,7 @@ endif
 
 " Auto Command
 " {{{
-augroup MyVimVimrc
+augroup UserSettings
     "autocmd[!]  [group]  {event}     {pattern}  {nested}  {cmd}
     "autocmd              BufNewFile  *                    set fileformat=unix
     autocmd!
