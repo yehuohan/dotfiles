@@ -538,6 +538,7 @@ endif
     nnoremap <M-u> :PopcBufferSwitchLeft<CR>
     nnoremap <M-p> :PopcBufferSwitchRight<CR>
     nnoremap <leader><leader>b :PopcBookmark<CR>
+    nnoremap <leader><leader>w :PopcWorkspace<CR>
 " }}}
 
 " ctrl-space {{{ buffer管理
@@ -607,7 +608,7 @@ endif
     let g:NERDTreeMapJumpPrevSibling = '<C-p>'
                                         " 前一个Sibling
     nnoremap <leader>te :NERDTreeToggle<CR>
-    nnoremap <leader>tE :NERDTree<CR>
+    nnoremap <leader>tE :execute ':NERDTree ' . getcwd()<CR>
 " }}}
 
 " vim-startify {{{ vim会话界面
@@ -1877,11 +1878,14 @@ endfunction
     set noshowmode                      " 命令行栏不显示VISUAL等字样
     set completeopt=menuone,preview     " 补全显示设置
     set backspace=2                     " Insert模式下使用BackSpace删除
+    set title                           " 允许设置titlestring
     set hidden                          " 允许在未保存文件时切换buffer
     set bufhidden=                      " 跟随hidden设置
     set nobackup                        " 不生成备份文件
     set nowritebackup                   " 覆盖文件前，不生成备份文件
     set autochdir                       " 自动切换当前目录为当前文件所在的目录
+    set noautowrite                     " 禁止自动保存文件
+    set noautowriteall                  " 禁止自动保存文件
     set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
                                         " 尝试解码序列
     set encoding=utf-8                  " vim内部使用utf-8编码
