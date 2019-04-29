@@ -485,7 +485,8 @@ endif
                 \           ['popc_segr'],
                 \           ['all_fileinfo', 'absolutepath']],
                 \ 'right': [['all_lineinfo', 'indent', 'trailing'],
-                \           ['all_format']],
+                \           ['all_format'],
+                \           ['find_working']],
                 \ },
         \ 'inactive': {
                 \ 'left' : [['absolutepath']],
@@ -499,6 +500,7 @@ endif
                 \ 'all_lineinfo': '0X%02B ≡%3p%%   %04l/%L  %-2v',
                 \ 'all_fileinfo': '%{winnr()},%-3n%{&ro?"":""}%M',
                 \ 'all_format'  : '%{&ft!=#""?&ft." • ":""}%{&fenc!=#""?&fenc:&enc}[%{&ff}]',
+                \ 'find_working': '%{FindWorkingGetString()}',
                 \ 'popc_segl'   : '%{&ft==#"Popc"?popc#ui#GetStatusLineSegments("l")[0]:""}',
                 \ 'popc_segc'   : '%{&ft==#"Popc"?popc#ui#GetStatusLineSegments("c")[0]:""}',
                 \ 'popc_segr'   : '%{&ft==#"Popc"?popc#ui#GetStatusLineSegments("r")[0]:""}',
@@ -1525,68 +1527,33 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
 endfunction
 " }}}
 
-" FUNCTION: FindWorkingUpdateInfo(flt) {{{ 更新working信息
-let s:working_root = ''
-let s:working_filter = ''
-function! FindWorkingUpdateInfo(flt)
-    let l:root = input(' Where (root) to find :', '', 'customlist,GetMultiFilesCompletion')
-    if empty(l:root)
-        return 0
-    endif
-    let s:working_root = fnamemodify(l:root, ':p')
-    if a:flt
-        let s:working_filter = input(' Which (filter) to find :', '')
-    endif
-    return 1
-endfunction
-" }}}
-
-" FUNCTION! FindWorkingFzfFile() {{{ 工程文件查找
-function! FindWorkingFzfFile()
-    if empty(s:working_root)
-        if !FindWorkingUpdateInfo(0)
-            return
-        endif
-    endif
-    execute ':LeaderfFile ' . s:working_root
-endfunction
-" }}}
-
-" FUNCTION: FindWorkingToggleDefault() {{{ 工程默认查找切换
-let s:fkregrep_default = 'r'
-function FindWorkingToggleDefault()
-    if s:fkregrep_default ==# 'r'
-        let s:fkregrep_default = 'l'
-    elseif s:fkregrep_default ==# 'l'
-        let s:fkregrep_default = 'r'
-    endif
-    echo "FindWorking default:" . s:fkregrep_default
-endfunction
-" }}}
-
-" FUNCTION: FindWorkingRggrep(type, mode) {{{ 工程快速查找
-let s:fkrggrep_nvmaps = [
-                       \ 'fi', 'fli', 'fLi', 'fri', 'fRi', 'fI', 'flI', 'fLI', 'frI', 'fRI',
-                       \ 'fw', 'flw', 'fLw', 'frw', 'fRw', 'fW', 'flW', 'fLW', 'frW', 'fRW',
-                       \ 'fs', 'fls', 'fLs', 'frs', 'fRs', 'fS', 'flS', 'fLS', 'frS', 'fRS',
-                       \ 'f=', 'fl=', 'fL=', 'fr=', 'fR=', 'f=', 'fl=', 'fL=', 'fr=', 'fR=',
-                       \ 'Fi', 'Fli', 'FLi', 'Fri', 'FRi', 'FI', 'FlI', 'FLI', 'FrI', 'FRI',
-                       \ 'Fw', 'Flw', 'FLw', 'Frw', 'FRw', 'FW', 'FlW', 'FLW', 'FrW', 'FRW',
-                       \ 'Fs', 'Fls', 'FLs', 'Frs', 'FRs', 'FS', 'FlS', 'FLS', 'FrS', 'FRS',
-                       \ 'F=', 'Fl=', 'FL=', 'Fr=', 'FR=', 'F=', 'Fl=', 'FL=', 'Fr=', 'FR=',
-                       \ ]
-function! FindWorkingRggrep(type, mode)
+" FUNCTION: FindWorking(type, mode) {{{ 超快查找
+let s:fw_root = ''
+let s:fw_markers = ['.root', '.git', '.svn']
+let s:fw_filters = ''
+let s:fw_nvmaps = [
+                \ 'fi', 'fli', 'fbi', 'fpi', 'fri', 'fI', 'flI', 'fbI', 'fpI', 'frI',
+                \ 'fw', 'flw', 'fbw', 'fpw', 'frw', 'fW', 'flW', 'fbW', 'fpW', 'frW',
+                \ 'fs', 'fls', 'fbs', 'fps', 'frs', 'fS', 'flS', 'fbS', 'fpS', 'frS',
+                \ 'f=', 'fl=', 'fb=', 'fp=', 'fr=', 'f=', 'fl=', 'fb=', 'fp=', 'fr=',
+                \ 'Fi', 'Fli', 'Fbi', 'Fpi', 'Fri', 'FI', 'FlI', 'FbI', 'FpI', 'FrI',
+                \ 'Fw', 'Flw', 'Fbw', 'Fpw', 'Frw', 'FW', 'FlW', 'FbW', 'FpW', 'FrW',
+                \ 'Fs', 'Fls', 'Fbs', 'Fps', 'Frs', 'FS', 'FlS', 'FbS', 'FpS', 'FrS',
+                \ 'F=', 'Fl=', 'Fb=', 'Fp=', 'Fr=', 'F=', 'Fl=', 'Fb=', 'Fp=', 'Fr=',
+                \ ]
+function! FindWorking(type, mode)
     " {{{
-    " Option: [fF][lLrR][IiWwSs=]
+    " Option: [fF][lbpr][IiWwSs=]
     "         [%1][ %2 ][  3%   ]
-    " Working: %1
-    "   F : find with no regexp match
-    " Path: %2
-    "   l : find with %
-    "   L : find with inputing path
-    "   r : find with working root and filter
-    "   R : find with inputing working root and filter
-    "   The %2 is 'r' in default. Toggle default to 'l' by FindWorkingToggleDefault()
+    " Find: %1
+    "   f : find with Rg
+    "   F : find with inputing args
+    " Working: %2
+    "   l : find with Rg in working root-filter and pass result to Leaderf
+    "   b : find with in buffer(%)
+    "   p : find with inputing path
+    "   r : find with inputing working root and filter
+    "  '' : find with working root-filter
     " Pattern: %3
     "   = : find text from clipboard
     "   Normal Mode: mode='n'
@@ -1600,7 +1567,6 @@ function! FindWorkingRggrep(type, mode)
     "   LowerCase: [iws] find in ignorecase
     "   UpperCase: [IWS] find in case match
     " }}}
-
     let l:command = ':Rg'
     let l:options = ''
     let l:pattern = ''
@@ -1609,14 +1575,14 @@ function! FindWorkingRggrep(type, mode)
     " 设置查找内容
     if a:mode ==# 'n'
         if a:type =~? 'i'
-            let l:pattern = input(' What to find :')
+            let l:pattern = input(' What to find: ')
         elseif a:type =~? '[ws]'
             let l:pattern = expand('<cword>')
         endif
     elseif a:mode ==# 'v'
         let l:selected = GetSelectedContent()
         if a:type =~? 'i'
-            let l:pattern = input(' What to find :', l:selected)
+            let l:pattern = input(' What to find: ', l:selected)
         elseif a:type =~? '[ws]'
             let l:pattern = l:selected
         endif
@@ -1628,38 +1594,109 @@ function! FindWorkingRggrep(type, mode)
     let l:pattern = escape(l:pattern, ' #%')      " 转义Space,#,%
 
     " 设置查找范围
-    let l:path_type = a:type
-    if a:type !~? '[lLrR]'
-        let l:path_type = a:type . s:fkregrep_default
-    endif
-    if l:path_type =~# 'l'
-        let l:location = '%'
-    elseif l:path_type =~# 'L'
-        let l:location = input(' Where to find :', '', 'customlist,GetMultiFilesCompletion')
-    elseif l:path_type =~# 'R'
-        if !FindWorkingUpdateInfo(1) | return | endif
-        let l:location = s:working_root
-    elseif l:path_type =~# 'r'
-        if empty(s:working_root)
-            if !FindWorkingUpdateInfo(1) | return | endif
+    if a:type !~# '[bpr]'
+        if empty(s:fw_root)
+            call FindWorkingSet()
         endif
-        let l:location = s:working_root
+        let l:location = s:fw_root
+    elseif a:type =~# 'b'
+        let l:location = '%'
+    elseif a:type =~# 'p'
+        let l:location = input(' Where to find: ', '', 'customlist,GetMultiFilesCompletion')
+    elseif a:type =~# 'r'
+        call FindWorkingSet()
+        let l:location = s:fw_root
     endif
     if empty(l:location) | return | endif
 
     " 设置查找选项
     if a:type =~? 's'     | let l:options .= '-w ' | endif
-    if a:type =~# '[iws]' | let l:options .= '-i ' | endif
-    if !empty(s:working_filter) && l:path_type =~? '[rR]'
-        let l:options .= '-g "*.{' . s:working_filter . '}" '
+    if a:type =~# '[iws]' | let l:options .= '-i ' | elseif a:type =~# '[IWS]' | let l:options .= '-s' | endif
+    if !empty(s:fw_filters) && a:type !~? '[bp]'
+        let l:options .= '-g "*.{' . s:fw_filters . '}" '
     endif
     if a:type =~# 'F'
-        let l:options .= '-F'
+        let l:options .= input(' Args to append: ', '')
     endif
 
-    " 使用Rg查找
+    " 设置查找方式
+    if a:type =~# 'l'
+        let l:command = ':Leaderf rg --nowrap'
+        let l:pattern = '-e ' . l:pattern
+    endif
     execute l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options
-    call QuickfixHighlight(l:pattern)
+    call FindWorkingHighlight(l:pattern)
+endfunction
+" }}}
+
+" FUNCTION: FindWorkingRoot() {{{ 检测root路径
+augroup UserFunctionSearch
+    autocmd!
+    autocmd VimEnter * call FindWorkingRoot()
+augroup END
+function! FindWorkingRoot()
+    if empty(s:fw_markers)
+        return
+    endif
+
+    let l:dir = fnamemodify('.', ':p:h')
+    let l:dirLast = ''
+    while l:dir !=# l:dirLast
+        let l:dirLast = l:dir
+        for m in s:fw_markers
+            let l:root = l:dir . '/' . m
+            if filereadable(l:root) || isdirectory(l:root)
+                let s:fw_root = fnameescape(l:dir)
+                return
+            endif
+        endfor
+        let l:dir = fnamemodify(l:dir, ':p:h:h')
+    endwhile
+endfunction
+" }}}
+
+" FUNCTION: FindWorkingSet() {{{ 设置root路径
+function! FindWorkingSet()
+    let l:root = input(' Where (Root) to find: ', '', 'customlist,GetMultiFilesCompletion')
+    if empty(l:root)
+        return 0
+    endif
+    let s:fw_root = fnamemodify(l:root, ':p')
+    let s:fw_filters = input(' Which (Filter) to find: ', '')
+    return 1
+endfunction
+" }}}
+
+" FUNCTION: FindWorkingGetString() {{{ 获取root信息
+function! FindWorkingGetString()
+    if empty(s:fw_root)
+        return ''
+    endif
+    return s:fw_root . '[' . s:fw_filters . ']'
+endfunction
+" }}}
+
+" FUNCTION: FindWorkingFile() {{{ 查找文件
+function! FindWorkingFile()
+    if empty(s:fw_root)
+        let l:root = input(' Where (Root) to find: ', '', 'customlist,GetMultiFilesCompletion')
+        if empty(l:root)
+            return 0
+        endif
+        let s:fw_root = fnamemodify(l:root, ':p')
+    endif
+    execute ':LeaderfFile ' . s:fw_root
+endfunction
+" }}}
+
+" FUNCTION: FindWorkingHighlight(str) {{{ 高亮字符串
+function! FindWorkingHighlight(...)
+    if a:0 >= 1
+        let s:hl_str = escape(a:1, '/*')
+    endif
+    if exists('s:hl_str') && getline(1) =~# s:hl_str
+        execute 'syntax match IncSearch /' . s:hl_str . '/'
+    endif
 endfunction
 " }}}
 
@@ -1680,14 +1717,14 @@ function! FindVimgrep(type, mode)
     " 设置查找内容
     if a:mode ==# 'n'
         if a:type =~? 'i'
-            let l:string = input(' What to find :')
+            let l:string = input(' What to find: ')
         elseif a:type =~? '[ws]'
             let l:string = expand('<cword>')
         endif
     elseif a:mode ==# 'v'
         let l:selected = GetSelectedContent()
         if a:type =~? 'i'
-            let l:string = input(' What to find :', l:selected)
+            let l:string = input(' What to find: ', l:selected)
         elseif a:type =~? '[ws]'
             let l:string = l:selected
         endif
@@ -1700,7 +1737,7 @@ function! FindVimgrep(type, mode)
 
     " 设置查找范围
     if a:type =~# 'g'
-        let l:files = input(' Where to find :', '', 'customlist,GetMultiFilesCompletion')
+        let l:files = input(' Where to find: ', '', 'customlist,GetMultiFilesCompletion')
         if empty(l:files) | return | endif
     endif
 
@@ -1725,7 +1762,7 @@ function! FindVimgrep(type, mode)
         endif
     endif
     execute 'syntax match IncSearch /' . l:string . '/'
-    call QuickfixHighlight(l:string)
+    call FindWorkingHighlight(l:string)
 endfunction
 " }}}
 endif
@@ -1749,17 +1786,6 @@ function! QuickfixGet()
 endfunction
 " }}}
 
-" FUNCTION: QuickfixHighlight(str) {{{ 高亮字符串
-function! QuickfixHighlight(...)
-    if a:0 >= 1
-        let s:hl_str = escape(a:1, '/*')
-    endif
-    if exists('s:hl_str') && getline(1) =~# s:hl_str
-        execute 'syntax match IncSearch /' . s:hl_str . '/'
-    endif
-endfunction
-" }}}
-
 " FUNCTION: QuickfixTabEdit() {{{ 新建Tab打开窗口
 function! QuickfixTabEdit()
     let [l:type, l:line] = QuickfixGet()
@@ -1779,7 +1805,7 @@ function! QuickfixTabEdit()
         silent! normal! zz
         execute 'botright lopen'
     endif
-    call QuickfixHighlight()
+    call FindWorkingHighlight()
 endfunction
 " }}}
 
@@ -2123,12 +2149,12 @@ endif
     nnoremap <leader>bp :bprevious<CR>
     nnoremap <leader>bl :b#<Bar>execute "set buflisted"<CR>
     " 打开/关闭Quickfix
-    nnoremap <leader>qo :botright copen<Bar>call QuickfixHighlight()<CR>
+    nnoremap <leader>qo :botright copen<Bar>call FindWorkingHighlight()<CR>
     nnoremap <leader>qc :cclose<Bar>wincmd p<CR>
     nnoremap <leader>qj :cnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     nnoremap <leader>qk :cprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     " 打开/关闭Location-list
-    nnoremap <leader>lo :botright lopen<Bar>call QuickfixHighlight()<CR>
+    nnoremap <leader>lo :botright lopen<Bar>call FindWorkingHighlight()<CR>
     nnoremap <leader>lc :lclose<Bar>wincmd p<CR>
     nnoremap <leader>lj :lnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     nnoremap <leader>lk :lprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
@@ -2260,15 +2286,15 @@ endif
     " 查找当前光标下的内容
     nnoremap <leader>/ :execute"let g:__str__=expand(\"<cword>\")"<Bar>execute "/" . g:__str__<CR>
 
-    " 使用FindVimgrep查找
-    for item in s:fkrggrep_nvmaps
-        execute 'nnoremap <leader>' . item ':call FindWorkingRggrep("' . item . '", "n")<CR>'
+    " FindWorking查找
+    for item in s:fw_nvmaps
+        execute 'nnoremap <leader>' . item ':call FindWorking("' . item . '", "n")<CR>'
     endfor
-    for item in s:fkrggrep_nvmaps
-        execute 'vnoremap <leader>' . item ':call FindWorkingRggrep("' . item . '", "v")<CR>'
+    for item in s:fw_nvmaps
+        execute 'vnoremap <leader>' . item ':call FindWorking("' . item . '", "v")<CR>'
     endfor
-    nnoremap <leader>ftd :call FindWorkingToggleDefault()<CR>
-    nnoremap <leader>ff :call FindWorkingFzfFile()<CR>
+    nnoremap <leader>ff :call FindWorkingFile()<CR>
+    nnoremap <leader>fR :call FindWorkingRoot()<CR>
 if IsNVim()
     for item in s:findvimgrep_nvmaps
         execute 'nnoremap <leader>' . item ':call FindVimgrep("' . item . '", "n")<CR>'
