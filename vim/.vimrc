@@ -362,11 +362,32 @@ call plug#begin($VimPluginPath.'/bundle')   " 可选设置，可以指定插件�
     nnoremap <leader>fF :FzfFiles
 " }}}
 
+" LeaderF {{{ 模糊查找
+if IsLinux()
+    Plug 'Yggdroot/LeaderF', { 'do': './install.sh' }
+elseif IsWin()
+    Plug 'Yggdroot/LeaderF', { 'do': './install.bat' }
+else
+    Plug 'Yggdroot/LeaderF'
+endif
+    let g:Lf_CacheDirectory = $VimPluginPath
+    let g:Lf_StlSeparator = {'left': '', 'right': '', 'font': ''}
+    let g:Lf_ShortcutF = ''
+    let g:Lf_ShortcutB = ''
+    nnoremap <leader>lf :LeaderfFile<CR>
+    nnoremap <leader>lF :LeaderfFile
+    nnoremap <leader>lu :LeaderfFunction<CR>
+    nnoremap <leader>lU :LeaderfFunctionAll<CR>
+    nnoremap <leader>ll :LeaderfLine<CR>
+    nnoremap <leader>lL :LeaderfLineAll<CR>
+    nnoremap <leader>lr :LeaderfRgInteractive<CR>
+" }}}
+
 " grep {{{ 大范围查找
 if IsVim()
     Plug 'yegappan/grep'
-    "let g:Ag_Path = '$VIM.'\\vim81\\ag.exe"
-    "let g:Rg_Path = '$VIM.'\\vim81\\rg.exe"
+    "let g:Ag_Path = $VIM.'/vim81/ag.exe'
+    "let g:Rg_Path = $VIM.'/vim81/rg.exe'
 endif
 " }}}
 
@@ -1527,7 +1548,7 @@ function! FindWorkingFzfFile()
             return
         endif
     endif
-    execute ':FzfFiles ' . s:working_root
+    execute ':LeaderfFile ' . s:working_root
 endfunction
 " }}}
 
@@ -1863,6 +1884,7 @@ endfunction
     set listchars=eol:$,tab:>-,trail:~,space:.
                                         " 不可见字符显示
     set autoindent                      " 使用autoindent缩进
+    set nobreakindent                   " 折行时不缩进
     set conceallevel=0                  " 显示markdown等格式中的隐藏字符
     set foldenable                      " 充许折叠
     set foldcolumn=0                    " 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
@@ -1896,7 +1918,8 @@ endfunction
     set nrformats=bin,octal,hex,alpha   " CTRL-A-X支持数字和字母
     set noimdisable                     " 切换Normal模式时，自动换成英文输入法
     set noerrorbells                    " 关闭错误信息响铃
-    set vb t_vb=                        " 关闭响铃(vb, visualbell)和可视闪铃(t_vb，即闪屏)，即normal模式时按esc会有响铃
+    set visualbell t_vb=                " 关闭响铃(vb, visualbell)和可视闪铃(t_vb，即闪屏)，即normal模式时按esc会有响铃
+    set belloff=all                     " 关闭所有事件的响铃
     set helplang=cn,en                  " 优先查找中文帮助
 
     " 终端光标设置
