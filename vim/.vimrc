@@ -586,7 +586,7 @@ endif
 
 " ctrl-space {{{ buffer管理
     " h,o,l,w,b,/,? 对应于 buffer,file,tab,workspace,bookmark,search,help
-    Plug 'yehuohan/vim-ctrlspace'
+    Plug 'yehuohan/vim-ctrlspace', {'on': 'CtrlSpace'}
     set hidden                          " 允许在未保存文件时切换buffer
     let g:CtrlSpaceCacheDir = $VimPluginPath
     let g:CtrlSpaceSetDefaultMapping = 1
@@ -604,7 +604,7 @@ endif
 " }}}
 
 " Pop Selection {{{ 弹出选项
-    Plug 'yehuohan/popset'
+    Plug 'yehuohan/popset', {'on': 'PSet'}
     highlight link PopsetSelected Search
     let g:Popset_CompleteAll = 0
     let g:Popset_SelectionData = [
@@ -640,7 +640,7 @@ endif
 " }}}
 
 " nerd-tree {{{ 目录树导航
-    Plug 'scrooloose/nerdtree'
+    Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTree']}
     let g:NERDTreeShowHidden=1
     let g:NERDTreeMapPreview = 'go'     " 预览打开
     let g:NERDTreeMapChangeRoot = 'cd'  " 更改根目录
@@ -971,15 +971,15 @@ endif
 " }}}
 
 " MarkDown {{{
-    Plug 'gabrielelana/vim-markdown'
+    Plug 'gabrielelana/vim-markdown', {'for': 'markdown'}
     let g:markdown_include_jekyll_support = 0
     let g:markdown_enable_mappings = 0
     let g:markdown_enable_spell_checking = 0
     let g:markdown_enable_folding = 1   " 感觉MarkDown折叠引起卡顿时，关闭此项
     let g:markdown_enable_conceal = 1   " 在Vim中显示MarkDown预览
 
-    Plug 'iamcco/mathjax-support-for-mkdp'
-    Plug 'iamcco/markdown-preview.vim'
+    Plug 'iamcco/mathjax-support-for-mkdp', {'for': 'markdown'}
+    Plug 'iamcco/markdown-preview.vim', {'for': 'markdown'}
     let g:mkdp_path_to_chrome = s:path_browser
     let g:mkdp_auto_start = 0
     let g:mkdp_auto_close = 1
@@ -1010,8 +1010,8 @@ endif
 " reStructruedText {{{
 if !(IsWin() && IsNVim())
     " 需要安装 https://github.com/Rykka/instant-rst.py
-    Plug 'Rykka/riv.vim'
-    Plug 'Rykka/InstantRst'
+    Plug 'Rykka/riv.vim', {'for': 'rst'}
+    Plug 'Rykka/InstantRst', {'for': 'rst'}
     let g:instant_rst_browser = s:path_browser
 if IsWin()
     " 需要安装 https://github.com/mgedmin/restview
