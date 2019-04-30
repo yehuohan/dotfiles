@@ -483,10 +483,10 @@ endif
         \ 'active': {
                 \ 'left' : [['mode', 'paste'],
                 \           ['popc_segr'],
-                \           ['all_fileinfo', 'absolutepath']],
+                \           ['all_fileinfo', 'fw_filepath']],
                 \ 'right': [['all_lineinfo', 'indent', 'trailing'],
                 \           ['all_format'],
-                \           ['find_working']],
+                \           ['fw_root']],
                 \ },
         \ 'inactive': {
                 \ 'left' : [['absolutepath']],
@@ -500,7 +500,6 @@ endif
                 \ 'all_lineinfo': '0X%02B ≡%3p%%   %04l/%L  %-2v',
                 \ 'all_fileinfo': '%{winnr()},%-3n%{&ro?"":""}%M',
                 \ 'all_format'  : '%{&ft!=#""?&ft." • ":""}%{&fenc!=#""?&fenc:&enc}[%{&ff}]',
-                \ 'find_working': '%{FindWorkingGetString()}',
                 \ 'popc_segl'   : '%{&ft==#"Popc"?popc#ui#GetStatusLineSegments("l")[0]:""}',
                 \ 'popc_segc'   : '%{&ft==#"Popc"?popc#ui#GetStatusLineSegments("c")[0]:""}',
                 \ 'popc_segr'   : '%{&ft==#"Popc"?popc#ui#GetStatusLineSegments("r")[0]:""}',
@@ -509,6 +508,8 @@ endif
                 \ 'mode'        : 'LightlineMode',
                 \ 'indent'      : 'LightlineCheckMixedIndent',
                 \ 'trailing'    : 'LightlineCheckTrailing',
+                \ 'fw_filepath' : 'LightlineFilepath',
+                \ 'fw_root'     : 'LightlineFindworking',
                 \ },
         \ 'component_expand': {
                 \},
@@ -530,6 +531,15 @@ endif
     function! LightlineCheckTrailing()
         let ret = search('\s\+$', 'nw')
         return (l:ret == 0) ? '' : 'T:'.string(l:ret)
+    endfunction
+    function! LightlineFilepath()
+        let l:fw = FindWorkingGet()
+        let l:fp = fnamemodify(expand('%'), ':p')
+        return empty(l:fw) ? l:fp : substitute(l:fp, escape(l:fw[0], '\'), '...', '')
+    endfunction
+    function! LightlineFindworking()
+        let l:fw = FindWorkingGet()
+        return empty(l:fw) ? '' : (l:fw[0] . '[' . l:fw[1] .']')
     endfunction
 " }}}
 
@@ -1667,12 +1677,12 @@ function! FindWorkingSet()
 endfunction
 " }}}
 
-" FUNCTION: FindWorkingGetString() {{{ 获取root信息
-function! FindWorkingGetString()
+" FUNCTION: FindWorkingGet() {{{ 获取root信息
+function! FindWorkingGet()
     if empty(s:fw_root)
-        return ''
+        return []
     endif
-    return s:fw_root . '[' . s:fw_filters . ']'
+    return [s:fw_root, s:fw_filters]
 endfunction
 " }}}
 
