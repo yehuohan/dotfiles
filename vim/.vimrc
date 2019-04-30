@@ -380,6 +380,8 @@ endif
     nnoremap <leader>lU :LeaderfFunctionAll<CR>
     nnoremap <leader>ll :LeaderfLine<CR>
     nnoremap <leader>lL :LeaderfLineAll<CR>
+    nnoremap <leader>lb :LeaderfBuffer<CR>
+    nnoremap <leader>lB :LeaderfBufferAll<CR>
     nnoremap <leader>lr :LeaderfRgInteractive<CR>
 " }}}
 
@@ -1614,8 +1616,7 @@ function! FindWorking(type, mode)
     elseif a:type =~# 'p'
         let l:location = input(' Where to find: ', '', 'customlist,GetMultiFilesCompletion')
     elseif a:type =~# 'r'
-        call FindWorkingSet()
-        let l:location = s:fw_root
+        let l:location = FindWorkingSet() ? s:fw_root : ''
     endif
     if empty(l:location) | return | endif
 
