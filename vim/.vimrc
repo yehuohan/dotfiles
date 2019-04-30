@@ -445,6 +445,14 @@ endif
     vmap iI <Plug>(textobj-indent-i)
     vmap ai <Plug>(textobj-indent-same-a)
     vmap ii <Plug>(textobj-indent-same-i)
+    Plug 'kana/vim-textobj-function'
+    Plug 'glts/vim-textobj-comment'
+    Plug 'adriaanzon/vim-textobj-matchit'
+    Plug 'lucapette/vim-textobj-underscore'
+    omap au <Plug>(textobj-underscore-a)
+    omap iu <Plug>(textobj-underscore-i)
+    vmap au <Plug>(textobj-underscore-a)
+    vmap iu <Plug>(textobj-underscore-i)
 " }}}
 " }}}
 
@@ -667,9 +675,6 @@ endif
             \ ['   Recent Files:'] , 'files'     ,
             \ ['   Recent Dirs:']  , 'dir'       ,
             \ ['   Commands:']     , 'commands']
-    let g:startify_session_before_save = ['silent! NERDTreeClose']
-    nnoremap <leader>qa :SDelete! default<CR><Bar>:SSave default<CR><Bar>:qa<CR>
-                                        " 先删除默认的，再保存会话，最后退出所有窗口
     nnoremap <leader>su :Startify<CR>   " start ui of vim-startify
 " }}}
 
