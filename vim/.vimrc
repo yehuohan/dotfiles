@@ -1544,34 +1544,57 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
 endfunction
 " }}}
 
-" FUNCTION: FindWorking(type, mode) {{{ 超快查找
+" FUNCTION: FindWorking(type, mode) {{{ 超速查找
+" {{{
 let s:fw_root = ''
 let s:fw_markers = ['.root', '.git', '.svn']
 let s:fw_filters = ''
+let s:fw_strings = []
 let s:fw_nvmaps = [
-                \ 'fi', 'fli', 'fbi', 'fpi', 'fri', 'fI', 'flI', 'fbI', 'fpI', 'frI',
-                \ 'fw', 'flw', 'fbw', 'fpw', 'frw', 'fW', 'flW', 'fbW', 'fpW', 'frW',
-                \ 'fs', 'fls', 'fbs', 'fps', 'frs', 'fS', 'flS', 'fbS', 'fpS', 'frS',
-                \ 'f=', 'fl=', 'fb=', 'fp=', 'fr=', 'f=', 'fl=', 'fb=', 'fp=', 'fr=',
-                \ 'Fi', 'Fli', 'Fbi', 'Fpi', 'Fri', 'FI', 'FlI', 'FbI', 'FpI', 'FrI',
-                \ 'Fw', 'Flw', 'Fbw', 'Fpw', 'Frw', 'FW', 'FlW', 'FbW', 'FpW', 'FrW',
-                \ 'Fs', 'Fls', 'Fbs', 'Fps', 'Frs', 'FS', 'FlS', 'FbS', 'FpS', 'FrS',
-                \ 'F=', 'Fl=', 'Fb=', 'Fp=', 'Fr=', 'F=', 'Fl=', 'Fb=', 'Fp=', 'Fr=',
+                \  'fi',  'fbi',  'fpi',  'fri',  'fI',  'fbI',  'fpI',  'frI',
+                \  'fw',  'fbw',  'fpw',  'frw',  'fW',  'fbW',  'fpW',  'frW',
+                \  'fs',  'fbs',  'fps',  'frs',  'fS',  'fbS',  'fpS',  'frS',
+                \  'f=',  'fb=',  'fp=',  'fr=',  'f=',  'fb=',  'fp=',  'fr=',
+                \  'Fi',  'Fbi',  'Fpi',  'Fri',  'FI',  'FbI',  'FpI',  'FrI',
+                \  'Fw',  'Fbw',  'Fpw',  'Frw',  'FW',  'FbW',  'FpW',  'FrW',
+                \  'Fs',  'Fbs',  'Fps',  'Frs',  'FS',  'FbS',  'FpS',  'FrS',
+                \  'F=',  'Fb=',  'Fp=',  'Fr=',  'F=',  'Fb=',  'Fp=',  'Fr=',
+                \ 'fli', 'flbi', 'flpi', 'flri', 'flI', 'flbI', 'flpI', 'flrI',
+                \ 'flw', 'flbw', 'flpw', 'flrw', 'flW', 'flbW', 'flpW', 'flrW',
+                \ 'fls', 'flbs', 'flps', 'flrs', 'flS', 'flbS', 'flpS', 'flrS',
+                \ 'fl=', 'flb=', 'flp=', 'flr=', 'fl=', 'flb=', 'flp=', 'flr=',
+                \ 'Fli', 'Flbi', 'Flpi', 'Flri', 'FlI', 'FlbI', 'FlpI', 'FlrI',
+                \ 'Flw', 'Flbw', 'Flpw', 'Flrw', 'FlW', 'FlbW', 'FlpW', 'FlrW',
+                \ 'Fls', 'Flbs', 'Flps', 'Flrs', 'FlS', 'FlbS', 'FlpS', 'FlrS',
+                \ 'Fl=', 'Flb=', 'Flp=', 'Flr=', 'Fl=', 'Flb=', 'Flp=', 'Flr=',
+                \ 'fai', 'fabi', 'fapi', 'fari', 'faI', 'fabI', 'fapI', 'farI',
+                \ 'faw', 'fabw', 'fapw', 'farw', 'faW', 'fabW', 'fapW', 'farW',
+                \ 'fas', 'fabs', 'faps', 'fars', 'faS', 'fabS', 'fapS', 'farS',
+                \ 'fa=', 'fab=', 'fap=', 'far=', 'fa=', 'fab=', 'fap=', 'far=',
+                \ 'Fai', 'Fabi', 'Fapi', 'Fari', 'FaI', 'FabI', 'FapI', 'FarI',
+                \ 'Faw', 'Fabw', 'Fapw', 'Farw', 'FaW', 'FabW', 'FapW', 'FarW',
+                \ 'Fas', 'Fabs', 'Faps', 'Fars', 'FaS', 'FabS', 'FapS', 'FarS',
+                \ 'Fa=', 'Fab=', 'Fap=', 'Far=', 'Fa=', 'Fab=', 'Fap=', 'Far=',
                 \ ]
+" }}}
 function! FindWorking(type, mode)
     " {{{
-    " Option: [fF][lbpr][IiWwSs=]
-    "         [%1][ %2 ][  3%   ]
+    " Required: based on 'yegappan/grep' and 'Yggdroot/LeaderF'
+    " Option: [fF][la][bpr][IiWwSs=]
+    "         [%1][%2][%3 ][4%     ]
     " Find: %1
-    "   f : find with Rg
-    "   F : find with inputing args
-    " Working: %2
+    "   f : find working
+    "   F : find working with inputing args
+    " Command: %2
+    "   '': find with Rg by default
     "   l : find with Rg in working root-filter and pass result to Leaderf
+    "   a : find with RgAdd
+    " Location: %3
     "   b : find with in buffer(%)
     "   p : find with inputing path
     "   r : find with inputing working root and filter
     "  '' : find with working root-filter
-    " Pattern: %3
+    " Pattern: %4
     "   = : find text from clipboard
     "   Normal Mode: mode='n'
     "   i : find input
@@ -1584,7 +1607,7 @@ function! FindWorking(type, mode)
     "   LowerCase: [iws] find in ignorecase
     "   UpperCase: [IWS] find in case match
     " }}}
-    let l:command = ':Rg'
+    let l:command = ''
     let l:options = ''
     let l:pattern = ''
     let l:location = ''
@@ -1617,7 +1640,7 @@ function! FindWorking(type, mode)
         endif
         let l:location = s:fw_root
     elseif a:type =~# 'b'
-        let l:location = '%'
+        let l:location = expand('%')
     elseif a:type =~# 'p'
         let l:location = input(' Where to find: ', '', 'customlist,GetMultiFilesCompletion')
     elseif a:type =~# 'r'
@@ -1636,12 +1659,19 @@ function! FindWorking(type, mode)
     endif
 
     " 设置查找方式
+    let l:command = ':Rg'
+    let l:reset = 1
     if a:type =~# 'l'
         let l:command = ':Leaderf rg --nowrap'
         let l:pattern = '-e ' . l:pattern
+    elseif a:type =~# 'a'
+        let l:command = ':RgAdd'
+        let l:reset = 0
     endif
+
+    " Execute Find Working
     execute l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options
-    call FindWorkingHighlight(l:pattern)
+    call FindWorkingHighlight(l:reset, l:pattern)
 endfunction
 " }}}
 
@@ -1706,12 +1736,21 @@ endfunction
 " }}}
 
 " FUNCTION: FindWorkingHighlight(str) {{{ 高亮字符串
-function! FindWorkingHighlight(...)
-    if a:0 >= 1
-        let s:hl_str = escape(a:1, '/*')
-    endif
-    if exists('s:hl_str') && getline(1) =~# s:hl_str
-        execute 'syntax match IncSearch /' . s:hl_str . '/'
+function! FindWorkingHighlight(reset, ...)
+    if &filetype ==# 'leaderf'
+        if a:0 >= 1
+            execute 'syntax match IncSearch /' . escape(a:1, '/*') . '/'
+        endif
+    elseif &filetype ==# 'qf'
+        if a:reset
+            let s:fw_strings = []
+        endif
+        if a:0 >= 1
+            call add(s:fw_strings, escape(a:1, '/*'))
+        endif
+        for str in s:fw_strings
+            execute 'syntax match IncSearch /' . str . '/'
+        endfor
     endif
 endfunction
 " }}}
@@ -1778,7 +1817,7 @@ function! FindVimgrep(type, mode)
         endif
     endif
     execute 'syntax match IncSearch /' . l:string . '/'
-    call FindWorkingHighlight(l:string)
+    call FindWorkingHighlight(1, l:string)
 endfunction
 " }}}
 endif
@@ -1821,7 +1860,7 @@ function! QuickfixTabEdit()
         silent! normal! zz
         execute 'botright lopen'
     endif
-    call FindWorkingHighlight()
+    call FindWorkingHighlight(0)
 endfunction
 " }}}
 
@@ -2165,12 +2204,12 @@ endif
     nnoremap <leader>bp :bprevious<CR>
     nnoremap <leader>bl :b#<Bar>execute "set buflisted"<CR>
     " 打开/关闭Quickfix
-    nnoremap <leader>qo :botright copen<Bar>call FindWorkingHighlight()<CR>
+    nnoremap <leader>qo :botright copen<Bar>call FindWorkingHighlight(0)<CR>
     nnoremap <leader>qc :cclose<Bar>wincmd p<CR>
     nnoremap <leader>qj :cnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     nnoremap <leader>qk :cprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     " 打开/关闭Location-list
-    nnoremap <leader>lo :botright lopen<Bar>call FindWorkingHighlight()<CR>
+    nnoremap <leader>lo :botright lopen<Bar>call FindWorkingHighlight(0)<CR>
     nnoremap <leader>lc :lclose<Bar>wincmd p<CR>
     nnoremap <leader>lj :lnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     nnoremap <leader>lk :lprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
