@@ -1885,7 +1885,7 @@ function! DivideSpace(pos) range
         let l:line = getline(k)
         let l:fie = ' '
         for ch in l:chars
-            let l:pch = '\s*' . escape(ch, '~*\.$^') . '\s*\C'
+            let l:pch = '\m\s*\M' . escape(ch, '\') . '\m\s*\C'
             if a:pos == 'h'
                 let l:sch = l:fie . escape(ch, '&\')
             elseif a:pos == 'c'
