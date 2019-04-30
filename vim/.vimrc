@@ -1663,7 +1663,7 @@ function! FindWorking(type, mode)
     let l:reset = 1
     if a:type =~# 'l'
         let l:command = ':Leaderf rg --nowrap'
-        let l:pattern = '-e ' . l:pattern
+        let l:pattern = '-e "' . l:pattern .'"'
     elseif a:type =~# 'a'
         let l:command = ':RgAdd'
         let l:reset = 0
