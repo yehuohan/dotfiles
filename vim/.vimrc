@@ -612,7 +612,7 @@ endif
             \ 'opt' : ['filetype', 'ft'],
             \ 'dsr' : 'When this option is set, the FileType autocommand event is triggered.',
             \ 'lst' : ['cpp', 'c', 'python', 'vim', 'go', 'markdown', 'help', 'text',
-                     \ 'sh', 'matlab', 'conf', 'make', 'javascript', 'html'],
+                     \ 'sh', 'matlab', 'conf', 'make', 'javascript', 'json', 'html'],
             \ 'dic' : {
                     \ 'cpp'        : 'Cpp file',
                     \ 'c'          : 'C file',
@@ -625,6 +625,7 @@ endif
                     \ 'conf'       : 'Config file',
                     \ 'make'       : 'Makefile of .mak file',
                     \ 'javascript' : 'JavaScript file',
+                    \ 'json'       : 'Json file',
                     \ 'html'       : 'Html file',
                     \},
             \ 'cmd' : 'popset#data#SetEqual',
@@ -1703,7 +1704,7 @@ endfunction
 
 " FUNCTION: FindWorkingSet() {{{ 设置root路径
 function! FindWorkingSet()
-    let l:root = input(' Where (Root) to find: ', '', 'customlist,GetMultiFilesCompletion')
+    let l:root = input(' Where (Root) to find: ', '', 'dir')
     if empty(l:root)
         return 0
     endif
@@ -1722,10 +1723,10 @@ function! FindWorkingGet()
 endfunction
 " }}}
 
-" FUNCTION: FindWorkingFile() {{{ 查找文件
-function! FindWorkingFile()
-    if empty(s:fw_root)
-        let l:root = input(' Where (Root) to find: ', '', 'customlist,GetMultiFilesCompletion')
+" FUNCTION: FindWorkingFile(r) {{{ 查找文件
+function! FindWorkingFile(r)
+    if empty(s:fw_root) || a:r
+        let l:root = input(' Where (Root) to find: ', '', 'dir')
         if empty(l:root)
             return 0
         endif
@@ -2317,8 +2318,8 @@ endif
 
 " File diff {{{
     " 文件比较，自动补全文件和目录
-    nnoremap <leader>ds :call ExecFuncInput('File: ', '', 'customlist,GetMultiFilesCompletion', 'FuncDiffFile', 's')<CR>
-    nnoremap <leader>dv :call ExecFuncInput('File: ', '', 'customlist,GetMultiFilesCompletion', 'FuncDiffFile', 'v')<CR>
+    nnoremap <leader>ds :call ExecFuncInput('File: ', '', 'file', 'FuncDiffFile', 's')<CR>
+    nnoremap <leader>dv :call ExecFuncInput('File: ', '', 'file', 'FuncDiffFile', 'v')<CR>
     " 比较当前文件（已经分屏）
     nnoremap <leader>dt :diffthis<CR>
     " 关闭文件比较，与diffthis互为逆命令
@@ -2348,7 +2349,8 @@ endif
     for item in s:fw_nvmaps
         execute 'vnoremap <leader>' . item ':call FindWorking("' . item . '", "v")<CR>'
     endfor
-    nnoremap <leader>ff :call FindWorkingFile()<CR>
+    nnoremap <leader>ff :call FindWorkingFile(0)<CR>
+    nnoremap <leader>frf :call FindWorkingFile(1)<CR>
     nnoremap <leader>fR :call FindWorkingRoot()<CR>
 if IsNVim()
     for item in s:findvimgrep_nvmaps
