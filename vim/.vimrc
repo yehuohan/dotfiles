@@ -575,8 +575,8 @@ endif
     let g:Popc_usePowerFont = 1
     let g:Popc_separator = {'left' : '', 'right': ''}
     let g:Popc_subSeparator = {'left' : '', 'right': ''}
-    nnoremap <M-Space> :Popc<CR>
-    inoremap <M-Space> <Esc>:Popc<CR>
+    nnoremap <C-Space> :Popc<CR>
+    inoremap <C-Space> <Esc>:Popc<CR>
     nnoremap <leader><leader>h :PopcBuffer<CR>
     nnoremap <M-u> :PopcBufferSwitchLeft<CR>
     nnoremap <M-p> :PopcBufferSwitchRight<CR>
@@ -599,8 +599,8 @@ endif
     let g:CtrlSpaceGlobCommand = 'ag -l --nocolor -g ""'
     let g:CtrlSpaceUseTabline = 0
     " 切换按键
-    nnoremap <C-Space> :CtrlSpace<CR>
-    inoremap <C-Space> <Esc>:CtrlSpace<CR>
+    nnoremap <M-Space> :CtrlSpace<CR>
+    inoremap <M-Space> <Esc>:CtrlSpace<CR>
 " }}}
 
 " Pop Selection {{{ 弹出选项
@@ -2231,6 +2231,7 @@ endif
     nnoremap <leader>wl <C-w>l
     nnoremap <leader>wp <C-w>p
     nnoremap <leader>wP <C-w>P
+    nnoremap <leader>ww <C-w>w
     " 移动窗口
     nnoremap <leader>wH <C-w>H
     nnoremap <leader>wJ <C-w>J
