@@ -374,6 +374,7 @@ endif
     let g:Lf_StlSeparator = {'left': '', 'right': '', 'font': ''}
     let g:Lf_ShortcutF = ''
     let g:Lf_ShortcutB = ''
+    let g:Lf_ReverseOrder = 1
     nnoremap <leader>lf :LeaderfFile<CR>
     nnoremap <leader>lF :LeaderfFile
     nnoremap <leader>lu :LeaderfFunction<CR>
@@ -582,6 +583,13 @@ endif
     nnoremap <M-p> :PopcBufferSwitchRight<CR>
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
+    nnoremap <leader><leader>fw :call PopcWksSearch()<CR>
+    function! PopcWksSearch()
+        let l:wksRoot = popc#layer#wks#GetCurrentWks()[1]
+        if !empty(l:wksRoot)
+            execute ':LeaderfFile ' . l:wksRoot
+        endif
+    endfunction
 " }}}
 
 " ctrl-space {{{ buffer管理
