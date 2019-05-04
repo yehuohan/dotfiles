@@ -1632,7 +1632,7 @@ function! FindWorking(type, mode)
         let l:pattern = getreg('+')
     endif
     if empty(l:pattern) | return | endif
-    let l:pattern = escape(l:pattern, ' #%')      " 转义Space,#,%
+    let l:pattern = escape(l:pattern, ' -#%')      " 转义Space,-,#,%
 
     " 设置查找范围
     if a:type !~# '[bpr]'
