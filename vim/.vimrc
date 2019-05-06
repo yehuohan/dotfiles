@@ -1560,37 +1560,37 @@ let s:fw_markers = ['.root', '.git', '.svn']
 let s:fw_filters = ''
 let s:fw_strings = []
 let s:fw_nvmaps = [
-                \  'fi',  'fbi',  'fpi',  'fri',  'fI',  'fbI',  'fpI',  'frI',
-                \  'fw',  'fbw',  'fpw',  'frw',  'fW',  'fbW',  'fpW',  'frW',
-                \  'fs',  'fbs',  'fps',  'frs',  'fS',  'fbS',  'fpS',  'frS',
-                \  'f=',  'fb=',  'fp=',  'fr=',  'f=',  'fb=',  'fp=',  'fr=',
-                \  'Fi',  'Fbi',  'Fpi',  'Fri',  'FI',  'FbI',  'FpI',  'FrI',
-                \  'Fw',  'Fbw',  'Fpw',  'Frw',  'FW',  'FbW',  'FpW',  'FrW',
-                \  'Fs',  'Fbs',  'Fps',  'Frs',  'FS',  'FbS',  'FpS',  'FrS',
-                \  'F=',  'Fb=',  'Fp=',  'Fr=',  'F=',  'Fb=',  'Fp=',  'Fr=',
-                \ 'fli', 'flbi', 'flpi', 'flri', 'flI', 'flbI', 'flpI', 'flrI',
-                \ 'flw', 'flbw', 'flpw', 'flrw', 'flW', 'flbW', 'flpW', 'flrW',
-                \ 'fls', 'flbs', 'flps', 'flrs', 'flS', 'flbS', 'flpS', 'flrS',
-                \ 'fl=', 'flb=', 'flp=', 'flr=', 'fl=', 'flb=', 'flp=', 'flr=',
-                \ 'Fli', 'Flbi', 'Flpi', 'Flri', 'FlI', 'FlbI', 'FlpI', 'FlrI',
-                \ 'Flw', 'Flbw', 'Flpw', 'Flrw', 'FlW', 'FlbW', 'FlpW', 'FlrW',
-                \ 'Fls', 'Flbs', 'Flps', 'Flrs', 'FlS', 'FlbS', 'FlpS', 'FlrS',
-                \ 'Fl=', 'Flb=', 'Flp=', 'Flr=', 'Fl=', 'Flb=', 'Flp=', 'Flr=',
-                \ 'fai', 'fabi', 'fapi', 'fari', 'faI', 'fabI', 'fapI', 'farI',
-                \ 'faw', 'fabw', 'fapw', 'farw', 'faW', 'fabW', 'fapW', 'farW',
-                \ 'fas', 'fabs', 'faps', 'fars', 'faS', 'fabS', 'fapS', 'farS',
-                \ 'fa=', 'fab=', 'fap=', 'far=', 'fa=', 'fab=', 'fap=', 'far=',
-                \ 'Fai', 'Fabi', 'Fapi', 'Fari', 'FaI', 'FabI', 'FapI', 'FarI',
-                \ 'Faw', 'Fabw', 'Fapw', 'Farw', 'FaW', 'FabW', 'FapW', 'FarW',
-                \ 'Fas', 'Fabs', 'Faps', 'Fars', 'FaS', 'FabS', 'FapS', 'FarS',
-                \ 'Fa=', 'Fab=', 'Fap=', 'Far=', 'Fa=', 'Fab=', 'Fap=', 'Far=',
+                \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fri',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'frI',
+                \  'fw',  'fbw',  'ftw',  'fow',  'fpw',  'frw',  'fW',  'fbW',  'ftW',  'foW',  'fpW',  'frW',
+                \  'fs',  'fbs',  'fts',  'fos',  'fps',  'frs',  'fS',  'fbS',  'ftS',  'foS',  'fpS',  'frS',
+                \  'f=',  'fb=',  'ft=',  'fo=',  'fp=',  'fr=',  'f=',  'fb=',  'ft=',  'fo=',  'fp=',  'fr=',
+                \  'Fi',  'Fbi',  'Fti',  'Foi',  'Fpi',  'Fri',  'FI',  'FbI',  'FtI',  'FoI',  'FpI',  'FrI',
+                \  'Fw',  'Fbw',  'Ftw',  'Fow',  'Fpw',  'Frw',  'FW',  'FbW',  'FtW',  'FoW',  'FpW',  'FrW',
+                \  'Fs',  'Fbs',  'Fts',  'Fos',  'Fps',  'Frs',  'FS',  'FbS',  'FtS',  'FoS',  'FpS',  'FrS',
+                \  'F=',  'Fb=',  'Ft=',  'Fo=',  'Fp=',  'Fr=',  'F=',  'Fb=',  'Ft=',  'Fo=',  'Fp=',  'Fr=',
+                \ 'fli', 'flbi', 'flti', 'floi', 'flpi', 'flri', 'flI', 'flbI', 'fltI', 'floI', 'flpI', 'flrI',
+                \ 'flw', 'flbw', 'fltw', 'flow', 'flpw', 'flrw', 'flW', 'flbW', 'fltW', 'floW', 'flpW', 'flrW',
+                \ 'fls', 'flbs', 'flts', 'flos', 'flps', 'flrs', 'flS', 'flbS', 'fltS', 'floS', 'flpS', 'flrS',
+                \ 'fl=', 'flb=', 'flt=', 'flo=', 'flp=', 'flr=', 'fl=', 'flb=', 'flt=', 'flo=', 'flp=', 'flr=',
+                \ 'Fli', 'Flbi', 'Flti', 'Floi', 'Flpi', 'Flri', 'FlI', 'FlbI', 'FltI', 'FloI', 'FlpI', 'FlrI',
+                \ 'Flw', 'Flbw', 'Fltw', 'Flow', 'Flpw', 'Flrw', 'FlW', 'FlbW', 'FltW', 'FloW', 'FlpW', 'FlrW',
+                \ 'Fls', 'Flbs', 'Flts', 'Flos', 'Flps', 'Flrs', 'FlS', 'FlbS', 'FltS', 'FloS', 'FlpS', 'FlrS',
+                \ 'Fl=', 'Flb=', 'Flt=', 'Flo=', 'Flp=', 'Flr=', 'Fl=', 'Flb=', 'Flt=', 'Flo=', 'Flp=', 'Flr=',
+                \ 'fai', 'fabi', 'fati', 'faoi', 'fapi', 'fari', 'faI', 'fabI', 'fatI', 'faoI', 'fapI', 'farI',
+                \ 'faw', 'fabw', 'fatw', 'faow', 'fapw', 'farw', 'faW', 'fabW', 'fatW', 'faoW', 'fapW', 'farW',
+                \ 'fas', 'fabs', 'fats', 'faos', 'faps', 'fars', 'faS', 'fabS', 'fatS', 'faoS', 'fapS', 'farS',
+                \ 'fa=', 'fab=', 'fat=', 'fao=', 'fap=', 'far=', 'fa=', 'fab=', 'fat=', 'fao=', 'fap=', 'far=',
+                \ 'Fai', 'Fabi', 'Fati', 'Faoi', 'Fapi', 'Fari', 'FaI', 'FabI', 'FatI', 'FaoI', 'FapI', 'FarI',
+                \ 'Faw', 'Fabw', 'Fatw', 'Faow', 'Fapw', 'Farw', 'FaW', 'FabW', 'FatW', 'FaoW', 'FapW', 'FarW',
+                \ 'Fas', 'Fabs', 'Fats', 'Faos', 'Faps', 'Fars', 'FaS', 'FabS', 'FatS', 'FaoS', 'FapS', 'FarS',
+                \ 'Fa=', 'Fab=', 'Fat=', 'Fao=', 'Fap=', 'Far=', 'Fa=', 'Fab=', 'Fat=', 'Fao=', 'Fap=', 'Far=',
                 \ ]
 " }}}
 function! FindWorking(type, mode)
     " {{{
-    " Required: based on 'yegappan/grep' and 'Yggdroot/LeaderF'
-    " Option: [fF][la][bpr][IiWwSs=]
-    "         [%1][%2][%3 ][4%     ]
+    " Required: based on 'yegappan/grep', 'Yggdroot/LeaderF' and 'yehuohan/popc'
+    " Option: [fF][la][btopr][IiWwSs=]
+    "         [%1][%2][%3   ][4%     ]
     " Find: %1
     "   f : find working
     "   F : find working with inputing args
@@ -1599,7 +1599,9 @@ function! FindWorking(type, mode)
     "   l : find with Rg in working root-filter and pass result to Leaderf
     "   a : find with RgAdd
     " Location: %3
-    "   b : find with in buffer(%)
+    "   b : find in current buffer(%)
+    "   t : find in buffers of tab via popc
+    "   o : find in buffers of all tabs via popc
     "   p : find with inputing path
     "   r : find with inputing working root and filter
     "  '' : find with working root-filter
@@ -1643,17 +1645,21 @@ function! FindWorking(type, mode)
     let l:pattern = escape(l:pattern, ' -#%')      " 转义Space,-,#,%
 
     " 设置查找范围
-    if a:type !~# '[bpr]'
-        if empty(s:fw_root)
-            call FindWorkingSet()
-        endif
-        let l:location = s:fw_root
-    elseif a:type =~# 'b'
+    if a:type =~# 'b'
         let l:location = expand('%')
+    elseif a:type =~# 't'
+        let l:location = join(popc#layer#buf#GetFiles('sigtab'), ' ')
+    elseif a:type =~# 'o'
+        let l:location = join(popc#layer#buf#GetFiles('alltab'), ' ')
     elseif a:type =~# 'p'
         let l:location = input(' Where to find: ', '', 'customlist,GetMultiFilesCompletion')
     elseif a:type =~# 'r'
         let l:location = FindWorkingSet() ? s:fw_root : ''
+    else
+        if empty(s:fw_root)
+            call FindWorkingSet()
+        endif
+        let l:location = s:fw_root
     endif
     if empty(l:location) | return | endif
 
