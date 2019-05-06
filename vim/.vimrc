@@ -1587,6 +1587,7 @@ let s:fw_nvmaps = [
                 \ ]
 " }}}
 function! FindWorking(type, mode)
+    " doc
     " {{{
     " Required: based on 'yegappan/grep', 'Yggdroot/LeaderF' and 'yehuohan/popc'
     " Option: [fF][la][btopr][IiWwSs=]
@@ -1618,62 +1619,85 @@ function! FindWorking(type, mode)
     "   LowerCase: [iws] find in ignorecase
     "   UpperCase: [IWS] find in case match
     " }}}
-    let l:command = ''
-    let l:options = ''
-    let l:pattern = ''
+    " parse function
+    " FUNCTION: s:parsePattern() closure {{{
+    function! s:parsePattern() closure
+        let l:pat = ''
+        if a:mode ==# 'n'
+            if a:type =~? 'i'
+                let l:pat = input(' What to find: ')
+            elseif a:type =~? '[ws]'
+                let l:pat = expand('<cword>')
+            endif
+        elseif a:mode ==# 'v'
+            let l:selected = GetSelectedContent()
+            if a:type =~? 'i'
+                let l:pat = input(' What to find: ', l:selected)
+            elseif a:type =~? '[ws]'
+                let l:pat = l:selected
+            endif
+        endif
+        if a:type =~ '='
+            let l:pat = getreg('+')
+        endif
+        let l:pat = escape(l:pat, ' -#%')      " 转义Space,-,#,%
+        return l:pat
+    endfunction
+    " }}}
+    " FUNCTION: s:parseLocation() closure {{{
+    function! s:parseLocation() closure
+        let l:loc = ''
+        if a:type =~# 'b'
+            let l:loc = expand('%')
+        elseif a:type =~# 't'
+            let l:loc = join(popc#layer#buf#GetFiles('sigtab'), ' ')
+        elseif a:type =~# 'o'
+            let l:loc = join(popc#layer#buf#GetFiles('alltab'), ' ')
+        elseif a:type =~# 'p'
+            let l:loc = input(' Where to find: ', '', 'customlist,GetMultiFilesCompletion')
+        elseif a:type =~# 'r'
+            let l:loc = FindWorkingSet() ? s:fw_root : ''
+        else
+            if empty(s:fw_root)
+                call FindWorkingSet()
+            endif
+            let l:loc = s:fw_root
+        endif
+        return l:loc
+    endfunction
+    " }}}
+    " FUNCTION: s:parseOptions() closure {{{
+    function! s:parseOptions() closure
+        let l:opt = ''
+        if a:type =~? 's'     | let l:opt .= '-w ' | endif
+        if a:type =~# '[iws]' | let l:opt .= '-i ' | elseif a:type =~# '[IWS]' | let l:opt .= '-s' | endif
+        if !empty(s:fw_filters) && a:type !~# '[btop]'
+            let l:opt .= '-g "*.{' . s:fw_filters . '}" '
+        endif
+        if a:type =~# 'F'
+            let l:opt .= input(' Args to append: ', '')
+        endif
+        return l:opt
+    endfunction
+    " }}}
+
+    let l:pattern  = ''
     let l:location = ''
+    let l:options  = ''
+    let l:command  = ''
 
-    " 设置查找内容
-    if a:mode ==# 'n'
-        if a:type =~? 'i'
-            let l:pattern = input(' What to find: ')
-        elseif a:type =~? '[ws]'
-            let l:pattern = expand('<cword>')
-        endif
-    elseif a:mode ==# 'v'
-        let l:selected = GetSelectedContent()
-        if a:type =~? 'i'
-            let l:pattern = input(' What to find: ', l:selected)
-        elseif a:type =~? '[ws]'
-            let l:pattern = l:selected
-        endif
-    endif
-    if a:type =~ '='
-        let l:pattern = getreg('+')
-    endif
+    " find pattern
+    let l:pattern = s:parsePattern()
     if empty(l:pattern) | return | endif
-    let l:pattern = escape(l:pattern, ' -#%')      " 转义Space,-,#,%
 
-    " 设置查找范围
-    if a:type =~# 'b'
-        let l:location = expand('%')
-    elseif a:type =~# 't'
-        let l:location = join(popc#layer#buf#GetFiles('sigtab'), ' ')
-    elseif a:type =~# 'o'
-        let l:location = join(popc#layer#buf#GetFiles('alltab'), ' ')
-    elseif a:type =~# 'p'
-        let l:location = input(' Where to find: ', '', 'customlist,GetMultiFilesCompletion')
-    elseif a:type =~# 'r'
-        let l:location = FindWorkingSet() ? s:fw_root : ''
-    else
-        if empty(s:fw_root)
-            call FindWorkingSet()
-        endif
-        let l:location = s:fw_root
-    endif
+    " find location
+    let l:location = s:parseLocation()
     if empty(l:location) | return | endif
 
-    " 设置查找选项
-    if a:type =~? 's'     | let l:options .= '-w ' | endif
-    if a:type =~# '[iws]' | let l:options .= '-i ' | elseif a:type =~# '[IWS]' | let l:options .= '-s' | endif
-    if !empty(s:fw_filters) && a:type !~? '[bp]'
-        let l:options .= '-g "*.{' . s:fw_filters . '}" '
-    endif
-    if a:type =~# 'F'
-        let l:options .= input(' Args to append: ', '')
-    endif
+    " find options
+    let l:options = s:parseOptions()
 
-    " 设置查找方式
+    " find command
     let l:command = ':Rg'
     let l:reset = 1
     if a:type =~# 'l'
