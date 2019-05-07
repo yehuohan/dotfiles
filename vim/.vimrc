@@ -862,8 +862,8 @@ endif
     " 给行添加Surround
     nmap <leader>sl <Plug>Yssurround
     nmap <leader>sL <Plug>YSsurround
-    xmap s <Plug>VSurround
-    xmap S <Plug>VgSurround
+    xmap <leader>sw <Plug>VSurround
+    xmap <leader>sW <Plug>VgSurround
 " }}}
 
 " auto-pairs {{{ 自动括号
@@ -1621,7 +1621,10 @@ function! FindWorking(type, mode)
         if a:type =~ '='
             let l:pat = getreg('+')
         endif
-        let l:pat = escape(l:pat, ' -#%')      " 转义Space,-,#,%
+        let l:pat = escape(l:pat, ' -#%')       " escape 'Space,-,#,%'
+        if a:type =~# 'l'
+            let l:pat = '-e "' . l:pat .'"'     " used for 'Leaderf rg'
+        endif
         return l:pat
     endfunction
     " }}}
@@ -1640,6 +1643,9 @@ function! FindWorking(type, mode)
             let l:loc = FindWorkingSet() ? s:fw_root : ''
         else
             if empty(s:fw_root)
+                call FindWorkingRoot()
+            endif
+            if empty(s:fw_root)
                 call FindWorkingSet()
             endif
             let l:loc = s:fw_root
@@ -1651,7 +1657,7 @@ function! FindWorking(type, mode)
     function! s:parseOptions() closure
         let l:opt = ''
         if a:type =~? 's'     | let l:opt .= '-w ' | endif
-        if a:type =~# '[iws]' | let l:opt .= '-i ' | elseif a:type =~# '[IWS]' | let l:opt .= '-s' | endif
+        if a:type =~# '[iws]' | let l:opt .= '-i ' | elseif a:type =~# '[IWS]' | let l:opt .= '-s ' | endif
         if !empty(s:fw_filters) && a:type !~# '[btop]'
             let l:opt .= '-g "*.{' . s:fw_filters . '}" '
         endif
@@ -1661,11 +1667,19 @@ function! FindWorking(type, mode)
         return l:opt
     endfunction
     " }}}
-
-    let l:pattern  = ''
-    let l:location = ''
-    let l:options  = ''
-    let l:command  = ''
+    " FUNCTION: s:parseCommand() closure {{{
+    function! s:parseCommand() closure
+        if a:type =~# 'l'
+            let l:cmd = ':Leaderf rg --nowrap'
+        elseif a:type =~# 'a'
+            let l:cmd = ':RgAdd'
+        else
+            let l:cmd = ':Rg'
+            let s:fw_strings = []
+        endif
+        return l:cmd
+    endfunction
+    " }}}
 
     " find pattern
     let l:pattern = s:parsePattern()
@@ -1679,19 +1693,11 @@ function! FindWorking(type, mode)
     let l:options = s:parseOptions()
 
     " find command
-    let l:command = ':Rg'
-    let l:reset = 1
-    if a:type =~# 'l'
-        let l:command = ':Leaderf rg --nowrap'
-        let l:pattern = '-e "' . l:pattern .'"'
-    elseif a:type =~# 'a'
-        let l:command = ':RgAdd'
-        let l:reset = 0
-    endif
+    let l:command = s:parseCommand()
 
-    " Execute Find Working
+    " Find Working
     execute l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options
-    call FindWorkingHighlight(l:reset, l:pattern)
+    call FindWorkingHighlight(l:pattern)
 endfunction
 " }}}
 
@@ -1755,16 +1761,11 @@ function! FindWorkingFile(r)
 endfunction
 " }}}
 
-" FUNCTION: FindWorkingHighlight(str) {{{ 高亮字符串
-function! FindWorkingHighlight(reset, ...)
+" FUNCTION: FindWorkingHighlight(...) {{{ 高亮字符串
+function! FindWorkingHighlight(...)
     if &filetype ==# 'leaderf'
-        if a:0 >= 1
-            execute 'syntax match IncSearch /' . escape(a:1, '/*') . '/'
-        endif
+        " use leaderf's highlight
     elseif &filetype ==# 'qf'
-        if a:reset
-            let s:fw_strings = []
-        endif
         if a:0 >= 1
             call add(s:fw_strings, escape(a:1, '/*'))
         endif
@@ -1781,9 +1782,6 @@ let s:findvimgrep_nvmaps = [
                           \ 'vi', 'vgi', 'vI', 'vgI',
                           \ 'vw', 'vgw', 'vW', 'vgW',
                           \ 'vs', 'vgs', 'vS', 'vgS',
-                          \ 'Vi', 'Vgi', 'VI', 'VgI',
-                          \ 'Vw', 'Vgw', 'VW', 'VgW',
-                          \ 'Vs', 'Vgs', 'VS', 'VgS',
                           \ ]
 function! FindVimgrep(type, mode)
     let l:string = ''
@@ -1817,27 +1815,15 @@ function! FindVimgrep(type, mode)
     endif
 
     " 使用vimgrep或lvimgrep查找
-    if a:type =~# 'v'
-        execute 'vimgrep /' . l:string . '/j ' . l:files
-        echo 'Finding...'
-        if empty(getqflist())
-            echo 'No match: ' . l:string
-            return
-        else
-            botright copen
-        endif
-    elseif a:type =~# 'V'
-        execute 'lvimgrep /' . l:string . '/j ' . l:files
-        echo 'Finding...'
-        if empty(getloclist(winnr()))
-            echo 'No match: ' . l:string
-            return
-        else
-            botright lopen
-        endif
+    execute 'vimgrep /' . l:string . '/j ' . l:files
+    echo 'Finding...'
+    if empty(getqflist())
+        echo 'No match: ' . l:string
+        return
+    else
+        botright copen
     endif
-    execute 'syntax match IncSearch /' . l:string . '/'
-    call FindWorkingHighlight(1, l:string)
+    execute 'syntax match IncSearch /' . escape(l:string, '/*') . '/'
 endfunction
 " }}}
 endif
@@ -1880,7 +1866,7 @@ function! QuickfixTabEdit()
         silent! normal! zz
         execute 'botright lopen'
     endif
-    call FindWorkingHighlight(0)
+    call FindWorkingHighlight()
 endfunction
 " }}}
 
@@ -2178,6 +2164,7 @@ if IsVim()
 endif
     " 嵌套映射匹配符(%)
     nmap <S-s> %
+    vmap <S-s> %
     " 行首和行尾
     nnoremap <S-l> $
     nnoremap <S-h> ^
@@ -2215,7 +2202,7 @@ endif
     cnoremap <M-o> <C-E>
 " }}}
 
-" Tab, Buffer, Quickfix {{{
+" Tab, Buffer, Quickfix, Windows {{{
     " Tab切换
     nnoremap <M-i> gT
     nnoremap <M-o> gt
@@ -2224,21 +2211,18 @@ endif
     nnoremap <leader>bp :bprevious<CR>
     nnoremap <leader>bl :b#<Bar>execute "set buflisted"<CR>
     " 打开/关闭Quickfix
-    nnoremap <leader>qo :botright copen<Bar>call FindWorkingHighlight(0)<CR>
+    nnoremap <leader>qo :botright copen<Bar>call FindWorkingHighlight()<CR>
     nnoremap <leader>qc :cclose<Bar>wincmd p<CR>
     nnoremap <leader>qj :cnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     nnoremap <leader>qk :cprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     " 打开/关闭Location-list
-    nnoremap <leader>lo :botright lopen<Bar>call FindWorkingHighlight(0)<CR>
+    nnoremap <leader>lo :botright lopen<Bar>call FindWorkingHighlight()<CR>
     nnoremap <leader>lc :lclose<Bar>wincmd p<CR>
     nnoremap <leader>lj :lnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     nnoremap <leader>lk :lprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
     " 在新Tab中打开列表项
     nnoremap <leader>qt :call QuickfixTabEdit()<CR>
     nnoremap <leader>lt :call QuickfixTabEdit()<CR>
-" }}}
-
-" Window manager{{{
     " 分割窗口
     nnoremap <leader>ws <C-w>s
     nnoremap <leader>wv <C-W>v
