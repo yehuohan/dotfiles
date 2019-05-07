@@ -86,7 +86,7 @@ if [ `uname` == "Linux" ]; then
         echo "Ubuntu: Copy was completed!"
     fi
 
-elif [ `uname -o` == "Cygwin" ]; then
+elif [ `uname -o` == "Msys" ]; then
 
     # vim
     if [ ! -d "../Vim" ]; then
@@ -104,6 +104,6 @@ elif [ `uname -o` == "Cygwin" ]; then
     cp ~/.gitconfig ./cf-gw/
     cp ~/.zshrc     ./cf-gw/
 
-    echo "Cygwin: Copy was completed!"
+    echo "Msys: Copy was completed!"
 fi
 

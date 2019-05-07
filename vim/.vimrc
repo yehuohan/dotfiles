@@ -166,7 +166,7 @@ vnoremap ; :
         " 未打开文件时，切换到HOME目录
         execute 'cd $HOME'
     elseif IsGw()
-        let $VimPluginPath='/cygdrive/c/MyApps/Vim/vimfiles'
+        let $VimPluginPath='/c/MyApps/Vim/vimfiles'
     elseif IsMac()
         let $VimPluginPath=s:home_path . '/.vim'
     endif

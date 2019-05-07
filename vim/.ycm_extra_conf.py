@@ -109,7 +109,9 @@ def GetCfamilyFlags():
         QT_DIR = '/usr/include/qt/'
     elif platform.system() == "Windows":
         UNIX_DIR = 'C:/MyApps/cygwin64/usr/include'
-        GCC_DIR = 'C:/MyApps/cygwin64/lib/gcc/x86_64-pc-cygwin/7.4.0/include'
+        GCC_DIR = os.path.join('C:/MyApps/cygwin64/lib/gcc/x86_64-pc-cygwin',
+                    list(filter(lambda dir: re.compile(r'^\d{1,2}\.\d{1,2}\.\d{1,2}$').match(dir),
+                        os.listdir('C:/MyApps/cygwin64/lib/gcc/x86_64-pc-cygwin')))[0]) + '/include'
         # GCC_DIR = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/include/'
         QT_DIR  = 'D:/Qt/5.10.1/msvc2017_64/include/'
 
