@@ -1750,12 +1750,18 @@ endfunction
 
 " FUNCTION: FindWorkingFile(r) {{{ 查找文件
 function! FindWorkingFile(r)
-    if empty(s:fw_root) || a:r
+    if a:r
         let l:root = input(' Where (Root) to find: ', '', 'dir')
         if empty(l:root)
             return 0
         endif
         let s:fw_root = fnamemodify(l:root, ':p')
+    endif
+    if empty(s:fw_root)
+        call FindWorkingRoot()
+    endif
+    if empty(s:fw_root)
+        call FindWorkingSet()
     endif
     execute ':LeaderfFile ' . s:fw_root
 endfunction
