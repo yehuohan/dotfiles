@@ -6,3 +6,4 @@
 	logOutputEncoding = gbk
 [core]
 	quotepath = false
+	fileMode = false
