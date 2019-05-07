@@ -592,25 +592,6 @@ endif
     endfunction
 " }}}
 
-" ctrl-space {{{ buffer管理
-    " h,o,l,w,b,/,? 对应于 buffer,file,tab,workspace,bookmark,search,help
-    Plug 'yehuohan/vim-ctrlspace', {'on': 'CtrlSpace'}
-    set hidden                          " 允许在未保存文件时切换buffer
-    let g:CtrlSpaceCacheDir = $VimPluginPath
-    let g:CtrlSpaceSetDefaultMapping = 1
-    let g:CtrlSpaceProjectRootMarkers = [
-         \ '.git', '.hg', '.svn', '.bzr', '_darcs', 'CVS']
-                                        " Project root markers
-    let g:CtrlSpaceSearchTiming = 50
-    let g:CtrlSpaceStatuslineFunction = 'airline#extensions#ctrlspace#statusline()'
-    let g:CtrlSpaceSymbols = { 'CS': '⌘'}
-    let g:CtrlSpaceGlobCommand = 'ag -l --nocolor -g ""'
-    let g:CtrlSpaceUseTabline = 0
-    " 切换按键
-    nnoremap <M-Space> :CtrlSpace<CR>
-    inoremap <M-Space> <Esc>:CtrlSpace<CR>
-" }}}
-
 " Pop Selection {{{ 弹出选项
     Plug 'yehuohan/popset', {'on': 'PSet'}
     highlight link PopsetSelected Search
@@ -1918,7 +1899,7 @@ function! QuickfixPreview()
     endif
     silent! normal! zO
     silent! normal! zz
-    execute 'noautocmd ' . l:last_winnr . 'wincmd w'
+    execute l:last_winnr . 'wincmd w'
 endfunction
 " }}}
 " }}}
