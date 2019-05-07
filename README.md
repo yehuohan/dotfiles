@@ -1,7 +1,7 @@
 
 ---
 ## Linux Configs(dotconfigs)
- Config fils.
+ Config files.
 
 ---
 ## Files
