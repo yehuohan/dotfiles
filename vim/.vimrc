@@ -567,35 +567,8 @@ endif
     nnoremap <leader>ti :IndentLinesToggle<CR>
 " }}}
 
-" popc {{{ buffer管理
-    Plug 'yehuohan/popc'
-    set hidden
-    let g:Popc_jsonPath = $VimPluginPath
-    let g:Popc_useTabline = 1
-    let g:Popc_useStatusline = 1
-    let g:Popc_usePowerFont = 1
-    let g:Popc_separator = {'left' : '', 'right': ''}
-    let g:Popc_subSeparator = {'left' : '', 'right': ''}
-    nnoremap <C-Space> :Popc<CR>
-    inoremap <C-Space> <Esc>:Popc<CR>
-    nnoremap <leader><leader>h :PopcBuffer<CR>
-    nnoremap <M-u> :PopcBufferSwitchLeft<CR>
-    nnoremap <M-p> :PopcBufferSwitchRight<CR>
-    nnoremap <leader><leader>b :PopcBookmark<CR>
-    nnoremap <leader><leader>w :PopcWorkspace<CR>
-    nnoremap <leader><leader>fw :call PopcWksSearch()<CR>
-    function! PopcWksSearch()
-        let l:wksRoot = popc#layer#wks#GetCurrentWks()[1]
-        if !empty(l:wksRoot)
-            execute ':LeaderfFile ' . l:wksRoot
-        endif
-    endfunction
-" }}}
-
 " Pop Selection {{{ 弹出选项
-    Plug 'yehuohan/popset', {'on': 'PSet'}
-    highlight link PopsetSelected Search
-    let g:Popset_CompleteAll = 0
+    Plug 'yehuohan/popset'
     let g:Popset_SelectionData = [
         \{
             \ 'opt' : ['filetype', 'ft'],
@@ -627,6 +600,31 @@ endif
     " set option with PSet
     nnoremap <leader>so :PSet
     nnoremap <leader>sa :PSet popset<CR>
+" }}}
+
+" popc {{{ buffer管理
+    Plug 'yehuohan/popc'
+    set hidden
+    let g:Popc_jsonPath = $VimPluginPath
+    let g:Popc_useTabline = 1
+    let g:Popc_useStatusline = 1
+    let g:Popc_usePowerFont = 1
+    let g:Popc_separator = {'left' : '', 'right': ''}
+    let g:Popc_subSeparator = {'left' : '', 'right': ''}
+    nnoremap <C-Space> :Popc<CR>
+    inoremap <C-Space> <Esc>:Popc<CR>
+    nnoremap <leader><leader>h :PopcBuffer<CR>
+    nnoremap <M-u> :PopcBufferSwitchLeft<CR>
+    nnoremap <M-p> :PopcBufferSwitchRight<CR>
+    nnoremap <leader><leader>b :PopcBookmark<CR>
+    nnoremap <leader><leader>w :PopcWorkspace<CR>
+    nnoremap <leader><leader>fw :call PopcWksSearch()<CR>
+    function! PopcWksSearch()
+        let l:wksRoot = popc#layer#wks#GetCurrentWks()[1]
+        if !empty(l:wksRoot)
+            execute ':LeaderfFile ' . l:wksRoot
+        endif
+    endfunction
 " }}}
 
 " nerd-tree {{{ 目录树导航
