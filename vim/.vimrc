@@ -455,6 +455,21 @@ endif
     vmap au <Plug>(textobj-underscore-a)
     vmap iu <Plug>(textobj-underscore-i)
 " }}}
+
+" vim-repeat {{{ 重复命令
+    Plug 'tpope/vim-repeat'
+    function! SetRepeatExecution(string)
+        let s:execution = a:string
+        call repeat#set("\<Plug>RepeatExecute", v:count)
+    endfunction
+    function! RepeatExecute()
+        if !empty(s:execution)
+            execute s:execution
+        endif
+    endfunction
+    nnoremap <Plug>RepeatExecute :call RepeatExecute()<CR>
+    nnoremap <leader>. :call RepeatExecute()<CR>
+" }}}
 " }}}
 
 " 界面管理
@@ -838,9 +853,8 @@ endif
     vnoremap <leader>fc :Neoformat<CR>
 " }}}
 
-" surround and repeat {{{ 添加包围符
+" surround {{{ 添加包围符
     Plug 'tpope/vim-surround'
-    Plug 'tpope/vim-repeat'
     let g:surround_no_mappings = 1      " 取消默认映射
     " 修改和删除Surround
     nmap <leader>sd <Plug>Dsurround
@@ -1693,6 +1707,7 @@ function! FindWorking(type, mode)
     " Find Working
     execute l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options
     call FindWorkingHighlight(l:pattern)
+    call SetRepeatExecution(l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options)
 endfunction
 " }}}
 
@@ -1921,8 +1936,9 @@ endfunction
 " }}}
 
 " 添加分隔符 {{{
-function! DivideSpace(pos) range
-    let l:chars = split(input('Divide ' . toupper(a:pos) . ' Space(split with space): '), ' ')
+function! DivideSpace(pos, ...) range
+    let l:chars = (a:0 > 0) ? a:1 :
+                \ split(input('Divide ' . toupper(a:pos) . ' Space(split with space): '), ' ')
     if empty(l:chars)
         return
     endif
@@ -1945,6 +1961,7 @@ function! DivideSpace(pos) range
         endfor
         call setline(k, l:line)
     endfor
+    call SetRepeatExecution('call DivideSpace(' . string(a:pos) . ', ' . string(l:chars) . ')')
 endfunction
 " }}}
 " }}}
