@@ -481,9 +481,6 @@ endif
     Plug 'itchyny/lightline.vim'
     "                    
     " ► ✘ ⌘ ▫ ▪ ★ ☆ • ≡ ፨ ♥
-if IsVim()
-    set renderoptions=                  " 设置正常显示unicode字符
-endif
     let g:lightline = {
         \ 'enable'              : {'statusline': 1, 'tabline': 0},
         \ 'colorscheme'         : 'gruvbox',
@@ -1966,6 +1963,9 @@ endfunction
     set cursorline                      " 高亮当前行
     set cursorcolumn                    " 高亮当前列
     set hlsearch                        " 设置高亮显示查找到的文本
+if IsVim()
+    set renderoptions=                  " 设置正常显示unicode字符
+endif
     set expandtab                       " 将Tab用Space代替，方便显示缩进标识indentLine
     set tabstop=4                       " 设置Tab键宽4个空格
     set softtabstop=4                   " 设置按<Tab>或<BS>移动的空格数
