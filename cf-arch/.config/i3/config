@@ -69,6 +69,7 @@ workspace_auto_back_and_forth yes
 # 打开软件时自动移至相应工作区
 assign [class="Nautilus"] workspace $WS1
 assign [class="Firefox"] workspace $WS2
+assign [class="Nightly"] workspace $WS2
 assign [class="Google-chrome"] workspace $WS3
 
 # 对特定窗口，执行特定命令
