@@ -841,7 +841,6 @@ endif
 " surround and repeat {{{ 添加包围符
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-repeat'
-
     let g:surround_no_mappings = 1      " 取消默认映射
     " 修改和删除Surround
     nmap <leader>sd <Plug>Dsurround
@@ -1017,14 +1016,15 @@ endif
 
 " open-browser.vim {{{ 在线搜索
     Plug 'tyru/open-browser.vim'
+    let g:openbrowser_default_search='baidu'
     nmap <leader>bs <Plug>(openbrowser-smart-search)
     vmap <leader>bs <Plug>(openbrowser-smart-search)
     " search funtion - google, baidu, github
     function! OpenBrowserSearchInGoogle(engine, mode)
         if a:mode ==# 'n'
-            execute ':OpenBrowserSearch -'. a:engine . ' ' . expand('<cword>')
+            call openbrowser#search(expand('<cword>'), a:engine)
         elseif a:mode ==# 'v'
-            execute ':OpenBrowserSearch -'. a:engine . ' ' . GetSelectedContent()
+            call openbrowser#search(GetSelectedContent(), a:engine)
         endif
     endfunction
     nnoremap <leader>big :OpenBrowserSearch -google
@@ -2127,7 +2127,6 @@ augroup END
     nnoremap <leader>ih :call InvHighLight()<CR>
     nnoremap <leader>ib :call InvScrollBind()<CR>
     if IsLinux()
-        "autocmd InsertLeave * call LinuxFcitx2En()
         inoremap <Esc> <Esc>:call LinuxFcitx2En()<CR>
     endif
 " }}}
