@@ -329,15 +329,27 @@ call plug#begin($VimPluginPath.'/bundle')   " 可选设置，可以指定插件�
         IncSearchNoreMap <M-j> <Over>(incsearch-scroll-f)
         IncSearchNoreMap <M-k> <Over>(incsearch-scroll-b)
     endfunction
+    function! PreviewPattern(prompt)
+        " 预览pattern
+        try
+            call incsearch#call({
+                                    \ 'command': '/',
+                                    \ 'is_stay': 1,
+                                    \ 'prompt': a:prompt
+                                \})
+        " E117: 函数不存在
+		catch /^Vim\%((\a\+)\)\=:E117/
+            return ''
+        endtry
+        return histget('/', -1)
+    endfunction
 
     nmap /  <Plug>(incsearch-forward)
     nmap ?  <Plug>(incsearch-backward)
     nmap g/ <Plug>(incsearch-stay)
-
     nmap z/ <Plug>(incsearch-fuzzy-/)
     nmap z? <Plug>(incsearch-fuzzy-?)
     nmap zg/ <Plug>(incsearch-fuzzy-stay)
-
     nmap n  <Plug>(incsearch-nohl-n)
     nmap N  <Plug>(incsearch-nohl-N)
     " *,#使用\< \>，而g*,g# 不使用\< \>
@@ -462,7 +474,8 @@ endif
         let s:execution = a:string
         try
             call repeat#set("\<Plug>RepeatExecute", v:count)
-        catch
+        " E117: 函数不存在
+		catch /^Vim\%((\a\+)\)\=:E117/
         endtry
     endfunction
     function! RepeatExecute()
@@ -986,9 +999,9 @@ endif
     let g:mkdp_auto_close = 1
     let g:mkdp_refresh_slow = 0         " 即时预览MarkDown
     let g:mkdp_command_for_global = 0   " 只有markdown文件可以预览
-    nnoremap <leader>vm :call PreViewMarkdown()<CR>
+    nnoremap <leader>vm :call ViewMarkdown()<CR>
     nnoremap <leader>tb :call ToggleBrowserPath()<CR>
-    function! PreViewMarkdown() abort
+    function! ViewMarkdown() abort
         if exists(':MarkdownPreviewStop')
             MarkdownPreviewStop
             echo 'MarkdownPreviewStop'
@@ -1018,9 +1031,9 @@ if IsWin()
     " 需要安装 https://github.com/mgedmin/restview
     nnoremap <leader>vr :execute ':AsyncRun restview ' . expand('%:p:t')<Bar>cclose<CR>
 else
-    nnoremap <leader>vr :call PreViewRst()<CR>
+    nnoremap <leader>vr :call ViewRst()<CR>
 endif
-    function! PreViewRst() abort
+    function! ViewRst() abort
         if g:_instant_rst_daemon_started
             StopInstantRst
             echo 'StopInstantRst'
