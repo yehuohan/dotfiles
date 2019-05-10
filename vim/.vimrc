@@ -1213,42 +1213,47 @@ function! ComplileFile(argstr)
     let l:ext      = expand('%:e')      " 扩展名
     let l:filename = expand('%:t')      " 文件名，不带路径，带扩展名
     let l:name     = expand('%:t:r')    " 文件名，不带路径，不带扩展名
-    let l:exec_str = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
+    let l:exec     = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
 
     " 生成可执行字符串
     if 'c' ==? l:ext
     "{{{
-        let l:exec_str .= 'gcc -static ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
-        let l:exec_str .= ' && "./' . l:name . '"'
+        let l:exec .= 'gcc -static ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
+        let l:exec .= ' && "./' . l:name . '"'
     "}}}
     elseif 'cpp' ==? l:ext
     "{{{
-        let l:exec_str .= 'g++ -std=c++11 -static ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
-        let l:exec_str .= ' && "./' . l:name . '"'
+        let l:exec .= 'g++ -std=c++11 -static ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
+        let l:exec .= ' && "./' . l:name . '"'
     "}}}
     elseif 'py' ==? l:ext || 'pyw' ==? l:ext
     "{{{
-        let l:exec_str .= 'python ' . l:filename
-        let l:exec_str .= ' ' . a:argstr
+        let l:exec .= 'python ' . l:filename
+        let l:exec .= ' ' . a:argstr
+    "}}}
+    elseif 'jl' ==? l:ext
+    "{{{
+        let l:exec .= 'julia ' . l:filename
+        let l:exec .= ' ' . a:argstr
     "}}}
     elseif 'go' ==? l:ext
     "{{{
-        let l:exec_str .= ' go run ' . l:filename
+        let l:exec .= ' go run ' . l:filename
     "}}}
     elseif 'java' ==? l:ext
     "{{{
-        let l:exec_str .= 'javac ' . l:filename
-        let l:exec_str .= ' && java ' . l:name
+        let l:exec .= 'javac ' . l:filename
+        let l:exec .= ' && java ' . l:name
     "}}}
     elseif 'm' ==? l:ext
     "{{{
-        let l:exec_str .= 'matlab -nosplash -nodesktop -r ' . l:name[3:-2]
+        let l:exec .= 'matlab -nosplash -nodesktop -r ' . l:name[3:-2]
     "}}}
     elseif 'sh' ==? l:ext
     "{{{
         if IsLinux() || IsGw()
-            let l:exec_str .= ' ./' . l:filename
-            let l:exec_str .= ' ' . a:argstr
+            let l:exec .= ' ./' . l:filename
+            let l:exec .= ' ' . a:argstr
         else
             return
         endif
@@ -1256,21 +1261,21 @@ function! ComplileFile(argstr)
     elseif 'bat' ==? l:ext
     "{{{
         if IsWin()
-            let l:exec_str .= ' ' . l:filename
-            let l:exec_str .= ' ' . a:argstr
+            let l:exec .= ' ' . l:filename
+            let l:exec .= ' ' . a:argstr
         else
             return
         endif
     "}}}
     elseif 'html' ==? l:ext
     "{{{
-        let l:exec_str .= s:path_browser . ' ' . l:filename
+        let l:exec .= s:path_browser . ' ' . l:filename
     "}}}
     else
         return
     endif
 
-    execute l:exec_str
+    execute l:exec
 endfunction
 " }}}
 
@@ -1349,7 +1354,7 @@ function! ComplileProject(str, fn, ...)
         call Fn('', l:prj[0], l:args)
     elseif len(l:prj) > 1
         call PopSelection({
-            \ 'opt' : ['Please Select your project file'],
+            \ 'opt' : ['Please select the project file'],
             \ 'lst' : l:prj,
             \ 'cmd' : a:fn,
             \}, 0, l:args)
@@ -1369,28 +1374,28 @@ function! ComplileProjectQmake(sopt, sel, args)
     let l:name     = FindProjectTarget(a:sel, 'qmake')
     let l:filedir  = fnameescape(fnamemodify(a:sel, ":p:h"))
     let l:olddir   = fnameescape(getcwd())
-    let l:exec_str = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
+    let l:exec     = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
 
     " change cwd
     execute 'lcd ' . l:filedir
 
     " execute shell code
     if IsLinux()
-        let l:exec_str .= 'qmake ' . l:filename
-        let l:exec_str .= ' && make'
+        let l:exec .= 'qmake ' . l:filename
+        let l:exec .= ' && make'
     elseif IsWin()
-        let l:exec_str .= s:path_qmake . " -r " . l:filename
-        let l:exec_str .= ' && ' . s:path_vcvars
-        let l:exec_str .= ' && ' . s:path_nmake . ' -f Makefile.Debug'
+        let l:exec .= s:path_qmake . " -r " . l:filename
+        let l:exec .= ' && ' . s:path_vcvars
+        let l:exec .= ' && ' . s:path_nmake . ' -f Makefile.Debug'
     else
         return
     endif
     if empty(a:args)
-        let l:exec_str .= ' && ' . l:name
+        let l:exec .= ' && ' . l:name
     else
-        let l:exec_str .= ' ' . join(a:args)
+        let l:exec .= ' ' . join(a:args)
     endif
-    execute l:exec_str
+    execute l:exec
 
     " change back cwd
     execute 'lcd ' . l:olddir
@@ -1407,19 +1412,19 @@ function! ComplileProjectMakefile(sopt, sel, args)
     let l:name     = FindProjectTarget(a:sel, 'make')
     let l:filedir  = fnameescape(fnamemodify(a:sel, ':p:h'))
     let l:olddir   = fnameescape(getcwd())
-    let l:exec_str = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
+    let l:exec     = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
 
     " change cwd
     execute 'lcd ' . l:filedir
 
     " execute shell code
-    let l:exec_str .= 'make'
+    let l:exec .= 'make'
     if empty(a:args)
-        let l:exec_str .= ' && ' . l:name
+        let l:exec .= ' && ' . l:name
     else
-        let l:exec_str .= ' ' . join(a:args)
+        let l:exec .= ' ' . join(a:args)
     endif
-    execute l:exec_str
+    execute l:exec
 
     " change back cwd
     execute 'lcd ' . l:olddir
@@ -1431,9 +1436,9 @@ endfunction
 " @param sopt: 参数信息，未用到，只是传入popset的函数需要
 " @param sel: index.html路径
 function! ComplileProjectHtml(sopt, sel)
-    let l:exec_str = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
-    let l:exec_str .= s:path_browser . ' ' . '"' . a:sel . '"'
-    execute l:exec_str
+    let l:exec = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
+    let l:exec .= s:path_browser . ' ' . '"' . a:sel . '"'
+    execute l:exec
 endfunction
 " }}}
 
@@ -1909,7 +1914,7 @@ endfunction
 " Misc {{{
 " 查找Vim关键字 {{{
 function! GotoKeyword(mode)
-    let l:exec_str = 'help '
+    let l:exec = 'help '
     if a:mode ==# 'n'
         let l:word = expand('<cword>')
     elseif a:mode ==# 'v'
@@ -1917,13 +1922,13 @@ function! GotoKeyword(mode)
     endif
 
     " 添加关键字
-    let l:exec_str .= l:word
+    let l:exec .= l:word
     if IsNVim()
         " nvim用自己的帮助文件，只有英文的
-        let l:exec_str .= '@en'
+        let l:exec .= '@en'
     endif
 
-    execute l:exec_str
+    execute l:exec
 endfunction
 " }}}
 
