@@ -654,7 +654,7 @@ endif
     let g:NERDTreeMapJumpPrevSibling = '<C-p>'
                                         " 前一个Sibling
     nnoremap <leader>te :NERDTreeToggle<CR>
-    nnoremap <leader>tE :execute ':NERDTree ' . getcwd()<CR>
+    nnoremap <leader>tE :execute ':NERDTree ' . expand('%:p:h')<CR>
 " }}}
 
 " vim-startify {{{ vim会话界面
