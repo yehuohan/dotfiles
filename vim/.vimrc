@@ -460,7 +460,10 @@ endif
     Plug 'tpope/vim-repeat'
     function! SetRepeatExecution(string)
         let s:execution = a:string
-        call repeat#set("\<Plug>RepeatExecute", v:count)
+        try
+            call repeat#set("\<Plug>RepeatExecute", v:count)
+        catch
+        endtry
     endfunction
     function! RepeatExecute()
         if !empty(s:execution)
