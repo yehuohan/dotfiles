@@ -331,6 +331,7 @@ call plug#begin($VimPluginPath.'/bundle')   " 可选设置，可以指定插件�
     endfunction
     function! PreviewPattern(prompt)
         " 预览pattern
+        let l:old_pat = histget('/', -1)
         try
             call incsearch#call({
                                     \ 'command': '/',
@@ -338,10 +339,11 @@ call plug#begin($VimPluginPath.'/bundle')   " 可选设置，可以指定插件�
                                     \ 'prompt': a:prompt
                                 \})
         " E117: 函数不存在
-		catch /^Vim\%((\a\+)\)\=:E117/
+        catch /^Vim\%((\a\+)\)\=:E117/
             return ''
         endtry
-        return histget('/', -1)
+        let l:pat = histget('/', -1)
+        return (l:pat ==# l:old_pat) ? '' : l:pat
     endfunction
 
     nmap /  <Plug>(incsearch-forward)
@@ -475,7 +477,7 @@ endif
         try
             call repeat#set("\<Plug>RepeatExecute", v:count)
         " E117: 函数不存在
-		catch /^Vim\%((\a\+)\)\=:E117/
+        catch /^Vim\%((\a\+)\)\=:E117/
         endtry
     endfunction
     function! RepeatExecute()
@@ -1201,7 +1203,7 @@ endif
 " }}}
 " }}}
 
-" Project Run {{{
+" Project run {{{
 " FUNCTION: ComplileToggleX86X64() "{{{
 " 切换成x86或x64编译环境
 let s:complile_type = 'x64'
@@ -1466,13 +1468,13 @@ let RC_MakeClean  = function('ComplileProject', ['[mM]akefile', 'ComplileProject
 let RC_Html       = function('ComplileProject', ['[iI]ndex.html', 'ComplileProjectHtml'])
 " }}}
 
-" Function Run {{{
+" Execute function {{{
 " FUNCTION: ExecFuncInput(prompt, text, cmpl, fn, ...) {{{
 " @param prompt: input的提示信息
 " @param text: input的缺省输入
 " @param cmpl: input的输入输入补全
 " @param fn: 要运行的函数，参数为input的输入，和可变输入参数
-function ExecFuncInput(prompt, text, cmpl, fn, ...)
+function! ExecFuncInput(prompt, text, cmpl, fn, ...)
     if empty(a:cmpl)
         let l:inpt = input(a:prompt, a:text)
     else
@@ -1490,11 +1492,22 @@ function ExecFuncInput(prompt, text, cmpl, fn, ...)
 endfunction
 " }}}
 
-" FUNCTION: EditTempFile(suffix, ntab) "{{{
+" FUNCTION: FuncSort() range {{{ 预览sort匹配
+function! FuncSort() range
+    let l:pat = PreviewPattern('sort pattern: /')
+    if empty(l:pat)
+        return
+    endif
+    let l:range = (a:firstline == a:lastline) ? '' : (string(a:firstline) . ',' . string(a:lastline))
+    call feedkeys(':' . l:range . 'sort /' . l:pat . '/', 'n')
+endfunction
+" }}}
+
+" FUNCTION: FuncEditTempFile(suffix, ntab) "{{{
 " 编辑临时文件
 " @param suffix: 临时文件附加后缀
 " @param ntab: 在新tab中打开
-function EditTempFile(suffix, ntab)
+function FuncEditTempFile(suffix, ntab)
     let l:tempfile = fnamemodify(tempname(), ':r')
     if empty(a:suffix)
         let l:tempfile .= '.tmp'
@@ -1956,7 +1969,7 @@ function! RemoveTrailingSpace()
 endfunction
 " }}}
 
-" 添加分隔符 {{{
+" {{{ 添加分隔符
 function! DivideSpace(pos, ...) range
     let l:chars = (a:0 > 0) ? a:1 :
                 \ split(input('Divide ' . toupper(a:pos) . ' Space(split with space): '), ' ')
@@ -2311,22 +2324,24 @@ endif
 endif
 " }}}
 
-" Run Program {{{
+" Program and function {{{
     " 建立临时文件
-    nnoremap <leader>ei :call ExecFuncInput('TempFile Suffix:', '', '', 'EditTempFile', 0)<CR>
-    nnoremap <leader>en :call EditTempFile (''   , 0)<CR>
-    nnoremap <leader>ec :call EditTempFile ('c'  , 0)<CR>
-    nnoremap <leader>ea :call EditTempFile ('cpp', 0)<CR>
-    nnoremap <leader>ep :call EditTempFile ('py' , 0)<CR>
-    nnoremap <leader>eg :call EditTempFile ('go' , 0)<CR>
-    nnoremap <leader>em :call EditTempFile ('m'  , 0)<CR>
-    nnoremap <leader>eti :call ExecFuncInput('TempFile Suffix:', '', '', 'EditTempFile', 1)<CR>
-    nnoremap <leader>etn :call EditTempFile(''   , 1)<CR>
-    nnoremap <leader>etc :call EditTempFile('c'  , 1)<CR>
-    nnoremap <leader>eta :call EditTempFile('cpp', 1)<CR>
-    nnoremap <leader>etp :call EditTempFile('py' , 1)<CR>
-    nnoremap <leader>etg :call EditTempFile('go' , 1)<CR>
-    nnoremap <leader>etm :call EditTempFile('m'  , 1)<CR>
+    nnoremap <leader>ei :call ExecFuncInput('TempFile Suffix:', '', '', 'FuncEditTempFile', 0)<CR>
+    nnoremap <leader>en :call FuncEditTempFile (''   , 0)<CR>
+    nnoremap <leader>ec :call FuncEditTempFile ('c'  , 0)<CR>
+    nnoremap <leader>ea :call FuncEditTempFile ('cpp', 0)<CR>
+    nnoremap <leader>ep :call FuncEditTempFile ('py' , 0)<CR>
+    nnoremap <leader>eg :call FuncEditTempFile ('go' , 0)<CR>
+    nnoremap <leader>em :call FuncEditTempFile ('m'  , 0)<CR>
+    nnoremap <leader>eti :call ExecFuncInput('TempFile Suffix:', '', '', 'FuncEditTempFile', 1)<CR>
+    nnoremap <leader>etn :call FuncEditTempFile(''   , 1)<CR>
+    nnoremap <leader>etc :call FuncEditTempFile('c'  , 1)<CR>
+    nnoremap <leader>eta :call FuncEditTempFile('cpp', 1)<CR>
+    nnoremap <leader>etp :call FuncEditTempFile('py' , 1)<CR>
+    nnoremap <leader>etg :call FuncEditTempFile('go' , 1)<CR>
+    nnoremap <leader>etm :call FuncEditTempFile('m'  , 1)<CR>
+    " 排序
+    nnoremap <leader>ss :call FuncSort()<CR>
 
     " 编译运行当前文件
     nnoremap <leader>rf :call ComplileFile('')<CR>
