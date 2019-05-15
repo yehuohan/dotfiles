@@ -8,7 +8,6 @@
 
 ```text
 .
-│
 ├── cf-arch   : Arch config
 ├── cf-ubuntu : Ubuntu config
 ├── cf-gw     : GNU-Win config
