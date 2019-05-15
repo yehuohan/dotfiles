@@ -1276,6 +1276,10 @@ function! ComplileFile(argstr)
         let l:exec .= 'javac ' . l:filename
         let l:exec .= ' && java ' . l:name
     "}}}
+    elseif 'json' ==? l:ext
+    " {{{
+        let l:exec .= 'python -m json.tool %'
+    " }}}
     elseif 'm' ==? l:ext
     "{{{
         let l:exec .= 'matlab -nosplash -nodesktop -r ' . l:name[3:-2]
