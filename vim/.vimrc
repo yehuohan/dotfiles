@@ -100,34 +100,34 @@
 " {{{
 " vim or nvim
 " {{{
-silent function! IsNVim()
+function! IsNVim()
     return (has('nvim'))
 endfunction
-silent function! IsVim()
+function! IsVim()
     return !(has('nvim'))
 endfunction
 " }}}
 
 " linux or win
 " {{{
-silent function! IsLinux()
+function! IsLinux()
     return (has('unix') && !has('macunix') && !has('win32unix'))
 endfunction
-silent function! IsWin()
+function! IsWin()
     return (has('win32') || has('win64'))
 endfunction
-silent function! IsGw()
+function! IsGw()
     " GNU for windows
     return (has('win32unix'))
 endfunction
-silent function! IsMac()
+function! IsMac()
     return (has('mac'))
 endfunction
 " }}}
 
 " gui or term
 " {{{
-silent function! IsGvim()
+function! IsGvim()
     return has('gui_running')
 endfunction
 function! IsTermType(tt)
@@ -321,9 +321,9 @@ call plug#begin($VimPluginPath.'/bundle')   " 可选设置，可以指定插件�
     " 设置查找时页面滚动映射
     augroup PluginIncsearch
         autocmd!
-        autocmd VimEnter * call s:incsearch_keymap()
+        autocmd VimEnter * call s:incsearchKeymap()
     augroup END
-    function! s:incsearch_keymap()
+    function! s:incsearchKeymap()
         IncSearchNoreMap <C-j> <Over>(incsearch-next)
         IncSearchNoreMap <C-k> <Over>(incsearch-prev)
         IncSearchNoreMap <M-j> <Over>(incsearch-scroll-f)
@@ -430,14 +430,10 @@ endif
 
 " smooth-scroll {{{ 平滑滚动
     Plug 'terryma/vim-smooth-scroll'
-    " nnoremap <silent> <C-d> :call smooth_scroll#down(&scroll, 0, 2)<CR>
-    " nnoremap <silent> <C-u> :call smooth_scroll#up(&scroll, 0, 2)<CR>
-    " nnoremap <silent> <C-f> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
-    " nnoremap <silent> <C-b> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
-    nnoremap <silent> <M-n> :call smooth_scroll#down(&scroll, 0, 2)<CR>
-    nnoremap <silent> <M-m> :call smooth_scroll#up(&scroll, 0, 2)<CR>
-    nnoremap <silent> <M-j> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
-    nnoremap <silent> <M-k> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
+    nnoremap <M-n> :call smooth_scroll#down(&scroll, 0, 2)<CR>
+    nnoremap <M-m> :call smooth_scroll#up(&scroll, 0, 2)<CR>
+    nnoremap <M-j> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
+    nnoremap <M-k> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
 " }}}
 
 " expand-region {{{ 快速块选择
@@ -949,8 +945,8 @@ endif
 
 " file switch {{{ c/c++文件切换
     Plug 'derekwyatt/vim-fswitch'
-    nnoremap <silent> <Leader>of :FSHere<CR>
-    nnoremap <silent> <Leader>os :FSSplitRight<CR>
+    nnoremap <Leader>of :FSHere<CR>
+    nnoremap <Leader>os :FSSplitRight<CR>
     let g:fsnonewfiles='on'
 " }}}
 
