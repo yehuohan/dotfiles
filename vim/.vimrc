@@ -566,7 +566,8 @@ endif
             call lightline#init()
             call lightline#colorscheme()
             call lightline#update()
-        catch
+        " E117: 函数不存在
+        catch /^Vim\%((\a\+)\)\=:E117/
         endtry
     endfunction
     function! LightlineMode()
@@ -958,7 +959,6 @@ endif
     endif
     nnoremap <leader>rr :AsyncRun
     nnoremap <leader>rs :AsyncStop<CR>
-
     augroup PluginAsyncrun
         autocmd!
         autocmd User AsyncRunStart call asyncrun#quickfix_toggle(8, 1)
@@ -988,7 +988,7 @@ endif
                                         " 允许指定的命令更新folds
 " }}}
 
-" vim-cpp-enhanced-highlight {{{ c++语法高亮
+" cpp-enhanced-highlight {{{ c++语法高亮
     Plug 'octol/vim-cpp-enhanced-highlight'
 " }}}
 " }}}
@@ -1307,6 +1307,7 @@ function! ComplileFile(argstr)
     endif
 
     execute l:exec
+    call SetRepeatExecution(l:exec)
 endfunction
 " }}}
 
@@ -1521,7 +1522,7 @@ endfunction
 " 编辑临时文件
 " @param suffix: 临时文件附加后缀
 " @param ntab: 在新tab中打开
-function FuncEditTempFile(suffix, ntab)
+function! FuncEditTempFile(suffix, ntab)
     let l:tempfile = fnamemodify(tempname(), ':r')
     if empty(a:suffix)
         let l:tempfile .= '.tmp'
@@ -1537,7 +1538,7 @@ endfunction
 "}}}
 
 " FUNCTION: FuncDiffFile(filename, mode) {{{
-function FuncDiffFile(filename, mode)
+function! FuncDiffFile(filename, mode)
     if a:mode == 's'
         execute 'diffsplit ' . a:filename
     elseif a:mode == 'v'
