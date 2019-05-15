@@ -557,6 +557,22 @@ endif
         \ 'component_type': {
                 \ },
         \ }
+    augroup PluginLightline
+        autocmd!
+        autocmd ColorScheme * call s:lightlineColorScheme()
+    augroup END
+    function! s:lightlineColorScheme()
+        if !exists('g:loaded_lightline')
+            return
+        endif
+        try
+            let g:lightline.colorscheme = g:colors_name
+            call lightline#init()
+            call lightline#colorscheme()
+            call lightline#update()
+        catch
+        endtry
+    endfunction
     function! LightlineMode()
         let fname = expand('%:t')
         return fname == '__Tagbar__' ? 'Tagbar' :
