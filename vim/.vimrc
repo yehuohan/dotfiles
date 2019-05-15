@@ -1469,12 +1469,12 @@ let RC_Html       = function('ComplileProject', ['[iI]ndex.html', 'ComplileProje
 " }}}
 
 " Execute function {{{
-" FUNCTION: ExecFuncInput(prompt, text, cmpl, fn, ...) {{{
+" FUNCTION: ExecFuncInput(prompt, text, cmpl, fn, ...) range {{{
 " @param prompt: input的提示信息
 " @param text: input的缺省输入
 " @param cmpl: input的输入输入补全
 " @param fn: 要运行的函数，参数为input的输入，和可变输入参数
-function! ExecFuncInput(prompt, text, cmpl, fn, ...)
+function! ExecFuncInput(prompt, text, cmpl, fn, ...) range
     if empty(a:cmpl)
         let l:inpt = input(a:prompt, a:text)
     else
@@ -1487,8 +1487,9 @@ function! ExecFuncInput(prompt, text, cmpl, fn, ...)
     if a:0 > 0
         call extend(l:args, a:000)
     endif
+    let l:range = (a:firstline == a:lastline) ? '' : (string(a:firstline) . ',' . string(a:lastline))
     let Fn = function(a:fn, l:args)
-    call Fn()
+    execute l:range . 'call Fn()'
 endfunction
 " }}}
 
@@ -1530,6 +1531,36 @@ function FuncDiffFile(filename, mode)
         execute 'vertical diffsplit ' . a:filename
     endif
 endfunction
+" }}}
+
+" FUNCTION: FuncDivideSpace(string, pos) range {{{ 添加分隔符
+function! FuncDivideSpace(string, pos) range
+    let l:chars = split(a:string)
+
+    for k in range(a:firstline, a:lastline)
+        let l:line = getline(k)
+        let l:fie = ' '
+        for ch in l:chars
+            let l:pch = '\m\s*\M' . escape(ch, '\') . '\m\s*\C'
+            if a:pos == 'h'
+                let l:sch = l:fie . escape(ch, '&\')
+            elseif a:pos == 'c'
+                let l:sch = l:fie . escape(ch, '&\') . l:fie
+            elseif a:pos == 'l'
+                let l:sch = escape(ch, '&\') . l:fie
+            elseif a:pos == 'd'
+                let l:sch = escape(ch, '&\')
+            endif
+            let l:line = substitute(l:line, l:pch, l:sch, 'g')
+        endfor
+        call setline(k, l:line)
+    endfor
+    call SetRepeatExecution('call FuncDivideSpace("' . a:string . '", "' . a:pos . '")')
+endfunction
+let DivideSpaceH = function('ExecFuncInput', ['Divide H Space(split with space): ', '', '', 'FuncDivideSpace', 'h'])
+let DivideSpaceC = function('ExecFuncInput', ['Divide C Space(split with space): ', '', '', 'FuncDivideSpace', 'c'])
+let DivideSpaceL = function('ExecFuncInput', ['Divide L Space(split with space): ', '', '', 'FuncDivideSpace', 'l'])
+let DivideSpaceD = function('ExecFuncInput', ['Divide D Space(split with space): ', '', '', 'FuncDivideSpace', 'd'])
 " }}}
 " }}}
 
@@ -1968,36 +1999,6 @@ function! RemoveTrailingSpace()
     call winrestview(l:save)
 endfunction
 " }}}
-
-" {{{ 添加分隔符
-function! DivideSpace(pos, ...) range
-    let l:chars = (a:0 > 0) ? a:1 :
-                \ split(input('Divide ' . toupper(a:pos) . ' Space(split with space): '), ' ')
-    if empty(l:chars)
-        return
-    endif
-
-    for k in range(a:firstline, a:lastline)
-        let l:line = getline(k)
-        let l:fie = ' '
-        for ch in l:chars
-            let l:pch = '\m\s*\M' . escape(ch, '\') . '\m\s*\C'
-            if a:pos == 'h'
-                let l:sch = l:fie . escape(ch, '&\')
-            elseif a:pos == 'c'
-                let l:sch = l:fie . escape(ch, '&\') . l:fie
-            elseif a:pos == 'l'
-                let l:sch = escape(ch, '&\') . l:fie
-            elseif a:pos == 'd'
-                let l:sch = escape(ch, '&\')
-            endif
-            let l:line = substitute(l:line, l:pch, l:sch, 'g')
-        endfor
-        call setline(k, l:line)
-    endfor
-    call SetRepeatExecution('call DivideSpace(' . string(a:pos) . ', ' . string(l:chars) . ')')
-endfunction
-" }}}
 " }}}
 " }}}
 
@@ -2161,10 +2162,10 @@ augroup END
     nnoremap <leader>xx :%!xxd<CR>
     nnoremap <leader>xr :%!xxd -r<CR>
     " 空格分隔
-    nnoremap <leader>dh :call DivideSpace('h')<CR>
-    nnoremap <leader>dc :call DivideSpace('c')<CR>
-    nnoremap <leader>dl :call DivideSpace('l')<CR>
-    nnoremap <leader>dd :call DivideSpace('d')<CR>
+    nnoremap <leader>dh :call DivideSpaceH()<CR>
+    nnoremap <leader>dc :call DivideSpaceC()<CR>
+    nnoremap <leader>dl :call DivideSpaceL()<CR>
+    nnoremap <leader>dd :call DivideSpaceD()<CR>
     " 显示折行
     nnoremap <leader>iw :set invwrap<CR>
     " 显示不可见字符
