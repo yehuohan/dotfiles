@@ -984,7 +984,7 @@ endif
 
 " FastFold {{{ 更新折叠
     Plug 'Konfekt/FastFold'
-    nmap zu <Plug>(FastFoldUpdate)
+    nmap <leader>zu <Plug>(FastFoldUpdate)
     let g:fastfold_savehook = 0         " 只允许手动更新folds
     "let g:fastfold_fold_command_suffixes =  ['x','X','a','A','o','O','c','C']
     "let g:fastfold_fold_movement_commands = [']z', '[z', 'zj', 'zk']
