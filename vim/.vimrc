@@ -689,23 +689,15 @@ endif
     Plug 'mhinz/vim-startify'
     if IsLinux()
         let g:startify_bookmarks = [ {'c': '~/.vimrc'}, '~/.zshrc', '~/.config/i3/config' ]
-        let g:startify_session_dir = '$VimPluginPath/sessions'
     elseif IsWin()
         let g:startify_bookmarks = [ {'c': '$VimPluginPath/../_vimrc'}, '$VimPluginPath/../vimfiles/.ycm_extra_conf.py']
-        let g:startify_session_dir = '$VimPluginPath/sessions'
-    elseif IsGw()
-        let g:startify_session_dir = '~/.vim/sessions'
     elseif IsMac()
         let g:startify_bookmarks = [ {'c': '~/.vimrc'}, '~/.zshrc']
-        let g:startify_session_dir = '$VimPluginPath/sessions'
     endif
-    let g:startify_files_number = 10
-    let g:startify_list_order = [
-            \ ['   Sessions:']     , 'sessions'  ,
-            \ ['   BookMarks:']    , 'bookmarks' ,
-            \ ['   Recent Files:'] , 'files'     ,
-            \ ['   Recent Dirs:']  , 'dir'       ,
-            \ ['   Commands:']     , 'commands']
+    let g:startify_lists = [
+            \ {'type': 'bookmarks', 'header': ['   Bookmarks']},
+            \ {'type': 'files',     'header': ['   Recent Files']      },
+            \ ]
     nnoremap <leader>su :Startify<CR>   " start ui of vim-startify
 " }}}
 
@@ -1162,7 +1154,7 @@ function! InvFoldColumeShow()
     else
         set foldcolumn=0
     endif
-    echo 'foldcolumn =' . &foldcolumn
+    echo 'foldcolumn = ' . &foldcolumn
 endfunction
 " }}}
 
