@@ -231,51 +231,53 @@ snippet makf "makefile template"
 #-------------------------------------------------
 
 #===============================================================================
-# path 
+# path
 #===============================================================================
-DIR_INC = ./inc
-DIR_SRC = ./src
-DIR_OBJ = ./obj
-DIR_BIN = ./
-DIR_3RD = ./3party
-DIR_LIB = ./lib
+DIR_INC := ./inc
+DIR_SRC := ./src
+DIR_OBJ := ./obj
+DIR_BIN := .
+DIR_3RD := ./3party
+DIR_LIB := ./lib
 
 #===============================================================================
-# setting 
+# settings
 #===============================================================================
-CC = ${1:g++}
-TARGET = ${2:main}
-
+CC         := ${1:g++}
+TARGET     := ${2:main}
 ifeq ($(CC), g++)
-CC_SUF = cpp
+CC_SUF     := cpp
+else
+CC_SUF     := c
 endif
-ifeq ($(CC), gcc)
-CC_SUF = c
-endif
+BIN		   := ${DIR_BIN}/${TARGET}
+SRC        := $(wildcard ${DIR_SRC}/*.${CC_SUF})
+OBJ        := $(patsubst %.${CC_SUF},${DIR_OBJ}/%.o,$(notdir ${SRC}))
+LIBS       :=
+#-lpthread \`pkg-config opencv --libs\`
+PKGFLAGS   :=
+#\`pkg-config opencv --cflags\`
+CXXFLAGS   := -g -Wall -I${DIR_INC} -I${DIR_SRC} -I${DIR_3RD} ${PKGFLAGS}
+LDFLAGS    := -L${DIR_LIB} ${LIBS}
 
-SRC = $(wildcard ${DIR_SRC}/*.${CC_SUF})
-OBJ = $(patsubst %.${CC_SUF},${DIR_OBJ}/%.o,$(notdir ${SRC}))
+define init_make
+	$(shell mkdir -p ${DIR_OBJ})
+endef
+$(call init_make)
 
-BIN_TARGET = ${DIR_BIN}/${TARGET}
-LDFLAGS = -L${DIR_LIB}
-LIBS =
-#-lopencv_core -lpthread
-PKGFLAGS =
-#\`pkg-config opencv --cflags` `pkg-config opencv --libs\`
-CXXFLAGS = -g -Wall -I${DIR_INC} -I${DIR_SRC} -I${DIR_3RD} ${PKGFLAGS}
+#===============================================================================
+# target
+#===============================================================================
+${BIN}: ${OBJ}
+	${CC} ${OBJ} -o $@ ${LDFLAGS}
 
+${DIR_OBJ}/%.o: ${DIR_SRC}/%.${CC_SUF}
+	${CC} ${CXXFLAGS} -c $< -o $@
 
-${BIN_TARGET} : ${OBJ}
-	$(CC) $(OBJ) -o $@ $(LDFLAGS) $(LIBS)
-
-${DIR_OBJ}/%.o:${DIR_SRC}/%.${CC_SUF}
-	mkdir -p ${DIR_OBJ}
-	$(CC) $(CXXFLAGS) -c $< -o $@
-
-.phony:clean
+.phony: clean
 clean:
-	rm ${OBJ}
-
+	rm -r ${DIR_OBJ}
+	rm $(BIN)
 endsnippet
 
 
