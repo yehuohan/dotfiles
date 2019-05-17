@@ -646,7 +646,7 @@ endif
 " }}}
 
 " popc {{{ buffer管理
-    Plug 'yehuohan/popc'
+    Plug 'yehuohan/popc', {'branch': 'dev'}
     set hidden
     let g:Popc_jsonPath = $VimPluginPath
     let g:Popc_useTabline = 1
