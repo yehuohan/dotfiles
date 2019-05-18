@@ -1,12 +1,12 @@
 
 " Platform
-silent function! IsLinux()
+function! IsLinux()
     return (has('unix') && !has('macunix') && !has('win32unix'))
 endfunction
-silent function! IsWin()
+function! IsWin()
     return (has('win32') || has('win64'))
 endfunction
-silent function! IsMac()
+function! IsMac()
     return (has('mac'))
 endfunction
 
