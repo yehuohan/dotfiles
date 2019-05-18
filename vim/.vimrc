@@ -379,6 +379,10 @@ call plug#begin($VimPluginPath.'/bundle')   " 可选设置，可以指定插件�
 " LeaderF {{{ 模糊查找
 if IsLinux()
     Plug 'Yggdroot/LeaderF', { 'do': './install.sh' }
+    augroup PluginLeaderF
+        autocmd!
+        autocmd VimEnter * autocmd! LeaderF_Mru
+    augroup END
 elseif IsWin()
     Plug 'Yggdroot/LeaderF', { 'do': './install.bat' }
 else
