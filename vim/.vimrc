@@ -1,9 +1,10 @@
 
-"
-" vimrc configuration for vim, gvim, neovim and neovim-qt.
-" set the path of 'Global settings' before using this vimrc.
-" yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
-"
+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+" Vimrc: configuration for vim, gvim, neovim. set the path of 'Global settings'
+"        before using this vimrc.
+" Github: https://github.com/yehuohan/dotconfigs
+" Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 "===============================================================================
 " My Notes
