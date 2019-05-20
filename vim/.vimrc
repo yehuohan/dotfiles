@@ -1711,7 +1711,7 @@ function! FindWorking(type, mode)
             let l:pat = getreg('+')
         endif
         let l:pat = escape(l:pat, ' -#%')       " escape 'Space,-,#,%'
-        if a:type =~# 'l'
+        if !empty(l:pat) && a:type =~# 'l'
             let l:pat = '-e "' . l:pat .'"'     " used for 'Leaderf rg'
         endif
         return l:pat
