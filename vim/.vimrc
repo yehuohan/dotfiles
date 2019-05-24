@@ -83,14 +83,13 @@
 " }}}
 
 " Software {{{
-    " Python                      : 需要在vim编译时添加Python支持
-    " LLVM(Clang)                 : YouCompleteMe补全
-    " fzf                         : Fzf模糊查找
-    " ripgrep                     : Rg文本查找
-    " ag                          : Ag文本查找
-    " ctags                       : tags生成
-    " fireFox                     : Markdown,ReStructruedText等标记文本预览
-    " fcitx                       : Linux下的输入法
+    " Python      : 需要在vim编译时添加Python支持
+    " LLVM(Clang) : YouCompleteMe补全
+    " fzf         : Fzf模糊查找
+    " ripgrep     : Rg文本查找
+    " ctags       : tags生成
+    " fireFox     : Markdown,ReStructruedText等标记文本预览
+    " fcitx       : Linux下的输入法
 " }}}
 
 " }}}
@@ -145,7 +144,9 @@ endfunction
 " Global settings
 "===============================================================================
 " {{{
+if IsVim()
 set nocompatible                        " 不兼容vi快捷键
+endif
 let mapleader="\<Space>"                " 使用Space作为leader
                                         " Space只在Normal或Command或Visual模式下map，不适合在Insert模式下map
 " 特殊键
@@ -199,8 +200,8 @@ vnoremap ; :
 " Exe
 " {{{
 if !executable('rg')    | echo 'Warning: No ripgerp(rg)' | endif
-if !executable('ag')    | echo 'Warning: No ag'          | endif
 if !executable('ctags') | echo 'Warning: No ctags'       | endif
+if !executable('fzf')   | echo 'Warning: No fzf'         | endif
 " }}}
 
 " 键码设定
@@ -2033,13 +2034,13 @@ endfunction
 " {{{
 " Term
 " {{{
-    set nocompatible                    " 不兼容vi快捷键
     syntax on                           " 语法高亮
     set number                          " 显示行号
     set relativenumber                  " 显示相对行号
     set cursorline                      " 高亮当前行
     set cursorcolumn                    " 高亮当前列
     set hlsearch                        " 设置高亮显示查找到的文本
+    set termguicolors
 if IsVim()
     set renderoptions=                  " 设置正常显示unicode字符
 endif
@@ -2091,12 +2092,14 @@ endif
     set helplang=cn,en                  " 优先查找中文帮助
 
     " 终端光标设置
+if IsVim()
     if IsTermType("xterm") || IsTermType("xterm-256color")
         " 适用于urxvt,st,xterm,gnome-termial
         " 5,6: 竖线，  3,4: 横线，  1,2: 方块
         let &t_SI = "\<Esc>[6 q"        " 进入Insert模式
         let &t_EI = "\<Esc>[2 q"        " 退出Insert模式
     endif
+endif
 " }}}
 
 " Gui
