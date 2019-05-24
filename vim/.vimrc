@@ -875,9 +875,19 @@ endif
         \ 'args' : ['--mode=java --style=google'],
         \ 'stdin' : 1,
         \ }
+    let g:neoformat_python_autopep8 = {
+        \ 'exe': 'autopep8',
+        \ 'args': ['-s 4', '-E'],
+        \ 'replace': 1,
+        \ 'stdin': 1,
+        \ 'env': ['DEBUG=1'],
+        \ 'valid_exit_codes': [0, 23],
+        \ 'no_append': 1,
+        \ }
     let g:neoformat_enabled_c = ['astyle']
     let g:neoformat_enabled_cpp = ['astyle']
     let g:neoformat_enabled_java = ['astyle']
+    let g:neoformat_enabled_python = ['autopep8']
     nnoremap <leader>fc :Neoformat<CR>
     vnoremap <leader>fc :Neoformat<CR>
 " }}}
