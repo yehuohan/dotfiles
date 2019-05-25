@@ -165,8 +165,6 @@ vnoremap ; :
         let $VimPluginPath=s:home_path . '\vimfiles'
         " windows下将HOME设置VIM的安装路径
         let $HOME=$VIM
-        " 未打开文件时，切换到HOME目录
-        execute 'cd $HOME'
     elseif IsGw()
         let $VimPluginPath='/c/MyApps/Vim/vimfiles'
     elseif IsMac()
