@@ -209,6 +209,8 @@ set ttimeout                            " 打开键码超时检测
 set timeoutlen=1000                     " 映射超时时间为1000ms
 set ttimeoutlen=70                      " 键码超时时间为70ms
 
+" 键码设置 {{{
+if IsVim()
 " 键码示例 {{{
     " 终端Alt键映射处理：如 Alt+x，实际连续发送 <Esc>x 编码
     " 以下三种方法都可以使按下 Alt+x 后，执行 CmdTest 命令，但超时检测有区别
@@ -219,8 +221,6 @@ set ttimeoutlen=70                      " 键码超时时间为70ms
     "<3> nnoremap x  :CmdTest<CR>     " 按映射超时时间检测
 " }}}
 
-" 键码设置 {{{
-if IsVim()
     set encoding=utf-8                  " 内部内部需要使用utf-8编码
     set <M-d>=d
     set <M-f>=f
@@ -2038,7 +2038,7 @@ endfunction
     set cursorline                      " 高亮当前行
     set cursorcolumn                    " 高亮当前列
     set hlsearch                        " 设置高亮显示查找到的文本
-    set termguicolors
+    set termguicolors                   " 在终端中使用24位彩色
 if IsVim()
     set renderoptions=                  " 设置正常显示unicode字符
 endif
