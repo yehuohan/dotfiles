@@ -22,6 +22,7 @@ if [ `uname` == "Linux" ]; then
         cp ../.vim/.tern-project      ./vim/
         cp -r ../.vim/mySnippets      ./vim/
         cp -r ../.vim/autoload        ./vim/
+        cp -r ../.config/nvim         ./vim/
 
         # zsh
         cp ../.zshrc                $cf_dir/
@@ -64,6 +65,7 @@ if [ `uname` == "Linux" ]; then
         cp ../.vim/.tern-project      ./vim/
         cp -r ../.vim/mySnippets      ./vim/
         cp -r ../.vim/autoload        ./vim/
+        cp -r ../.config/nvim         ./vim/
 
         # zsh
         cp ../.zshrc                $cf_dir/

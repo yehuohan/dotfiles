@@ -2115,28 +2115,55 @@ if IsGvim()
         set columns=100
         "set guifont=DejaVu\ Sans\ Mono\ 13
         set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 13.5
-        set linespace=0                 " required by DejaVuSansMono for Powerline
+        set linespace=0                 " required by Powerline Font
         set guifontwide=WenQuanYi\ Micro\ Hei\ Mono\ 13.5
     elseif IsWin()
         set lines=25
         set columns=100
         "set guifont=Consolas:h13:cANSI
         set guifont=Consolas_For_Powerline:h12:cANSI
-        set linespace=0                 " required by PowerlineFont
+        set linespace=0                 " required by Powerline Font
         set guifontwide=Microsoft_YaHei_Mono:h11:cGB2312
         nnoremap <leader>tf <Esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
-                                        " gvim全屏快捷键
+                                        " gvim全屏
     elseif IsMac()
         set lines=30
         set columns=100
         set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h15
     endif
 endif
+
+if IsNVim()
+augroup UserSettingsGui
+    autocmd!
+    autocmd VimEnter * call s:guiNvimQt()
+augroup END
+
+" FUNCTION: s:guiNvimQt() {{{ neovim-qt设置
+function! s:guiNvimQt()
+if exists('g:GuiLoaded')
+    if (has('unix') && !has('macunix') && !has('win32unix')) || (has('mac'))
+        Guifont WenQuanYi Micro Hei Mono:h13
+        Guifont DejaVu Sans Mono for Powerline:h13
+    elseif (has('win32') || has('win64'))
+        " 先设置一次中文（缺省）字体，再设置英文字体(BUG:有时有问题)
+        "Guifont! YaHei Mono For Powerline:h12
+        Guifont! Microsoft YaHei Mono:h12
+        Guifont! Consolas For Powerline:h12
+    endif
+    GuiLinespace 0
+    GuiTabline 0
+    nnoremap <leader>tf :call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
+                                        " neovim-qt全屏
+endif
+endfunction
+" }}}
+endif
 " }}}
 
 " Auto Command
 " {{{
-augroup UserSettings
+augroup UserSettingsCmd
     "autocmd[!]  [group]  {event}     {pattern}  {nested}  {cmd}
     "autocmd              BufNewFile  *                    set fileformat=unix
     autocmd!
