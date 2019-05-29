@@ -1,7 +1,7 @@
 
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-" Vimrc: configuration for vim, gvim, neovim. set the path of 'Global settings'
-"        before using this vimrc.
+" Vimrc: configuration for vim, gvim, neovim and neovim-qt. set the path of
+"        'Global settings' before using this vimrc.
 " Github: https://github.com/yehuohan/dotconfigs
 " Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -98,13 +98,20 @@
 " Platform
 "===============================================================================
 " {{{
-" vim or nvim
+" vim or nvim, with or without gui
 " {{{
+function! IsVim()
+    return !(has('nvim'))
+endfunction
 function! IsNVim()
     return (has('nvim'))
 endfunction
-function! IsVim()
-    return !(has('nvim'))
+function! IsGVim()
+    return has('gui_running')
+endfunction
+function! IsNVimQt()
+    " 只在VimEnter之后起作用
+    return exists('g:GuiLoaded')
 endfunction
 " }}}
 
@@ -125,11 +132,8 @@ function! IsMac()
 endfunction
 " }}}
 
-" gui or term
+" term
 " {{{
-function! IsGvim()
-    return has('gui_running')
-endfunction
 function! IsTermType(tt)
     if &term ==? a:tt
         return 1
@@ -692,15 +696,22 @@ endif
 " vim-startify {{{ vim会话界面
     Plug 'mhinz/vim-startify'
     if IsLinux()
-        let g:startify_bookmarks = [ {'c': '~/.vimrc'}, '~/.zshrc', '~/.config/i3/config' ]
+        let g:startify_bookmarks = [ {'c': '~/.vimrc'},
+                                    \ '~/.zshrc',
+                                    \ '~/.config/i3/config',
+                                    \ '~/.config/nvim/init.vim'
+                                    \]
     elseif IsWin()
-        let g:startify_bookmarks = [ {'c': '$VimPluginPath/../_vimrc'}, '$VimPluginPath/../vimfiles/.ycm_extra_conf.py']
+        let g:startify_bookmarks = [ {'c': '$VimPluginPath/../_vimrc'},
+                                    \ '$VimPluginPath/../vimfiles/.ycm_extra_conf.py',
+                                    \ '$APPDATA/../Local/nvim/init.vim'
+                                    \]
     elseif IsMac()
         let g:startify_bookmarks = [ {'c': '~/.vimrc'}, '~/.zshrc']
     endif
     let g:startify_lists = [
             \ {'type': 'bookmarks', 'header': ['   Bookmarks']},
-            \ {'type': 'files',     'header': ['   Recent Files']      },
+            \ {'type': 'files',     'header': ['   Recent Files']},
             \ ]
     nnoremap <leader>su :Startify<CR>   " start ui of vim-startify
 " }}}
@@ -2102,7 +2113,7 @@ endif
 
 " Gui
 " {{{
-if IsGvim()
+if IsGVim()
     set guioptions-=m                   " 隐藏菜单栏
     set guioptions-=T                   " 隐藏工具栏
     set guioptions-=L                   " 隐藏左侧滚动条
@@ -2136,16 +2147,16 @@ endif
 if IsNVim()
 augroup UserSettingsGui
     autocmd!
-    autocmd VimEnter * call s:guiNvimQt()
+    autocmd VimEnter * call s:setGuifontNVimQt()
 augroup END
 
-" FUNCTION: s:guiNvimQt() {{{ neovim-qt设置
-function! s:guiNvimQt()
-if exists('g:GuiLoaded')
-    if (has('unix') && !has('macunix') && !has('win32unix')) || (has('mac'))
-        Guifont WenQuanYi Micro Hei Mono:h13
-        Guifont DejaVu Sans Mono for Powerline:h13
-    elseif (has('win32') || has('win64'))
+" FUNCTION: s:setGuifontNVimQt() {{{ neovim-qt设置
+function! s:setGuifontNVimQt()
+if IsNVimQt()
+    if IsLinux()
+        Guifont! WenQuanYi Micro Hei Mono:h13
+        Guifont! DejaVu Sans Mono for Powerline:h13
+    elseif IsWin()
         " 先设置一次中文（缺省）字体，再设置英文字体(BUG:有时有问题)
         "Guifont! YaHei Mono For Powerline:h12
         Guifont! Microsoft YaHei Mono:h12
