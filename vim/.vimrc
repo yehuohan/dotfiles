@@ -157,19 +157,19 @@ vnoremap ; :
     set rtp+=$VimPluginPath             " 添加 .vim 和 vimfiles 到 rtp(runtimepath)
 
     if IsWin()
-        let s:path_vcvars32  = '"D:/VS2017/VC/Auxiliary/Build/vcvars32.bat"'
-        let s:path_vcvars64  = '"D:/VS2017/VC/Auxiliary/Build/vcvars64.bat"'
-        let s:path_nmake_x86 = '"D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx86/x86/nmake.exe"'
-        let s:path_nmake_x64 = '"D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx64/x64/nmake.exe"'
-        let s:path_qmake_x86 = '"D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe"'
-        let s:path_qmake_x64 = '"D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe"'
+        let s:path_vcvars32  = 'D:/VS2017/VC/Auxiliary/Build/vcvars32.bat'
+        let s:path_vcvars64  = 'D:/VS2017/VC/Auxiliary/Build/vcvars64.bat'
+        let s:path_nmake_x86 = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx86/x86/nmake.exe'
+        let s:path_nmake_x64 = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx64/x64/nmake.exe'
+        let s:path_qmake_x86 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
+        let s:path_qmake_x64 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
         let s:path_vcvars = s:path_vcvars64
         let s:path_nmake  = s:path_nmake_x64
         let s:path_qmake  = s:path_qmake_x64
     endif
     if (IsWin() || IsGw())
-        let s:path_browser_chrome = escape('C:/Program Files (x86)/Google/Chrome/Application/chrome.exe', ' ')
-        let s:path_browser_firefox = escape('D:/Mozilla Firefox/firefox.exe', ' ')
+        let s:path_browser_chrome = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
+        let s:path_browser_firefox = 'D:/Mozilla Firefox/firefox.exe'
     elseif IsLinux()
         let s:path_browser_chrome = '/usr/bin/chrome'
         let s:path_browser_firefox = '/usr/bin/firefox'
@@ -268,7 +268,7 @@ call plug#begin($VimPluginPath.'/bundle')   " 可选设置，可以指定插件�
     let g:textmanip_enable_mappings = 0
     function! SetTextmanipMode(mode)
         let g:textmanip_current_mode = a:mode
-        echo "textmanip mode: " . g:textmanip_current_mode
+        echo 'textmanip mode: ' . g:textmanip_current_mode
     endfunction
 
     " 切换Insert/Replace Mode
@@ -649,9 +649,9 @@ endif
     nnoremap <leader><leader>w :PopcWorkspace<CR>
     nnoremap <leader><leader>fw :call PopcWksSearch()<CR>
     function! PopcWksSearch()
-        let l:wksRoot = popc#layer#wks#GetCurrentWks()[1]
-        if !empty(l:wksRoot)
-            execute ':LeaderfFile ' . l:wksRoot
+        let l:wks_root = popc#layer#wks#GetCurrentWks()[1]
+        if !empty(l:wks_root)
+            execute ':LeaderfFile ' . l:wks_root
         endif
     endfunction
 " }}}
@@ -721,10 +721,10 @@ endif
     \ }
     nnoremap <leader>tm :SignatureToggleSigns<CR>
     nnoremap <leader>ma :SignatureListBufferMarks<CR>
-    nnoremap <leader>mc :<C-U>call signature#mark#Purge("all")<CR>
+    nnoremap <leader>mc :<C-U>call signature#mark#Purge('all')<CR>
     nnoremap <leader>mx :<C-U>call signature#marker#Purge()<CR>
-    nnoremap <M-d> :<C-U>call signature#mark#Goto("prev", "line", "pos")<CR>
-    nnoremap <M-f> :<C-U>call signature#mark#Goto("next", "line", "pos")<CR>
+    nnoremap <M-d> :<C-U>call signature#mark#Goto('prev', 'line', 'pos')<CR>
+    nnoremap <M-f> :<C-U>call signature#mark#Goto('next', 'line', 'pos')<CR>
 " }}}
 
 " undo {{{ 撤消历史
@@ -1011,6 +1011,11 @@ endif
     nnoremap <leader>vm :call ViewMarkdown()<CR>
     function! ViewMarkdown() abort
         let g:mkdp_browser = s:path_browser
+        if !get(b:, 'MarkdownPreviewToggleBool')
+            echo 'Open markdown preview'
+        else
+            echo 'Close markdown preview'
+        endif
         call mkdp#util#toggle_preview()
     endfunction
 " }}}
@@ -1255,13 +1260,21 @@ endfunction
 " }}}
 
 " Project run {{{
+" FUNCTION: ExecCompile(str) {{{
+function! ExecCompile(str)
+    let l:exec = ((exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!') . a:str
+    execute l:exec
+    return l:exec
+endfunction
+" }}}
+
 " FUNCTION: ComplileFile(argstr) {{{
 " @param argstr: 想要传递的命令参数
 function! ComplileFile(argstr)
     let l:ext      = expand('%:e')      " 扩展名
     let l:filename = expand('%:t')      " 文件名，不带路径，带扩展名
     let l:name     = expand('%:t:r')    " 文件名，不带路径，不带扩展名
-    let l:exec     = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
+    let exec       = ''
 
     " 生成可执行字符串
     if 'c' ==? l:ext
@@ -1321,14 +1334,13 @@ function! ComplileFile(argstr)
     "}}}
     elseif 'html' ==? l:ext
     "{{{
-        let l:exec .= s:path_browser . ' ' . l:filename
+        let l:exec .= '"' . s:path_browser . '"' . ' ' . l:filename
     "}}}
     else
         return
     endif
 
-    execute l:exec
-    call SetRepeatExecution(l:exec)
+    call SetRepeatExecution(ExecCompile(l:exec))
 endfunction
 " }}}
 
@@ -1356,22 +1368,22 @@ function! FindProjectFile(...)
         return ''
     endif
     let l:marker = a:1
-    let l:dir = (a:0 >= 2) ? a:2 : "."
-    let l:prj_dir      = fnamemodify(l:dir, ':p:h')
-    let l:prj_dir_last = ''
-    let l:prj_file     = ''
+    let l:start_dir = (a:0 >= 2) ? a:2 : '.'
+    let l:dir      = fnamemodify(l:start_dir, ':p:h')
+    let l:dir_last = ''
+    let l:pfile    = ''
 
-    while l:prj_dir != l:prj_dir_last
-        let l:prj_file = glob(l:prj_dir . '/' . l:marker)
-        if !empty(l:prj_file)
+    while l:dir !=# l:dir_last
+        let l:pfile = glob(l:dir . '/' . l:marker)
+        if !empty(l:pfile)
             break
         endif
 
-        let l:prj_dir_last = l:prj_dir
-        let l:prj_dir = fnamemodify(l:prj_dir, ':p:h:h')
+        let l:dir_last = l:dir
+        let l:dir = fnamemodify(l:dir, ':p:h:h')
     endwhile
 
-    return split(l:prj_file, '\n')
+    return split(l:pfile, "\n")
 endfunction
 " }}}
 
@@ -1394,23 +1406,22 @@ function! FindProjectTarget(str, type)
 endfunction
 " }}}
 
-" FUNCTION: ComplileProject(str, fn) {{{
+" FUNCTION: ComplileProject(str, fn, args) {{{
 " 当找到多个Project File时，会弹出选项以供选择。
 " @param str: 工程文件名，可用通配符，如*.pro
 " @param fn: 编译工程文件的函数，需要采用popset插件
 " @param args: 编译工程文件函数的附加参数，需要采用popset插件
-function! ComplileProject(str, fn, ...)
+function! ComplileProject(str, fn, args)
     let l:prj = FindProjectFile(a:str)
-    let l:args = (a:0 >= 1) ? a:1 : []
     if len(l:prj) == 1
         let Fn = function(a:fn)
-        call Fn('', l:prj[0], l:args)
+        call Fn('', l:prj[0], a:args)
     elseif len(l:prj) > 1
         call PopSelection({
             \ 'opt' : ['Please select the project file'],
             \ 'lst' : l:prj,
             \ 'cmd' : a:fn,
-            \}, 0, l:args)
+            \}, 0, a:args)
     else
         echo 'None of ' . a:str . ' was found!'
     endif
@@ -1425,9 +1436,9 @@ endfunction
 function! ComplileProjectQmake(sopt, sel, args)
     let l:filename = '"./' . fnamemodify(a:sel, ':p:t') . '"'
     let l:name     = FindProjectTarget(a:sel, 'qmake')
-    let l:filedir  = fnameescape(fnamemodify(a:sel, ":p:h"))
+    let l:filedir  = fnameescape(fnamemodify(a:sel, ':p:h'))
     let l:olddir   = fnameescape(getcwd())
-    let l:exec     = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
+    let l:exec     = ''
 
     " change cwd
     execute 'lcd ' . l:filedir
@@ -1437,7 +1448,7 @@ function! ComplileProjectQmake(sopt, sel, args)
         let l:exec .= 'qmake ' . l:filename
         let l:exec .= ' && make'
     elseif IsWin()
-        let l:exec .= s:path_qmake . " -r " . l:filename
+        let l:exec .= s:path_qmake . ' -r ' . l:filename
         let l:exec .= ' && ' . s:path_vcvars
         let l:exec .= ' && ' . s:path_nmake . ' -f Makefile.Debug'
     else
@@ -1448,7 +1459,7 @@ function! ComplileProjectQmake(sopt, sel, args)
     else
         let l:exec .= ' ' . join(a:args)
     endif
-    execute l:exec
+    call ExecCompile(l:exec)
 
     " change back cwd
     execute 'lcd ' . l:olddir
@@ -1465,7 +1476,7 @@ function! ComplileProjectMakefile(sopt, sel, args)
     let l:name     = FindProjectTarget(a:sel, 'make')
     let l:filedir  = fnameescape(fnamemodify(a:sel, ':p:h'))
     let l:olddir   = fnameescape(getcwd())
-    let l:exec     = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
+    let l:exec     = ''
 
     " change cwd
     execute 'lcd ' . l:filedir
@@ -1477,30 +1488,28 @@ function! ComplileProjectMakefile(sopt, sel, args)
     else
         let l:exec .= ' ' . join(a:args)
     endif
-    execute l:exec
+    call ExecCompile(l:exec)
 
     " change back cwd
     execute 'lcd ' . l:olddir
 endfunction
 "}}}
 
-" FUNCTION: ComplileProjectHtml(sopt, sel) {{{
+" FUNCTION: ComplileProjectHtml(sopt, sel, args) {{{
 " 用于popset的函数，用于打开index.html
 " @param sopt: 参数信息，未用到，只是传入popset的函数需要
 " @param sel: index.html路径
-function! ComplileProjectHtml(sopt, sel)
-    let l:exec = (exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!'
-    let l:exec .= s:path_browser . ' ' . '"' . a:sel . '"'
-    execute l:exec
+function! ComplileProjectHtml(sopt, sel, args)
+    call ExecCompile('"' . s:path_browser . '" "' . a:sel . '"')
 endfunction
 " }}}
 
 " Run compliler
-let RC_Qmake      = function('ComplileProject', ['*.pro', 'ComplileProjectQmake'])
+let RC_Qmake      = function('ComplileProject', ['*.pro', 'ComplileProjectQmake', []])
 let RC_QmakeClean = function('ComplileProject', ['*.pro', 'ComplileProjectQmake', ['clean']])
-let RC_Make       = function('ComplileProject', ['[mM]akefile', 'ComplileProjectMakefile'])
+let RC_Make       = function('ComplileProject', ['[mM]akefile', 'ComplileProjectMakefile', []])
 let RC_MakeClean  = function('ComplileProject', ['[mM]akefile', 'ComplileProjectMakefile', ['clean']])
-let RC_Html       = function('ComplileProject', ['[iI]ndex.html', 'ComplileProjectHtml'])
+let RC_Html       = function('ComplileProject', ['[iI]ndex.html', 'ComplileProjectHtml', []])
 " }}}
 
 " Execute function {{{
@@ -1539,7 +1548,7 @@ function! FuncSort() range
 endfunction
 " }}}
 
-" FUNCTION: FuncEditTempFile(suffix, ntab) "{{{
+" FUNCTION: FuncEditTempFile(suffix, ntab) {{{
 " 编辑临时文件
 " @param suffix: 临时文件附加后缀
 " @param ntab: 在新tab中打开
@@ -1822,9 +1831,9 @@ function! FindWorkingRoot()
     endif
 
     let l:dir = fnamemodify('.', ':p:h')
-    let l:dirLast = ''
-    while l:dir !=# l:dirLast
-        let l:dirLast = l:dir
+    let l:dir_last = ''
+    while l:dir !=# l:dir_last
+        let l:dir_last = l:dir
         for m in s:fw_markers
             let l:root = l:dir . '/' . m
             if filereadable(l:root) || isdirectory(l:root)
@@ -1957,7 +1966,7 @@ function! QuickfixGet()
         elseif l:dict[0].quickfix && l:dict[0].loclist
             let l:type = 'l'
         endif
-        let l:line = line(".")
+        let l:line = line('.')
     endif
     return [l:type, l:line]
 endfunction
@@ -2072,7 +2081,7 @@ endif
 
     " 终端光标设置
 if IsVim()
-    if IsTermType("xterm") || IsTermType("xterm-256color")
+    if IsTermType('xterm') || IsTermType('xterm-256color')
         " 适用于urxvt,st,xterm,gnome-termial
         " 5,6: 竖线，  3,4: 横线，  1,2: 方块
         let &t_SI = "\<Esc>[6 q"        " 进入Insert模式
@@ -2105,7 +2114,7 @@ if IsGVim()
         set guifont=Consolas_For_Powerline:h12:cANSI
         set linespace=0                 " required by Powerline Font
         set guifontwide=Microsoft_YaHei_Mono:h11:cGB2312
-        nnoremap <leader>tf <Esc>:call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<CR>
+        nnoremap <leader>tf <Esc>:call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)<CR>
                                         " gvim全屏
     elseif IsMac()
         set lines=30
@@ -2300,17 +2309,17 @@ endif
     " Buffer切换
     nnoremap <leader>bn :bnext<CR>
     nnoremap <leader>bp :bprevious<CR>
-    nnoremap <leader>bl :b#<Bar>execute "set buflisted"<CR>
+    nnoremap <leader>bl :b#<Bar>execute 'set buflisted'<CR>
     " 打开/关闭Quickfix
     nnoremap <leader>qo :botright copen<Bar>call FindWorkingHighlight()<CR>
     nnoremap <leader>qc :cclose<Bar>wincmd p<CR>
-    nnoremap <leader>qj :cnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
-    nnoremap <leader>qk :cprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
+    nnoremap <leader>qj :cnext<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
+    nnoremap <leader>qk :cprevious<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
     " 打开/关闭Location-list
     nnoremap <leader>lo :botright lopen<Bar>call FindWorkingHighlight()<CR>
     nnoremap <leader>lc :lclose<Bar>wincmd p<CR>
-    nnoremap <leader>lj :lnext<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
-    nnoremap <leader>lk :lprevious<Bar>execute"silent! normal! zO"<Bar>execute"normal! zz"<CR>
+    nnoremap <leader>lj :lnext<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
+    nnoremap <leader>lk :lprevious<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
     " 在新Tab中打开列表项
     nnoremap <leader>qt :call QuickfixTabEdit()<CR>
     nnoremap <leader>lt :call QuickfixTabEdit()<CR>
@@ -2434,9 +2443,9 @@ endif
 
 " Find and search{{{
     " 查找选择的内容
-    vnoremap / "*y<Bar>:execute"let g:__str__=getreg('*')"<Bar>execute"/" . g:__str__<CR>
+    vnoremap / "*y<Bar>:execute'let g:__str__=getreg("*")'<Bar>execute'/' . g:__str__<CR>
     " 查找当前光标下的内容
-    nnoremap <leader>/ :execute"let g:__str__=expand(\"<cword>\")"<Bar>execute "/" . g:__str__<CR>
+    nnoremap <leader>/ :execute'let g:__str__=expand("<cword>")'<Bar>execute '/' . g:__str__<CR>
 
     " FindWorking查找
     for item in s:fw_nvmaps
