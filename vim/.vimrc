@@ -157,24 +157,22 @@ vnoremap ; :
     set rtp+=$VimPluginPath             " 添加 .vim 和 vimfiles 到 rtp(runtimepath)
 
     if IsWin()
-        let s:path_vcvars32 = '"D:/VS2017/VC/Auxiliary/Build/vcvars32.bat"'
-        let s:path_vcvars64 = '"D:/VS2017/VC/Auxiliary/Build/vcvars64.bat"'
+        let s:path_vcvars32  = '"D:/VS2017/VC/Auxiliary/Build/vcvars32.bat"'
+        let s:path_vcvars64  = '"D:/VS2017/VC/Auxiliary/Build/vcvars64.bat"'
         let s:path_nmake_x86 = '"D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx86/x86/nmake.exe"'
         let s:path_nmake_x64 = '"D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx64/x64/nmake.exe"'
         let s:path_qmake_x86 = '"D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe"'
         let s:path_qmake_x64 = '"D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe"'
+        let s:path_vcvars = s:path_vcvars64
+        let s:path_nmake  = s:path_nmake_x64
+        let s:path_qmake  = s:path_qmake_x64
     endif
     if (IsWin() || IsGw())
-        let s:path_browser_chrome = '"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"'
-        let s:path_browser_firefox = '"D:/Mozilla Firefox/firefox.exe"'
+        let s:path_browser_chrome = escape('C:/Program Files (x86)/Google/Chrome/Application/chrome.exe', ' ')
+        let s:path_browser_firefox = escape('D:/Mozilla Firefox/firefox.exe', ' ')
     elseif IsLinux()
-        let s:path_browser_chrome = '"/usr/bin/chrome"'
-        let s:path_browser_firefox = '"/usr/bin/firefox"'
-    endif
-    if IsWin()
-        let s:path_vcvars  = s:path_vcvars64
-        let s:path_nmake   = s:path_nmake_x64
-        let s:path_qmake   = s:path_qmake_x64
+        let s:path_browser_chrome = '/usr/bin/chrome'
+        let s:path_browser_firefox = '/usr/bin/firefox'
     endif
     let s:path_browser = s:path_browser_firefox
 " }}}
@@ -1004,32 +1002,16 @@ endif
     let g:markdown_enable_folding = 1   " 感觉MarkDown折叠引起卡顿时，关闭此项
     let g:markdown_enable_conceal = 1   " 在Vim中显示MarkDown预览
 
-    Plug 'iamcco/mathjax-support-for-mkdp', {'for': 'markdown'}
-    Plug 'iamcco/markdown-preview.vim', {'for': 'markdown'}
-    let g:mkdp_path_to_chrome = s:path_browser
+    Plug 'iamcco/markdown-preview.nvim', {'for': 'markdown', 'do': { -> mkdp#util#install()}}
     let g:mkdp_auto_start = 0
     let g:mkdp_auto_close = 1
     let g:mkdp_refresh_slow = 0         " 即时预览MarkDown
     let g:mkdp_command_for_global = 0   " 只有markdown文件可以预览
+    let g:mkdp_browser = s:path_browser
     nnoremap <leader>vm :call ViewMarkdown()<CR>
-    nnoremap <leader>tb :call ToggleBrowserPath()<CR>
     function! ViewMarkdown() abort
-        if exists(':MarkdownPreviewStop')
-            MarkdownPreviewStop
-            echo 'MarkdownPreviewStop'
-        else
-            MarkdownPreview
-            echo 'MarkdownPreview'
-        endif
-    endfunction
-    function! ToggleBrowserPath()
-        if s:path_browser ==# s:path_browser_firefox
-            let s:path_browser = s:path_browser_chrome
-        else
-            let s:path_browser = s:path_browser_firefox
-        endif
-        let g:mkdp_path_to_chrome = s:path_browser
-        echo 'Browser Path: ' . s:path_browser
+        let g:mkdp_browser = s:path_browser
+        call mkdp#util#toggle_preview()
     endfunction
 " }}}
 
@@ -1097,7 +1079,7 @@ call plug#end()                         " required
 " User functions
 "===============================================================================
 " {{{
-" Basic {{{
+" Basic and misc {{{
 " 切换显示隐藏字符 {{{
 function! InvConceallevel()
     if &conceallevel == 0
@@ -1197,27 +1179,9 @@ function! InvScrollBind()
 endfunction
 " }}}
 
-" Linux-Fcitx输入法切换  {{{
-if IsLinux()
-function! LinuxFcitx2En()
-    if 2 == system('fcitx-remote')
-        let l:t = system('fcitx-remote -c')
-    endif
-endfunction
-function! LinuxFcitx2Zh()
-    if 1 == system('fcitx-remote')
-        let l:t = system('fcitx-remote -o')
-    endif
-endfunction
-endif
-" }}}
-" }}}
-
-" Project run {{{
-" FUNCTION: ComplileToggleX86X64() "{{{
-" 切换成x86或x64编译环境
+" 切换成x86或x64编译环境 {{{
 let s:complile_type = 'x64'
-function! ComplileToggleX86X64()
+function! ToggleX86X64()
     if IsWin()
         if 'x86' ==# s:complile_type
             let s:complile_type = 'x64'
@@ -1235,6 +1199,62 @@ function! ComplileToggleX86X64()
 endfunction
 " }}}
 
+" {{{ 切换浏览器路径
+function! ToggleBrowserPath()
+    if s:path_browser ==# s:path_browser_firefox
+        let s:path_browser = s:path_browser_chrome
+    else
+        let s:path_browser = s:path_browser_firefox
+    endif
+    echo 'Browser Path: ' . s:path_browser
+endfunction
+" }}}
+
+" Linux-Fcitx输入法切换 {{{
+if IsLinux()
+function! LinuxFcitx2En()
+    if 2 == system('fcitx-remote')
+        let l:t = system('fcitx-remote -c')
+    endif
+endfunction
+function! LinuxFcitx2Zh()
+    if 1 == system('fcitx-remote')
+        let l:t = system('fcitx-remote -o')
+    endif
+endfunction
+endif
+" }}}
+
+" 查找Vim关键字 {{{
+function! GotoKeyword(mode)
+    let l:exec = 'help '
+    if a:mode ==# 'n'
+        let l:word = expand('<cword>')
+    elseif a:mode ==# 'v'
+        let l:word = GetSelectedContent()
+    endif
+
+    " 添加关键字
+    let l:exec .= l:word
+    if IsNVim()
+        " nvim用自己的帮助文件，只有英文的
+        let l:exec .= '@en'
+    endif
+
+    execute l:exec
+endfunction
+" }}}
+
+" 去除尾部空白 {{{
+function! RemoveTrailingSpace()
+    let l:save = winsaveview()
+    %s/\s\+$//e
+    call winrestview(l:save)
+endfunction
+" }}}
+" }}}
+
+" Project run {{{
 " FUNCTION: ComplileFile(argstr) {{{
 " @param argstr: 想要传递的命令参数
 function! ComplileFile(argstr)
@@ -1985,36 +2005,6 @@ function! QuickfixPreview()
 endfunction
 " }}}
 " }}}
-
-" Misc {{{
-" 查找Vim关键字 {{{
-function! GotoKeyword(mode)
-    let l:exec = 'help '
-    if a:mode ==# 'n'
-        let l:word = expand('<cword>')
-    elseif a:mode ==# 'v'
-        let l:word = GetSelectedContent()
-    endif
-
-    " 添加关键字
-    let l:exec .= l:word
-    if IsNVim()
-        " nvim用自己的帮助文件，只有英文的
-        let l:exec .= '@en'
-    endif
-
-    execute l:exec
-endfunction
-" }}}
-
-" 去除尾部空白 {{{
-function! RemoveTrailingSpace()
-    let l:save = winsaveview()
-    %s/\s\+$//e
-    call winrestview(l:save)
-endfunction
-" }}}
-" }}}
 " }}}
 
 "===============================================================================
@@ -2222,6 +2212,8 @@ augroup END
     nnoremap <leader>is :call InvSigncolumn()<CR>
     nnoremap <leader>ih :call InvHighLight()<CR>
     nnoremap <leader>ib :call InvScrollBind()<CR>
+    nnoremap <leader>tc :call ToggleX86X64()<CR>
+    nnoremap <leader>tb :call ToggleBrowserPath()<CR>
     if IsLinux()
         inoremap <Esc> <Esc>:call LinuxFcitx2En()<CR>
     endif
@@ -2395,7 +2387,6 @@ endif
     nnoremap <leader>rcq :call RC_QmakeClean()<CR>
     nnoremap <leader>rcm :call RC_MakeClean()<CR>
     nnoremap <leader>rh :call RC_Html()<CR>
-    nnoremap <leader>tc :call ComplileToggleX86X64()<CR>
     nnoremap <leader>ra :call PopSelection(g:complile_args, 0)<CR>
     nnoremap <leader>ri :call ExecFuncInput('Compile Args: ', '', 'customlist,GetMultiFilesCompletion', 'ComplileFile')<CR>
     nnoremap <leader>rd :Termdebug<CR>
