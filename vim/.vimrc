@@ -10,26 +10,6 @@
 " My Notes
 "===============================================================================
 " {{{
-" Gvim Complilation(Windows) {{{
-    " [*] 设置Make_cyg_ming.mak:
-    " DIRECTX=yes                         - 使用DirectX
-    " ARCH=i686                           - 使用32位(x86-64为64位)，python也使用32位
-    " TERMINAL=yes                        - 添加terminal特性(最新已经添加winpty)
-    " CC := $(CROSS_COMPILE)gcc -m32      - 32位编绎
-    " CXX := $(CROSS_COMPILE)g++ -m32     - 32位编绎
-    " WINDRES := windres --target=pe-i386 - 资源文件添加i386编绎
-    " DYNAMIC_PYTHON3=yes                 - Python3设置
-    " PYTHON3_VER=36                      - Python3版本
-    "
-    " [*] 设置Make_ming.mak:
-    " PYTHON3=C:/MyApps/Python36          - 没置Python3路径
-    "
-    " [*] 使用MinGw-x64:
-    " mingw32-make -f Make_ming.mak gvim.exe
-    " 若设置32位选项前编译过一次，清理一次.o文件再编译
-    " 若使用64位，只需要添加Python路径和DirectX支持
-" }}}
-
 " Help {{{
     " :help       = 查看Vim帮助
     " :help index = 查看帮助列表
