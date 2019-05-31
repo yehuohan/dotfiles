@@ -387,11 +387,8 @@ endif
 " }}}
 
 " grep {{{ 大范围查找
-if IsVim()
-    Plug 'yegappan/grep'
-    "let g:Ag_Path = $VIM.'/vim81/ag.exe'
-    "let g:Rg_Path = $VIM.'/vim81/rg.exe'
-endif
+    Plug 'mhinz/vim-grepper'
+    "Plug 'yegappan/grep'               "不支持neovim
 " }}}
 
 " far {{{ 查找与替换
@@ -509,7 +506,7 @@ endif
                 \           ['all_fileinfo', 'fw_filepath']],
                 \ 'right': [['all_lineinfo', 'indent', 'trailing'],
                 \           ['all_format'],
-                \           ['fw_root']],
+                \           ['fw.rootdir']],
                 \ },
         \ 'inactive': {
                 \ 'left' : [['absolutepath']],
@@ -532,7 +529,7 @@ endif
                 \ 'indent'      : 'LightlineCheckMixedIndent',
                 \ 'trailing'    : 'LightlineCheckTrailing',
                 \ 'fw_filepath' : 'LightlineFilepath',
-                \ 'fw_root'     : 'LightlineFindworking',
+                \ 'fw.rootdir'  : 'LightlineFindworking',
                 \ },
         \ 'component_expand': {
                 \},
@@ -1654,10 +1651,21 @@ endfunction
 
 " FUNCTION: FindWorking(type, mode) {{{ 超速查找
 " {{{
-let s:fw_root = ''
+let s:fw = {
+    \ 'command'  : '',
+    \ 'pattern'  : '',
+    \ 'location' : '',
+    \ 'options'  : '',
+    \ 'root'     : '',
+    \ 'filters'  : '',
+    \ 'strings'  : [],
+    \}
+function! s:fw.run() dict
+    let l:exec = s:fw.command . ' ' . s:fw.pattern . ' ' . s:fw.location . ' ' . s:fw.options
+    execute l:exec
+    call SetRepeatExecution(l:exec)
+endfunction
 let s:fw_markers = ['.root', '.git', '.svn']
-let s:fw_filters = ''
-let s:fw_strings = []
 let s:fw_nvmaps = [
                 \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fri',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'frI',
                 \  'fw',  'fbw',  'ftw',  'fow',  'fpw',  'frw',  'fW',  'fbW',  'ftW',  'foW',  'fpW',  'frW',
@@ -1683,21 +1691,31 @@ let s:fw_nvmaps = [
                 \ 'Faw', 'Fabw', 'Fatw', 'Faow', 'Fapw', 'Farw', 'FaW', 'FabW', 'FatW', 'FaoW', 'FapW', 'FarW',
                 \ 'Fas', 'Fabs', 'Fats', 'Faos', 'Faps', 'Fars', 'FaS', 'FabS', 'FatS', 'FaoS', 'FapS', 'FarS',
                 \ 'Fa=', 'Fab=', 'Fat=', 'Fao=', 'Fap=', 'Far=', 'Fa=', 'Fab=', 'Fat=', 'Fao=', 'Fap=', 'Far=',
+                \ 'fvi', 'fvpi', 'fvI',  'fvpI',
+                \ 'fvw', 'fvpw', 'fvW',  'fvpW',
+                \ 'fvs', 'fvps', 'fvS',  'fvpS',
+                \ 'fv=', 'fvp=', 'fv=',  'fvp=',
                 \ ]
 " }}}
+augroup UserFunctionSearch
+    autocmd!
+    autocmd VimEnter * call FindWorkingRoot()
+    autocmd User Grepper call FindWorkingHighlight(s:fw.pattern)
+augroup END
 function! FindWorking(type, mode)
     " doc
     " {{{
-    " Required: based on 'yegappan/grep', 'Yggdroot/LeaderF' and 'yehuohan/popc'
-    " Option: [fF][la][btopr][IiWwSs=]
-    "         [%1][%2][%3   ][4%     ]
+    " Required: based on 'mhinz/vim-grepper' or 'yegappan/grep', 'Yggdroot/LeaderF' and 'yehuohan/popc'
+    " Option: [fF][lav][btopr][IiWwSs=]
+    "         [%1][%2 ][%3   ][4%     ]
     " Find: %1
     "   f : find working
     "   F : find working with inputing args
     " Command: %2
-    "   '': find with Rg by default
-    "   l : find with Rg in working root-filter and pass result to Leaderf
-    "   a : find with RgAdd
+    "   '': find with rg by default
+    "   l : find with rg in working root-filter and pass result to Leaderf
+    "   a : find with rg append
+    "   v : find with vimgrep
     " Location: %3
     "   b : find in current buffer(%)
     "   t : find in buffers of tab via popc
@@ -1758,15 +1776,15 @@ function! FindWorking(type, mode)
         elseif a:type =~# 'p'
             let l:loc = input(' Where to find: ', '', 'customlist,GetMultiFilesCompletion')
         elseif a:type =~# 'r'
-            let l:loc = FindWorkingSet() ? s:fw_root : ''
+            let l:loc = FindWorkingSet() ? s:fw.root : ''
         else
-            if empty(s:fw_root)
+            if empty(s:fw.root)
                 call FindWorkingRoot()
             endif
-            if empty(s:fw_root)
+            if empty(s:fw.root)
                 call FindWorkingSet()
             endif
-            let l:loc = s:fw_root
+            let l:loc = s:fw.root
         endif
         return l:loc
     endfunction
@@ -1776,8 +1794,8 @@ function! FindWorking(type, mode)
         let l:opt = ''
         if a:type =~? 's'     | let l:opt .= '-w ' | endif
         if a:type =~# '[iws]' | let l:opt .= '-i ' | elseif a:type =~# '[IWS]' | let l:opt .= '-s ' | endif
-        if !empty(s:fw_filters) && a:type !~# '[btop]'
-            let l:opt .= '-g "*.{' . s:fw_filters . '}" '
+        if !empty(s:fw.filters) && a:type !~# '[btop]'
+            let l:opt .= '-g "*.{' . s:fw.filters . '}" '
         endif
         if a:type =~# 'F'
             let l:opt .= input(' Args to append: ', '')
@@ -1790,41 +1808,71 @@ function! FindWorking(type, mode)
         if a:type =~# 'l'
             let l:cmd = ':Leaderf rg --nowrap'
         elseif a:type =~# 'a'
-            let l:cmd = ':RgAdd'
+            "let l:cmd = ':RgAdd'
+            let l:cmd = 'Grepper -noprompt -append -tool rg -query'
         else
-            let l:cmd = ':Rg'
-            let s:fw_strings = []
+            "let l:cmd = ':Rg'
+            let l:cmd = 'Grepper -noprompt -tool rg -query'
+            let s:fw.strings = []
         endif
         return l:cmd
     endfunction
     " }}}
+    " FUNCTION: s:parseVimgrep() closure {{{
+    function! s:parseVimgrep() closure
+        if a:type !~# 'v'
+            return 0
+        endif
+
+        " get pattern and set options
+        let s:fw.pattern = s:parsePattern()
+        if empty(s:fw.pattern) | return 0 | endif
+        let l:pat = (a:type =~? 's') ? ('\<' . s:fw.pattern . '\>') : (s:fw.pattern)
+        let l:pat .= (a:type =~# '[iws]') ? '\c' : '\C'
+
+        " set loaction
+        let l:loc = '%'
+        if a:type =~# 'p'
+            let l:loc = input(' Where to find: ', '', 'customlist,GetMultiFilesCompletion')
+            if empty(l:loc) | return 0 | endif
+        endif
+
+        " execute vimgrep
+        execute 'vimgrep /' . l:pat . '/j ' . l:loc
+        echo 'Finding...'
+        if empty(getqflist())
+            echo 'No match: ' . l:pat
+        else
+            botright copen
+            call FindWorkingHighlight(s:fw.pattern)
+        endif
+        return 1
+    endfunction
+    " }}}
+
+    " try use vimgrep first
+    if s:parseVimgrep() | return | endif
 
     " find pattern
-    let l:pattern = s:parsePattern()
-    if empty(l:pattern) | return | endif
+    let s:fw.pattern = s:parsePattern()
+    if empty(s:fw.pattern) | return | endif
 
     " find location
-    let l:location = s:parseLocation()
-    if empty(l:location) | return | endif
+    let s:fw.location = s:parseLocation()
+    if empty(s:fw.location) | return | endif
 
     " find options
-    let l:options = s:parseOptions()
+    let s:fw.options = s:parseOptions()
 
     " find command
-    let l:command = s:parseCommand()
+    let s:fw.command = s:parseCommand()
 
     " Find Working
-    execute l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options
-    call FindWorkingHighlight(l:pattern)
-    call SetRepeatExecution(l:command . ' ' . l:pattern . ' ' . l:location . ' ' . l:options)
+    call s:fw.run()
 endfunction
 " }}}
 
 " FUNCTION: FindWorkingRoot() {{{ 检测root路径
-augroup UserFunctionSearch
-    autocmd!
-    autocmd VimEnter * call FindWorkingRoot()
-augroup END
 function! FindWorkingRoot()
     if empty(s:fw_markers)
         return
@@ -1837,7 +1885,7 @@ function! FindWorkingRoot()
         for m in s:fw_markers
             let l:root = l:dir . '/' . m
             if filereadable(l:root) || isdirectory(l:root)
-                let s:fw_root = fnameescape(l:dir)
+                let s:fw.root = fnameescape(l:dir)
                 return
             endif
         endfor
@@ -1852,18 +1900,18 @@ function! FindWorkingSet()
     if empty(l:root)
         return 0
     endif
-    let s:fw_root = fnamemodify(l:root, ':p')
-    let s:fw_filters = input(' Which (Filter) to find: ', '')
+    let s:fw.root = fnamemodify(l:root, ':p')
+    let s:fw.filters = input(' Which (Filter) to find: ', '')
     return 1
 endfunction
 " }}}
 
 " FUNCTION: FindWorkingGet() {{{ 获取root信息
 function! FindWorkingGet()
-    if empty(s:fw_root)
+    if empty(s:fw.root)
         return []
     endif
-    return [s:fw_root, s:fw_filters]
+    return [s:fw.root, s:fw.filters]
 endfunction
 " }}}
 
@@ -1874,15 +1922,15 @@ function! FindWorkingFile(r)
         if empty(l:root)
             return 0
         endif
-        let s:fw_root = fnamemodify(l:root, ':p')
+        let s:fw.root = fnamemodify(l:root, ':p')
     endif
-    if empty(s:fw_root)
+    if empty(s:fw.root)
         call FindWorkingRoot()
     endif
-    if empty(s:fw_root)
+    if empty(s:fw.root)
         call FindWorkingSet()
     endif
-    execute ':LeaderfFile ' . s:fw_root
+    execute ':LeaderfFile ' . s:fw.root
 endfunction
 " }}}
 
@@ -1892,66 +1940,14 @@ function! FindWorkingHighlight(...)
         " use leaderf's highlight
     elseif &filetype ==# 'qf'
         if a:0 >= 1
-            call add(s:fw_strings, escape(a:1, '/*'))
+            call add(s:fw.strings, escape(a:1, '/*'))
         endif
-        for str in s:fw_strings
+        for str in s:fw.strings
             execute 'syntax match IncSearch /' . str . '/'
         endfor
     endif
 endfunction
 " }}}
-
-if IsNVim()
-" FUNCTION: FindVimgrep(type, mode) {{{ 快速查找
-let s:findvimgrep_nvmaps = [
-                          \ 'vi', 'vgi', 'vI', 'vgI',
-                          \ 'vw', 'vgw', 'vW', 'vgW',
-                          \ 'vs', 'vgs', 'vS', 'vgS',
-                          \ ]
-function! FindVimgrep(type, mode)
-    let l:string = ''
-    let l:files = '%'
-
-    " 设置查找内容
-    if a:mode ==# 'n'
-        if a:type =~? 'i'
-            let l:string = input(' What to find: ')
-        elseif a:type =~? '[ws]'
-            let l:string = expand('<cword>')
-        endif
-    elseif a:mode ==# 'v'
-        let l:selected = GetSelectedContent()
-        if a:type =~? 'i'
-            let l:string = input(' What to find: ', l:selected)
-        elseif a:type =~? '[ws]'
-            let l:string = l:selected
-        endif
-    endif
-    if empty(l:string) | return | endif
-
-    " 设置查找选项
-    if a:type =~? 's'     | let l:string = '\<' . l:string . '\>' | endif
-    if a:type =~# '[IWS]' | let l:string = '\C' . l:string        | endif
-
-    " 设置查找范围
-    if a:type =~# 'g'
-        let l:files = input(' Where to find: ', '', 'customlist,GetMultiFilesCompletion')
-        if empty(l:files) | return | endif
-    endif
-
-    " 使用vimgrep或lvimgrep查找
-    execute 'vimgrep /' . l:string . '/j ' . l:files
-    echo 'Finding...'
-    if empty(getqflist())
-        echo 'No match: ' . l:string
-        return
-    else
-        botright copen
-    endif
-    execute 'syntax match IncSearch /' . escape(l:string, '/*') . '/'
-endfunction
-" }}}
-endif
 
 " FUNCTION: QuickfixGet() {{{ 类型与编号
 function! QuickfixGet()
@@ -2457,13 +2453,5 @@ endif
     nnoremap <leader>ff :call FindWorkingFile(0)<CR>
     nnoremap <leader>frf :call FindWorkingFile(1)<CR>
     nnoremap <leader>fR :call FindWorkingRoot()<CR>
-if IsNVim()
-    for item in s:findvimgrep_nvmaps
-        execute 'nnoremap <leader>' . item ':call FindVimgrep("' . item . '", "n")<CR>'
-    endfor
-    for item in s:findvimgrep_nvmaps
-        execute 'vnoremap <leader>' . item ':call FindVimgrep("' . item . '", "v")<CR>'
-    endfor
-endif
 " }}}
 " }}}
