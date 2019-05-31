@@ -387,8 +387,11 @@ endif
 " }}}
 
 " grep {{{ 大范围查找
-    Plug 'mhinz/vim-grepper'
-    "Plug 'yegappan/grep'               "不支持neovim
+if IsVim()
+    Plug 'yehuohan/grep'
+elseif IsNVim()
+    Plug 'mhinz/vim-grepper', {'on': ['Grepper', '<plug>(GrepperOperator)']}
+endif
 " }}}
 
 " far {{{ 查找与替换
@@ -1664,6 +1667,9 @@ function! s:fw.run() dict
     let l:exec = s:fw.command . ' ' . s:fw.pattern . ' ' . s:fw.location . ' ' . s:fw.options
     execute l:exec
     call SetRepeatExecution(l:exec)
+    if IsVim()
+        call FindWorkingHighlight(s:fw.pattern)
+    endif
 endfunction
 let s:fw_markers = ['.root', '.git', '.svn']
 let s:fw_nvmaps = [
@@ -1700,7 +1706,9 @@ let s:fw_nvmaps = [
 augroup UserFunctionSearch
     autocmd!
     autocmd VimEnter * call FindWorkingRoot()
+if IsNVim()
     autocmd User Grepper call FindWorkingHighlight(s:fw.pattern)
+endif
 augroup END
 function! FindWorking(type, mode)
     " doc
@@ -1808,11 +1816,17 @@ function! FindWorking(type, mode)
         if a:type =~# 'l'
             let l:cmd = ':Leaderf rg --nowrap'
         elseif a:type =~# 'a'
-            "let l:cmd = ':RgAdd'
-            let l:cmd = 'Grepper -noprompt -append -tool rg -query'
+            if IsVim()
+                let l:cmd = ':RgAdd'
+            elseif IsNVim()
+                let l:cmd = 'Grepper -noprompt -append -tool rg -query'
+            endif
         else
-            "let l:cmd = ':Rg'
-            let l:cmd = 'Grepper -noprompt -tool rg -query'
+            if IsVim()
+                let l:cmd = ':Rg'
+            elseif IsNVim()
+                let l:cmd = 'Grepper -noprompt -tool rg -query'
+            endif
             let s:fw.strings = []
         endif
         return l:cmd
