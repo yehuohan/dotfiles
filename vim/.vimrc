@@ -387,8 +387,16 @@ endif
 " }}}
 
 " grep {{{ 大范围查找
-    Plug 'mhinz/vim-grepper'
-    "Plug 'yegappan/grep'               "不支持neovim
+if IsVim()
+    Plug 'yehuohan/grep'                " 不支持neovim
+endif
+    Plug 'mhinz/vim-grepper', {'on': ['Grepper', '<plug>(GrepperOperator)']}
+    let g:grepper = {
+        \ 'rg': {
+            \ 'grepprg':    'rg -H --no-heading --vimgrep' . (has('win32') ? ' $*' : ''),
+            \ 'grepformat': '%f:%l:%c:%m',
+            \ 'escape':     '\^$.*+?()[]{}|'}
+        \}
 " }}}
 
 " far {{{ 查找与替换
@@ -1651,6 +1659,12 @@ endfunction
 
 " FUNCTION: FindWorking(type, mode) {{{ 超速查找
 " {{{
+augroup UserFunctionSearch
+    autocmd!
+    autocmd VimEnter * call FindWorkingRoot()
+    autocmd VimEnter * let s:fw_rg = exists('loaded_grep') ? 1 : 0
+    autocmd User Grepper call FindWorkingHighlight(s:fw.pattern)
+augroup END
 let s:fw = {
     \ 'command'  : '',
     \ 'pattern'  : '',
@@ -1663,6 +1677,9 @@ let s:fw = {
 function! s:fw.run() dict
     let l:exec = s:fw.command . ' ' . s:fw.pattern . ' ' . s:fw.location . ' ' . s:fw.options
     execute l:exec
+    if s:fw_rg
+        call FindWorkingHighlight(s:fw.pattern)
+    endif
     call SetRepeatExecution(l:exec)
 endfunction
 let s:fw_markers = ['.root', '.git', '.svn']
@@ -1697,11 +1714,6 @@ let s:fw_nvmaps = [
                 \ 'fv=', 'fvp=', 'fv=',  'fvp=',
                 \ ]
 " }}}
-augroup UserFunctionSearch
-    autocmd!
-    autocmd VimEnter * call FindWorkingRoot()
-    autocmd User Grepper call FindWorkingHighlight(s:fw.pattern)
-augroup END
 function! FindWorking(type, mode)
     " doc
     " {{{
@@ -1808,11 +1820,9 @@ function! FindWorking(type, mode)
         if a:type =~# 'l'
             let l:cmd = ':Leaderf rg --nowrap'
         elseif a:type =~# 'a'
-            "let l:cmd = ':RgAdd'
-            let l:cmd = 'Grepper -noprompt -append -tool rg -query'
+            let l:cmd = s:fw_rg ? ':RgAdd' : 'Grepper -noprompt -tool rg -append -query'
         else
-            "let l:cmd = ':Rg'
-            let l:cmd = 'Grepper -noprompt -tool rg -query'
+            let l:cmd = s:fw_rg ? ':Rg'    : 'Grepper -noprompt -tool rg -query'
             let s:fw.strings = []
         endif
         return l:cmd
