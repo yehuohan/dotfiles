@@ -1274,77 +1274,51 @@ endfunction
 " }}}
 
 " FUNCTION: ComplileFile(argstr) {{{
-" @param argstr: 想要传递的命令参数
+" s:cpl {{{
+let s:cpl = {
+    \ 'args' : '',
+    \ 'srcf' : '',
+    \ 'outf' : '',
+    \ 'ext'  : {
+        \ 'c'    : ['gcc -static %s -o %s %s && "./%s"'            , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
+        \ 'cpp'  : ['g++ -std=c++11 -static %s -o %s %s && "./%s"' , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
+        \ 'py'   : ['python %s %s'                                 , 'srcf'  , 'args'] ,
+        \ 'jl'   : ['julia %s %s'                                  , 'srcf'  , 'args'] ,
+        \ 'lua'  : ['lua %s %s'                                    , 'srcf'  , 'args'] ,
+        \ 'go'   : ['go run %s'                                    , 'srcf'] ,
+        \ 'java' : ['javac %s && java %s'                          , 'srcf'  , 'outf'] ,
+        \ 'json' : ['python -m json.tool %s'                       , 'srcf'] ,
+        \ 'm'    : ['matlab -nosplash -nodesktop -r %s'            , 'outf'] ,
+        \ 'sh'   : ['./%s %s'                                      , 'srcf'  , 'args'] ,
+        \ 'bat'  : ['%s %s'                                        , 'srcf'  , 'args'] ,
+        \ 'html' : ['"' . s:path_browser . '" %s'                  , 'srcf'] ,
+        \}
+    \}
+function s:cpl.printf(ext, args, srcf, outf) dict
+    if !has_key(self.ext, a:ext)
+        \ || ('sh' ==? a:ext && !(IsLinux() || IsGw() || IsMac()))
+        \ || ('bat' ==? a:ext && !IsWin())
+        return ''
+    endif
+    let self.args = a:args
+    let self.srcf = a:srcf
+    let self.outf = a:outf
+    let l:pstr = copy(self.ext[a:ext])
+    call map(l:pstr, {key, val -> (key == 0) ? val : get(self, val, '')})
+    return call('printf', l:pstr)
+endfunction
+" }}}
 function! ComplileFile(argstr)
     let l:ext      = expand('%:e')      " 扩展名
     let l:filename = expand('%:t')      " 文件名，不带路径，带扩展名
     let l:name     = expand('%:t:r')    " 文件名，不带路径，不带扩展名
-    let exec       = ''
 
-    " 生成可执行字符串
-    if 'c' ==? l:ext
-    "{{{
-        let l:exec .= 'gcc -static ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
-        let l:exec .= ' && "./' . l:name . '"'
-    "}}}
-    elseif 'cpp' ==? l:ext
-    "{{{
-        let l:exec .= 'g++ -std=c++11 -static ' . a:argstr . ' -o ' . l:name . ' ' . l:filename
-        let l:exec .= ' && "./' . l:name . '"'
-    "}}}
-    elseif 'py' ==? l:ext || 'pyw' ==? l:ext
-    "{{{
-        let l:exec .= 'python ' . l:filename
-        let l:exec .= ' ' . a:argstr
-    "}}}
-    elseif 'jl' ==? l:ext
-    "{{{
-        let l:exec .= 'julia ' . l:filename
-        let l:exec .= ' ' . a:argstr
-    "}}}
-    elseif 'go' ==? l:ext
-    "{{{
-        let l:exec .= ' go run ' . l:filename
-    "}}}
-    elseif 'java' ==? l:ext
-    "{{{
-        let l:exec .= 'javac ' . l:filename
-        let l:exec .= ' && java ' . l:name
-    "}}}
-    elseif 'json' ==? l:ext
-    " {{{
-        let l:exec .= 'python -m json.tool %'
-    " }}}
-    elseif 'm' ==? l:ext
-    "{{{
-        let l:exec .= 'matlab -nosplash -nodesktop -r ' . l:name[3:-2]
-    "}}}
-    elseif 'sh' ==? l:ext
-    "{{{
-        if IsLinux() || IsGw()
-            let l:exec .= ' ./' . l:filename
-            let l:exec .= ' ' . a:argstr
-        else
-            return
-        endif
-    "}}}
-    elseif 'bat' ==? l:ext
-    "{{{
-        if IsWin()
-            let l:exec .= ' ' . l:filename
-            let l:exec .= ' ' . a:argstr
-        else
-            return
-        endif
-    "}}}
-    elseif 'html' ==? l:ext
-    "{{{
-        let l:exec .= '"' . s:path_browser . '"' . ' ' . l:filename
-    "}}}
-    else
+    " 可执行字符串
+    let l:exec = s:cpl.printf(l:ext, a:argstr, l:filename, l:name)
+    if empty(l:exec)
+        echo 's:cpl doesn''t support ' . l:ext
         return
     endif
-
     call SetRepeatExecution(ExecCompile(l:exec))
 endfunction
 " }}}
@@ -1665,6 +1639,8 @@ augroup UserFunctionSearch
     autocmd VimEnter * let s:fw_rg = exists('loaded_grep') ? 1 : 0
     autocmd User Grepper call FindWorkingHighlight(s:fw.pattern)
 augroup END
+
+" s:fw {{{
 let s:fw = {
     \ 'command'  : '',
     \ 'pattern'  : '',
@@ -1674,14 +1650,16 @@ let s:fw = {
     \ 'filters'  : '',
     \ 'strings'  : [],
     \}
-function! s:fw.run() dict
-    let l:exec = s:fw.command . ' ' . s:fw.pattern . ' ' . s:fw.location . ' ' . s:fw.options
+function! s:fw.exec() dict
+    let l:exec = self.command . ' ' . self.pattern . ' ' . self.location . ' ' . self.options
     execute l:exec
     if s:fw_rg
-        call FindWorkingHighlight(s:fw.pattern)
+        call FindWorkingHighlight(self.pattern)
     endif
     call SetRepeatExecution(l:exec)
 endfunction
+" }}}
+
 let s:fw_markers = ['.root', '.git', '.svn']
 let s:fw_nvmaps = [
                 \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fri',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'frI',
@@ -1878,7 +1856,7 @@ function! FindWorking(type, mode)
     let s:fw.command = s:parseCommand()
 
     " Find Working
-    call s:fw.run()
+    call s:fw.exec()
 endfunction
 " }}}
 
