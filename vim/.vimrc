@@ -514,7 +514,7 @@ endif
                 \           ['all_fileinfo', 'fw_filepath']],
                 \ 'right': [['all_lineinfo', 'indent', 'trailing'],
                 \           ['all_format'],
-                \           ['fw.rootdir']],
+                \           ['fw_rootdir']],
                 \ },
         \ 'inactive': {
                 \ 'left' : [['absolutepath']],
@@ -537,7 +537,7 @@ endif
                 \ 'indent'      : 'LightlineCheckMixedIndent',
                 \ 'trailing'    : 'LightlineCheckTrailing',
                 \ 'fw_filepath' : 'LightlineFilepath',
-                \ 'fw.rootdir'  : 'LightlineFindworking',
+                \ 'fw_rootdir'  : 'LightlineFindworking',
                 \ },
         \ 'component_expand': {
                 \},
@@ -1810,7 +1810,7 @@ function! FindWorking(type, mode)
             let l:opt .= '-g "*.{' . s:fw.filters . '}" '
         endif
         if a:type =~# 'F'
-            let l:opt .= input(' Args to append: ', '')
+            let l:opt .= input(' Args(-F, --hidden ...) to append: ', '')
         endif
         return l:opt
     endfunction
