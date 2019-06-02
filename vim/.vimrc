@@ -1266,20 +1266,12 @@ endfunction
 
 " Project run {{{
 " FUNCTION: ExecCompile(str) {{{
-function! ExecCompile(str)
-    let l:exec = ((exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!') . a:str
-    execute l:exec
-    return l:exec
-endfunction
-" }}}
-
-" FUNCTION: ComplileFile(argstr) {{{
 " s:cpl {{{
 let s:cpl = {
     \ 'args' : '',
     \ 'srcf' : '',
     \ 'outf' : '',
-    \ 'ext'  : {
+    \ 'type' : {
         \ 'c'    : ['gcc -static %s -o %s %s && "./%s"'            , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
         \ 'cpp'  : ['g++ -std=c++11 -static %s -o %s %s && "./%s"' , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
         \ 'py'   : ['python %s %s'                                 , 'srcf'  , 'args'] ,
@@ -1292,22 +1284,36 @@ let s:cpl = {
         \ 'sh'   : ['./%s %s'                                      , 'srcf'  , 'args'] ,
         \ 'bat'  : ['%s %s'                                        , 'srcf'  , 'args'] ,
         \ 'html' : ['"' . s:path_browser . '" %s'                  , 'srcf'] ,
-        \}
+        \ 'make' : ['make %s && "./%s"'                            , 'args'  , 'outf'] ,
+        \ 'qt'   : [(IsWin() ?
+                    \ (s:path_qmake . ' -r %s && ' . s:path_vcvars . ' && ' . s:path_nmake . ' -f Makefile.Debug') :
+                    \ ('qmake %s && make'))
+                    \ . '%s && "./%s"',
+                    \ 'srcf', 'args', 'outf'],
+        \},
     \}
-function s:cpl.printf(ext, args, srcf, outf) dict
-    if !has_key(self.ext, a:ext)
-        \ || ('sh' ==? a:ext && !(IsLinux() || IsGw() || IsMac()))
-        \ || ('bat' ==? a:ext && !IsWin())
+function s:cpl.printf(type, args, srcf, outf) dict
+    if !has_key(self.type, a:type)
+        \ || ('sh' ==? a:type && !(IsLinux() || IsGw() || IsMac()))
+        \ || ('bat' ==? a:type && !IsWin())
         return ''
     endif
     let self.args = a:args
     let self.srcf = a:srcf
     let self.outf = a:outf
-    let l:pstr = copy(self.ext[a:ext])
+    let l:pstr = copy(self.type[a:type])
     call map(l:pstr, {key, val -> (key == 0) ? val : get(self, val, '')})
     return call('printf', l:pstr)
 endfunction
 " }}}
+function! ExecCompile(str)
+    let l:exec = ((exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!') . a:str
+    execute l:exec
+    return l:exec
+endfunction
+" }}}
+
+" FUNCTION: ComplileFile(argstr) {{{
 function! ComplileFile(argstr)
     let l:ext      = expand('%:e')      " 扩展名
     let l:filename = expand('%:t')      " 文件名，不带路径，带扩展名
@@ -1370,14 +1376,14 @@ endfunction
 " @param str: 工程文件路径，如*.pro
 " @param type: 工程文件类型，如qmake, make
 function! FindProjectTarget(str, type)
-    let l:target = '"./' . fnamemodify(a:str, ':t:r') . '"'
+    let l:target = fnamemodify(a:str, ':t:r')
     if a:type == 'qmake' || a:type == 'make'
         for line in readfile(a:str)
-            if line =~? '^\s*TARGET\s*='
+            if line =~? '^\s*TARGET'
                 let l:target = split(line, '=')[1]
                 let l:target = substitute(l:target, '^\s\+', '', 'g')
                 let l:target = substitute(l:target, '\s\+$', '', 'g')
-                let l:target = '"./' . l:target . '"'
+                break
             endif
         endfor
     endif
@@ -1407,37 +1413,22 @@ function! ComplileProject(str, fn, args)
 endfunction
 " }}}
 
-" FUNCTION: ComplileProjectQmake(sopt, sel, args) {{{
+" FUNCTION: ComplileProjectQt(sopt, sel, args) {{{
 " 用于popset的函数，用于编译qmake工程并运行生成的可执行文件。
 " @param sopt: 参数信息，未用到，只是传入popset的函数需要
 " @param sel: pro文件路径
 " @param args: make命令附加参数列表
-function! ComplileProjectQmake(sopt, sel, args)
+function! ComplileProjectQt(sopt, sel, args)
     let l:filename = '"./' . fnamemodify(a:sel, ':p:t') . '"'
     let l:name     = FindProjectTarget(a:sel, 'qmake')
     let l:filedir  = fnameescape(fnamemodify(a:sel, ':p:h'))
     let l:olddir   = fnameescape(getcwd())
-    let l:exec     = ''
 
     " change cwd
     execute 'lcd ' . l:filedir
 
     " execute shell code
-    if IsLinux()
-        let l:exec .= 'qmake ' . l:filename
-        let l:exec .= ' && make'
-    elseif IsWin()
-        let l:exec .= s:path_qmake . ' -r ' . l:filename
-        let l:exec .= ' && ' . s:path_vcvars
-        let l:exec .= ' && ' . s:path_nmake . ' -f Makefile.Debug'
-    else
-        return
-    endif
-    if empty(a:args)
-        let l:exec .= ' && ' . l:name
-    else
-        let l:exec .= ' ' . join(a:args)
-    endif
+    let l:exec = s:cpl.printf('qt', join(a:args), l:filename, l:name)
     call ExecCompile(l:exec)
 
     " change back cwd
@@ -1445,28 +1436,21 @@ function! ComplileProjectQmake(sopt, sel, args)
 endfunction
 " }}}
 
-" FUNCTION: ComplileProjectMakefile(sopt, sel, args) {{{
+" FUNCTION: ComplileProjectMake(sopt, sel, args) {{{
 " 用于popset的函数，用于编译makefile工程并运行生成的可执行文件。
 " @param sopt: 参数信息，未用到，只是传入popset的函数需要
 " @param sel: makefile文件路径
 " @param args: make命令附加参数列表
-function! ComplileProjectMakefile(sopt, sel, args)
-    let l:filename = '"./' . fnamemodify(a:sel, ':p:t') . '"'
+function! ComplileProjectMake(sopt, sel, args)
     let l:name     = FindProjectTarget(a:sel, 'make')
     let l:filedir  = fnameescape(fnamemodify(a:sel, ':p:h'))
     let l:olddir   = fnameescape(getcwd())
-    let l:exec     = ''
 
     " change cwd
     execute 'lcd ' . l:filedir
 
     " execute shell code
-    let l:exec .= 'make'
-    if empty(a:args)
-        let l:exec .= ' && ' . l:name
-    else
-        let l:exec .= ' ' . join(a:args)
-    endif
+    let l:exec = s:cpl.printf('make', join(a:args), '', l:name)
     call ExecCompile(l:exec)
 
     " change back cwd
@@ -1479,15 +1463,15 @@ endfunction
 " @param sopt: 参数信息，未用到，只是传入popset的函数需要
 " @param sel: index.html路径
 function! ComplileProjectHtml(sopt, sel, args)
-    call ExecCompile('"' . s:path_browser . '" "' . a:sel . '"')
+    call ExecCompile(s:cpl.printf('html', '', a:sel, ''))
 endfunction
 " }}}
 
 " Run compliler
-let RC_Qmake      = function('ComplileProject', ['*.pro', 'ComplileProjectQmake', []])
-let RC_QmakeClean = function('ComplileProject', ['*.pro', 'ComplileProjectQmake', ['clean']])
-let RC_Make       = function('ComplileProject', ['[mM]akefile', 'ComplileProjectMakefile', []])
-let RC_MakeClean  = function('ComplileProject', ['[mM]akefile', 'ComplileProjectMakefile', ['clean']])
+let RC_Qmake      = function('ComplileProject', ['*.pro', 'ComplileProjectQt', []])
+let RC_QmakeClean = function('ComplileProject', ['*.pro', 'ComplileProjectQt', ['clean']])
+let RC_Make       = function('ComplileProject', ['[mM]akefile', 'ComplileProjectMake', []])
+let RC_MakeClean  = function('ComplileProject', ['[mM]akefile', 'ComplileProjectMake', ['clean']])
 let RC_Html       = function('ComplileProject', ['[iI]ndex.html', 'ComplileProjectHtml', []])
 " }}}
 
