@@ -59,8 +59,8 @@ font pango:WenQuanYi Micro Hei 12
 # 窗口设置
 # {{{
 # window operations
-new_window normal
-new_float normal
+default_border normal
+default_floating_border normal
 popup_during_fullscreen leave_fullscreen
 focus_follows_mouse no
 # 自动跳转到原来的workspace
@@ -75,6 +75,7 @@ assign [class="VirtualBox Manager"] workspace $WS3
 
 # 对特定窗口，执行特定命令
 for_window [window_role="pop-up"] floating enable
+for_window [class="^.*" tiling] border pixel $bp
 # Touchpad Off|On
 set $TPadOff "XTerm|Xfce4-terminal|Gvim"
 set $TPadOn  "^(?!((XTerm)|(Xfce4-terminal)|(Gvim)))"
@@ -83,7 +84,6 @@ for_window [class=$TPadOff] exec ToggleTouchPad off
 
 # i3-gaps configuration
 set $bp 3
-for_window [class="^.*"] border pixel $bp
 gaps inner 2
 gaps outer 2
 
