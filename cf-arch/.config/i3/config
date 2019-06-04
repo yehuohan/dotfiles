@@ -16,7 +16,7 @@ set $mod Mod4
 
 set $WS1 "1|"
 set $WS2 "2|"
-set $WS3 "3|"
+set $WS3 "3|"
 set $WS4 "4"
 set $WS5 "5"
 set $WS6 "6"
@@ -70,7 +70,8 @@ workspace_auto_back_and_forth yes
 assign [class="Nautilus"] workspace $WS1
 assign [class="Firefox"] workspace $WS2
 assign [class="Nightly"] workspace $WS2
-assign [class="Google-chrome"] workspace $WS3
+assign [class="Google-chrome"] workspace $WS2
+assign [class="VirtualBox Manager"] workspace $WS3
 
 # 对特定窗口，执行特定命令
 for_window [window_role="pop-up"] floating enable

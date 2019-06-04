@@ -32,7 +32,8 @@ export XMODIFIERS=@im=fcitx
 #===============================================================================
 # user path
 #===============================================================================
-export PATH=$PATH:$HOME/my-apps/
+export PATH=$PATH:$HOME/my-apps
+export PATH=$PATH:$HOME/my-apps/AppImage
 export PATH=$PATH:$HOME/my-apps/XXNet
 export PATH=$PATH:$HOME/my-apps/firefox
 export PATH=$PATH:/opt/cuda/bin
