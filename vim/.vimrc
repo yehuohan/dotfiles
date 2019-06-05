@@ -2326,15 +2326,12 @@ endif
 " }}}
 
 " Terminal {{{
-if has('terminal')
     nnoremap <leader>tz :terminal zsh<CR>
-    set termwinkey=<C-l>
 if IsVim()
+    set termwinkey=<C-l>
     tnoremap <Esc> <C-l>N
-    packadd termdebug
 else
     tnoremap <Esc> <C-\><C-n>
-endif
 endif
 " }}}
 
@@ -2366,27 +2363,6 @@ endif
     nnoremap <leader>rh :call RC_Html()<CR>
     nnoremap <leader>ra :call PopSelection(g:complile_args, 0)<CR>
     nnoremap <leader>ri :call ExecFuncInput('Compile Args: ', '', 'customlist,GetMultiFilesCompletion', 'ComplileFile')<CR>
-    nnoremap <leader>rd :Termdebug<CR>
-
-    let g:termdebug_wide = 150
-    tnoremap <F1> <C-l>:Gdb<CR>
-    tnoremap <F2> <C-l>:Program<CR>
-    tnoremap <F3> <C-l>:Source<CR>
-    nnoremap <F1> :Gdb<CR>
-    nnoremap <F2> :Program<CR>
-    nnoremap <F3> :Source<CR>
-    nnoremap <F4> :Stop<CR>
-    nnoremap <F5> :Run<CR>
-    nnoremap <F6> :Continue<CR>
-    " Termdebug模式下，K会自动map成Evaluate
-    nnoremap <leader>ge :Evaluate<CR>
-    vnoremap <leader>ge :Evaluate<CR>
-    nnoremap <F7> :Evaluate<CR>
-    vnoremap <F7> :Evaluate<CR>
-    nnoremap <F8> :Clear<CR>
-    nnoremap <F9> :Break<CR>
-    nnoremap <F10> :Over<CR>
-    nnoremap <F11> :Step<CR>
 " }}}
 
 " File diff {{{
