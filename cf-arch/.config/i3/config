@@ -303,8 +303,8 @@ floating_modifier $mod
 #===============================================================================
 #{{{
 # terminal
-bindsym $mod+Return exec xterm || xfce4-terminal
-bindsym $mod+mod1+Return exec xfce4-terminal
+bindsym $mod+Return exec xfce4-terminal
+bindsym $mod+mod1+Return exec xterm || xfce4-terminal
 
 # file manager
 bindsym $mod+e exec nautilus
