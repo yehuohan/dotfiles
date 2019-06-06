@@ -289,10 +289,11 @@ bindsym $mod+u split v
 bindsym $mod+mod1+u split h
 
 # toggle the border style
-bindsym $mod+b border toggle
+bindsym $mod+b border normal
+bindsym $mod+mod1+b border pixel $bp
 
-# Use Mouse+$mod to drag floating windows to their wanted position
-#floating_modifier $mod
+# Use Mouse+$mod to drag floating windows at any position, not only at border
+floating_modifier $mod
 
 # }}}
 
