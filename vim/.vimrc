@@ -1279,6 +1279,14 @@ let s:cpl = {
                     \ . '%s && "./%s"',
                     \ 'srcf', 'args', 'outf'],
         \},
+    \ 'item' : {
+        \ 'opt' : ['cppargs'],
+        \ 'lst' : ['charset'],
+        \ 'dic' : {
+                \ 'charset' : '-finput-charset=utf-8 -fexec-charset=gbk',
+                \},
+        \ 'cmd' : 'ExecArgs'
+        \}
     \}
 function s:cpl.printf(type, args, srcf, outf) dict
     if !has_key(self.type, a:type)
@@ -1294,10 +1302,15 @@ function s:cpl.printf(type, args, srcf, outf) dict
     return call('printf', l:pstr)
 endfunction
 " }}}
+
 function! ExecCompile(str)
     let l:exec = ((exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!') . a:str
     execute l:exec
     return l:exec
+endfunction
+
+function! ExecArgs(sopt, arg)
+    call ComplileFile(s:cpl.item.dic[a:arg])
 endfunction
 " }}}
 
@@ -1315,21 +1328,6 @@ function! ComplileFile(argstr)
     endif
     call SetRepeatExecution(ExecCompile(l:exec))
 endfunction
-" }}}
-
-" FUNCTION: ComplileFileArgs(sopt, arg) {{{
-function! ComplileFileArgs(sopt, arg)
-    if a:arg ==# 'charset'
-        call ComplileFile('-finput-charset=utf-8 -fexec-charset=gbk')
-    endif
-endfunction
-let g:complile_args = {
-    \ 'opt' : ['cppargs'],
-    \ 'lst' : ['charset'],
-    \ 'dic' : {
-            \ 'charset' : '-finput-charset=utf-8 -fexec-charset=gbk',
-            \},
-    \ 'cmd' : 'ComplileFileArgs'}
 " }}}
 
 " FUNCTION: FindProjectTarget(str, type) {{{
@@ -1428,6 +1426,7 @@ endfunction
 " }}}
 
 " Run compliler
+let RC_Args       = function('popset#set#PopSelection', [s:cpl.item, 0])
 let RC_Qmake      = function('ComplileProject', ['*.pro', 'ComplileProjectQt', []])
 let RC_QmakeClean = function('ComplileProject', ['*.pro', 'ComplileProjectQt', ['clean']])
 let RC_Make       = function('ComplileProject', ['[mM]akefile', 'ComplileProjectMake', []])
@@ -2292,6 +2291,7 @@ endif
     " 在新Tab中打开列表项
     nnoremap <leader>qt :call QuickfixTabEdit()<CR>
     nnoremap <leader>lt :call QuickfixTabEdit()<CR>
+    nnoremap <leader>ql :call setloclist(0, getqflist())<Bar>vertical botright lopen 35<CR>
     " 分割窗口
     nnoremap <leader>ws <C-w>s
     nnoremap <leader>wv <C-W>v
@@ -2360,13 +2360,13 @@ endif
 
     " 编译运行当前文件
     nnoremap <leader>rf :call ComplileFile('')<CR>
+    nnoremap <leader>ri :call ExecFuncInput('Compile Args: ', '', 'customlist,GetMultiFilesCompletion', 'ComplileFile')<CR>
+    nnoremap <leader>ra :call RC_Args()<CR>
     nnoremap <leader>rq :call RC_Qmake()<CR>
     nnoremap <leader>rm :call RC_Make()<CR>
     nnoremap <leader>rcq :call RC_QmakeClean()<CR>
     nnoremap <leader>rcm :call RC_MakeClean()<CR>
     nnoremap <leader>rh :call RC_Html()<CR>
-    nnoremap <leader>ra :call PopSelection(g:complile_args, 0)<CR>
-    nnoremap <leader>ri :call ExecFuncInput('Compile Args: ', '', 'customlist,GetMultiFilesCompletion', 'ComplileFile')<CR>
 " }}}
 
 " File diff {{{
