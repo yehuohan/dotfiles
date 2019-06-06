@@ -1089,178 +1089,166 @@ call plug#end()                         " required
 " User functions
 "===============================================================================
 " {{{
-" Basic and misc {{{
-" 切换显示隐藏字符 {{{
-function! InvConceallevel()
-    if &conceallevel == 0
-        set conceallevel=2
+" Execute function {{{
+" FUNCTION: GetSelectedContent() {{{ 获取选区内容
+function! GetSelectedContent()
+    let l:reg_var = getreg('0', 1)
+    let l:reg_mode = getregtype('0')
+    normal! gv"0y
+    let l:word = getreg('0')
+    call setreg('0', l:reg_var, l:reg_mode)
+    return l:word
+endfunction
+" }}}
+
+" FUNCTION: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{ 多文件自动补全
+function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
+    let l:complete = []
+    let l:arglead_list = ['']
+    let l:arglead_first = ''
+    let l:arglead_glob = ''
+    let l:files_list = []
+
+    " process glob path-string
+    if !empty(a:arglead)
+        let l:arglead_list = split(a:arglead, ' ')
+        let l:arglead_first = join(l:arglead_list[0:-2], ' ')
+        let l:arglead_glob = l:arglead_list[-1]
+    endif
+
+    " glob non-hidden and hidden files(but no . and ..) with ignorecase
+    set wildignorecase
+    set wildignore+=.,..
+    let l:files_list = split(glob(l:arglead_glob . "*") . "\n" . glob(l:arglead_glob . "\.[^.]*"), "\n")
+    set wildignore-=.,..
+
+    if len(l:arglead_list) == 1
+        let l:complete = l:files_list
     else
-        set conceallevel=0              " 显示markdown等格式中的隐藏字符
+        for item in l:files_list
+            call add(l:complete, l:arglead_first . ' ' . item)
+        endfor
     endif
-    echo 'conceallevel = ' . &conceallevel
+    return l:complete
 endfunction
 " }}}
 
-" 切换虚拟编辑 {{{
-function! InvVirtualedit()
-    if &virtualedit == ''
-        set virtualedit=all
-    else
-        set virtualedit=""
-    endif
-    echo 'virtualedit = ' . &virtualedit
-endfunction
-" }}}
+" FUNCTION: GetFileList(pat, sdir) {{{ 获取文件列表
+" @param pat: 文件匹配模式，如*.pro
+" @param sdir: 查找起始目录，默认从当前目录向上查找到根目录
+" @return 返回找到的文件列表
+function! GetFileList(pat, sdir)
+    let l:start_dir = (a:sdir == '') ? '.' : a:sdir
+    let l:dir      = fnamemodify(l:start_dir, ':p:h')
+    let l:dir_last = ''
+    let l:pfile    = ''
 
-" 切换透明背影（需要系统本身支持透明） {{{
-let s:inv_transparent_bg_flg = 0
-function! InvTransParentBackground()
-    if s:inv_transparent_bg_flg == 1
-        hi Normal ctermbg=235
-        let s:inv_transparent_bg_flg = 0
-    else
-        hi Normal ctermbg=NONE
-        let s:inv_transparent_bg_flg = 1
-    endif
-endfunction
-" }}}
-
-" 切换显示行号 {{{
-let s:inv_number_type=1
-function! InvNumberType()
-    if s:inv_number_type == 1
-        let s:inv_number_type = 2
-        set nonumber
-        set norelativenumber
-    elseif s:inv_number_type == 2
-        let s:inv_number_type = 3
-        set number
-        set norelativenumber
-    elseif s:inv_number_type == 3
-        let s:inv_number_type = 1
-        set number
-        set relativenumber
-    endif
-endfunction
-" }}}
-
-" 切换显示折叠列 {{{
-function! InvFoldColumeShow()
-    if &foldcolumn == 0
-        set foldcolumn=1
-    else
-        set foldcolumn=0
-    endif
-    echo 'foldcolumn = ' . &foldcolumn
-endfunction
-" }}}
-
-" 切换显示标志列 {{{
-function! InvSigncolumn()
-    if &signcolumn == 'auto'
-        set signcolumn=no
-    else
-        set signcolumn=auto
-    endif
-    echo 'signcolumn = ' . &signcolumn
-endfunction
-" }}}
-
-" 切换高亮 {{{
-function! InvHighLight()
-    if exists('g:syntax_on')
-        syntax off
-        echo 'syntax off'
-    else
-        syntax on
-        echo 'syntax on'
-    endif
-endfunction
-" }}}
-
-" 切换滚屏bind {{{
-function! InvScrollBind()
-    if &scrollbind == 1
-        set noscrollbind
-    else
-        set scrollbind
-    endif
-    echo 'scrollbind = ' . &scrollbind
-endfunction
-" }}}
-
-" 切换成x86或x64编译环境 {{{
-let s:complile_type = 'x64'
-function! ToggleX86X64()
-    if IsWin()
-        if 'x86' ==# s:complile_type
-            let s:complile_type = 'x64'
-            let s:path_vcvars = s:path_vcvars64
-            let s:path_nmake = s:path_nmake_x64
-            let s:path_qmake = s:path_qmake_x64
-        else
-            let s:complile_type = 'x86'
-            let s:path_vcvars = s:path_vcvars32
-            let s:path_nmake = s:path_nmake_x86
-            let s:path_qmake = s:path_qmake_x86
+    while l:dir !=# l:dir_last
+        let l:pfile = glob(l:dir . '/' . a:pat)
+        if !empty(l:pfile)
+            break
         endif
-        echo 'Complile Type: ' . s:complile_type
-    endif
+
+        let l:dir_last = l:dir
+        let l:dir = fnamemodify(l:dir, ':p:h:h')
+    endwhile
+
+    return split(l:pfile, "\n")
 endfunction
 " }}}
 
-" {{{ 切换浏览器路径
-function! ToggleBrowserPath()
-    if s:path_browser ==# s:path_browser_firefox
-        let s:path_browser = s:path_browser_chrome
+" FUNCTION: ExecFuncInput(prompt, text, cmpl, fn, ...) range {{{
+" @param prompt: input的提示信息
+" @param text: input的缺省输入
+" @param cmpl: input的输入输入补全
+" @param fn: 要运行的函数，参数为input的输入，和可变输入参数
+function! ExecFuncInput(prompt, text, cmpl, fn, ...) range
+    if empty(a:cmpl)
+        let l:inpt = input(a:prompt, a:text)
     else
-        let s:path_browser = s:path_browser_firefox
+        let l:inpt = input(a:prompt, a:text, a:cmpl)
     endif
-    echo 'Browser Path: ' . s:path_browser
+    if empty(l:inpt)
+        return
+    endif
+    let l:args = [l:inpt]
+    if a:0 > 0
+        call extend(l:args, a:000)
+    endif
+    let l:range = (a:firstline == a:lastline) ? '' : (string(a:firstline) . ',' . string(a:lastline))
+    let Fn = function(a:fn, l:args)
+    execute l:range . 'call Fn()'
 endfunction
 " }}}
 
-" Linux-Fcitx输入法切换 {{{
-if IsLinux()
-function! LinuxFcitx2En()
-    if 2 == system('fcitx-remote')
-        let l:t = system('fcitx-remote -c')
+" FUNCTION: FuncSort() range {{{ 预览sort匹配
+function! FuncSort() range
+    let l:pat = PreviewPattern('sort pattern: /')
+    if empty(l:pat)
+        return
     endif
+    let l:range = (a:firstline == a:lastline) ? '' : (string(a:firstline) . ',' . string(a:lastline))
+    call feedkeys(':' . l:range . 'sort /' . l:pat . '/', 'n')
 endfunction
-function! LinuxFcitx2Zh()
-    if 1 == system('fcitx-remote')
-        let l:t = system('fcitx-remote -o')
-    endif
-endfunction
-endif
 " }}}
 
-" 查找Vim关键字 {{{
-function! GotoKeyword(mode)
-    let l:exec = 'help '
-    if a:mode ==# 'n'
-        let l:word = expand('<cword>')
+" FUNCTION: FuncEditTempFile(suffix, ntab) {{{
+" 编辑临时文件
+" @param suffix: 临时文件附加后缀
+" @param ntab: 在新tab中打开
+function! FuncEditTempFile(suffix, ntab)
+    let l:tempfile = fnamemodify(tempname(), ':r')
+    if empty(a:suffix)
+        let l:tempfile .= '.tmp'
+    else
+        let l:tempfile .= '.' . a:suffix
+    endif
+    if a:ntab
+        execute 'tabedit ' . l:tempfile
+    else
+        execute 'edit ' . l:tempfile
+    endif
+endfunction
+"}}}
+
+" FUNCTION: FuncDiffFile(filename, mode) {{{
+function! FuncDiffFile(filename, mode)
+    if a:mode ==# 's'
+        execute 'diffsplit ' . a:filename
     elseif a:mode ==# 'v'
-        let l:word = GetSelectedContent()
+        execute 'vertical diffsplit ' . a:filename
     endif
-
-    " 添加关键字
-    let l:exec .= l:word
-    if IsNVim()
-        " nvim用自己的帮助文件，只有英文的
-        let l:exec .= '@en'
-    endif
-
-    execute l:exec
 endfunction
 " }}}
 
-" 去除尾部空白 {{{
-function! RemoveTrailingSpace()
-    let l:save = winsaveview()
-    %s/\s\+$//e
-    call winrestview(l:save)
+" FUNCTION: FuncDivideSpace(string, pos) range {{{ 添加分隔符
+function! FuncDivideSpace(string, pos) range
+    let l:chars = split(a:string)
+
+    for k in range(a:firstline, a:lastline)
+        let l:line = getline(k)
+        let l:fie = ' '
+        for ch in l:chars
+            let l:pch = '\m\s*\M' . escape(ch, '\') . '\m\s*\C'
+            if a:pos == 'h'
+                let l:sch = l:fie . escape(ch, '&\')
+            elseif a:pos == 'c'
+                let l:sch = l:fie . escape(ch, '&\') . l:fie
+            elseif a:pos == 'l'
+                let l:sch = escape(ch, '&\') . l:fie
+            elseif a:pos == 'd'
+                let l:sch = escape(ch, '&\')
+            endif
+            let l:line = substitute(l:line, l:pch, l:sch, 'g')
+        endfor
+        call setline(k, l:line)
+    endfor
+    call SetRepeatExecution('call FuncDivideSpace("' . a:string . '", "' . a:pos . '")')
 endfunction
+let DivideSpaceH = function('ExecFuncInput', ['Divide H Space(split with space): ', '', '', 'FuncDivideSpace', 'h'])
+let DivideSpaceC = function('ExecFuncInput', ['Divide C Space(split with space): ', '', '', 'FuncDivideSpace', 'c'])
+let DivideSpaceL = function('ExecFuncInput', ['Divide L Space(split with space): ', '', '', 'FuncDivideSpace', 'l'])
+let DivideSpaceD = function('ExecFuncInput', ['Divide D Space(split with space): ', '', '', 'FuncDivideSpace', 'd'])
 " }}}
 " }}}
 
@@ -1344,34 +1332,6 @@ let g:complile_args = {
     \ 'cmd' : 'ComplileFileArgs'}
 " }}}
 
-" FUNCTION: FindProjectFile(...) {{{
-" @param 1: 工程文件，如*.pro
-" @param 2: 查找起始目录，默认从当前目录向上查找到根目录
-" @return 返回找到的文件路径列表
-function! FindProjectFile(...)
-    if a:0 == 0
-        return ''
-    endif
-    let l:marker = a:1
-    let l:start_dir = (a:0 >= 2) ? a:2 : '.'
-    let l:dir      = fnamemodify(l:start_dir, ':p:h')
-    let l:dir_last = ''
-    let l:pfile    = ''
-
-    while l:dir !=# l:dir_last
-        let l:pfile = glob(l:dir . '/' . l:marker)
-        if !empty(l:pfile)
-            break
-        endif
-
-        let l:dir_last = l:dir
-        let l:dir = fnamemodify(l:dir, ':p:h:h')
-    endwhile
-
-    return split(l:pfile, "\n")
-endfunction
-" }}}
-
 " FUNCTION: FindProjectTarget(str, type) {{{
 " @param str: 工程文件路径，如*.pro
 " @param type: 工程文件类型，如qmake, make
@@ -1397,7 +1357,7 @@ endfunction
 " @param fn: 编译工程文件的函数，需要采用popset插件
 " @param args: 编译工程文件函数的附加参数，需要采用popset插件
 function! ComplileProject(str, fn, args)
-    let l:prj = FindProjectFile(a:str)
+    let l:prj = GetFileList(a:str, '')
     if len(l:prj) == 1
         let Fn = function(a:fn)
         call Fn('', l:prj[0], a:args)
@@ -1475,146 +1435,7 @@ let RC_MakeClean  = function('ComplileProject', ['[mM]akefile', 'ComplileProject
 let RC_Html       = function('ComplileProject', ['[iI]ndex.html', 'ComplileProjectHtml', []])
 " }}}
 
-" Execute function {{{
-" FUNCTION: ExecFuncInput(prompt, text, cmpl, fn, ...) range {{{
-" @param prompt: input的提示信息
-" @param text: input的缺省输入
-" @param cmpl: input的输入输入补全
-" @param fn: 要运行的函数，参数为input的输入，和可变输入参数
-function! ExecFuncInput(prompt, text, cmpl, fn, ...) range
-    if empty(a:cmpl)
-        let l:inpt = input(a:prompt, a:text)
-    else
-        let l:inpt = input(a:prompt, a:text, a:cmpl)
-    endif
-    if empty(l:inpt)
-        return
-    endif
-    let l:args = [l:inpt]
-    if a:0 > 0
-        call extend(l:args, a:000)
-    endif
-    let l:range = (a:firstline == a:lastline) ? '' : (string(a:firstline) . ',' . string(a:lastline))
-    let Fn = function(a:fn, l:args)
-    execute l:range . 'call Fn()'
-endfunction
-" }}}
-
-" FUNCTION: FuncSort() range {{{ 预览sort匹配
-function! FuncSort() range
-    let l:pat = PreviewPattern('sort pattern: /')
-    if empty(l:pat)
-        return
-    endif
-    let l:range = (a:firstline == a:lastline) ? '' : (string(a:firstline) . ',' . string(a:lastline))
-    call feedkeys(':' . l:range . 'sort /' . l:pat . '/', 'n')
-endfunction
-" }}}
-
-" FUNCTION: FuncEditTempFile(suffix, ntab) {{{
-" 编辑临时文件
-" @param suffix: 临时文件附加后缀
-" @param ntab: 在新tab中打开
-function! FuncEditTempFile(suffix, ntab)
-    let l:tempfile = fnamemodify(tempname(), ':r')
-    if empty(a:suffix)
-        let l:tempfile .= '.tmp'
-    else
-        let l:tempfile .= '.' . a:suffix
-    endif
-    if a:ntab
-        execute 'tabedit ' . l:tempfile
-    else
-        execute 'edit ' . l:tempfile
-    endif
-endfunction
-"}}}
-
-" FUNCTION: FuncDiffFile(filename, mode) {{{
-function! FuncDiffFile(filename, mode)
-    if a:mode == 's'
-        execute 'diffsplit ' . a:filename
-    elseif a:mode == 'v'
-        execute 'vertical diffsplit ' . a:filename
-    endif
-endfunction
-" }}}
-
-" FUNCTION: FuncDivideSpace(string, pos) range {{{ 添加分隔符
-function! FuncDivideSpace(string, pos) range
-    let l:chars = split(a:string)
-
-    for k in range(a:firstline, a:lastline)
-        let l:line = getline(k)
-        let l:fie = ' '
-        for ch in l:chars
-            let l:pch = '\m\s*\M' . escape(ch, '\') . '\m\s*\C'
-            if a:pos == 'h'
-                let l:sch = l:fie . escape(ch, '&\')
-            elseif a:pos == 'c'
-                let l:sch = l:fie . escape(ch, '&\') . l:fie
-            elseif a:pos == 'l'
-                let l:sch = escape(ch, '&\') . l:fie
-            elseif a:pos == 'd'
-                let l:sch = escape(ch, '&\')
-            endif
-            let l:line = substitute(l:line, l:pch, l:sch, 'g')
-        endfor
-        call setline(k, l:line)
-    endfor
-    call SetRepeatExecution('call FuncDivideSpace("' . a:string . '", "' . a:pos . '")')
-endfunction
-let DivideSpaceH = function('ExecFuncInput', ['Divide H Space(split with space): ', '', '', 'FuncDivideSpace', 'h'])
-let DivideSpaceC = function('ExecFuncInput', ['Divide C Space(split with space): ', '', '', 'FuncDivideSpace', 'c'])
-let DivideSpaceL = function('ExecFuncInput', ['Divide L Space(split with space): ', '', '', 'FuncDivideSpace', 'l'])
-let DivideSpaceD = function('ExecFuncInput', ['Divide D Space(split with space): ', '', '', 'FuncDivideSpace', 'd'])
-" }}}
-" }}}
-
 " Search {{{
-" FUNCTION: GetSelectedContent() {{{ 获取选区内容
-function! GetSelectedContent()
-    let l:reg_var = getreg('0', 1)
-    let l:reg_mode = getregtype('0')
-    normal! gv"0y
-    let l:word = getreg('0')
-    call setreg('0', l:reg_var, l:reg_mode)
-    return l:word
-endfunction
-" }}}
-
-" FUNCTION: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{ 多文件自动补全
-function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
-    let l:complete = []
-    let l:arglead_list = ['']
-    let l:arglead_first = ''
-    let l:arglead_glob = ''
-    let l:files_list = []
-
-    " process glob path-string
-    if !empty(a:arglead)
-        let l:arglead_list = split(a:arglead, ' ')
-        let l:arglead_first = join(l:arglead_list[0:-2], ' ')
-        let l:arglead_glob = l:arglead_list[-1]
-    endif
-
-    " glob non-hidden and hidden files(but no . and ..) with ignorecase
-    set wildignorecase
-    set wildignore+=.,..
-    let l:files_list = split(glob(l:arglead_glob . "*") . "\n" . glob(l:arglead_glob . "\.[^.]*"), "\n")
-    set wildignore-=.,..
-
-    if len(l:arglead_list) == 1
-        let l:complete = l:files_list
-    else
-        for item in l:files_list
-            call add(l:complete, l:arglead_first . ' ' . item)
-        endfor
-    endif
-    return l:complete
-endfunction
-" }}}
-
 " FUNCTION: FindWorking(type, mode) {{{ 超速查找
 " {{{
 augroup UserFunctionSearch
@@ -1982,6 +1803,191 @@ function! QuickfixPreview()
 endfunction
 " }}}
 " }}}
+
+" Misc {{{
+" 切换显示隐藏字符 {{{
+function! InvConceallevel()
+    if &conceallevel == 0
+        set conceallevel=2
+    else
+        set conceallevel=0              " 显示markdown等格式中的隐藏字符
+    endif
+    echo 'conceallevel = ' . &conceallevel
+endfunction
+" }}}
+
+" 切换虚拟编辑 {{{
+function! InvVirtualedit()
+    if &virtualedit == ''
+        set virtualedit=all
+    else
+        set virtualedit=""
+    endif
+    echo 'virtualedit = ' . &virtualedit
+endfunction
+" }}}
+
+" 切换透明背影（需要系统本身支持透明） {{{
+let s:inv_transparent_bg_flg = 0
+function! InvTransParentBackground()
+    if s:inv_transparent_bg_flg == 1
+        hi Normal ctermbg=235
+        let s:inv_transparent_bg_flg = 0
+    else
+        hi Normal ctermbg=NONE
+        let s:inv_transparent_bg_flg = 1
+    endif
+endfunction
+" }}}
+
+" 切换显示行号 {{{
+let s:inv_number_type=1
+function! InvNumberType()
+    if s:inv_number_type == 1
+        let s:inv_number_type = 2
+        set nonumber
+        set norelativenumber
+    elseif s:inv_number_type == 2
+        let s:inv_number_type = 3
+        set number
+        set norelativenumber
+    elseif s:inv_number_type == 3
+        let s:inv_number_type = 1
+        set number
+        set relativenumber
+    endif
+endfunction
+" }}}
+
+" 切换显示折叠列 {{{
+function! InvFoldColumeShow()
+    if &foldcolumn == 0
+        set foldcolumn=1
+    else
+        set foldcolumn=0
+    endif
+    echo 'foldcolumn = ' . &foldcolumn
+endfunction
+" }}}
+
+" 切换显示标志列 {{{
+function! InvSigncolumn()
+    if &signcolumn == 'auto'
+        set signcolumn=no
+    else
+        set signcolumn=auto
+    endif
+    echo 'signcolumn = ' . &signcolumn
+endfunction
+" }}}
+
+" 切换高亮 {{{
+function! InvHighLight()
+    if exists('g:syntax_on')
+        syntax off
+        echo 'syntax off'
+    else
+        syntax on
+        echo 'syntax on'
+    endif
+endfunction
+" }}}
+
+" 切换滚屏bind {{{
+function! InvScrollBind()
+    if &scrollbind == 1
+        set noscrollbind
+    else
+        set scrollbind
+    endif
+    echo 'scrollbind = ' . &scrollbind
+endfunction
+" }}}
+
+" 切换成x86或x64编译环境 {{{
+let s:complile_type = 'x64'
+function! ToggleX86X64()
+    if IsWin()
+        if 'x86' ==# s:complile_type
+            let s:complile_type = 'x64'
+            let s:path_vcvars = s:path_vcvars64
+            let s:path_nmake = s:path_nmake_x64
+            let s:path_qmake = s:path_qmake_x64
+        else
+            let s:complile_type = 'x86'
+            let s:path_vcvars = s:path_vcvars32
+            let s:path_nmake = s:path_nmake_x86
+            let s:path_qmake = s:path_qmake_x86
+        endif
+        echo 'Complile Type: ' . s:complile_type
+    endif
+endfunction
+" }}}
+
+" {{{ 切换浏览器路径
+function! ToggleBrowserPath()
+    if s:path_browser ==# s:path_browser_firefox
+        let s:path_browser = s:path_browser_chrome
+    else
+        let s:path_browser = s:path_browser_firefox
+    endif
+    echo 'Browser Path: ' . s:path_browser
+endfunction
+" }}}
+
+" 切换Fcitx输入法 {{{
+if IsLinux()
+function! LinuxFcitx2En()
+    if 2 == system('fcitx-remote')
+        let l:t = system('fcitx-remote -c')
+    endif
+endfunction
+function! LinuxFcitx2Zh()
+    if 1 == system('fcitx-remote')
+        let l:t = system('fcitx-remote -o')
+    endif
+endfunction
+endif
+" }}}
+
+" 查找Vim关键字 {{{
+function! GotoKeyword(mode)
+    let l:exec = 'help '
+    if a:mode ==# 'n'
+        let l:word = expand('<cword>')
+    elseif a:mode ==# 'v'
+        let l:word = GetSelectedContent()
+    endif
+
+    " 添加关键字
+    let l:exec .= l:word
+    if IsNVim()
+        " nvim用自己的帮助文件，只有英文的
+        let l:exec .= '@en'
+    endif
+
+    execute l:exec
+endfunction
+" }}}
+
+" 去除尾部空白 {{{
+function! RemoveTrailingSpace()
+    let l:save = winsaveview()
+    %s/\s\+$//e
+    call winrestview(l:save)
+endfunction
+" }}}
+
+" {{{ 冻结顶行
+function! HoldTopLine()
+    let l:line = line('.')
+    split %
+    resize 1
+    call cursor(l:line, 1)
+    wincmd p
+endfunction
+" }}}
+" }}}
 " }}}
 
 "===============================================================================
@@ -2150,7 +2156,7 @@ augroup END
 " User Key-Maps
 "===============================================================================
 " {{{
-" Basic Edit {{{
+" Basic {{{
     " 回退操作
     nnoremap <S-u> <C-r>
     " 大小写转换
@@ -2167,19 +2173,12 @@ augroup END
     vnoremap <leader>ak <C-a>
     vnoremap <leader>agj g<C-x>
     vnoremap <leader>agk g<C-a>
-    " 去除尾部空白
-    nnoremap <leader>rt :call RemoveTrailingSpace()<CR>
     " HEX编辑
     nnoremap <leader>xx :%!xxd<CR>
     nnoremap <leader>xr :%!xxd -r<CR>
-    " 空格分隔
-    nnoremap <leader>dh :call DivideSpaceH()<CR>
-    nnoremap <leader>dc :call DivideSpaceC()<CR>
-    nnoremap <leader>dl :call DivideSpaceL()<CR>
-    nnoremap <leader>dd :call DivideSpaceD()<CR>
-    " 显示折行
+
+    " Misc
     nnoremap <leader>iw :set invwrap<CR>
-    " 显示不可见字符
     nnoremap <leader>il :set invlist<CR>
     nnoremap <leader>iv :call InvVirtualedit()<CR>
     nnoremap <leader>ic :call InvConceallevel()<CR>
@@ -2194,6 +2193,8 @@ augroup END
     if IsLinux()
         inoremap <Esc> <Esc>:call LinuxFcitx2En()<CR>
     endif
+    nnoremap <leader>rt :call RemoveTrailingSpace()<CR>
+    nnoremap <leader>hl :call HoldTopLine()<CR>
 " }}}
 
 " Copy and paste{{{
@@ -2351,8 +2352,11 @@ endif
     nnoremap <leader>etp :call FuncEditTempFile('py' , 1)<CR>
     nnoremap <leader>etg :call FuncEditTempFile('go' , 1)<CR>
     nnoremap <leader>etm :call FuncEditTempFile('m'  , 1)<CR>
-    " 排序
     nnoremap <leader>ss :call FuncSort()<CR>
+    nnoremap <leader>dh :call DivideSpaceH()<CR>
+    nnoremap <leader>dc :call DivideSpaceC()<CR>
+    nnoremap <leader>dl :call DivideSpaceL()<CR>
+    nnoremap <leader>dd :call DivideSpaceD()<CR>
 
     " 编译运行当前文件
     nnoremap <leader>rf :call ComplileFile('')<CR>
