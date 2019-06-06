@@ -3,10 +3,24 @@
 # python's code snippets of matplotlib
 #===============================================================================
 
-snippet mpl-key "matplotlib key event"
-def on_key(event:${1:mpl}.backend_bases.KeyEvent):
+snippet mpl "matplotlib for python"
+import matplotlib as ${1:mpl}
+import matplotlib.pyplot as ${2:plt}
+
+# mpl.rcParams['font.family'] = 'Consolas'
+# mpl.rcParams['font.family'] = 'DejaVu Sans'
+# mpl.rcParams['font.size'] = 9
+
+def on_key(event:$1.backend_bases.KeyEvent):
     if event.key == 'escape':
-        ${2:plt}.close()
+        $2.close()
+
+fig = $2.figure('Plot')
+fig.canvas.mpl_connect('key_press_event', on_key)
+# ax = fig.add_subplot(1, 1, 1)
+# ax = fig.add_axes((0.1, 0.1, 0.8, 0.8))
+# ax.plot()
+plt.show()
 ${0}
 endsnippet
 
