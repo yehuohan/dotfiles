@@ -2103,9 +2103,9 @@ if IsGVim()
         set lines=20
         set columns=100
         "set guifont=DejaVu\ Sans\ Mono\ 13
-        set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 13.5
+        set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 12
         set linespace=0                 " required by Powerline Font
-        set guifontwide=WenQuanYi\ Micro\ Hei\ Mono\ 13.5
+        set guifontwide=WenQuanYi\ Micro\ Hei\ Mono\ 12
     elseif IsWin()
         set lines=25
         set columns=100
@@ -2132,8 +2132,8 @@ augroup END
 function! s:setGuifontNVimQt()
 if IsNVimQt()
     if IsLinux()
-        Guifont! WenQuanYi Micro Hei Mono:h13
-        Guifont! DejaVu Sans Mono for Powerline:h13
+        Guifont! WenQuanYi Micro Hei Mono:h12
+        Guifont! DejaVu Sans Mono for Powerline:h12
     elseif IsWin()
         " 先设置一次中文（缺省）字体，再设置英文字体(BUG:有时有问题)
         "Guifont! YaHei Mono For Powerline:h12
