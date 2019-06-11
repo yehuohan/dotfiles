@@ -1253,7 +1253,7 @@ let DivideSpaceD = function('ExecFuncInput', ['Divide D Space(split with space):
 " }}}
 
 " Project run {{{
-" FUNCTION: ExecCompile(str) {{{
+" FUNCTION: ComplileFile(argstr) {{{
 " s:cpl {{{
 let s:cpl = {
     \ 'args' : '',
@@ -1279,13 +1279,13 @@ let s:cpl = {
                     \ . '%s && "./%s"',
                     \ 'srcf', 'args', 'outf'],
         \},
-    \ 'item' : {
+    \ 'sel_cpp' : {
         \ 'opt' : ['cppargs'],
         \ 'lst' : ['charset'],
         \ 'dic' : {
                 \ 'charset' : '-finput-charset=utf-8 -fexec-charset=gbk',
                 \},
-        \ 'cmd' : 'ExecArgs'
+        \ 'cmd' : 'ExecSelCpp'
         \}
     \}
 function s:cpl.printf(type, args, srcf, outf) dict
@@ -1309,12 +1309,10 @@ function! ExecCompile(str)
     return l:exec
 endfunction
 
-function! ExecArgs(sopt, arg)
-    call ComplileFile(s:cpl.item.dic[a:arg])
+function! ExecSelCpp(sopt, arg)
+    call ComplileFile(s:cpl.sel_cpp.dic[a:arg])
 endfunction
-" }}}
 
-" FUNCTION: ComplileFile(argstr) {{{
 function! ComplileFile(argstr)
     let l:ext      = expand('%:e')      " 扩展名
     let l:filename = expand('%:t')      " 文件名，不带路径，带扩展名
@@ -1426,7 +1424,7 @@ endfunction
 " }}}
 
 " Run compliler
-let RC_Args       = function('popset#set#PopSelection', [s:cpl.item, 0])
+let RC_Args       = function('popset#set#PopSelection', [s:cpl.sel_cpp, 0])
 let RC_Qmake      = function('ComplileProject', ['*.pro', 'ComplileProjectQt', []])
 let RC_QmakeClean = function('ComplileProject', ['*.pro', 'ComplileProjectQt', ['clean']])
 let RC_Make       = function('ComplileProject', ['[mM]akefile', 'ComplileProjectMake', []])
