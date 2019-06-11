@@ -1157,6 +1157,16 @@ function! GetFileList(pat, sdir)
 endfunction
 " }}}
 
+" FUNCTION: GetCmdResult(type, cmd, args) {{{ 获取命令结果
+function! GetCmdResult(type, cmd, args)
+    if a:type ==# 'call'
+        return call(a:cmd, a:args)
+    elseif a:type ==# 'exec'
+        return execute(a:cmd)
+    endif
+endfunction
+" }}}
+
 " FUNCTION: ExecFuncInput(prompt, text, cmpl, fn, ...) range {{{
 " @param prompt: input的提示信息
 " @param text: input的缺省输入
@@ -1249,6 +1259,24 @@ let DivideSpaceH = function('ExecFuncInput', ['Divide H Space(split with space):
 let DivideSpaceC = function('ExecFuncInput', ['Divide C Space(split with space): ', '', '', 'FuncDivideSpace', 'c'])
 let DivideSpaceL = function('ExecFuncInput', ['Divide L Space(split with space): ', '', '', 'FuncDivideSpace', 'l'])
 let DivideSpaceD = function('ExecFuncInput', ['Divide D Space(split with space): ', '', '', 'FuncDivideSpace', 'd'])
+" }}}
+
+" FUNCTION: FuncAppendCmd(str) {{{ 将命令结果作为文本插入
+function! FuncAppendCmd(str, type)
+    if a:type ==# 'call'
+        let l:as = match(a:str, '(')
+        let l:ae = -1   " match(a:str, ')') - 1
+        let l:str = a:str[0 : l:as - 1]
+        let l:args = split(a:str[l:as + 1 : l:ae - 1], ',')
+    elseif a:type ==# 'exec'
+        let l:str = ':' . a:str
+        let l:args = []
+    endif
+    let l:result = GetCmdResult(a:type, l:str, l:args)
+    call append(line('.'), split(l:result, "\n"))
+endfunction
+let AppendExecResult = function('ExecFuncInput', ['Input cmd = ', '', 'command', 'FuncAppendCmd', 'exec'])
+let AppendCallResult = function('ExecFuncInput', ['Input cmd = ', '', 'function', 'FuncAppendCmd', 'call'])
 " }}}
 " }}}
 
@@ -2355,6 +2383,8 @@ endif
     nnoremap <leader>dc :call DivideSpaceC()<CR>
     nnoremap <leader>dl :call DivideSpaceL()<CR>
     nnoremap <leader>dd :call DivideSpaceD()<CR>
+    nnoremap <leader>ae :call AppendExecResult()<CR>
+    nnoremap <leader>af :call AppendCallResult()<CR>
 
     " 编译运行当前文件
     nnoremap <leader>rf :call ComplileFile('')<CR>
