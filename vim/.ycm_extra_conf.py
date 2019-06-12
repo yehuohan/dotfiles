@@ -138,7 +138,7 @@ def GetCfamilyFlags():
 #===============================================================================
 # Python flags
 #===============================================================================
-def GerPythonPath():
+def GetPythonPath():
     if platform.system() == "Linux":
         return '/usr/bin/python'
     elif platform.system() == "Windows":
@@ -155,7 +155,7 @@ def Settings( **kwargs ):
             }
     elif language == 'python':
         return {
-            # 'interpreter_path': GerPythonPath(),
+            # 'interpreter_path': GetPythonPath(),
             # 'sys_path': [LOC_DIR, ],
             }
     return {}
