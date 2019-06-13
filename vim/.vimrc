@@ -2192,8 +2192,8 @@ augroup END
     nnoremap vv <C-v>
     vnoremap vv <C-v>
     " 加减序号
-    nnoremap <C-h> <C-x>
-    nnoremap <C-l> <C-a>
+    nnoremap <leader>aj <C-x>
+    nnoremap <leader>ak <C-a>
     vnoremap <leader>aj <C-x>
     vnoremap <leader>ak <C-a>
     vnoremap <leader>agj g<C-x>
@@ -2285,6 +2285,8 @@ endif
     nnoremap <C-k> <C-y>
     nnoremap zh zt
     nnoremap zl zb
+    nnoremap <C-h> 2zh
+    nnoremap <C-l> 2zl
     nnoremap <M-h> 16zh
     nnoremap <M-l> 16zl
     " 命令行移动
