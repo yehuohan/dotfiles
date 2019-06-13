@@ -510,7 +510,7 @@ endif
         \ 'tabline_subseparator': {'left': '', 'right': ''},
         \ 'active': {
                 \ 'left' : [['mode', 'paste'],
-                \           ['popc_segr'],
+                \           ['operation'],
                 \           ['all_fileinfo', 'fw_filepath']],
                 \ 'right': [['all_lineinfo', 'indent', 'trailing'],
                 \           ['all_format'],
@@ -528,12 +528,10 @@ endif
                 \ 'all_lineinfo': '0X%02B ≡%3p%%   %04l/%L  %-2v',
                 \ 'all_fileinfo': '%{winnr()},%-3n%{&ro?"":""}%M',
                 \ 'all_format'  : '%{&ft!=#""?&ft." • ":""}%{&fenc!=#""?&fenc:&enc}[%{&ff}]',
-                \ 'popc_segl'   : '%{&ft==#"Popc"?popc#ui#GetStatusLineSegments("l")[0]:""}',
-                \ 'popc_segc'   : '%{&ft==#"Popc"?popc#ui#GetStatusLineSegments("c")[0]:""}',
-                \ 'popc_segr'   : '%{&ft==#"Popc"?popc#ui#GetStatusLineSegments("r")[0]:""}',
                 \ },
         \ 'component_function': {
                 \ 'mode'        : 'LightlineMode',
+                \ 'operation'   : 'LightlineOperation',
                 \ 'indent'      : 'LightlineCheckMixedIndent',
                 \ 'trailing'    : 'LightlineCheckTrailing',
                 \ 'fw_filepath' : 'LightlineFilepath',
@@ -568,6 +566,10 @@ endif
             \ &ft ==# 'Popc' ? popc#ui#GetStatusLineSegments('l')[0] :
             \ &ft ==# 'startify' ? 'Startify' :
             \ winwidth(0) > 60 ? lightline#mode() : ''
+    endfunction
+    function! LightlineOperation()
+        return &ft ==# 'Popc' ? popc#ui#GetStatusLineSegments("r")[0] :
+            \ ''
     endfunction
     function! LightlineCheckMixedIndent()
         let l:ret = search('\t', 'nw')
