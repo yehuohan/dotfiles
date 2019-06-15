@@ -91,7 +91,7 @@ def GetCfamilyFlags():
         # '-Werror',                # Take all errors as warnings
         # '-Wno-unused-variable',   # Show warning of unused variable
         # '-Wno-unused-parameter',  # Show warning of unused parameter
-        '-std=c++11',               # std parameter with 'c++11', 'c99',
+        # '-std=c++17',             # std parameter with 'c++17', 'c++14', 'c++11', 'c99'
         '-xc++',                    # Set language: 'c', 'c++', 'objc', 'cuda',
         # '-DXX=XX'                 # define macro to elimate some errors
     ]
@@ -118,11 +118,9 @@ def GetCfamilyFlags():
     global_flags = [
             '-isystem', GCC_DIR,
             # '-isystem', UNIX_DIR,
+            # '-isystem', QT_DIR,
         ] + GetDirsRecursive('-isystem',
         [
-            # UNIX_DIR,
-            # GCC_DIR,
-            # QT_DIR,
         ])
 
     flags_cfamily = project_flags + local_flags + global_flags
