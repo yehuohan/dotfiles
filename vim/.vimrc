@@ -1306,7 +1306,7 @@ let s:cpl = {
         \ 'qt'   : [(IsWin() ?
                     \ (s:path_qmake . ' -r %s && ' . s:path_vcvars . ' && ' . s:path_nmake . ' -f Makefile.Debug') :
                     \ ('qmake %s && make'))
-                    \ . '%s && "./%s"',
+                    \ . ' %s && "./%s"',
                     \ 'srcf', 'args', 'outf'],
         \},
     \ 'sel_cpp' : {
@@ -2021,8 +2021,7 @@ endfunction
 " User Settings
 "===============================================================================
 " {{{
-" Term
-" {{{
+" Term {{{
     syntax on                           " 语法高亮
     set number                          " 显示行号
     set relativenumber                  " 显示相对行号
@@ -2091,8 +2090,7 @@ if IsVim()
 endif
 " }}}
 
-" Gui
-" {{{
+" Gui {{{
 if IsGVim()
     set guioptions-=m                   " 隐藏菜单栏
     set guioptions-=T                   " 隐藏工具栏
@@ -2152,8 +2150,7 @@ endfunction
 endif
 " }}}
 
-" Auto Command
-" {{{
+" Auto Command {{{
 augroup UserSettingsCmd
     "autocmd[!]  [group]  {event}     {pattern}  {nested}  {cmd}
     "autocmd              BufNewFile  *                    set fileformat=unix
@@ -2180,7 +2177,7 @@ augroup END
 " }}}
 
 "===============================================================================
-" User Key-Maps
+" User Mappings
 "===============================================================================
 " {{{
 " Basic {{{
