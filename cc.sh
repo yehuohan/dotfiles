@@ -40,20 +40,22 @@ if [ `uname` == "Linux" ]; then
     if [[ `uname -r` =~ "lts" ]]; then
         cf_dir=$cf_home/"home-arch"
 
-        # x11
+        # X11
         cp ../.Xresources           $cf_dir/
         cp ../.xinitrc              $cf_dir/
         cp ../.nvidia-xinitrc       $cf_dir/
         cp ../.inputrc              $cf_dir/
-        # ect
         cp /etc/X11/xorg.conf                       $cf_dir/etc/X11/
         cp /etc/X11/xorg.conf.d/30-touchpad.conf    $cf_dir/etc/X11/xorg.conf.d
         cp /etc/X11/nvidia-xorg.conf                $cf_dir/etc/X11/
         cp -r /etc/X11/nvidia-xorg.conf.d           $cf_dir/etc/X11/
-        cp /etc/systemd/logind.conf                 $cf_dir/etc/systemd/
-        cp /etc/pacman.conf                         $cf_dir/etc/
-        cp -r /etc/modprobe.d                       $cf_dir/etc/
-        cp -r /etc/modules-load.d                   $cf_dir/etc/
+        # systemd
+        cp /etc/systemd/logind.conf $cf_dir/etc/systemd/
+        # pacman
+        cp /etc/pacman.conf         $cf_dir/etc/
+        # modules
+        cp -r /etc/modprobe.d       $cf_dir/etc/
+        cp -r /etc/modules-load.d   $cf_dir/etc/
 
         echo "Arch: Copy was completed!"
     fi
