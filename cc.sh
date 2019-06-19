@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# copy all the <config-files> to <cf-dir>
+# copy all the <config-files> to <cf-home>
 # cd to LinuxConfigs before execute this file.
 # this file must be in "~/dotconfigs/"
 
@@ -13,33 +13,38 @@ if [ `uname` == "Linux" ]; then
         exit
     fi
 
+    cf_home="cf-home"
+
+    # vim
+    cp ../.vimrc                    ./vim/
+    cp ../.vim/.ycm_extra_conf.py   ./vim/
+    cp ../.vim/.tern-project        ./vim/
+    cp -r ../.vim/mySnippets        ./vim/
+    cp -r ../.vim/autoload          ./vim/
+    cp -r ../.config/nvim           ./vim/
+    # zsh
+    cp ../.zshrc                    $cf_home/
+    cp ../.zprofile                 $cf_home/
+    cp ../.Xmodmap                  $cf_home/
+    cp ../.gitconfig                $cf_home/
+    # .config
+    cp -r ../.config/i3             $cf_home/.config/
+    cp -r ../.config/i3status       $cf_home/.config/
+    cp -r ../.config/rofi           $cf_home/.config/
+    # tmux
+    cp ../.tmux.conf                $cf_home/
+    cp ../.tmux-status.conf         $cf_home/
+    # misc
+    cp ../my-apps/ToggleTouchPad.py ./misc/
+
     if [[ `uname -r` =~ "lts" ]]; then
-        cf_dir="cf-arch"
+        cf_dir=$cf_home/"home-arch"
 
-        # vim
-        cp ../.vimrc                  ./vim/
-        cp ../.vim/.ycm_extra_conf.py ./vim/
-        cp ../.vim/.tern-project      ./vim/
-        cp -r ../.vim/mySnippets      ./vim/
-        cp -r ../.vim/autoload        ./vim/
-        cp -r ../.config/nvim         ./vim/
-
-        # zsh
-        cp ../.zshrc                $cf_dir/
-        cp ../.zprofile             $cf_dir/
-        cp ../.Xmodmap              $cf_dir/
+        # x11
         cp ../.Xresources           $cf_dir/
-        cp ../.gitconfig            $cf_dir/
         cp ../.xinitrc              $cf_dir/
         cp ../.nvidia-xinitrc       $cf_dir/
         cp ../.inputrc              $cf_dir/
-        # .config
-        cp -r ../.config/i3         $cf_dir/.config/
-        cp -r ../.config/i3status   $cf_dir/.config/
-        cp -r ../.config/rofi       $cf_dir/.config/
-        # tmux
-        cp ../.tmux.conf            $cf_dir/
-        cp ../.tmux-status.conf     $cf_dir/
         # ect
         cp /etc/X11/xorg.conf                       $cf_dir/etc/X11/
         cp /etc/X11/xorg.conf.d/30-touchpad.conf    $cf_dir/etc/X11/xorg.conf.d
@@ -50,40 +55,15 @@ if [ `uname` == "Linux" ]; then
         cp -r /etc/modprobe.d                       $cf_dir/etc/
         cp -r /etc/modules-load.d                   $cf_dir/etc/
 
-        # misc
-        cp ../my-apps/ToggleTouchPad.py ./misc/
-
         echo "Arch: Copy was completed!"
     fi
 
     if [[ `uname -v` =~ "Ubuntu" ]]; then
-        cf_dir="cf-ubuntu"
+        cf_dir=$cf_home/"home-ubuntu"
 
-        # vim
-        cp ../.vimrc                  ./vim/
-        cp ../.vim/.ycm_extra_conf.py ./vim/
-        cp ../.vim/.tern-project      ./vim/
-        cp -r ../.vim/mySnippets      ./vim/
-        cp -r ../.vim/autoload        ./vim/
-        cp -r ../.config/nvim         ./vim/
-
-        # zsh
-        cp ../.zshrc                $cf_dir/
-        cp ../.zprofile             $cf_dir/
-        cp ../.Xmodmap              $cf_dir/
-        cp ../.gitconfig            $cf_dir/
         # .config
-        cp -r ../.config/i3         $cf_dir/.config/
-        cp -r ../.config/i3status   $cf_dir/.config/
-        cp -r ../.config/rofi       $cf_dir/.config/
         cp ../.config/libinput-gestures.conf    $cf_dir/.config/
         cp ../.config/user-dirs.dirs            $cf_dir/.config/
-        # tmux
-        #cp ../.tmux.conf            $cf_dir/
-        #cp ../.tmux-status.conf     $cf_dir/
-
-        # misc
-        cp ../my-apps/ToggleTouchPad.py ./misc/
 
         echo "Ubuntu: Copy was completed!"
     fi
