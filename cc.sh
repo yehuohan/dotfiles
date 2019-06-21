@@ -84,9 +84,10 @@ elif [ `uname -o` == "Msys" ]; then
     cp -r ../Vim/vimfiles/autoload        ./vim/
 
     # cf-msys2
-    cp ~/.minttyrc  ./cf-gw/
-    cp ~/.gitconfig ./cf-gw/
-    cp ~/.zshrc     ./cf-gw/
+    cp ~/.minttyrc      ./cf-gw/
+    cp ~/.gitconfig     ./cf-gw/
+    cp ~/.zshrc         ./cf-gw/
+    cp /msys2_shell.cmd ./cf-gw/
 
     echo "Msys: Copy was completed!"
 fi
