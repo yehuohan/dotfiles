@@ -71,7 +71,6 @@
     " fireFox     : Markdown,ReStructruedText等标记文本预览
     " fcitx       : Linux下的输入法
 " }}}
-
 " }}}
 
 "===============================================================================
@@ -138,101 +137,90 @@ nnoremap ; :
 nnoremap : ;
 vnoremap ; :
 
-" Path
-" {{{
-    let s:path_home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
-    " vim插件路径
-    if IsLinux()
-        " 链接root-vimrc到user's vimrc
-        let $VimPluginPath=s:path_home . '/.vim'
-    elseif IsWin()
-        let $VimPluginPath=s:path_home . '\vimfiles'
-        " windows下将HOME设置VIM的安装路径
-        let $HOME=$VIM
-    elseif IsGw()
-        let $VimPluginPath='/c/MyApps/Vim/vimfiles'
-    elseif IsMac()
-        let $VimPluginPath=s:path_home . '/.vim'
-    endif
-    set rtp+=$VimPluginPath             " 添加 .vim 和 vimfiles 到 rtp(runtimepath)
+" Path {{{
+let s:path_home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+if IsLinux()
+    " 链接root-vimrc到user's vimrc
+    let $DotVimPath=s:path_home . '/.vim'
+elseif IsWin()
+    let $DotVimPath=s:path_home . '\vimfiles'
+    " windows下将HOME设置VIM的安装路径
+    let $HOME=$VIM
+elseif IsGw()
+    let $DotVimPath='/c/MyApps/Vim/vimfiles'
+elseif IsMac()
+    let $DotVimPath=s:path_home . '/.vim'
+endif
+set rtp+=$DotVimPath                    " 添加 .vim 和 vimfiles 到 rtp(runtimepath)
 
-    " FUNCTION: s:path.toggle(type) dict {{{
-    let s:path = {
-        \ 'env'     : 'x86',
-        \ 'make'    : '',
-        \ 'qmake'   : '',
-        \ 'vcvars'  : '',
-        \ 'browser' : '',
-        \ }
-    function! s:path.toggle(type) dict
-        if a:type ==# 'env'
-            " 切换成x86或x64编译环境
-            if IsWin()
-                if 'x86' ==# s:path.env
-                    let s:path.env = 'x64'
-                    let s:path.make   = s:path.make_x64
-                    let s:path.qmake  = s:path.qmake_x64
-                    let s:path.vcvars = s:path.vcvars64
-                else
-                    let s:path.env = 'x86'
-                    let s:path.vcvars = s:path.vcvars32
-                    let s:path.make   = s:path.make_x86
-                    let s:path.qmake  = s:path.qmake_x86
-                endif
-                echo 's:path env: ' . s:path.env
-            endif
-        elseif a:type ==# 'browser'
-            if s:path.browser ==# s:path.browser_firefox
-                let s:path.browser = s:path.browser_chrome
+" s:path {{{
+let s:path = {
+    \ 'env'     : 'x86',
+    \ 'make'    : '',
+    \ 'qmake'   : '',
+    \ 'vcvars'  : '',
+    \ 'browser' : '',
+    \ }
+function! s:path.toggle(type) dict
+    if a:type ==# 'env'
+        " 切换成x86或x64编译环境
+        if IsWin()
+            if 'x86' ==# s:path.env
+                let s:path.env = 'x64'
+                let s:path.make   = s:path.make_x64
+                let s:path.qmake  = s:path.qmake_x64
+                let s:path.vcvars = s:path.vcvars64
             else
-                let s:path.browser = s:path.browser_firefox
+                let s:path.env = 'x86'
+                let s:path.vcvars = s:path.vcvars32
+                let s:path.make   = s:path.make_x86
+                let s:path.qmake  = s:path.qmake_x86
             endif
-            echo 's:path browser: ' . s:path.browser
+            echo 's:path env: ' . s:path.env
         endif
-    endfunction
-    " }}}
-
-    if IsWin()
-        let s:path.vcvars32  = 'D:/VS2017/VC/Auxiliary/Build/vcvars32.bat'
-        let s:path.vcvars64  = 'D:/VS2017/VC/Auxiliary/Build/vcvars64.bat'
-        let s:path.make_x86  = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx86/x86/nmake.exe'
-        let s:path.make_x64  = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx64/x64/nmake.exe'
-        let s:path.qmake_x86 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
-        let s:path.qmake_x64 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
-        let s:path.make      = s:path.make_x64
-        let s:path.qmake     = s:path.qmake_x64
-        let s:path.vcvars    = s:path.vcvars64
-    elseif IsLinux()
-        let s:path.make      = 'make'
-        let s:path.qmake     = 'qmake'
+    elseif a:type ==# 'browser'
+        if s:path.browser ==# s:path.browser_firefox
+            let s:path.browser = s:path.browser_chrome
+        else
+            let s:path.browser = s:path.browser_firefox
+        endif
+        echo 's:path browser: ' . s:path.browser
     endif
-    if (IsWin() || IsGw())
-        let s:path.browser_chrome = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
-        let s:path.browser_firefox = 'D:/Mozilla Firefox/firefox.exe'
-    elseif IsLinux()
-        let s:path.browser_chrome = '/usr/bin/chrome'
-        let s:path.browser_firefox = '/usr/bin/firefox'
-    endif
-    let s:path.browser = s:path.browser_firefox
+endfunction
 " }}}
 
-" Exe
-" {{{
-if !executable('rg')    | echo 'Warning: No ripgerp(rg)' | endif
-if !executable('ctags') | echo 'Warning: No ctags'       | endif
-if !executable('fzf')   | echo 'Warning: No fzf'         | endif
+if IsWin()
+    let s:path.vcvars32  = 'D:/VS2017/VC/Auxiliary/Build/vcvars32.bat'
+    let s:path.vcvars64  = 'D:/VS2017/VC/Auxiliary/Build/vcvars64.bat'
+    let s:path.make_x86  = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx86/x86/nmake.exe'
+    let s:path.make_x64  = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx64/x64/nmake.exe'
+    let s:path.qmake_x86 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
+    let s:path.qmake_x64 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
+    let s:path.make      = s:path.make_x64
+    let s:path.qmake     = s:path.qmake_x64
+    let s:path.vcvars    = s:path.vcvars64
+elseif IsLinux()
+    let s:path.make      = 'make'
+    let s:path.qmake     = 'qmake'
+endif
+if (IsWin() || IsGw())
+    let s:path.browser_chrome = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
+    let s:path.browser_firefox = 'D:/Mozilla Firefox/firefox.exe'
+elseif IsLinux()
+    let s:path.browser_chrome = '/usr/bin/chrome'
+    let s:path.browser_firefox = '/usr/bin/firefox'
+endif
+let s:path.browser = s:path.browser_firefox
 " }}}
 
-" 键码设定
-" {{{
+" KeyCode {{{
 set timeout                             " 打开映射超时检测
 set ttimeout                            " 打开键码超时检测
 set timeoutlen=1000                     " 映射超时时间为1000ms
 set ttimeoutlen=70                      " 键码超时时间为70ms
 
-" 键码设置 {{{
 if IsVim()
-" 键码示例 {{{
+" 示例 {{{
     " 终端Alt键映射处理：如 Alt+x，实际连续发送 <Esc>x 编码
     " 以下三种方法都可以使按下 Alt+x 后，执行 CmdTest 命令，但超时检测有区别
     "<1> set <M-x>=x  " 设置键码，这里的是一个字符，即<Esc>的编码，不是^和[放在一起
@@ -256,7 +244,6 @@ if IsVim()
     set <M-n>=n
     set <M-m>=m
 endif
-" }}}
 
 " }}}
 " }}}
@@ -265,7 +252,7 @@ endif
 " Plug Settings
 "===============================================================================
 " {{{
-call plug#begin($VimPluginPath.'/bundle')   " 可选设置，可以指定插件安装位置
+call plug#begin($DotVimPath.'/bundle')  " 可选设置，可以指定插件安装位置
 
 " 基本编辑
 " {{{
@@ -311,11 +298,11 @@ call plug#begin($VimPluginPath.'/bundle')   " 可选设置，可以指定插件�
     endfunction
 
     " 切换Insert/Replace Mode
-    xnoremap <M-i> :<C-u>call SetTextmanipMode('insert')<CR>gv
-    xnoremap <M-o> :<C-u>call SetTextmanipMode('replace')<CR>gv
+    xnoremap <M-i> :<C-U>call SetTextmanipMode('insert')<CR>gv
+    xnoremap <M-o> :<C-U>call SetTextmanipMode('replace')<CR>gv
     " C-i 与 <Tab>等价
-    xnoremap <C-i> :<C-u>call SetTextmanipMode('insert')<CR>gv
-    xnoremap <C-o> :<C-u>call SetTextmanipMode('replace')<CR>gv
+    xnoremap <C-i> :<C-U>call SetTextmanipMode('insert')<CR>gv
+    xnoremap <C-o> :<C-U>call SetTextmanipMode('replace')<CR>gv
     " 更据Mode使用Move-Insert或Move-Replace
     xmap <C-j> <Plug>(textmanip-move-down)
     xmap <C-k> <Plug>(textmanip-move-up)
@@ -345,10 +332,12 @@ call plug#begin($VimPluginPath.'/bundle')   " 可选设置，可以指定插件�
         autocmd VimEnter * call s:incsearchKeymap()
     augroup END
     function! s:incsearchKeymap()
-        IncSearchNoreMap <C-j> <Over>(incsearch-next)
-        IncSearchNoreMap <C-k> <Over>(incsearch-prev)
-        IncSearchNoreMap <M-j> <Over>(incsearch-scroll-f)
-        IncSearchNoreMap <M-k> <Over>(incsearch-scroll-b)
+        if exists('g:loaded_incsearch')
+            IncSearchNoreMap <C-j> <Over>(incsearch-next)
+            IncSearchNoreMap <C-k> <Over>(incsearch-prev)
+            IncSearchNoreMap <M-j> <Over>(incsearch-scroll-f)
+            IncSearchNoreMap <M-k> <Over>(incsearch-scroll-b)
+        endif
     endfunction
     function! PreviewPattern(prompt)
         " 预览pattern
@@ -409,7 +398,7 @@ elseif IsWin()
 else
     Plug 'Yggdroot/LeaderF'
 endif
-    let g:Lf_CacheDirectory = $VimPluginPath
+    let g:Lf_CacheDirectory = $DotVimPath
     let g:Lf_StlSeparator = {'left': '', 'right': '', 'font': ''}
     let g:Lf_ShortcutF = ''
     let g:Lf_ShortcutB = ''
@@ -518,25 +507,16 @@ endif
 
 " 界面管理
 " {{{
-" theme {{{ Vim主题
+" theme {{{ Vim主题(ColorScheme, StatusLine, TabLine)
     Plug 'morhetz/gruvbox'
-    set rtp+=$VimPluginPath/bundle/gruvbox/
-    " 背景选项：dark, medium, soft
-    let g:gruvbox_contrast_dark='soft'
-
+    set rtp+=$DotVimPath/bundle/gruvbox/
+    let g:gruvbox_contrast_dark='soft'  " 背景选项：dark, medium, soft
     Plug 'junegunn/seoul256.vim'
-    set rtp+=$VimPluginPath/bundle/seoul256.vim/
+    set rtp+=$DotVimPath/bundle/seoul256.vim/
     let g:seoul256_background=236       " 233(暗) ~ 239(亮)
     let g:seoul256_light_background=256 " 252(暗) ~ 256(亮)
-
     Plug 'altercation/vim-colors-solarized'
-    set rtp+=$VimPluginPath/bundle/vim-colors-solarized/
-
-    set background=dark
-    colorscheme gruvbox
-" }}}
-
-" lightline {{{ 状态栏
+    set rtp+=$DotVimPath/bundle/vim-colors-solarized/
     Plug 'itchyny/lightline.vim'
     "                    
     " ► ✘ ⌘ ▫ ▪ ★ ☆ • ≡ ፨ ♥
@@ -581,6 +561,16 @@ endif
         \ 'component_type': {
                 \ },
         \ }
+    try
+        set background=dark
+        colorscheme gruvbox
+    " E185: 找不到主题
+    catch /^Vim\%((\a\+)\)\=:E185/
+        silent! colorscheme desert
+        let g:lightline.colorscheme = 'solarized'
+    endtry
+
+    " FUNCTION: s:lightlineColorScheme() {{{
     augroup PluginLightline
         autocmd!
         autocmd ColorScheme * call s:lightlineColorScheme()
@@ -598,6 +588,8 @@ endif
         catch /^Vim\%((\a\+)\)\=:E117/
         endtry
     endfunction
+    " }}}
+    " FUNCTION: LightlineMode() {{{
     function! LightlineMode()
         let fname = expand('%:t')
         return fname == '__Tagbar__' ? 'Tagbar' :
@@ -606,27 +598,38 @@ endif
             \ &ft ==# 'startify' ? 'Startify' :
             \ winwidth(0) > 60 ? lightline#mode() : ''
     endfunction
+    " }}}
+    " FUNCTION: LightlineOperation() {{{
     function! LightlineOperation()
         return &ft ==# 'Popc' ? popc#ui#GetStatusLineSegments("r")[0] :
             \ ''
     endfunction
+    " }}}
+    " FUNCTION: LightlineCheckMixedIndent() {{{
     function! LightlineCheckMixedIndent()
         let l:ret = search('\t', 'nw')
         return (l:ret == 0) ? '' : 'I:'.string(l:ret)
     endfunction
+    " }}}
+    " FUNCTION: LightlineCheckTrailing() {{{
     function! LightlineCheckTrailing()
         let ret = search('\s\+$', 'nw')
         return (l:ret == 0) ? '' : 'T:'.string(l:ret)
     endfunction
+    " }}}
+    " FUNCTION: LightlineFilepath() {{{
     function! LightlineFilepath()
         let l:fw = FindWorkingGet()
         let l:fp = fnamemodify(expand('%'), ':p')
         return empty(l:fw) ? l:fp : substitute(l:fp, escape(l:fw[0], '\'), '...', '')
     endfunction
+    " }}}
+    " FUNCTION: LightlineFindworking() {{{
     function! LightlineFindworking()
         let l:fw = FindWorkingGet()
         return empty(l:fw) ? '' : (l:fw[0] . '[' . l:fw[1] .']')
     endfunction
+    " }}}
 " }}}
 
 " rainbow {{{ 彩色括号
@@ -680,7 +683,7 @@ endif
 " popc {{{ buffer管理
     Plug 'yehuohan/popc', {'branch': 'dev'}
     set hidden
-    let g:Popc_jsonPath = $VimPluginPath
+    let g:Popc_jsonPath = $DotVimPath
     let g:Popc_useTabline = 1
     let g:Popc_useStatusline = 1
     let g:Popc_usePowerFont = 1
@@ -726,8 +729,8 @@ endif
                                     \ '~/.config/nvim/init.vim'
                                     \]
     elseif IsWin()
-        let g:startify_bookmarks = [ {'c': '$VimPluginPath/../_vimrc'},
-                                    \ '$VimPluginPath/../vimfiles/.ycm_extra_conf.py',
+        let g:startify_bookmarks = [ {'c': '$DotVimPath/../_vimrc'},
+                                    \ '$DotVimPath/../vimfiles/.ycm_extra_conf.py',
                                     \ '$APPDATA/../Local/nvim/init.vim'
                                     \]
     elseif IsMac()
@@ -810,7 +813,7 @@ endif
         endif
     endfunction
     Plug 'Valloric/YouCompleteMe', { 'do': function('YcmBuild') }
-    let g:ycm_global_ycm_extra_conf=$VimPluginPath.'/.ycm_extra_conf.py'
+    let g:ycm_global_ycm_extra_conf=$DotVimPath.'/.ycm_extra_conf.py'
                                                                 " C-family补全路径
     let g:ycm_enable_diagnostic_signs = 1                       " 开启语法检测
     let g:ycm_max_diagnostics_to_display = 30
@@ -857,7 +860,7 @@ endif
     function! YcmCreateJsConf()
         " 在当前目录下创建.tern-project
         if !filereadable('.tern-project')
-            let l:file = readfile($VimPluginPath.'/.tern-project')
+            let l:file = readfile($DotVimPath.'/.tern-project')
             call writefile(l:file, '.tern-project')
         endif
         execute 'edit .tern-project'
@@ -868,7 +871,7 @@ endif
     Plug 'yehuohan/ultisnips'           " snippet插入引擎（vmap的映射，与vim-textmanip的<C-i>有冲突）
     Plug 'honza/vim-snippets'           " snippet合集
     " 使用:UltiSnipsEdit编辑g:UltiSnipsSnippetsDir中的snippet文件
-    let g:UltiSnipsSnippetsDir = $VimPluginPath . '/mySnippets'
+    let g:UltiSnipsSnippetsDir = $DotVimPath . '/mySnippets'
     let g:UltiSnipsSnippetDirectories=['UltiSnips', 'mySnippets']
                                         " 自定义mySnippets合集
     let g:UltiSnipsExpandTrigger='<Tab>'
