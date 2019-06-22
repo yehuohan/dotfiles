@@ -1,7 +1,7 @@
 
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-" Vimrc: configuration for vim, gvim, neovim and neovim-qt. set the path of
-"        'Global settings' before using this vimrc.
+" Vimrc: configuration for vim, gvim, neovim and neovim-qt.
+"        set 'Global settings' before using this vimrc.
 " Github: https://github.com/yehuohan/dotconfigs
 " Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -128,30 +128,61 @@ endfunction
 "===============================================================================
 " {{{
 if IsVim()
-set nocompatible                        " 不兼容vi快捷键
+    set nocompatible
 endif
-let mapleader="\<Space>"                " 使用Space作为leader
-                                        " Space只在Normal或Command或Visual模式下map，不适合在Insert模式下map
-" 特殊键
+let mapleader="\<Space>"
 nnoremap ; :
 nnoremap : ;
 vnoremap ; :
 
-" Path {{{
-let s:path_home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 if IsLinux()
     " 链接root-vimrc到user's vimrc
-    let $DotVimPath=s:path_home . '/.vim'
+    let $DotVimPath=s:home . '/.vim'
 elseif IsWin()
-    let $DotVimPath=s:path_home . '\vimfiles'
+    let $DotVimPath=s:home . '\vimfiles'
     " windows下将HOME设置VIM的安装路径
     let $HOME=$VIM
 elseif IsGw()
     let $DotVimPath='/c/MyApps/Vim/vimfiles'
 elseif IsMac()
-    let $DotVimPath=s:path_home . '/.vim'
+    let $DotVimPath=s:home . '/.vim'
 endif
-set rtp+=$DotVimPath                    " 添加 .vim 和 vimfiles 到 rtp(runtimepath)
+set rtp+=$DotVimPath
+
+" s:gset {{{
+let s:gset_file = $DotVimPath . '/.gset'
+let s:gset = {
+    \ 'use_powerfont' : 1,
+    \ 'use_ycm' : 1,
+    \ }
+" FUNCTION: s:loadGset() {{{
+function! s:loadGset()
+    if filereadable(s:gset_file)
+        let s:gset = json_decode(join(readfile(s:gset_file)))
+    endif
+endfunction
+" }}}
+" FUNCTION: s:saveGset() {{{
+function! s:saveGset()
+    call writefile([json_encode(s:gset)], s:gset_file)
+    echo 's:gset save successful!'
+endfunction
+" }}}
+" FUNCTION: s:initGset() {{{
+function! s:initGset()
+    for key in keys(s:gset)
+        let s:gset[key] = input('let s:gset.'. key . ' = ', s:gset[key])
+    endfor
+    redraw
+    call s:saveGset()
+endfunction
+" }}}
+command! -nargs=0 GSLoad :call s:loadGset()
+command! -nargs=0 GSSave :call s:saveGset()
+command! -nargs=0 GSInit :call s:initGset()
+call s:loadGset()
+" }}}
 
 " s:path {{{
 let s:path = {
@@ -161,6 +192,7 @@ let s:path = {
     \ 'vcvars'  : '',
     \ 'browser' : '',
     \ }
+" FUNCTION: s:path.toggle(type) dict {{{
 function! s:path.toggle(type) dict
     if a:type ==# 'env'
         " 切换成x86或x64编译环境
@@ -188,7 +220,6 @@ function! s:path.toggle(type) dict
     endif
 endfunction
 " }}}
-
 if IsWin()
     let s:path.vcvars32  = 'D:/VS2017/VC/Auxiliary/Build/vcvars32.bat'
     let s:path.vcvars64  = 'D:/VS2017/VC/Auxiliary/Build/vcvars64.bat'
@@ -523,10 +554,6 @@ endif
     let g:lightline = {
         \ 'enable'              : {'statusline': 1, 'tabline': 0},
         \ 'colorscheme'         : 'gruvbox',
-        \ 'separator'           : {'left': '', 'right': ''},
-        \ 'subseparator'        : {'left': '', 'right': ''},
-        \ 'tabline_separator'   : {'left': '', 'right': ''},
-        \ 'tabline_subseparator': {'left': '', 'right': ''},
         \ 'active': {
                 \ 'left' : [['mode', 'paste'],
                 \           ['operation'],
@@ -561,6 +588,12 @@ endif
         \ 'component_type': {
                 \ },
         \ }
+    if s:gset.use_powerfont
+        let g:lightline.separator            = {'left': '', 'right': ''}
+        let g:lightline.subseparator         = {'left': '', 'right': ''}
+        let g:lightline.tabline_separator    = {'left': '', 'right': ''}
+        let g:lightline.tabline_subseparator = {'left': '', 'right': ''}
+    endif
     try
         set background=dark
         colorscheme gruvbox
@@ -686,7 +719,7 @@ endif
     let g:Popc_jsonPath = $DotVimPath
     let g:Popc_useTabline = 1
     let g:Popc_useStatusline = 1
-    let g:Popc_usePowerFont = 1
+    let g:Popc_usePowerFont = s:gset.use_powerfont
     let g:Popc_separator = {'left' : '', 'right': ''}
     let g:Popc_subSeparator = {'left' : '', 'right': ''}
     nnoremap <C-Space> :Popc<CR>
@@ -785,6 +818,8 @@ endif
 " 代码编写
 " {{{
 " YouCompleteMe {{{ 自动补全
+if s:gset.use_ycm
+    " FUNCTION: YcmBuild(info) {{{
     " Completion Params: install.py安装参数
     "   --clang-completer : C-famlily，基于Clang补全，需要安装Clang
     "   --go-completer    : Go，基于Gocode/Godef补全，需要安装Go
@@ -812,6 +847,7 @@ endif
             endif
         endif
     endfunction
+    " }}}
     Plug 'Valloric/YouCompleteMe', { 'do': function('YcmBuild') }
     let g:ycm_global_ycm_extra_conf=$DotVimPath.'/.ycm_extra_conf.py'
                                                                 " C-family补全路径
@@ -865,6 +901,7 @@ endif
         endif
         execute 'edit .tern-project'
     endfunction
+endif
 " }}}
 
 " ultisnips {{{ 代码片段插入
@@ -1402,6 +1439,9 @@ function! ComplileFile(argstr)
     let l:name     = expand('%:t:r')    " 文件名，不带路径，不带扩展名
 
     " 可执行字符串
+    if !has_key(s:cpl.type, l:ext)
+        let l:ext = &filetype
+    endif
     let l:exec = s:cpl.printf(l:ext, a:argstr, l:filename, l:name)
     if empty(l:exec)
         echo 's:cpl doesn''t support ' . l:ext
