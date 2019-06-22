@@ -140,41 +140,80 @@ vnoremap ; :
 
 " Path
 " {{{
-    let s:home_path = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+    let s:path_home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
     " vim插件路径
     if IsLinux()
         " 链接root-vimrc到user's vimrc
-        let $VimPluginPath=s:home_path . '/.vim'
+        let $VimPluginPath=s:path_home . '/.vim'
     elseif IsWin()
-        let $VimPluginPath=s:home_path . '\vimfiles'
+        let $VimPluginPath=s:path_home . '\vimfiles'
         " windows下将HOME设置VIM的安装路径
         let $HOME=$VIM
     elseif IsGw()
         let $VimPluginPath='/c/MyApps/Vim/vimfiles'
     elseif IsMac()
-        let $VimPluginPath=s:home_path . '/.vim'
+        let $VimPluginPath=s:path_home . '/.vim'
     endif
     set rtp+=$VimPluginPath             " 添加 .vim 和 vimfiles 到 rtp(runtimepath)
 
+    " FUNCTION: s:path.toggle(type) dict {{{
+    let s:path = {
+        \ 'env'     : 'x86',
+        \ 'make'    : '',
+        \ 'qmake'   : '',
+        \ 'vcvars'  : '',
+        \ 'browser' : '',
+        \ }
+    function! s:path.toggle(type) dict
+        if a:type ==# 'env'
+            " 切换成x86或x64编译环境
+            if IsWin()
+                if 'x86' ==# s:path.env
+                    let s:path.env = 'x64'
+                    let s:path.make   = s:path.make_x64
+                    let s:path.qmake  = s:path.qmake_x64
+                    let s:path.vcvars = s:path.vcvars64
+                else
+                    let s:path.env = 'x86'
+                    let s:path.vcvars = s:path.vcvars32
+                    let s:path.make   = s:path.make_x86
+                    let s:path.qmake  = s:path.qmake_x86
+                endif
+                echo 's:path env: ' . s:path.env
+            endif
+        elseif a:type ==# 'browser'
+            if s:path.browser ==# s:path.browser_firefox
+                let s:path.browser = s:path.browser_chrome
+            else
+                let s:path.browser = s:path.browser_firefox
+            endif
+            echo 's:path browser: ' . s:path.browser
+        endif
+    endfunction
+    " }}}
+
     if IsWin()
-        let s:path_vcvars32  = 'D:/VS2017/VC/Auxiliary/Build/vcvars32.bat'
-        let s:path_vcvars64  = 'D:/VS2017/VC/Auxiliary/Build/vcvars64.bat'
-        let s:path_nmake_x86 = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx86/x86/nmake.exe'
-        let s:path_nmake_x64 = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx64/x64/nmake.exe'
-        let s:path_qmake_x86 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
-        let s:path_qmake_x64 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
-        let s:path_vcvars = s:path_vcvars64
-        let s:path_nmake  = s:path_nmake_x64
-        let s:path_qmake  = s:path_qmake_x64
+        let s:path.vcvars32  = 'D:/VS2017/VC/Auxiliary/Build/vcvars32.bat'
+        let s:path.vcvars64  = 'D:/VS2017/VC/Auxiliary/Build/vcvars64.bat'
+        let s:path.make_x86  = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx86/x86/nmake.exe'
+        let s:path.make_x64  = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx64/x64/nmake.exe'
+        let s:path.qmake_x86 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
+        let s:path.qmake_x64 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
+        let s:path.make      = s:path.make_x64
+        let s:path.qmake     = s:path.qmake_x64
+        let s:path.vcvars    = s:path.vcvars64
+    elseif IsLinux()
+        let s:path.make      = 'make'
+        let s:path.qmake     = 'qmake'
     endif
     if (IsWin() || IsGw())
-        let s:path_browser_chrome = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
-        let s:path_browser_firefox = 'D:/Mozilla Firefox/firefox.exe'
+        let s:path.browser_chrome = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
+        let s:path.browser_firefox = 'D:/Mozilla Firefox/firefox.exe'
     elseif IsLinux()
-        let s:path_browser_chrome = '/usr/bin/chrome'
-        let s:path_browser_firefox = '/usr/bin/firefox'
+        let s:path.browser_chrome = '/usr/bin/chrome'
+        let s:path.browser_firefox = '/usr/bin/firefox'
     endif
-    let s:path_browser = s:path_browser_firefox
+    let s:path.browser = s:path.browser_firefox
 " }}}
 
 " Exe
@@ -1014,10 +1053,10 @@ endif
     let g:mkdp_auto_close = 1
     let g:mkdp_refresh_slow = 0         " 即时预览MarkDown
     let g:mkdp_command_for_global = 0   " 只有markdown文件可以预览
-    let g:mkdp_browser = s:path_browser
+    let g:mkdp_browser = s:path.browser
     nnoremap <leader>vm :call ViewMarkdown()<CR>
     function! ViewMarkdown() abort
-        let g:mkdp_browser = s:path_browser
+        let g:mkdp_browser = s:path.browser
         if !get(b:, 'MarkdownPreviewToggleBool')
             echo 'Open markdown preview'
         else
@@ -1032,7 +1071,7 @@ if !(IsWin() && IsNVim())
     " 需要安装 https://github.com/Rykka/instant-rst.py
     Plug 'Rykka/riv.vim', {'for': 'rst'}
     Plug 'Rykka/InstantRst', {'for': 'rst'}
-    let g:instant_rst_browser = s:path_browser
+    let g:instant_rst_browser = s:path.browser
 if IsWin()
     " 需要安装 https://github.com/mgedmin/restview
     nnoremap <leader>vr :execute ':AsyncRun restview ' . expand('%:p:t')<Bar>cclose<CR>
@@ -1159,6 +1198,17 @@ function! GetFileList(pat, sdir)
 endfunction
 " }}}
 
+" FUNCTION: GetArgs(str) {{{ 解析字符串参数到列表中
+function! GetArgs(str)
+    let l:args = []
+    function! s:parseArgs(...) closure
+        let l:args = a:000
+    endfunction
+    execute 'call s:parseArgs(' . a:str . ')'
+    return l:args
+endfunction
+" }}}
+
 " FUNCTION: GetCmdResult(type, cmd, args) {{{ 获取命令结果
 function! GetCmdResult(type, cmd, args)
     if a:type ==# 'call'
@@ -1269,7 +1319,7 @@ function! FuncAppendCmd(str, type)
         let l:as = match(a:str, '(')
         let l:ae = -1   " match(a:str, ')') - 1
         let l:str = a:str[0 : l:as - 1]
-        let l:args = split(a:str[l:as + 1 : l:ae - 1], ',')
+        let l:args = GetArgs(a:str[l:as + 1 : l:ae - 1])
     elseif a:type ==# 'exec'
         let l:str = ':' . a:str
         let l:args = []
@@ -1301,10 +1351,10 @@ let s:cpl = {
         \ 'm'    : ['matlab -nosplash -nodesktop -r %s'            , 'outf'] ,
         \ 'sh'   : ['./%s %s'                                      , 'srcf'  , 'args'] ,
         \ 'bat'  : ['%s %s'                                        , 'srcf'  , 'args'] ,
-        \ 'html' : ['"' . s:path_browser . '" %s'                  , 'srcf'] ,
+        \ 'html' : ['"' . s:path.browser . '" %s'                  , 'srcf'] ,
         \ 'make' : ['make %s && "./%s"'                            , 'args'  , 'outf'] ,
         \ 'qt'   : [(IsWin() ?
-                    \ (s:path_qmake . ' -r %s && ' . s:path_vcvars . ' && ' . s:path_nmake . ' -f Makefile.Debug') :
+                    \ (s:path.qmake . ' -r %s && ' . s:path.vcvars . ' && ' . s:path.make . ' -f Makefile.Debug') :
                     \ ('qmake %s && make'))
                     \ . ' %s && "./%s"',
                     \ 'srcf', 'args', 'outf'],
@@ -1854,32 +1904,19 @@ function! InvVirtualedit()
 endfunction
 " }}}
 
-" 切换透明背影（需要系统本身支持透明） {{{
-let s:inv_transparent_bg_flg = 0
-function! InvTransParentBackground()
-    if s:inv_transparent_bg_flg == 1
-        hi Normal ctermbg=235
-        let s:inv_transparent_bg_flg = 0
-    else
-        hi Normal ctermbg=NONE
-        let s:inv_transparent_bg_flg = 1
-    endif
-endfunction
-" }}}
-
 " 切换显示行号 {{{
-let s:inv_number_type=1
+let s:misc_number_type = 1
 function! InvNumberType()
-    if s:inv_number_type == 1
-        let s:inv_number_type = 2
+    if s:misc_number_type == 1
+        let s:misc_number_type = 2
         set nonumber
         set norelativenumber
-    elseif s:inv_number_type == 2
-        let s:inv_number_type = 3
+    elseif s:misc_number_type == 2
+        let s:misc_number_type = 3
         set number
         set norelativenumber
-    elseif s:inv_number_type == 3
-        let s:inv_number_type = 1
+    elseif s:misc_number_type == 3
+        let s:misc_number_type = 1
         set number
         set relativenumber
     endif
@@ -1928,37 +1965,6 @@ function! InvScrollBind()
         set scrollbind
     endif
     echo 'scrollbind = ' . &scrollbind
-endfunction
-" }}}
-
-" 切换成x86或x64编译环境 {{{
-let s:complile_type = 'x64'
-function! ToggleX86X64()
-    if IsWin()
-        if 'x86' ==# s:complile_type
-            let s:complile_type = 'x64'
-            let s:path_vcvars = s:path_vcvars64
-            let s:path_nmake = s:path_nmake_x64
-            let s:path_qmake = s:path_qmake_x64
-        else
-            let s:complile_type = 'x86'
-            let s:path_vcvars = s:path_vcvars32
-            let s:path_nmake = s:path_nmake_x86
-            let s:path_qmake = s:path_qmake_x86
-        endif
-        echo 'Complile Type: ' . s:complile_type
-    endif
-endfunction
-" }}}
-
-" {{{ 切换浏览器路径
-function! ToggleBrowserPath()
-    if s:path_browser ==# s:path_browser_firefox
-        let s:path_browser = s:path_browser_chrome
-    else
-        let s:path_browser = s:path_browser_firefox
-    endif
-    echo 'Browser Path: ' . s:path_browser
 endfunction
 " }}}
 
@@ -2206,14 +2212,14 @@ augroup END
     nnoremap <leader>il :set invlist<CR>
     nnoremap <leader>iv :call InvVirtualedit()<CR>
     nnoremap <leader>ic :call InvConceallevel()<CR>
-    nnoremap <leader>it :call InvTransParentBackground()<CR>
     nnoremap <leader>in :call InvNumberType()<CR>
     nnoremap <leader>if :call InvFoldColumeShow()<CR>
     nnoremap <leader>is :call InvSigncolumn()<CR>
     nnoremap <leader>ih :call InvHighLight()<CR>
     nnoremap <leader>ib :call InvScrollBind()<CR>
-    nnoremap <leader>tc :call ToggleX86X64()<CR>
-    nnoremap <leader>tb :call ToggleBrowserPath()<CR>
+    nnoremap <leader>tc :call s:path.toggle('env')<CR>
+    nnoremap <leader>tb :call s:path.toggle('browser')<CR>
+
     if IsLinux()
         inoremap <Esc> <Esc>:call LinuxFcitx2En()<CR>
     endif
@@ -2231,22 +2237,17 @@ augroup END
     nnoremap <leader>p "0p
     nnoremap <leader>P "0P
 
-    let s:lower_chars = split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
-    let s:digital_chars = split('1 2 3 4 5 6 7 8 9 0', ' ')
-
-    " 寄存器快速复制与粘贴
-    for t in s:lower_chars
+    for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
+        " 寄存器快速复制与粘贴
         execute "vnoremap <leader>'" . t            .   ' "' . t . 'y'
         execute "nnoremap <leader>'" . t            .   ' "' . t . 'p'
         execute "nnoremap <leader>'" . toupper(t)   .   ' "' . t . 'P'
+        " 快速执行宏
+        execute "nnoremap <leader>2" . t            .   ' @' . t
     endfor
-    for t in s:digital_chars
+    for t in split('1 2 3 4 5 6 7 8 9 0', ' ')
         execute "vnoremap <leader>'" . t            .   ' "' . t . 'y'
         execute "nnoremap <leader>'" . t            .   ' "' . t . 'p'
-    endfor
-    " 快速执行宏
-    for t in s:lower_chars
-        execute "nnoremap <leader>2" . t            .   ' @' . t
     endfor
 " }}}
 
@@ -2318,6 +2319,7 @@ endif
     " 在新Tab中打开列表项
     nnoremap <leader>qt :call QuickfixTabEdit()<CR>
     nnoremap <leader>lt :call QuickfixTabEdit()<CR>
+    " 将Quickfix中的内容放到Location-list中打开
     nnoremap <leader>ql :call setloclist(0, getqflist())<Bar>vertical botright lopen 35<CR>
     " 分割窗口
     nnoremap <leader>ws <C-w>s
