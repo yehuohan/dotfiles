@@ -192,56 +192,71 @@ let s:path = {
     \ 'vcvars'  : '',
     \ 'browser' : '',
     \ }
-" FUNCTION: s:path.toggle(type) dict {{{
-function! s:path.toggle(type) dict
-    if a:type ==# 'env'
-        " 切换成x86或x64编译环境
-        if IsWin()
-            if 'x86' ==# s:path.env
-                let s:path.env = 'x64'
-                let s:path.make   = s:path.make_x64
-                let s:path.qmake  = s:path.qmake_x64
-                let s:path.vcvars = s:path.vcvars64
-            else
-                let s:path.env = 'x86'
-                let s:path.vcvars = s:path.vcvars32
-                let s:path.make   = s:path.make_x86
-                let s:path.qmake  = s:path.qmake_x86
-            endif
-            echo 's:path env: ' . s:path.env
-        endif
-    elseif a:type ==# 'browser'
-        if s:path.browser ==# s:path.browser_firefox
-            let s:path.browser = s:path.browser_chrome
+" FUNCTION: s:path.init() dict {{{
+function! s:path.init() dict
+    if IsWin()
+        let self.vcvars32  = 'D:/VS2017/VC/Auxiliary/Build/vcvars32.bat'
+        let self.vcvars64  = 'D:/VS2017/VC/Auxiliary/Build/vcvars64.bat'
+        let self.make_x86  = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx86/x86/nmake.exe'
+        let self.make_x64  = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx64/x64/nmake.exe'
+        let self.qmake_x86 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
+        let self.qmake_x64 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
+        let self.make      = self.make_x64
+        let self.qmake     = self.qmake_x64
+        let self.vcvars    = self.vcvars64
+    elseif IsLinux()
+        let self.make      = 'make'
+        let self.qmake     = 'qmake'
+    endif
+    if (IsWin() || IsGw())
+        let self.browser_chrome = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
+        let self.browser_firefox = 'D:/Mozilla Firefox/firefox.exe'
+    elseif IsLinux()
+        let self.browser_chrome = '/usr/bin/chrome'
+        let self.browser_firefox = '/usr/bin/firefox'
+    endif
+    let self.browser = self.browser_firefox
+endfunction
+" }}}
+" FUNCTION: s:path.toggleEnv() dict {{{
+function! s:path.toggleEnv() dict
+    " 切换成x86或x64编译环境
+    if IsWin()
+        if 'x86' ==# self.env
+            let self.env = 'x64'
+            let self.make   = self.make_x64
+            let self.qmake  = self.qmake_x64
+            let self.vcvars = self.vcvars64
         else
-            let s:path.browser = s:path.browser_firefox
+            let self.env = 'x86'
+            let self.vcvars = self.vcvars32
+            let self.make   = self.make_x86
+            let self.qmake  = self.qmake_x86
         endif
+    endif
+endfunction
+" }}}
+" FUNCTION: s:path.toggleBrowser(type) dict {{{
+function! s:path.toggleBrowser() dict
+    if self.browser ==# self.browser_firefox
+        let self.browser = self.browser_chrome
+    else
+        let self.browser = self.browser_firefox
+    endif
+endfunction
+" }}}
+" FUNCTION: TogglePath(type) {{{
+function! TogglePath(type)
+    if a:type ==# 'env'
+        call s:path.toggleEnv()
+        echo 's:path env: ' . s:path.env
+    elseif a:type ==# 'browser'
+        call s:path.toggleBrowser()
         echo 's:path browser: ' . s:path.browser
     endif
 endfunction
 " }}}
-if IsWin()
-    let s:path.vcvars32  = 'D:/VS2017/VC/Auxiliary/Build/vcvars32.bat'
-    let s:path.vcvars64  = 'D:/VS2017/VC/Auxiliary/Build/vcvars64.bat'
-    let s:path.make_x86  = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx86/x86/nmake.exe'
-    let s:path.make_x64  = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx64/x64/nmake.exe'
-    let s:path.qmake_x86 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
-    let s:path.qmake_x64 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
-    let s:path.make      = s:path.make_x64
-    let s:path.qmake     = s:path.qmake_x64
-    let s:path.vcvars    = s:path.vcvars64
-elseif IsLinux()
-    let s:path.make      = 'make'
-    let s:path.qmake     = 'qmake'
-endif
-if (IsWin() || IsGw())
-    let s:path.browser_chrome = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
-    let s:path.browser_firefox = 'D:/Mozilla Firefox/firefox.exe'
-elseif IsLinux()
-    let s:path.browser_chrome = '/usr/bin/chrome'
-    let s:path.browser_firefox = '/usr/bin/firefox'
-endif
-let s:path.browser = s:path.browser_firefox
+call s:path.init()
 " }}}
 
 " KeyCode {{{
@@ -2260,8 +2275,8 @@ augroup END
     nnoremap <leader>is :call InvSigncolumn()<CR>
     nnoremap <leader>ih :call InvHighLight()<CR>
     nnoremap <leader>ib :call InvScrollBind()<CR>
-    nnoremap <leader>tc :call s:path.toggle('env')<CR>
-    nnoremap <leader>tb :call s:path.toggle('browser')<CR>
+    nnoremap <leader>tc :call TogglePath('env')<CR>
+    nnoremap <leader>tb :call TogglePath('browser')<CR>
 
     if IsLinux()
         inoremap <Esc> <Esc>:call LinuxFcitx2En()<CR>
