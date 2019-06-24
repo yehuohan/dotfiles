@@ -2293,6 +2293,7 @@ augroup END
 
 " Copy and paste{{{
     vnoremap <leader>y ygv
+    nnoremap <leader>ay :execute 'let @0.=getline(line("."))."\n"'<CR>
     vnoremap <leader>c "+y
     vnoremap <C-c> "+y
     nnoremap <C-v> "+p
