@@ -136,7 +136,7 @@ nnoremap : ;
 vnoremap ; :
 
 let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
-if IsLinux()
+if (IsLinux() || IsMac())
     " 链接root-vimrc到user's vimrc
     let $DotVimPath=s:home . '/.vim'
 elseif IsWin()
@@ -145,8 +145,6 @@ elseif IsWin()
     let $HOME=$VIM
 elseif IsGw()
     let $DotVimPath='/c/MyApps/Vim/vimfiles'
-elseif IsMac()
-    let $DotVimPath=s:home . '/.vim'
 endif
 set rtp+=$DotVimPath
 
@@ -155,11 +153,15 @@ let s:gset_file = $DotVimPath . '/.gset'
 let s:gset = {
     \ 'use_powerfont' : 1,
     \ 'use_ycm' : 1,
+    \ 'use_fzf' : 1,
+    \ 'use_startify' : 1,
     \ }
 " FUNCTION: s:loadGset() {{{
 function! s:loadGset()
     if filereadable(s:gset_file)
-        let s:gset = json_decode(join(readfile(s:gset_file)))
+        call extend(s:gset, json_decode(join(readfile(s:gset_file))), 'force')
+    else
+        call s:saveGset()
     endif
 endfunction
 " }}}
@@ -422,6 +424,7 @@ call plug#begin($DotVimPath.'/bundle')  " 可选设置，可以指定插件安�
 " }}}
 
 " Fzf {{{ 模糊查找
+if s:gset.use_fzf
     " linux下直接pacman -S fzf
     " win下载fzf.exe放入bundle/fzf/bin/下
     if IsWin()
@@ -430,6 +433,7 @@ call plug#begin($DotVimPath.'/bundle')  " 可选设置，可以指定插件安�
     Plug 'junegunn/fzf.vim'
     let g:fzf_command_prefix = 'Fzf'
     nnoremap <leader>fF :FzfFiles
+endif
 " }}}
 
 " LeaderF {{{ 模糊查找
@@ -769,6 +773,7 @@ endif
 " }}}
 
 " vim-startify {{{ vim会话界面
+if s:gset.use_startify
     Plug 'mhinz/vim-startify'
     if IsLinux()
         let g:startify_bookmarks = [ {'c': '~/.vimrc'},
@@ -789,6 +794,7 @@ endif
             \ {'type': 'files',     'header': ['   Recent Files']},
             \ ]
     nnoremap <leader>su :Startify<CR>   " start ui of vim-startify
+endif
 " }}}
 
 " bookmarks {{{ 书签管理
@@ -1085,7 +1091,7 @@ endif
 " }}}
 
 " cpp-enhanced-highlight {{{ c++语法高亮
-    Plug 'octol/vim-cpp-enhanced-highlight'
+    Plug 'octol/vim-cpp-enhanced-highlight', {'for': 'cpp'}
 " }}}
 " }}}
 
