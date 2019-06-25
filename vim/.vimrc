@@ -2257,9 +2257,6 @@ augroup END
     nnoremap <leader>u ~
     vnoremap <leader>u ~
     nnoremap <leader>gu g~
-    " 矩形选择
-    nnoremap vv <C-v>
-    vnoremap vv <C-v>
     " 加减序号
     nnoremap <leader>aj <C-x>
     nnoremap <leader>ak <C-a>
@@ -2293,7 +2290,8 @@ augroup END
 
 " Copy and paste{{{
     vnoremap <leader>y ygv
-    nnoremap <leader>ay :execute 'let @0.=getline(line("."))."\n"'<CR>
+    nnoremap ya :execute 'let @0.=getline(line("."))."\n"'<CR>
+    nnoremap yd dd<Bar>:execute 'let @0.=@"'<CR>
     vnoremap <leader>c "+y
     vnoremap <C-c> "+y
     nnoremap <C-v> "+p
@@ -2301,6 +2299,9 @@ augroup END
     " 粘贴通过y复制的内容
     nnoremap <leader>p "0p
     nnoremap <leader>P "0P
+    " 矩形选择
+    nnoremap vv <C-v>
+    vnoremap vv <C-v>
 
     for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
         " 寄存器快速复制与粘贴
