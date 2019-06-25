@@ -744,8 +744,8 @@ endif
     nnoremap <C-Space> :Popc<CR>
     inoremap <C-Space> <Esc>:Popc<CR>
     nnoremap <leader><leader>h :PopcBuffer<CR>
-    nnoremap <M-u> :PopcBufferSwitchLeft<CR>
-    nnoremap <M-p> :PopcBufferSwitchRight<CR>
+    nnoremap <M-i> :PopcBufferSwitchLeft<CR>
+    nnoremap <M-o> :PopcBufferSwitchRight<CR>
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
     nnoremap <leader><leader>fw :call PopcWksSearch()<CR>
@@ -2366,8 +2366,8 @@ endif
 
 " Tab, Buffer, Quickfix, Windows {{{
     " Tab切换
-    nnoremap <M-i> gT
-    nnoremap <M-o> gt
+    nnoremap <M-u> gT
+    nnoremap <M-p> gt
     " Buffer切换
     nnoremap <leader>bn :bnext<CR>
     nnoremap <leader>bp :bprevious<CR>
