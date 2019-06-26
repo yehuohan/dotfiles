@@ -127,8 +127,9 @@ endfunction
 " Global settings
 "===============================================================================
 " {{{
+set encoding=utf-8                      " 内部使用utf-8编码
 if IsVim()
-    set nocompatible
+    set nocompatible                    " 不兼容vi
 endif
 let mapleader="\<Space>"
 nnoremap ; :
@@ -199,11 +200,9 @@ function! s:path.init() dict
     if IsWin()
         let self.vcvars32  = 'D:/VS2017/VC/Auxiliary/Build/vcvars32.bat'
         let self.vcvars64  = 'D:/VS2017/VC/Auxiliary/Build/vcvars64.bat'
-        let self.make_x86  = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx86/x86/nmake.exe'
-        let self.make_x64  = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx64/x64/nmake.exe'
         let self.qmake_x86 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
         let self.qmake_x64 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
-        let self.make      = self.make_x64
+        let self.make      = 'nmake.exe'
         let self.qmake     = self.qmake_x64
         let self.vcvars    = self.vcvars64
     elseif IsLinux()
@@ -226,19 +225,17 @@ function! s:path.toggleEnv() dict
     if IsWin()
         if 'x86' ==# self.env
             let self.env = 'x64'
-            let self.make   = self.make_x64
             let self.qmake  = self.qmake_x64
             let self.vcvars = self.vcvars64
         else
             let self.env = 'x86'
-            let self.vcvars = self.vcvars32
-            let self.make   = self.make_x86
             let self.qmake  = self.qmake_x86
+            let self.vcvars = self.vcvars32
         endif
     endif
 endfunction
 " }}}
-" FUNCTION: s:path.toggleBrowser(type) dict {{{
+" FUNCTION: s:path.toggleBrowser() dict {{{
 function! s:path.toggleBrowser() dict
     if self.browser ==# self.browser_firefox
         let self.browser = self.browser_chrome
@@ -247,12 +244,12 @@ function! s:path.toggleBrowser() dict
     endif
 endfunction
 " }}}
-" FUNCTION: TogglePath(type) {{{
-function! TogglePath(type)
-    if a:type ==# 'env'
+" FUNCTION: TogglePath(flg) {{{
+function! TogglePath(flg)
+    if a:flg ==# 'env'
         call s:path.toggleEnv()
         echo 's:path env: ' . s:path.env
-    elseif a:type ==# 'browser'
+    elseif a:flg ==# 'browser'
         call s:path.toggleBrowser()
         echo 's:path browser: ' . s:path.browser
     endif
@@ -268,7 +265,6 @@ set timeoutlen=1000                     " 映射超时时间为1000ms
 set ttimeoutlen=70                      " 键码超时时间为70ms
 
 if IsVim()
-" 示例 {{{
     " 终端Alt键映射处理：如 Alt+x，实际连续发送 <Esc>x 编码
     " 以下三种方法都可以使按下 Alt+x 后，执行 CmdTest 命令，但超时检测有区别
     "<1> set <M-x>=x  " 设置键码，这里的是一个字符，即<Esc>的编码，不是^和[放在一起
@@ -276,9 +272,6 @@ if IsVim()
     "    nnoremap <M-x> :CmdTest<CR>    " 按键码超时时间检测
     "<2> nnoremap <Esc>x :CmdTest<CR>   " 按映射超时时间检测
     "<3> nnoremap x  :CmdTest<CR>     " 按映射超时时间检测
-" }}}
-
-    set encoding=utf-8                  " 内部内部需要使用utf-8编码
     set <M-d>=d
     set <M-f>=f
     set <M-h>=h
@@ -1160,7 +1153,7 @@ endif
         if a:mode ==# 'n'
             call openbrowser#search(expand('<cword>'), a:engine)
         elseif a:mode ==# 'v'
-            call openbrowser#search(GetSelectedContent(), a:engine)
+            call openbrowser#search(GetSelected(), a:engine)
         endif
     endfunction
     nnoremap <leader>big :OpenBrowserSearch -google
@@ -1192,8 +1185,8 @@ call plug#end()                         " required
 "===============================================================================
 " {{{
 " Execute function {{{
-" FUNCTION: GetSelectedContent() {{{ 获取选区内容
-function! GetSelectedContent()
+" FUNCTION: GetSelected() {{{ 获取选区内容
+function! GetSelected()
     let l:reg_var = getreg('0', 1)
     let l:reg_mode = getregtype('0')
     normal! gv"0y
@@ -1259,7 +1252,33 @@ function! GetFileList(pat, sdir)
 endfunction
 " }}}
 
+" FUNCTION: GetFileContent(fp, pat) {{{
+" 获取文件中特定的内容
+" @param fp: 目录文件
+" @param pat: 匹配模式，必须使用 \(\) 来提取字符串
+" @param flg: 匹配所有还是第一个
+" @return 返回匹配的内容列表
+function! GetFileContent(fp, pat, flg)
+    let l:content = []
+    for l:line in readfile(a:fp)
+        let l:result = matchlist(l:line, a:pat)
+        if !empty(l:result)
+            if a:flg ==# 'all'
+                if !empty(l:result[1])
+                    call add(l:content, l:result[1])
+                endif
+            elseif a:flg ==# 'first'
+                return empty(l:result[1]) ? [] : [result[1]]
+            endif
+        endif
+    endfor
+    return l:content
+endfunction
+" }}}
+
 " FUNCTION: GetArgs(str) {{{ 解析字符串参数到列表中
+" @param str: 参数字符串，如 '"Test", 10, g:a'
+" @return 返回参数列表，如 ["Test", 10, g:a]
 function! GetArgs(str)
     let l:args = []
     function! s:parseArgs(...) closure
@@ -1270,11 +1289,11 @@ function! GetArgs(str)
 endfunction
 " }}}
 
-" FUNCTION: GetCmdResult(type, cmd, args) {{{ 获取命令结果
-function! GetCmdResult(type, cmd, args)
-    if a:type ==# 'call'
+" FUNCTION: GetCmdResult(flg, cmd, args) {{{ 获取命令或函数执行结果
+function! GetCmdResult(flg, cmd, args)
+    if a:flg ==# 'call'
         return call(a:cmd, a:args)
-    elseif a:type ==# 'exec'
+    elseif a:flg ==# 'exec'
         return execute(a:cmd)
     endif
 endfunction
@@ -1375,17 +1394,17 @@ let DivideSpaceD = function('ExecFuncInput', ['Divide D Space(split with space):
 " }}}
 
 " FUNCTION: FuncAppendCmd(str) {{{ 将命令结果作为文本插入
-function! FuncAppendCmd(str, type)
-    if a:type ==# 'call'
+function! FuncAppendCmd(str, flg)
+    if a:flg ==# 'call'
         let l:as = match(a:str, '(')
         let l:ae = -1   " match(a:str, ')') - 1
         let l:str = a:str[0 : l:as - 1]
         let l:args = GetArgs(a:str[l:as + 1 : l:ae - 1])
-    elseif a:type ==# 'exec'
+    elseif a:flg ==# 'exec'
         let l:str = ':' . a:str
         let l:args = []
     endif
-    let l:result = GetCmdResult(a:type, l:str, l:args)
+    let l:result = GetCmdResult(a:flg, l:str, l:args)
     call append(line('.'), split(l:result, "\n"))
 endfunction
 let AppendExecResult = function('ExecFuncInput', ['Input cmd = ', '', 'command', 'FuncAppendCmd', 'exec'])
@@ -1394,13 +1413,14 @@ let AppendCallResult = function('ExecFuncInput', ['Input cmd = ', '', 'function'
 " }}}
 
 " Project run {{{
-" FUNCTION: ComplileFile(argstr) {{{
+" FUNCTION: CompileFile(argstr) {{{
 " s:cpl {{{
 let s:cpl = {
+    \ 'wdir' : '',
     \ 'args' : '',
     \ 'srcf' : '',
     \ 'outf' : '',
-    \ 'type' : {
+    \ 'flg'  : {
         \ 'c'    : ['gcc -static %s -o %s %s && "./%s"'            , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
         \ 'cpp'  : ['g++ -std=c++11 -static %s -o %s %s && "./%s"' , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
         \ 'py'   : ['python %s %s'                                 , 'srcf'  , 'args'] ,
@@ -1413,12 +1433,17 @@ let s:cpl = {
         \ 'sh'   : ['./%s %s'                                      , 'srcf'  , 'args'] ,
         \ 'bat'  : ['%s %s'                                        , 'srcf'  , 'args'] ,
         \ 'html' : ['"' . s:path.browser . '" %s'                  , 'srcf'] ,
-        \ 'make' : ['make %s && "./%s"'                            , 'args'  , 'outf'] ,
-        \ 'qt'   : [(IsWin() ?
-                    \ (s:path.qmake . ' -r %s && ' . s:path.vcvars . ' && ' . s:path.make . ' -f Makefile.Debug') :
-                    \ ('qmake %s && make'))
+        \ 'make' : ['cd "%s" && make %s && "./%s"'                   , 'wdir'  , 'args'  , 'outf'] ,
+        \ 'qt'   : ['cd "%s" && ' . (IsWin() ?
+                    \ (s:path.qmake . ' -r "%s" && ' . s:path.vcvars . ' && nmake -f Makefile.Debug') :
+                    \ ('qmake "%s" && make'))
                     \ . ' %s && "./%s"',
-                    \ 'srcf', 'args', 'outf'],
+                    \ 'wdir', 'srcf', 'args', 'outf'],
+        \ 'vs'   : ['cd "%s" && ' . s:path.vcvars . ' && devenv "%s" /%s && "./%s"',
+                    \ 'wdir', 'srcf', 'args', 'outf']
+        \},
+    \ 'pat' : {
+        \ 'make' : 'TARGET\s*=\s*\(\<[a-zA-Z_][a-zA-Z0-9_]*\)',
         \},
     \ 'sel_cpp' : {
         \ 'opt' : ['cppargs'],
@@ -1429,74 +1454,60 @@ let s:cpl = {
         \ 'cmd' : 'ExecSelCpp'
         \}
     \}
-function s:cpl.printf(type, args, srcf, outf) dict
-    if !has_key(self.type, a:type)
-        \ || ('sh' ==? a:type && !(IsLinux() || IsGw() || IsMac()))
-        \ || ('bat' ==? a:type && !IsWin())
+" FUNCTION:s:cpl.printf(flg, args, srcf, outf) dict {{{
+" 生成编译运行命令字符串。
+" @param flg: 编译类型，需要包含于s:cpl.flg中
+" @param wdir: 命令运行目录
+" @param args: 参数
+" @param srcf: 源文件
+" @param outf: 目标文件
+" @return 返回编译或运行命令
+function s:cpl.printf(flg, wdir, args, srcf, outf) dict
+    if !has_key(self.flg, a:flg)
+        \ || ('sh' ==? a:flg && !(IsLinux() || IsGw() || IsMac()))
+        \ || ('bat' ==? a:flg && !IsWin())
         return ''
     endif
+    let self.wdir = a:wdir
     let self.args = a:args
     let self.srcf = a:srcf
     let self.outf = a:outf
-    let l:pstr = copy(self.type[a:type])
+    let l:pstr = copy(self.flg[a:flg])
     call map(l:pstr, {key, val -> (key == 0) ? val : get(self, val, '')})
-    return call('printf', l:pstr)
+    return ((exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!') . call('printf', l:pstr)
 endfunction
 " }}}
-
-function! ExecCompile(str)
-    let l:exec = ((exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!') . a:str
-    execute l:exec
-    return l:exec
-endfunction
+" }}}
 
 function! ExecSelCpp(sopt, arg)
-    call ComplileFile(s:cpl.sel_cpp.dic[a:arg])
+    call CompileFile(s:cpl.sel_cpp.dic[a:arg])
 endfunction
 
-function! ComplileFile(argstr)
-    let l:ext      = expand('%:e')      " 扩展名
-    let l:filename = expand('%:t')      " 文件名，不带路径，带扩展名
-    let l:name     = expand('%:t:r')    " 文件名，不带路径，不带扩展名
+function! CompileFile(argstr)
+    let l:ext     = expand('%:e')      " 扩展名
+    let l:srcfile = expand('%:t')      " 文件名，不带路径，带扩展名
+    let l:outfile = expand('%:t:r')    " 文件名，不带路径，不带扩展名
 
     " 可执行字符串
-    if !has_key(s:cpl.type, l:ext)
+    if !has_key(s:cpl.flg, l:ext)
         let l:ext = &filetype
     endif
-    let l:exec = s:cpl.printf(l:ext, a:argstr, l:filename, l:name)
+    let l:exec = s:cpl.printf(l:ext, '', a:argstr, l:srcfile, l:outfile)
     if empty(l:exec)
         echo 's:cpl doesn''t support ' . l:ext
         return
     endif
-    call SetRepeatExecution(ExecCompile(l:exec))
+    execute l:exec
+    call SetRepeatExecution(l:exec)
 endfunction
 " }}}
 
-" FUNCTION: FindProjectTarget(str, type) {{{
-" @param str: 工程文件路径，如*.pro
-" @param type: 工程文件类型，如qmake, make
-function! FindProjectTarget(str, type)
-    let l:target = fnamemodify(a:str, ':t:r')
-    if a:type == 'qmake' || a:type == 'make'
-        for line in readfile(a:str)
-            if line =~? '^\s*TARGET'
-                let l:target = split(line, '=')[1]
-                let l:target = substitute(l:target, '^\s\+', '', 'g')
-                let l:target = substitute(l:target, '\s\+$', '', 'g')
-                break
-            endif
-        endfor
-    endif
-    return l:target
-endfunction
-" }}}
-
-" FUNCTION: ComplileProject(str, fn, args) {{{
+" FUNCTION: CompileProject(str, fn, args) {{{
 " 当找到多个Project File时，会弹出选项以供选择。
 " @param str: 工程文件名，可用通配符，如*.pro
 " @param fn: 编译工程文件的函数，需要采用popset插件
 " @param args: 编译工程文件函数的附加参数，需要采用popset插件
-function! ComplileProject(str, fn, args)
+function! CompileProject(str, fn, args)
     let l:prj = GetFileList(a:str, '')
     if len(l:prj) == 1
         let Fn = function(a:fn)
@@ -1513,71 +1524,74 @@ function! ComplileProject(str, fn, args)
 endfunction
 " }}}
 
-" FUNCTION: ComplileProjectQt(sopt, sel, args) {{{
+" FUNCTION: CompileProjectQt(sopt, sel, args) {{{
 " 用于popset的函数，用于编译qmake工程并运行生成的可执行文件。
 " @param sopt: 参数信息，未用到，只是传入popset的函数需要
 " @param sel: pro文件路径
 " @param args: make命令附加参数列表
-function! ComplileProjectQt(sopt, sel, args)
-    let l:filename = '"./' . fnamemodify(a:sel, ':p:t') . '"'
-    let l:name     = FindProjectTarget(a:sel, 'qmake')
-    let l:filedir  = fnameescape(fnamemodify(a:sel, ':p:h'))
-    let l:olddir   = fnameescape(getcwd())
-
-    " change cwd
-    execute 'lcd ' . l:filedir
+function! CompileProjectQt(sopt, sel, args)
+    let l:srcfile = fnamemodify(a:sel, ':p:t')
+    let l:outfile = GetFileContent(a:sel, s:cpl.pat.make， 'first')
+    let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
+    let l:workdir = fnamemodify(a:sel, ':p:h')
 
     " execute shell code
-    let l:exec = s:cpl.printf('qt', join(a:args), l:filename, l:name)
-    call ExecCompile(l:exec)
-
-    " change back cwd
-    execute 'lcd ' . l:olddir
+    execute s:cpl.printf('qt', l:workdir, join(a:args), l:srcfile, l:outfile)
 endfunction
 " }}}
 
-" FUNCTION: ComplileProjectMake(sopt, sel, args) {{{
+" FUNCTION: CompileProjectMake(sopt, sel, args) {{{
 " 用于popset的函数，用于编译makefile工程并运行生成的可执行文件。
 " @param sopt: 参数信息，未用到，只是传入popset的函数需要
 " @param sel: makefile文件路径
 " @param args: make命令附加参数列表
-function! ComplileProjectMake(sopt, sel, args)
-    let l:name     = FindProjectTarget(a:sel, 'make')
-    let l:filedir  = fnameescape(fnamemodify(a:sel, ':p:h'))
-    let l:olddir   = fnameescape(getcwd())
-
-    " change cwd
-    execute 'lcd ' . l:filedir
+function! CompileProjectMake(sopt, sel, args)
+    let l:outfile = GetFileContent(a:sel, s:cpl.pat.make, 'first')
+    let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
+    let l:workdir = fnamemodify(a:sel, ':p:h')
 
     " execute shell code
-    let l:exec = s:cpl.printf('make', join(a:args), '', l:name)
-    call ExecCompile(l:exec)
-
-    " change back cwd
-    execute 'lcd ' . l:olddir
+    execute s:cpl.printf('make', l:workdir, join(a:args), '', l:outfile)
 endfunction
 "}}}
 
-" FUNCTION: ComplileProjectHtml(sopt, sel, args) {{{
-" 用于popset的函数，用于打开index.html
+" FUNCTION: CompileProjectQtVs(sopt, sel, args) {{{
+" 用于popset的函数，用于编译vs工程并运行生成的可执行文件。
 " @param sopt: 参数信息，未用到，只是传入popset的函数需要
-" @param sel: index.html路径
-function! ComplileProjectHtml(sopt, sel, args)
-    call ExecCompile(s:cpl.printf('html', '', a:sel, ''))
+" @param sel: sln文件路径
+" @param args: devenv命令附加参数列表
+function! CompileProjectVs(sopt, sel, args)
+    let l:srcfile = fnamemodify(a:sel, ':p:t')
+    let l:outfile = fnamemodify(a:sel, ':p:t:r')
+    let l:workdir = fnamemodify(a:sel, ':p:h')
+
+    " execute shell code
+    execute s:cpl.printf('vs', l:workdir, join(a:args), l:srcfile, l:outfile)
 endfunction
 " }}}
 
-" Run compliler
+" FUNCTION: CompileProjectHtml(sopt, sel, args) {{{
+" 用于popset的函数，用于打开index.html
+" @param sopt: 参数信息，未用到，只是传入popset的函数需要
+" @param sel: index.html路径
+function! CompileProjectHtml(sopt, sel, args)
+    execute s:cpl.printf('html', '', '', a:sel, '')
+endfunction
+" }}}
+
+" Run compiler
 let RC_Args       = function('popset#set#PopSelection', [s:cpl.sel_cpp, 0])
-let RC_Qmake      = function('ComplileProject', ['*.pro', 'ComplileProjectQt', []])
-let RC_QmakeClean = function('ComplileProject', ['*.pro', 'ComplileProjectQt', ['clean']])
-let RC_Make       = function('ComplileProject', ['[mM]akefile', 'ComplileProjectMake', []])
-let RC_MakeClean  = function('ComplileProject', ['[mM]akefile', 'ComplileProjectMake', ['clean']])
-let RC_Html       = function('ComplileProject', ['[iI]ndex.html', 'ComplileProjectHtml', []])
+let RC_Qt         = function('CompileProject', ['*.pro', 'CompileProjectQt', []])
+let RC_QtClean    = function('CompileProject', ['*.pro', 'CompileProjectQt', ['distclean']])
+let RC_Vs         = function('CompileProject', ['*.sln', 'CompileProjectVs', ['Build']])
+let RC_VsClean    = function('CompileProject', ['*.sln', 'CompileProjectVs', ['Clean']])
+let RC_Make       = function('CompileProject', ['[mM]akefile', 'CompileProjectMake', []])
+let RC_MakeClean  = function('CompileProject', ['[mM]akefile', 'CompileProjectMake', ['clean']])
+let RC_Html       = function('CompileProject', ['[iI]ndex.html', 'CompileProjectHtml', []])
 " }}}
 
 " Search {{{
-" FUNCTION: FindWorking(type, mode) {{{ 超速查找
+" FUNCTION: FindWorking(keys, mode) {{{ 超速查找
 " {{{
 augroup UserFunctionSearch
     autocmd!
@@ -1638,12 +1652,12 @@ let s:fw_nvmaps = [
                 \ 'fv=', 'fvp=', 'fv=',  'fvp=',
                 \ ]
 " }}}
-function! FindWorking(type, mode)
+function! FindWorking(keys, mode)
     " doc
     " {{{
     " Required: based on 'mhinz/vim-grepper' or 'yegappan/grep', 'Yggdroot/LeaderF' and 'yehuohan/popc'
-    " Option: [fF][lav][btopr][IiWwSs=]
-    "         [%1][%2 ][%3   ][4%     ]
+    " MapKeys: [fF][lav][btopr][IiWwSs=]
+    "          [%1][%2 ][%3   ][4%     ]
     " Find: %1
     "   f : find working
     "   F : find working with inputing args
@@ -1677,24 +1691,24 @@ function! FindWorking(type, mode)
     function! s:parsePattern() closure
         let l:pat = ''
         if a:mode ==# 'n'
-            if a:type =~? 'i'
+            if a:keys =~? 'i'
                 let l:pat = input(' What to find: ')
-            elseif a:type =~? '[ws]'
+            elseif a:keys =~? '[ws]'
                 let l:pat = expand('<cword>')
             endif
         elseif a:mode ==# 'v'
-            let l:selected = GetSelectedContent()
-            if a:type =~? 'i'
+            let l:selected = GetSelected()
+            if a:keys =~? 'i'
                 let l:pat = input(' What to find: ', l:selected)
-            elseif a:type =~? '[ws]'
+            elseif a:keys =~? '[ws]'
                 let l:pat = l:selected
             endif
         endif
-        if a:type =~ '='
+        if a:keys =~ '='
             let l:pat = getreg('+')
         endif
         let l:pat = escape(l:pat, ' -#%')       " escape 'Space,-,#,%'
-        if !empty(l:pat) && a:type =~# 'l'
+        if !empty(l:pat) && a:keys =~# 'l'
             let l:pat = '-e "' . l:pat .'"'     " used for 'Leaderf rg'
         endif
         return l:pat
@@ -1703,15 +1717,15 @@ function! FindWorking(type, mode)
     " FUNCTION: s:parseLocation() closure {{{
     function! s:parseLocation() closure
         let l:loc = ''
-        if a:type =~# 'b'
+        if a:keys =~# 'b'
             let l:loc = expand('%')
-        elseif a:type =~# 't'
+        elseif a:keys =~# 't'
             let l:loc = join(popc#layer#buf#GetFiles('sigtab'), ' ')
-        elseif a:type =~# 'o'
+        elseif a:keys =~# 'o'
             let l:loc = join(popc#layer#buf#GetFiles('alltab'), ' ')
-        elseif a:type =~# 'p'
+        elseif a:keys =~# 'p'
             let l:loc = input(' Where to find: ', '', 'customlist,GetMultiFilesCompletion')
-        elseif a:type =~# 'r'
+        elseif a:keys =~# 'r'
             let l:loc = FindWorkingSet() ? s:fw.root : ''
         else
             if empty(s:fw.root)
@@ -1728,12 +1742,12 @@ function! FindWorking(type, mode)
     " FUNCTION: s:parseOptions() closure {{{
     function! s:parseOptions() closure
         let l:opt = ''
-        if a:type =~? 's'     | let l:opt .= '-w ' | endif
-        if a:type =~# '[iws]' | let l:opt .= '-i ' | elseif a:type =~# '[IWS]' | let l:opt .= '-s ' | endif
-        if !empty(s:fw.filters) && a:type !~# '[btop]'
+        if a:keys =~? 's'     | let l:opt .= '-w ' | endif
+        if a:keys =~# '[iws]' | let l:opt .= '-i ' | elseif a:keys =~# '[IWS]' | let l:opt .= '-s ' | endif
+        if !empty(s:fw.filters) && a:keys !~# '[btop]'
             let l:opt .= '-g "*.{' . s:fw.filters . '}" '
         endif
-        if a:type =~# 'F'
+        if a:keys =~# 'F'
             let l:opt .= input(' Args(-F, --hidden ...) to append: ', '')
         endif
         return l:opt
@@ -1741,9 +1755,9 @@ function! FindWorking(type, mode)
     " }}}
     " FUNCTION: s:parseCommand() closure {{{
     function! s:parseCommand() closure
-        if a:type =~# 'l'
+        if a:keys =~# 'l'
             let l:cmd = ':Leaderf rg --nowrap'
-        elseif a:type =~# 'a'
+        elseif a:keys =~# 'a'
             let l:cmd = s:fw_rg ? ':RgAdd' : 'Grepper -noprompt -tool rg -append -query'
         else
             let l:cmd = s:fw_rg ? ':Rg'    : 'Grepper -noprompt -tool rg -query'
@@ -1754,19 +1768,19 @@ function! FindWorking(type, mode)
     " }}}
     " FUNCTION: s:parseVimgrep() closure {{{
     function! s:parseVimgrep() closure
-        if a:type !~# 'v'
+        if a:keys !~# 'v'
             return 0
         endif
 
         " get pattern and set options
         let s:fw.pattern = s:parsePattern()
         if empty(s:fw.pattern) | return 0 | endif
-        let l:pat = (a:type =~? 's') ? ('\<' . s:fw.pattern . '\>') : (s:fw.pattern)
-        let l:pat .= (a:type =~# '[iws]') ? '\c' : '\C'
+        let l:pat = (a:keys =~? 's') ? ('\<' . s:fw.pattern . '\>') : (s:fw.pattern)
+        let l:pat .= (a:keys =~# '[iws]') ? '\c' : '\C'
 
         " set loaction
         let l:loc = '%'
-        if a:type =~# 'p'
+        if a:keys =~# 'p'
             let l:loc = input(' Where to find: ', '', 'customlist,GetMultiFilesCompletion')
             if empty(l:loc) | return 0 | endif
         endif
@@ -2053,7 +2067,7 @@ function! GotoKeyword(mode)
     if a:mode ==# 'n'
         let l:word = expand('<cword>')
     elseif a:mode ==# 'v'
-        let l:word = GetSelectedContent()
+        let l:word = GetSelected()
     endif
 
     " 添加关键字
@@ -2137,8 +2151,8 @@ endif
     set noautowriteall                  " 禁止自动保存文件
     set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
                                         " 尝试解码序列
-    set encoding=utf-8                  " vim内部使用utf-8编码
     set fileformat=unix                 " 以unix格式保存文本文件，即CR作为换行符
+    set magic                           " 默认使用magic匹配
     set ignorecase                      " 不区别大小写搜索
     set smartcase                       " 有大写字母时才区别大小写搜索
     set notildeop                       " 使切换大小写的~，类似于c,y,d等操作符
@@ -2267,7 +2281,6 @@ augroup END
     " HEX编辑
     nnoremap <leader>xx :%!xxd<CR>
     nnoremap <leader>xr :%!xxd -r<CR>
-
     " Misc
     nnoremap <leader>iw :set invwrap<CR>
     nnoremap <leader>il :set invlist<CR>
@@ -2280,7 +2293,6 @@ augroup END
     nnoremap <leader>ib :call InvScrollBind()<CR>
     nnoremap <leader>tc :call TogglePath('env')<CR>
     nnoremap <leader>tb :call TogglePath('browser')<CR>
-
     if IsLinux()
         inoremap <Esc> <Esc>:call LinuxFcitx2En()<CR>
     endif
@@ -2421,6 +2433,26 @@ endif
     nnoremap <M-Right> :vertical resize+5<CR>
 " }}}
 
+" File diff {{{
+    " 文件比较，自动补全文件和目录
+    nnoremap <leader>ds :call ExecFuncInput('File: ', '', 'file', 'FuncDiffFile', 's')<CR>
+    nnoremap <leader>dv :call ExecFuncInput('File: ', '', 'file', 'FuncDiffFile', 'v')<CR>
+    " 比较当前文件（已经分屏）
+    nnoremap <leader>dt :diffthis<CR>
+    " 关闭文件比较，与diffthis互为逆命令
+    nnoremap <leader>do :diffoff<CR>
+    " 更新比较结果
+    nnoremap <leader>du :diffupdate<CR>
+    " 应用差异到别一文件，[range]<leader>dp，range默认为1行
+    nnoremap <leader>dp :<C-U>execute '.,+' . string(v:count1-1) . 'diffput'<CR>
+    " 拉取差异到当前文件，[range]<leader>dg，range默认为1行
+    nnoremap <leader>dg :<C-U>execute '.,+' . string(v:count1-1) . 'diffget'<CR>
+    " 下一个diff
+    nnoremap <leader>dj ]c
+    " 前一个diff
+    nnoremap <leader>dk [c
+" }}}
+
 " Terminal {{{
     nnoremap <leader>tz :terminal zsh<CR>
 if IsVim()
@@ -2431,7 +2463,7 @@ else
 endif
 " }}}
 
-" Program and function {{{
+" Coding {{{
     " 建立临时文件
     nnoremap <leader>ei :call ExecFuncInput('TempFile Suffix:', '', '', 'FuncEditTempFile', 0)<CR>
     nnoremap <leader>en :call FuncEditTempFile (''   , 0)<CR>
@@ -2454,36 +2486,17 @@ endif
     nnoremap <leader>dd :call DivideSpaceD()<CR>
     nnoremap <leader>ae :call AppendExecResult()<CR>
     nnoremap <leader>af :call AppendCallResult()<CR>
-
     " 编译运行当前文件
-    nnoremap <leader>rf :call ComplileFile('')<CR>
-    nnoremap <leader>ri :call ExecFuncInput('Compile Args: ', '', 'customlist,GetMultiFilesCompletion', 'ComplileFile')<CR>
+    nnoremap <leader>rf :call CompileFile('')<CR>
+    nnoremap <leader>ri :call ExecFuncInput('Compile Args: ', '', 'customlist,GetMultiFilesCompletion', 'CompileFile')<CR>
     nnoremap <leader>ra :call RC_Args()<CR>
-    nnoremap <leader>rq :call RC_Qmake()<CR>
+    nnoremap <leader>rq :call RC_Qt()<CR>
+    nnoremap <leader>rv :call RC_Vs()<CR>
     nnoremap <leader>rm :call RC_Make()<CR>
-    nnoremap <leader>rcq :call RC_QmakeClean()<CR>
+    nnoremap <leader>rcq :call RC_QtClean()<CR>
+    nnoremap <leader>rcv :call RC_VsClean()<CR>
     nnoremap <leader>rcm :call RC_MakeClean()<CR>
     nnoremap <leader>rh :call RC_Html()<CR>
-" }}}
-
-" File diff {{{
-    " 文件比较，自动补全文件和目录
-    nnoremap <leader>ds :call ExecFuncInput('File: ', '', 'file', 'FuncDiffFile', 's')<CR>
-    nnoremap <leader>dv :call ExecFuncInput('File: ', '', 'file', 'FuncDiffFile', 'v')<CR>
-    " 比较当前文件（已经分屏）
-    nnoremap <leader>dt :diffthis<CR>
-    " 关闭文件比较，与diffthis互为逆命令
-    nnoremap <leader>do :diffoff<CR>
-    " 更新比较结果
-    nnoremap <leader>du :diffupdate<CR>
-    " 应用差异到别一文件，[range]<leader>dp，range默认为1行
-    nnoremap <leader>dp :<C-U>execute '.,+' . string(v:count1-1) . 'diffput'<CR>
-    " 拉取差异到当前文件，[range]<leader>dg，range默认为1行
-    nnoremap <leader>dg :<C-U>execute '.,+' . string(v:count1-1) . 'diffget'<CR>
-    " 下一个diff
-    nnoremap <leader>dj ]c
-    " 前一个diff
-    nnoremap <leader>dk [c
 " }}}
 
 " Find and search{{{
