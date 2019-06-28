@@ -566,40 +566,36 @@ if s:gset.use_lightline
     "                    
     " ► ✘ ⌘ ▫ ▪ ★ ☆ • ≡ ፨ ♥
     let g:lightline = {
-        \ 'enable'              : {'statusline': 1, 'tabline': 0},
-        \ 'colorscheme'         : 'gruvbox',
+        \ 'enable' : {'statusline': 1, 'tabline': 0},
+        \ 'colorscheme' : 'gruvbox',
         \ 'active': {
-                \ 'left' : [['mode', 'paste'],
-                \           ['operation'],
-                \           ['all_fileinfo', 'fw_filepath']],
+                \ 'left' : [['mode'],
+                \           ['all_filesign'],
+                \           ['left_msg']],
                 \ 'right': [['all_lineinfo', 'indent', 'trailing'],
                 \           ['all_format'],
-                \           ['fw_rootdir']],
+                \           ['right_msg']],
                 \ },
         \ 'inactive': {
                 \ 'left' : [['absolutepath']],
-                \ 'right': [['all_lineinfo']],
+                \ 'right': [['lite_info']],
                 \ },
         \ 'tabline' : {
                 \ 'left' : [['tabs']],
                 \ 'right': [['close']],
                 \ },
         \ 'component': {
-                \ 'all_lineinfo': '0X%02B ≡%3p%%   %04l/%L  %-2v',
-                \ 'all_fileinfo': '%{winnr()},%-3n%{&ro?"":""}%M',
+                \ 'all_filesign': '%{winnr()},%-n%{&ro?" ":""}%M',
                 \ 'all_format'  : '%{&ft!=#""?&ft." • ":""}%{&fenc!=#""?&fenc:&enc}[%{&ff}]',
+                \ 'all_lineinfo': '0X%02B ≡%3p%%   %04l/%L  %-2v',
+                \ 'lite_info'   : '%p%%≡%L',
                 \ },
         \ 'component_function': {
-                \ 'mode'        : 'LightlineMode',
-                \ 'operation'   : 'LightlineOperation',
-                \ 'indent'      : 'LightlineCheckMixedIndent',
-                \ 'trailing'    : 'LightlineCheckTrailing',
-                \ 'fw_filepath' : 'LightlineFilepath',
-                \ 'fw_rootdir'  : 'LightlineFindworking',
-                \ },
-        \ 'component_expand': {
-                \},
-        \ 'component_type': {
+                \ 'mode'      : 'LightlineMode',
+                \ 'left_msg'  : 'LightlineMsgLeft',
+                \ 'right_msg' : 'LightlineMsgRight',
+                \ 'indent'    : 'LightlineCheckMixedIndent',
+                \ 'trailing'  : 'LightlineCheckTrailing',
                 \ },
         \ }
     if s:gset.use_powerfont
@@ -643,15 +639,28 @@ if s:gset.use_lightline
         let fname = expand('%:t')
         return fname == '__Tagbar__' ? 'Tagbar' :
             \ fname =~ 'NERD_tree' ? 'NERDTree' :
+            \ &ft ==# 'qf' ? (QuickfixGet()[0] ==# 'q' ? 'Quickfix' : 'Location') :
+            \ &ft ==# 'help' ? 'Help' :
             \ &ft ==# 'Popc' ? popc#ui#GetStatusLineSegments('l')[0] :
             \ &ft ==# 'startify' ? 'Startify' :
             \ winwidth(0) > 60 ? lightline#mode() : ''
     endfunction
     " }}}
-    " FUNCTION: LightlineOperation() {{{
-    function! LightlineOperation()
-        return &ft ==# 'Popc' ? popc#ui#GetStatusLineSegments("r")[0] :
-            \ ''
+    " FUNCTION: LightlineMsgLeft() {{{
+    function! LightlineMsgLeft()
+        if &ft ==# 'qf'
+            return 'CWD = ' . getcwd()
+        else
+            let l:fw = FindWorkingGet()
+            let l:fp = fnamemodify(expand('%'), ':p')
+            return empty(l:fw) ? l:fp : substitute(l:fp, escape(l:fw[0], '\'), '...', '')
+        endif
+    endfunction
+    " }}}
+    " FUNCTION: LightlineMsgRight() {{{
+    function! LightlineMsgRight()
+        let l:fw = FindWorkingGet()
+        return empty(l:fw) ? '' : (l:fw[0] . '[' . l:fw[1] .']')
     endfunction
     " }}}
     " FUNCTION: LightlineCheckMixedIndent() {{{
@@ -664,19 +673,6 @@ if s:gset.use_lightline
     function! LightlineCheckTrailing()
         let ret = search('\s\+$', 'nw')
         return (l:ret == 0) ? '' : 'T:'.string(l:ret)
-    endfunction
-    " }}}
-    " FUNCTION: LightlineFilepath() {{{
-    function! LightlineFilepath()
-        let l:fw = FindWorkingGet()
-        let l:fp = fnamemodify(expand('%'), ':p')
-        return empty(l:fw) ? l:fp : substitute(l:fp, escape(l:fw[0], '\'), '...', '')
-    endfunction
-    " }}}
-    " FUNCTION: LightlineFindworking() {{{
-    function! LightlineFindworking()
-        let l:fw = FindWorkingGet()
-        return empty(l:fw) ? '' : (l:fw[0] . '[' . l:fw[1] .']')
     endfunction
     " }}}
 endif
@@ -768,6 +764,10 @@ endif
                                         " 前一个Sibling
     nnoremap <leader>te :NERDTreeToggle<CR>
     nnoremap <leader>tE :execute ':NERDTree ' . expand('%:p:h')<CR>
+    augroup PluginNerdtree
+        autocmd!
+        autocmd BufEnter * if exists('b:NERDTree') | let &l:statusline='%{b:NERDTree.root.path.str()}' | endif
+    augroup END
 " }}}
 
 " vim-startify {{{ vim会话界面
@@ -1348,8 +1348,7 @@ function! FuncSort() range
 endfunction
 " }}}
 
-" FUNCTION: FuncEditTempFile(suffix, ntab) {{{
-" 编辑临时文件
+" FUNCTION: FuncEditTempFile(suffix, ntab) {{{ 编辑临时文件
 " @param suffix: 临时文件附加后缀
 " @param ntab: 在新tab中打开
 function! FuncEditTempFile(suffix, ntab)
@@ -1367,7 +1366,7 @@ function! FuncEditTempFile(suffix, ntab)
 endfunction
 "}}}
 
-" FUNCTION: FuncDiffFile(filename, mode) {{{
+" FUNCTION: FuncDiffFile(filename, mode) {{{ 文件对比
 function! FuncDiffFile(filename, mode)
     if a:mode ==# 's'
         execute 'diffsplit ' . a:filename
