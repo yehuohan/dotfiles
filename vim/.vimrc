@@ -153,9 +153,10 @@ set rtp+=$DotVimPath
 let s:gset_file = $DotVimPath . '/.gset'
 let s:gset = {
     \ 'use_powerfont' : 1,
-    \ 'use_ycm' : 1,
     \ 'use_fzf' : 1,
+    \ 'use_lightline': 1,
     \ 'use_startify' : 1,
+    \ 'use_ycm' : 1,
     \ }
 " FUNCTION: s:loadGset() {{{
 function! s:loadGset()
@@ -560,6 +561,7 @@ endif
     let g:seoul256_light_background=256 " 252(暗) ~ 256(亮)
     Plug 'altercation/vim-colors-solarized'
     set rtp+=$DotVimPath/bundle/vim-colors-solarized/
+if s:gset.use_lightline
     Plug 'itchyny/lightline.vim'
     "                    
     " ► ✘ ⌘ ▫ ▪ ★ ☆ • ≡ ፨ ♥
@@ -614,11 +616,13 @@ endif
         silent! colorscheme desert
         let g:lightline.colorscheme = 'solarized'
     endtry
+    nnoremap <leader>tl :call lightline#toggle()<CR>
 
-    " FUNCTION: s:lightlineColorScheme() {{{
+    " Augroup: PluginLightline {{{
     augroup PluginLightline
         autocmd!
         autocmd ColorScheme * call s:lightlineColorScheme()
+        autocmd BufReadPre * let f=getfsize(expand("<afile>")) | if f>1024*1024*2 || f==-2 | call lightline#disable() | endif
     augroup END
     function! s:lightlineColorScheme()
         if !exists('g:loaded_lightline')
@@ -675,6 +679,7 @@ endif
         return empty(l:fw) ? '' : (l:fw[0] . '[' . l:fw[1] .']')
     endfunction
     " }}}
+endif
 " }}}
 
 " rainbow {{{ 彩色括号
@@ -1443,7 +1448,7 @@ let s:cpl = {
                     \ 'wdir', 'srcf', 'args', 'outf']
         \},
     \ 'pat' : {
-        \ 'make' : 'TARGET\s*=\s*\(\<[a-zA-Z_][a-zA-Z0-9_]*\)',
+        \ 'make' : '\mTARGET\s*=\s*\(\<[a-zA-Z_][a-zA-Z0-9_]*\)',
         \},
     \ 'sel_cpp' : {
         \ 'opt' : ['cppargs'],
