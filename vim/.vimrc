@@ -540,7 +540,7 @@ endif
         endtry
     endfunction
     function! RepeatExecute()
-        if !empty(s:execution)
+        if exists('s:execution') && !empty(s:execution)
             execute s:execution
         endif
     endfunction
@@ -1238,8 +1238,7 @@ endfunction
 " @param sdir: 查找起始目录，默认从当前目录向上查找到根目录
 " @return 返回找到的文件列表
 function! GetFileList(pat, sdir)
-    let l:start_dir = (a:sdir == '') ? '.' : a:sdir
-    let l:dir      = fnamemodify(l:start_dir, ':p:h')
+    let l:dir      = empty(a:sdir) ? expand('%:p:h') : a:sdir
     let l:dir_last = ''
     let l:pfile    = ''
 
@@ -1257,8 +1256,7 @@ function! GetFileList(pat, sdir)
 endfunction
 " }}}
 
-" FUNCTION: GetFileContent(fp, pat) {{{
-" 获取文件中特定的内容
+" FUNCTION: GetFileContent(fp, pat) {{{ 获取文件中特定的内容
 " @param fp: 目录文件
 " @param pat: 匹配模式，必须使用 \(\) 来提取字符串
 " @param flg: 匹配所有还是第一个
@@ -1304,26 +1302,37 @@ function! GetCmdResult(flg, cmd, args)
 endfunction
 " }}}
 
-" FUNCTION: ExecFuncInput(prompt, text, cmpl, fn, ...) range {{{
-" @param prompt: input的提示信息
-" @param text: input的缺省输入
-" @param cmpl: input的输入输入补全
-" @param fn: 要运行的函数，参数为input的输入，和可变输入参数
-function! ExecFuncInput(prompt, text, cmpl, fn, ...) range
-    if empty(a:cmpl)
-        let l:inpt = input(a:prompt, a:text)
-    else
-        let l:inpt = input(a:prompt, a:text, a:cmpl)
+" FUNCTION: GetInput(prompt, [text, completion, workdir]) {{{ 输入字符串
+" @param workdir: 设置工作目录，用于文件和目录补全
+function! GetInput(prompt, ...)
+    if a:0 == 0
+        return input(a:prompt)
+    elseif a:0 == 1
+        return input(a:prompt, a:1)
+    elseif a:0 == 2
+        return input(a:prompt, a:1, a:2)
+    elseif a:0 == 3
+        execute 'lcd ' . a:3
+        return input(a:prompt, a:1, a:2)
     endif
+endfunction
+" }}}
+
+" FUNCTION: ExecFuncInput(iargs, fn, [fargs...]) range {{{
+" @param iargs: 用于GetInput的参数列表
+" @param fn: 要运行的函数，第一个参数必须为GetInput的输入
+" @param fargs: fn的附加参数
+function! ExecFuncInput(iargs, fn, ...) range
+    let l:inpt = call('GetInput', a:iargs)
     if empty(l:inpt)
         return
     endif
-    let l:args = [l:inpt]
+    let l:fargs = [l:inpt]
     if a:0 > 0
-        call extend(l:args, a:000)
+        call extend(l:fargs, a:000)
     endif
     let l:range = (a:firstline == a:lastline) ? '' : (string(a:firstline) . ',' . string(a:lastline))
-    let Fn = function(a:fn, l:args)
+    let Fn = function(a:fn, l:fargs)
     execute l:range . 'call Fn()'
 endfunction
 " }}}
@@ -1392,10 +1401,10 @@ function! FuncDivideSpace(string, pos) range
     endfor
     call SetRepeatExecution('call FuncDivideSpace("' . a:string . '", "' . a:pos . '")')
 endfunction
-let DivideSpaceH = function('ExecFuncInput', ['Divide H Space(split with space): ', '', '', 'FuncDivideSpace', 'h'])
-let DivideSpaceC = function('ExecFuncInput', ['Divide C Space(split with space): ', '', '', 'FuncDivideSpace', 'c'])
-let DivideSpaceL = function('ExecFuncInput', ['Divide L Space(split with space): ', '', '', 'FuncDivideSpace', 'l'])
-let DivideSpaceD = function('ExecFuncInput', ['Divide D Space(split with space): ', '', '', 'FuncDivideSpace', 'd'])
+let DivideSpaceH = function('ExecFuncInput', [['Divide H Space(split with space): '], 'FuncDivideSpace', 'h'])
+let DivideSpaceC = function('ExecFuncInput', [['Divide C Space(split with space): '], 'FuncDivideSpace', 'c'])
+let DivideSpaceL = function('ExecFuncInput', [['Divide L Space(split with space): '], 'FuncDivideSpace', 'l'])
+let DivideSpaceD = function('ExecFuncInput', [['Divide D Space(split with space): '], 'FuncDivideSpace', 'd'])
 " }}}
 
 " FUNCTION: FuncAppendCmd(str) {{{ 将命令结果作为文本插入
@@ -1412,8 +1421,8 @@ function! FuncAppendCmd(str, flg)
     let l:result = GetCmdResult(a:flg, l:str, l:args)
     call append(line('.'), split(l:result, "\n"))
 endfunction
-let AppendExecResult = function('ExecFuncInput', ['Input cmd = ', '', 'command', 'FuncAppendCmd', 'exec'])
-let AppendCallResult = function('ExecFuncInput', ['Input cmd = ', '', 'function', 'FuncAppendCmd', 'call'])
+let AppendExecResult = function('ExecFuncInput', [['Input cmd = ', '', 'command'] , 'FuncAppendCmd', 'exec'])
+let AppendCallResult = function('ExecFuncInput', [['Input cmd = ', '', 'function'], 'FuncAppendCmd', 'call'])
 " }}}
 " }}}
 
@@ -1479,7 +1488,17 @@ function s:cpl.printf(flg, wdir, args, srcf, outf) dict
     let self.outf = a:outf
     let l:pstr = copy(self.flg[a:flg])
     call map(l:pstr, {key, val -> (key == 0) ? val : get(self, val, '')})
-    return ((exists(':AsyncRun') == 2) ? ':AsyncRun ' : '!') . call('printf', l:pstr)
+    " create execution string
+    if exists(':AsyncRun') == 2
+        let l:exec = ':AsyncRun '
+        if !empty(a:wdir)
+            let l:exec .= '-cwd="' . a:wdir . '" '
+            execute 'lcd ' . a:wdir
+        endif
+    else
+        let l:exec = '!'
+    endif
+    return l:exec . call('printf', l:pstr)
 endfunction
 " }}}
 " }}}
@@ -1489,15 +1508,15 @@ function! ExecSelCpp(sopt, arg)
 endfunction
 
 function! CompileFile(argstr)
-    let l:ext     = expand('%:e')      " 扩展名
-    let l:srcfile = expand('%:t')      " 文件名，不带路径，带扩展名
-    let l:outfile = expand('%:t:r')    " 文件名，不带路径，不带扩展名
+    let l:ext     = expand('%:e')       " 扩展名
+    let l:srcfile = expand('%:t')       " 文件名，不带路径，带扩展名
+    let l:outfile = expand('%:t:r')     " 文件名，不带路径，不带扩展名
+    let l:workdir = expand('%:p:h')     " 当前文件目录
 
-    " 可执行字符串
     if !has_key(s:cpl.flg, l:ext)
         let l:ext = &filetype
     endif
-    let l:exec = s:cpl.printf(l:ext, '', a:argstr, l:srcfile, l:outfile)
+    let l:exec = s:cpl.printf(l:ext, l:workdir, a:argstr, l:srcfile, l:outfile)
     if empty(l:exec)
         echo 's:cpl doesn''t support ' . l:ext
         return
@@ -1508,9 +1527,14 @@ endfunction
 " }}}
 
 " FUNCTION: CompileProject(str, fn, args) {{{
-" 当找到多个Project File时，会弹出选项以供选择。
+" 当找到多个Project文件时，会弹出选项以供选择。
 " @param str: 工程文件名，可用通配符，如*.pro
-" @param fn: 编译工程文件的函数，需要采用popset插件
+" @param fn:
+"   编译工程文件的函数，可能用于popset插件
+"   fn需要3个参数：
+"   - sopt: 自定义参数信息
+"   - sel: Project文件路径
+"   - args: Project的附加参数列表
 " @param args: 编译工程文件函数的附加参数，需要采用popset插件
 function! CompileProject(str, fn, args)
     let l:prj = GetFileList(a:str, '')
@@ -1530,13 +1554,9 @@ endfunction
 " }}}
 
 " FUNCTION: CompileProjectQt(sopt, sel, args) {{{
-" 用于popset的函数，用于编译qmake工程并运行生成的可执行文件。
-" @param sopt: 参数信息，未用到，只是传入popset的函数需要
-" @param sel: pro文件路径
-" @param args: make命令附加参数列表
 function! CompileProjectQt(sopt, sel, args)
     let l:srcfile = fnamemodify(a:sel, ':p:t')
-    let l:outfile = GetFileContent(a:sel, s:cpl.pat.make， 'first')
+    let l:outfile = GetFileContent(a:sel, s:cpl.pat.make, 'first')
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
@@ -1546,10 +1566,6 @@ endfunction
 " }}}
 
 " FUNCTION: CompileProjectMake(sopt, sel, args) {{{
-" 用于popset的函数，用于编译makefile工程并运行生成的可执行文件。
-" @param sopt: 参数信息，未用到，只是传入popset的函数需要
-" @param sel: makefile文件路径
-" @param args: make命令附加参数列表
 function! CompileProjectMake(sopt, sel, args)
     let l:outfile = GetFileContent(a:sel, s:cpl.pat.make, 'first')
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
@@ -1561,10 +1577,6 @@ endfunction
 "}}}
 
 " FUNCTION: CompileProjectQtVs(sopt, sel, args) {{{
-" 用于popset的函数，用于编译vs工程并运行生成的可执行文件。
-" @param sopt: 参数信息，未用到，只是传入popset的函数需要
-" @param sel: sln文件路径
-" @param args: devenv命令附加参数列表
 function! CompileProjectVs(sopt, sel, args)
     let l:srcfile = fnamemodify(a:sel, ':p:t')
     let l:outfile = fnamemodify(a:sel, ':p:t:r')
@@ -1576,9 +1588,6 @@ endfunction
 " }}}
 
 " FUNCTION: CompileProjectHtml(sopt, sel, args) {{{
-" 用于popset的函数，用于打开index.html
-" @param sopt: 参数信息，未用到，只是传入popset的函数需要
-" @param sel: index.html路径
 function! CompileProjectHtml(sopt, sel, args)
     execute s:cpl.printf('html', '', '', a:sel, '')
 endfunction
@@ -1623,8 +1632,6 @@ function! s:fw.exec() dict
     endif
     call SetRepeatExecution(l:exec)
 endfunction
-" }}}
-
 let s:fw_markers = ['.root', '.git', '.svn']
 let s:fw_nvmaps = [
                 \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fri',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'frI',
@@ -1656,6 +1663,7 @@ let s:fw_nvmaps = [
                 \ 'fvs', 'fvps', 'fvS',  'fvpS',
                 \ 'fv=', 'fvp=', 'fv=',  'fvp=',
                 \ ]
+" }}}
 " }}}
 function! FindWorking(keys, mode)
     " doc
@@ -1697,14 +1705,14 @@ function! FindWorking(keys, mode)
         let l:pat = ''
         if a:mode ==# 'n'
             if a:keys =~? 'i'
-                let l:pat = input(' What to find: ')
+                let l:pat = GetInput(' What to find: ')
             elseif a:keys =~? '[ws]'
                 let l:pat = expand('<cword>')
             endif
         elseif a:mode ==# 'v'
             let l:selected = GetSelected()
             if a:keys =~? 'i'
-                let l:pat = input(' What to find: ', l:selected)
+                let l:pat = GetInput(' What to find: ', l:selected)
             elseif a:keys =~? '[ws]'
                 let l:pat = l:selected
             endif
@@ -1729,7 +1737,7 @@ function! FindWorking(keys, mode)
         elseif a:keys =~# 'o'
             let l:loc = join(popc#layer#buf#GetFiles('alltab'), ' ')
         elseif a:keys =~# 'p'
-            let l:loc = input(' Where to find: ', '', 'customlist,GetMultiFilesCompletion')
+            let l:loc = GetInput(' Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
         elseif a:keys =~# 'r'
             let l:loc = FindWorkingSet() ? s:fw.root : ''
         else
@@ -1753,7 +1761,7 @@ function! FindWorking(keys, mode)
             let l:opt .= '-g "*.{' . s:fw.filters . '}" '
         endif
         if a:keys =~# 'F'
-            let l:opt .= input(' Args(-F, --hidden ...) to append: ', '')
+            let l:opt .= GetInput(' Args(-F, --hidden ...) to append: ')
         endif
         return l:opt
     endfunction
@@ -1786,7 +1794,7 @@ function! FindWorking(keys, mode)
         " set loaction
         let l:loc = '%'
         if a:keys =~# 'p'
-            let l:loc = input(' Where to find: ', '', 'customlist,GetMultiFilesCompletion')
+            let l:loc = GetInput(' Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
             if empty(l:loc) | return 0 | endif
         endif
 
@@ -1831,7 +1839,7 @@ function! FindWorkingRoot()
         return
     endif
 
-    let l:dir = fnamemodify('.', ':p:h')
+    let l:dir = fnamemodify(expand('%'), ':p:h')
     let l:dir_last = ''
     while l:dir !=# l:dir_last
         let l:dir_last = l:dir
@@ -1849,12 +1857,12 @@ endfunction
 
 " FUNCTION: FindWorkingSet() {{{ 设置root路径
 function! FindWorkingSet()
-    let l:root = input(' Where (Root) to find: ', '', 'dir')
+    let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
     if empty(l:root)
         return 0
     endif
     let s:fw.root = fnamemodify(l:root, ':p')
-    let s:fw.filters = input(' Which (Filter) to find: ', '')
+    let s:fw.filters = GetInput(' Which (Filter) to find: ')
     return 1
 endfunction
 " }}}
@@ -1871,7 +1879,7 @@ endfunction
 " FUNCTION: FindWorkingFile(r) {{{ 查找文件
 function! FindWorkingFile(r)
     if a:r
-        let l:root = input(' Where (Root) to find: ', '', 'dir')
+        let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
         if empty(l:root)
             return 0
         endif
@@ -1887,7 +1895,7 @@ function! FindWorkingFile(r)
 endfunction
 " }}}
 
-" FUNCTION: FindWorkingHighlight(...) {{{ 高亮字符串
+" FUNCTION: FindWorkingHighlight([string]) {{{ 高亮字符串
 function! FindWorkingHighlight(...)
     if &filetype ==# 'leaderf'
         " use leaderf's highlight
@@ -2151,7 +2159,7 @@ endif
     set bufhidden=                      " 跟随hidden设置
     set nobackup                        " 不生成备份文件
     set nowritebackup                   " 覆盖文件前，不生成备份文件
-    set autochdir                       " 自动切换当前目录为当前文件所在的目录
+    set noautochdir                     " 禁止自动切换当前目录为当前文件所在的目录
     set noautowrite                     " 禁止自动保存文件
     set noautowriteall                  " 禁止自动保存文件
     set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
@@ -2440,8 +2448,8 @@ endif
 
 " File diff {{{
     " 文件比较，自动补全文件和目录
-    nnoremap <leader>ds :call ExecFuncInput('File: ', '', 'file', 'FuncDiffFile', 's')<CR>
-    nnoremap <leader>dv :call ExecFuncInput('File: ', '', 'file', 'FuncDiffFile', 'v')<CR>
+    nnoremap <leader>ds :call ExecFuncInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 's')<CR>
+    nnoremap <leader>dv :call ExecFuncInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 'v')<CR>
     " 比较当前文件（已经分屏）
     nnoremap <leader>dt :diffthis<CR>
     " 关闭文件比较，与diffthis互为逆命令
@@ -2470,20 +2478,18 @@ endif
 
 " Coding {{{
     " 建立临时文件
-    nnoremap <leader>ei :call ExecFuncInput('TempFile Suffix:', '', '', 'FuncEditTempFile', 0)<CR>
+    nnoremap <leader>ei :call ExecFuncInput(['TempFile Suffix: '], 'FuncEditTempFile', 0)<CR>
     nnoremap <leader>en :call FuncEditTempFile (''   , 0)<CR>
     nnoremap <leader>ec :call FuncEditTempFile ('c'  , 0)<CR>
     nnoremap <leader>ea :call FuncEditTempFile ('cpp', 0)<CR>
     nnoremap <leader>ep :call FuncEditTempFile ('py' , 0)<CR>
     nnoremap <leader>eg :call FuncEditTempFile ('go' , 0)<CR>
-    nnoremap <leader>em :call FuncEditTempFile ('m'  , 0)<CR>
-    nnoremap <leader>eti :call ExecFuncInput('TempFile Suffix:', '', '', 'FuncEditTempFile', 1)<CR>
+    nnoremap <leader>eti :call ExecFuncInput(['TempFile Suffix: '], 'FuncEditTempFile', 1)<CR>
     nnoremap <leader>etn :call FuncEditTempFile(''   , 1)<CR>
     nnoremap <leader>etc :call FuncEditTempFile('c'  , 1)<CR>
     nnoremap <leader>eta :call FuncEditTempFile('cpp', 1)<CR>
     nnoremap <leader>etp :call FuncEditTempFile('py' , 1)<CR>
     nnoremap <leader>etg :call FuncEditTempFile('go' , 1)<CR>
-    nnoremap <leader>etm :call FuncEditTempFile('m'  , 1)<CR>
     nnoremap <leader>ss :call FuncSort()<CR>
     nnoremap <leader>dh :call DivideSpaceH()<CR>
     nnoremap <leader>dc :call DivideSpaceC()<CR>
@@ -2493,7 +2499,7 @@ endif
     nnoremap <leader>af :call AppendCallResult()<CR>
     " 编译运行当前文件
     nnoremap <leader>rf :call CompileFile('')<CR>
-    nnoremap <leader>ri :call ExecFuncInput('Compile Args: ', '', 'customlist,GetMultiFilesCompletion', 'CompileFile')<CR>
+    nnoremap <leader>ri :call ExecFuncInput(['Compile Args: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h')], 'CompileFile')<CR>
     nnoremap <leader>ra :call RC_Args()<CR>
     nnoremap <leader>rq :call RC_Qt()<CR>
     nnoremap <leader>rv :call RC_Vs()<CR>
