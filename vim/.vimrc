@@ -426,7 +426,7 @@ if s:gset.use_fzf
     endif
     Plug 'junegunn/fzf.vim'
     let g:fzf_command_prefix = 'Fzf'
-    nnoremap <leader>fF :FzfFiles
+    nnoremap <leader><leader>f :call feedkeys(':FzfFiles ', 'n')<CR>
 endif
 " }}}
 
@@ -447,8 +447,8 @@ endif
     let g:Lf_ShortcutF = ''
     let g:Lf_ShortcutB = ''
     let g:Lf_ReverseOrder = 1
+    nnoremap <leader><leader>l :call feedkeys(':LeaderfFile ', 'n')<CR>
     nnoremap <leader>lf :LeaderfFile<CR>
-    nnoremap <leader>lF :LeaderfFile
     nnoremap <leader>lu :LeaderfFunction<CR>
     nnoremap <leader>lU :LeaderfFunctionAll<CR>
     nnoremap <leader>ll :LeaderfLine<CR>
@@ -487,8 +487,8 @@ endif
     "               第3个field又重新从第1个对齐符开始（对齐符可以有多个，循环使用）
     "               这样就相当于：需对齐的field使用第1个对齐符，分割符(,)field使用第2个对齐符
     " /,\zs     -   将分割符(,)作为对齐内容field里的字符
-    vnoremap <leader>al :Tabularize /
-    nnoremap <leader>al :Tabularize /
+    nnoremap <leader><leader>a :call feedkeys(':Tabularize /', 'n')<CR>
+    vnoremap <leader><leader>a :Tabularize /
 " }}}
 
 " smooth-scroll {{{ 平滑滚动
@@ -612,13 +612,14 @@ if s:gset.use_lightline
         silent! colorscheme desert
         let g:lightline.colorscheme = 'solarized'
     endtry
+    let s:lightline_check = 1
     nnoremap <leader>tl :call lightline#toggle()<CR>
 
     " Augroup: PluginLightline {{{
     augroup PluginLightline
         autocmd!
         autocmd ColorScheme * call s:lightlineColorScheme()
-        autocmd BufReadPre * let f=getfsize(expand("<afile>")) | if f>1024*1024*2 || f==-2 | call lightline#disable() | endif
+        autocmd BufReadPre * call s:lightlineCheck(getfsize(expand('<afile>')))
     augroup END
     function! s:lightlineColorScheme()
         if !exists('g:loaded_lightline')
@@ -632,6 +633,9 @@ if s:gset.use_lightline
         " E117: 函数不存在
         catch /^Vim\%((\a\+)\)\=:E117/
         endtry
+    endfunction
+    function! s:lightlineCheck(size)
+        let s:lightline_check = (a:size > 1024*1024*2 || a:size == -2) ? 0 : 1
     endfunction
     " }}}
     " FUNCTION: LightlineMode() {{{
@@ -665,12 +669,18 @@ if s:gset.use_lightline
     " }}}
     " FUNCTION: LightlineCheckMixedIndent() {{{
     function! LightlineCheckMixedIndent()
+        if !s:lightline_check
+            return ''
+        endif
         let l:ret = search('\t', 'nw')
         return (l:ret == 0) ? '' : 'I:'.string(l:ret)
     endfunction
     " }}}
     " FUNCTION: LightlineCheckTrailing() {{{
     function! LightlineCheckTrailing()
+        if !s:lightline_check
+            return ''
+        endif
         let ret = search('\s\+$', 'nw')
         return (l:ret == 0) ? '' : 'T:'.string(l:ret)
     endfunction
@@ -722,7 +732,7 @@ endif
             \ 'cmd' : '',
         \},]
     " set option with PSet
-    nnoremap <leader>so :PSet
+    nnoremap <leader><leader>s :call feedkeys(':PSet ', 'n')<CR>
     nnoremap <leader>sa :PSet popset<CR>
 " }}}
 
@@ -742,7 +752,7 @@ endif
     nnoremap <M-o> :PopcBufferSwitchRight<CR>
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
-    nnoremap <leader><leader>fw :call PopcWksSearch()<CR>
+    nnoremap <leader>wf :call PopcWksSearch()<CR>
     function! PopcWksSearch()
         let l:wks_root = popc#layer#wks#GetCurrentWks()[1]
         if !empty(l:wks_root)
@@ -1046,7 +1056,7 @@ endif
 " }}}
 
 " file switch {{{ c/c++文件切换
-    Plug 'derekwyatt/vim-fswitch'
+    Plug 'derekwyatt/vim-fswitch', {'for': 'cpp'}
     nnoremap <Leader>of :FSHere<CR>
     nnoremap <Leader>os :FSSplitRight<CR>
     let g:fsnonewfiles='on'
@@ -1057,7 +1067,8 @@ endif
     if IsWin()
         let g:asyncrun_encs = 'cp936'   " 即'gbk'编码
     endif
-    nnoremap <leader>rr :AsyncRun
+    nnoremap <leader><leader>r :call feedkeys(':AsyncRun ', 'n')<CR>
+    nnoremap <leader>rr :call feedkeys(':AsyncRun ', 'n')<CR>
     nnoremap <leader>rs :AsyncStop<CR>
     augroup PluginAsyncrun
         autocmd!
@@ -1161,13 +1172,13 @@ endif
             call openbrowser#search(GetSelected(), a:engine)
         endif
     endfunction
-    nnoremap <leader>big :OpenBrowserSearch -google
+    nnoremap <leader>big :call feedkeys(':OpenBrowserSearch -google ', 'n')<CR>
     nnoremap <leader>bg  :call OpenBrowserSearchInGoogle('google', 'n')<CR>
     vnoremap <leader>bg  :call OpenBrowserSearchInGoogle('google', 'v')<CR>
-    nnoremap <leader>bib :OpenBrowserSearch -baidu
+    nnoremap <leader>bib :call feedkeys(':OpenBrowserSearch -baidu ', 'n')<CR>
     nnoremap <leader>bb  :call OpenBrowserSearchInGoogle('baidu', 'n')<CR>
     vnoremap <leader>bb  :call OpenBrowserSearchInGoogle('baidu', 'v')<CR>
-    nnoremap <leader>bih :OpenBrowserSearch -github
+    nnoremap <leader>bih :call feedkeys(':OpenBrowserSearch -github ', 'n')<CR>
     nnoremap <leader>bh  :call OpenBrowserSearchInGoogle('github', 'n')<CR>
     vnoremap <leader>bh  :call OpenBrowserSearchInGoogle('github', 'v')<CR>
 "}}}
@@ -1854,7 +1865,7 @@ function! FindWorkingRoot()
 endfunction
 " }}}
 
-" FUNCTION: FindWorkingSet() {{{ 设置root路径
+" FUNCTION: FindWorkingSet() {{{ 设置root和filter
 function! FindWorkingSet()
     let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
     if empty(l:root)
@@ -1877,18 +1888,19 @@ endfunction
 
 " FUNCTION: FindWorkingFile(r) {{{ 查找文件
 function! FindWorkingFile(r)
-    if a:r
+    if !a:r && empty(s:fw.root)
+        call FindWorkingRoot()
+    endif
+    if a:r || empty(s:fw.root)
         let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
         if empty(l:root)
             return 0
         endif
         let s:fw.root = fnamemodify(l:root, ':p')
     endif
+
     if empty(s:fw.root)
-        call FindWorkingRoot()
-    endif
-    if empty(s:fw.root)
-        call FindWorkingSet()
+        return 0
     endif
     execute ':LeaderfFile ' . s:fw.root
 endfunction
@@ -2158,7 +2170,7 @@ endif
     set bufhidden=                      " 跟随hidden设置
     set nobackup                        " 不生成备份文件
     set nowritebackup                   " 覆盖文件前，不生成备份文件
-    set noautochdir                     " 禁止自动切换当前目录为当前文件所在的目录
+    set autochdir                       " 自动切换当前目录为当前文件所在的目录
     set noautowrite                     " 禁止自动保存文件
     set noautowriteall                  " 禁止自动保存文件
     set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
