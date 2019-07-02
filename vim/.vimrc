@@ -1056,7 +1056,7 @@ endif
 " }}}
 
 " file switch {{{ c/c++文件切换
-    Plug 'derekwyatt/vim-fswitch', {'for': 'cpp'}
+    Plug 'derekwyatt/vim-fswitch', {'for': ['cpp', 'c']}
     nnoremap <Leader>of :FSHere<CR>
     nnoremap <Leader>os :FSSplitRight<CR>
     let g:fsnonewfiles='on'
@@ -2501,7 +2501,7 @@ endif
     nnoremap <leader>eta :call FuncEditTempFile('cpp', 1)<CR>
     nnoremap <leader>etp :call FuncEditTempFile('py' , 1)<CR>
     nnoremap <leader>etg :call FuncEditTempFile('go' , 1)<CR>
-    nnoremap <leader>ss :call FuncSort()<CR>
+    nnoremap <leader>so :call FuncSort()<CR>
     nnoremap <leader>dh :call DivideSpaceH()<CR>
     nnoremap <leader>dc :call DivideSpaceC()<CR>
     nnoremap <leader>dl :call DivideSpaceL()<CR>
