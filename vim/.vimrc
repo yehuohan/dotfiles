@@ -1843,7 +1843,27 @@ function! FindWorking(keys, mode)
 endfunction
 " }}}
 
-" FUNCTION: FindWorkingRoot() {{{ 检测root路径
+" FUNCTION: FindWorkingFile(r) {{{ 查找文件
+function! FindWorkingFile(r)
+    if !a:r && empty(s:fw.root)
+        call FindWorkingRoot()
+    endif
+    if a:r || empty(s:fw.root)
+        let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
+        if empty(l:root)
+            return 0
+        endif
+        let s:fw.root = fnamemodify(l:root, ':p')
+    endif
+
+    if empty(s:fw.root)
+        return 0
+    endif
+    execute ':LeaderfFile ' . s:fw.root
+endfunction
+" }}}
+
+" FUNCTION: FindWorkingRoot() {{{ 查找root路径
 function! FindWorkingRoot()
     if empty(s:fw_markers)
         return
@@ -1865,7 +1885,7 @@ function! FindWorkingRoot()
 endfunction
 " }}}
 
-" FUNCTION: FindWorkingSet() {{{ 设置root和filter
+" FUNCTION: FindWorkingSet() {{{ 设置root和filters
 function! FindWorkingSet()
     let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
     if empty(l:root)
@@ -1877,32 +1897,12 @@ function! FindWorkingSet()
 endfunction
 " }}}
 
-" FUNCTION: FindWorkingGet() {{{ 获取root信息
+" FUNCTION: FindWorkingGet() {{{ 获取root和filters
 function! FindWorkingGet()
     if empty(s:fw.root)
         return []
     endif
     return [s:fw.root, s:fw.filters]
-endfunction
-" }}}
-
-" FUNCTION: FindWorkingFile(r) {{{ 查找文件
-function! FindWorkingFile(r)
-    if !a:r && empty(s:fw.root)
-        call FindWorkingRoot()
-    endif
-    if a:r || empty(s:fw.root)
-        let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
-        if empty(l:root)
-            return 0
-        endif
-        let s:fw.root = fnamemodify(l:root, ':p')
-    endif
-
-    if empty(s:fw.root)
-        return 0
-    endif
-    execute ':LeaderfFile ' . s:fw.root
 endfunction
 " }}}
 
