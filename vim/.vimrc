@@ -443,7 +443,11 @@ else
     Plug 'Yggdroot/LeaderF'
 endif
     let g:Lf_CacheDirectory = $DotVimPath
-    let g:Lf_StlSeparator = {'left': '', 'right': '', 'font': ''}
+if s:gset.use_powerfont
+    let g:Lf_StlSeparator = {'left': '', 'right': ''}
+else
+    let g:Lf_StlSeparator = {'left': '', 'right': ''}
+endif
     let g:Lf_ShortcutF = ''
     let g:Lf_ShortcutB = ''
     let g:Lf_ReverseOrder = 1
@@ -571,10 +575,10 @@ if s:gset.use_lightline
         \ 'active': {
                 \ 'left' : [['mode'],
                 \           ['all_filesign'],
-                \           ['left_msg']],
-                \ 'right': [['all_lineinfo', 'indent', 'trailing'],
+                \           ['msg_left']],
+                \ 'right': [['all_lineinfo', 'chk_indent', 'chk_trailing'],
                 \           ['all_format'],
-                \           ['right_msg']],
+                \           ['msg_right']],
                 \ },
         \ 'inactive': {
                 \ 'left' : [['absolutepath']],
@@ -591,11 +595,11 @@ if s:gset.use_lightline
                 \ 'lite_info'   : '%p%%≡%L',
                 \ },
         \ 'component_function': {
-                \ 'mode'      : 'LightlineMode',
-                \ 'left_msg'  : 'LightlineMsgLeft',
-                \ 'right_msg' : 'LightlineMsgRight',
-                \ 'indent'    : 'LightlineCheckMixedIndent',
-                \ 'trailing'  : 'LightlineCheckTrailing',
+                \ 'mode'        : 'LightlineMode',
+                \ 'msg_left'    : 'LightlineMsgLeft',
+                \ 'msg_right'   : 'LightlineMsgRight',
+                \ 'chk_indent'  : 'LightlineCheckMixedIndent',
+                \ 'chk_trailing': 'LightlineCheckTrailing',
                 \ },
         \ }
     if s:gset.use_powerfont
@@ -612,7 +616,7 @@ if s:gset.use_lightline
         silent! colorscheme desert
         let g:lightline.colorscheme = 'solarized'
     endtry
-    let s:lightline_check = 1
+    let s:lightline_check_flg = 1       " 是否检测Tab和Trailing
     nnoremap <leader>tl :call lightline#toggle()<CR>
 
     " Augroup: PluginLightline {{{
@@ -635,7 +639,7 @@ if s:gset.use_lightline
         endtry
     endfunction
     function! s:lightlineCheck(size)
-        let s:lightline_check = (a:size > 1024*1024*2 || a:size == -2) ? 0 : 1
+        let s:lightline_check_flg = (a:size > 1024*1024*2 || a:size == -2) ? 0 : 1
     endfunction
     " }}}
     " FUNCTION: LightlineMode() {{{
@@ -669,7 +673,7 @@ if s:gset.use_lightline
     " }}}
     " FUNCTION: LightlineCheckMixedIndent() {{{
     function! LightlineCheckMixedIndent()
-        if !s:lightline_check
+        if !s:lightline_check_flg
             return ''
         endif
         let l:ret = search('\t', 'nw')
@@ -678,7 +682,7 @@ if s:gset.use_lightline
     " }}}
     " FUNCTION: LightlineCheckTrailing() {{{
     function! LightlineCheckTrailing()
-        if !s:lightline_check
+        if !s:lightline_check_flg
             return ''
         endif
         let ret = search('\s\+$', 'nw')
@@ -1844,6 +1848,7 @@ endfunction
 " }}}
 
 " FUNCTION: FindWorkingFile(r) {{{ 查找文件
+" @param r: 是否设置查找目录s:fw.root
 function! FindWorkingFile(r)
     if !a:r && empty(s:fw.root)
         call FindWorkingRoot()
@@ -1907,6 +1912,7 @@ endfunction
 " }}}
 
 " FUNCTION: FindWorkingHighlight([string]) {{{ 高亮字符串
+" @param string: 若有字符串，则先添加到s:fw.strings，再高亮
 function! FindWorkingHighlight(...)
     if &filetype ==# 'leaderf'
         " use leaderf's highlight
