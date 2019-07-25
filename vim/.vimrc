@@ -741,7 +741,7 @@ endif
 " }}}
 
 " popc {{{ buffer管理
-    Plug 'yehuohan/popc', {'branch': 'dev'}
+    Plug 'yehuohan/popc'
     set hidden
     let g:Popc_jsonPath = $DotVimPath
     let g:Popc_useTabline = 1
