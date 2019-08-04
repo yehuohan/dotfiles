@@ -2152,6 +2152,7 @@ endfunction
 " {{{
 " Term {{{
     syntax on                           " 语法高亮
+    filetype plugin indent on           " 打开文件类型检测
     set number                          " 显示行号
     set relativenumber                  " 显示相对行号
     set cursorline                      " 高亮当前行
@@ -2288,6 +2289,7 @@ augroup UserSettingsCmd
     autocmd BufNewFile *    set fileformat=unix
     autocmd GuiEnter *      set t_vb=   " 关闭可视闪铃(即闪屏)
     autocmd BufEnter *.tikz set filetype=tex
+    autocmd BufEnter *.gv   set filetype=dot
 
     autocmd Filetype vim    setlocal foldmethod=marker
     autocmd Filetype c      setlocal foldmethod=syntax
