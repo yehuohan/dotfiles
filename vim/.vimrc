@@ -68,8 +68,9 @@
     " fzf         : Fzf模糊查找
     " ripgrep     : Rg文本查找
     " ctags       : tags生成
+    " cflow       : c语言函数调用流程分析
+    " astyle      : 代码格式化工具
     " fireFox     : Markdown,ReStructruedText等标记文本预览
-    " fcitx       : Linux下的输入法
 " }}}
 " }}}
 
@@ -900,6 +901,17 @@ if s:gset.use_ycm
     let g:ycm_key_list_stop_completion = ['<C-y>']              " 关闭补全menu
     let g:ycm_key_invoke_completion = '<C-l>'                   " 显示补全内容
     let g:ycm_key_detailed_diagnostics = ''                     " 直接map :YcmShowDetailedDiagnostic命令即可
+    let g:ycm_filetype_blacklist = {
+          \ 'tagbar': 1,
+          \ 'notes': 1,
+          \ 'netrw': 1,
+          \ 'unite': 1,
+          \ 'text': 1,
+          \ 'vimwiki': 1,
+          \ 'pandoc': 1,
+          \ 'infolog': 1,
+          \ 'mail': 1
+          \}                                                    " 禁用YCM的列表
     let g:ycm_key_list_select_completion = ['<C-j>', '<C-n>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-k>', '<C-p>', '<Up>']
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
