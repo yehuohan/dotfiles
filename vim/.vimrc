@@ -70,6 +70,7 @@
     " ctags       : tags生成
     " cflow       : c语言函数调用流程分析
     " astyle      : 代码格式化工具
+    " graphviz    : 画图工具
     " fireFox     : Markdown,ReStructruedText等标记文本预览
 " }}}
 " }}}
@@ -1470,10 +1471,12 @@ let s:cpl = {
         \ 'java' : ['javac %s && java %s'                          , 'srcf'  , 'outf'] ,
         \ 'json' : ['python -m json.tool %s'                       , 'srcf'] ,
         \ 'm'    : ['matlab -nosplash -nodesktop -r %s'            , 'outf'] ,
+        \ 'dot'  : ['dotty %s && dot -Tpng %s -o %s.png'           , 'srcf'  , 'srcf'  , 'outf'],
+        \ 'gv'   : ['dotty %s && dot -Tpng %s -o %s.png'           , 'srcf'  , 'srcf'  , 'outf'],
         \ 'sh'   : ['./%s %s'                                      , 'srcf'  , 'args'] ,
         \ 'bat'  : ['%s %s'                                        , 'srcf'  , 'args'] ,
         \ 'html' : ['"' . s:path.browser . '" %s'                  , 'srcf'] ,
-        \ 'make' : ['cd "%s" && make %s && "./%s"'                   , 'wdir'  , 'args'  , 'outf'] ,
+        \ 'make' : ['cd "%s" && make %s && "./%s"'                 , 'wdir'  , 'args'  , 'outf'] ,
         \ 'qt'   : ['cd "%s" && ' . (IsWin() ?
                     \ (s:path.qmake . ' -r "%s" && ' . s:path.vcvars . ' && nmake -f Makefile.Debug') :
                     \ ('qmake "%s" && make'))
