@@ -1119,6 +1119,10 @@ endif
 " cpp-enhanced-highlight {{{ c++语法高亮
     Plug 'octol/vim-cpp-enhanced-highlight', {'for': 'cpp'}
 " }}}
+
+" dart-vim-plugin {{{ dart语法高亮
+    Plug 'dart-lang/dart-vim-plugin', {'for': 'dart'}
+" }}}
 " }}}
 
 " 软件辅助
@@ -1471,6 +1475,7 @@ let s:cpl = {
         \ 'java' : ['javac %s && java %s'                          , 'srcf'  , 'outf'] ,
         \ 'json' : ['python -m json.tool %s'                       , 'srcf'] ,
         \ 'm'    : ['matlab -nosplash -nodesktop -r %s'            , 'outf'] ,
+        \ 'dart' : ['dart %s %s'                                   , 'srcf'  , 'args'] ,
         \ 'dot'  : ['dotty %s && dot -Tpng %s -o %s.png'           , 'srcf'  , 'srcf'  , 'outf'],
         \ 'gv'   : ['dotty %s && dot -Tpng %s -o %s.png'           , 'srcf'  , 'srcf'  , 'outf'],
         \ 'sh'   : ['./%s %s'                                      , 'srcf'  , 'args'] ,
