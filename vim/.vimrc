@@ -177,8 +177,8 @@ endfunction
 " }}}
 " FUNCTION: s:initGset() {{{
 function! s:initGset()
-    for key in keys(s:gset)
-        let s:gset[key] = input('let s:gset.'. key . ' = ', s:gset[key])
+    for [key, val] in items(s:gset)
+        let s:gset[key] = input('let s:gset.'. key . ' = ', val)
     endfor
     redraw
     call s:saveGset()
@@ -1383,6 +1383,13 @@ endfunction
 " FUNCTION: FuncEditTempFile(suffix, ntab) {{{ 编辑临时文件
 " @param suffix: 临时文件附加后缀
 " @param ntab: 在新tab中打开
+let s:func_file_extension = {
+            \ 'n' : '',
+            \ 'c' : 'c',
+            \ 'a' : 'cpp',
+            \ 'p' : 'py',
+            \ 'g' : 'go',
+            \}
 function! FuncEditTempFile(suffix, ntab)
     let l:tempfile = fnamemodify(tempname(), ':r')
     if empty(a:suffix)
@@ -1432,10 +1439,10 @@ function! FuncDivideSpace(string, pos) range
     endfor
     call SetRepeatExecution('call FuncDivideSpace("' . a:string . '", "' . a:pos . '")')
 endfunction
-let DivideSpaceH = function('ExecFuncInput', [['Divide H Space(split with space): '], 'FuncDivideSpace', 'h'])
-let DivideSpaceC = function('ExecFuncInput', [['Divide C Space(split with space): '], 'FuncDivideSpace', 'c'])
-let DivideSpaceL = function('ExecFuncInput', [['Divide L Space(split with space): '], 'FuncDivideSpace', 'l'])
-let DivideSpaceD = function('ExecFuncInput', [['Divide D Space(split with space): '], 'FuncDivideSpace', 'd'])
+let FuncDivideSpaceH = function('ExecFuncInput', [['Divide H Space(split with space): '], 'FuncDivideSpace', 'h'])
+let FuncDivideSpaceC = function('ExecFuncInput', [['Divide C Space(split with space): '], 'FuncDivideSpace', 'c'])
+let FuncDivideSpaceL = function('ExecFuncInput', [['Divide L Space(split with space): '], 'FuncDivideSpace', 'l'])
+let FuncDivideSpaceD = function('ExecFuncInput', [['Delete D Space(split with space): '], 'FuncDivideSpace', 'd'])
 " }}}
 
 " FUNCTION: FuncAppendCmd(str) {{{ 将命令结果作为文本插入
@@ -1452,8 +1459,8 @@ function! FuncAppendCmd(str, flg)
     let l:result = GetCmdResult(a:flg, l:str, l:args)
     call append(line('.'), split(l:result, "\n"))
 endfunction
-let AppendExecResult = function('ExecFuncInput', [['Input cmd = ', '', 'command'] , 'FuncAppendCmd', 'exec'])
-let AppendCallResult = function('ExecFuncInput', [['Input cmd = ', '', 'function'], 'FuncAppendCmd', 'call'])
+let FuncAppendExecResult = function('ExecFuncInput', [['Input cmd = ', '', 'command'] , 'FuncAppendCmd', 'exec'])
+let FuncAppendCallResult = function('ExecFuncInput', [['Input cmd = ', '', 'function'], 'FuncAppendCmd', 'call'])
 " }}}
 " }}}
 
@@ -1657,6 +1664,7 @@ let s:fw = {
     \ 'root'     : '',
     \ 'filters'  : '',
     \ 'strings'  : [],
+    \ 'markers'  : ['.root', '.git', '.svn'],
     \}
 function! s:fw.exec() dict
     let l:exec = self.command . ' ' . self.pattern . ' ' . self.location . ' ' . self.options
@@ -1666,7 +1674,6 @@ function! s:fw.exec() dict
     endif
     call SetRepeatExecution(l:exec)
 endfunction
-let s:fw_markers = ['.root', '.git', '.svn']
 let s:fw_nvmaps = [
                 \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fri',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'frI',
                 \  'fw',  'fbw',  'ftw',  'fow',  'fpw',  'frw',  'fW',  'fbW',  'ftW',  'foW',  'fpW',  'frW',
@@ -1890,7 +1897,7 @@ endfunction
 
 " FUNCTION: FindWorkingRoot() {{{ 查找root路径
 function! FindWorkingRoot()
-    if empty(s:fw_markers)
+    if empty(s:fw.markers)
         return
     endif
 
@@ -1898,7 +1905,7 @@ function! FindWorkingRoot()
     let l:dir_last = ''
     while l:dir !=# l:dir_last
         let l:dir_last = l:dir
-        for m in s:fw_markers
+        for m in s:fw.markers
             let l:root = l:dir . '/' . m
             if filereadable(l:root) || isdirectory(l:root)
                 let s:fw.root = fnameescape(l:dir)
@@ -2243,7 +2250,7 @@ if IsGVim()
         set guifontwide=WenQuanYi\ Micro\ Hei\ Mono\ 12
     elseif IsWin()
         set lines=25
-        set columns=100
+        set columns=90
         "set guifont=Consolas:h13:cANSI
         set guifont=Consolas_For_Powerline:h12:cANSI
         set linespace=0                 " required by Powerline Font
@@ -2518,24 +2525,18 @@ endif
 " Coding {{{
     " 建立临时文件
     nnoremap <leader>ei :call ExecFuncInput(['TempFile Suffix: '], 'FuncEditTempFile', 0)<CR>
-    nnoremap <leader>en :call FuncEditTempFile (''   , 0)<CR>
-    nnoremap <leader>ec :call FuncEditTempFile ('c'  , 0)<CR>
-    nnoremap <leader>ea :call FuncEditTempFile ('cpp', 0)<CR>
-    nnoremap <leader>ep :call FuncEditTempFile ('py' , 0)<CR>
-    nnoremap <leader>eg :call FuncEditTempFile ('go' , 0)<CR>
     nnoremap <leader>eti :call ExecFuncInput(['TempFile Suffix: '], 'FuncEditTempFile', 1)<CR>
-    nnoremap <leader>etn :call FuncEditTempFile(''   , 1)<CR>
-    nnoremap <leader>etc :call FuncEditTempFile('c'  , 1)<CR>
-    nnoremap <leader>eta :call FuncEditTempFile('cpp', 1)<CR>
-    nnoremap <leader>etp :call FuncEditTempFile('py' , 1)<CR>
-    nnoremap <leader>etg :call FuncEditTempFile('go' , 1)<CR>
+    for [key, val] in items(s:func_file_extension)
+        execute 'nnoremap <leader>e'  . key . ' :call FuncEditTempFile("' . val . '", 0)<CR>'
+        execute 'nnoremap <leader>et' . key . ' :call FuncEditTempFile("' . val . '", 1)<CR>'
+    endfor
     nnoremap <leader>so :call FuncSort()<CR>
-    nnoremap <leader>dh :call DivideSpaceH()<CR>
-    nnoremap <leader>dc :call DivideSpaceC()<CR>
-    nnoremap <leader>dl :call DivideSpaceL()<CR>
-    nnoremap <leader>dd :call DivideSpaceD()<CR>
-    nnoremap <leader>ae :call AppendExecResult()<CR>
-    nnoremap <leader>af :call AppendCallResult()<CR>
+    nnoremap <leader>dh :call FuncDivideSpaceH()<CR>
+    nnoremap <leader>dc :call FuncDivideSpaceC()<CR>
+    nnoremap <leader>dl :call FuncDivideSpaceL()<CR>
+    nnoremap <leader>dd :call FuncDivideSpaceD()<CR>
+    nnoremap <leader>ae :call FuncAppendExecResult()<CR>
+    nnoremap <leader>af :call FuncAppendCallResult()<CR>
     " 编译运行当前文件
     nnoremap <leader>rf :call CompileFile('')<CR>
     nnoremap <leader>ri :call ExecFuncInput(['Compile Args: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h')], 'CompileFile')<CR>
@@ -2556,11 +2557,11 @@ endif
     nnoremap <leader>/ :execute'let g:__str__=expand("<cword>")'<Bar>execute '/' . g:__str__<CR>
 
     " FindWorking查找
-    for item in s:fw_nvmaps
-        execute 'nnoremap <leader>' . item ':call FindWorking("' . item . '", "n")<CR>'
+    for key in s:fw_nvmaps
+        execute 'nnoremap <leader>' . key ':call FindWorking("' . key . '", "n")<CR>'
     endfor
-    for item in s:fw_nvmaps
-        execute 'vnoremap <leader>' . item ':call FindWorking("' . item . '", "v")<CR>'
+    for key in s:fw_nvmaps
+        execute 'vnoremap <leader>' . key ':call FindWorking("' . key . '", "v")<CR>'
     endfor
     nnoremap <leader>ff :call FindWorkingFile(0)<CR>
     nnoremap <leader>frf :call FindWorkingFile(1)<CR>
