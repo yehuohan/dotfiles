@@ -883,7 +883,7 @@ if s:gset.use_ycm
         endif
     endfunction
     " }}}
-    Plug 'Valloric/YouCompleteMe', { 'do': function('YcmBuild') }
+    Plug 'ycm-core/YouCompleteMe', { 'do': function('YcmBuild') }
     let g:ycm_global_ycm_extra_conf=$DotVimPath.'/.ycm_extra_conf.py'
                                                                 " C-family补全路径
     let g:ycm_enable_diagnostic_signs = 1                       " 开启语法检测
@@ -903,16 +903,16 @@ if s:gset.use_ycm
     let g:ycm_key_invoke_completion = '<C-l>'                   " 显示补全内容
     let g:ycm_key_detailed_diagnostics = ''                     " 直接map :YcmShowDetailedDiagnostic命令即可
     let g:ycm_filetype_blacklist = {
-          \ 'tagbar': 1,
-          \ 'notes': 1,
-          \ 'netrw': 1,
-          \ 'unite': 1,
-          \ 'text': 1,
-          \ 'vimwiki': 1,
-          \ 'pandoc': 1,
-          \ 'infolog': 1,
-          \ 'mail': 1
-          \}                                                    " 禁用YCM的列表
+        \ 'tagbar': 1,
+        \ 'notes': 1,
+        \ 'netrw': 1,
+        \ 'unite': 1,
+        \ 'text': 1,
+        \ 'vimwiki': 1,
+        \ 'pandoc': 1,
+        \ 'infolog': 1,
+        \ 'mail': 1
+        \ }                                                    " 禁用YCM的列表
     let g:ycm_key_list_select_completion = ['<C-j>', '<C-n>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-k>', '<C-p>', '<Up>']
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
@@ -929,23 +929,15 @@ if s:gset.use_ycm
     nnoremap <leader>yr :YcmRestartServer<CR>
     nnoremap <leader>yd :YcmShowDetailedDiagnostic<CR>
     nnoremap <leader>yD :YcmDiags<CR>
-    nnoremap <leader>yc :call YcmCreateCppConf()<CR>
-    nnoremap <leader>yj :call YcmCreateJsConf()<CR>
-    function! YcmCreateCppConf()
-        " 在当前目录下创建.ycm_extra_conf.py
-        if !filereadable('.ycm_extra_conf.py')
-            let l:file = readfile(g:ycm_global_ycm_extra_conf)
-            call writefile(l:file, '.ycm_extra_conf.py')
+    nnoremap <leader>yc :call YcmCreateConf('.ycm_extra_conf.py')<CR>
+    nnoremap <leader>yj :call YcmCreateConf('.tern-project')<CR>
+    function! YcmCreateConf(filename)
+        " 在当前目录下创建配置文件
+        if !filereadable(a:filename)
+            let l:file = readfile($DotVimPath . '/' . a:filename)
+            call writefile(l:file, a:filename)
         endif
-        execute 'edit .ycm_extra_conf.py'
-    endfunction
-    function! YcmCreateJsConf()
-        " 在当前目录下创建.tern-project
-        if !filereadable('.tern-project')
-            let l:file = readfile($DotVimPath.'/.tern-project')
-            call writefile(l:file, '.tern-project')
-        endif
-        execute 'edit .tern-project'
+        execute 'edit ' . a:filename
     endfunction
 endif
 " }}}
@@ -964,11 +956,11 @@ endif
 " }}}
 
 " ale {{{ 语法检测
-    Plug 'w0rp/ale'
+    Plug 'dense-analysis/ale'
     " 语法引擎:
     "   VimScript : vint
     let g:ale_completion_enabled = 0    " 使能ale补全(只支持TypeScript)
-    let g:ale_linters = {'java' : []}   " 禁用Java检测
+    let g:ale_linters = {'java' : []}   " 禁用Java检测（与YCM冲突）
     let g:ale_sign_error = '✘'
     let g:ale_sign_warning = '►'
     let g:ale_set_loclist = 1
@@ -1203,15 +1195,6 @@ endif
     nnoremap <leader>bh  :call OpenBrowserSearchInGoogle('github', 'n')<CR>
     vnoremap <leader>bh  :call OpenBrowserSearchInGoogle('github', 'v')<CR>
 "}}}
-" }}}
-
-" Disabled Plugins
-" {{{
-" easy-align {{{ 字符对齐
-    "Plug 'junegunn/vim-easy-align'
-    "xmap <leader>ga <Plug>(EasyAlign)
-    "nmap <leader>ga <Plug>(EasyAlign)
-" }}}
 " }}}
 
 call plug#end()                         " required
