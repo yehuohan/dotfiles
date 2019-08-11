@@ -889,9 +889,6 @@ if s:gset.use_ycm
     let g:ycm_seed_identifiers_with_syntax = 1                  " 收集语法关键字补全
     let g:ycm_use_ultisnips_completer = 1                       " 收集UltiSnips补全
     let g:ycm_autoclose_preview_window_after_insertion = 1      " 自动关闭预览窗口
-    let g:ycm_key_list_stop_completion = ['<C-y>']              " 关闭补全menu
-    let g:ycm_key_invoke_completion = '<C-l>'                   " 显示补全内容
-    let g:ycm_key_detailed_diagnostics = ''                     " 直接map :YcmShowDetailedDiagnostic命令即可
     let g:ycm_filetype_blacklist = {
         \ 'tagbar': 1,
         \ 'notes': 1,
@@ -902,9 +899,13 @@ if s:gset.use_ycm
         \ 'pandoc': 1,
         \ 'infolog': 1,
         \ 'mail': 1
-        \ }                                                    " 禁用YCM的列表
+        \ }                                                     " 禁用YCM的列表
+    let g:ycm_language_server = []                              " LSP支持
     let g:ycm_key_list_select_completion = ['<C-j>', '<C-n>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-k>', '<C-p>', '<Up>']
+    let g:ycm_key_list_stop_completion = ['<C-y>']              " 关闭补全menu
+    let g:ycm_key_invoke_completion = '<C-l>'                   " 显示补全内容，YCM使用completefunc（C-X C-U）
+    let g:ycm_key_detailed_diagnostics = ''                     " 直接map :YcmShowDetailedDiagnostic命令即可
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
     nnoremap <leader>gi :YcmCompleter GoToInclude<CR>
     nnoremap <leader>gd :YcmCompleter GoToDefinition<CR>
@@ -932,8 +933,27 @@ if s:gset.use_ycm
 endif
 " }}}
 
-" ultisnips {{{ 代码片段插入
-    Plug 'yehuohan/ultisnips'           " snippet插入引擎（vmap的映射，与vim-textmanip的<C-i>有冲突）
+" LanguageClient-neovim {{{ 代码补全（使用LSP）
+    Plug 'autozimu/LanguageClient-neovim', {
+        \ 'branch': 'next',
+        \ 'do': IsWin() ? 'powershell -executionpolicy bypass -File install.ps1' : 'bash install.sh',
+        \ 'for': 'dart'
+        \ }
+    " YCM使用completefunc(C-X C-U)
+    " LCN使用omnifunc(C-X C-O)
+    " YCM不技持的语言，通过LCN(omnifunc)集成到YCM上
+    set omnifunc=LanguageClient#complete
+    let g:LanguageClient_serverCommands = {
+        \ 'dart' : ['dart', 'C:/MyApps/dart-sdk/bin/snapshots/analysis_server.dart.snapshot', '--lsp'],
+        \ }
+    let g:LanguageClient_diagnosticsDisplay = {}                " 禁用语法检测
+    let g:LanguageClient_diagnosticsSignsMax = 0
+    let g:LanguageClient_diagnosticsEnable = 0
+    let g:LanguageClient_hasSnippetSupport = 0                  " 禁用snippet支持
+" }}}
+
+" ultisnips {{{ 代码片段
+    Plug 'yehuohan/ultisnips'           " snippet引擎（vmap的映射，与vim-textmanip的<C-i>有冲突）
     Plug 'honza/vim-snippets'           " snippet合集
     " 使用:UltiSnipsEdit编辑g:UltiSnipsSnippetsDir中的snippet文件
     let g:UltiSnipsSnippetsDir = $DotVimPath . '/mySnippets'
@@ -2266,8 +2286,10 @@ augroup UserSettingsCmd
 
     autocmd BufNewFile *    set fileformat=unix
     autocmd GuiEnter *      set t_vb=   " 关闭可视闪铃(即闪屏)
-    autocmd BufEnter *.tikz set filetype=tex
-    autocmd BufEnter *.gv   set filetype=dot
+    autocmd BufRead,BufNewFile *.jl     set filetype=julia
+    autocmd BufRead,BufNewFile *.dart   set filetype=dart
+    autocmd BufRead,BufNewFile *.tikz   set filetype=tex
+    autocmd BufRead,BufNewFile *.gv     set filetype=dot
 
     autocmd Filetype vim    setlocal foldmethod=marker
     autocmd Filetype c      setlocal foldmethod=syntax
