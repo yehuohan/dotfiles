@@ -11,10 +11,16 @@
 "===============================================================================
 " {{{
 " Help {{{
-    " :help       = 查看Vim帮助
-    " :help index = 查看帮助列表
-    " <S-k>       = 快速查看光标所在cword或选择内容的vim帮助
-    " :help *@en  = 指定查看英文(en，cn即为中文)帮助
+    " help/h        : 查看Vim帮助
+    " <S-k>         : 快速查看光标所在cword或选择内容的vim帮助
+    " h *@en        : 指定查看英文(en，cn即为中文)帮助
+    " h index       : 帮助列表
+    " h range       : Command范围
+    " h pattern     : 匹配模式
+    " h magic       : Magic匹配模式
+    " h Visual      : Visual模式
+    " h map-listing : 映射命令
+    " h registers   : 寄存器列表
 " }}}
 
 " Map {{{
@@ -25,42 +31,6 @@
     " - 尽量不映射偏远的按键（F1~F12，数字键等），且集中于'j,k,i,o'键位附近
     " - 调换Esc和CapsLock键
 "  }}}
-
-" Substitute {{{
-"   :%s     - 所有行
-"   :'<,'>s - 所选范圈
-"   :n,$s   - 第n行到最一行
-"   :.,ns   - 当前行到第n行
-"   :.,+30s - 从当前行开始的30行
-"   :'s,'es - 从ms标记到me标记的范围
-"   :s//g   - 替换一行中所有找到的字符串
-"   :s//c   - 替换前要确认
-"
-"   :s/ar\[i\]/\*(ar+i)/
-"       ar[i] 替换成 *(ar+)，注意：对于 * . / \ [ ] 需要转义
-"   :s/"\([A-J]\)"/"Group \1"/
-"       将"X" 替换成 "Group X"，其中X可为A-J， \( \) 表示后面用 \1 引用 () 的内容
-"   :s/"\(.*\)"/set("\1")/
-"       将“*" 替换成 set("*") ，其中 .* 为任意字符
-"   :s/text/\rtext/
-"       \r相当于一个回车的效果
-"   :s/text\n/text/
-"       查找内容为text，且其后是回车
-"   :s/\s\+$//g
-"       去除尾部空格
-"   /\<str\>
-"       匹配整个单词(如可以匹配 "the str is"，但不能匹配 "string")
-" }}}
-
-" Visual {{{
-    " c/r/y : 修改/替换/复制
-    " I/A   : 在选择区域前面/后面输入
-    " d/x   : 直接删除，不输入
-    " ~/u/U : 大小写转换
-    " >/<   : 右/左移
-    " =     : 按equalprg命令格式化所选内容
-    " !     : 按外部命令过滤所选内容
-" }}}
 
 " Software {{{
     " Python      : 需要在vim编译时添加Python支持
@@ -495,6 +465,26 @@ endif
     " /,\zs     -   将分割符(,)作为对齐内容field里的字符
     nnoremap <leader><leader>a :call feedkeys(':Tabularize /', 'n')<CR>
     vnoremap <leader><leader>a :Tabularize /
+" }}}
+
+" easy-align {{{ 字符对齐
+    Plug 'junegunn/vim-easy-align'
+    " 默认对齐内含段落（Text Object: vip）
+    nmap <leader>ga <Plug>(EasyAlign)ip
+    xmap <leader>ga <Plug>(EasyAlign)
+    " 命令格式
+    ":EasyAlign[!] [N-th]DELIMITER_KEY[OPTIONS]
+    ":EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
+    nnoremap <leader><leader>g :call feedkeys(EasyAlignParagraph(), 'n')<CR>
+    vnoremap <leader><leader>g :EasyAlign
+    function! EasyAlignParagraph()
+        let l:start = search('^[ \t]*$', 'bn')
+        let l:cur = line('.')
+        let l:end = search('^[ \t]*$', 'n')
+        let l:start = (l:start == 0 || l:start >= l:cur) ? 1 : (l:start + 1)
+        let l:end = (l:end == 0 || l:end <= l:cur) ? line('$') : (l:end - 1)
+        return ':' . string(l:start) . ',' . string(l:end) . 'EasyAlign '
+    endfunction
 " }}}
 
 " smooth-scroll {{{ 平滑滚动
@@ -1366,13 +1356,6 @@ endfunction
 " FUNCTION: FuncEditTempFile(suffix, ntab) {{{ 编辑临时文件
 " @param suffix: 临时文件附加后缀
 " @param ntab: 在新tab中打开
-let s:func_file_extension = {
-            \ 'n' : '',
-            \ 'c' : 'c',
-            \ 'a' : 'cpp',
-            \ 'p' : 'py',
-            \ 'g' : 'go',
-            \}
 function! FuncEditTempFile(suffix, ntab)
     let l:tempfile = fnamemodify(tempname(), ':r')
     if empty(a:suffix)
@@ -2509,7 +2492,13 @@ endif
     " 建立临时文件
     nnoremap <leader>ei :call ExecFuncInput(['TempFile Suffix: '], 'FuncEditTempFile', 0)<CR>
     nnoremap <leader>eti :call ExecFuncInput(['TempFile Suffix: '], 'FuncEditTempFile', 1)<CR>
-    for [key, val] in items(s:func_file_extension)
+    for [key, val] in items({
+            \ 'n' : '',
+            \ 'c' : 'c',
+            \ 'a' : 'cpp',
+            \ 'p' : 'py',
+            \ 'g' : 'go',
+            \})
         execute 'nnoremap <leader>e'  . key . ' :call FuncEditTempFile("' . val . '", 0)<CR>'
         execute 'nnoremap <leader>et' . key . ' :call FuncEditTempFile("' . val . '", 1)<CR>'
     endfor
