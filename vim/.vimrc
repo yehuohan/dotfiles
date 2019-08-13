@@ -1466,16 +1466,16 @@ let s:cpl = {
     \ 'flg'  : {
         \ 'c'    : ['gcc -static %s -o %s %s && "./%s"'            , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
         \ 'cpp'  : ['g++ -std=c++11 -static %s -o %s %s && "./%s"' , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
+        \ 'java' : ['javac %s && java %s %s'                       , 'srcf'  , 'outf'  , 'args'] ,
         \ 'py'   : ['python %s %s'                                 , 'srcf'  , 'args'] ,
         \ 'jl'   : ['julia %s %s'                                  , 'srcf'  , 'args'] ,
         \ 'lua'  : ['lua %s %s'                                    , 'srcf'  , 'args'] ,
-        \ 'go'   : ['go run %s'                                    , 'srcf'] ,
-        \ 'java' : ['javac %s && java %s'                          , 'srcf'  , 'outf'] ,
+        \ 'go'   : ['go run %s %s'                                 , 'srcf'  , 'args'] ,
+        \ 'js'   : ['node %s %s'                                   , 'srcf'  , 'args'],
+        \ 'dart' : ['dart %s %s'                                   , 'srcf'  , 'args'] ,
         \ 'json' : ['python -m json.tool %s'                       , 'srcf'] ,
         \ 'm'    : ['matlab -nosplash -nodesktop -r %s'            , 'outf'] ,
-        \ 'dart' : ['dart %s %s'                                   , 'srcf'  , 'args'] ,
         \ 'dot'  : ['dotty %s && dot -Tpng %s -o %s.png'           , 'srcf'  , 'srcf'  , 'outf'],
-        \ 'gv'   : ['dotty %s && dot -Tpng %s -o %s.png'           , 'srcf'  , 'srcf'  , 'outf'],
         \ 'sh'   : ['./%s %s'                                      , 'srcf'  , 'args'] ,
         \ 'bat'  : ['%s %s'                                        , 'srcf'  , 'args'] ,
         \ 'html' : ['"' . s:path.browser . '" %s'                  , 'srcf'] ,
@@ -2538,7 +2538,7 @@ endif
     nnoremap <leader>af :call FuncAppendCallResult()<CR>
     " 编译运行当前文件
     nnoremap <leader>rf :call CompileFile('')<CR>
-    nnoremap <leader>ri :call ExecFuncInput(['Compile Args: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h')], 'CompileFile')<CR>
+    nnoremap <leader>ri :call ExecFuncInput(['Compile/Run args: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h')], 'CompileFile')<CR>
     nnoremap <leader>ra :call RC_Args()<CR>
     nnoremap <leader>rq :call RC_Qt()<CR>
     nnoremap <leader>rv :call RC_Vs()<CR>
