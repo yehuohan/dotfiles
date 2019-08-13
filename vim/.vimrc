@@ -856,7 +856,7 @@ if s:gset.use_ycm
     "   ycm使用python命令指向的版本(如2.7或3.6)
     " Windows: 使用install.py安装
     "   先安装python, Cmake, VS, 7-zip
-    "   "install.py --clang-completer --go-completer --js-completer --java-completer --msvc 14 --build-dir <ycm_build>"
+    "   "install.py --clang-completer --go-completer --js-completer --java-completer --msvc 15 --build-dir <ycm_build>"
     "   自己指定vs版本，自己指定build路径，编译完成后，可以删除<ycm_build>
     "   如果已经安装了clang，可以使用--system-libclang参数，就不必再下载clang了
     function! YcmBuild(info)
@@ -868,7 +868,7 @@ if s:gset.use_ycm
             if IsLinux()
                 !./install.py --clang-completer --go-completer --java-completer --system-libclang
             elseif IsWin()
-                !./install.py --clang-completer --go-completer --js-completer --java-completer --msvc 14 --build-dir ycm_build
+                !install.py --clang-completer --go-completer --js-completer --java-completer --msvc 15 --build-dir ycm_build
             endif
         endif
     endfunction
@@ -942,9 +942,10 @@ endif
     " YCM使用completefunc(C-X C-U)
     " LCN使用omnifunc(C-X C-O)
     " YCM不技持的语言，通过LCN(omnifunc)集成到YCM上
-    set omnifunc=LanguageClient#complete
     let g:LanguageClient_serverCommands = {
-        \ 'dart' : ['dart', 'C:/MyApps/dart-sdk/bin/snapshots/analysis_server.dart.snapshot', '--lsp'],
+        \ 'dart' : ['dart',
+                  \ IsWin() ? 'C:/MyApps/dart-sdk/bin/snapshots/analysis_server.dart.snapshot' : '/opt/dart-sdk/bin/snapshots/analysis_server.dart.snapshot',
+                  \ '--lsp'],
         \ }
     let g:LanguageClient_diagnosticsDisplay = {}                " 禁用语法检测
     let g:LanguageClient_diagnosticsSignsMax = 0
@@ -1120,6 +1121,10 @@ endif
 
 " cpp-enhanced-highlight {{{ c++语法高亮
     Plug 'octol/vim-cpp-enhanced-highlight', {'for': 'cpp'}
+" }}}
+
+" dart-vim-plugin {{{ Julia支持
+    Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
 " }}}
 
 " dart-vim-plugin {{{ dart语法高亮
