@@ -129,7 +129,7 @@ let s:gset = {
     \ 'use_lightline': 1,
     \ 'use_startify' : 1,
     \ 'use_ycm' : 1,
-    \ 'use_lcn' : 1,
+    \ 'use_lcn' : 0,
     \ }
 " FUNCTION: s:loadGset() {{{
 function! s:loadGset()
@@ -155,9 +155,19 @@ function! s:initGset()
     call s:saveGset()
 endfunction
 " }}}
+" FUNCTION: s:showGset() {{{
+function! s:showGset()
+    let l:str = 'Gset:'
+    for [key, val] in items(s:gset)
+        let l:str .= "\n    " . key . ' = ' . val
+    endfor
+    echo l:str
+endfunction
+" }}}
 command! -nargs=0 GSLoad :call s:loadGset()
 command! -nargs=0 GSSave :call s:saveGset()
 command! -nargs=0 GSInit :call s:initGset()
+command! -nargs=0 GSShow :call s:showGset()
 call s:loadGset()
 " }}}
 
