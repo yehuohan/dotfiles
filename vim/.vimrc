@@ -2323,6 +2323,9 @@ augroup END
     nnoremap <leader>u ~
     vnoremap <leader>u ~
     nnoremap <leader>gu g~
+    " 行移动
+    nnoremap > >>
+    nnoremap < <<
     " 加减序号
     nnoremap <leader>aj <C-x>
     nnoremap <leader>ak <C-a>
@@ -2330,6 +2333,49 @@ augroup END
     vnoremap <leader>ak <C-a>
     vnoremap <leader>agj g<C-x>
     vnoremap <leader>agk g<C-a>
+    " 嵌套映射匹配符(%)
+if IsVim()
+    packadd matchit
+endif
+    nmap <S-s> %
+    vmap <S-s> %
+    " 行首和行尾
+    nnoremap <S-l> $
+    nnoremap <S-h> ^
+    vnoremap <S-l> $
+    vnoremap <S-h> ^
+    " 复制到行首行尾
+    nnoremap yL y$
+    nnoremap yH y^
+    " j, k 移行
+    nnoremap j gj
+    vnoremap j gj
+    nnoremap k gk
+    vnoremap k gk
+    " 折叠
+    nnoremap <leader>za zA
+    nnoremap <leader>zc zC
+    nnoremap <leader>zo zO
+    nnoremap <leader>zm zM
+    nnoremap <leader>zn zN
+    nnoremap <leader>zr zR
+    nnoremap <leader>zx zX
+    " 滚屏
+    nnoremap <C-j> <C-e>
+    nnoremap <C-k> <C-y>
+    nnoremap zh zt
+    nnoremap zl zb
+    nnoremap <C-h> 2zh
+    nnoremap <C-l> 2zl
+    nnoremap <M-h> 16zh
+    nnoremap <M-l> 16zl
+    " 命令行移动
+    cnoremap <M-h> <Left>
+    cnoremap <M-l> <Right>
+    cnoremap <M-k> <C-Right>
+    cnoremap <M-j> <C-Left>
+    cnoremap <M-i> <C-B>
+    cnoremap <M-o> <C-E>
     " HEX编辑
     nnoremap <leader>xx :%!xxd<CR>
     nnoremap <leader>xr :%!xxd -r<CR>
@@ -2379,53 +2425,6 @@ augroup END
         execute "vnoremap <leader>'" . t            .   ' "' . t . 'y'
         execute "nnoremap <leader>'" . t            .   ' "' . t . 'p'
     endfor
-" }}}
-
-" Move and goto{{{
-    " 扩展匹配符(%)功能
-if IsVim()
-    packadd matchit
-endif
-    " 嵌套映射匹配符(%)
-    nmap <S-s> %
-    vmap <S-s> %
-    " 行首和行尾
-    nnoremap <S-l> $
-    nnoremap <S-h> ^
-    vnoremap <S-l> $
-    vnoremap <S-h> ^
-    " 复制到行首行尾
-    nnoremap yL y$
-    nnoremap yH y^
-    " j, k 移行
-    nnoremap j gj
-    vnoremap j gj
-    nnoremap k gk
-    vnoremap k gk
-    " 折叠
-    nnoremap <leader>za zA
-    nnoremap <leader>zc zC
-    nnoremap <leader>zo zO
-    nnoremap <leader>zm zM
-    nnoremap <leader>zn zN
-    nnoremap <leader>zr zR
-    nnoremap <leader>zx zX
-    " 滚屏
-    nnoremap <C-j> <C-e>
-    nnoremap <C-k> <C-y>
-    nnoremap zh zt
-    nnoremap zl zb
-    nnoremap <C-h> 2zh
-    nnoremap <C-l> 2zl
-    nnoremap <M-h> 16zh
-    nnoremap <M-l> 16zl
-    " 命令行移动
-    cnoremap <M-h> <Left>
-    cnoremap <M-l> <Right>
-    cnoremap <M-k> <C-Right>
-    cnoremap <M-j> <C-Left>
-    cnoremap <M-i> <C-B>
-    cnoremap <M-o> <C-E>
 " }}}
 
 " Tab, Buffer, Quickfix, Windows {{{
@@ -2516,7 +2515,7 @@ endif
 " }}}
 
 " Coding {{{
-    " 建立临时文件
+    " 创建临时文件
     nnoremap <leader>ei :call ExecFuncInput(['TempFile Suffix: '], 'FuncEditTempFile', 0)<CR>
     nnoremap <leader>eti :call ExecFuncInput(['TempFile Suffix: '], 'FuncEditTempFile', 1)<CR>
     for [key, val] in items({

@@ -2,7 +2,6 @@
 #===============================================================================
 # python's code snippets of matplotlib
 #===============================================================================
-
 snippet mpl "matplotlib for python"
 import matplotlib as ${1:mpl}
 import matplotlib.pyplot as ${2:plt}
@@ -28,11 +27,49 @@ endsnippet
 #===============================================================================
 # ReStructuredText docstring style for python
 #===============================================================================
-
 snippet pfunc "python function"
 """${0:rst}
 :Parameters:
 :Returns:
 :Raises:
 """
+endsnippet
+
+#===============================================================================
+# doxygen style for python
+#===============================================================================
+snippet dmpage "doxygen mainpage"
+@mainpage ${1:title}
+#${0:markdown}
+endsnippet
+
+snippet dpage "doxygen page"
+@page ${1:name} ${2:title}
+${0:markdown}
+endsnippet
+
+snippet dspage "doxygen subpage"
+@subpage ${1:name} "${2:text}"
+endsnippet
+
+snippet dfile "doxygen file"
+@file ${0}
+@brief
+
+@date `!v strftime("%Y-%m-%d")`
+@version
+@author
+@copyright
+endsnippet
+
+snippet dbrief "doxygen brief for class etc."
+@brief ${0}
+endsnippet
+
+snippet dfunc "doxygen function"
+@brief ${0}
+
+@param None
+@return
+@retval None
 endsnippet
