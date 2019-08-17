@@ -904,12 +904,26 @@ if s:gset.use_ycm
     let g:ycm_language_server = [
         \ {
             \ 'name': 'dart',
-            \ 'cmdline': [
-                \ 'dart',
-                \ IsWin() ? 'C:/MyApps/dart-sdk/bin/snapshots/analysis_server.dart.snapshot' :
-                \           '/opt/dart-sdk/bin/snapshots/analysis_server.dart.snapshot',
-                \ '--lsp'],
+            \ 'cmdline': ['dart',
+            \       IsWin() ? 'C:/MyApps/dart-sdk/bin/snapshots/analysis_server.dart.snapshot' :
+            \                 '/opt/dart-sdk/bin/snapshots/analysis_server.dart.snapshot',
+            \       '--lsp'],
             \ 'filetypes': ['dart']
+        \ },
+        \ {
+            \ 'name': 'julia',
+            \ 'cmdline': ['julia', '--startup-file=no', '--history-file=no', '-e', '
+            \       using LanguageServer;
+            \       using Pkg;
+            \       import StaticLint;
+            \       import SymbolServer;
+            \       env_path = dirname(Pkg.Types.Context().env.project_file);
+            \       debug = false;
+            \       server = LanguageServer.LanguageServerInstance(stdin, stdout, debug, env_path, "", Dict());
+            \       server.runlinter = true;
+            \       run(server);
+            \       '],
+            \ 'filetypes': ['julia']
         \ },
         \ ]                                                     " LSP支持
     let g:ycm_key_list_select_completion = ['<C-j>', '<C-n>', '<Down>']
@@ -917,10 +931,12 @@ if s:gset.use_ycm
     let g:ycm_key_list_stop_completion = ['<C-y>']              " 关闭补全menu
     let g:ycm_key_invoke_completion = '<C-l>'                   " 显示补全内容，YCM使用completefunc（C-X C-U）
     let g:ycm_key_detailed_diagnostics = ''                     " 直接map :YcmShowDetailedDiagnostic命令即可
+    nnoremap <leader>gg :YcmCompleter<CR>
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
-    nnoremap <leader>gi :YcmCompleter GoToInclude<CR>
+    nnoremap <leader>gI :YcmCompleter GoToInclude<CR>
     nnoremap <leader>gd :YcmCompleter GoToDefinition<CR>
     nnoremap <leader>gD :YcmCompleter GoToDeclaration<CR>
+    nnoremap <leader>gi :YcmCompleter GoToImplementation<CR>
     nnoremap <leader>gr :YcmCompleter GoToReferences<CR>
     nnoremap <leader>gp :YcmCompleter GetParent<CR>
     nnoremap <leader>gk :YcmCompleter GetDoc<CR>
