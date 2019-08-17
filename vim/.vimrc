@@ -129,6 +129,7 @@ let s:gset = {
     \ 'use_lightline': 1,
     \ 'use_startify' : 1,
     \ 'use_ycm' : 1,
+    \ 'use_lcn' : 1,
     \ }
 " FUNCTION: s:loadGset() {{{
 function! s:loadGset()
@@ -900,7 +901,17 @@ if s:gset.use_ycm
         \ 'infolog': 1,
         \ 'mail': 1
         \ }                                                     " 禁用YCM的列表
-    let g:ycm_language_server = []                              " LSP支持
+    let g:ycm_language_server = [
+        \ {
+            \ 'name': 'dart',
+            \ 'cmdline': [
+                \ 'dart',
+                \ IsWin() ? 'C:/MyApps/dart-sdk/bin/snapshots/analysis_server.dart.snapshot' :
+                \           '/opt/dart-sdk/bin/snapshots/analysis_server.dart.snapshot',
+                \ '--lsp'],
+            \ 'filetypes': ['dart']
+        \ },
+        \ ]                                                     " LSP支持
     let g:ycm_key_list_select_completion = ['<C-j>', '<C-n>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-k>', '<C-p>', '<Up>']
     let g:ycm_key_list_stop_completion = ['<C-y>']              " 关闭补全menu
@@ -934,6 +945,7 @@ endif
 " }}}
 
 " LanguageClient-neovim {{{ 代码补全（使用LSP）
+if s:gset.use_lcn
     Plug 'autozimu/LanguageClient-neovim', {
         \ 'branch': 'next',
         \ 'do': IsWin() ? 'powershell -executionpolicy bypass -File install.ps1' : 'bash install.sh',
@@ -951,6 +963,7 @@ endif
     let g:LanguageClient_diagnosticsSignsMax = 0
     let g:LanguageClient_diagnosticsEnable = 0
     let g:LanguageClient_hasSnippetSupport = 0                  " 禁用snippet支持
+endif
 " }}}
 
 " ultisnips {{{ 代码片段
@@ -1123,7 +1136,7 @@ endif
     Plug 'octol/vim-cpp-enhanced-highlight', {'for': 'cpp'}
 " }}}
 
-" dart-vim-plugin {{{ Julia支持
+" julia-vim {{{ Julia支持
     Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
 " }}}
 
