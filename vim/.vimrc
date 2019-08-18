@@ -856,20 +856,13 @@ endif
 " YouCompleteMe {{{ 自动补全
 if s:gset.use_ycm
     " FUNCTION: YcmBuild(info) {{{
-    " Completion Params: install.py安装参数
+    " Linux: 需要python-dev, python3-dev, cmake, llvm, clang
+    " Windows: 需要python, Cmake, VS, 7-zip
+    " Params: install.py安装参数
     "   --clang-completer : C-famlily，基于Clang补全，需要安装Clang
     "   --go-completer    : Go，基于Gocode/Godef补全，需要安装Go
     "   --js-completer    : Javascript，基于Tern补全，需要安装node和npm
     "   --java-completer  : Java补全，需要安装JDK8
-    " Linux: 使用install.py安装
-    "   先安装python-dev, python3-dev, cmake, llvm, clang
-    "   "python install.py --clang-completer --go-completer --js-completer --java-completer --system-libclang"
-    "   ycm使用python命令指向的版本(如2.7或3.6)
-    " Windows: 使用install.py安装
-    "   先安装python, Cmake, VS, 7-zip
-    "   "python install.py --clang-completer --go-completer --js-completer --java-completer --msvc 15 --build-dir <ycm_build>"
-    "   自己指定vs版本，自己指定build路径，编译完成后，可以删除<ycm_build>
-    "   如果已经安装了clang，可以使用--system-libclang参数，就不必再下载clang了
     function! YcmBuild(info)
         " info is a dictionary with 3 fields
         " - name:   name of the plugin
@@ -877,7 +870,7 @@ if s:gset.use_ycm
         " - force:  set on PlugInstall! or PlugUpdate!
         if a:info.status == 'installed' || a:info.force
             if IsLinux()
-                !python install.py --clang-completer --go-completer --java-completer --system-libclang
+                !python install.py --clang-completer --go-completer --java-completer --build-dir ycm_build
             elseif IsWin()
                 !python install.py --clang-completer --go-completer --java-completer --js-completer --msvc 15 --build-dir ycm_build
             endif
