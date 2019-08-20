@@ -714,16 +714,18 @@ endif
         \{
             \ 'opt' : ['filetype', 'ft'],
             \ 'dsr' : 'When this option is set, the FileType autocommand event is triggered.',
-            \ 'lst' : ['cpp', 'c', 'python', 'vim', 'go', 'markdown', 'help', 'text',
-                     \ 'sh', 'matlab', 'conf', 'make', 'javascript', 'json', 'html'],
+            \ 'lst' : ['cpp', 'c', 'python', 'julia', 'vim', 'go', 'markdown', 'help', 'text',
+                     \ 'sh', 'conf', 'make', 'javascript', 'json', 'html'],
             \ 'dic' : {
                     \ 'cpp'        : 'Cpp file',
                     \ 'c'          : 'C file',
                     \ 'python'     : 'Python script file',
+                    \ 'julia'      : 'Julia script file',
                     \ 'vim'        : 'Vim script file',
                     \ 'go'         : 'Go Language',
                     \ 'markdown'   : 'MarkDown file',
                     \ 'help'       : 'Vim help doc',
+                    \ 'text'       : 'Simple text',
                     \ 'sh'         : 'Linux shell script',
                     \ 'conf'       : 'Config file',
                     \ 'make'       : 'Makefile of .mak file',
@@ -837,7 +839,7 @@ endif
         \ 'ListBufferMarks'    :  "m/",
         \ 'ListBufferMarkers'  :  "m?"
     \ }
-    nnoremap <leader>tm :SignatureToggleSigns<CR>
+    nnoremap <leader>ts :SignatureToggleSigns<CR>
     nnoremap <leader>ma :SignatureListBufferMarks<CR>
     nnoremap <leader>mc :<C-U>call signature#mark#Purge('all')<CR>
     nnoremap <leader>mx :<C-U>call signature#marker#Purge()<CR>
@@ -1140,6 +1142,13 @@ endif
     nmap <leader>hr <Plug>(quickhl-manual-reset)
 
     nnoremap <leader>th :QuickhlManualLockWindowToggle<CR>
+" }}}
+
+" colorizer {{{ 颜色预览
+    Plug 'lilydjwg/colorizer'
+    let g:colorizer_nomap = 1
+    let g:colorizer_startup = 0
+    nnoremap <leader>tc :ColorToggle<CR>
 " }}}
 
 " FastFold {{{ 更新折叠
@@ -1505,11 +1514,11 @@ let s:cpl = {
         \ 'go'   : ['go run %s %s'                                 , 'srcf'  , 'args'] ,
         \ 'js'   : ['node %s %s'                                   , 'srcf'  , 'args'],
         \ 'dart' : ['dart %s %s'                                   , 'srcf'  , 'args'] ,
+        \ 'sh'   : ['./%s %s'                                      , 'srcf'  , 'args'] ,
+        \ 'bat'  : ['%s %s'                                        , 'srcf'  , 'args'] ,
         \ 'json' : ['python -m json.tool %s'                       , 'srcf'] ,
         \ 'm'    : ['matlab -nosplash -nodesktop -r %s'            , 'outf'] ,
         \ 'dot'  : ['dotty %s && dot -Tpng %s -o %s.png'           , 'srcf'  , 'srcf'  , 'outf'],
-        \ 'sh'   : ['./%s %s'                                      , 'srcf'  , 'args'] ,
-        \ 'bat'  : ['%s %s'                                        , 'srcf'  , 'args'] ,
         \ 'html' : ['"' . s:path.browser . '" %s'                  , 'srcf'] ,
         \ 'make' : ['cd "%s" && make %s && "./%s"'                 , 'wdir'  , 'args'  , 'outf'] ,
         \ 'qt'   : ['cd "%s" && ' . (IsWin() ?
@@ -2421,7 +2430,7 @@ endif
     nnoremap <leader>is :call InvSigncolumn()<CR>
     nnoremap <leader>ih :call InvHighLight()<CR>
     nnoremap <leader>ib :call InvScrollBind()<CR>
-    nnoremap <leader>tc :call TogglePath('env')<CR>
+    nnoremap <leader>tx :call TogglePath('env')<CR>
     nnoremap <leader>tb :call TogglePath('browser')<CR>
     if IsLinux()
         inoremap <Esc> <Esc>:call LinuxFcitx2En()<CR>
