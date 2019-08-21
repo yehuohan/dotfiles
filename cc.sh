@@ -18,7 +18,7 @@ if [ `uname` == "Linux" ]; then
     # vim
     cp ../.vimrc                    ./vim/
     cp ../.vim/.ycm_extra_conf.py   ./vim/
-    cp ../.vim/.tern-project        ./vim/
+    cp ../.vim/jsconfig.json        ./vim/
     cp -r ../.vim/mySnippets        ./vim/
     cp -r ../.vim/autoload          ./vim/
     cp -r ../.config/nvim           ./vim/
@@ -79,7 +79,7 @@ elif [ `uname -o` == "Msys" ]; then
     fi
     cp ../Vim/_vimrc                      ./vim/.vimrc
     cp ../Vim/vimfiles/.ycm_extra_conf.py ./vim/
-    cp ../Vim/vimfiles/.tern-project      ./vim/
+    cp ../Vim/vimfiles/jsconfig.json      ./vim/
     cp -r ../Vim/vimfiles/mySnippets      ./vim/
     cp -r ../Vim/vimfiles/autoload        ./vim/
 

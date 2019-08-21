@@ -861,9 +861,9 @@ if s:gset.use_ycm
     " Linux: 需要python-dev, python3-dev, cmake, llvm, clang
     " Windows: 需要python, Cmake, VS, 7-zip
     " Params: install.py安装参数
-    "   --clang-completer : C-famlily，基于Clang补全，需要安装Clang
+    "   --clang-completer : C-famlily，基于Clang补全
     "   --go-completer    : Go，基于Gocode/Godef补全，需要安装Go
-    "   --js-completer    : Javascript，基于Tern补全，需要安装node和npm
+    "   --ts-completer    : Javascript和TypeScript，基于TSServer补全，需要安装node和npm
     "   --java-completer  : Java补全，需要安装JDK8
     function! YcmBuild(info)
         " info is a dictionary with 3 fields
@@ -874,7 +874,7 @@ if s:gset.use_ycm
             if IsLinux()
                 !python install.py --clang-completer --go-completer --java-completer --build-dir ycm_build
             elseif IsWin()
-                !python install.py --clang-completer --go-completer --java-completer --js-completer --msvc 15 --build-dir ycm_build
+                !python install.py --clang-completer --go-completer --java-completer --ts-completer --msvc 15 --build-dir ycm_build
             endif
         endif
     endfunction
@@ -953,7 +953,7 @@ if s:gset.use_ycm
     nnoremap <leader>yd :YcmShowDetailedDiagnostic<CR>
     nnoremap <leader>yD :YcmDiags<CR>
     nnoremap <leader>yc :call YcmCreateConf('.ycm_extra_conf.py')<CR>
-    nnoremap <leader>yj :call YcmCreateConf('.tern-project')<CR>
+    nnoremap <leader>yj :call YcmCreateConf('jsconfig.json')<CR>
     function! YcmCreateConf(filename)
         " 在当前目录下创建配置文件
         if !filereadable(a:filename)
