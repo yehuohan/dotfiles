@@ -2441,7 +2441,7 @@ endif
 
 " Copy and paste{{{
     vnoremap <leader>y ygv
-    nnoremap ya :<C-U>execute 'let @0.=join(getline(line("."), line(".")+v:count), "\n")'<CR>
+    nnoremap ya :<C-U>execute 'let @0.=join(getline(line("."), line(".")+v:count), "\n")."\n"'<CR>
     nnoremap yd dd<Bar>:execute 'let @0.=@"'<CR>
     vnoremap <leader>c "+y
     vnoremap <C-c> "+y
