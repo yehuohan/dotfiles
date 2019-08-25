@@ -108,7 +108,7 @@ nnoremap ; :
 nnoremap : ;
 vnoremap ; :
 
-let s:home = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+let s:home = resolve(expand('<sfile>:p:h'))
 if (IsLinux() || IsMac())
     " 链接root-vimrc到user's vimrc
     let $DotVimPath=s:home . '/.vim'
@@ -663,7 +663,7 @@ if s:gset.use_lightline
             return 'CWD = ' . getcwd()
         else
             let l:fw = FindWorkingGet()
-            let l:fp = fnamemodify(expand('%'), ':p')
+            let l:fp = expand('%:p')
             return empty(l:fw) ? l:fp : substitute(l:fp, escape(l:fw[0], '\'), '...', '')
         endif
     endfunction
@@ -1804,7 +1804,7 @@ function! FindWorking(keys, mode)
     function! s:parseLocation() closure
         let l:loc = ''
         if a:keys =~# 'b'
-            let l:loc = expand('%')
+            let l:loc = expand('%:p')
         elseif a:keys =~# 't'
             let l:loc = join(popc#layer#buf#GetFiles('sigtab'), ' ')
         elseif a:keys =~# 'o'
@@ -1933,7 +1933,7 @@ function! FindWorkingRoot()
         return
     endif
 
-    let l:dir = fnamemodify(expand('%'), ':p:h')
+    let l:dir = expand('%:p:h')
     let l:dir_last = ''
     while l:dir !=# l:dir_last
         let l:dir_last = l:dir
