@@ -31,18 +31,6 @@
     " - 尽量不映射偏远的按键（F1~F12，数字键等），且集中于'j,k,i,o'键位附近
     " - 调换Esc和CapsLock键
 "  }}}
-
-" Software {{{
-    " Python      : 需要在vim编译时添加Python支持
-    " LLVM(Clang) : YouCompleteMe补全
-    " fzf         : Fzf模糊查找
-    " ripgrep     : Rg文本查找
-    " ctags       : tags生成
-    " cflow       : c语言函数调用流程分析
-    " astyle      : 代码格式化工具
-    " graphviz    : 画图工具
-    " fireFox     : Markdown,ReStructruedText等标记文本预览
-" }}}
 " }}}
 
 "===============================================================================
@@ -173,50 +161,18 @@ call s:loadGset()
 
 " s:path {{{
 let s:path = {
-    \ 'env'     : 'x86',
-    \ 'make'    : '',
-    \ 'qmake'   : '',
-    \ 'vcvars'  : '',
     \ 'browser' : '',
     \ }
 " FUNCTION: s:path.init() dict {{{
 function! s:path.init() dict
-    if IsWin()
-        let self.vcvars32  = 'D:/VS2017/VC/Auxiliary/Build/vcvars32.bat'
-        let self.vcvars64  = 'D:/VS2017/VC/Auxiliary/Build/vcvars64.bat'
-        let self.qmake_x86 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
-        let self.qmake_x64 = 'D:/Qt/5.10.1/msvc2017_64/bin/qmake.exe'
-        let self.make      = 'nmake.exe'
-        let self.qmake     = self.qmake_x64
-        let self.vcvars    = self.vcvars64
-    elseif IsLinux()
-        let self.make      = 'make'
-        let self.qmake     = 'qmake'
-    endif
     if (IsWin() || IsGw())
-        let self.browser_chrome = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
-        let self.browser_firefox = 'D:/Mozilla Firefox/firefox.exe'
+        let self.browser_chrome = 'chrome'
+        let self.browser_firefox = 'firefox'
     elseif IsLinux()
         let self.browser_chrome = '/usr/bin/chrome'
         let self.browser_firefox = '/usr/bin/firefox'
     endif
     let self.browser = self.browser_firefox
-endfunction
-" }}}
-" FUNCTION: s:path.toggleEnv() dict {{{
-function! s:path.toggleEnv() dict
-    " 切换成x86或x64编译环境
-    if IsWin()
-        if 'x86' ==# self.env
-            let self.env = 'x64'
-            let self.qmake  = self.qmake_x64
-            let self.vcvars = self.vcvars64
-        else
-            let self.env = 'x86'
-            let self.qmake  = self.qmake_x86
-            let self.vcvars = self.vcvars32
-        endif
-    endif
 endfunction
 " }}}
 " FUNCTION: s:path.toggleBrowser() dict {{{
@@ -230,10 +186,7 @@ endfunction
 " }}}
 " FUNCTION: TogglePath(flg) {{{
 function! TogglePath(flg)
-    if a:flg ==# 'env'
-        call s:path.toggleEnv()
-        echo 's:path env: ' . s:path.env
-    elseif a:flg ==# 'browser'
+    if a:flg ==# 'browser'
         call s:path.toggleBrowser()
         echo 's:path browser: ' . s:path.browser
     endif
@@ -1514,19 +1467,21 @@ let s:cpl = {
         \ 'go'   : ['go run %s %s'                                 , 'srcf'  , 'args'] ,
         \ 'js'   : ['node %s %s'                                   , 'srcf'  , 'args'],
         \ 'dart' : ['dart %s %s'                                   , 'srcf'  , 'args'] ,
+        \ 'tex'  : ['pdfLatex %s && miktex-texworks %s.pdf'        , 'srcf'  , 'outf'] ,
         \ 'sh'   : ['./%s %s'                                      , 'srcf'  , 'args'] ,
         \ 'bat'  : ['%s %s'                                        , 'srcf'  , 'args'] ,
+        \ 'md'   : ['typora %s'                                    , 'srcf'] ,
         \ 'json' : ['python -m json.tool %s'                       , 'srcf'] ,
         \ 'm'    : ['matlab -nosplash -nodesktop -r %s'            , 'outf'] ,
-        \ 'dot'  : ['dotty %s && dot -Tpng %s -o %s.png'           , 'srcf'  , 'srcf'  , 'outf'],
         \ 'html' : ['"' . s:path.browser . '" %s'                  , 'srcf'] ,
+        \ 'dot'  : ['dotty %s && dot -Tpng %s -o %s.png'           , 'srcf'  , 'srcf'  , 'outf'],
         \ 'make' : ['cd "%s" && make %s && "./%s"'                 , 'wdir'  , 'args'  , 'outf'] ,
         \ 'qt'   : ['cd "%s" && ' . (IsWin() ?
-                    \ (s:path.qmake . ' -r "%s" && ' . s:path.vcvars . ' && nmake -f Makefile.Debug') :
+                    \ ('qmake -r "%s" && vcvars64.bat && nmake -f Makefile.Debug') :
                     \ ('qmake "%s" && make'))
                     \ . ' %s && "./%s"',
                     \ 'wdir', 'srcf', 'args', 'outf'],
-        \ 'vs'   : ['cd "%s" && ' . s:path.vcvars . ' && devenv "%s" /%s && "./%s"',
+        \ 'vs'   : ['cd "%s" && vcvars64.bat && devenv "%s" /%s && "./%s"',
                     \ 'wdir', 'srcf', 'args', 'outf']
         \},
     \ 'pat' : {
@@ -2430,7 +2385,6 @@ endif
     nnoremap <leader>is :call InvSigncolumn()<CR>
     nnoremap <leader>ih :call InvHighLight()<CR>
     nnoremap <leader>ib :call InvScrollBind()<CR>
-    nnoremap <leader>tx :call TogglePath('env')<CR>
     nnoremap <leader>tb :call TogglePath('browser')<CR>
     if IsLinux()
         inoremap <Esc> <Esc>:call LinuxFcitx2En()<CR>
