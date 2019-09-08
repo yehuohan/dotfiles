@@ -251,20 +251,27 @@ call plug#begin($DotVimPath.'/bundle')  " 可选设置，可以指定插件安�
     nmap <leader>mB <Plug>(easymotion-B)
     nmap <leader>mE <Plug>(easymotion-E)
     nmap <leader>mG <Plug>(easymotion-gE)
-    "
 " }}}
 
-" multiple-cursors {{{ 多光标编辑
-    Plug 'terryma/vim-multiple-cursors'
-    let g:multi_cursor_use_default_mapping=0
-                                        " 取消默认按键
-    let g:multi_cursor_start_key='<C-n>'
-                                        " 进入Multiple-cursors Model
-                                        " 可以自己选定区域（包括矩形选区），或自动选择当前光标<cword>
-    let g:multi_cursor_next_key='<C-n>'
-    let g:multi_cursor_prev_key='<C-p>'
-    let g:multi_cursor_skip_key='<C-x>'
-    let g:multi_cursor_quit_key='<Esc>'
+" vim-visual-multi {{{ 多光标编辑
+    Plug 'mg979/vim-visual-multi'
+    let g:VM_mouse_mappings = 0         " 禁用鼠标
+    " C-n: 进入cursor模式
+    " C-Up/Down: 进入extend模式
+    " Tab: 切换cursor/extend模式
+    let g:VM_leader = ','
+    let g:VM_maps = {
+        \ 'Find Under'         : '<C-n>',
+        \ 'Find Subword Under' : '<C-n>',
+        \ 'Select Cursor Down' : '<C-Down>',
+        \ 'Select Cursor Up'   : '<C-Up>',
+        \ 'Switch Mode'        : '<Tab>',
+        \ }
+    let g:VM_custom_remaps = {
+        \ '<C-p>': '[',
+        \ '<C-s>': 'q',
+        \ '<C-c>': 'Q',
+        \ }
 " }}}
 
 " textmanip {{{ 块编辑
@@ -812,7 +819,7 @@ endif
 if s:gset.use_ycm
     " FUNCTION: YcmBuild(info) {{{
     " Linux: 需要python-dev, python3-dev, cmake, llvm, clang
-    " Windows: 需要python, Cmake, VS, 7-zip
+    " Windows: 需要python, cmake, VS, 7-zip
     " Params: install.py安装参数
     "   --clang-completer : C-famlily，基于Clang补全
     "   --go-completer    : Go，基于Gocode/Godef补全，需要安装Go
@@ -1604,7 +1611,7 @@ function! CompileProjectMake(sopt, sel, args)
 endfunction
 "}}}
 
-" FUNCTION: CompileProjectQtVs(sopt, sel, args) {{{
+" FUNCTION: CompileProjectVs(sopt, sel, args) {{{
 function! CompileProjectVs(sopt, sel, args)
     let l:srcfile = fnamemodify(a:sel, ':p:t')
     let l:outfile = fnamemodify(a:sel, ':p:t:r')
@@ -2465,14 +2472,10 @@ endif
     nnoremap <leader>wT <C-w>T
     " 修改尺寸
     nnoremap <leader>w= <C-w>=
-    inoremap <C-Up> <Esc>:resize+1<CR>i
-    inoremap <C-Down> <Esc>:resize-1<CR>i
-    inoremap <C-Left> <Esc>:vertical resize-1<CR>i
-    inoremap <C-Right> <Esc>:vertical resize+1<CR>i
-    nnoremap <C-Up> :resize+1<CR>
-    nnoremap <C-Down> :resize-1<CR>
-    nnoremap <C-Left> :vertical resize-1<CR>
-    nnoremap <C-Right> :vertical resize+1<CR>
+    "nnoremap <C-Up> :resize+1<CR>
+    "nnoremap <C-Down> :resize-1<CR>
+    "nnoremap <C-Left> :vertical resize-1<CR>
+    "nnoremap <C-Right> :vertical resize+1<CR>
     nnoremap <M-Up> :resize+5<CR>
     nnoremap <M-Down> :resize-5<CR>
     nnoremap <M-Left> :vertical resize-5<CR>
