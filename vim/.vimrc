@@ -520,15 +520,25 @@ endif
 " {{{
 " theme {{{ Vim主题(ColorScheme, StatusLine, TabLine)
     Plug 'morhetz/gruvbox'
-    set rtp+=$DotVimPath/bundle/gruvbox/
+    set rtp+=$DotVimPath/bundle/gruvbox
     let g:gruvbox_contrast_dark='soft'  " 背景选项：dark, medium, soft
     Plug 'junegunn/seoul256.vim'
-    set rtp+=$DotVimPath/bundle/seoul256.vim/
+    set rtp+=$DotVimPath/bundle/seoul256.vim
     let g:seoul256_background=236       " 233(暗) ~ 239(亮)
     let g:seoul256_light_background=256 " 252(暗) ~ 256(亮)
     Plug 'altercation/vim-colors-solarized'
-    set rtp+=$DotVimPath/bundle/vim-colors-solarized/
-if s:gset.use_lightline
+    set rtp+=$DotVimPath/bundle/vim-colors-solarized
+    Plug 'sainnhe/vim-color-forest-night'
+    set rtp+=$DotVimPath/bundle/vim-color-forest-night
+if !s:gset.use_lightline
+    try
+        set background=dark
+        colorscheme gruvbox
+    " E185: 找不到主题
+    catch /^Vim\%((\a\+)\)\=:E185/
+        silent! colorscheme desert
+    endtry
+else
     Plug 'itchyny/lightline.vim'
     "                    
     " ► ✘ ⌘ ▫ ▪ ★ ☆ • ≡ ፨ ♥
@@ -697,7 +707,7 @@ endif
         \},
         \{
             \ 'opt' : ['colorscheme', 'colo'],
-            \ 'lst' : ['gruvbox', 'seoul256', 'seoul256-light', 'solarized'],
+            \ 'lst' : ['forest-night', 'gruvbox', 'seoul256', 'seoul256-light', 'solarized'],
             \ 'cmd' : '',
         \},]
     " set option with PSet
