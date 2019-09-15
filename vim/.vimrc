@@ -2411,16 +2411,18 @@ endif
 " }}}
 
 " Copy and paste{{{
+    " yank & put
     vnoremap <leader>y ygv
     nnoremap ya :<C-U>execute 'let @0.=join(getline(line("."), line(".")+v:count), "\n")."\n"'<CR>
     nnoremap yd dd<Bar>:execute 'let @0.=@"'<CR>
+    nnoremap <leader>p "0p
+    nnoremap <leader>P "0P
+    " ctrl-c & ctrl-v 
     vnoremap <leader>c "+y
     vnoremap <C-c> "+y
     nnoremap <C-v> "+p
     inoremap <C-v> <Esc>"+pi
-    " 粘贴通过y复制的内容
-    nnoremap <leader>p "0p
-    nnoremap <leader>P "0P
+    inoremap <C-a> <C-v>
     " 矩形选择
     nnoremap vv <C-v>
     vnoremap vv <C-v>
