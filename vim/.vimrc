@@ -742,15 +742,18 @@ endif
 
 " nerd-tree {{{ 目录树导航
     Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTree']}
-    let g:NERDTreeShowHidden=1
-    let g:NERDTreeMapPreview = 'go'     " 预览打开
+    let g:NERDTreeShowHidden = 1
+    let g:NERDTreeMapPreview = 'go'
+    let g:NERDTreeMapOpenInTabSilent = 'gt'
+    let g:NERDTreeMapOpenSplit = 's'
+    let g:NERDTreeMapPreviewSplit = 'gs'
+    let g:NERDTreeMapOpenVSplit = 'i'
+    let g:NERDTreeMapPreviewVSplit = 'gi'
+    let g:NERDTreeMapJumpNextSibling = '<C-n>'
+    let g:NERDTreeMapJumpPrevSibling = '<C-p>'
     let g:NERDTreeMapChangeRoot = 'cd'  " 更改根目录
     let g:NERDTreeMapChdir = 'CW'       " 更改CWD
     let g:NERDTreeMapCWD = 'CD'         " 更改根目录为CWD
-    let g:NERDTreeMapJumpNextSibling = '<C-n>'
-                                        " 下一个Sibling
-    let g:NERDTreeMapJumpPrevSibling = '<C-p>'
-                                        " 前一个Sibling
     nnoremap <leader>te :NERDTreeToggle<CR>
     nnoremap <leader>tE :execute ':NERDTree ' . expand('%:p:h')<CR>
     augroup PluginNerdtree
@@ -2417,7 +2420,7 @@ endif
     nnoremap yd dd<Bar>:execute 'let @0.=@"'<CR>
     nnoremap <leader>p "0p
     nnoremap <leader>P "0P
-    " ctrl-c & ctrl-v 
+    " ctrl-c & ctrl-v
     vnoremap <leader>c "+y
     vnoremap <C-c> "+y
     nnoremap <C-v> "+p
