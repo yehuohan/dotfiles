@@ -375,11 +375,18 @@ endif
 
 " LeaderF {{{ 模糊查找
 if IsLinux()
-    Plug 'Yggdroot/LeaderF', { 'do': './install.sh' }
+    "Plug 'Yggdroot/LeaderF', { 'do': './install.sh' }
     augroup PluginLeaderF
         autocmd!
-        autocmd VimEnter * autocmd! LeaderF_Mru
+        autocmd VimEnter * call s:leaderfRemoveMru()
     augroup END
+    function! s:leaderfRemoveMru()
+        try
+            autocmd! LeaderF_Mru
+        " E216:事件组不存在
+        catch /^Vim\%((\a\+)\)\=:E216/
+        endtry
+    endfunction
 elseif IsWin()
     Plug 'Yggdroot/LeaderF', { 'do': './install.bat' }
 else
