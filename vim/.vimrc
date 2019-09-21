@@ -119,32 +119,32 @@ let s:gset = {
     \ 'use_ycm' : 1,
     \ 'use_lcn' : 0,
     \ }
-" FUNCTION: s:loadGset() {{{
-function! s:loadGset()
+" FUNCTION: s:gsetLoad() {{{
+function! s:gsetLoad()
     if filereadable(s:gset_file)
         call extend(s:gset, json_decode(join(readfile(s:gset_file))), 'force')
     else
-        call s:saveGset()
+        call s:gsetSave()
     endif
 endfunction
 " }}}
-" FUNCTION: s:saveGset() {{{
-function! s:saveGset()
+" FUNCTION: s:gsetSave() {{{
+function! s:gsetSave()
     call writefile([json_encode(s:gset)], s:gset_file)
     echo 's:gset save successful!'
 endfunction
 " }}}
-" FUNCTION: s:initGset() {{{
-function! s:initGset()
+" FUNCTION: s:gsetInit() {{{
+function! s:gsetInit()
     for [key, val] in items(s:gset)
         let s:gset[key] = input('let s:gset.'. key . ' = ', val)
     endfor
     redraw
-    call s:saveGset()
+    call s:gsetSave()
 endfunction
 " }}}
-" FUNCTION: s:showGset() {{{
-function! s:showGset()
+" FUNCTION: s:gsetShow() {{{
+function! s:gsetShow()
     let l:str = 'Gset:'
     for [key, val] in items(s:gset)
         let l:str .= "\n    " . key . ' = ' . val
@@ -152,11 +152,11 @@ function! s:showGset()
     echo l:str
 endfunction
 " }}}
-command! -nargs=0 GSLoad :call s:loadGset()
-command! -nargs=0 GSSave :call s:saveGset()
-command! -nargs=0 GSInit :call s:initGset()
-command! -nargs=0 GSShow :call s:showGset()
-call s:loadGset()
+command! -nargs=0 GSLoad :call s:gsetLoad()
+command! -nargs=0 GSSave :call s:gsetSave()
+command! -nargs=0 GSInit :call s:gsetInit()
+command! -nargs=0 GSShow :call s:gsetShow()
+call s:gsetLoad()
 " }}}
 
 " s:path {{{
@@ -184,8 +184,8 @@ function! s:path.toggleBrowser() dict
     endif
 endfunction
 " }}}
-" FUNCTION: TogglePath(flg) {{{
-function! TogglePath(flg)
+" FUNCTION: PathToggle(flg) {{{
+function! PathToggle(flg)
     if a:flg ==# 'browser'
         call s:path.toggleBrowser()
         echo 's:path browser: ' . s:path.browser
@@ -277,17 +277,17 @@ call plug#begin($DotVimPath.'/bundle')  " 可选设置，可以指定插件安�
 " textmanip {{{ 块编辑
     Plug 't9md/vim-textmanip'
     let g:textmanip_enable_mappings = 0
-    function! SetTextmanipMode(mode)
+    function! Plug_tm_setMode(mode)
         let g:textmanip_current_mode = a:mode
         echo 'textmanip mode: ' . g:textmanip_current_mode
     endfunction
 
     " 切换Insert/Replace Mode
-    xnoremap <M-i> :<C-U>call SetTextmanipMode('insert')<CR>gv
-    xnoremap <M-o> :<C-U>call SetTextmanipMode('replace')<CR>gv
+    xnoremap <M-i> :<C-U>call Plug_tm_setMode('insert')<CR>gv
+    xnoremap <M-o> :<C-U>call Plug_tm_setMode('replace')<CR>gv
     " C-i 与 <Tab>等价
-    xnoremap <C-i> :<C-U>call SetTextmanipMode('insert')<CR>gv
-    xnoremap <C-o> :<C-U>call SetTextmanipMode('replace')<CR>gv
+    xnoremap <C-i> :<C-U>call Plug_tm_setMode('insert')<CR>gv
+    xnoremap <C-o> :<C-U>call Plug_tm_setMode('replace')<CR>gv
     " 更据Mode使用Move-Insert或Move-Replace
     xmap <C-j> <Plug>(textmanip-move-down)
     xmap <C-k> <Plug>(textmanip-move-up)
@@ -314,9 +314,9 @@ call plug#begin($DotVimPath.'/bundle')  " 可选设置，可以指定插件安�
     " 设置查找时页面滚动映射
     augroup PluginIncsearch
         autocmd!
-        autocmd VimEnter * call s:incsearchKeymap()
+        autocmd VimEnter * call s:Plug_incs_keymap()
     augroup END
-    function! s:incsearchKeymap()
+    function! s:Plug_incs_keymap()
         if exists('g:loaded_incsearch')
             IncSearchNoreMap <C-j> <Over>(incsearch-next)
             IncSearchNoreMap <C-k> <Over>(incsearch-prev)
@@ -324,7 +324,7 @@ call plug#begin($DotVimPath.'/bundle')  " 可选设置，可以指定插件安�
             IncSearchNoreMap <M-k> <Over>(incsearch-scroll-b)
         endif
     endfunction
-    function! PreviewPattern(prompt)
+    function! Plug_incs_previewPattern(prompt)
         " 预览pattern
         let l:old_pat = histget('/', -1)
         try
@@ -378,9 +378,9 @@ if IsLinux()
     "Plug 'Yggdroot/LeaderF', { 'do': './install.sh' }
     augroup PluginLeaderF
         autocmd!
-        autocmd VimEnter * call s:leaderfRemoveMru()
+        autocmd VimEnter * call s:Plug_lf_removeMru()
     augroup END
-    function! s:leaderfRemoveMru()
+    function! s:Plug_lf_removeMru()
         try
             autocmd! LeaderF_Mru
         " E216:事件组不存在
@@ -453,9 +453,9 @@ endif
     " 命令格式
     ":EasyAlign[!] [N-th]DELIMITER_KEY[OPTIONS]
     ":EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
-    nnoremap <leader><leader>g :call feedkeys(EasyAlignParagraph(), 'n')<CR>
+    nnoremap <leader><leader>g :call feedkeys(Plug_ea_paragraph(), 'n')<CR>
     vnoremap <leader><leader>g :EasyAlign
-    function! EasyAlignParagraph()
+    function! Plug_ea_paragraph()
         let l:start = search('^[ \t]*$', 'bn')
         let l:cur = line('.')
         let l:end = search('^[ \t]*$', 'n')
@@ -505,21 +505,21 @@ endif
 
 " vim-repeat {{{ 重复命令
     Plug 'tpope/vim-repeat'
-    function! SetRepeatExecution(string)
+    function! Plug_rpt_setExecution(string)
         let s:execution = a:string
         try
-            call repeat#set("\<Plug>RepeatExecute", v:count)
+            call repeat#set("\<Plug>Plug_rpt_execute", v:count)
         " E117: 函数不存在
         catch /^Vim\%((\a\+)\)\=:E117/
         endtry
     endfunction
-    function! RepeatExecute()
+    function! Plug_rpt_execute()
         if exists('s:execution') && !empty(s:execution)
             execute s:execution
         endif
     endfunction
-    nnoremap <Plug>RepeatExecute :call RepeatExecute()<CR>
-    nnoremap <leader>. :call RepeatExecute()<CR>
+    nnoremap <Plug>Plug_rpt_execute :call Plug_rpt_execute()<CR>
+    nnoremap <leader>. :call Plug_rpt_execute()<CR>
 " }}}
 " }}}
 
@@ -575,11 +575,11 @@ else
                 \ 'lite_info'   : '%p%%≡%L',
                 \ },
         \ 'component_function': {
-                \ 'mode'        : 'LightlineMode',
-                \ 'msg_left'    : 'LightlineMsgLeft',
-                \ 'msg_right'   : 'LightlineMsgRight',
-                \ 'chk_indent'  : 'LightlineCheckMixedIndent',
-                \ 'chk_trailing': 'LightlineCheckTrailing',
+                \ 'mode'        : 'Plug_ll_mode',
+                \ 'msg_left'    : 'Plug_ll_msgLeft',
+                \ 'msg_right'   : 'Plug_ll_msgRight',
+                \ 'chk_indent'  : 'Plug_ll_checkMixedIndent',
+                \ 'chk_trailing': 'Plug_ll_checkTrailing',
                 \ },
         \ }
     if s:gset.use_powerfont
@@ -602,10 +602,10 @@ else
     " Augroup: PluginLightline {{{
     augroup PluginLightline
         autocmd!
-        autocmd ColorScheme * call s:lightlineColorScheme()
-        autocmd BufReadPre * call s:lightlineCheck(getfsize(expand('<afile>')))
+        autocmd ColorScheme * call s:Plug_ll_colorScheme()
+        autocmd BufReadPre * call s:Plug_ll_check(getfsize(expand('<afile>')))
     augroup END
-    function! s:lightlineColorScheme()
+    function! s:Plug_ll_colorScheme()
         if !exists('g:loaded_lightline')
             return
         endif
@@ -618,12 +618,12 @@ else
         catch /^Vim\%((\a\+)\)\=:E117/
         endtry
     endfunction
-    function! s:lightlineCheck(size)
+    function! s:Plug_ll_check(size)
         let s:lightline_check_flg = (a:size > 1024*1024*2 || a:size == -2) ? 0 : 1
     endfunction
     " }}}
-    " FUNCTION: LightlineMode() {{{
-    function! LightlineMode()
+    " FUNCTION: Plug_ll_mode() {{{
+    function! Plug_ll_mode()
         let fname = expand('%:t')
         return fname == '__Tagbar__' ? 'Tagbar' :
             \ fname =~ 'NERD_tree' ? 'NERDTree' :
@@ -634,8 +634,8 @@ else
             \ winwidth(0) > 60 ? lightline#mode() : ''
     endfunction
     " }}}
-    " FUNCTION: LightlineMsgLeft() {{{
-    function! LightlineMsgLeft()
+    " FUNCTION: Plug_ll_msgLeft() {{{
+    function! Plug_ll_msgLeft()
         if &ft ==# 'qf'
             return 'CWD = ' . getcwd()
         else
@@ -645,14 +645,14 @@ else
         endif
     endfunction
     " }}}
-    " FUNCTION: LightlineMsgRight() {{{
-    function! LightlineMsgRight()
+    " FUNCTION: Plug_ll_msgRight() {{{
+    function! Plug_ll_msgRight()
         let l:fw = FindWorkingGet()
         return empty(l:fw) ? '' : (l:fw[0] . '[' . l:fw[1] .']')
     endfunction
     " }}}
-    " FUNCTION: LightlineCheckMixedIndent() {{{
-    function! LightlineCheckMixedIndent()
+    " FUNCTION: Plug_ll_checkMixedIndent() {{{
+    function! Plug_ll_checkMixedIndent()
         if !s:lightline_check_flg
             return ''
         endif
@@ -660,8 +660,8 @@ else
         return (l:ret == 0) ? '' : 'I:'.string(l:ret)
     endfunction
     " }}}
-    " FUNCTION: LightlineCheckTrailing() {{{
-    function! LightlineCheckTrailing()
+    " FUNCTION: Plug_ll_checkTrailing() {{{
+    function! Plug_ll_checkTrailing()
         if !s:lightline_check_flg
             return ''
         endif
@@ -738,8 +738,8 @@ endif
     nnoremap <M-o> :PopcBufferSwitchRight<CR>
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
-    nnoremap <leader>wf :call PopcWksSearch()<CR>
-    function! PopcWksSearch()
+    nnoremap <leader>wf :call Plug_popc_wksSearch()<CR>
+    function! Plug_popc_wksSearch()
         let l:wks_root = popc#layer#wks#GetCurrentWks()[1]
         if !empty(l:wks_root)
             execute ':LeaderfFile ' . l:wks_root
@@ -837,7 +837,7 @@ endif
 " {{{
 " YouCompleteMe {{{ 自动补全
 if s:gset.use_ycm
-    " FUNCTION: YcmBuild(info) {{{
+    " FUNCTION: Plug_ycm_build(info) {{{
     " Linux: 需要python-dev, python3-dev, cmake, llvm, clang
     " Windows: 需要python, cmake, VS, 7-zip
     " Params: install.py安装参数
@@ -845,7 +845,7 @@ if s:gset.use_ycm
     "   --go-completer    : Go，基于Gocode/Godef补全，需要安装Go
     "   --ts-completer    : Javascript和TypeScript，基于TSServer补全，需要安装node和npm
     "   --java-completer  : Java补全，需要安装JDK8
-    function! YcmBuild(info)
+    function! Plug_ycm_build(info)
         " info is a dictionary with 3 fields
         " - name:   name of the plugin
         " - status: 'installed', 'updated', or 'unchanged'
@@ -859,7 +859,7 @@ if s:gset.use_ycm
         endif
     endfunction
     " }}}
-    Plug 'ycm-core/YouCompleteMe', { 'do': function('YcmBuild') }
+    Plug 'ycm-core/YouCompleteMe', { 'do': function('Plug_ycm_build') }
     let g:ycm_global_ycm_extra_conf=$DotVimPath.'/.ycm_extra_conf.py'
                                                                 " C-family补全路径
     let g:ycm_enable_diagnostic_signs = 1                       " 开启语法检测
@@ -932,9 +932,9 @@ if s:gset.use_ycm
     nnoremap <leader>yr :YcmRestartServer<CR>
     nnoremap <leader>yd :YcmShowDetailedDiagnostic<CR>
     nnoremap <leader>yD :YcmDiags<CR>
-    nnoremap <leader>yc :call YcmCreateConf('.ycm_extra_conf.py')<CR>
-    nnoremap <leader>yj :call YcmCreateConf('jsconfig.json')<CR>
-    function! YcmCreateConf(filename)
+    nnoremap <leader>yc :call Plug_ycm_createConf('.ycm_extra_conf.py')<CR>
+    nnoremap <leader>yj :call Plug_ycm_createConf('jsconfig.json')<CR>
+    function! Plug_ycm_createConf(filename)
         " 在当前目录下创建配置文件
         if !filereadable(a:filename)
             let l:file = readfile($DotVimPath . '/' . a:filename)
@@ -1173,8 +1173,8 @@ endif
     let g:mkdp_refresh_slow = 0         " 即时预览MarkDown
     let g:mkdp_command_for_global = 0   " 只有markdown文件可以预览
     let g:mkdp_browser = s:path.browser
-    nnoremap <leader>vm :call ViewMarkdown()<CR>
-    function! ViewMarkdown() abort
+    nnoremap <leader>vm :call Plug_md_view()<CR>
+    function! Plug_md_view() abort
         let g:mkdp_browser = s:path.browser
         if !get(b:, 'MarkdownPreviewToggleBool')
             echo 'Open markdown preview'
@@ -1195,9 +1195,9 @@ if IsWin()
     " 需要安装 https://github.com/mgedmin/restview
     nnoremap <leader>vr :execute ':AsyncRun restview ' . expand('%:p:t')<Bar>cclose<CR>
 else
-    nnoremap <leader>vr :call ViewRst()<CR>
+    nnoremap <leader>vr :call Plug_rst_view()<CR>
 endif
-    function! ViewRst() abort
+    function! Plug_rst_view() abort
         if g:_instant_rst_daemon_started
             StopInstantRst
             echo 'StopInstantRst'
@@ -1214,7 +1214,7 @@ endif
     nmap <leader>bs <Plug>(openbrowser-smart-search)
     vmap <leader>bs <Plug>(openbrowser-smart-search)
     " search funtion - google, baidu, github
-    function! OpenBrowserSearchInGoogle(engine, mode)
+    function! Plug_brw_search(engine, mode)
         if a:mode ==# 'n'
             call openbrowser#search(expand('<cword>'), a:engine)
         elseif a:mode ==# 'v'
@@ -1222,14 +1222,14 @@ endif
         endif
     endfunction
     nnoremap <leader>big :call feedkeys(':OpenBrowserSearch -google ', 'n')<CR>
-    nnoremap <leader>bg  :call OpenBrowserSearchInGoogle('google', 'n')<CR>
-    vnoremap <leader>bg  :call OpenBrowserSearchInGoogle('google', 'v')<CR>
+    nnoremap <leader>bg  :call Plug_brw_search('google', 'n')<CR>
+    vnoremap <leader>bg  :call Plug_brw_search('google', 'v')<CR>
     nnoremap <leader>bib :call feedkeys(':OpenBrowserSearch -baidu ', 'n')<CR>
-    nnoremap <leader>bb  :call OpenBrowserSearchInGoogle('baidu', 'n')<CR>
-    vnoremap <leader>bb  :call OpenBrowserSearchInGoogle('baidu', 'v')<CR>
+    nnoremap <leader>bb  :call Plug_brw_search('baidu', 'n')<CR>
+    vnoremap <leader>bb  :call Plug_brw_search('baidu', 'v')<CR>
     nnoremap <leader>bih :call feedkeys(':OpenBrowserSearch -github ', 'n')<CR>
-    nnoremap <leader>bh  :call OpenBrowserSearchInGoogle('github', 'n')<CR>
-    vnoremap <leader>bh  :call OpenBrowserSearchInGoogle('github', 'v')<CR>
+    nnoremap <leader>bh  :call Plug_brw_search('github', 'n')<CR>
+    vnoremap <leader>bh  :call Plug_brw_search('github', 'v')<CR>
 "}}}
 " }}}
 
@@ -1369,11 +1369,11 @@ function! GetInput(prompt, ...)
 endfunction
 " }}}
 
-" FUNCTION: ExecFuncInput(iargs, fn, [fargs...]) range {{{
+" FUNCTION: FuncExecInput(iargs, fn, [fargs...]) range {{{
 " @param iargs: 用于GetInput的参数列表
 " @param fn: 要运行的函数，第一个参数必须为GetInput的输入
 " @param fargs: fn的附加参数
-function! ExecFuncInput(iargs, fn, ...) range
+function! FuncExecInput(iargs, fn, ...) range
     let l:inpt = call('GetInput', a:iargs)
     if empty(l:inpt)
         return
@@ -1390,7 +1390,7 @@ endfunction
 
 " FUNCTION: FuncSort() range {{{ 预览sort匹配
 function! FuncSort() range
-    let l:pat = PreviewPattern('sort pattern: /')
+    let l:pat = Plug_incs_previewPattern('sort pattern: /')
     if empty(l:pat)
         return
     endif
@@ -1449,12 +1449,12 @@ function! FuncDivideSpace(string, pos) range
         endfor
         call setline(k, l:line)
     endfor
-    call SetRepeatExecution('call FuncDivideSpace("' . a:string . '", "' . a:pos . '")')
+    call Plug_rpt_setExecution('call FuncDivideSpace("' . a:string . '", "' . a:pos . '")')
 endfunction
-let FuncDivideSpaceH = function('ExecFuncInput', [['Divide H Space(split with space): '], 'FuncDivideSpace', 'h'])
-let FuncDivideSpaceC = function('ExecFuncInput', [['Divide C Space(split with space): '], 'FuncDivideSpace', 'c'])
-let FuncDivideSpaceL = function('ExecFuncInput', [['Divide L Space(split with space): '], 'FuncDivideSpace', 'l'])
-let FuncDivideSpaceD = function('ExecFuncInput', [['Delete D Space(split with space): '], 'FuncDivideSpace', 'd'])
+let FuncDivideSpaceH = function('FuncExecInput', [['Divide H Space(split with space): '], 'FuncDivideSpace', 'h'])
+let FuncDivideSpaceC = function('FuncExecInput', [['Divide C Space(split with space): '], 'FuncDivideSpace', 'c'])
+let FuncDivideSpaceL = function('FuncExecInput', [['Divide L Space(split with space): '], 'FuncDivideSpace', 'l'])
+let FuncDivideSpaceD = function('FuncExecInput', [['Delete D Space(split with space): '], 'FuncDivideSpace', 'd'])
 " }}}
 
 " FUNCTION: FuncAppendCmd(str) {{{ 将命令结果作为文本插入
@@ -1471,8 +1471,8 @@ function! FuncAppendCmd(str, flg)
     let l:result = GetCmdResult(a:flg, l:str, l:args)
     call append(line('.'), split(l:result, "\n"))
 endfunction
-let FuncAppendExecResult = function('ExecFuncInput', [['Input cmd = ', '', 'command'] , 'FuncAppendCmd', 'exec'])
-let FuncAppendCallResult = function('ExecFuncInput', [['Input cmd = ', '', 'function'], 'FuncAppendCmd', 'call'])
+let FuncAppendExecResult = function('FuncExecInput', [['Input cmd = ', '', 'command'] , 'FuncAppendCmd', 'exec'])
+let FuncAppendCallResult = function('FuncExecInput', [['Input cmd = ', '', 'function'], 'FuncAppendCmd', 'call'])
 " }}}
 " }}}
 
@@ -1520,7 +1520,7 @@ let s:cpl = {
         \ 'dic' : {
                 \ 'charset' : '-finput-charset=utf-8 -fexec-charset=gbk',
                 \},
-        \ 'cmd' : 'ExecSelCpp'
+        \ 'cmd' : 'CompileExecSelCpp'
         \}
     \}
 " FUNCTION:s:cpl.printf(flg, args, srcf, outf) dict {{{
@@ -1558,7 +1558,7 @@ endfunction
 " }}}
 " }}}
 
-function! ExecSelCpp(sopt, arg)
+function! CompileExecSelCpp(sopt, arg)
     call CompileFile(s:cpl.sel_cpp.dic[a:arg])
 endfunction
 
@@ -1577,7 +1577,7 @@ function! CompileFile(argstr)
         return
     endif
     execute l:exec
-    call SetRepeatExecution(l:exec)
+    call Plug_rpt_setExecution(l:exec)
 endfunction
 " }}}
 
@@ -1686,7 +1686,7 @@ function! s:fw.exec() dict
     if s:fw_rg
         call FindWorkingHighlight(self.pattern)
     endif
-    call SetRepeatExecution(l:exec)
+    call Plug_rpt_setExecution(l:exec)
 endfunction
 let s:fw_nvmaps = [
                 \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fri',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'frI',
@@ -2031,7 +2031,7 @@ endfunction
 " }}}
 
 " Misc {{{
-" 切换显示隐藏字符 {{{
+" FUNCTION: InvConceallevel() {{{ 切换显示隐藏字符
 function! InvConceallevel()
     if &conceallevel == 0
         set conceallevel=2
@@ -2042,7 +2042,7 @@ function! InvConceallevel()
 endfunction
 " }}}
 
-" 切换虚拟编辑 {{{
+" FUNCTION: InvVirtualedit() {{{ 切换虚拟编辑
 function! InvVirtualedit()
     if &virtualedit == ''
         set virtualedit=all
@@ -2053,7 +2053,7 @@ function! InvVirtualedit()
 endfunction
 " }}}
 
-" 切换显示行号 {{{
+" FUNCTION: InvNumberType() {{{ 切换显示行号
 let s:misc_number_type = 1
 function! InvNumberType()
     if s:misc_number_type == 1
@@ -2072,7 +2072,7 @@ function! InvNumberType()
 endfunction
 " }}}
 
-" 切换显示折叠列 {{{
+" FUNCTION: InvFoldColumeShow() {{{ 切换显示折叠列
 function! InvFoldColumeShow()
     if &foldcolumn == 0
         set foldcolumn=1
@@ -2083,7 +2083,7 @@ function! InvFoldColumeShow()
 endfunction
 " }}}
 
-" 切换显示标志列 {{{
+" FUNCTION: InvSigncolumn() {{{ 切换显示标志列
 function! InvSigncolumn()
     if &signcolumn == 'auto'
         set signcolumn=no
@@ -2094,7 +2094,7 @@ function! InvSigncolumn()
 endfunction
 " }}}
 
-" 切换高亮 {{{
+" FUNCTION: InvHighLight() {{{ 切换高亮
 function! InvHighLight()
     if exists('g:syntax_on')
         syntax off
@@ -2106,7 +2106,7 @@ function! InvHighLight()
 endfunction
 " }}}
 
-" 切换滚屏bind {{{
+" FUNCTION: InvScrollBind() bind {{{ 切换滚屏bind
 function! InvScrollBind()
     if &scrollbind == 1
         set noscrollbind
@@ -2117,14 +2117,14 @@ function! InvScrollBind()
 endfunction
 " }}}
 
-" 切换Fcitx输入法 {{{
+" FUNCTION: Misc_fcitx2en() Misc_fcitx2zh() {{{ 切换Fcitx输入法
 if IsLinux()
-function! LinuxFcitx2En()
+function! Misc_fcitx2en()
     if 2 == system('fcitx-remote')
         let l:t = system('fcitx-remote -c')
     endif
 endfunction
-function! LinuxFcitx2Zh()
+function! Misc_fcitx2zh()
     if 1 == system('fcitx-remote')
         let l:t = system('fcitx-remote -o')
     endif
@@ -2132,8 +2132,8 @@ endfunction
 endif
 " }}}
 
-" 查找Vim关键字 {{{
-function! GotoKeyword(mode)
+" FUNCTION: Misc_gotoKeyword(mode) {{{ 查找Vim关键字
+function! Misc_gotoKeyword(mode)
     let l:exec = 'help '
     if a:mode ==# 'n'
         let l:word = expand('<cword>')
@@ -2152,16 +2152,16 @@ function! GotoKeyword(mode)
 endfunction
 " }}}
 
-" 去除尾部空白 {{{
-function! RemoveTrailingSpace()
+" FUNCTION: Misc_removeTrailingSpace() {{{ 去除尾部空白
+function! Misc_removeTrailingSpace()
     let l:save = winsaveview()
     %s/\s\+$//e
     call winrestview(l:save)
 endfunction
 " }}}
 
-" {{{ 冻结顶行
-function! HoldTopLine()
+" FUNCTION: Misc_holdTopLine() {{{ 冻结顶行
+function! Misc_holdTopLine()
     let l:line = line('.')
     split %
     resize 1
@@ -2281,11 +2281,11 @@ endif
 if IsNVim()
 augroup UserSettingsGui
     autocmd!
-    autocmd VimEnter * call s:setGuifontNVimQt()
+    autocmd VimEnter * call s:NVimQt_setFont()
 augroup END
 
-" FUNCTION: s:setGuifontNVimQt() {{{ neovim-qt设置
-function! s:setGuifontNVimQt()
+" FUNCTION: s:NVimQt_setFont() {{{ neovim-qt设置
+function! s:NVimQt_setFont()
 if IsNVimQt()
     if IsLinux()
         Guifont! WenQuanYi Micro Hei Mono:h12
@@ -2327,8 +2327,8 @@ augroup UserSettingsCmd
     autocmd FileType javascript setlocal foldmethod=syntax
 
     " Help keys
-    autocmd Filetype vim,help nnoremap <buffer> <S-k> :call GotoKeyword('n')<CR>
-    autocmd Filetype vim,help vnoremap <buffer> <S-k> :call GotoKeyword('v')<CR>
+    autocmd Filetype vim,help nnoremap <buffer> <S-k> :call Misc_gotoKeyword('n')<CR>
+    autocmd Filetype vim,help vnoremap <buffer> <S-k> :call Misc_gotoKeyword('v')<CR>
     " 预览Quickfix和Location-list
     autocmd Filetype qf       nnoremap <buffer> <M-Space> :call QuickfixPreview()<CR>
 augroup END
@@ -2412,12 +2412,12 @@ endif
     nnoremap <leader>is :call InvSigncolumn()<CR>
     nnoremap <leader>ih :call InvHighLight()<CR>
     nnoremap <leader>ib :call InvScrollBind()<CR>
-    nnoremap <leader>tb :call TogglePath('browser')<CR>
+    nnoremap <leader>tb :call PathToggle('browser')<CR>
     if IsLinux()
-        inoremap <Esc> <Esc>:call LinuxFcitx2En()<CR>
+        inoremap <Esc> <Esc>:call Misc_fcitx2en()<CR>
     endif
-    nnoremap <leader>rt :call RemoveTrailingSpace()<CR>
-    nnoremap <leader>hl :call HoldTopLine()<CR>
+    nnoremap <leader>rt :call Misc_removeTrailingSpace()<CR>
+    nnoremap <leader>hl :call Misc_holdTopLine()<CR>
 " }}}
 
 " Copy and paste{{{
@@ -2506,8 +2506,8 @@ endif
 
 " File diff {{{
     " 文件比较，自动补全文件和目录
-    nnoremap <leader>ds :call ExecFuncInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 's')<CR>
-    nnoremap <leader>dv :call ExecFuncInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 'v')<CR>
+    nnoremap <leader>ds :call FuncExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 's')<CR>
+    nnoremap <leader>dv :call FuncExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 'v')<CR>
     " 比较当前文件（已经分屏）
     nnoremap <leader>dt :diffthis<CR>
     " 关闭文件比较，与diffthis互为逆命令
@@ -2536,8 +2536,8 @@ endif
 
 " Coding {{{
     " 创建临时文件
-    nnoremap <leader>ei :call ExecFuncInput(['TempFile Suffix: '], 'FuncEditTempFile', 0)<CR>
-    nnoremap <leader>eti :call ExecFuncInput(['TempFile Suffix: '], 'FuncEditTempFile', 1)<CR>
+    nnoremap <leader>ei :call FuncExecInput(['TempFile Suffix: '], 'FuncEditTempFile', 0)<CR>
+    nnoremap <leader>eti :call FuncExecInput(['TempFile Suffix: '], 'FuncEditTempFile', 1)<CR>
     for [key, val] in items({
             \ 'n' : '',
             \ 'c' : 'c',
@@ -2557,7 +2557,7 @@ endif
     nnoremap <leader>af :call FuncAppendCallResult()<CR>
     " 编译运行当前文件
     nnoremap <leader>rf :call CompileFile('')<CR>
-    nnoremap <leader>ri :call ExecFuncInput(['Compile/Run args: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h')], 'CompileFile')<CR>
+    nnoremap <leader>ri :call FuncExecInput(['Compile/Run args: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h')], 'CompileFile')<CR>
     nnoremap <leader>ra :call RC_Args()<CR>
     nnoremap <leader>rq :call RC_Qt()<CR>
     nnoremap <leader>rv :call RC_Vs()<CR>
