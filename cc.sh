@@ -19,7 +19,8 @@ if [ `uname` == "Linux" ]; then
     cp ../.vimrc                    ./vim/
     cp ../.vim/.ycm_extra_conf.py   ./vim/
     cp ../.vim/jsconfig.json        ./vim/
-    cp -r ../.vim/mySnippets        ./vim/
+    cp -r ../.vim/vSnippets         ./vim/
+    cp -r ../.vim/vBin              ./vim/
     cp -r ../.vim/autoload          ./vim/
     cp -r ../.config/nvim           ./vim/
     # zsh
@@ -80,7 +81,8 @@ elif [ `uname -o` == "Msys" ]; then
     cp ../Vim/_vimrc                      ./vim/.vimrc
     cp ../Vim/vimfiles/.ycm_extra_conf.py ./vim/
     cp ../Vim/vimfiles/jsconfig.json      ./vim/
-    cp -r ../Vim/vimfiles/mySnippets      ./vim/
+    cp -r ../Vim/vimfiles/vSnippets       ./vim/
+    cp -r ../Vim/vimfiles/vBin            ./vim/
     cp -r ../Vim/vimfiles/autoload        ./vim/
 
     # cf-msys2

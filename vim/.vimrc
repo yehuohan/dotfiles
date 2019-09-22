@@ -971,8 +971,8 @@ endif
     Plug 'yehuohan/ultisnips'           " snippet引擎（vmap的映射，与vim-textmanip的<C-i>有冲突）
     Plug 'honza/vim-snippets'           " snippet合集
     " 使用:UltiSnipsEdit编辑g:UltiSnipsSnippetsDir中的snippet文件
-    let g:UltiSnipsSnippetsDir = $DotVimPath . '/mySnippets'
-    let g:UltiSnipsSnippetDirectories=['UltiSnips', 'mySnippets']
+    let g:UltiSnipsSnippetsDir = $DotVimPath . '/vSnippets'
+    let g:UltiSnipsSnippetDirectories=['UltiSnips', 'vSnippets']
                                         " 自定义mySnippets合集
     let g:UltiSnipsExpandTrigger='<Tab>'
     let g:UltiSnipsListSnippets='<C-Tab>'
@@ -1061,11 +1061,6 @@ endif
 
 " tagbar {{{ 代码结构查看
     Plug 'majutsushi/tagbar'
-    if IsLinux()
-        let g:tagbar_ctags_bin='/usr/bin/ctags'
-    elseif IsWin()
-        let g:tagbar_ctags_bin=$VIM.'\vim81\ctags.exe'
-    endif                               " 设置ctags路径，需要安装ctags
     let g:tagbar_width=30
     let g:tagbar_map_showproto=''       " 取消tagbar对<Space>的占用
     nnoremap <leader>tt :TagbarToggle<CR>

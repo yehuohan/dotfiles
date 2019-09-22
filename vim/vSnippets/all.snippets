@@ -1,0 +1,373 @@
+
+#===============================================================================
+# qt project
+#===============================================================================
+snippet qpro "qmake pro file"
+#-------------------------------------------------
+#
+# Project created by Vim `!v strftime("%Y-%m-%d %X")`
+#
+#-------------------------------------------------
+
+QT += core gui
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+TEMPLATE = app
+CONFIG  += c++11
+
+# debug, release, debug_and_release
+CONFIG += debug
+CONFIG -= release
+CONFIG(debug, debug|release) {
+    TARGET      = ${1:project-name}
+    OBJECTS_DIR = debug
+} else {
+    TARGET      = $1
+    OBJECTS_DIR = release
+    DEFINES    += QT_NO_WARNING_OUTPUT \
+                QT_NO_DEBUG_OUTPUT
+}
+#DESTDIR = $$OBJECTS_DIR/../
+MOC_DIR  = $$OBJECTS_DIR/moc
+UI_DIR   = $$OBJECTS_DIR/ui
+RCC_DIR  = $$OBJECTS_DIR/rcc
+
+#INCLUDEPATH +=
+#LIBS        +=
+unix {
+    #LIBS += \`pkg-config --libs \`
+}
+
+#PRECOMPILED_HEADER = pch.h
+SOURCES    += \
+	main.cpp
+#HEADERS   += .h
+#FORMS     += .ui
+#RESOURCES += .qrc
+#TRANSLATIONS += lang/lang_zh_cn.ts	\
+#                lang/lang_en.ts
+endsnippet
+
+snippet qproc "qmake pro console file"
+#-------------------------------------------------
+#
+# Project created by Vim `!v strftime("%Y-%m-%d %X")`
+#
+#-------------------------------------------------
+
+QT += core
+QT -= gui
+
+TEMPLATE = app
+CONFIG  += c++11 console
+
+# debug, release, debug_and_release
+CONFIG += debug
+CONFIG -= release
+CONFIG(debug, debug|release) {
+    TARGET      = ${1:project-name}
+    OBJECTS_DIR = debug
+} else {
+    TARGET      = $1
+    OBJECTS_DIR = release
+    DEFINES    += QT_NO_WARNING_OUTPUT \
+                QT_NO_DEBUG_OUTPUT
+}
+#DESTDIR = $$OBJECTS_DIR/../
+MOC_DIR  = $$OBJECTS_DIR/moc
+UI_DIR   = $$OBJECTS_DIR/ui
+RCC_DIR  = $$OBJECTS_DIR/rcc
+
+#INCLUDEPATH +=
+#LIBS        +=
+unix {
+    #LIBS += \`pkg-config --libs \`
+}
+
+#PRECOMPILED_HEADER = pch.h
+SOURCES    += \
+	main.cpp
+#HEADERS   += .h
+endsnippet
+
+snippet qcpp "qmake pro only for c/c++"
+#-------------------------------------------------
+#
+# Project created by Vim `!v strftime("%Y-%m-%d %X")`
+#
+#-------------------------------------------------
+
+TEMPLATE = app
+CONFIG  -= qt
+CONFIG  -= app_bundle
+CONFIG  += c++11 console
+
+# debug, release, debug_and_release
+CONFIG += debug
+CONFIG -= release
+CONFIG(debug, debug|release) {
+    TARGET      = ${1:project-name}
+    OBJECTS_DIR = debug
+} else {
+    TARGET      = $1
+    OBJECTS_DIR = release
+}
+#DESTDIR = $$OBJECTS_DIR/../
+MOC_DIR  = $$OBJECTS_DIR/moc
+UI_DIR   = $$OBJECTS_DIR/ui
+RCC_DIR  = $$OBJECTS_DIR/rcc
+
+#INCLUDEPATH +=
+#LIBS        +=
+unix {
+    #LIBS += \`pkg-config --libs \`
+}
+
+#PRECOMPILED_HEADER = pch.h
+SOURCES    += \
+	main.cpp
+#HEADERS   += .h
+endsnippet
+
+snippet qcudapp "qmake for cuda application"
+
+#-------------------------------------------------
+#
+# Project created by Vim `!v strftime("%Y-%m-%d %X")`
+#
+#-------------------------------------------------
+
+TEMPLATE = app
+CONFIG  -= qt
+CONFIG  -= app_bundle
+CONFIG  += c++11 console
+
+# debug, release, debug_and_release
+CONFIG += debug
+CONFIG -= release
+CONFIG(debug, debug|release) {
+    TARGET      = ${1:project-name}
+    OBJECTS_DIR = debug
+} else {
+    TARGET      = $1
+    OBJECTS_DIR = release
+}
+#DESTDIR = $$OBJECTS_DIR/../
+MOC_DIR  = $$OBJECTS_DIR/moc
+UI_DIR   = $$OBJECTS_DIR/ui
+RCC_DIR  = $$OBJECTS_DIR/rcc
+
+#INCLUDEPATH +=
+#LIBS +=
+unix {
+	#INCLUDEPATH += -I/usr/include/GL
+    #LIBS += \`pkg-config --libs gl glu freeglut\`
+}
+
+#HEADERS   += .h
+
+#===============================================================================
+# build as cuda application in linux
+#===============================================================================
+CONFIG(release, debug|release): CUDA_OBJECTS_DIR = $$OBJECTS_DIR/cuda
+else: CUDA_OBJECTS_DIR = $$OBJECTS_DIR/cuda
+
+CUDA_TARGET = $$TARGET
+CUDA_SOURCES += $0
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# cuda settings
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+CUDA_DIR    = /opt/cuda
+CUDA_INC    = $$CUDA_DIR/include \
+              $$CUDA_DIR/samples/common/inc
+CUDA_LIBDIR = $$CUDA_DIR/lib64
+CUDA_LIBS   = cudart cuda
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# cuda nvcc settings
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+CUDA_NVCC   = $$CUDA_DIR/bin/nvcc -ccbin g++
+NVCC_INC   += $$join(CUDA_INC, '" -I"', '-I"', '"') \
+              $$INCLUDEPATH
+NVCC_LIBS  += $$join(CUDA_LIBS, ' -l', '-l', '') \
+              $$LIBS
+NVCC_ARCH   = sm_61
+NVCC_FLAGS  = -use_fast_math -arch=$$NVCC_ARCH -m64
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# add compiler
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+QMAKE_LIBDIR += $$CUDA_LIBDIR
+cuda.input    = CUDA_SOURCES
+cuda.output   = $$CUDA_OBJECTS_DIR/${QMAKE_FILE_BASE}_cuda.o
+cuda.commands = $$CUDA_NVCC \
+                $$NVCC_FLAGS $$NVCC_INC $$NVCC_LIBS \
+                -c -o ${QMAKE_FILE_OUT} ${QMAKE_FILE_NAME}
+cuda.depend_type = TYPE_C
+QMAKE_EXTRA_COMPILERS += cuda
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# add target, link ${OBJECTS} in makefile
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cudapp.target   = $$CUDA_TARGET
+cudapp.commands = $$CUDA_NVCC \
+                $$NVCC_FLAGS $$NVCC_INC $$NVCC_LIBS \
+                -o $$CUDA_TARGET ${OBJECTS}
+QMAKE_EXTRA_TARGETS += cudapp
+endsnippet
+
+
+
+#===============================================================================
+# makefile
+#===============================================================================
+snippet makf "makefile template"
+
+#-------------------------------------------------
+#
+# Project created by Vim `!v strftime("%Y-%m-%d %X")`
+#
+#-------------------------------------------------
+
+#===============================================================================
+# path
+#===============================================================================
+DIR_INC := ./inc
+DIR_SRC := ./src
+DIR_OBJ := ./obj
+DIR_BIN := .
+DIR_3RD := ./3party
+DIR_LIB := ./lib
+
+#===============================================================================
+# settings
+#===============================================================================
+CC         := ${1:g++}
+TARGET     := ${2:main}
+ifeq ($(CC), g++)
+CC_SUF     := cpp
+else
+CC_SUF     := c
+endif
+BIN		   := ${DIR_BIN}/${TARGET}
+SRC        := $(wildcard ${DIR_SRC}/*.${CC_SUF})
+OBJ        := $(patsubst %.${CC_SUF},${DIR_OBJ}/%.o,$(notdir ${SRC}))
+LIBS       :=
+#-lpthread \`pkg-config opencv --libs\`
+PKGFLAGS   :=
+#\`pkg-config opencv --cflags\`
+CXXFLAGS   := -g -Wall -I${DIR_INC} -I${DIR_SRC} -I${DIR_3RD} ${PKGFLAGS}
+LDFLAGS    := -L${DIR_LIB} ${LIBS}
+
+define init_make
+	$(shell mkdir -p ${DIR_OBJ})
+endef
+$(call init_make)
+
+#===============================================================================
+# target
+#===============================================================================
+${BIN}: ${OBJ}
+	${CC} ${OBJ} -o $@ ${LDFLAGS}
+
+${DIR_OBJ}/%.o: ${DIR_SRC}/%.${CC_SUF}
+	${CC} ${CXXFLAGS} -c $< -o $@
+
+.phony: clean
+clean:
+	rm -r ${DIR_OBJ}
+	rm $(BIN)
+endsnippet
+
+
+
+#===============================================================================
+# block comment
+#===============================================================================
+
+snippet cmc "comment block for c/cpp"
+//==============================================================================
+/* ${1:name} */
+${0}
+/* $1 End */
+//==============================================================================
+endsnippet
+
+snippet cmv "comment for vim"
+"===============================================================================
+"${0}
+"===============================================================================
+endsnippet
+
+snippet cmb "commet = with 1 character"
+${1:type}===============================================================================
+$1 ${0}
+$1===============================================================================
+endsnippet
+
+snippet cmb2 "commet = with 2 character"
+${1:type}==============================================================================
+$1 ${0}
+$1==============================================================================
+endsnippet
+
+snippet cml "commet ~ with 1 character"
+${1:type}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$1 ${0}
+$1~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+endsnippet
+
+snippet cml2 "commet - with 2 character"
+${1:type}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$1 ${0}
+$1~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+endsnippet
+
+
+#===============================================================================
+#  chars
+#===============================================================================
+
+snippet cbox "chars for box"
+┌─┬─┐
+│ │ │
+├─┼─┤
+└─┴─┘
+endsnippet
+
+snippet cbox11 "chars for box ┌"
+┌
+endsnippet
+
+snippet cbox12 "chars for box ┬"
+┬
+endsnippet
+
+snippet cbox13 "chars for box ┐"
+┐
+endsnippet
+
+snippet cbox21 "chars for box ├"
+├
+endsnippet
+
+snippet cbox22 "chars for box ┼"
+┼
+endsnippet
+
+snippet cbox23 "chars for box ┤"
+┤
+endsnippet
+
+snippet cbox31 "chars for box └"
+└
+endsnippet
+
+snippet cbox32 "chars for box ┴"
+┴
+endsnippet
+
+snippet cbox33 "chars for box ┘"
+┘
+endsnippet
