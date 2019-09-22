@@ -222,7 +222,6 @@ if IsVim()
     set <M-n>=n
     set <M-m>=m
 endif
-
 " }}}
 " }}}
 
@@ -375,7 +374,7 @@ endif
 
 " LeaderF {{{ 模糊查找
 if IsLinux()
-    "Plug 'Yggdroot/LeaderF', { 'do': './install.sh' }
+    Plug 'Yggdroot/LeaderF', {'do': './install.sh'}
     augroup PluginLeaderF
         autocmd!
         autocmd VimEnter * call s:Plug_lf_removeMru()
@@ -388,7 +387,7 @@ if IsLinux()
         endtry
     endfunction
 elseif IsWin()
-    Plug 'Yggdroot/LeaderF', { 'do': './install.bat' }
+    Plug 'Yggdroot/LeaderF', {'do': './install.bat'}
 else
     Plug 'Yggdroot/LeaderF'
 endif
@@ -911,11 +910,12 @@ if s:gset.use_ycm
             \ 'filetypes': ['julia']
         \ },
         \ ]                                                     " LSP支持
+    let g:ycm_key_detailed_diagnostics = ''                     " 直接使用:YcmShowDetailedDiagnostic命令
     let g:ycm_key_list_select_completion = ['<C-j>', '<C-n>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-k>', '<C-p>', '<Up>']
     let g:ycm_key_list_stop_completion = ['<C-y>']              " 关闭补全menu
     let g:ycm_key_invoke_completion = '<C-l>'                   " 显示补全内容，YCM使用completefunc（C-X C-U）
-    let g:ycm_key_detailed_diagnostics = ''                     " 直接map :YcmShowDetailedDiagnostic命令即可
+                                                                " YCM不技持的补全，通过omnifunc(C-X C-O)集成到YCM上
     nnoremap <leader>gg :YcmCompleter<CR>
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
     nnoremap <leader>gI :YcmCompleter GoToInclude<CR>
@@ -952,9 +952,7 @@ if s:gset.use_lcn
         \ 'do': IsWin() ? 'powershell -executionpolicy bypass -File install.ps1' : 'bash install.sh',
         \ 'for': 'dart'
         \ }
-    " YCM使用completefunc(C-X C-U)
-    " LCN使用omnifunc(C-X C-O)
-    " YCM不技持的语言，通过LCN(omnifunc)集成到YCM上
+    " LCN使用omnifunc(LanguageClient#complete)
     let g:LanguageClient_serverCommands = {
         \ 'dart' : ['dart',
                   \ IsWin() ? 'C:/MyApps/dart-sdk/bin/snapshots/analysis_server.dart.snapshot' : '/opt/dart-sdk/bin/snapshots/analysis_server.dart.snapshot',
@@ -1201,6 +1199,27 @@ endif
         endif
     endfunction
 endif
+" }}}
+
+" vimtex {{{ Latex
+    Plug 'lervag/vimtex', {'for': 'tex'}
+    let g:vimtex_view_general_viewer = 'SumatraPDF'
+    let g:vimtex_complete_enabled = 1   " 使用vimtex#complete#omnifunc补全
+    let g:vimtex_complete_close_braces = 1
+    let g:vimtex_compiler_method = 'latexmk'
+                                        " TexLive中包含了latexmk
+    nmap <leader>at <Plug>(vimtex-toc-toggle)
+    nmap <leader>al <Plug>(vimtex-compile)
+    nmap <leader>aL <Plug>(vimtex-compile-ss)
+    nmap <leader>ac <Plug>(vimtex-clean)
+    nmap <leader>as <Plug>(vimtex-stop)
+    nmap <leader>av <Plug>(vimtex-view)
+    nmap <leader>am <Plug>(vimtex-toggle-main)
+    " 添加YCM集成
+    augroup PluginVimtex
+        autocmd!
+        autocmd VimEnter * let g:ycm_semantic_triggers.tex=g:vimtex#re#youcompleteme
+    augroup END
 " }}}
 
 " open-browser.vim {{{ 在线搜索
@@ -1489,7 +1508,7 @@ let s:cpl = {
         \ 'go'   : ['go run %s %s'                                 , 'srcf'  , 'args'] ,
         \ 'js'   : ['node %s %s'                                   , 'srcf'  , 'args'],
         \ 'dart' : ['dart %s %s'                                   , 'srcf'  , 'args'] ,
-        \ 'tex'  : ['pdfLatex %s && miktex-texworks %s.pdf'        , 'srcf'  , 'outf'] ,
+        \ 'tex'  : ['pdfLatex %s && SumatraPDF %s.pdf'             , 'srcf'  , 'outf'] ,
         \ 'sh'   : ['./%s %s'                                      , 'srcf'  , 'args'] ,
         \ 'bat'  : ['%s %s'                                        , 'srcf'  , 'args'] ,
         \ 'md'   : ['typora %s'                                    , 'srcf'] ,
