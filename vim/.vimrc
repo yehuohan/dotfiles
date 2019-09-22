@@ -2298,6 +2298,7 @@ if IsNVimQt()
     endif
     GuiLinespace 0
     GuiTabline 0
+    GuiPopupmenu 0
     nnoremap <leader>tf :call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
                                         " neovim-qt全屏
 endif
