@@ -299,10 +299,9 @@ call plug#begin($DotVimPath.'/bundle')  " 可选设置，可以指定插件安�
     xmap <M-l> <Plug>(textmanip-duplicate-right)
 "}}}
 
-" vim-over {{{ 替换预览
-    Plug 'osyo-manga/vim-over'
-    nnoremap <leader>sp :OverCommandLine<CR>
-    vnoremap <leader>sp :OverCommandLine<CR>
+" traces {{{ 预览增强
+    Plug 'markonm/traces.vim'
+    " 支持:s, :g, :v, :sort, :range预览
 " }}}
 
 " incsearch {{{ 查找预览
@@ -322,22 +321,6 @@ call plug#begin($DotVimPath.'/bundle')  " 可选设置，可以指定插件安�
             IncSearchNoreMap <M-j> <Over>(incsearch-scroll-f)
             IncSearchNoreMap <M-k> <Over>(incsearch-scroll-b)
         endif
-    endfunction
-    function! Plug_incs_previewPattern(prompt)
-        " 预览pattern
-        let l:old_pat = histget('/', -1)
-        try
-            call incsearch#call({
-                                    \ 'command': '/',
-                                    \ 'is_stay': 1,
-                                    \ 'prompt': a:prompt
-                                \})
-        " E117: 函数不存在
-        catch /^Vim\%((\a\+)\)\=:E117/
-            return ''
-        endtry
-        let l:pat = histget('/', -1)
-        return (l:pat ==# l:old_pat) ? '' : l:pat
     endfunction
 
     nmap /  <Plug>(incsearch-forward)
@@ -1399,17 +1382,6 @@ function! FuncExecInput(iargs, fn, ...) range
     let l:range = (a:firstline == a:lastline) ? '' : (string(a:firstline) . ',' . string(a:lastline))
     let Fn = function(a:fn, l:fargs)
     execute l:range . 'call Fn()'
-endfunction
-" }}}
-
-" FUNCTION: FuncSort() range {{{ 预览sort匹配
-function! FuncSort() range
-    let l:pat = Plug_incs_previewPattern('sort pattern: /')
-    if empty(l:pat)
-        return
-    endif
-    let l:range = (a:firstline == a:lastline) ? '' : (string(a:firstline) . ',' . string(a:lastline))
-    call feedkeys(':' . l:range . 'sort /' . l:pat . '/', 'n')
 endfunction
 " }}}
 
@@ -2563,7 +2535,6 @@ endif
         execute 'nnoremap <leader>e'  . key . ' :call FuncEditTempFile("' . val . '", 0)<CR>'
         execute 'nnoremap <leader>et' . key . ' :call FuncEditTempFile("' . val . '", 1)<CR>'
     endfor
-    nnoremap <leader>so :call FuncSort()<CR>
     nnoremap <leader>dh :call FuncDivideSpaceH()<CR>
     nnoremap <leader>dc :call FuncDivideSpaceC()<CR>
     nnoremap <leader>dl :call FuncDivideSpaceL()<CR>
