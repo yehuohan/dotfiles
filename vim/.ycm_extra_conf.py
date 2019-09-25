@@ -121,6 +121,9 @@ def GetCfamilyFlags():
             # '-isystem', QT_DIR,
         ] + GetDirsRecursive('-isystem',
         [
+            # GCC_DIR,
+            # UNIX_DIR,
+            # QT_DIR,
         ])
 
     flags_cfamily = project_flags + local_flags + global_flags
