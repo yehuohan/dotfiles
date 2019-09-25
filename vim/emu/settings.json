@@ -1,0 +1,150 @@
+{
+    "workbench.colorTheme": "Quiet Light",
+    "latex-workshop.view.pdf.viewer": "tab",
+    "editor.fontLigatures": true,
+    "editor.fontFamily": "'Cascadia Code', Consolas, 'Courier New', monospace",
+    // Vim 设置
+    "vim.leader": "<Space>",
+    "vim.easymotion": true,
+    "vim.easymotionMarkerYOffset": 4,
+    "vim.surround": true,
+    "vim.incsearch": true,
+    "vim.useCtrlKeys": true,
+    "vim.handleKeys": {
+        "<C-l>": true
+    },
+    "vim.normalModeKeyBindingsNonRecursive": [
+        // 基本设置
+        {
+            "before": [";"],
+            "after": [":"]
+        }, {
+            "before": ["U"],
+            "after": ["<C-r>"]
+        }, {
+            "before": ["<leader>", "u"],
+            "after": ["~"]
+        }, {
+            "before": ["S"],
+            "after": ["%"]
+        }, {
+            "before": [">"],
+            "commands": [
+                "editor.action.indentLines"
+            ]
+        }, {
+            "before": ["<"],
+            "commands": [
+                "editor.action.outdentLines"
+            ]
+        }, {
+            "before": ["L"],
+            "after": ["$"]
+        }, {
+            "before": ["H"],
+            "after": ["^"]
+        }, {
+            "before": ["<leader>", "z", "a"],
+            "after": ["z", "A"]
+        }, {
+            "before": ["<leader>", "z", "c"],
+            "after": ["z", "C"]
+        }, {
+            "before": ["<leader>", "z", "o"],
+            "after": ["z", "O"]
+        }, {
+            "before": ["<leader>", "z", "m"],
+            "after": ["z", "M"]
+        }, {
+            "before": ["<leader>", "z", "n"],
+            "after": ["z", "N"]
+        }, {
+            "before": ["<leader>", "z", "r"],
+            "after": ["z", "R"]
+        }, {
+            "before": ["<leader>", "z", "x"],
+            "after": ["z", "X"]
+        }, {
+            "before": ["z", "h"],
+            "after": ["z", "t"]
+        }, {
+            "before": ["z", "l"],
+            "after": ["z", "b"]
+        }, {
+            "before": ["<C-j>"],
+            "after": ["<C-e>"]
+        }, {
+            "before": ["<C-k>"],
+            "after": ["<C-y>"]
+        }, {
+            "before": ["<leader>", "p"],
+            "after": ["\"", "0", "p"]
+        }, {
+            "before": ["<leader>", "P"],
+            "after": ["\"", "0", "P"]
+        }, {
+            "before": ["v", "v"],
+            "after": ["<C-v>"]
+        }, {
+            "before": ["<C-i>"],
+            "after": ["g", "T"]
+        }, {
+            "before": ["<C-o>"],
+            "after": ["g", "t"]
+        },
+        // vim.easymotion
+        {
+            "before": ["s"],
+            "after": ["<leader>", "<leader>", "s"]
+        }, {
+            "before": ["<leader>", "j"],
+            "after": ["<leader>", "<leader>", "j"]
+        }, {
+            "before": ["<leader>", "k"],
+            "after": ["<leader>", "<leader>", "k"]
+        }, {
+            "before": ["<leader>", "/"],
+            "after": ["<leader>", "<leader>", "/"]
+        }, {
+            "before": ["<leader>", "m", "w"],
+            "after": ["<leader>", "<leader>", "w"]
+        }, {
+            "before": ["<leader>", "m", "b"],
+            "after": ["<leader>", "<leader>", "b"]
+        },
+        // vim.surround
+        {
+            "before": ["<leader>", "s", "i"],
+            "after": ["y", "s", "w"]
+        }, {
+            "before": ["<leader>", "s", "w"],
+            "after": ["y", "s", "a", "w"]
+        }, {
+            "before": ["<leader>", "s", "c"],
+            "after": ["c", "s"]
+        }, {
+            "before": ["<leader>", "s", "d"],
+            "after": ["d", "s"]
+        },
+        // comment
+        {
+            "before": ["<leader>", "c"],
+            "after": ["g", "c"]
+        }, {
+            "before": ["<leader>", "g", "d"],
+            "after": ["g", "d"]
+        }, {
+            "before": ["<leader>", "g", "h"],
+            "after": ["g", "h"]
+        }
+    ],
+    "vim.visualModeKeyBindingsNonRecursive": [
+        {
+            "before": ["<leader>", "u"],
+            "after": ["~"]
+        }, {
+            "before": ["v", "v"],
+            "after": ["<C-v>"]
+        }
+    ]
+}
