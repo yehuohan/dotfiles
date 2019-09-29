@@ -1340,16 +1340,6 @@ function! GetArgs(str)
 endfunction
 " }}}
 
-" FUNCTION: GetCmdResult(flg, cmd, args) {{{ 获取命令或函数执行结果
-function! GetCmdResult(flg, cmd, args)
-    if a:flg ==# 'call'
-        return call(a:cmd, a:args)
-    elseif a:flg ==# 'exec'
-        return execute(a:cmd)
-    endif
-endfunction
-" }}}
-
 " FUNCTION: GetInput(prompt, [text, completion, workdir]) {{{ 输入字符串
 " @param workdir: 设置工作目录，用于文件和目录补全
 function! GetInput(prompt, ...)
@@ -1450,15 +1440,18 @@ function! FuncAppendCmd(str, flg)
         let l:ae = -1   " match(a:str, ')') - 1
         let l:str = a:str[0 : l:as - 1]
         let l:args = GetArgs(a:str[l:as + 1 : l:ae - 1])
+        let l:result = call(l:str, l:args)
+        if type(l:result) != v:t_string
+            let l:result = string(l:result)
+        endif
     elseif a:flg ==# 'exec'
         let l:str = ':' . a:str
-        let l:args = []
+        let l:result = execute(a:str)
     endif
-    let l:result = GetCmdResult(a:flg, l:str, l:args)
     call append(line('.'), split(l:result, "\n"))
 endfunction
-let FuncAppendExecResult = function('FuncExecInput', [['Input cmd = ', '', 'command'] , 'FuncAppendCmd', 'exec'])
-let FuncAppendCallResult = function('FuncExecInput', [['Input cmd = ', '', 'function'], 'FuncAppendCmd', 'call'])
+let FuncAppendExecResult = function('FuncExecInput', [['Input command = ', '', 'command'] , 'FuncAppendCmd', 'exec'])
+let FuncAppendCallResult = function('FuncExecInput', [['Input function = ', '', 'function'], 'FuncAppendCmd', 'call'])
 " }}}
 " }}}
 
@@ -1471,8 +1464,8 @@ let s:cpl = {
     \ 'srcf' : '',
     \ 'outf' : '',
     \ 'flg'  : {
-        \ 'c'    : ['gcc -static %s -o %s %s && "./%s"'            , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
-        \ 'cpp'  : ['g++ -std=c++11 -static %s -o %s %s && "./%s"' , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
+        \ 'c'    : ['gcc %s -o %s %s && "./%s"'                    , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
+        \ 'cpp'  : ['g++ -std=c++11 %s -o %s %s && "./%s"'         , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
         \ 'java' : ['javac %s && java %s %s'                       , 'srcf'  , 'outf'  , 'args'] ,
         \ 'py'   : ['python %s %s'                                 , 'srcf'  , 'args'] ,
         \ 'jl'   : ['julia %s %s'                                  , 'srcf'  , 'args'] ,
@@ -1500,13 +1493,21 @@ let s:cpl = {
     \ 'pat' : {
         \ 'make' : '\mTARGET\s*=\s*\(\<[a-zA-Z_][a-zA-Z0-9_]*\)',
         \},
-    \ 'sel_cpp' : {
-        \ 'opt' : ['cppargs'],
-        \ 'lst' : ['charset'],
-        \ 'dic' : {
-                \ 'charset' : '-finput-charset=utf-8 -fexec-charset=gbk',
-                \},
-        \ 'cmd' : 'CompileExecSelCpp'
+    \ 'sel_arg' : {
+        \ 'opt' : ['select args to CompileFile'],
+        \ 'lst' : [
+                \ '-finput-charset=utf-8 -fexec-charset=gbk',
+                \ '-static'
+                \ ],
+        \ 'cmd' : {sopt, arg -> call('CompileFile', [arg])}
+        \},
+    \ 'sel_cmd' : {
+        \ 'opt' : ['select command to run'],
+        \ 'lst' : [
+                \ 'go mod init %:r',
+                \ 'cflow -T %'
+                \ ],
+        \ 'cmd' : {sopt, arg -> execute(':AsyncRun ' . arg)}
         \}
     \}
 " FUNCTION:s:cpl.printf(flg, args, srcf, outf) dict {{{
@@ -1543,10 +1544,6 @@ function s:cpl.printf(flg, wdir, args, srcf, outf) dict
 endfunction
 " }}}
 " }}}
-
-function! CompileExecSelCpp(sopt, arg)
-    call CompileFile(s:cpl.sel_cpp.dic[a:arg])
-endfunction
 
 function! CompileFile(argstr)
     let l:ext     = expand('%:e')       " 扩展名
@@ -1628,21 +1625,15 @@ function! CompileProjectVs(sopt, sel, args)
 endfunction
 " }}}
 
-" FUNCTION: CompileProjectHtml(sopt, sel, args) {{{
-function! CompileProjectHtml(sopt, sel, args)
-    execute s:cpl.printf('html', '', '', a:sel, '')
-endfunction
-" }}}
-
 " Run compiler
-let RC_Args       = function('popset#set#PopSelection', [s:cpl.sel_cpp, 0])
-let RC_Qt         = function('CompileProject', ['*.pro', 'CompileProjectQt', []])
-let RC_QtClean    = function('CompileProject', ['*.pro', 'CompileProjectQt', ['distclean']])
-let RC_Vs         = function('CompileProject', ['*.sln', 'CompileProjectVs', ['Build']])
-let RC_VsClean    = function('CompileProject', ['*.sln', 'CompileProjectVs', ['Clean']])
-let RC_Make       = function('CompileProject', ['[mM]akefile', 'CompileProjectMake', []])
-let RC_MakeClean  = function('CompileProject', ['[mM]akefile', 'CompileProjectMake', ['clean']])
-let RC_Html       = function('CompileProject', ['[iI]ndex.html', 'CompileProjectHtml', []])
+let RC_Arg       = function('popset#set#PopSelection', [s:cpl.sel_arg, 0])
+let RC_Cmd       = function('popset#set#PopSelection', [s:cpl.sel_cmd, 0])
+let RC_Qt        = function('CompileProject', ['*.pro', 'CompileProjectQt', []])
+let RC_QtClean   = function('CompileProject', ['*.pro', 'CompileProjectQt', ['distclean']])
+let RC_Vs        = function('CompileProject', ['*.sln', 'CompileProjectVs', ['Build']])
+let RC_VsClean   = function('CompileProject', ['*.sln', 'CompileProjectVs', ['Clean']])
+let RC_Make      = function('CompileProject', ['[mM]akefile', 'CompileProjectMake', []])
+let RC_MakeClean = function('CompileProject', ['[mM]akefile', 'CompileProjectMake', ['clean']])
 " }}}
 
 " Search {{{
@@ -2544,14 +2535,14 @@ endif
     " 编译运行当前文件
     nnoremap <leader>rf :call CompileFile('')<CR>
     nnoremap <leader>ri :call FuncExecInput(['Compile/Run args: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h')], 'CompileFile')<CR>
-    nnoremap <leader>ra :call RC_Args()<CR>
+    nnoremap <leader>ra :call RC_Arg()<CR>
+    nnoremap <leader>rd :call RC_Cmd()<CR>
     nnoremap <leader>rq :call RC_Qt()<CR>
     nnoremap <leader>rv :call RC_Vs()<CR>
     nnoremap <leader>rm :call RC_Make()<CR>
     nnoremap <leader>rcq :call RC_QtClean()<CR>
     nnoremap <leader>rcv :call RC_VsClean()<CR>
     nnoremap <leader>rcm :call RC_MakeClean()<CR>
-    nnoremap <leader>rh :call RC_Html()<CR>
 " }}}
 
 " Find and search{{{
