@@ -1086,6 +1086,29 @@ endif
     augroup END
 " }}}
 
+" Debugger {{{ NodeJS, Go, Python调试器(Vim only)
+if IsVim()
+    Plug 'jayli/vim-easydebugger', {'for': ['python', 'go']}
+    " 启动关闭NodeJS/Python/Go调试
+    nmap <F5>   <Plug>EasyDebuggerInspect
+    nmap <S-F5> <Plug>EasyDebuggerExit
+    " 暂停继续
+    nmap <F6>   <Plug>EasyDebuggerContinue
+    tmap <F6>   <Plug>EasyDebuggerContinue
+    nmap <S-F6>   <Plug>EasyDebuggerPause
+    tmap <S-F6>   <Plug>EasyDebuggerPause
+    " 设置断点
+    nmap <F9>   <Plug>EasyDebuggerSetBreakPoint
+    " 单步：Step over, into, out
+    nmap <F10>  <Plug>EasyDebuggerNext
+    tmap <F10>  <Plug>EasyDebuggerNext
+    nmap <F11>  <Plug>EasyDebuggerStepIn
+    tmap <F11>  <Plug>EasyDebuggerStepIn
+    nmap <S-F11>    <Plug>EasyDebuggerStepOut
+    tmap <S-F11>    <Plug>EasyDebuggerStepOut
+endif
+" }}}
+
 " vim-quickhl {{{ 单词高亮
     Plug 't9md/vim-quickhl'
     nmap <leader>hw <Plug>(quickhl-manual-this)
