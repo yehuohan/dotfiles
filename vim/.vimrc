@@ -184,9 +184,9 @@ function! s:path.toggleBrowser() dict
     endif
 endfunction
 " }}}
-" FUNCTION: PathToggle(flg) {{{
-function! PathToggle(flg)
-    if a:flg ==# 'browser'
+" FUNCTION: PathToggle(type) {{{
+function! PathToggle(type)
+    if a:type ==# 'browser'
         call s:path.toggleBrowser()
         echo 's:path browser: ' . s:path.browser
     endif
@@ -1078,7 +1078,9 @@ endif
         let g:asyncrun_encs = 'cp936'   " 即'gbk'编码
     endif
     nnoremap <leader><leader>r :call feedkeys(':AsyncRun ', 'n')<CR>
+    vnoremap <leader><leader>r :AsyncRun
     nnoremap <leader>rr :call feedkeys(':AsyncRun ', 'n')<CR>
+    vnoremap <leader>rr :AsyncRun
     nnoremap <leader>rs :AsyncStop<CR>
     augroup PluginAsyncrun
         autocmd!
@@ -1486,7 +1488,7 @@ let s:cpl = {
     \ 'args' : '',
     \ 'srcf' : '',
     \ 'outf' : '',
-    \ 'flg'  : {
+    \ 'type'  : {
         \ 'c'    : ['gcc %s -o %s %s && "./%s"'                    , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
         \ 'cpp'  : ['g++ -std=c++11 %s -o %s %s && "./%s"'         , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
         \ 'java' : ['javac %s && java %s %s'                       , 'srcf'  , 'outf'  , 'args'] ,
@@ -1533,25 +1535,25 @@ let s:cpl = {
         \ 'cmd' : {sopt, arg -> execute(':AsyncRun ' . arg)}
         \}
     \}
-" FUNCTION:s:cpl.printf(flg, args, srcf, outf) dict {{{
+" FUNCTION:s:cpl.printf(type, args, srcf, outf) dict {{{
 " 生成编译运行命令字符串。
-" @param flg: 编译类型，需要包含于s:cpl.flg中
+" @param type: 编译类型，需要包含于s:cpl.type中
 " @param wdir: 命令运行目录
 " @param args: 参数
 " @param srcf: 源文件
 " @param outf: 目标文件
 " @return 返回编译或运行命令
-function s:cpl.printf(flg, wdir, args, srcf, outf) dict
-    if !has_key(self.flg, a:flg)
-        \ || ('sh' ==? a:flg && !(IsLinux() || IsGw() || IsMac()))
-        \ || ('bat' ==? a:flg && !IsWin())
+function s:cpl.printf(type, wdir, args, srcf, outf) dict
+    if !has_key(self.type, a:type)
+        \ || ('sh' ==? a:type && !(IsLinux() || IsGw() || IsMac()))
+        \ || ('bat' ==? a:type && !IsWin())
         return ''
     endif
     let self.wdir = a:wdir
     let self.args = a:args
     let self.srcf = a:srcf
     let self.outf = a:outf
-    let l:pstr = copy(self.flg[a:flg])
+    let l:pstr = copy(self.type[a:type])
     call map(l:pstr, {key, val -> (key == 0) ? val : get(self, val, '')})
     " create execution string
     if exists(':AsyncRun') == 2
@@ -1574,7 +1576,7 @@ function! CompileFile(argstr)
     let l:outfile = expand('%:t:r')     " 文件名，不带路径，不带扩展名
     let l:workdir = expand('%:p:h')     " 当前文件目录
 
-    if !has_key(s:cpl.flg, l:ext)
+    if !has_key(s:cpl.type, l:ext)
         let l:ext = &filetype
     endif
     let l:exec = s:cpl.printf(l:ext, l:workdir, a:argstr, l:srcfile, l:outfile)
@@ -2317,6 +2319,7 @@ augroup UserSettingsCmd
     autocmd GuiEnter *      set t_vb=   " 关闭可视闪铃(即闪屏)
     autocmd BufRead,BufNewFile *.jl     set filetype=julia
     autocmd BufRead,BufNewFile *.dart   set filetype=dart
+    autocmd BufRead,BufNewFile *.tex    set filetype=tex
     autocmd BufRead,BufNewFile *.tikz   set filetype=tex
     autocmd BufRead,BufNewFile *.gv     set filetype=dot
 
