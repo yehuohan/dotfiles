@@ -1226,8 +1226,15 @@ endif
     " 添加YCM集成
     augroup PluginVimtex
         autocmd!
-        autocmd VimEnter * let g:ycm_semantic_triggers.tex=g:vimtex#re#youcompleteme
+        autocmd VimEnter * call s:Plug_vt_setYcmTrigger()
     augroup END
+    function! s:Plug_vt_setYcmTrigger()
+        try
+            let g:ycm_semantic_triggers.tex=g:vimtex#re#youcompleteme
+        " E121:变量不存在
+        catch /^Vim\%((\a\+)\)\=:E121/
+        endtry
+    endfunction
 " }}}
 
 " open-browser.vim {{{ 在线搜索
