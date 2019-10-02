@@ -113,7 +113,7 @@ def GetCfamilyFlags():
                     list(filter(lambda dir: re.compile(r'^\d{1,2}\.\d{1,2}\.\d{1,2}$').match(dir),
                         os.listdir('C:/MyApps/cygwin64/lib/gcc/x86_64-pc-cygwin')))[0]) + '/include'
         # GCC_DIR = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/include/'
-        QT_DIR  = 'D:/Qt/5.10.1/msvc2017_64/include/'
+        QT_DIR  = 'D:/Qt/5.12.5/msvc2017_64/include/'
 
     global_flags = [
             '-isystem', GCC_DIR,
