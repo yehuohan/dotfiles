@@ -20,7 +20,6 @@ if [ `uname` == "Linux" ]; then
     cp ../.vim/.ycm_extra_conf.py   ./vim/
     cp ../.vim/jsconfig.json        ./vim/
     cp -r ../.vim/vSnippets         ./vim/
-    cp -r ../.vim/vBin              ./vim/
     cp -r ../.vim/autoload          ./vim/
     cp -r ../.config/nvim           ./vim/
     # zsh
