@@ -1610,10 +1610,13 @@ endfunction
 function! CompileRange()
     let l:ext     = expand('%:e')       " 扩展名
     if !has_key(s:cpl.pat, l:ext)
+        echo 's:cpl doesn''t support range of ' . l:ext
         return
     endif
     let [l:bin, l:pats, l:pate] = s:cpl.pat[l:ext]
-    execute ':' . join(GetContentRange(l:pats, l:pate), ',') . ':AsyncRun '. l:bin
+    let l:range = GetContentRange(l:pats, l:pate)
+    echo 'CompileRange() in ' . join(l:range, ',')
+    execute ':' . join(l:range, ',') . ':AsyncRun '. l:bin
 endfunction
 " }}}
 
