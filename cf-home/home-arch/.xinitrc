@@ -53,5 +53,5 @@ export XMODIFIERS=@im=fcitx
 
 #===============================================================================
 # set DPI for QT and GTK and i3wm
-xrandr --dpi 120
+xrandr --dpi 115
 exec i3

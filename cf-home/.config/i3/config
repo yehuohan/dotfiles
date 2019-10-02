@@ -53,7 +53,7 @@ exec --no-startup-id volumeicon
 # {{{
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font pango:WenQuanYi Micro Hei 11
+font pango:WenQuanYi Micro Hei 12
 # }}}
 
 # 窗口设置
@@ -74,12 +74,14 @@ assign [class="Google-chrome"] workspace $WS2
 assign [class="VirtualBox Manager"] workspace $WS3
 
 # 对特定窗口，执行特定命令
-set $bp 2
+set $bp 3
 for_window [window_role="pop-up"] floating enable
 for_window [class="^.*" tiling] border pixel $bp
 # Touchpad Off|On
-set $TPadOff "XTerm|Xfce4-terminal|Gvim"
-set $TPadOn  "^(?!((XTerm)|(Xfce4-terminal)|(Gvim)))"
+set $TPadOff "XTerm|Gnome-terminal|Gvim"
+set $TPadOn  "^(?!((XTerm)|(Gnome-terminal)|(Gvim)))"
+#set $TPadOff "XTerm|Xfce4-terminal|Gvim"
+#set $TPadOn  "^(?!((XTerm)|(Xfce4-terminal)|(Gvim)))"
 for_window [class=$TPadOff] exec ToggleTouchPad off
 #for_window [class=$TPadOn] exec ToggleTouchPad on
 
@@ -111,7 +113,7 @@ client.background       #$CLR_D
 bar {
     # 显示
     position top
-    height 28
+    height 25
     i3bar_command i3bar -t
     # 调用i3status
     #status_command i3status
@@ -303,8 +305,10 @@ floating_modifier $mod
 #===============================================================================
 #{{{
 # terminal
-bindsym $mod+Return exec xfce4-terminal
-bindsym $mod+mod1+Return exec xterm || xfce4-terminal
+bindsym $mod+Return exec gnome-terminal
+bindsym $mod+mod1+Return exec xterm || gnome-terminal
+#bindsym $mod+Return exec xfce4-terminal
+#bindsym $mod+mod1+Return exec xterm || xfce4-terminal
 
 # file manager
 bindsym $mod+e exec nautilus
