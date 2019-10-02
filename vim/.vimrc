@@ -435,16 +435,8 @@ endif
     " 命令格式
     ":EasyAlign[!] [N-th]DELIMITER_KEY[OPTIONS]
     ":EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
-    nnoremap <leader><leader>g :call feedkeys(Plug_ea_paragraph(), 'n')<CR>
+    nnoremap <leader><leader>g :call feedkeys(':' . join(GetContentRange('^[ \t]*$', '^[ \t]*$'), ',') . 'EasyAlign', 'n')<CR>
     vnoremap <leader><leader>g :EasyAlign
-    function! Plug_ea_paragraph()
-        let l:start = search('^[ \t]*$', 'bn')
-        let l:cur = line('.')
-        let l:end = search('^[ \t]*$', 'n')
-        let l:start = (l:start == 0 || l:start >= l:cur) ? 1 : (l:start + 1)
-        let l:end = (l:end == 0 || l:end <= l:cur) ? line('$') : (l:end - 1)
-        return ':' . string(l:start) . ',' . string(l:end) . 'EasyAlign '
-    endfunction
 " }}}
 
 " smooth-scroll {{{ 平滑滚动
@@ -1336,7 +1328,7 @@ function! GetFileList(pat, sdir)
 endfunction
 " }}}
 
-" FUNCTION: GetFileContent(fp, pat) {{{ 获取文件中特定的内容
+" FUNCTION: GetFileContent(fp, pat, flg) {{{ 获取文件中特定的内容
 " @param fp: 目录文件
 " @param pat: 匹配模式，必须使用 \(\) 来提取字符串
 " @param flg: 匹配所有还是第一个
@@ -1356,6 +1348,23 @@ function! GetFileContent(fp, pat, flg)
         endif
     endfor
     return l:content
+endfunction
+" }}}
+
+" FUNCTION: GetContentRange(pats, pate) {{{ 获取特定的内容的范围
+" @param pats: 起始行匹配模式，start为pats的下一行
+" @param pate: 结束行匹配模式，end为pate的上一行
+" @return 返回列表[start, end]
+function! GetContentRange(pats, pate)
+    let l:start = search(a:pats, 'bcnW')
+    let l:end = search(a:pate, 'cnW')
+    if l:start == 0
+        let l:start = 1
+    endif
+    if l:end == 0
+        let l:end = line('$')
+    endif
+    return [l:start, l:end]
 endfunction
 " }}}
 
@@ -1465,7 +1474,7 @@ let FuncDivideSpaceL = function('FuncExecInput', [['Divide L Space(split with sp
 let FuncDivideSpaceD = function('FuncExecInput', [['Delete D Space(split with space): '], 'FuncDivideSpace', 'd'])
 " }}}
 
-" FUNCTION: FuncAppendCmd(str) {{{ 将命令结果作为文本插入
+" FUNCTION: FuncAppendCmd(str, flg) {{{ 将命令结果作为文本插入
 function! FuncAppendCmd(str, flg)
     if a:flg ==# 'call'
         let l:as = match(a:str, '(')
@@ -1488,7 +1497,6 @@ let FuncAppendCallResult = function('FuncExecInput', [['Input function = ', '', 
 " }}}
 
 " Project run {{{
-" FUNCTION: CompileFile(argstr) {{{
 " s:cpl {{{
 let s:cpl = {
     \ 'wdir' : '',
@@ -1524,6 +1532,7 @@ let s:cpl = {
         \},
     \ 'pat' : {
         \ 'make' : '\mTARGET\s*=\s*\(\<[a-zA-Z_][a-zA-Z0-9_]*\)',
+        \ 'py' : ['python', '^#%%', '^#%%'],
         \},
     \ 'sel_arg' : {
         \ 'opt' : ['select args to CompileFile'],
@@ -1577,6 +1586,7 @@ endfunction
 " }}}
 " }}}
 
+" FUNCTION: CompileFile(argstr) {{{
 function! CompileFile(argstr)
     let l:ext     = expand('%:e')       " 扩展名
     let l:srcfile = expand('%:t')       " 文件名，不带路径，带扩展名
@@ -1593,6 +1603,17 @@ function! CompileFile(argstr)
     endif
     execute l:exec
     call Plug_rpt_setExecution(l:exec)
+endfunction
+" }}}
+
+" FUNCTION: CompileRange(argstr) {{{
+function! CompileRange()
+    let l:ext     = expand('%:e')       " 扩展名
+    if !has_key(s:cpl.pat, l:ext)
+        return
+    endif
+    let [l:bin, l:pats, l:pate] = s:cpl.pat[l:ext]
+    execute ':' . join(GetContentRange(l:pats, l:pate), ',') . ':AsyncRun '. l:bin
 endfunction
 " }}}
 
@@ -2404,6 +2425,8 @@ endif
     nnoremap <M-h> 16zh
     nnoremap <M-l> 16zl
     " 命令行移动
+    cnoremap <C-j> <Down>
+    cnoremap <C-k> <Up>
     cnoremap <M-h> <Left>
     cnoremap <M-l> <Right>
     cnoremap <M-k> <C-Right>
@@ -2568,6 +2591,7 @@ endif
     " 编译运行当前文件
     nnoremap <leader>rf :call CompileFile('')<CR>
     nnoremap <leader>ri :call FuncExecInput(['Compile/Run args: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h')], 'CompileFile')<CR>
+    nnoremap <leader>rj :call CompileRange()<CR>
     nnoremap <leader>ra :call RC_Arg()<CR>
     nnoremap <leader>rd :call RC_Cmd()<CR>
     nnoremap <leader>rq :call RC_Qt()<CR>
