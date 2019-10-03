@@ -1503,32 +1503,34 @@ let s:cpl = {
     \ 'args' : '',
     \ 'srcf' : '',
     \ 'outf' : '',
-    \ 'type'  : {
-        \ 'c'    : ['gcc %s -o %s %s && "./%s"'                    , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
-        \ 'cpp'  : ['g++ -std=c++11 %s -o %s %s && "./%s"'         , 'args'  , 'outf'  , 'srcf' , 'outf'] ,
-        \ 'java' : ['javac %s && java %s %s'                       , 'srcf'  , 'outf'  , 'args'] ,
-        \ 'py'   : ['python %s %s'                                 , 'srcf'  , 'args'] ,
-        \ 'jl'   : ['julia %s %s'                                  , 'srcf'  , 'args'] ,
-        \ 'lua'  : ['lua %s %s'                                    , 'srcf'  , 'args'] ,
-        \ 'go'   : ['go run %s %s'                                 , 'srcf'  , 'args'] ,
-        \ 'js'   : ['node %s %s'                                   , 'srcf'  , 'args'],
-        \ 'dart' : ['dart %s %s'                                   , 'srcf'  , 'args'] ,
-        \ 'tex'  : ['pdfLatex %s && SumatraPDF %s.pdf'             , 'srcf'  , 'outf'] ,
-        \ 'sh'   : ['./%s %s'                                      , 'srcf'  , 'args'] ,
-        \ 'bat'  : ['%s %s'                                        , 'srcf'  , 'args'] ,
-        \ 'md'   : ['typora %s'                                    , 'srcf'] ,
-        \ 'json' : ['python -m json.tool %s'                       , 'srcf'] ,
-        \ 'm'    : ['matlab -nosplash -nodesktop -r %s'            , 'outf'] ,
-        \ 'html' : ['"' . s:path.browser . '" %s'                  , 'srcf'] ,
-        \ 'dot'  : ['dotty %s && dot -Tpng %s -o %s.png'           , 'srcf'  , 'srcf'  , 'outf'],
-        \ 'make' : ['cd "%s" && make %s && "./%s"'                 , 'wdir'  , 'args'  , 'outf'] ,
-        \ 'qt'   : ['cd "%s" && ' . (IsWin() ?
-                    \ ('qmake -r "%s" && vcvars64.bat && nmake -f Makefile.Debug') :
-                    \ ('qmake "%s" && make'))
-                    \ . ' %s && "./%s"',
-                    \ 'wdir', 'srcf', 'args', 'outf'],
-        \ 'vs'   : ['cd "%s" && vcvars64.bat && devenv "%s" /%s && "./%s"',
-                    \ 'wdir', 'srcf', 'args', 'outf']
+    \ 'type' : {
+        \ 'c'     : ['gcc %s -o %s %s && "./%s"'            , 'args' , 'outf' , 'srcf' , 'outf'],
+        \ 'cpp'   : ['g++ -std=c++11 %s -o %s %s && "./%s"' , 'args' , 'outf' , 'srcf' , 'outf'],
+        \ 'java'  : ['javac %s && java %s %s'               , 'srcf' , 'outf' , 'args'],
+        \ 'py'    : ['python %s %s'                         , 'srcf' , 'args'],
+        \ 'jl'    : ['julia %s %s'                          , 'srcf' , 'args'],
+        \ 'lua'   : ['lua %s %s'                            , 'srcf' , 'args'],
+        \ 'go'    : ['go run %s %s'                         , 'srcf' , 'args'],
+        \ 'js'    : ['node %s %s'                           , 'srcf' , 'args'],
+        \ 'dart'  : ['dart %s %s'                           , 'srcf' , 'args'],
+        \ 'tex'   : ['pdfLatex %s && SumatraPDF %s.pdf'     , 'srcf' , 'outf'],
+        \ 'sh'    : ['./%s %s'                              , 'srcf' , 'args'],
+        \ 'bat'   : ['%s %s'                                , 'srcf' , 'args'],
+        \ 'md'    : ['typora %s'                            , 'srcf'],
+        \ 'json'  : ['python -m json.tool %s'               , 'srcf'],
+        \ 'm'     : ['matlab -nosplash -nodesktop -r %s'    , 'outf'],
+        \ 'html'  : [s:path.browser . ' %s'                 , 'srcf'],
+        \ 'dot'   : ['dotty %s && dot -Tpng %s -o %s.png'   , 'srcf' , 'srcf' , 'outf'],
+        \ 'make'  : ['cd "%s" && make %s && "./%s"'         , 'wdir' , 'args' , 'outf'],
+        \ 'qt'    : ['cd "%s" && ' . (IsWin() ?
+                     \ ('qmake -r "%s" && vcvars64.bat && nmake -f Makefile.Debug') :
+                     \ ('qmake "%s" && make'))
+                     \ . ' %s && "./%s"',
+                     \ 'wdir', 'srcf', 'args', 'outf'],
+        \ 'vs'    : ['cd "%s" && vcvars64.bat && devenv "%s" /%s && "./%s"',
+                     \ 'wdir', 'srcf', 'args', 'outf'],
+        \ 'sphinx': ['cd "%s" && make %s && ' . s:path.browser . ' %s',
+                     \ 'wdir', 'args', 'outf']
         \},
     \ 'pat' : {
         \ 'make' : '\mTARGET\s*=\s*\(\<[a-zA-Z_][a-zA-Z0-9_]*\)',
@@ -1651,7 +1653,7 @@ endfunction
 function! CompileProjectQt(sopt, sel, args)
     let l:srcfile = fnamemodify(a:sel, ':p:t')
     let l:outfile = GetFileContent(a:sel, s:cpl.pat.make, 'first')
-    let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
+    let l:outfile = empty(l:outfile) ? fnamemodify(a:sel, ':t:r') : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
     " execute shell code
@@ -1681,15 +1683,27 @@ function! CompileProjectVs(sopt, sel, args)
 endfunction
 " }}}
 
+" FUNCTION: CompileProjectSphinx(sopt, sel, args) {{{
+function! CompileProjectSphinx(sopt, sel, args)
+    let l:outfile = 'build/html/index.html'
+    let l:workdir = fnamemodify(a:sel, ':p:h')
+
+    " execute shell code
+    execute s:cpl.printf('sphinx', l:workdir, join(a:args), '', l:outfile)
+endfunction
+"}}}
+
 " Run compiler
-let RC_Arg       = function('popset#set#PopSelection', [s:cpl.sel_arg, 0])
-let RC_Cmd       = function('popset#set#PopSelection', [s:cpl.sel_cmd, 0])
-let RC_Qt        = function('CompileProject', ['*.pro', 'CompileProjectQt', []])
-let RC_QtClean   = function('CompileProject', ['*.pro', 'CompileProjectQt', ['distclean']])
-let RC_Vs        = function('CompileProject', ['*.sln', 'CompileProjectVs', ['Build']])
-let RC_VsClean   = function('CompileProject', ['*.sln', 'CompileProjectVs', ['Clean']])
-let RC_Make      = function('CompileProject', ['[mM]akefile', 'CompileProjectMake', []])
-let RC_MakeClean = function('CompileProject', ['[mM]akefile', 'CompileProjectMake', ['clean']])
+let RC_Arg         = function('popset#set#PopSelection', [s:cpl.sel_arg, 0])
+let RC_Cmd         = function('popset#set#PopSelection', [s:cpl.sel_cmd, 0])
+let RC_Qt          = function('CompileProject', ['*.pro', 'CompileProjectQt', []])
+let RC_QtClean     = function('CompileProject', ['*.pro', 'CompileProjectQt', ['distclean']])
+let RC_Vs          = function('CompileProject', ['*.sln', 'CompileProjectVs', ['Build']])
+let RC_VsClean     = function('CompileProject', ['*.sln', 'CompileProjectVs', ['Clean']])
+let RC_Make        = function('CompileProject', ['[mM]akefile', 'CompileProjectMake', []])
+let RC_MakeClean   = function('CompileProject', ['[mM]akefile', 'CompileProjectMake', ['clean']])
+let RC_Sphinx      = function('CompileProject', [IsWin() ? 'make.bat' : '[mM]akefile', 'CompileProjectSphinx', ['html']])
+let RC_SphinxClean = function('CompileProject', [IsWin() ? 'make.bat' : '[mM]akefile', 'CompileProjectSphinx', ['clean']])
 " }}}
 
 " Search {{{
@@ -2600,9 +2614,11 @@ endif
     nnoremap <leader>rq :call RC_Qt()<CR>
     nnoremap <leader>rv :call RC_Vs()<CR>
     nnoremap <leader>rm :call RC_Make()<CR>
+    nnoremap <leader>rp :call RC_Sphinx()<CR>
     nnoremap <leader>rcq :call RC_QtClean()<CR>
     nnoremap <leader>rcv :call RC_VsClean()<CR>
     nnoremap <leader>rcm :call RC_MakeClean()<CR>
+    nnoremap <leader>rcp :call RC_SphinxClean()<CR>
 " }}}
 
 " Find and search{{{
