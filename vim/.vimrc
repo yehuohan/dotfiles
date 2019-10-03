@@ -613,7 +613,7 @@ else
         if &ft ==# 'qf'
             return 'CWD = ' . getcwd()
         else
-            let l:fw = FindWorkingGet()
+            let l:fw = FindWowGet()
             let l:fp = expand('%:p')
             return empty(l:fw) ? l:fp : substitute(l:fp, escape(l:fw[0], '\'), '...', '')
         endif
@@ -621,7 +621,7 @@ else
     " }}}
     " FUNCTION: Plug_ll_msgRight() {{{
     function! Plug_ll_msgRight()
-        let l:fw = FindWorkingGet()
+        let l:fw = FindWowGet()
         return empty(l:fw) ? '' : (l:fw[0] . '[' . l:fw[1] .']')
     endfunction
     " }}}
@@ -1496,8 +1496,8 @@ let FuncAppendCallResult = function('FuncExecInput', [['Input function = ', '', 
 " }}}
 " }}}
 
-" Project run {{{
-" s:cpl {{{
+" Project {{{
+" s:cpl {{{ Compiler command of project
 let s:cpl = {
     \ 'wdir' : '',
     \ 'args' : '',
@@ -1649,8 +1649,8 @@ function! CompileProject(str, fn, args)
 endfunction
 " }}}
 
-" FUNCTION: CompileProjectQt(sopt, sel, args) {{{
-function! CompileProjectQt(sopt, sel, args)
+" FUNCTION: CFnQt(sopt, sel, args) {{{
+function! CFnQt(sopt, sel, args)
     let l:srcfile = fnamemodify(a:sel, ':p:t')
     let l:outfile = GetFileContent(a:sel, s:cpl.pat.make, 'first')
     let l:outfile = empty(l:outfile) ? fnamemodify(a:sel, ':t:r') : l:outfile[0]
@@ -1661,8 +1661,8 @@ function! CompileProjectQt(sopt, sel, args)
 endfunction
 " }}}
 
-" FUNCTION: CompileProjectMake(sopt, sel, args) {{{
-function! CompileProjectMake(sopt, sel, args)
+" FUNCTION: CFnMake(sopt, sel, args) {{{
+function! CFnMake(sopt, sel, args)
     let l:outfile = GetFileContent(a:sel, s:cpl.pat.make, 'first')
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
@@ -1672,8 +1672,8 @@ function! CompileProjectMake(sopt, sel, args)
 endfunction
 "}}}
 
-" FUNCTION: CompileProjectVs(sopt, sel, args) {{{
-function! CompileProjectVs(sopt, sel, args)
+" FUNCTION: CFnVs(sopt, sel, args) {{{
+function! CFnVs(sopt, sel, args)
     let l:srcfile = fnamemodify(a:sel, ':p:t')
     let l:outfile = fnamemodify(a:sel, ':p:t:r')
     let l:workdir = fnamemodify(a:sel, ':p:h')
@@ -1683,8 +1683,8 @@ function! CompileProjectVs(sopt, sel, args)
 endfunction
 " }}}
 
-" FUNCTION: CompileProjectSphinx(sopt, sel, args) {{{
-function! CompileProjectSphinx(sopt, sel, args)
+" FUNCTION: CFnSphinx(sopt, sel, args) {{{
+function! CFnSphinx(sopt, sel, args)
     let l:outfile = 'build/html/index.html'
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
@@ -1694,29 +1694,29 @@ endfunction
 "}}}
 
 " Run compiler
-let RC_Arg         = function('popset#set#PopSelection', [s:cpl.sel_arg, 0])
-let RC_Cmd         = function('popset#set#PopSelection', [s:cpl.sel_cmd, 0])
-let RC_Qt          = function('CompileProject', ['*.pro', 'CompileProjectQt', []])
-let RC_QtClean     = function('CompileProject', ['*.pro', 'CompileProjectQt', ['distclean']])
-let RC_Vs          = function('CompileProject', ['*.sln', 'CompileProjectVs', ['Build']])
-let RC_VsClean     = function('CompileProject', ['*.sln', 'CompileProjectVs', ['Clean']])
-let RC_Make        = function('CompileProject', ['[mM]akefile', 'CompileProjectMake', []])
-let RC_MakeClean   = function('CompileProject', ['[mM]akefile', 'CompileProjectMake', ['clean']])
-let RC_Sphinx      = function('CompileProject', [IsWin() ? 'make.bat' : '[mM]akefile', 'CompileProjectSphinx', ['html']])
-let RC_SphinxClean = function('CompileProject', [IsWin() ? 'make.bat' : '[mM]akefile', 'CompileProjectSphinx', ['clean']])
+let RcArg         = function('popset#set#PopSelection', [s:cpl.sel_arg, 0])
+let RcCmd         = function('popset#set#PopSelection', [s:cpl.sel_cmd, 0])
+let RcQt          = function('CompileProject', ['*.pro', 'CFnQt', []])
+let RcQtClean     = function('CompileProject', ['*.pro', 'CFnQt', ['distclean']])
+let RcVs          = function('CompileProject', ['*.sln', 'CFnVs', ['Build']])
+let RcVsClean     = function('CompileProject', ['*.sln', 'CFnVs', ['Clean']])
+let RcMake        = function('CompileProject', ['[mM]akefile', 'CFnMake', []])
+let RcMakeClean   = function('CompileProject', ['[mM]akefile', 'CFnMake', ['clean']])
+let RcSphinx      = function('CompileProject', [IsWin() ? 'make.bat' : '[mM]akefile', 'CFnSphinx', ['html']])
+let RcSphinxClean = function('CompileProject', [IsWin() ? 'make.bat' : '[mM]akefile', 'CFnSphinx', ['clean']])
 " }}}
 
 " Search {{{
-" FUNCTION: FindWorking(keys, mode) {{{ 超速查找
-" {{{
+" s:fw {{{
 augroup UserFunctionSearch
     autocmd!
-    autocmd VimEnter * call FindWorkingRoot()
+    autocmd VimEnter * call FindWowRoot()
+    " s:fw_rg = 1 使用'mhinz/vim-grepper'
+    " s:fw_rg = 0 使用'yegappan/grep'
     autocmd VimEnter * let s:fw_rg = exists('loaded_grep') ? 1 : 0
-    autocmd User Grepper call FindWorkingHighlight(s:fw.pattern)
+    autocmd User Grepper call FindWowHighlight(s:fw.pattern)
 augroup END
 
-" s:fw {{{
 let s:fw = {
     \ 'command'  : '',
     \ 'pattern'  : '',
@@ -1727,14 +1727,16 @@ let s:fw = {
     \ 'strings'  : [],
     \ 'markers'  : ['.root', '.git', '.svn'],
     \}
+
 function! s:fw.exec() dict
     let l:exec = self.command . ' ' . self.pattern . ' ' . self.location . ' ' . self.options
     execute l:exec
     if s:fw_rg
-        call FindWorkingHighlight(self.pattern)
+        call FindWowHighlight(self.pattern)
     endif
     call Plug_rpt_setExecution(l:exec)
 endfunction
+
 let s:fw_nvmaps = [
                 \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fri',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'frI',
                 \  'fw',  'fbw',  'ftw',  'fow',  'fpw',  'frw',  'fW',  'fbW',  'ftW',  'foW',  'fpW',  'frW',
@@ -1766,8 +1768,9 @@ let s:fw_nvmaps = [
                 \ 'fv=', 'fvp=', 'fv=',  'fvp=',
                 \ ]
 " }}}
-" }}}
-function! FindWorking(keys, mode)
+
+" FUNCTION: FindWow(keys, mode) {{{ 超速查找
+function! FindWow(keys, mode)
     " doc
     " {{{
     " Required: based on 'mhinz/vim-grepper' or 'yegappan/grep', 'Yggdroot/LeaderF' and 'yehuohan/popc'
@@ -1841,13 +1844,13 @@ function! FindWorking(keys, mode)
         elseif a:keys =~# 'p'
             let l:loc = GetInput(' Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
         elseif a:keys =~# 'r'
-            let l:loc = FindWorkingSet() ? s:fw.root : ''
+            let l:loc = FindWowSet() ? s:fw.root : ''
         else
             if empty(s:fw.root)
-                call FindWorkingRoot()
+                call FindWowRoot()
             endif
             if empty(s:fw.root)
-                call FindWorkingSet()
+                call FindWowSet()
             endif
             let l:loc = s:fw.root
         endif
@@ -1907,7 +1910,7 @@ function! FindWorking(keys, mode)
             echo 'No match: ' . l:pat
         else
             botright copen
-            call FindWorkingHighlight(s:fw.pattern)
+            call FindWowHighlight(s:fw.pattern)
         endif
         return 1
     endfunction
@@ -1935,11 +1938,11 @@ function! FindWorking(keys, mode)
 endfunction
 " }}}
 
-" FUNCTION: FindWorkingFile(r) {{{ 查找文件
+" FUNCTION: FindWowFile(r) {{{ 查找文件
 " @param r: 是否设置查找目录s:fw.root
-function! FindWorkingFile(r)
+function! FindWowFile(r)
     if !a:r && empty(s:fw.root)
-        call FindWorkingRoot()
+        call FindWowRoot()
     endif
     if a:r || empty(s:fw.root)
         let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
@@ -1956,8 +1959,8 @@ function! FindWorkingFile(r)
 endfunction
 " }}}
 
-" FUNCTION: FindWorkingRoot() {{{ 查找root路径
-function! FindWorkingRoot()
+" FUNCTION: FindWowRoot() {{{ 查找root路径
+function! FindWowRoot()
     if empty(s:fw.markers)
         return
     endif
@@ -1978,8 +1981,8 @@ function! FindWorkingRoot()
 endfunction
 " }}}
 
-" FUNCTION: FindWorkingSet() {{{ 设置root和filters
-function! FindWorkingSet()
+" FUNCTION: FindWowSet() {{{ 设置root和filters
+function! FindWowSet()
     let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
     if empty(l:root)
         return 0
@@ -1990,8 +1993,8 @@ function! FindWorkingSet()
 endfunction
 " }}}
 
-" FUNCTION: FindWorkingGet() {{{ 获取root和filters
-function! FindWorkingGet()
+" FUNCTION: FindWowGet() {{{ 获取root和filters
+function! FindWowGet()
     if empty(s:fw.root)
         return []
     endif
@@ -1999,9 +2002,9 @@ function! FindWorkingGet()
 endfunction
 " }}}
 
-" FUNCTION: FindWorkingHighlight([string]) {{{ 高亮字符串
+" FUNCTION: FindWowHighlight([string]) {{{ 高亮字符串
 " @param string: 若有字符串，则先添加到s:fw.strings，再高亮
-function! FindWorkingHighlight(...)
+function! FindWowHighlight(...)
     if &filetype ==# 'leaderf'
         " use leaderf's highlight
     elseif &filetype ==# 'qf'
@@ -2053,7 +2056,7 @@ function! QuickfixTabEdit()
         silent! normal! zz
         execute 'botright lopen'
     endif
-    call FindWorkingHighlight()
+    call FindWowHighlight()
 endfunction
 " }}}
 
@@ -2511,12 +2514,12 @@ endif
     nnoremap <leader>bp :bprevious<CR>
     nnoremap <leader>bl :b#<Bar>execute 'set buflisted'<CR>
     " 打开/关闭Quickfix
-    nnoremap <leader>qo :botright copen<Bar>call FindWorkingHighlight()<CR>
+    nnoremap <leader>qo :botright copen<Bar>call FindWowHighlight()<CR>
     nnoremap <leader>qc :cclose<Bar>wincmd p<CR>
     nnoremap <leader>qj :cnext<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
     nnoremap <leader>qk :cprevious<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
     " 打开/关闭Location-list
-    nnoremap <leader>lo :botright lopen<Bar>call FindWorkingHighlight()<CR>
+    nnoremap <leader>lo :botright lopen<Bar>call FindWowHighlight()<CR>
     nnoremap <leader>lc :lclose<Bar>wincmd p<CR>
     nnoremap <leader>lj :lnext<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
     nnoremap <leader>lk :lprevious<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
@@ -2609,16 +2612,16 @@ endif
     nnoremap <leader>rf :call CompileFile('')<CR>
     nnoremap <leader>ri :call FuncExecInput(['Compile/Run args: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h')], 'CompileFile')<CR>
     nnoremap <leader>rj :call CompileRange()<CR>
-    nnoremap <leader>ra :call RC_Arg()<CR>
-    nnoremap <leader>rd :call RC_Cmd()<CR>
-    nnoremap <leader>rq :call RC_Qt()<CR>
-    nnoremap <leader>rv :call RC_Vs()<CR>
-    nnoremap <leader>rm :call RC_Make()<CR>
-    nnoremap <leader>rp :call RC_Sphinx()<CR>
-    nnoremap <leader>rcq :call RC_QtClean()<CR>
-    nnoremap <leader>rcv :call RC_VsClean()<CR>
-    nnoremap <leader>rcm :call RC_MakeClean()<CR>
-    nnoremap <leader>rcp :call RC_SphinxClean()<CR>
+    nnoremap <leader>ra :call RcArg()<CR>
+    nnoremap <leader>rd :call RcCmd()<CR>
+    nnoremap <leader>rq :call RcQt()<CR>
+    nnoremap <leader>rv :call RcVs()<CR>
+    nnoremap <leader>rm :call RcMake()<CR>
+    nnoremap <leader>rp :call RcSphinx()<CR>
+    nnoremap <leader>rcq :call RcQtClean()<CR>
+    nnoremap <leader>rcv :call RcVsClean()<CR>
+    nnoremap <leader>rcm :call RcMakeClean()<CR>
+    nnoremap <leader>rcp :call RcSphinxClean()<CR>
 " }}}
 
 " Find and search{{{
@@ -2627,15 +2630,15 @@ endif
     " 查找当前光标下的内容
     nnoremap <leader>/ :execute'let g:__str__=expand("<cword>")'<Bar>execute '/' . g:__str__<CR>
 
-    " FindWorking查找
+    " FindWow查找
     for key in s:fw_nvmaps
-        execute 'nnoremap <leader>' . key ':call FindWorking("' . key . '", "n")<CR>'
+        execute 'nnoremap <leader>' . key ':call FindWow("' . key . '", "n")<CR>'
     endfor
     for key in s:fw_nvmaps
-        execute 'vnoremap <leader>' . key ':call FindWorking("' . key . '", "v")<CR>'
+        execute 'vnoremap <leader>' . key ':call FindWow("' . key . '", "v")<CR>'
     endfor
-    nnoremap <leader>ff :call FindWorkingFile(0)<CR>
-    nnoremap <leader>frf :call FindWorkingFile(1)<CR>
-    nnoremap <leader>fR :call FindWorkingRoot()<CR>
+    nnoremap <leader>ff :call FindWowFile(0)<CR>
+    nnoremap <leader>frf :call FindWowFile(1)<CR>
+    nnoremap <leader>fR :call FindWowRoot()<CR>
 " }}}
 " }}}
