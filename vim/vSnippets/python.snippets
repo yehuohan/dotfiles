@@ -4,7 +4,7 @@
 #===============================================================================
 snippet mpl "matplotlib for python"
 import matplotlib as ${1:mpl}
-import matplotlib.pyplot as ${2:plt}
+import matplotlib.pyplot as plt
 
 # mpl.rcParams['font.family'] = 'Consolas'
 # mpl.rcParams['font.family'] = 'DejaVu Sans'
@@ -12,9 +12,9 @@ import matplotlib.pyplot as ${2:plt}
 
 def on_key(event:$1.backend_bases.KeyEvent):
     if event.key == 'escape':
-        $2.close()
+        plt.close()
 
-fig = $2.figure('Plot')
+fig = plt.figure('Plot')
 fig.canvas.mpl_connect('key_press_event', on_key)
 # ax = fig.add_subplot(1, 1, 1)
 # ax = fig.add_axes((0.1, 0.1, 0.8, 0.8))
@@ -23,6 +23,26 @@ plt.show()
 ${0}
 endsnippet
 
+snippet mplt "matplotlib.pyplot for python"
+import matplotlib as ${1:mpl}
+import matplotlib.pyplot as plt
+
+# mpl.rcParams['font.family'] = 'Consolas'
+# mpl.rcParams['font.family'] = 'DejaVu Sans'
+# mpl.rcParams['font.size'] = 9
+
+def on_key(event:$1.backend_bases.KeyEvent):
+    if event.key == 'escape':
+        plt.close()
+
+plt.figure('Plot')
+plt.connect('key_press_event', on_key)
+# plt.subplot(1, 1, 1)
+# plt.axes((0.1, 0.1, 0.8, 0.8))
+# plt.plot()
+plt.show()
+${0}
+endsnippet
 
 #===============================================================================
 # ReStructuredText docstring style for python
