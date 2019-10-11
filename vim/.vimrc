@@ -1498,43 +1498,45 @@ let FuncAppendCallResult = function('FuncExecInput', [['Input function = ', '', 
 
 " Project {{{
 " s:cpl {{{ Compiler command of project
+" @attribute type: 文件类型
+" @attribute wdir, args, srcf, outf: 用于type的参数
+" @attribute pro: 项目类型
+" @attribute pat: 匹配模式字符串
+" @attribute sel_arg: 预置CompileFile参数输入
+" @attribute sel_cmd: 预置命令
 let s:cpl = {
     \ 'wdir' : '',
     \ 'args' : '',
     \ 'srcf' : '',
     \ 'outf' : '',
     \ 'type' : {
-        \ 'c'     : ['gcc %s -o %s %s && "./%s"'            , 'args' , 'outf' , 'srcf' , 'outf'],
-        \ 'cpp'   : ['g++ -std=c++11 %s -o %s %s && "./%s"' , 'args' , 'outf' , 'srcf' , 'outf'],
-        \ 'java'  : ['javac %s && java %s %s'               , 'srcf' , 'outf' , 'args'],
-        \ 'py'    : ['python %s %s'                         , 'srcf' , 'args'],
-        \ 'jl'    : ['julia %s %s'                          , 'srcf' , 'args'],
-        \ 'lua'   : ['lua %s %s'                            , 'srcf' , 'args'],
-        \ 'go'    : ['go run %s %s'                         , 'srcf' , 'args'],
-        \ 'js'    : ['node %s %s'                           , 'srcf' , 'args'],
-        \ 'dart'  : ['dart %s %s'                           , 'srcf' , 'args'],
-        \ 'tex'   : ['pdfLatex %s && SumatraPDF %s.pdf'     , 'srcf' , 'outf'],
-        \ 'sh'    : ['./%s %s'                              , 'srcf' , 'args'],
-        \ 'bat'   : ['%s %s'                                , 'srcf' , 'args'],
-        \ 'md'    : ['typora %s'                            , 'srcf'],
-        \ 'json'  : ['python -m json.tool %s'               , 'srcf'],
-        \ 'm'     : ['matlab -nosplash -nodesktop -r %s'    , 'outf'],
-        \ 'html'  : [s:path.browser . ' %s'                 , 'srcf'],
-        \ 'dot'   : ['dotty %s && dot -Tpng %s -o %s.png'   , 'srcf' , 'srcf' , 'outf'],
-        \ 'make'  : ['cd "%s" && make %s && "./%s"'         , 'wdir' , 'args' , 'outf'],
-        \ 'qt'    : ['cd "%s" && ' . (IsWin() ?
-                     \ ('qmake -r "%s" && vcvars64.bat && nmake -f Makefile.Debug') :
-                     \ ('qmake "%s" && make'))
-                     \ . ' %s && "./%s"',
-                     \ 'wdir', 'srcf', 'args', 'outf'],
-        \ 'vs'    : ['cd "%s" && vcvars64.bat && devenv "%s" /%s && "./%s"',
-                     \ 'wdir', 'srcf', 'args', 'outf'],
-        \ 'sphinx': ['cd "%s" && make %s && ' . s:path.browser . ' %s',
-                     \ 'wdir', 'args', 'outf']
+        \ 'c'    : ['gcc %s -o %s %s && "./%s"'            , 'args' , 'outf' , 'srcf' , 'outf'],
+        \ 'cpp'  : ['g++ -std=c++11 %s -o %s %s && "./%s"' , 'args' , 'outf' , 'srcf' , 'outf'],
+        \ 'java' : ['javac %s && java %s %s'               , 'srcf' , 'outf' , 'args'],
+        \ 'py'   : ['python %s %s'                         , 'srcf' , 'args'],
+        \ 'jl'   : ['julia %s %s'                          , 'srcf' , 'args'],
+        \ 'lua'  : ['lua %s %s'                            , 'srcf' , 'args'],
+        \ 'go'   : ['go run %s %s'                         , 'srcf' , 'args'],
+        \ 'js'   : ['node %s %s'                           , 'srcf' , 'args'],
+        \ 'dart' : ['dart %s %s'                           , 'srcf' , 'args'],
+        \ 'tex'  : ['pdfLatex %s && SumatraPDF %s.pdf'     , 'srcf' , 'outf'],
+        \ 'sh'   : ['./%s %s'                              , 'srcf' , 'args'],
+        \ 'bat'  : ['%s %s'                                , 'srcf' , 'args'],
+        \ 'md'   : ['typora %s'                            , 'srcf'],
+        \ 'json' : ['python -m json.tool %s'               , 'srcf'],
+        \ 'm'    : ['matlab -nosplash -nodesktop -r %s'    , 'outf'],
+        \ 'html' : [s:path.browser . ' %s'                 , 'srcf'],
+        \ 'dot'  : ['dotty %s && dot -Tpng %s -o %s.png'   , 'srcf' , 'srcf' , 'outf']
         \},
+    \ 'pro' : {
+        \ 'qt'     : ['*.pro', 'CFnQt'],
+        \ 'vs'     : ['*.sln', 'CFnVs'],
+        \ 'mk'     : ['[mM]akefile', 'CFnMake'],
+        \ 'sphinx' : [IsWin() ? 'make.bat' : '[mM]akefile', 'CFnSphinx']
+        \ },
     \ 'pat' : {
-        \ 'make' : '\mTARGET\s*=\s*\(\<[a-zA-Z_][a-zA-Z0-9_]*\)',
-        \ 'py' : ['python', '^#%%', '^#%%'],
+        \ 'make' : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z_][a-zA-Z0-9_]*\)',
+        \ 'py'   : ['python', '^#%%', '^#%%'],
         \},
     \ 'sel_arg' : {
         \ 'opt' : ['select args to CompileFile'],
@@ -1554,19 +1556,14 @@ let s:cpl = {
         \}
     \}
 " FUNCTION:s:cpl.printf(type, args, srcf, outf) dict {{{
-" 生成编译运行命令字符串。
+" 生成文件编译或执行命令字符串。
 " @param type: 编译类型，需要包含于s:cpl.type中
 " @param wdir: 命令运行目录
 " @param args: 参数
 " @param srcf: 源文件
 " @param outf: 目标文件
-" @return 返回编译或运行命令
+" @return 返回编译或执行命令
 function s:cpl.printf(type, wdir, args, srcf, outf) dict
-    if !has_key(self.type, a:type)
-        \ || ('sh' ==? a:type && !(IsLinux() || IsGw() || IsMac()))
-        \ || ('bat' ==? a:type && !IsWin())
-        return ''
-    endif
     let self.wdir = a:wdir
     let self.args = a:args
     let self.srcf = a:srcf
@@ -1574,6 +1571,16 @@ function s:cpl.printf(type, wdir, args, srcf, outf) dict
     let l:pstr = copy(self.type[a:type])
     call map(l:pstr, {key, val -> (key == 0) ? val : get(self, val, '')})
     " create execution string
+    return self.run(a:wdir, call('printf', l:pstr))
+endfunction
+" }}}
+
+" FUNCTION:s:cpl.run(wdir, cmd) dict {{{
+" 生成运行命令字符串。
+" @param wdir: 命令运行目录
+" @param cmd: 命令字符串
+" @return 返回运行命令
+function s:cpl.run(wdir, cmd) dict
     if exists(':AsyncRun') == 2
         let l:exec = ':AsyncRun '
         if !empty(a:wdir)
@@ -1583,7 +1590,7 @@ function s:cpl.printf(type, wdir, args, srcf, outf) dict
     else
         let l:exec = '!'
     endif
-    return l:exec . call('printf', l:pstr)
+    return join([l:exec, a:cmd])
 endfunction
 " }}}
 " }}}
@@ -1598,11 +1605,13 @@ function! CompileFile(argstr)
     if !has_key(s:cpl.type, l:ext)
         let l:ext = &filetype
     endif
-    let l:exec = s:cpl.printf(l:ext, l:workdir, a:argstr, l:srcfile, l:outfile)
-    if empty(l:exec)
+    if !has_key(s:cpl.type, l:ext)
+        \ || ('sh' ==? l:ext && !(IsLinux() || IsGw() || IsMac()))
+        \ || ('bat' ==? l:ext && !IsWin())
         echo 's:cpl doesn''t support ' . l:ext
         return
     endif
+    let l:exec = s:cpl.printf(l:ext, l:workdir, a:argstr, l:srcfile, l:outfile)
     execute l:exec
     call Plug_rpt_setExecution(l:exec)
 endfunction
@@ -1622,20 +1631,19 @@ function! CompileRange()
 endfunction
 " }}}
 
-" FUNCTION: CompileProject(str, fn, args) {{{
+" FUNCTION: CompileProject(type, args) {{{
 " 当找到多个Project文件时，会弹出选项以供选择。
-" @param str: 工程文件名，可用通配符，如*.pro
-" @param fn:
-"   编译工程文件的函数，可能用于popset插件
-"   fn需要3个参数：
+" @param type: 工程类型，用于获取工程运行回调函数
+"   项目回调函数需要3个参数(可能用于popset插件)：
 "   - sopt: 自定义参数信息
 "   - sel: Project文件路径
 "   - args: Project的附加参数列表
 " @param args: 编译工程文件函数的附加参数，需要采用popset插件
-function! CompileProject(str, fn, args)
-    let l:prj = GetFileList(a:str, '')
+function! CompileProject(type, args)
+    let [l:pat, l:fn] = s:cpl.pro[a:type]
+    let l:prj = GetFileList(l:pat, '')
     if len(l:prj) == 1
-        let Fn = function(a:fn)
+        let Fn = function(l:fn)
         call Fn('', l:prj[0], a:args)
     elseif len(l:prj) > 1
         call PopSelection({
@@ -1644,7 +1652,7 @@ function! CompileProject(str, fn, args)
             \ 'cmd' : a:fn,
             \}, 0, a:args)
     else
-        echo 'None of ' . a:str . ' was found!'
+        echo 'None of ' . l:pat . ' was found!'
     endif
 endfunction
 " }}}
@@ -1656,8 +1664,17 @@ function! CFnQt(sopt, sel, args)
     let l:outfile = empty(l:outfile) ? fnamemodify(a:sel, ':t:r') : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
-    " execute shell code
-    execute s:cpl.printf('qt', l:workdir, join(a:args), l:srcfile, l:outfile)
+    if IsWin()
+        let l:cmd = printf('cd "%s" && qmake -r "%s" && vcvars64.bat && nmake -f Makefile.Debug %s',
+                    \ l:workdir, l:srcfile, join(a:args))
+    else
+        let l:cmd = printf('cd "%s" && qmake "%s" && make %s'
+                    \ l:workdir, l:srcfile, join(a:args))
+    endif
+    if empty(a:args)
+        let l:cmd .= ' && "' . l:outfile .'"'
+    endif
+    execute s:cpl.run(l:workdir, l:cmd)
 endfunction
 " }}}
 
@@ -1667,8 +1684,11 @@ function! CFnMake(sopt, sel, args)
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
-    " execute shell code
-    execute s:cpl.printf('make', l:workdir, join(a:args), '', l:outfile)
+    let l:cmd = printf('cd "%s" && make %s', l:workdir, join(a:args))
+    if empty(a:args)
+        let l:cmd .= ' && "./' . l:outfile .'"'
+    endif
+    execute s:cpl.run(l:workdir, l:cmd)
 endfunction
 "}}}
 
@@ -1678,32 +1698,41 @@ function! CFnVs(sopt, sel, args)
     let l:outfile = fnamemodify(a:sel, ':p:t:r')
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
-    " execute shell code
-    execute s:cpl.printf('vs', l:workdir, join(a:args), l:srcfile, l:outfile)
+    let l:cmd = printf('cd "%s" && vcvars64.bat && devenv "%s" /%s',
+                    \ l:workdir, l:srcfile, join(a:args))
+    if a:args[0] !=# 'Clean'
+        let l:cmd .= ' && "./' . l:outfile .'"'
+    endif
+    execute s:cpl.run(l:workdir, l:cmd)
 endfunction
 " }}}
 
 " FUNCTION: CFnSphinx(sopt, sel, args) {{{
+" @param args[0]: 是否直接打开sphinx文档
 function! CFnSphinx(sopt, sel, args)
     let l:outfile = 'build/html/index.html'
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
-    " execute shell code
-    execute s:cpl.printf('sphinx', l:workdir, join(a:args), '', l:outfile)
+    let l:cmd = printf('cd "%s" && make %s', l:workdir, a:args[1])
+    if a:args[0]
+        let l:cmd .= join([' &&', s:path.browser, l:outfile])
+    endif
+    execute s:cpl.run(l:workdir, l:cmd)
 endfunction
 "}}}
 
 " Run compiler
 let RcArg         = function('popset#set#PopSelection', [s:cpl.sel_arg, 0])
 let RcCmd         = function('popset#set#PopSelection', [s:cpl.sel_cmd, 0])
-let RcQt          = function('CompileProject', ['*.pro', 'CFnQt', []])
-let RcQtClean     = function('CompileProject', ['*.pro', 'CFnQt', ['distclean']])
-let RcVs          = function('CompileProject', ['*.sln', 'CFnVs', ['Build']])
-let RcVsClean     = function('CompileProject', ['*.sln', 'CFnVs', ['Clean']])
-let RcMake        = function('CompileProject', ['[mM]akefile', 'CFnMake', []])
-let RcMakeClean   = function('CompileProject', ['[mM]akefile', 'CFnMake', ['clean']])
-let RcSphinx      = function('CompileProject', [IsWin() ? 'make.bat' : '[mM]akefile', 'CFnSphinx', ['html']])
-let RcSphinxClean = function('CompileProject', [IsWin() ? 'make.bat' : '[mM]akefile', 'CFnSphinx', ['clean']])
+let RcQt          = function('CompileProject', ['qt', []])
+let RcQtClean     = function('CompileProject', ['qt', ['distclean']])
+let RcVs          = function('CompileProject', ['vs', ['Build']])
+let RcVsClean     = function('CompileProject', ['vs', ['Clean']])
+let RcMake        = function('CompileProject', ['mk', []])
+let RcMakeClean   = function('CompileProject', ['mk', ['clean']])
+let RcSphinx      = function('CompileProject', ['sphinx', [0, 'html']])
+let RcSphinxRun   = function('CompileProject', ['sphinx', [1, 'html']])
+let RcSphinxClean = function('CompileProject', ['sphinx', [0, 'clean']])
 " }}}
 
 " Search {{{
@@ -2608,7 +2637,7 @@ endif
     nnoremap <leader>dd :call FuncDivideSpaceD()<CR>
     nnoremap <leader>ae :call FuncAppendExecResult()<CR>
     nnoremap <leader>af :call FuncAppendCallResult()<CR>
-    " 编译运行当前文件
+    " 编译运行当前文件或项目
     nnoremap <leader>rf :call CompileFile('')<CR>
     nnoremap <leader>ri :call FuncExecInput(['Compile/Run args: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h')], 'CompileFile')<CR>
     nnoremap <leader>rj :call CompileRange()<CR>
@@ -2618,6 +2647,7 @@ endif
     nnoremap <leader>rv :call RcVs()<CR>
     nnoremap <leader>rm :call RcMake()<CR>
     nnoremap <leader>rp :call RcSphinx()<CR>
+    nnoremap <leader>rP :call RcSphinxRun()<CR>
     nnoremap <leader>rcq :call RcQtClean()<CR>
     nnoremap <leader>rcv :call RcVsClean()<CR>
     nnoremap <leader>rcm :call RcMakeClean()<CR>

@@ -44,6 +44,27 @@ plt.show()
 ${0}
 endsnippet
 
+snippet mpl3d "matplotlib 3d for python"
+import mpl_toolkits.mplot3d as plt3d
+
+#ax = fig.add_subplot(111, projection='3d')
+#ax.plot_wireframe(x, y, z)
+#x, y = np.meshgrid(np.linespace(), np.arange())
+#ax.plot_surface(x, y, z, shade=True, cmap='jet')
+endsnippet
+
+snippet mpy "pymovie make gif"
+import moviepy.editor as mpy
+from moviepy.video.io.bindings import mplfig_to_npimage
+
+def make_frame(t):
+    return mplfig_to_npimage(fig)
+
+anim = mpy.VideoClip(make_frame, duration=1)
+anim.write_videofile("m.mp4", fps=24)
+anim.write_gif("m.gif", fps=24)
+endsnippet
+
 #===============================================================================
 # ReStructuredText docstring style for python
 #===============================================================================
