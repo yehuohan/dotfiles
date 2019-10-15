@@ -214,7 +214,7 @@ endif
 " }}}
 
 " Plug Settings {{{
-call plug#begin($DotVimPath.'/bundle')  " 可选设置，可以指定插件安装位置
+call plug#begin($DotVimPath.'/bundle')  " 可以指定插件安装位置
 
 " 基本编辑 {{{
 " easy-motion {{{ 快速跳转
@@ -686,6 +686,8 @@ endif
     let g:Popc_useTabline = 1
     let g:Popc_useStatusline = 1
     let g:Popc_usePowerFont = s:gset.use_powerfont
+    let g:Popc_tabLineLeft = 'buffer'
+    let g:Popc_tabLineRight = 'tab'
     let g:Popc_separator = {'left' : '', 'right': ''}
     let g:Popc_subSeparator = {'left' : '', 'right': ''}
     nnoremap <C-Space> :Popc<CR>
@@ -1236,7 +1238,7 @@ endif
 "}}}
 " }}}
 
-call plug#end()                         " required
+call plug#end()
 " }}}
 
 " User functions {{{
