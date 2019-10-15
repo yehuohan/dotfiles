@@ -6,10 +6,7 @@
 " Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-"===============================================================================
-" My Notes
-"===============================================================================
-" {{{
+" Readme {{{
 " Help {{{
     " help/h        : 查看Vim帮助
     " <S-k>         : 快速查看光标所在cword或选择内容的vim帮助
@@ -30,15 +27,11 @@
     " - 尽量一只手不同时按两个键，且连续按键相隔尽量近
     " - 尽量不映射偏远的按键（F1~F12，数字键等），且集中于'j,k,i,o'键位附近
     " - 调换Esc和CapsLock键
-"  }}}
+" }}}
 " }}}
 
-"===============================================================================
-" Platform
-"===============================================================================
-" {{{
-" vim or nvim, with or without gui
-" {{{
+" Platform {{{
+" vim or nvim, with or without gui {{{
 function! IsVim()
     return !(has('nvim'))
 endfunction
@@ -54,8 +47,7 @@ function! IsNVimQt()
 endfunction
 " }}}
 
-" linux or win
-" {{{
+" linux or win {{{
 function! IsLinux()
     return (has('unix') && !has('macunix') && !has('win32unix'))
 endfunction
@@ -71,8 +63,7 @@ function! IsMac()
 endfunction
 " }}}
 
-" term
-" {{{
+" term {{{
 function! IsTermType(tt)
     if &term ==? a:tt
         return 1
@@ -83,10 +74,7 @@ endfunction
 " }}}
 " }}}
 
-"===============================================================================
-" Global settings
-"===============================================================================
-" {{{
+" Global settings {{{
 set encoding=utf-8                      " 内部使用utf-8编码
 if IsVim()
     set nocompatible                    " 不兼容vi
@@ -225,14 +213,10 @@ endif
 " }}}
 " }}}
 
-"===============================================================================
-" Plug Settings
-"===============================================================================
-" {{{
+" Plug Settings {{{
 call plug#begin($DotVimPath.'/bundle')  " 可选设置，可以指定插件安装位置
 
-" 基本编辑
-" {{{
+" 基本编辑 {{{
 " easy-motion {{{ 快速跳转
     Plug 'easymotion/vim-easymotion'
     let g:EasyMotion_do_mapping = 0     " 禁止默认map
@@ -497,8 +481,7 @@ endif
 " }}}
 " }}}
 
-" 界面管理
-" {{{
+" 界面管理 {{{
 " theme {{{ Vim主题(ColorScheme, StatusLine, TabLine)
     Plug 'morhetz/gruvbox'
     set rtp+=$DotVimPath/bundle/gruvbox
@@ -807,8 +790,7 @@ endif
 " }}}
 " }}}
 
-" 代码编写
-" {{{
+" 代码编写 {{{
 " YouCompleteMe {{{ 自动补全
 if s:gset.use_ycm
     " FUNCTION: Plug_ycm_build(info) {{{
@@ -1146,8 +1128,7 @@ endif
 " }}}
 " }}}
 
-" 软件辅助
-" {{{
+" 软件辅助 {{{
 " vimcdoc {{{ 中文帮助文档
     Plug 'yianwillis/vimcdoc'
 " }}}
@@ -1257,10 +1238,7 @@ endif
 call plug#end()                         " required
 " }}}
 
-"===============================================================================
-" User functions
-"===============================================================================
-" {{{
+" User functions {{{
 " Execute function {{{
 " FUNCTION: GetSelected() {{{ 获取选区内容
 function! GetSelected()
@@ -1542,7 +1520,8 @@ let s:cpl = {
         \ 'opt' : ['select args to CompileFile'],
         \ 'lst' : [
                 \ '-finput-charset=utf-8 -fexec-charset=gbk',
-                \ '-static'
+                \ '-static',
+                \ '-fPIC -shared'
                 \ ],
         \ 'cmd' : {sopt, arg -> call('CompileFile', [arg])}
         \},
@@ -2251,10 +2230,7 @@ endfunction
 " }}}
 " }}}
 
-"===============================================================================
-" User Settings
-"===============================================================================
-" {{{
+" User Settings {{{
 " Term {{{
     syntax on                           " 语法高亮
     filetype plugin indent on           " 打开文件类型检测
@@ -2416,10 +2392,7 @@ augroup END
 " }}}
 " }}}
 
-"===============================================================================
-" User Mappings
-"===============================================================================
-" {{{
+" User Mappings {{{
 " Basic {{{
     " 回退操作
     nnoremap <S-u> <C-r>
