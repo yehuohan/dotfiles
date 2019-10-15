@@ -747,6 +747,7 @@ if s:gset.use_startify
             \ {'type': 'bookmarks', 'header': ['   Bookmarks']},
             \ {'type': 'files',     'header': ['   Recent Files']},
             \ ]
+    let g:startify_files_number = 7
     nnoremap <leader>su :Startify<CR>   " start ui of vim-startify
 endif
 " }}}
