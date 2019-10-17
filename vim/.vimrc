@@ -367,6 +367,7 @@ endif
     let g:Lf_ShortcutF = ''
     let g:Lf_ShortcutB = ''
     let g:Lf_ReverseOrder = 1
+    let g:Lf_ShowHidden = 1             " 搜索隐藏文件和目录
     nnoremap <leader><leader>l :call feedkeys(':LeaderfFile ', 'n')<CR>
     nnoremap <leader>lf :LeaderfFile<CR>
     nnoremap <leader>lu :LeaderfFunction<CR>
@@ -376,6 +377,8 @@ endif
     nnoremap <leader>lb :LeaderfBuffer<CR>
     nnoremap <leader>lB :LeaderfBufferAll<CR>
     nnoremap <leader>lr :LeaderfRgInteractive<CR>
+    nnoremap <leader>ls ::LeaderfSelf<CR>
+    nnoremap <leader>lh ::LeaderfHelp<CR>
 " }}}
 
 " grep {{{ 大范围查找
@@ -1333,8 +1336,8 @@ endfunction
 " }}}
 
 " FUNCTION: GetContentRange(pats, pate) {{{ 获取特定的内容的范围
-" @param pats: 起始行匹配模式，start为pats的下一行
-" @param pate: 结束行匹配模式，end为pate的上一行
+" @param pats: 起始行匹配模式，start为pats所在行
+" @param pate: 结束行匹配模式，end为pate所在行
 " @return 返回列表[start, end]
 function! GetContentRange(pats, pate)
     let l:start = search(a:pats, 'bcnW')
@@ -2371,19 +2374,18 @@ augroup UserSettingsCmd
     "autocmd              BufNewFile  *                    set fileformat=unix
     autocmd!
 
-    autocmd BufNewFile *    set fileformat=unix
-    autocmd GuiEnter *      set t_vb=   " 关闭可视闪铃(即闪屏)
+    autocmd BufNewFile *                set fileformat=unix
     autocmd BufRead,BufNewFile *.jl     set filetype=julia
     autocmd BufRead,BufNewFile *.dart   set filetype=dart
     autocmd BufRead,BufNewFile *.tex    set filetype=tex
     autocmd BufRead,BufNewFile *.tikz   set filetype=tex
     autocmd BufRead,BufNewFile *.gv     set filetype=dot
 
-    autocmd Filetype vim    setlocal foldmethod=marker
-    autocmd Filetype c      setlocal foldmethod=syntax
-    autocmd Filetype cpp    setlocal foldmethod=syntax
-    autocmd Filetype python setlocal foldmethod=indent
-    autocmd FileType go     setlocal expandtab
+    autocmd Filetype vim        setlocal foldmethod=marker
+    autocmd Filetype c          setlocal foldmethod=syntax
+    autocmd Filetype cpp        setlocal foldmethod=syntax
+    autocmd Filetype python     setlocal foldmethod=indent
+    autocmd FileType go         setlocal expandtab
     autocmd FileType javascript setlocal foldmethod=syntax
 
     " Help keys
