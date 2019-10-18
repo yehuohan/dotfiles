@@ -1494,33 +1494,36 @@ let s:cpl = {
     \ 'srcf' : '',
     \ 'outf' : '',
     \ 'type' : {
-        \ 'c'    : ['gcc %s -o %s %s && "./%s"'            , 'args' , 'outf' , 'srcf' , 'outf'],
-        \ 'cpp'  : ['g++ -std=c++11 %s -o %s %s && "./%s"' , 'args' , 'outf' , 'srcf' , 'outf'],
-        \ 'java' : ['javac %s && java %s %s'               , 'srcf' , 'outf' , 'args'],
-        \ 'py'   : ['python %s %s'                         , 'srcf' , 'args'],
-        \ 'jl'   : ['julia %s %s'                          , 'srcf' , 'args'],
-        \ 'lua'  : ['lua %s %s'                            , 'srcf' , 'args'],
-        \ 'go'   : ['go run %s %s'                         , 'srcf' , 'args'],
-        \ 'js'   : ['node %s %s'                           , 'srcf' , 'args'],
-        \ 'dart' : ['dart %s %s'                           , 'srcf' , 'args'],
-        \ 'tex'  : ['pdfLatex %s && SumatraPDF %s.pdf'     , 'srcf' , 'outf'],
-        \ 'sh'   : ['./%s %s'                              , 'srcf' , 'args'],
-        \ 'bat'  : ['%s %s'                                , 'srcf' , 'args'],
-        \ 'md'   : ['typora %s'                            , 'srcf'],
-        \ 'json' : ['python -m json.tool %s'               , 'srcf'],
-        \ 'm'    : ['matlab -nosplash -nodesktop -r %s'    , 'outf'],
-        \ 'html' : [s:path.browser . ' %s'                 , 'srcf'],
-        \ 'dot'  : ['dotty %s && dot -Tpng %s -o %s.png'   , 'srcf' , 'srcf' , 'outf']
+        \ 'c'          : ['gcc %s -o %s %s && "./%s"'            , 'args' , 'outf' , 'srcf' , 'outf'],
+        \ 'cpp'        : ['g++ -std=c++11 %s -o %s %s && "./%s"' , 'args' , 'outf' , 'srcf' , 'outf'],
+        \ 'java'       : ['javac %s && java %s %s'               , 'srcf' , 'outf' , 'args'],
+        \ 'python'     : ['python %s %s'                         , 'srcf' , 'args'],
+        \ 'julia'      : ['julia %s %s'                          , 'srcf' , 'args'],
+        \ 'lua'        : ['lua %s %s'                            , 'srcf' , 'args'],
+        \ 'go'         : ['go run %s %s'                         , 'srcf' , 'args'],
+        \ 'javascript' : ['node %s %s'                           , 'srcf' , 'args'],
+        \ 'dart'       : ['dart %s %s'                           , 'srcf' , 'args'],
+        \ 'tex'        : ['pdfLatex %s && SumatraPDF %s.pdf'     , 'srcf' , 'outf'],
+        \ 'sh'         : ['./%s %s'                              , 'srcf' , 'args'],
+        \ 'dosbatch'   : ['%s %s'                                , 'srcf' , 'args'],
+        \ 'markdown'   : ['typora %s'                            , 'srcf'],
+        \ 'json'       : ['python -m json.tool %s'               , 'srcf'],
+        \ 'matlab'     : ['matlab -nosplash -nodesktop -r %s'    , 'outf'],
+        \ 'html'       : [s:path.browser . ' %s'                 , 'srcf'],
+        \ 'dot'        : ['dotty %s && dot -Tpng %s -o %s.png'   , 'srcf' , 'srcf' , 'outf'],
+        \},
+    \ 'cell' : {
+        \ 'python' : ['python', '^#%%', '^#%%'],
+        \ 'julia'  : ['julia', '^#%%', '^#%%'],
         \},
     \ 'pro' : {
         \ 'qt'     : ['*.pro', 'CFnQt'],
         \ 'vs'     : ['*.sln', 'CFnVs'],
         \ 'mk'     : ['[mM]akefile', 'CFnMake'],
-        \ 'sphinx' : [IsWin() ? 'make.bat' : '[mM]akefile', 'CFnSphinx']
-        \ },
+        \ 'sphinx' : [IsWin() ? 'make.bat' : '[mM]akefile', 'CFnSphinx'],
+        \},
     \ 'pat' : {
         \ 'make' : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z_][a-zA-Z0-9_]*\)',
-        \ 'py'   : ['python', '^#%%', '^#%%'],
         \},
     \ 'sel_arg' : {
         \ 'opt' : ['select args to CompileFile'],
@@ -1582,21 +1585,18 @@ endfunction
 
 " FUNCTION: CompileFile(argstr) {{{
 function! CompileFile(argstr)
-    let l:ext     = expand('%:e')       " 扩展名
+    let l:type    = &filetype           " 文件类型
     let l:srcfile = expand('%:t')       " 文件名，不带路径，带扩展名
     let l:outfile = expand('%:t:r')     " 文件名，不带路径，不带扩展名
     let l:workdir = expand('%:p:h')     " 当前文件目录
 
-    if !has_key(s:cpl.type, l:ext)
-        let l:ext = &filetype
-    endif
-    if !has_key(s:cpl.type, l:ext)
-        \ || ('sh' ==? l:ext && !(IsLinux() || IsGw() || IsMac()))
-        \ || ('bat' ==? l:ext && !IsWin())
-        echo 's:cpl doesn''t support ' . l:ext
+    if !has_key(s:cpl.type, l:type)
+        \ || ('sh' ==? l:type && !(IsLinux() || IsGw() || IsMac()))
+        \ || ('bat' ==? l:type && !IsWin())
+        echo 's:cpl.type doesn''t support "' . l:type . '"'
         return
     endif
-    let l:exec = s:cpl.printf(l:ext, l:workdir, a:argstr, l:srcfile, l:outfile)
+    let l:exec = s:cpl.printf(l:type, l:workdir, a:argstr, l:srcfile, l:outfile)
     execute l:exec
     call Plug_rpt_setExecution(l:exec)
 endfunction
@@ -1604,12 +1604,12 @@ endfunction
 
 " FUNCTION: CompileRange(argstr) {{{
 function! CompileRange()
-    let l:ext     = expand('%:e')       " 扩展名
-    if !has_key(s:cpl.pat, l:ext)
-        echo 's:cpl doesn''t support range of ' . l:ext
+    let l:type = &filetype              " 文件类型
+    if !has_key(s:cpl.cell, l:type)
+        echo 's:cpl.cell doesn''t support of "' . l:type . '"'
         return
     endif
-    let [l:bin, l:pats, l:pate] = s:cpl.pat[l:ext]
+    let [l:bin, l:pats, l:pate] = s:cpl.cell[l:type]
     let l:range = GetContentRange(l:pats, l:pate)
     echo 'CompileRange() in ' . join(l:range, ',')
     execute ':' . join(l:range, ',') . ':AsyncRun '. l:bin
