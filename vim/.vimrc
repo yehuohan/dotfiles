@@ -101,11 +101,12 @@ set rtp+=$DotVimPath
 let s:gset_file = $DotVimPath . '/.gset'
 let s:gset = {
     \ 'use_powerfont' : 1,
-    \ 'use_fzf' : 1,
     \ 'use_lightline': 1,
     \ 'use_startify' : 1,
+    \ 'use_fzf' : 1,
     \ 'use_ycm' : 1,
     \ 'use_lcn' : 0,
+    \ 'use_utils' : 1,
     \ }
 " FUNCTION: s:gsetLoad() {{{
 function! s:gsetLoad()
@@ -1135,6 +1136,7 @@ endif
 " }}}
 
 " 软件辅助 {{{
+if s:gset.use_utils
 " vimcdoc {{{ 中文帮助文档
     Plug 'yianwillis/vimcdoc'
 " }}}
@@ -1239,6 +1241,7 @@ endif
     nnoremap <leader>bh  :call Plug_brw_search('github', 'n')<CR>
     vnoremap <leader>bh  :call Plug_brw_search('github', 'v')<CR>
 "}}}
+endif
 " }}}
 
 call plug#end()
