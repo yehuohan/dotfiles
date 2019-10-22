@@ -478,6 +478,7 @@ endif
     function! Plug_rpt_execute()
         if exists('s:execution') && !empty(s:execution)
             execute s:execution
+            echo s:execution
         endif
     endfunction
     nnoremap <Plug>Plug_rpt_execute :call Plug_rpt_execute()<CR>
@@ -1058,15 +1059,14 @@ endif
     if IsWin()
         let g:asyncrun_encs = 'cp936'   " 即'gbk'编码
     endif
+    let g:asyncrun_open = 8             " 自动打开quickfix window
+    let g:asyncrun_save = 1             " 自动保存当前文件
+    let g:asyncrun_local = 1            " 使用setlocal的efm
     nnoremap <leader><leader>r :call feedkeys(':AsyncRun ', 'n')<CR>
     vnoremap <leader><leader>r :AsyncRun
     nnoremap <leader>rr :call feedkeys(':AsyncRun ', 'n')<CR>
     vnoremap <leader>rr :AsyncRun
     nnoremap <leader>rs :AsyncStop<CR>
-    augroup PluginAsyncrun
-        autocmd!
-        autocmd User AsyncRunStart call asyncrun#quickfix_toggle(8, 1)
-    augroup END
 " }}}
 
 " Debugger {{{ NodeJS, Go, Python调试器(Vim only)
@@ -1484,6 +1484,9 @@ let FuncAppendCallResult = function('FuncExecInput', [['Input function = ', '', 
 " }}}
 
 " Project {{{
+" Required: 'skywind3000/asyncrun.vim'
+"           'yehuohan/popset'
+
 " s:cpl {{{ Compiler command of project
 " @attribute type: 文件类型
 " @attribute wdir, args, srcf, outf: 用于type的参数
@@ -1519,6 +1522,9 @@ let s:cpl = {
         \ 'python' : ['python', '^#%%', '^#%%'],
         \ 'julia'  : ['julia', '^#%%', '^#%%'],
         \},
+    \ 'efm' : {
+        \ 'python' : '%*\\sFile\ \"%f\"\\,\ line\ %l\\,\ %m',
+        \},
     \ 'pro' : {
         \ 'qt'     : ['*.pro', 'CFnQt'],
         \ 'vs'     : ['*.sln', 'CFnVs'],
@@ -1546,7 +1552,7 @@ let s:cpl = {
         \ 'cmd' : {sopt, arg -> execute(':AsyncRun ' . arg)}
         \}
     \}
-" FUNCTION:s:cpl.printf(type, args, srcf, outf) dict {{{
+" FUNCTION: s:cpl.printf(type, args, srcf, outf) dict {{{
 " 生成文件编译或执行命令字符串。
 " @param type: 编译类型，需要包含于s:cpl.type中
 " @param wdir: 命令运行目录
@@ -1554,34 +1560,54 @@ let s:cpl = {
 " @param srcf: 源文件
 " @param outf: 目标文件
 " @return 返回编译或执行命令
-function s:cpl.printf(type, wdir, args, srcf, outf) dict
+function! s:cpl.printf(type, wdir, args, srcf, outf) dict
+    if !has_key(s:cpl.type, a:type)
+        \ || ('sh' ==? a:type && !(IsLinux() || IsGw() || IsMac()))
+        \ || ('dosbatch' ==? a:type && !IsWin())
+        throw 's:cpl.type doesn''t support "' . a:type . '"'
+    endif
     let self.wdir = a:wdir
     let self.args = a:args
     let self.srcf = a:srcf
     let self.outf = a:outf
     let l:pstr = copy(self.type[a:type])
     call map(l:pstr, {key, val -> (key == 0) ? val : get(self, val, '')})
-    " create execution string
-    return self.run(a:wdir, call('printf', l:pstr))
+    " create exec string
+    return self.run(a:wdir, a:type, call('printf', l:pstr))
 endfunction
 " }}}
 
-" FUNCTION:s:cpl.run(wdir, cmd) dict {{{
+" FUNCTION: s:cpl.run(wdir, cmd) dict {{{
 " 生成运行命令字符串。
 " @param wdir: 命令运行目录
+" @param efm: errorformat类型
 " @param cmd: 命令字符串
 " @return 返回运行命令
-function s:cpl.run(wdir, cmd) dict
-    if exists(':AsyncRun') == 2
-        let l:exec = ':AsyncRun '
-        if !empty(a:wdir)
-            let l:exec .= '-cwd="' . a:wdir . '" '
-            execute 'lcd ' . a:wdir
-        endif
-    else
-        let l:exec = '!'
+function! s:cpl.run(wdir, efm, cmd) dict
+    if has_key(s:cpl.efm, a:efm)
+        execute 'setlocal efm=' . s:cpl.efm[a:efm]
+    endif
+    let l:exec = ':AsyncRun '
+    if !empty(a:wdir)
+        let l:exec .= '-cwd="' . a:wdir . '" '
+        execute 'lcd ' . a:wdir
     endif
     return join([l:exec, a:cmd])
+endfunction
+" }}}
+
+" FUNCTION: s:cpl.runcell(type) dict {{{
+function! s:cpl.runcell(type) dict
+    if !has_key(s:cpl.cell, a:type)
+        throw 's:cpl.cell doesn''t support "' . a:type . '"'
+    endif
+    if has_key(s:cpl.efm, a:type)
+        execute 'setlocal efm=' . s:cpl.efm[a:type]
+    endif
+    let [l:bin, l:pats, l:pate] = s:cpl.cell[a:type]
+    let l:range = GetContentRange(l:pats, l:pate)
+    " create exec string
+    return ':' . join(l:range, ',') . 'AsyncRun '. l:bin
 endfunction
 " }}}
 " }}}
@@ -1592,30 +1618,26 @@ function! CompileFile(argstr)
     let l:srcfile = expand('%:t')       " 文件名，不带路径，带扩展名
     let l:outfile = expand('%:t:r')     " 文件名，不带路径，不带扩展名
     let l:workdir = expand('%:p:h')     " 当前文件目录
-
-    if !has_key(s:cpl.type, l:type)
-        \ || ('sh' ==? l:type && !(IsLinux() || IsGw() || IsMac()))
-        \ || ('bat' ==? l:type && !IsWin())
-        echo 's:cpl.type doesn''t support "' . l:type . '"'
-        return
-    endif
-    let l:exec = s:cpl.printf(l:type, l:workdir, a:argstr, l:srcfile, l:outfile)
-    execute l:exec
-    call Plug_rpt_setExecution(l:exec)
+    try
+        let l:exec = s:cpl.printf(l:type, l:workdir, a:argstr, l:srcfile, l:outfile)
+        execute l:exec
+        call Plug_rpt_setExecution(l:exec)
+    catch
+        echo v:exception
+    endtry
 endfunction
 " }}}
 
-" FUNCTION: CompileRange(argstr) {{{
-function! CompileRange()
-    let l:type = &filetype              " 文件类型
-    if !has_key(s:cpl.cell, l:type)
-        echo 's:cpl.cell doesn''t support of "' . l:type . '"'
-        return
-    endif
-    let [l:bin, l:pats, l:pate] = s:cpl.cell[l:type]
-    let l:range = GetContentRange(l:pats, l:pate)
-    echo 'CompileRange() in ' . join(l:range, ',')
-    execute ':' . join(l:range, ',') . ':AsyncRun '. l:bin
+" FUNCTION: CompileCell(argstr) {{{
+function! CompileCell()
+    try
+        let l:exec = s:cpl.runcell(&filetype)
+        execute l:exec
+        echo l:exec
+        call Plug_rpt_setExecution(l:exec)
+    catch
+        echo v:exception
+    endtry
 endfunction
 " }}}
 
@@ -1662,7 +1684,7 @@ function! CFnQt(sopt, sel, args)
     if empty(a:args)
         let l:cmd .= ' && "' . l:outfile .'"'
     endif
-    execute s:cpl.run(l:workdir, l:cmd)
+    execute s:cpl.run(l:workdir, 'cpp', l:cmd)
 endfunction
 " }}}
 
@@ -1676,7 +1698,7 @@ function! CFnMake(sopt, sel, args)
     if empty(a:args)
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:cpl.run(l:workdir, l:cmd)
+    execute s:cpl.run(l:workdir, 'cpp', l:cmd)
 endfunction
 "}}}
 
@@ -1691,7 +1713,7 @@ function! CFnVs(sopt, sel, args)
     if a:args[0] !=# 'Clean'
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:cpl.run(l:workdir, l:cmd)
+    execute s:cpl.run(l:workdir, 'cpp', l:cmd)
 endfunction
 " }}}
 
@@ -1705,7 +1727,7 @@ function! CFnSphinx(sopt, sel, args)
     if a:args[0]
         let l:cmd .= join([' &&', s:path.browser, l:outfile])
     endif
-    execute s:cpl.run(l:workdir, l:cmd)
+    execute s:cpl.run(l:workdir, '', l:cmd)
 endfunction
 "}}}
 
@@ -1724,6 +1746,10 @@ let RcSphinxClean = function('CompileProject', ['sphinx', [0, 'clean']])
 " }}}
 
 " Search {{{
+" Required: 'mhinz/vim-grepper' or 'yegappan/grep'
+"           'Yggdroot/LeaderF'
+"           'yehuohan/popc'
+
 " s:fw {{{
 augroup UserFunctionSearch
     autocmd!
@@ -1790,7 +1816,6 @@ let s:fw_nvmaps = [
 function! FindWow(keys, mode)
     " doc
     " {{{
-    " Required: based on 'mhinz/vim-grepper' or 'yegappan/grep', 'Yggdroot/LeaderF' and 'yehuohan/popc'
     " MapKeys: [fF][lav][btopr][IiWwSs=]
     "          [%1][%2 ][%3   ][4%     ]
     " Find: %1
@@ -2621,7 +2646,7 @@ endif
     " 编译运行当前文件或项目
     nnoremap <leader>rf :call CompileFile('')<CR>
     nnoremap <leader>ri :call FuncExecInput(['Compile/Run args: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h')], 'CompileFile')<CR>
-    nnoremap <leader>rj :call CompileRange()<CR>
+    nnoremap <leader>rj :call CompileCell()<CR>
     nnoremap <leader>ra :call RcArg()<CR>
     nnoremap <leader>rd :call RcCmd()<CR>
     nnoremap <leader>rq :call RcQt()<CR>
