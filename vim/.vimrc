@@ -1,6 +1,6 @@
 
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-" Vimrc: configuration for vim, gvim, neovim and neovim-qt.
+" Vimrc: configuration for vim and neovim.
 "        set 'Global settings' before using this vimrc.
 " Github: https://github.com/yehuohan/dotconfigs
 " Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
@@ -86,7 +86,6 @@ vnoremap ; :
 
 let s:home = resolve(expand('<sfile>:p:h'))
 if (IsLinux() || IsMac())
-    " 链接root-vimrc到user's vimrc
     let $DotVimPath=s:home . '/.vim'
 elseif IsWin()
     let $DotVimPath=s:home . '\vimfiles'
@@ -98,7 +97,7 @@ endif
 set rtp+=$DotVimPath
 
 " s:gset {{{
-let s:gset_file = $DotVimPath . '/.gset'
+let s:gset_file = $DotVimPath . '/.gset.json'
 let s:gset = {
     \ 'use_powerfont' : 1,
     \ 'use_lightline': 1,
@@ -107,6 +106,8 @@ let s:gset = {
     \ 'use_ycm' : 1,
     \ 'use_lcn' : 0,
     \ 'use_utils' : 1,
+    \ 'set_dev' : v:none,
+    \ 'set_os' : v:none,
     \ }
 " FUNCTION: s:gsetLoad() {{{
 function! s:gsetLoad()
@@ -115,6 +116,7 @@ function! s:gsetLoad()
     else
         call s:gsetSave()
     endif
+    call env#env(s:gset.set_dev, s:gset.set_os)
 endfunction
 " }}}
 " FUNCTION: s:gsetSave() {{{
@@ -1597,6 +1599,7 @@ endfunction
 " }}}
 
 " FUNCTION: s:cpl.runcell(type) dict {{{
+" @param type: cell类型，同时也是efm类型
 function! s:cpl.runcell(type) dict
     if !has_key(s:cpl.cell, a:type)
         throw 's:cpl.cell doesn''t support "' . a:type . '"'
@@ -1754,9 +1757,9 @@ let RcSphinxClean = function('CompileProject', ['sphinx', [0, 'clean']])
 augroup UserFunctionSearch
     autocmd!
     autocmd VimEnter * call FindWowRoot()
-    " s:fw_rg = 1 使用'mhinz/vim-grepper'
-    " s:fw_rg = 0 使用'yegappan/grep'
-    autocmd VimEnter * let s:fw_rg = exists('loaded_grep') ? 1 : 0
+    " s:fw.rgtype = 0 使用'mhinz/vim-grepper'
+    " s:fw.rgtype = 1 使用'yegappan/grep'
+    autocmd VimEnter * let s:fw.rgtype = exists('loaded_grep') ? 1 : 0
     autocmd User Grepper call FindWowHighlight(s:fw.pattern)
 augroup END
 
@@ -1769,18 +1772,20 @@ let s:fw = {
     \ 'filters'  : '',
     \ 'strings'  : [],
     \ 'markers'  : ['.root', '.git', '.svn'],
+    \ 'rgtype'   : 1,
+    \ 'nvmaps'   : [],
     \}
 
 function! s:fw.exec() dict
     let l:exec = self.command . ' ' . self.pattern . ' ' . self.location . ' ' . self.options
     execute l:exec
-    if s:fw_rg
+    if s:fw.rgtype
         call FindWowHighlight(self.pattern)
     endif
     call Plug_rpt_setExecution(l:exec)
 endfunction
 
-let s:fw_nvmaps = [
+let s:fw.nvmaps = [
                 \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fri',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'frI',
                 \  'fw',  'fbw',  'ftw',  'fow',  'fpw',  'frw',  'fW',  'fbW',  'ftW',  'foW',  'fpW',  'frW',
                 \  'fs',  'fbs',  'fts',  'fos',  'fps',  'frs',  'fS',  'fbS',  'ftS',  'foS',  'fpS',  'frS',
@@ -1886,13 +1891,13 @@ function! FindWow(keys, mode)
         elseif a:keys =~# 'p'
             let l:loc = GetInput(' Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
         elseif a:keys =~# 'r'
-            let l:loc = FindWowSet() ? s:fw.root : ''
+            let l:loc = FindWowSet('a') ? s:fw.root : ''
         else
             if empty(s:fw.root)
                 call FindWowRoot()
             endif
             if empty(s:fw.root)
-                call FindWowSet()
+                call FindWowSet('r')
             endif
             let l:loc = s:fw.root
         endif
@@ -1918,9 +1923,9 @@ function! FindWow(keys, mode)
         if a:keys =~# 'l'
             let l:cmd = ':Leaderf rg --nowrap'
         elseif a:keys =~# 'a'
-            let l:cmd = s:fw_rg ? ':RgAdd' : 'Grepper -noprompt -tool rg -append -query'
+            let l:cmd = s:fw.rgtype ? ':RgAdd' : 'Grepper -noprompt -tool rg -append -query'
         else
-            let l:cmd = s:fw_rg ? ':Rg'    : 'Grepper -noprompt -tool rg -query'
+            let l:cmd = s:fw.rgtype ? ':Rg'    : 'Grepper -noprompt -tool rg -query'
             let s:fw.strings = []
         endif
         return l:cmd
@@ -1987,17 +1992,11 @@ function! FindWowFile(r)
         call FindWowRoot()
     endif
     if a:r || empty(s:fw.root)
-        let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
-        if empty(l:root)
-            return 0
-        endif
-        let s:fw.root = fnamemodify(l:root, ':p')
+        call FindWowSet('r')
     endif
-
-    if empty(s:fw.root)
-        return 0
+    if !empty(s:fw.root)
+        execute ':LeaderfFile ' . s:fw.root
     endif
-    execute ':LeaderfFile ' . s:fw.root
 endfunction
 " }}}
 
@@ -2024,13 +2023,18 @@ endfunction
 " }}}
 
 " FUNCTION: FindWowSet() {{{ 设置root和filters
-function! FindWowSet()
-    let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
-    if empty(l:root)
-        return 0
+" @return 0表示异常结束函数（root无效），1表示正常结束函数
+function! FindWowSet(type)
+    if a:type =~? '[ar]'
+        let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
+        if empty(l:root)
+            return 0
+        endif
+        let s:fw.root = fnamemodify(l:root, ':p')
     endif
-    let s:fw.root = fnamemodify(l:root, ':p')
-    let s:fw.filters = GetInput(' Which (Filter) to find: ')
+    if a:type =~? '[af]'
+        let s:fw.filters = GetInput(' Which (Filter) to find: ')
+    endif
     return 1
 endfunction
 " }}}
@@ -2614,11 +2618,16 @@ endif
 " }}}
 
 " Terminal {{{
+if IsWin()
+    nnoremap <leader>tz :terminal<CR>
+else
     nnoremap <leader>tz :terminal zsh<CR>
+endif
 if IsVim()
     set termwinkey=<C-l>
     tnoremap <Esc> <C-l>N
 else
+    tnoremap <C-l> <C-\><C-n><C-w>
     tnoremap <Esc> <C-\><C-n>
 endif
 " }}}
@@ -2667,14 +2676,17 @@ endif
     nnoremap <leader>/ :execute'let g:__str__=expand("<cword>")'<Bar>execute '/' . g:__str__<CR>
 
     " FindWow查找
-    for key in s:fw_nvmaps
+    for key in s:fw.nvmaps
         execute 'nnoremap <leader>' . key ':call FindWow("' . key . '", "n")<CR>'
     endfor
-    for key in s:fw_nvmaps
+    for key in s:fw.nvmaps
         execute 'vnoremap <leader>' . key ':call FindWow("' . key . '", "v")<CR>'
     endfor
     nnoremap <leader>ff :call FindWowFile(0)<CR>
     nnoremap <leader>frf :call FindWowFile(1)<CR>
-    nnoremap <leader>fR :call FindWowRoot()<CR>
+    nnoremap <leader>fet :call FindWowRoot()<CR>
+    nnoremap <leader>fer :call FindWowSet('r')<CR>
+    nnoremap <leader>fef :call FindWowSet('f')<CR>
+    nnoremap <leader>fea :call FindWowSet('a')<CR>
 " }}}
 " }}}
