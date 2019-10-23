@@ -65,11 +65,7 @@ endfunction
 
 " term {{{
 function! IsTermType(tt)
-    if &term ==? a:tt
-        return 1
-    else
-        return 0
-    endif
+    return (&term ==? a:tt) ? 1 : 0
 endfunction
 " }}}
 " }}}
@@ -148,42 +144,6 @@ command! -nargs=0 GSSave :call s:gsetSave()
 command! -nargs=0 GSInit :call s:gsetInit()
 command! -nargs=0 GSShow :call s:gsetShow()
 call s:gsetLoad()
-" }}}
-
-" s:path {{{
-let s:path = {
-    \ 'browser' : '',
-    \ }
-" FUNCTION: s:path.init() dict {{{
-function! s:path.init() dict
-    if (IsWin() || IsGw())
-        let self.browser_chrome = 'chrome'
-        let self.browser_firefox = 'firefox'
-    elseif IsLinux()
-        let self.browser_chrome = '/usr/bin/chrome'
-        let self.browser_firefox = '/usr/bin/firefox'
-    endif
-    let self.browser = self.browser_firefox
-endfunction
-" }}}
-" FUNCTION: s:path.toggleBrowser() dict {{{
-function! s:path.toggleBrowser() dict
-    if self.browser ==# self.browser_firefox
-        let self.browser = self.browser_chrome
-    else
-        let self.browser = self.browser_firefox
-    endif
-endfunction
-" }}}
-" FUNCTION: PathToggle(type) {{{
-function! PathToggle(type)
-    if a:type ==# 'browser'
-        call s:path.toggleBrowser()
-        echo 's:path browser: ' . s:path.browser
-    endif
-endfunction
-" }}}
-call s:path.init()
 " }}}
 
 " KeyCode {{{
@@ -1156,16 +1116,25 @@ if s:gset.use_utils
     let g:mkdp_auto_close = 1
     let g:mkdp_refresh_slow = 0         " 即时预览MarkDown
     let g:mkdp_command_for_global = 0   " 只有markdown文件可以预览
-    let g:mkdp_browser = s:path.browser
+    let g:mkdp_browser = 'firefox'
     nnoremap <leader>vm :call Plug_md_view()<CR>
+    nnoremap <leader>tb :call Plug_md_toggleBrowser()<CR>
     function! Plug_md_view() abort
-        let g:mkdp_browser = s:path.browser
         if !get(b:, 'MarkdownPreviewToggleBool')
             echo 'Open markdown preview'
         else
             echo 'Close markdown preview'
         endif
         call mkdp#util#toggle_preview()
+    endfunction
+    function! Plug_md_toggleBrowser()
+        if g:mkdp_browser ==# 'firefox'
+            let g:mkdp_browser = 'chrome'
+        else
+            let g:mkdp_browser = 'firefox'
+        endif
+        let g:mkdp_browser = g:mkdp_browser
+        echo 'Browser toggle to: ' . g:mkdp_browser
     endfunction
 " }}}
 
@@ -1174,13 +1143,12 @@ if !(IsWin() && IsNVim())
     " 需要安装 https://github.com/Rykka/instant-rst.py
     Plug 'Rykka/riv.vim', {'for': 'rst'}
     Plug 'Rykka/InstantRst', {'for': 'rst'}
-    let g:instant_rst_browser = s:path.browser
+    let g:instant_rst_browser = 'firefox'
 if IsWin()
     " 需要安装 https://github.com/mgedmin/restview
     nnoremap <leader>vr :execute ':AsyncRun restview ' . expand('%:p:t')<Bar>cclose<CR>
 else
     nnoremap <leader>vr :call Plug_rst_view()<CR>
-endif
     function! Plug_rst_view() abort
         if g:_instant_rst_daemon_started
             StopInstantRst
@@ -1189,6 +1157,7 @@ endif
             InstantRst
         endif
     endfunction
+endif
 endif
 " }}}
 
@@ -1517,7 +1486,7 @@ let s:cpl = {
         \ 'markdown'   : ['typora %s'                            , 'srcf'],
         \ 'json'       : ['python -m json.tool %s'               , 'srcf'],
         \ 'matlab'     : ['matlab -nosplash -nodesktop -r %s'    , 'outf'],
-        \ 'html'       : [s:path.browser . ' %s'                 , 'srcf'],
+        \ 'html'       : ['firefox %s'                           , 'srcf'],
         \ 'dot'        : ['dotty %s && dot -Tpng %s -o %s.png'   , 'srcf' , 'srcf' , 'outf'],
         \},
     \ 'cell' : {
@@ -1728,7 +1697,7 @@ function! CFnSphinx(sopt, sel, args)
 
     let l:cmd = printf('cd "%s" && make %s', l:workdir, a:args[1])
     if a:args[0]
-        let l:cmd .= join([' &&', s:path.browser, l:outfile])
+        let l:cmd .= join([' && firefox', l:outfile])
     endif
     execute s:cpl.run(l:workdir, '', l:cmd)
 endfunction
@@ -2505,7 +2474,6 @@ endif
     nnoremap <leader>is :call InvSigncolumn()<CR>
     nnoremap <leader>ih :call InvHighLight()<CR>
     nnoremap <leader>ib :call InvScrollBind()<CR>
-    nnoremap <leader>tb :call PathToggle('browser')<CR>
     if IsLinux()
         inoremap <Esc> <Esc>:call Misc_fcitx2en()<CR>
     endif
@@ -2634,8 +2602,8 @@ endif
 
 " Coding {{{
     " 创建临时文件
-    nnoremap <leader>ei :call FuncExecInput(['TempFile Suffix: '], 'FuncEditTempFile', 0)<CR>
-    nnoremap <leader>eti :call FuncExecInput(['TempFile Suffix: '], 'FuncEditTempFile', 1)<CR>
+    nnoremap <leader>ei :call FuncExecInput(['Temp file suffix: '], 'FuncEditTempFile', 0)<CR>
+    nnoremap <leader>eti :call FuncExecInput(['Temp file suffix: '], 'FuncEditTempFile', 1)<CR>
     for [key, val] in items({
             \ 'n' : '',
             \ 'c' : 'c',
