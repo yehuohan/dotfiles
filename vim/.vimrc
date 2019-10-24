@@ -572,7 +572,7 @@ else
     " FUNCTION: Plug_ll_msgRight() {{{
     function! Plug_ll_msgRight()
         let l:fw = FindWowGet()
-        return empty(l:fw) ? '' : (l:fw[0] . '[' . l:fw[1] .']')
+        return empty(l:fw) ? '' : (l:fw[0] . '[' . l:fw[1] . '(' . join(l:fw[2],',') . ')]')
     endfunction
     " }}}
     " FUNCTION: Plug_ll_checkMixedIndent() {{{
@@ -1741,6 +1741,7 @@ let s:fw = {
     \ 'options'  : '',
     \ 'root'     : '',
     \ 'filters'  : '',
+    \ 'globlst'  : [],
     \ 'strings'  : [],
     \ 'markers'  : ['.root', '.git', '.svn'],
     \ 'rgtype'   : 1,
@@ -1862,7 +1863,7 @@ function! FindWow(keys, mode)
         elseif a:keys =~# 'p'
             let l:loc = GetInput(' Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
         elseif a:keys =~# 'r'
-            let l:loc = FindWowSet('a') ? s:fw.root : ''
+            let l:loc = FindWowSet('rf') ? s:fw.root : ''
         else
             if empty(s:fw.root)
                 call FindWowRoot()
@@ -1880,8 +1881,16 @@ function! FindWow(keys, mode)
         let l:opt = ''
         if a:keys =~? 's'     | let l:opt .= '-w ' | endif
         if a:keys =~# '[iws]' | let l:opt .= '-i ' | elseif a:keys =~# '[IWS]' | let l:opt .= '-s ' | endif
-        if !empty(s:fw.filters) && a:keys !~# '[btop]'
-            let l:opt .= '-g "*.{' . s:fw.filters . '}" '
+        "if !empty(s:fw.filters) && a:keys !~# '[btop]'
+        "    let l:opt .= '-g "*.{' . s:fw.filters . '}" '
+        "endif
+        if a:keys !~# '[btop]'
+            if !empty(s:fw.filters)
+                let l:opt .= '-g "*.{' . s:fw.filters . '}" '
+            endif
+            if !empty(s:fw.globlst)
+                let l:opt .= '-g ' . join(s:fw.globlst, ' -g ')
+            endif
         endif
         if a:keys =~# 'F'
             let l:opt .= GetInput(' Args(-F, --hidden ...) to append: ')
@@ -1994,17 +2003,21 @@ endfunction
 " }}}
 
 " FUNCTION: FindWowSet() {{{ 设置root和filters
+" @param type: r-root, f-filters, g-glob
 " @return 0表示异常结束函数（root无效），1表示正常结束函数
 function! FindWowSet(type)
-    if a:type =~? '[ar]'
+    if a:type =~? 'r'
         let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
         if empty(l:root)
             return 0
         endif
         let s:fw.root = fnamemodify(l:root, ':p')
     endif
-    if a:type =~? '[af]'
+    if a:type =~? 'f'
         let s:fw.filters = GetInput(' Which (Filter) to find: ')
+    endif
+    if a:type =~? 'g'
+        let s:fw.globlst = split(GetInput(' What (Glob) to append: '), ',')
     endif
     return 1
 endfunction
@@ -2015,7 +2028,7 @@ function! FindWowGet()
     if empty(s:fw.root)
         return []
     endif
-    return [s:fw.root, s:fw.filters]
+    return [s:fw.root, s:fw.filters, s:fw.globlst]
 endfunction
 " }}}
 
@@ -2657,6 +2670,7 @@ endif
     nnoremap <leader>fet :call FindWowRoot()<CR>
     nnoremap <leader>fer :call FindWowSet('r')<CR>
     nnoremap <leader>fef :call FindWowSet('f')<CR>
-    nnoremap <leader>fea :call FindWowSet('a')<CR>
+    nnoremap <leader>feg :call FindWowSet('g')<CR>
+    nnoremap <leader>fea :call FindWowSet('rfg')<CR>
 " }}}
 " }}}
