@@ -102,8 +102,8 @@ let s:gset = {
     \ 'use_ycm' : 1,
     \ 'use_lcn' : 0,
     \ 'use_utils' : 1,
-    \ 'set_dev' : v:none,
-    \ 'set_os' : v:none,
+    \ 'set_dev' : v:null,
+    \ 'set_os' : v:null,
     \ }
 " FUNCTION: s:gsetLoad() {{{
 function! s:gsetLoad()
@@ -1090,6 +1090,8 @@ endif
 
 " julia-vim {{{ Julia支持
     Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
+    let g:latex_to_unicode_tab = 1      " 使用<Tab>输入unicode字符
+    nnoremap <leader>tn :call LaTeXtoUnicode#Toggle()<CR>
 " }}}
 
 " dart-vim-plugin {{{ dart语法高亮
