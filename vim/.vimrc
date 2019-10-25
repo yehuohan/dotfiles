@@ -941,13 +941,13 @@ endif
     let g:neoformat_basic_format_trim = 1
     let g:neoformat_c_astyle = {
         \ 'exe' : 'astyle',
-        \ 'args' : ['--style=allman'],
+        \ 'args' : ['--style=allman', '--pad-oper'],
         \ 'stdin' : 1,
         \ }
     let g:neoformat_cpp_astyle = g:neoformat_c_astyle
     let g:neoformat_java_astyle = {
         \ 'exe' : 'astyle',
-        \ 'args' : ['--mode=java --style=google'],
+        \ 'args' : ['--mode=java --style=google', '--pad-oper'],
         \ 'stdin' : 1,
         \ }
     let g:neoformat_python_autopep8 = {
