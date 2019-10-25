@@ -616,7 +616,7 @@ endif
             \ 'opt' : ['filetype', 'ft'],
             \ 'dsr' : 'When this option is set, the FileType autocommand event is triggered.',
             \ 'lst' : ['cpp', 'c', 'python', 'julia', 'vim', 'go', 'markdown', 'help', 'text',
-                     \ 'sh', 'conf', 'make', 'javascript', 'json', 'html'],
+                     \ 'sh', 'conf', 'make', 'cmake', 'javascript', 'json', 'html'],
             \ 'dic' : {
                     \ 'cpp'        : 'Cpp file',
                     \ 'c'          : 'C file',
@@ -630,6 +630,7 @@ endif
                     \ 'sh'         : 'Linux shell script',
                     \ 'conf'       : 'Config file',
                     \ 'make'       : 'Makefile of .mak file',
+                    \ 'cmake'      : 'CMakeLists.txt file',
                     \ 'javascript' : 'JavaScript file',
                     \ 'json'       : 'Json file',
                     \ 'html'       : 'Html file',
@@ -653,10 +654,9 @@ endif
     let g:Popc_useTabline = 1
     let g:Popc_useStatusline = 1
     let g:Popc_usePowerFont = s:gset.use_powerfont
-    let g:Popc_tabLineLeft = 'buffer'
-    let g:Popc_tabLineRight = 'tab'
     let g:Popc_separator = {'left' : '', 'right': ''}
     let g:Popc_subSeparator = {'left' : '', 'right': ''}
+    let s:popc_tabline_layout = 1
     nnoremap <C-Space> :Popc<CR>
     inoremap <C-Space> <Esc>:Popc<CR>
     nnoremap <leader><leader>h :PopcBuffer<CR>
@@ -665,10 +665,23 @@ endif
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
     nnoremap <leader>wf :call Plug_popc_wksSearch()<CR>
+    nnoremap <leader>ty :call Plug_popc_toggleLayout()<CR>
     function! Plug_popc_wksSearch()
         let l:wks_root = popc#layer#wks#GetCurrentWks()[1]
         if !empty(l:wks_root)
             execute ':LeaderfFile ' . l:wks_root
+        endif
+    endfunction
+    function! Plug_popc_toggleLayout()
+        if s:popc_tabline_layout == 0
+            call popc#ui#TabLineSetLayout('buffer', 'tab')
+            let s:popc_tabline_layout = 1
+        elseif s:popc_tabline_layout == 1
+            call popc#ui#TabLineSetLayout('buffer', '')
+            let s:popc_tabline_layout = 2
+        elseif s:popc_tabline_layout == 2
+            call popc#ui#TabLineSetLayout('', 'tab')
+            let s:popc_tabline_layout = 0
         endif
     endfunction
 " }}}
