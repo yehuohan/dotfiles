@@ -730,7 +730,7 @@ if s:gset.use_startify
             \ {'type': 'files',     'header': ['   Recent Files']},
             \ ]
     let g:startify_files_number = 7
-    nnoremap <leader>su :Startify<CR>   " start ui of vim-startify
+    nnoremap <leader>su :Startify<CR>
 endif
 " }}}
 
@@ -2547,7 +2547,7 @@ endif
     " Buffer切换
     nnoremap <leader>bn :bnext<CR>
     nnoremap <leader>bp :bprevious<CR>
-    nnoremap <leader>bl :b#<Bar>execute 'set buflisted'<CR>
+    nnoremap <leader>bl <C-^>
     " 打开/关闭Quickfix
     nnoremap <leader>qo :botright copen<Bar>call FindWowHighlight()<CR>
     nnoremap <leader>qc :cclose<Bar>wincmd p<CR>
