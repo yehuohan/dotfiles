@@ -20,6 +20,7 @@ let s:env.hp.win = [
     \ 'C:/MyApps/cygwin64/bin',
     \ 'C:/MyApps/msys64/usr/bin',
     \ 'C:/MyApps/Go/bin',
+    \ 'C:/MyApps/lua',
     \ 'C:/Program Files (x86)/Google/Chrome/Application',
     \ 'D:/Java/jdk1.8.0_201/bin',
     \ 'D:/Qt/5.12.5/msvc2017_64/bin',
@@ -41,7 +42,12 @@ let s:env.hp.win = [
 function! env#env(dev, os)
     let l:e = get(get(s:env, a:dev, {}), a:os, [])
     if !empty(l:e)
-        let $PATH .= ';' . join(l:e, ';')
+        " IsWin() is from vimrc
+        if IsWin()
+            let $PATH .= ';' . join(l:e, ';')
+        else
+            let $PATH .= ':' . join(l:e, ':')
+        endif
     endif
 endfunction
 " }}}

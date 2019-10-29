@@ -1507,6 +1507,7 @@ let s:cpl = {
     \ 'cell' : {
         \ 'python' : ['python', '^#%%', '^#%%'],
         \ 'julia'  : ['julia', '^#%%', '^#%%'],
+        \ 'lua'    : ['lua', '^--%%', '^--%%'],
         \},
     \ 'efm' : {
         \ 'python' : '%*\\sFile\ \"%f\"\\,\ line\ %l\\,\ %m',
@@ -2360,7 +2361,6 @@ if IsGVim()
         set linespace=0                 " required by Powerline Font
         set guifontwide=Microsoft_YaHei_Mono:h11:cGB2312
         nnoremap <leader>tf <Esc>:call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)<CR>
-                                        " gvim全屏
     elseif IsMac()
         set lines=30
         set columns=100
@@ -2389,8 +2389,9 @@ if IsNVimQt()
     GuiLinespace 0
     GuiTabline 0
     GuiPopupmenu 0
+    " 基于Qt-Gui的设置
     nnoremap <leader>tf :call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
-                                        " neovim-qt全屏
+    nnoremap <leader>tm :call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>
 endif
 endfunction
 " }}}
@@ -2663,6 +2664,10 @@ endif
     nnoremap <leader>rcv :call RcVsClean()<CR>
     nnoremap <leader>rcm :call RcMakeClean()<CR>
     nnoremap <leader>rcp :call RcSphinxClean()<CR>
+    " 调试
+if IsVim()
+    packadd termdebug
+endif
 " }}}
 
 " Find and search{{{
