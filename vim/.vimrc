@@ -289,7 +289,7 @@ call plug#begin($DotVimPath.'/bundle')  " 可以指定插件安装位置
     nmap <leader>g3 <Plug>(incsearch-nohl-g#)
 " }}}
 
-" Fzf {{{ 模糊查找
+" fzf {{{ 模糊查找
 if s:gset.use_fzf
     " linux下直接pacman -S fzf
     " win下载fzf.exe放入bundle/fzf/bin/下
@@ -405,7 +405,7 @@ endif
     vmap <C-u> <Plug>(expand_region_shrink)
 " }}}
 
-" vim-textobj-user {{{ 文本对象
+" textobj-user {{{ 文本对象
     Plug 'kana/vim-textobj-user'
     Plug 'kana/vim-textobj-indent'
     let g:textobj_indent_no_default_key_mappings=1
@@ -427,7 +427,7 @@ endif
     vmap iu <Plug>(textobj-underscore-i)
 " }}}
 
-" vim-repeat {{{ 重复命令
+" repeat {{{ 重复命令
     Plug 'tpope/vim-repeat'
     function! Plug_rpt_setExecution(string)
         let s:execution = a:string
@@ -602,14 +602,14 @@ endif
     nnoremap <leader>tr :RainbowToggle<CR>
 " }}}
 
-" indent-line {{{ 显示缩进标识
+" indentLine {{{ 显示缩进标识
     Plug 'Yggdroot/indentLine'
     "let g:indentLine_char = '|'        " 设置标识符样式
     let g:indentLinet_color_term=200    " 设置标识符颜色
     nnoremap <leader>ti :IndentLinesToggle<CR>
 " }}}
 
-" Pop Selection {{{ 弹出选项
+" popset {{{ 弹出选项
     Plug 'yehuohan/popset'
     let g:Popset_SelectionData = [
         \{
@@ -686,7 +686,7 @@ endif
     endfunction
 " }}}
 
-" nerd-tree {{{ 目录树导航
+" nerdtree {{{ 目录树导航
     Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTree']}
     let g:NERDTreeShowHidden = 1
     let g:NERDTreeMapPreview = 'go'
@@ -708,7 +708,7 @@ endif
     augroup END
 " }}}
 
-" vim-startify {{{ vim会话界面
+" startify {{{ vim会话界面
 if s:gset.use_startify
     Plug 'mhinz/vim-startify'
     if IsLinux()
@@ -734,7 +734,7 @@ if s:gset.use_startify
 endif
 " }}}
 
-" bookmarks {{{ 书签管理
+" signature {{{ 书签管理
     Plug 'kshenoy/vim-signature'
     let g:SignatureMap = {
         \ 'Leader'             :  "m",
@@ -767,7 +767,7 @@ endif
     nnoremap <M-f> :<C-U>call signature#mark#Goto('next', 'line', 'pos')<CR>
 " }}}
 
-" undo {{{ 撤消历史
+" undotree {{{ 撤消历史
     Plug 'mbbill/undotree'
     nnoremap <leader>tu :UndotreeToggle<CR>
 " }}}
@@ -905,6 +905,25 @@ if s:gset.use_lcn
 endif
 " }}}
 
+" echodoc {{{ 参数文档显示
+    Plug 'Shougo/echodoc.vim'
+    let g:echodoc_enable_at_startup = 1
+if IsVim()
+    let g:echodoc#type = 'echo'
+else
+    let g:echodoc#type = 'floating'
+endif
+    nnoremap <leader>td :call Plug_ed_toggle()<CR>
+    function! Plug_ed_toggle()
+        if echodoc#is_enabled()
+            call echodoc#disable()
+        else
+            call echodoc#enable()
+        endif
+        echo 'Echo doc: ' . string(echodoc#is_enabled())
+    endfunction
+" }}}
+
 " ultisnips {{{ 代码片段
     Plug 'yehuohan/ultisnips'           " snippet引擎（vmap的映射，与vim-textmanip的<C-i>有冲突）
     Plug 'honza/vim-snippets'           " snippet合集
@@ -931,7 +950,7 @@ endif
     let g:ale_echo_delay = 10           " 显示语文错误的延时时间
     let g:ale_lint_delay = 300          " 文本更改后的延时检测时间
     let g:ale_enabled = 0               " 默认关闭ALE检测
-    nnoremap <leader>ta :execute ':ALEToggle'<Bar>echo 'AleToggle:' . g:ale_enabled<CR>
+    nnoremap <leader>ta :execute ':ALEToggle'<Bar>echo 'AleToggle: ' . g:ale_enabled<CR>
 " }}}
 
 " neoformat {{{ 代码格式化
@@ -1005,7 +1024,7 @@ endif
                                         " 可以 ctags -R 命令自行生成tags
 " }}}
 
-" nerd-commenter {{{ 批量注释
+" nerdcommenter {{{ 批量注释
     Plug 'scrooloose/nerdcommenter'
     let g:NERDCreateDefaultMappings = 0
     let g:NERDSpaceDelims = 0           " 在Comment后添加Space
@@ -1022,14 +1041,14 @@ endif
     nmap <leader>cu <Plug>NERDCommenterUncomment
 " }}}
 
-" file switch {{{ c/c++文件切换
+" fswitch {{{ c/c++文件切换
     Plug 'derekwyatt/vim-fswitch', {'for': ['cpp', 'c']}
     nnoremap <Leader>of :FSHere<CR>
     nnoremap <Leader>os :FSSplitRight<CR>
     let g:fsnonewfiles='on'
 " }}}
 
-" AsyncRun {{{ 导步运行程序
+" asyncrun {{{ 导步运行程序
     Plug 'skywind3000/asyncrun.vim'
     if IsWin()
         let g:asyncrun_encs = 'cp936'   " 即'gbk'编码
@@ -1044,7 +1063,7 @@ endif
     nnoremap <leader>rs :AsyncStop<CR>
 " }}}
 
-" Debugger {{{ NodeJS, Go, Python调试器(Vim only)
+" easydebugger {{{ NodeJS, Go, Python调试器(Vim only)
 if IsVim()
     Plug 'jayli/vim-easydebugger', {'for': ['python', 'go']}
     " 启动关闭NodeJS/Python/Go调试
@@ -1067,7 +1086,7 @@ if IsVim()
 endif
 " }}}
 
-" vim-quickhl {{{ 单词高亮
+" quickhl {{{ 单词高亮
     Plug 't9md/vim-quickhl'
     nmap <leader>hw <Plug>(quickhl-manual-this)
     xmap <leader>hw <Plug>(quickhl-manual-this)
@@ -1101,18 +1120,18 @@ endif
     Plug 'octol/vim-cpp-enhanced-highlight', {'for': 'cpp'}
 " }}}
 
-" julia-vim {{{ Julia支持
+" julia {{{ Julia支持
     Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
     let g:latex_to_unicode_tab = 1      " 使用<Tab>输入unicode字符
     nnoremap <leader>tn :call LaTeXtoUnicode#Toggle()<CR>
 " }}}
 
-" dart-vim-plugin {{{ dart语法高亮
+" dart-plugin {{{ dart语法高亮
     Plug 'dart-lang/dart-vim-plugin', {'for': 'dart'}
 " }}}
 " }}}
 
-" 软件辅助 {{{
+" 软件工具 {{{
 if s:gset.use_utils
 " vimcdoc {{{ 中文帮助文档
     Plug 'yianwillis/vimcdoc'
@@ -1149,7 +1168,7 @@ if s:gset.use_utils
             let g:mkdp_browser = 'firefox'
         endif
         let g:mkdp_browser = g:mkdp_browser
-        echo 'Browser toggle to: ' . g:mkdp_browser
+        echo 'Browser toggle to ' . g:mkdp_browser
     endfunction
 " }}}
 
@@ -1176,7 +1195,7 @@ endif
 endif
 " }}}
 
-" vimtex {{{ Latex
+" vimtex {{{ Latex支持
     Plug 'lervag/vimtex', {'for': 'tex'}
     let g:vimtex_view_general_viewer = 'SumatraPDF'
     let g:vimtex_complete_enabled = 1   " 使用vimtex#complete#omnifunc补全
@@ -1524,6 +1543,7 @@ let s:cpl = {
     \ 'sel_arg' : {
         \ 'opt' : ['select args to CompileFile'],
         \ 'lst' : [
+                \ '-g',
                 \ '-finput-charset=utf-8 -fexec-charset=gbk',
                 \ '-static',
                 \ '-fPIC -shared'
