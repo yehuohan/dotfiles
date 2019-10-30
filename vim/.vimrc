@@ -1979,6 +1979,16 @@ function! FindWow(keys, mode)
 endfunction
 " }}}
 
+" FUNCTION: FindWowKill() {{{
+function! FindWowKill()
+    if s:fw.rgtype
+        :GrepStop
+    else
+        :Grepper -stop
+    endif
+endfunction
+" }}}
+
 " FUNCTION: FindWowFile(r) {{{ 查找文件
 " @param r: 是否设置查找目录s:fw.root
 function! FindWowFile(r)
@@ -2683,6 +2693,7 @@ endif
     for key in s:fw.nvmaps
         execute 'vnoremap <leader>' . key ':call FindWow("' . key . '", "v")<CR>'
     endfor
+    nnoremap <leader>fk :call FindWowKill()<CR>
     nnoremap <leader>ff :call FindWowFile(0)<CR>
     nnoremap <leader>frf :call FindWowFile(1)<CR>
     nnoremap <leader>fet :call FindWowRoot()<CR>
