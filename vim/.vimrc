@@ -1550,13 +1550,20 @@ let s:cpl = {
                 \ ],
         \ 'cmd' : {sopt, arg -> call('CompileFile', [arg])}
         \},
-    \ 'sel_cmd' : {
-        \ 'opt' : ['select command to run'],
+    \ 'sel_exe' : {
+        \ 'opt' : ['select execution to run'],
         \ 'lst' : [
-                \ 'go mod init %:r',
-                \ 'cflow -T %'
+                \ 'retab',
+                \ '%s/\s\+$//g',
+                \ '%s/\r//g',
+                \ 'AsyncRun go mod init %:r',
+                \ 'AsyncRun cflow -T %'
                 \ ],
-        \ 'cmd' : {sopt, arg -> execute(':AsyncRun ' . arg)}
+        \ 'dic' : {
+                \ '%s/\s\+$//g' : 'remove trailing space',
+                \ '%s/\r//g'    : 'remove ^M',
+                \ },
+        \ 'cmd' : {sopt, arg -> execute(arg)}
         \}
     \}
 " FUNCTION: s:cpl.printf(type, args, srcf, outf) dict {{{
@@ -1741,7 +1748,7 @@ endfunction
 
 " Run compiler
 let RcArg         = function('popset#set#PopSelection', [s:cpl.sel_arg, 0])
-let RcCmd         = function('popset#set#PopSelection', [s:cpl.sel_cmd, 0])
+let RcExe         = function('popset#set#PopSelection', [s:cpl.sel_exe, 0])
 let RcQt          = function('CompileProject', ['qt', []])
 let RcQtClean     = function('CompileProject', ['qt', ['distclean']])
 let RcVs          = function('CompileProject', ['vs', ['Build']])
@@ -2276,14 +2283,6 @@ function! Misc_gotoKeyword(mode)
 endfunction
 " }}}
 
-" FUNCTION: Misc_removeTrailingSpace() {{{ 去除尾部空白
-function! Misc_removeTrailingSpace()
-    let l:save = winsaveview()
-    %s/\s\+$//e
-    call winrestview(l:save)
-endfunction
-" }}}
-
 " FUNCTION: Misc_holdTopLine() {{{ 冻结顶行
 function! Misc_holdTopLine()
     let l:line = line('.')
@@ -2536,7 +2535,6 @@ endif
     if IsLinux()
         inoremap <Esc> <Esc>:call Misc_fcitx2en()<CR>
     endif
-    nnoremap <leader>rt :call Misc_removeTrailingSpace()<CR>
     nnoremap <leader>hl :call Misc_holdTopLine()<CR>
 " }}}
 
@@ -2684,7 +2682,7 @@ endif
     nnoremap <leader>ri :call FuncExecInput(['Compile/Run args: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h')], 'CompileFile')<CR>
     nnoremap <leader>rj :call CompileCell()<CR>
     nnoremap <leader>ra :call RcArg()<CR>
-    nnoremap <leader>rd :call RcCmd()<CR>
+    nnoremap <leader>re :call RcExe()<CR>
     nnoremap <leader>rq :call RcQt()<CR>
     nnoremap <leader>rv :call RcVs()<CR>
     nnoremap <leader>rm :call RcMake()<CR>
