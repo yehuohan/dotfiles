@@ -13,8 +13,6 @@ if [ `uname` == "Linux" ]; then
         exit
     fi
 
-    cf_home="cf-home"
-
     # vim
     cp ../.vimrc                    ./vim/
     cp ../.vim/.ycm_extra_conf.py   ./vim/
@@ -23,49 +21,49 @@ if [ `uname` == "Linux" ]; then
     cp -r ../.vim/autoload          ./vim/
     cp -r ../.config/nvim           ./vim/
     # zsh
-    cp ../.zshrc                    $cf_home/
-    cp ../.zprofile                 $cf_home/
-    cp ../.Xmodmap                  $cf_home/
-    cp ../.gitconfig                $cf_home/
+    cp ../.zshrc                    ./root/home/
+    cp ../.zprofile                 ./root/home/
+    cp ../.Xmodmap                  ./root/home/
+    cp ../.gitconfig                ./root/home/
     # .config
-    cp -r ../.config/i3             $cf_home/.config/
-    cp -r ../.config/i3status       $cf_home/.config/
-    cp -r ../.config/rofi           $cf_home/.config/
+    cp -r ../.config/i3             ./root/home/.config/
+    cp -r ../.config/i3status       ./root/home/.config/
+    cp -r ../.config/rofi           ./root/home/.config/
     # tmux
-    cp ../.tmux.conf                $cf_home/
-    cp ../.tmux-status.conf         $cf_home/
+    cp ../.tmux.conf                ./root/home/
+    cp ../.tmux-status.conf         ./root/home/
     # misc
     cp ../my-apps/ToggleTouchPad.py ./misc/
 
+    # Arch
     if [[ `uname -r` =~ "lts" ]]; then
-        cf_dir=$cf_home/"home-arch"
-
         # X11
-        cp ../.Xresources           $cf_dir/
-        cp ../.xinitrc              $cf_dir/
-        cp ../.nvidia-xinitrc       $cf_dir/
-        cp ../.inputrc              $cf_dir/
-        cp /etc/X11/xorg.conf                       $cf_dir/etc/X11/
-        cp /etc/X11/xorg.conf.d/30-touchpad.conf    $cf_dir/etc/X11/xorg.conf.d
-        cp /etc/X11/nvidia-xorg.conf                $cf_dir/etc/X11/
-        cp -r /etc/X11/nvidia-xorg.conf.d           $cf_dir/etc/X11/
+        cp ../.Xresources           ./root/home-arch/
+        cp ../.xinitrc              ./root/home-arch/
+        cp ../.nvidia-xinitrc       ./root/home-arch/
+        cp ../.inputrc              ./root/home-arch/
+        cp /etc/X11/xorg.conf                       ./root/etc-arch/X11/
+        cp /etc/X11/xorg.conf.d/30-touchpad.conf    ./root/etc-arch/X11/xorg.conf.d
+        cp /etc/X11/nvidia-xorg.conf                ./root/etc-arch/X11/
+        cp -r /etc/X11/nvidia-xorg.conf.d           ./root/etc-arch/X11/
         # systemd
-        cp /etc/systemd/logind.conf $cf_dir/etc/systemd/
+        cp /etc/systemd/logind.conf ./root/etc-arch/systemd/
         # pacman
-        cp /etc/pacman.conf         $cf_dir/etc/
+        cp /etc/pacman.conf         ./root/etc-arch/
         # modules
-        cp -r /etc/modprobe.d       $cf_dir/etc/
-        cp -r /etc/modules-load.d   $cf_dir/etc/
+        cp -r /etc/modprobe.d       ./root/etc-arch/
+        cp -r /etc/modules-load.d   ./root/etc-arch/
 
         echo "Arch: Copy was completed!"
     fi
 
+    # Ubuntu
     if [[ `uname -v` =~ "Ubuntu" ]]; then
         cf_dir=$cf_home/"home-ubuntu"
 
         # .config
-        cp ../.config/libinput-gestures.conf    $cf_dir/.config/
-        cp ../.config/user-dirs.dirs            $cf_dir/.config/
+        cp ../.config/libinput-gestures.conf    ./root/home-ubuntu/.config/
+        cp ../.config/user-dirs.dirs            ./root/home-ubuntu/.config/
 
         echo "Ubuntu: Copy was completed!"
     fi
@@ -85,10 +83,10 @@ elif [ `uname -o` == "Msys" ]; then
     cp -r ../Vim/vimfiles/autoload        ./vim/
 
     # cf-msys2
-    cp ~/.minttyrc      ./cf-gw/
-    cp ~/.gitconfig     ./cf-gw/
-    cp ~/.zshrc         ./cf-gw/
-    cp /msys2_shell.cmd ./cf-gw/
+    cp ~/.minttyrc      ./root/home-gw/
+    cp ~/.gitconfig     ./root/home-gw/
+    cp ~/.zshrc         ./root/home-gw/
+    cp /msys2_shell.cmd ./root/home-gw/
 
     echo "Msys: Copy was completed!"
 fi
