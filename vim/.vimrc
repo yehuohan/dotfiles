@@ -95,6 +95,8 @@ set rtp+=$DotVimPath
 " s:gset {{{
 let s:gset_file = $DotVimPath . '/.gset.json'
 let s:gset = {
+    \ 'set_dev' : v:null,
+    \ 'set_os' : v:null,
     \ 'use_powerfont' : 1,
     \ 'use_lightline': 1,
     \ 'use_startify' : 1,
@@ -102,8 +104,6 @@ let s:gset = {
     \ 'use_ycm' : 1,
     \ 'use_lcn' : 0,
     \ 'use_utils' : 1,
-    \ 'set_dev' : v:null,
-    \ 'set_os' : v:null,
     \ }
 " FUNCTION: s:gsetLoad() {{{
 function! s:gsetLoad()
@@ -123,7 +123,7 @@ endfunction
 " }}}
 " FUNCTION: s:gsetInit() {{{
 function! s:gsetInit()
-    for [key, val] in items(s:gset)
+    for [key, val] in sort(items(s:gset))
         let s:gset[key] = input('let s:gset.'. key . ' = ', val)
     endfor
     redraw
@@ -133,14 +133,13 @@ endfunction
 " FUNCTION: s:gsetShow() {{{
 function! s:gsetShow()
     let l:str = 'Gset:'
-    for [key, val] in items(s:gset)
+    for [key, val] in sort(items(s:gset))
         let l:str .= "\n    " . key . ' = ' . val
     endfor
     echo l:str
 endfunction
 " }}}
 command! -nargs=0 GSLoad :call s:gsetLoad()
-command! -nargs=0 GSSave :call s:gsetSave()
 command! -nargs=0 GSInit :call s:gsetInit()
 command! -nargs=0 GSShow :call s:gsetShow()
 call s:gsetLoad()
@@ -160,18 +159,12 @@ if IsVim()
     "    nnoremap <M-x> :CmdTest<CR>    " 按键码超时时间检测
     "<2> nnoremap <Esc>x :CmdTest<CR>   " 按映射超时时间检测
     "<3> nnoremap x  :CmdTest<CR>     " 按映射超时时间检测
-    set <M-d>=d
-    set <M-f>=f
-    set <M-h>=h
-    set <M-j>=j
-    set <M-k>=k
-    set <M-l>=l
-    set <M-u>=u
-    set <M-i>=i
-    set <M-o>=o
-    set <M-p>=p
-    set <M-n>=n
-    set <M-m>=m
+    for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
+        execute 'set <M-e>=' . t
+    endfor
+    set <M-,>=,
+    set <M-.>=.
+    set <M-;>=;
 endif
 " }}}
 " }}}
@@ -763,8 +756,8 @@ endif
     nnoremap <leader>ma :SignatureListBufferMarks<CR>
     nnoremap <leader>mc :<C-U>call signature#mark#Purge('all')<CR>
     nnoremap <leader>mx :<C-U>call signature#marker#Purge()<CR>
-    nnoremap <M-d> :<C-U>call signature#mark#Goto('prev', 'line', 'pos')<CR>
-    nnoremap <M-f> :<C-U>call signature#mark#Goto('next', 'line', 'pos')<CR>
+    nnoremap <M-,> :<C-U>call signature#mark#Goto('prev', 'line', 'pos')<CR>
+    nnoremap <M-.> :<C-U>call signature#mark#Goto('next', 'line', 'pos')<CR>
 " }}}
 
 " undotree {{{ 撤消历史
@@ -823,8 +816,9 @@ if s:gset.use_ycm
         \ 'vimwiki': 1,
         \ 'pandoc': 1,
         \ 'infolog': 1,
-        \ 'mail': 1
+        \ 'mail': 1,
         \ }                                                     " 禁用YCM的列表
+    let g:ycm_filetype_whitelist = {'*': 1}                     " YCM只在白名单出现且黑名单未出现的filetype工作
     let g:ycm_language_server = [
         \ {
             \ 'name': 'dart',
@@ -855,7 +849,7 @@ if s:gset.use_ycm
     let g:ycm_key_list_previous_completion = ['<C-k>', '<C-p>', '<Up>']
     let g:ycm_key_list_stop_completion = ['<C-y>']              " 关闭补全menu
     let g:ycm_key_invoke_completion = '<C-l>'                   " 显示补全内容，YCM使用completefunc（C-X C-U）
-                                                                " YCM不技持的补全，通过omnifunc(C-X C-O)集成到YCM上
+                                                                " YCM不支持的补全，通过omnifunc(C-X C-O)集成到YCM上
     nnoremap <leader>gg :YcmCompleter<CR>
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
     nnoremap <leader>gI :YcmCompleter GoToInclude<CR>
@@ -2184,9 +2178,9 @@ function! InvVirtualedit()
 endfunction
 " }}}
 
-" FUNCTION: InvNumberType() {{{ 切换显示行号
+" FUNCTION: InvNumber() {{{ 切换显示行号
 let s:misc_number_type = 1
-function! InvNumberType()
+function! InvNumber()
     if s:misc_number_type == 1
         let s:misc_number_type = 2
         set nonumber
@@ -2203,8 +2197,8 @@ function! InvNumberType()
 endfunction
 " }}}
 
-" FUNCTION: InvFoldColumeShow() {{{ 切换显示折叠列
-function! InvFoldColumeShow()
+" FUNCTION: InvFoldColumn() {{{ 切换显示折叠列
+function! InvFoldColumn()
     if &foldcolumn == 0
         set foldcolumn=1
     else
@@ -2525,10 +2519,11 @@ endif
     " Misc
     nnoremap <leader>iw :set invwrap<CR>
     nnoremap <leader>il :set invlist<CR>
+    nnoremap <leader>ii :set invignorecase<Bar>echo 'ignorecase = ' . &ignorecase<CR>
     nnoremap <leader>iv :call InvVirtualedit()<CR>
     nnoremap <leader>ic :call InvConceallevel()<CR>
-    nnoremap <leader>in :call InvNumberType()<CR>
-    nnoremap <leader>if :call InvFoldColumeShow()<CR>
+    nnoremap <leader>in :call InvNumber()<CR>
+    nnoremap <leader>if :call InvFoldColumn()<CR>
     nnoremap <leader>is :call InvSigncolumn()<CR>
     nnoremap <leader>ih :call InvHighLight()<CR>
     nnoremap <leader>ib :call InvScrollBind()<CR>
@@ -2595,8 +2590,12 @@ endif
     " 分割窗口
     nnoremap <leader>ws <C-w>s
     nnoremap <leader>wv <C-W>v
-    " 移动焦点
     nnoremap <leader>wc <C-w>c
+    " 移动焦点
+    nnoremap <M-s> <C-w>h
+    nnoremap <M-d> <C-w>j
+    nnoremap <M-e> <C-w>k
+    nnoremap <M-f> <C-w>l
     nnoremap <leader>wh <C-w>h
     nnoremap <leader>wj <C-w>j
     nnoremap <leader>wk <C-w>k
@@ -2612,10 +2611,6 @@ endif
     nnoremap <leader>wT <C-w>T
     " 修改尺寸
     nnoremap <leader>w= <C-w>=
-    "nnoremap <C-Up> :resize+1<CR>
-    "nnoremap <C-Down> :resize-1<CR>
-    "nnoremap <C-Left> :vertical resize-1<CR>
-    "nnoremap <C-Right> :vertical resize+1<CR>
     nnoremap <M-Up> :resize+5<CR>
     nnoremap <M-Down> :resize-5<CR>
     nnoremap <M-Left> :vertical resize-5<CR>

@@ -59,9 +59,7 @@ if [ `uname` == "Linux" ]; then
 
     # Ubuntu
     if [[ `uname -v` =~ "Ubuntu" ]]; then
-        cf_dir=$cf_home/"home-ubuntu"
-
-        # .config
+        # home/.config
         cp ../.config/libinput-gestures.conf    ./root/home-ubuntu/.config/
         cp ../.config/user-dirs.dirs            ./root/home-ubuntu/.config/
 
