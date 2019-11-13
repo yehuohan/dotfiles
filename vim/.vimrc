@@ -71,15 +71,6 @@ endfunction
 " }}}
 
 " Global settings {{{
-set encoding=utf-8                      " 内部使用utf-8编码
-if IsVim()
-    set nocompatible                    " 不兼容vi
-endif
-let mapleader="\<Space>"
-nnoremap ; :
-nnoremap : ;
-vnoremap ; :
-
 let s:home = resolve(expand('<sfile>:p:h'))
 if (IsLinux() || IsMac())
     let $DotVimPath=s:home . '/.vim'
@@ -92,6 +83,36 @@ elseif IsGw()
 endif
 set rtp+=$DotVimPath
 
+" First {{{
+set encoding=utf-8                      " 内部使用utf-8编码
+if IsVim()
+    set nocompatible                    " 不兼容vi
+endif
+let mapleader="\<Space>"
+nnoremap ; :
+nnoremap : ;
+vnoremap ; :
+set timeout                             " 打开映射超时检测
+set ttimeout                            " 打开键码超时检测
+set timeoutlen=1000                     " 映射超时时间为1000ms
+set ttimeoutlen=70                      " 键码超时时间为70ms
+if IsVim()
+    " 终端Alt键映射处理：如 Alt+x，实际连续发送 <Esc>x 编码
+    " 以下三种方法都可以使按下 Alt+x 后，执行 CmdTest 命令，但超时检测有区别
+    "<1> set <M-x>=x  " 设置键码，这里的是一个字符，即<Esc>的编码，不是^和[放在一起
+                        " 在终端的Insert模式，按Ctrl+v再按Alt+x可输入
+    "    nnoremap <M-x> :CmdTest<CR>    " 按键码超时时间检测
+    "<2> nnoremap <Esc>x :CmdTest<CR>   " 按映射超时时间检测
+    "<3> nnoremap x  :CmdTest<CR>     " 按映射超时时间检测
+    for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
+        execute 'set <M-e>=' . t
+    endfor
+    set <M-,>=,
+    set <M-.>=.
+    set <M-;>=;
+endif
+" }}}
+
 " s:gset {{{
 let s:gset_file = $DotVimPath . '/.gset.json'
 let s:gset = {
@@ -102,6 +123,7 @@ let s:gset = {
     \ 'use_startify' : 1,
     \ 'use_fzf' : 1,
     \ 'use_ycm' : 1,
+    \ 'use_ultisnips' : 1,
     \ 'use_lcn' : 0,
     \ 'use_utils' : 1,
     \ }
@@ -143,29 +165,6 @@ command! -nargs=0 GSLoad :call s:gsetLoad()
 command! -nargs=0 GSInit :call s:gsetInit()
 command! -nargs=0 GSShow :call s:gsetShow()
 call s:gsetLoad()
-" }}}
-
-" KeyCode {{{
-set timeout                             " 打开映射超时检测
-set ttimeout                            " 打开键码超时检测
-set timeoutlen=1000                     " 映射超时时间为1000ms
-set ttimeoutlen=70                      " 键码超时时间为70ms
-
-if IsVim()
-    " 终端Alt键映射处理：如 Alt+x，实际连续发送 <Esc>x 编码
-    " 以下三种方法都可以使按下 Alt+x 后，执行 CmdTest 命令，但超时检测有区别
-    "<1> set <M-x>=x  " 设置键码，这里的是一个字符，即<Esc>的编码，不是^和[放在一起
-                        " 在终端的Insert模式，按Ctrl+v再按Alt+x可输入
-    "    nnoremap <M-x> :CmdTest<CR>    " 按键码超时时间检测
-    "<2> nnoremap <Esc>x :CmdTest<CR>   " 按映射超时时间检测
-    "<3> nnoremap x  :CmdTest<CR>     " 按映射超时时间检测
-    for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
-        execute 'set <M-e>=' . t
-    endfor
-    set <M-,>=,
-    set <M-.>=.
-    set <M-;>=;
-endif
 " }}}
 " }}}
 
@@ -454,6 +453,8 @@ endif
     set rtp+=$DotVimPath/bundle/vim-colors-solarized
     Plug 'sainnhe/vim-color-forest-night'
     set rtp+=$DotVimPath/bundle/vim-color-forest-night
+    Plug 'srcery-colors/srcery-vim'
+    set rtp+=$DotVimPath/bundle/srcery-vim
 if !s:gset.use_lightline
     try
         set background=dark
@@ -488,7 +489,7 @@ else
         \ 'component': {
                 \ 'all_filesign': '%{winnr()},%-n%{&ro?" ":""}%M',
                 \ 'all_format'  : '%{&ft!=#""?&ft." • ":""}%{&fenc!=#""?&fenc:&enc}[%{&ff}]',
-                \ 'all_lineinfo': '0X%02B ≡%3p%%   %04l/%L  %-2v',
+                \ 'all_lineinfo': '0x%02B ≡%3p%%   %04l/%L  %-2v',
                 \ 'lite_info'   : '%p%%≡%L',
                 \ },
         \ 'component_function': {
@@ -632,7 +633,7 @@ endif
         \},
         \{
             \ 'opt' : ['colorscheme', 'colo'],
-            \ 'lst' : ['forest-night', 'gruvbox', 'seoul256', 'seoul256-light', 'solarized'],
+            \ 'lst' : ['forest-night', 'gruvbox', 'seoul256', 'seoul256-light', 'solarized', 'srcery'],
             \ 'cmd' : '',
         \},]
     " set option with PSet
@@ -919,6 +920,7 @@ endif
 " }}}
 
 " ultisnips {{{ 代码片段
+if s:gset.use_ultisnips
     Plug 'yehuohan/ultisnips'           " snippet引擎（vmap的映射，与vim-textmanip的<C-i>有冲突）
     Plug 'honza/vim-snippets'           " snippet合集
     " 使用:UltiSnipsEdit编辑g:UltiSnipsSnippetsDir中的snippet文件
@@ -929,6 +931,7 @@ endif
     let g:UltiSnipsListSnippets='<C-Tab>'
     let g:UltiSnipsJumpForwardTrigger='<C-j>'
     let g:UltiSnipsJumpBackwardTrigger='<C-k>'
+endif
 " }}}
 
 " ale {{{ 语法检测
@@ -1499,41 +1502,41 @@ let s:cpl = {
     \ 'srcf' : '',
     \ 'outf' : '',
     \ 'type' : {
-        \ 'c'          : ['gcc %s -o %s %s && "./%s"'            , 'args' , 'outf' , 'srcf' , 'outf'],
-        \ 'cpp'        : ['g++ -std=c++11 %s -o %s %s && "./%s"' , 'args' , 'outf' , 'srcf' , 'outf'],
-        \ 'java'       : ['javac %s && java %s %s'               , 'srcf' , 'outf' , 'args'],
-        \ 'python'     : ['python %s %s'                         , 'srcf' , 'args'],
-        \ 'julia'      : ['julia %s %s'                          , 'srcf' , 'args'],
-        \ 'lua'        : ['lua %s %s'                            , 'srcf' , 'args'],
-        \ 'go'         : ['go run %s %s'                         , 'srcf' , 'args'],
-        \ 'javascript' : ['node %s %s'                           , 'srcf' , 'args'],
-        \ 'dart'       : ['dart %s %s'                           , 'srcf' , 'args'],
-        \ 'tex'        : ['pdfLatex %s && SumatraPDF %s.pdf'     , 'srcf' , 'outf'],
-        \ 'sh'         : ['./%s %s'                              , 'srcf' , 'args'],
-        \ 'dosbatch'   : ['%s %s'                                , 'srcf' , 'args'],
-        \ 'markdown'   : ['typora %s'                            , 'srcf'],
-        \ 'json'       : ['python -m json.tool %s'               , 'srcf'],
-        \ 'matlab'     : ['matlab -nosplash -nodesktop -r %s'    , 'outf'],
-        \ 'html'       : ['firefox %s'                           , 'srcf'],
-        \ 'dot'        : ['dotty %s && dot -Tpng %s -o %s.png'   , 'srcf' , 'srcf' , 'outf'],
-        \},
+        \ 'c'          : ['gcc %s -o %s %s && "./%s"'            , 'args' , 'outf' , 'srcf' , 'outf' ],
+        \ 'cpp'        : ['g++ -std=c++11 %s -o %s %s && "./%s"' , 'args' , 'outf' , 'srcf' , 'outf' ],
+        \ 'java'       : ['javac %s && java %s %s'               , 'srcf' , 'outf' , 'args'          ],
+        \ 'python'     : ['python %s %s'                         , 'srcf' , 'args'                   ],
+        \ 'julia'      : ['julia %s %s'                          , 'srcf' , 'args'                   ],
+        \ 'lua'        : ['lua %s %s'                            , 'srcf' , 'args'                   ],
+        \ 'go'         : ['go run %s %s'                         , 'srcf' , 'args'                   ],
+        \ 'javascript' : ['node %s %s'                           , 'srcf' , 'args'                   ],
+        \ 'dart'       : ['dart %s %s'                           , 'srcf' , 'args'                   ],
+        \ 'tex'        : ['pdfLatex %s && SumatraPDF %s.pdf'     , 'srcf' , 'outf'                   ],
+        \ 'sh'         : ['./%s %s'                              , 'srcf' , 'args'                   ],
+        \ 'dosbatch'   : ['%s %s'                                , 'srcf' , 'args'                   ],
+        \ 'markdown'   : ['typora %s'                            , 'srcf'                            ],
+        \ 'json'       : ['python -m json.tool %s'               , 'srcf'                            ],
+        \ 'matlab'     : ['matlab -nosplash -nodesktop -r %s'    , 'outf'                            ],
+        \ 'html'       : ['firefox %s'                           , 'srcf'                            ],
+        \ 'dot'        : ['dotty %s && dot -Tpng %s -o %s.png'   , 'srcf' , 'srcf' , 'outf'          ],
+        \ },
     \ 'cell' : {
         \ 'python' : ['python', '^#%%', '^#%%'],
         \ 'julia'  : ['julia', '^#%%', '^#%%'],
         \ 'lua'    : ['lua', '^--%%', '^--%%'],
-        \},
+        \ },
     \ 'efm' : {
         \ 'python' : '%*\\sFile\ \"%f\"\\,\ line\ %l\\,\ %m',
-        \},
+        \ },
     \ 'pro' : {
         \ 'qt'     : ['*.pro', 'CFnQt'],
         \ 'vs'     : ['*.sln', 'CFnVs'],
         \ 'mk'     : ['[mM]akefile', 'CFnMake'],
         \ 'sphinx' : [IsWin() ? 'make.bat' : '[mM]akefile', 'CFnSphinx'],
-        \},
+        \ },
     \ 'pat' : {
         \ 'make' : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z_][a-zA-Z0-9_]*\)',
-        \},
+        \ },
     \ 'sel_arg' : {
         \ 'opt' : ['select args to CompileFile'],
         \ 'lst' : [
@@ -1543,7 +1546,7 @@ let s:cpl = {
                 \ '-fPIC -shared'
                 \ ],
         \ 'cmd' : {sopt, arg -> call('CompileFile', [arg])}
-        \},
+        \ },
     \ 'sel_exe' : {
         \ 'opt' : ['select execution to run'],
         \ 'lst' : [
@@ -1558,7 +1561,7 @@ let s:cpl = {
                 \ '%s/\r//g'    : 'remove ^M',
                 \ },
         \ 'cmd' : {sopt, arg -> execute(arg)}
-        \}
+        \ }
     \}
 " FUNCTION: s:cpl.printf(type, args, srcf, outf) dict {{{
 " 生成文件编译或执行命令字符串。
@@ -1585,7 +1588,7 @@ function! s:cpl.printf(type, wdir, args, srcf, outf) dict
 endfunction
 " }}}
 
-" FUNCTION: s:cpl.run(wdir, cmd) dict {{{
+" FUNCTION: s:cpl.run(wdir, efm, cmd) dict {{{
 " 生成运行命令字符串。
 " @param wdir: 命令运行目录
 " @param efm: errorformat类型
@@ -2693,7 +2696,7 @@ if IsVim()
 endif
 " }}}
 
-" Find and search{{{
+" Find and search {{{
     " 查找选择的内容
     vnoremap / "*y<Bar>:execute'let g:__str__=getreg("*")'<Bar>execute'/' . g:__str__<CR>
     " 查找当前光标下的内容
