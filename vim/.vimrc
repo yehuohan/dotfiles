@@ -557,7 +557,7 @@ else
         if &ft ==# 'qf'
             return 'CWD = ' . getcwd()
         else
-            let l:fw = FindWowGet()
+            let l:fw = FindWowGetArgs()
             let l:fp = expand('%:p')
             return empty(l:fw) ? l:fp : substitute(l:fp, escape(l:fw[0], '\'), '...', '')
         endif
@@ -565,7 +565,7 @@ else
     " }}}
     " FUNCTION: Plug_ll_msgRight() {{{
     function! Plug_ll_msgRight()
-        let l:fw = FindWowGet()
+        let l:fw = FindWowGetArgs()
         return empty(l:fw) ? '' : (l:fw[0] . '[' . l:fw[1] . '(' . join(l:fw[2],',') . ')]')
     endfunction
     " }}}
@@ -1492,10 +1492,12 @@ let FuncAppendCallResult = function('FuncExecInput', [['Input function = ', '', 
 " s:cpl {{{ Compiler command of project
 " @attribute type: 文件类型
 " @attribute wdir, args, srcf, outf: 用于type的参数
+" @attribute cell: 用于type的cell类型
+" @attribute efm: 用于type的errorformat类型
 " @attribute pro: 项目类型
 " @attribute pat: 匹配模式字符串
 " @attribute sel_arg: 预置CompileFile参数输入
-" @attribute sel_cmd: 预置命令
+" @attribute sel_exe: 预置命令
 let s:cpl = {
     \ 'wdir' : '',
     \ 'args' : '',
@@ -1758,44 +1760,70 @@ let RcSphinxClean = function('CompileProject', ['sphinx', [0, 'clean']])
 " }}}
 
 " Search {{{
-" Required: 'mhinz/vim-grepper' or 'yegappan/grep'
+" Required: 'skywind3000/asyncrun.vim' or 'yegappan/grep' or 'mhinz/vim-grepper'
 "           'Yggdroot/LeaderF'
 "           'yehuohan/popc'
-
-" s:fw {{{
+"           'yehuohan/popset'
 augroup UserFunctionSearch
     autocmd!
-    autocmd VimEnter * call FindWowRoot()
-    " s:fw.rgtype = 0 使用'mhinz/vim-grepper'
-    " s:fw.rgtype = 1 使用'yegappan/grep'
-    autocmd VimEnter * let s:fw.rgtype = exists('loaded_grep') ? 1 : 0
     autocmd User Grepper call FindWowHighlight(s:fw.pattern)
 augroup END
 
+" s:fw {{{
+" @attribute engine: 搜索程序
+" @attribute args: 搜索参数
+" @attribute rg: 预置的rg搜索命令
+" @attribute misc: 搜索高亮等参数
+" @attribute mappings: 映射按键
 let s:fw = {
     \ 'command'  : '',
     \ 'pattern'  : '',
     \ 'location' : '',
     \ 'options'  : '',
-    \ 'root'     : '',
-    \ 'filters'  : '',
-    \ 'globlst'  : [],
-    \ 'strings'  : [],
-    \ 'markers'  : ['.root', '.git', '.svn'],
-    \ 'rgtype'   : 1,
-    \ 'nvmaps'   : [],
-    \}
+    \ 'engine' : {
+        \ 'r' : '',
+        \ 'a' : '',
+        \ 'k' : '',
+        \ 'l' : ':Leaderf rg --nowrap'
+    \ },
+    \ 'args' : {
+        \ 'root'    : '',
+        \ 'filters' : '',
+        \ 'globlst' : []
+        \ },
+    \ 'rg' : {
+        \ 'asyncrun' : {
+            \ 'r' : ':AsyncRun! rg --vimgrep',
+            \ 'a' : ':AsyncRun! -append rg --vimgrep',
+            \ 'k' : ':AsyncStop'},
+        \ 'grep' : {
+            \ 'r' : ':Rg',
+            \ 'a' : ':RgAdd',
+            \ 'k' : ':GrepStop'},
+        \ 'grepper' : {
+            \ 'r' : ':Grepper -noprompt -tool rg -query',
+            \ 'a' : ':Grepper -noprompt -tool rg -append -query',
+            \ 'k' : ':Grepper -stop'},
+        \ 'sel' : {
+            \ 'opt' : ['select rg engine'],
+            \ 'lst' : ['asyncrun', 'grep', 'grepper'],
+            \ 'cmd' : {sopt, arg -> extend(s:fw.engine, s:fw.rg[arg], 'force')}
+            \ }
+        \ },
+    \ 'misc' : {
+        \ 'markers' : ['.root', '.git', '.svn'],
+        \ 'strings' : []
+        \ },
+    \ 'mappings' : []
+    \ }
+if IsVim()
+    call extend(s:fw.engine, s:fw.rg.grep, 'force')
+else
+    call extend(s:fw.engine, s:fw.rg.grepper, 'force')
+endif
 
-function! s:fw.exec() dict
-    let l:exec = self.command . ' ' . self.pattern . ' ' . self.location . ' ' . self.options
-    execute l:exec
-    if s:fw.rgtype
-        call FindWowHighlight(self.pattern)
-    endif
-    call Plug_rpt_setExecution(l:exec)
-endfunction
-
-let s:fw.nvmaps = [
+" s:fw.mappings {{{
+let s:fw.mappings = [
                 \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fri',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'frI',
                 \  'fw',  'fbw',  'ftw',  'fow',  'fpw',  'frw',  'fW',  'fbW',  'ftW',  'foW',  'fpW',  'frW',
                 \  'fs',  'fbs',  'fts',  'fos',  'fps',  'frs',  'fS',  'fbS',  'ftS',  'foS',  'fpS',  'frS',
@@ -1825,6 +1853,17 @@ let s:fw.nvmaps = [
                 \ 'fvs', 'fvps', 'fvS',  'fvpS',
                 \ 'fv=', 'fvp=', 'fv=',  'fvp=',
                 \ ]
+" }}}
+
+" FUNCTION: s:fw.exec() dict {{{
+function! s:fw.exec() dict
+    let l:exec = self.command . ' ' . self.pattern . ' ' . self.location . ' ' . self.options
+    execute l:exec
+    botright copen
+    call FindWowHighlight(self.pattern)
+    call Plug_rpt_setExecution(l:exec)
+endfunction
+" }}}
 " }}}
 
 " FUNCTION: FindWow(keys, mode) {{{ 超速查找
@@ -1901,15 +1940,15 @@ function! FindWow(keys, mode)
         elseif a:keys =~# 'p'
             let l:loc = GetInput(' Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
         elseif a:keys =~# 'r'
-            let l:loc = FindWowSet('rf') ? s:fw.root : ''
+            let l:loc = FindWowSetArgs('rf') ? s:fw.args.root : ''
         else
-            if empty(s:fw.root)
+            if empty(s:fw.args.root)
                 call FindWowRoot()
             endif
-            if empty(s:fw.root)
-                call FindWowSet('r')
+            if empty(s:fw.args.root)
+                call FindWowSetArgs('r')
             endif
-            let l:loc = s:fw.root
+            let l:loc = s:fw.args.root
         endif
         return l:loc
     endfunction
@@ -1919,15 +1958,12 @@ function! FindWow(keys, mode)
         let l:opt = ''
         if a:keys =~? 's'     | let l:opt .= '-w ' | endif
         if a:keys =~# '[iws]' | let l:opt .= '-i ' | elseif a:keys =~# '[IWS]' | let l:opt .= '-s ' | endif
-        "if !empty(s:fw.filters) && a:keys !~# '[btop]'
-        "    let l:opt .= '-g "*.{' . s:fw.filters . '}" '
-        "endif
         if a:keys !~# '[btop]'
-            if !empty(s:fw.filters)
-                let l:opt .= '-g "*.{' . s:fw.filters . '}" '
+            if !empty(s:fw.args.filters)
+                let l:opt .= '-g "*.{' . s:fw.args.filters . '}" '
             endif
-            if !empty(s:fw.globlst)
-                let l:opt .= '-g ' . join(s:fw.globlst, ' -g ')
+            if !empty(s:fw.args.globlst)
+                let l:opt .= '-g ' . join(s:fw.args.globlst, ' -g ')
             endif
         endif
         if a:keys =~# 'F'
@@ -1939,12 +1975,12 @@ function! FindWow(keys, mode)
     " FUNCTION: s:parseCommand() closure {{{
     function! s:parseCommand() closure
         if a:keys =~# 'l'
-            let l:cmd = ':Leaderf rg --nowrap'
+            let l:cmd = s:fw.engine.l
         elseif a:keys =~# 'a'
-            let l:cmd = s:fw.rgtype ? ':RgAdd' : 'Grepper -noprompt -tool rg -append -query'
+            let l:cmd = s:fw.engine.a
         else
-            let l:cmd = s:fw.rgtype ? ':Rg'    : 'Grepper -noprompt -tool rg -query'
-            let s:fw.strings = []
+            let l:cmd = s:fw.engine.r
+            let s:fw.misc.strings = []
         endif
         return l:cmd
     endfunction
@@ -2003,34 +2039,36 @@ function! FindWow(keys, mode)
 endfunction
 " }}}
 
-" FUNCTION: FindWowKill() {{{
+" FUNCTION: FindWowKill() {{{ 停止超速查找
 function! FindWowKill()
-    if s:fw.rgtype
-        :GrepStop
-    else
-        :Grepper -stop
-    endif
+    execute s:fw.engine.k
 endfunction
 " }}}
 
 " FUNCTION: FindWowFile(r) {{{ 查找文件
-" @param r: 是否设置查找目录s:fw.root
+" @param r: 是否设置查找目录s:fw.args.root
 function! FindWowFile(r)
-    if !a:r && empty(s:fw.root)
+    if !a:r && empty(s:fw.args.root)
         call FindWowRoot()
     endif
-    if a:r || empty(s:fw.root)
-        call FindWowSet('r')
+    if a:r || empty(s:fw.args.root)
+        call FindWowSetArgs('r')
     endif
-    if !empty(s:fw.root)
-        execute ':LeaderfFile ' . s:fw.root
+    if !empty(s:fw.args.root)
+        execute ':LeaderfFile ' . s:fw.args.root
     endif
+endfunction
+" }}}
+
+" FUNCTION: FindWowSetEngine(type) {{{ 设置engine
+function! FindWowSetEngine(type)
+    call PopSelection(s:fw[a:type]['sel'], 0)
 endfunction
 " }}}
 
 " FUNCTION: FindWowRoot() {{{ 查找root路径
 function! FindWowRoot()
-    if empty(s:fw.markers)
+    if empty(s:fw.misc.markers)
         return
     endif
 
@@ -2038,10 +2076,10 @@ function! FindWowRoot()
     let l:dir_last = ''
     while l:dir !=# l:dir_last
         let l:dir_last = l:dir
-        for m in s:fw.markers
+        for m in s:fw.misc.markers
             let l:root = l:dir . '/' . m
             if filereadable(l:root) || isdirectory(l:root)
-                let s:fw.root = fnameescape(l:dir)
+                let s:fw.args.root = fnameescape(l:dir)
                 return
             endif
         endfor
@@ -2050,46 +2088,46 @@ function! FindWowRoot()
 endfunction
 " }}}
 
-" FUNCTION: FindWowSet() {{{ 设置root和filters
+" FUNCTION: FindWowSetArgs() {{{ 设置args
 " @param type: r-root, f-filters, g-glob
 " @return 0表示异常结束函数（root无效），1表示正常结束函数
-function! FindWowSet(type)
+function! FindWowSetArgs(type)
     if a:type =~? 'r'
         let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
         if empty(l:root)
             return 0
         endif
-        let s:fw.root = fnamemodify(l:root, ':p')
+        let s:fw.args.root = fnamemodify(l:root, ':p')
     endif
     if a:type =~? 'f'
-        let s:fw.filters = GetInput(' Which (Filter) to find: ')
+        let s:fw.args.filters = GetInput(' Which (Filter) to find: ')
     endif
     if a:type =~? 'g'
-        let s:fw.globlst = split(GetInput(' What (Glob) to append: '), ',')
+        let s:fw.args.globlst = split(GetInput(' What (Glob) to append: '), ',')
     endif
     return 1
 endfunction
 " }}}
 
-" FUNCTION: FindWowGet() {{{ 获取root和filters
-function! FindWowGet()
-    if empty(s:fw.root)
+" FUNCTION: FindWowGetArgs() {{{ 获取args
+function! FindWowGetArgs()
+    if empty(s:fw.args.root)
         return []
     endif
-    return [s:fw.root, s:fw.filters, s:fw.globlst]
+    return [s:fw.args.root, s:fw.args.filters, s:fw.args.globlst]
 endfunction
 " }}}
 
 " FUNCTION: FindWowHighlight([string]) {{{ 高亮字符串
-" @param string: 若有字符串，则先添加到s:fw.strings，再高亮
+" @param string: 若有字符串，则先添加到s:fw.misc.strings，再高亮
 function! FindWowHighlight(...)
     if &filetype ==# 'leaderf'
         " use leaderf's highlight
     elseif &filetype ==# 'qf'
         if a:0 >= 1
-            call add(s:fw.strings, escape(a:1, '/*'))
+            call add(s:fw.misc.strings, escape(a:1, '/*'))
         endif
-        for str in s:fw.strings
+        for str in s:fw.misc.strings
             execute 'syntax match IncSearch /' . str . '/'
         endfor
     endif
@@ -2703,19 +2741,20 @@ endif
     nnoremap <leader>/ :execute'let g:__str__=expand("<cword>")'<Bar>execute '/' . g:__str__<CR>
 
     " FindWow查找
-    for key in s:fw.nvmaps
+    for key in s:fw.mappings
         execute 'nnoremap <leader>' . key ':call FindWow("' . key . '", "n")<CR>'
     endfor
-    for key in s:fw.nvmaps
+    for key in s:fw.mappings
         execute 'vnoremap <leader>' . key ':call FindWow("' . key . '", "v")<CR>'
     endfor
     nnoremap <leader>fk :call FindWowKill()<CR>
     nnoremap <leader>ff :call FindWowFile(0)<CR>
     nnoremap <leader>frf :call FindWowFile(1)<CR>
+    nnoremap <leader>fee :call FindWowSetEngine('rg')<CR>
     nnoremap <leader>fet :call FindWowRoot()<CR>
-    nnoremap <leader>fer :call FindWowSet('r')<CR>
-    nnoremap <leader>fef :call FindWowSet('f')<CR>
-    nnoremap <leader>feg :call FindWowSet('g')<CR>
-    nnoremap <leader>fea :call FindWowSet('rfg')<CR>
+    nnoremap <leader>fer :call FindWowSetArgs('r')<CR>
+    nnoremap <leader>fef :call FindWowSetArgs('f')<CR>
+    nnoremap <leader>feg :call FindWowSetArgs('g')<CR>
+    nnoremap <leader>fea :call FindWowSetArgs('rfg')<CR>
 " }}}
 " }}}
