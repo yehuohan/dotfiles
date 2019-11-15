@@ -635,10 +635,11 @@ endif
             \ 'opt' : ['colorscheme', 'colo'],
             \ 'lst' : ['forest-night', 'gruvbox', 'seoul256', 'seoul256-light', 'solarized', 'srcery'],
             \ 'cmd' : '',
-        \},]
-    " set option with PSet
-    nnoremap <leader><leader>s :call feedkeys(':PSet ', 'n')<CR>
-    nnoremap <leader>sa :PSet popset<CR>
+        \},
+    \ ]
+    " set option with PopSet
+    nnoremap <leader><leader>s :call feedkeys(':PopSet ', 'n')<CR>
+    nnoremap <leader>sa :PopSet popset<CR>
 " }}}
 
 " popc {{{ buffer管理
@@ -1547,7 +1548,8 @@ let s:cpl = {
                 \ '-static',
                 \ '-fPIC -shared'
                 \ ],
-        \ 'cmd' : {sopt, arg -> call('CompileFile', [arg])}
+        \ 'cmd' : {sopt, arg -> call('CompileFile', [arg])},
+        \ 'pre' : 0
         \ },
     \ 'sel_exe' : {
         \ 'opt' : ['select execution to run'],
@@ -1562,7 +1564,8 @@ let s:cpl = {
                 \ '%s/\s\+$//g' : 'remove trailing space',
                 \ '%s/\r//g'    : 'remove ^M',
                 \ },
-        \ 'cmd' : {sopt, arg -> execute(arg)}
+        \ 'cmd' : {sopt, arg -> execute(arg)},
+        \ 'pre' : 1,
         \ }
     \}
 " FUNCTION: s:cpl.printf(type, args, srcf, outf) dict {{{
@@ -1674,7 +1677,9 @@ function! CompileProject(type, args)
             \ 'opt' : ['Please select the project file'],
             \ 'lst' : l:prj,
             \ 'cmd' : a:fn,
-            \}, 0, a:args)
+            \ 'pre' : 0,
+            \ 'arg' : a:args
+            \})
     else
         echo 'None of ' . l:pat . ' was found!'
     endif
@@ -1746,8 +1751,8 @@ endfunction
 "}}}
 
 " Run compiler
-let RcArg         = function('popset#set#PopSelection', [s:cpl.sel_arg, 0])
-let RcExe         = function('popset#set#PopSelection', [s:cpl.sel_exe, 0])
+let RcArg         = function('popset#set#PopSelection', [s:cpl.sel_arg])
+let RcExe         = function('popset#set#PopSelection', [s:cpl.sel_exe])
 let RcQt          = function('CompileProject', ['qt', []])
 let RcQtClean     = function('CompileProject', ['qt', ['distclean']])
 let RcVs          = function('CompileProject', ['vs', ['Build']])
@@ -1807,7 +1812,8 @@ let s:fw = {
         \ 'sel' : {
             \ 'opt' : ['select rg engine'],
             \ 'lst' : ['asyncrun', 'grep', 'grepper'],
-            \ 'cmd' : {sopt, arg -> extend(s:fw.engine, s:fw.rg[arg], 'force')}
+            \ 'cmd' : {sopt, arg -> extend(s:fw.engine, s:fw.rg[arg], 'force')},
+            \ 'pre' : 0
             \ }
         \ },
     \ 'misc' : {
@@ -2062,7 +2068,7 @@ endfunction
 
 " FUNCTION: FindWowSetEngine(type) {{{ 设置engine
 function! FindWowSetEngine(type)
-    call PopSelection(s:fw[a:type]['sel'], 0)
+    call PopSelection(s:fw[a:type]['sel'])
 endfunction
 " }}}
 
