@@ -2408,35 +2408,40 @@ endif
 " }}}
 
 " Gui {{{
+let s:gui_fontsize = 12
+
 " Gui-vim {{{
 if IsGVim()
+" FUNCTION: GuiAdjustFontSize(inc) {{{
+function! GuiAdjustFontSize(inc)
+    let s:gui_fontsize += a:inc
+    if IsLinux()
+        execute 'set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ ' . s:gui_fontsize
+        execute 'set guifontwide=WenQuanYi\ Micro\ Hei\ Mono\ ' . s:gui_fontsize
+    elseif IsWin()
+        execute 'set guifont=Consolas_For_Powerline:h' . s:gui_fontsize . ':cANSI'
+        execute 'set guifontwide=Microsoft_YaHei_Mono:h' . (s:gui_fontsize - 1). ':cGB2312'
+    elseif IsMac()
+        execute 'set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h' . s:gui_fontsize
+    endif
+endfunction
+" }}}
+
     set guioptions-=m                   " 隐藏菜单栏
     set guioptions-=T                   " 隐藏工具栏
     set guioptions-=L                   " 隐藏左侧滚动条
     set guioptions-=r                   " 隐藏右侧滚动条
     set guioptions-=b                   " 隐藏底部滚动条
     set guioptions-=e                   " 不使用GUI标签
-
-    if IsLinux()
-        set lines=20
-        set columns=100
-        "set guifont=DejaVu\ Sans\ Mono\ 13
-        set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ 12
-        set linespace=0
-        set guifontwide=WenQuanYi\ Micro\ Hei\ Mono\ 12
-    elseif IsWin()
-        set lines=25
-        set columns=90
-        "set guifont=Consolas:h13:cANSI
-        set guifont=Consolas_For_Powerline:h12:cANSI
-        set linespace=0
-        set guifontwide=Microsoft_YaHei_Mono:h11:cGB2312
+    call GuiAdjustFontSize(0)
+    set lines=25
+    set columns=90
+    set linespace=0
+    if IsWin()
         nnoremap <leader>tf <Esc>:call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)<CR>
-    elseif IsMac()
-        set lines=30
-        set columns=100
-        set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h15
     endif
+    nnoremap <kPlus> :call GuiAdjustFontSize(1)<CR>
+    nnoremap <kMinus> :call GuiAdjustFontSize(-1)<CR>
 endif
 " }}}
 
@@ -2447,24 +2452,32 @@ augroup UserSettingsGui
     autocmd VimEnter * call s:NVimQt_setGui()
 augroup END
 
-" FUNCTION: s:NVimQt_setGui() {{{ neovim-qt设置
+" FUNCTION: GuiAdjustFontSize(inc) {{{
+function! GuiAdjustFontSize(inc)
+    let s:gui_fontsize += a:inc
+    if IsLinux()
+        execute 'Guifont! WenQuanYi Micro Hei Mono:h' . s:gui_fontsize
+        execute 'Guifont! DejaVu Sans Mono for Powerline:h' . s:gui_fontsize
+    elseif IsWin()
+        "Guifont! YaHei Mono For Powerline:h12
+        "Guifont! Microsoft YaHei Mono:h12
+        execute 'Guifont! Consolas For Powerline:h' . s:gui_fontsize
+    endif
+endfunction
+" }}}
+
+" FUNCTION: s:NVimQt_setGui() {{{
 function! s:NVimQt_setGui()
 if IsNVimQt()
-    if IsLinux()
-        Guifont! WenQuanYi Micro Hei Mono:h12
-        Guifont! DejaVu Sans Mono for Powerline:h12
-    elseif IsWin()
-        " 先设置一次中文（缺省）字体，再设置英文字体(BUG:有时有问题)
-        "Guifont! YaHei Mono For Powerline:h12
-        Guifont! Microsoft YaHei Mono:h12
-        Guifont! Consolas For Powerline:h12
-    endif
+    call GuiAdjustFontSize(0)
     GuiLinespace 0
     GuiTabline 0
     GuiPopupmenu 0
     " 基于Qt-Gui的设置
     nnoremap <leader>tf :call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
     nnoremap <leader>tm :call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>
+    nnoremap <kPlus> :call GuiAdjustFontSize(1)<CR>
+    nnoremap <kMinus> :call GuiAdjustFontSize(-1)<CR>
 endif
 endfunction
 " }}}
