@@ -1,6 +1,5 @@
 
----
-## Dotconfigs from root
+## Dotconfigs start from root
 
  - arch: Arch linux
  - ubuntu: Ubuntu linux

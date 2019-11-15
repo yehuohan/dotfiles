@@ -1,22 +1,10 @@
 
----
-## Linux Configs(dotconfigs)
- Config files.
-
----
-## Files
+## Dotconfigs
 
 ```text
 .
-├── cf-arch   : Arch config
-├── cf-ubuntu : Ubuntu config
-├── cf-gw     : GNU-Win config
+├── root      : Linux config
 ├── vim       : Vim config
-├── font      : Consolas For Powerline Font
+├── fonts     : Powerline font
 └── misc      : Others
 ```
-
----
-## Contributors
- - yehuohan, yehuohan@qq.com, yehuohan@gmail.com
-

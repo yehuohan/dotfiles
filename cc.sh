@@ -1,10 +1,8 @@
 #!/bin/bash
 
-# copy all the <config-files> to <cf-home>
-# cd to LinuxConfigs before execute this file.
-# this file must be in "~/dotconfigs/"
-
-
+# copy all the config files to <root>;
+# cd to <dotconfigs> first before execute this file;
+# this file must be in '~/dotconfigs/'.
 
 if [ `uname` == "Linux" ]; then
 

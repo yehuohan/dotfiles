@@ -1,4 +1,4 @@
 
 # .gitignore for dotconfigs 
 
-*.swp
+*.sw*
