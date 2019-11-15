@@ -76,8 +76,6 @@ if (IsLinux() || IsMac())
     let $DotVimPath=s:home . '/.vim'
 elseif IsWin()
     let $DotVimPath=s:home . '\vimfiles'
-    " windows下将HOME设置VIM的安装路径
-    let $HOME=$VIM
 elseif IsGw()
     let $DotVimPath='/c/MyApps/Vim/vimfiles'
 endif
@@ -489,7 +487,7 @@ else
         \ 'component': {
                 \ 'all_filesign': '%{winnr()},%-n%{&ro?" ":""}%M',
                 \ 'all_format'  : '%{&ft!=#""?&ft." • ":""}%{&fenc!=#""?&fenc:&enc}[%{&ff}]',
-                \ 'all_lineinfo': '0x%02B ≡%3p%%   %04l/%L  %-2v',
+                \ 'all_lineinfo': '0x%02B ≡%3p%%  %04l/%L  %-2v',
                 \ 'lite_info'   : '%p%%≡%L',
                 \ },
         \ 'component_function': {
@@ -713,9 +711,9 @@ if s:gset.use_startify
                                     \ '~/.config/nvim/init.vim'
                                     \]
     elseif IsWin()
-        let g:startify_bookmarks = [ {'c': '$DotVimPath/../_vimrc'},
-                                    \ '$DotVimPath/../vimfiles/.ycm_extra_conf.py',
-                                    \ '$APPDATA/../Local/nvim/init.vim'
+        let g:startify_bookmarks = [ {'c': '$VIM/_vimrc'},
+                                    \ '$DotVimPath/.ycm_extra_conf.py',
+                                    \ '$LOCALAPPDATA/nvim/init.vim'
                                     \]
     elseif IsMac()
         let g:startify_bookmarks = [ {'c': '~/.vimrc'}, '~/.zshrc']
