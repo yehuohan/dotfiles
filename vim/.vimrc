@@ -1503,23 +1503,23 @@ let s:cpl = {
     \ 'srcf' : '',
     \ 'outf' : '',
     \ 'type' : {
-        \ 'c'          : ['gcc %s -o %s %s && "./%s"'            , 'args' , 'outf' , 'srcf' , 'outf' ],
-        \ 'cpp'        : ['g++ -std=c++11 %s -o %s %s && "./%s"' , 'args' , 'outf' , 'srcf' , 'outf' ],
-        \ 'java'       : ['javac %s && java %s %s'               , 'srcf' , 'outf' , 'args'          ],
-        \ 'python'     : ['python %s %s'                         , 'srcf' , 'args'                   ],
-        \ 'julia'      : ['julia %s %s'                          , 'srcf' , 'args'                   ],
-        \ 'lua'        : ['lua %s %s'                            , 'srcf' , 'args'                   ],
-        \ 'go'         : ['go run %s %s'                         , 'srcf' , 'args'                   ],
-        \ 'javascript' : ['node %s %s'                           , 'srcf' , 'args'                   ],
-        \ 'dart'       : ['dart %s %s'                           , 'srcf' , 'args'                   ],
-        \ 'tex'        : ['pdfLatex %s && SumatraPDF %s.pdf'     , 'srcf' , 'outf'                   ],
-        \ 'sh'         : ['./%s %s'                              , 'srcf' , 'args'                   ],
-        \ 'dosbatch'   : ['%s %s'                                , 'srcf' , 'args'                   ],
-        \ 'markdown'   : ['typora %s'                            , 'srcf'                            ],
-        \ 'json'       : ['python -m json.tool %s'               , 'srcf'                            ],
-        \ 'matlab'     : ['matlab -nosplash -nodesktop -r %s'    , 'outf'                            ],
-        \ 'html'       : ['firefox %s'                           , 'srcf'                            ],
-        \ 'dot'        : ['dotty %s && dot -Tpng %s -o %s.png'   , 'srcf' , 'srcf' , 'outf'          ],
+        \ 'c'          : ['gcc %s -o %s %s && %s'              , 'args' , 'outf' , 'srcf' , 'outf' ],
+        \ 'cpp'        : ['g++ -std=c++11 %s -o %s %s && %s'   , 'args' , 'outf' , 'srcf' , 'outf' ],
+        \ 'java'       : ['javac %s && java %s %s'             , 'srcf' , 'outf' , 'args'          ],
+        \ 'python'     : ['python %s %s'                       , 'srcf' , 'args'                   ],
+        \ 'julia'      : ['julia %s %s'                        , 'srcf' , 'args'                   ],
+        \ 'lua'        : ['lua %s %s'                          , 'srcf' , 'args'                   ],
+        \ 'go'         : ['go run %s %s'                       , 'srcf' , 'args'                   ],
+        \ 'javascript' : ['node %s %s'                         , 'srcf' , 'args'                   ],
+        \ 'dart'       : ['dart %s %s'                         , 'srcf' , 'args'                   ],
+        \ 'tex'        : ['pdfLatex %s && SumatraPDF %s.pdf'   , 'srcf' , 'outf'                   ],
+        \ 'sh'         : ['./%s %s'                            , 'srcf' , 'args'                   ],
+        \ 'dosbatch'   : ['%s %s'                              , 'srcf' , 'args'                   ],
+        \ 'markdown'   : ['typora %s'                          , 'srcf'                            ],
+        \ 'json'       : ['python -m json.tool %s'             , 'srcf'                            ],
+        \ 'matlab'     : ['matlab -nosplash -nodesktop -r %s'  , 'outf'                            ],
+        \ 'html'       : ['firefox %s'                         , 'srcf'                            ],
+        \ 'dot'        : ['dotty %s && dot -Tpng %s -o %s.png' , 'srcf' , 'srcf' , 'outf'          ],
         \ },
     \ 'cell' : {
         \ 'python' : ['python', '^#%%', '^#%%'],
@@ -1580,14 +1580,14 @@ function! s:cpl.printf(type, wdir, args, srcf, outf) dict
         \ || ('dosbatch' ==? a:type && !IsWin())
         throw 's:cpl.type doesn''t support "' . a:type . '"'
     endif
-    let self.wdir = a:wdir
+    let self.wdir = '"' . fnameescape(a:wdir) . '"'
     let self.args = a:args
-    let self.srcf = a:srcf
-    let self.outf = a:outf
+    let self.srcf = '"' . a:srcf . '"'
+    let self.outf = '"' . a:outf . '"'
     let l:pstr = copy(self.type[a:type])
     call map(l:pstr, {key, val -> (key == 0) ? val : get(self, val, '')})
     " create exec string
-    return self.run(a:wdir, a:type, call('printf', l:pstr))
+    return self.run(self.wdir, a:type, call('printf', l:pstr))
 endfunction
 " }}}
 
@@ -1603,7 +1603,7 @@ function! s:cpl.run(wdir, efm, cmd) dict
     endif
     let l:exec = ':AsyncRun '
     if !empty(a:wdir)
-        let l:exec .= '-cwd="' . a:wdir . '" '
+        let l:exec .= '-cwd=' . a:wdir
         execute 'lcd ' . a:wdir
     endif
     return join([l:exec, a:cmd])
