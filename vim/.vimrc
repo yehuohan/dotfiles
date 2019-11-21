@@ -644,6 +644,7 @@ endif
     Plug 'yehuohan/popc'
     set hidden
     let g:Popc_jsonPath = $DotVimPath
+    let g:Popc_useGlobalPath = 1
     let g:Popc_useTabline = 1
     let g:Popc_useStatusline = 1
     let g:Popc_usePowerFont = s:gset.use_powerfont
@@ -1769,25 +1770,25 @@ let RcSphinxClean = function('CompileProject', ['sphinx', [0, 'clean']])
 "           'yehuohan/popset'
 augroup UserFunctionSearch
     autocmd!
-    autocmd User Grepper call FindWowHighlight(s:fw.pattern)
+    autocmd User Grepper call FindWowHighlight(s:fw.pat)
 augroup END
 
 " s:fw {{{
-" @attribute engine: 搜索程序
+" @attribute engine: 搜索程序，命令格式为：printf('cmd %s %s %s',<pat>,<loc>,<opt>)
 " @attribute args: 搜索参数
 " @attribute rg: 预置的rg搜索命令
 " @attribute misc: 搜索高亮等参数
 " @attribute mappings: 映射按键
 let s:fw = {
-    \ 'command'  : '',
-    \ 'pattern'  : '',
-    \ 'location' : '',
-    \ 'options'  : '',
+    \ 'cmd' : '',
+    \ 'pat' : '',
+    \ 'loc' : '',
+    \ 'opt' : '',
     \ 'engine' : {
         \ 'r' : '',
         \ 'a' : '',
         \ 'k' : '',
-        \ 'l' : ':Leaderf rg --nowrap'
+        \ 'l' : ':Leaderf rg --nowrap -e "%s" %s %s'
     \ },
     \ 'args' : {
         \ 'root'    : '',
@@ -1796,16 +1797,16 @@ let s:fw = {
         \ },
     \ 'rg' : {
         \ 'asyncrun' : {
-            \ 'r' : ':AsyncRun! rg --vimgrep',
-            \ 'a' : ':AsyncRun! -append rg --vimgrep',
+            \ 'r' : ':botright copen | :AsyncRun! rg --vimgrep "%s" %s %s',
+            \ 'a' : ':botright copen | :AsyncRun! -append rg --vimgrep "%s" %s %s',
             \ 'k' : ':AsyncStop'},
         \ 'grep' : {
-            \ 'r' : ':Rg',
-            \ 'a' : ':RgAdd',
+            \ 'r' : ':Rg %s %s %s',
+            \ 'a' : ':RgAdd %s %s %s',
             \ 'k' : ':GrepStop'},
         \ 'grepper' : {
-            \ 'r' : ':Grepper -noprompt -tool rg -query',
-            \ 'a' : ':Grepper -noprompt -tool rg -append -query',
+            \ 'r' : ':Grepper -noprompt -tool rg -query "%s" %s %s',
+            \ 'a' : ':Grepper -noprompt -tool rg -append -query "%s" %s %s',
             \ 'k' : ':Grepper -stop'},
         \ 'sel' : {
             \ 'opt' : ['select rg engine'],
@@ -1815,8 +1816,8 @@ let s:fw = {
             \ }
         \ },
     \ 'misc' : {
-        \ 'markers' : ['.root', '.git', '.svn'],
-        \ 'strings' : []
+        \ 'markers' : ['.root', '.popc', '.git', '.svn'],
+        \ 'strings' : [],
         \ },
     \ 'mappings' : []
     \ }
@@ -1861,10 +1862,9 @@ let s:fw.mappings = [
 
 " FUNCTION: s:fw.exec() dict {{{
 function! s:fw.exec() dict
-    let l:exec = self.command . ' ' . self.pattern . ' ' . self.location . ' ' . self.options
+    let l:exec = printf(self.cmd, escape(self.pat, '"-#%\'), self.loc, self.opt)
     execute l:exec
-    botright copen
-    call FindWowHighlight(self.pattern)
+    call FindWowHighlight(self.pat)
     call Plug_rpt_setExecution(l:exec)
 endfunction
 " }}}
@@ -1924,10 +1924,6 @@ function! FindWow(keys, mode)
         endif
         if a:keys =~ '='
             let l:pat = getreg('+')
-        endif
-        let l:pat = escape(l:pat, ' -#%')       " escape 'Space,-,#,%'
-        if !empty(l:pat) && a:keys =~# 'l'
-            let l:pat = '-e "' . l:pat .'"'     " used for 'Leaderf rg'
         endif
         return l:pat
     endfunction
@@ -1996,9 +1992,9 @@ function! FindWow(keys, mode)
         endif
 
         " get pattern and set options
-        let s:fw.pattern = s:parsePattern()
-        if empty(s:fw.pattern) | return 0 | endif
-        let l:pat = (a:keys =~? 's') ? ('\<' . s:fw.pattern . '\>') : (s:fw.pattern)
+        let s:fw.pat = s:parsePattern()
+        if empty(s:fw.pat) | return 0 | endif
+        let l:pat = (a:keys =~? 's') ? ('\<' . s:fw.pat . '\>') : (s:fw.pat)
         let l:pat .= (a:keys =~# '[iws]') ? '\c' : '\C'
 
         " set loaction
@@ -2015,7 +2011,7 @@ function! FindWow(keys, mode)
             echo 'No match: ' . l:pat
         else
             botright copen
-            call FindWowHighlight(s:fw.pattern)
+            call FindWowHighlight(s:fw.pat)
         endif
         return 1
     endfunction
@@ -2025,18 +2021,18 @@ function! FindWow(keys, mode)
     if s:parseVimgrep() | return | endif
 
     " find pattern
-    let s:fw.pattern = s:parsePattern()
-    if empty(s:fw.pattern) | return | endif
+    let s:fw.pat = s:parsePattern()
+    if empty(s:fw.pat) | return | endif
 
     " find location
-    let s:fw.location = s:parseLocation()
-    if empty(s:fw.location) | return | endif
+    let s:fw.loc = s:parseLocation()
+    if empty(s:fw.loc) | return | endif
 
     " find options
-    let s:fw.options = s:parseOptions()
+    let s:fw.opt = s:parseOptions()
 
     " find command
-    let s:fw.command = s:parseCommand()
+    let s:fw.cmd = s:parseCommand()
 
     " Find Working
     call s:fw.exec()
