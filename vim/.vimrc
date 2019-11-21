@@ -284,9 +284,9 @@ if s:gset.use_fzf
     " linux下直接pacman -S fzf
     " win下载fzf.exe放入bundle/fzf/bin/下
     if IsWin()
-        Plug 'junegunn/fzf'
+        Plug 'junegunn/fzf', {'on': ['FzfFiles', 'FzfRg']}
     endif
-    Plug 'junegunn/fzf.vim'
+    Plug 'junegunn/fzf.vim', {'on': ['FzfFiles', 'FzfRg']}
     let g:fzf_command_prefix = 'Fzf'
     nnoremap <leader><leader>f :call feedkeys(':FzfFiles ', 'n')<CR>
 endif
@@ -348,7 +348,7 @@ endif
 " }}}
 
 " far {{{ 查找与替换
-    Plug 'brooth/far.vim'
+    Plug 'brooth/far.vim', {'on': 'Farp'}
     let g:far#file_mask_favorites = ['%', '*.txt']
     nnoremap <leader>sr :Farp<CR>
                                         " Search and Replace, 使用Fardo和Farundo来更改替换结果
@@ -357,7 +357,7 @@ endif
 " }}}
 
 " tabular {{{ 字符对齐
-    Plug 'godlygeek/tabular'
+    Plug 'godlygeek/tabular', {'on': 'Tabularize'}
     " /,/r2l0   -   第1个field使用第1个对齐符（右对齐），再插入2个空格
     "               第2个field使用第2个对齐符（左对齐），再插入0个空格
     "               第3个field又重新从第1个对齐符开始（对齐符可以有多个，循环使用）
@@ -462,9 +462,9 @@ if !s:gset.use_lightline
         silent! colorscheme desert
     endtry
 else
-    Plug 'itchyny/lightline.vim'
+    Plug 'epheien/lightline.vim'
     "                    
-    " ► ✘ ⌘ ▫ ▪ ★ ☆ • ≡ ፨ ♥
+    " ► ✘ ❖ ⌘ ▫ ▪ ★ ☆ • ≡ ፨ ♥
     let g:lightline = {
         \ 'enable' : {'statusline': 1, 'tabline': 0},
         \ 'colorscheme' : 'gruvbox',
@@ -696,10 +696,6 @@ endif
     let g:NERDTreeMapCWD = 'CD'         " 更改根目录为CWD
     nnoremap <leader>te :NERDTreeToggle<CR>
     nnoremap <leader>tE :execute ':NERDTree ' . expand('%:p:h')<CR>
-    augroup PluginNerdtree
-        autocmd!
-        autocmd BufEnter * if exists('b:NERDTree') | let &l:statusline='%{b:NERDTree.root.path.str()}' | endif
-    augroup END
 " }}}
 
 " startify {{{ vim会话界面
@@ -935,7 +931,7 @@ endif
 " }}}
 
 " ale {{{ 语法检测
-    Plug 'dense-analysis/ale'
+    Plug 'dense-analysis/ale', {'on': 'ALEToggle'}
     " 语法引擎:
     "   VimScript : vint
     let g:ale_completion_enabled = 0    " 使能ale补全(只支持TypeScript)
@@ -951,7 +947,7 @@ endif
 " }}}
 
 " neoformat {{{ 代码格式化
-    Plug 'sbdchd/neoformat'
+    Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
     let g:neoformat_basic_format_align = 1
     let g:neoformat_basic_format_retab = 1
     let g:neoformat_basic_format_trim = 1
@@ -1098,7 +1094,7 @@ endif
 " }}}
 
 " colorizer {{{ 颜色预览
-    Plug 'lilydjwg/colorizer'
+    Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
     let g:colorizer_nomap = 1
     let g:colorizer_startup = 0
     nnoremap <leader>tc :ColorToggle<CR>
@@ -1131,7 +1127,7 @@ endif
 " 软件工具 {{{
 if s:gset.use_utils
 " vimcdoc {{{ 中文帮助文档
-    Plug 'yianwillis/vimcdoc'
+    Plug 'yianwillis/vimcdoc', {'for': 'help'}
 " }}}
 
 " MarkDown {{{
