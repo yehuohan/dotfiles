@@ -2349,7 +2349,7 @@ endif
     set shiftwidth=4                    " 设置>和<命令移动宽度为4
     set nowrap                          " 默认关闭折行
     set textwidth=0                     " 关闭自动换行
-    set listchars=eol:$,tab:>-,trail:~,space:.
+    set listchars=eol:$,tab:»·,trail:~,space:.
                                         " 不可见字符显示
     set autoindent                      " 使用autoindent缩进
     set nobreakindent                   " 折行时不缩进
