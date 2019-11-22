@@ -1761,7 +1761,7 @@ let RcSphinxClean = function('CompileProject', ['sphinx', [0, 'clean']])
 
 " Search {{{
 " Required: 'skywind3000/asyncrun.vim' or 'yegappan/grep' or 'mhinz/vim-grepper'
-"           'Yggdroot/LeaderF'
+"           'Yggdroot/LeaderF', 'junegunn/fzf.vim'
 "           'yehuohan/popc'
 "           'yehuohan/popset'
 augroup UserFunctionSearch
@@ -1771,8 +1771,15 @@ augroup END
 
 " s:fw {{{
 " @attribute engine: 搜索程序，命令格式为：printf('cmd %s %s %s',<pat>,<loc>,<opt>)
+"            sr : search
+"            sa : search append
+"            sk : search kill
+"            sl : search lines with fuzzy
+"            ff : fuzzy files
+"            fh : fuzzy text
 " @attribute args: 搜索参数
-" @attribute rg: 预置的rg搜索命令
+" @attribute rg: 预置的rg搜索命令，用于搜索指定文本
+" @attribute fuzzy: 预置的模糊搜索命令，用于文件和文本等模糊搜索
 " @attribute misc: 搜索高亮等参数
 " @attribute mappings: 映射按键
 let s:fw = {
@@ -1781,10 +1788,12 @@ let s:fw = {
     \ 'loc' : '',
     \ 'opt' : '',
     \ 'engine' : {
-        \ 'r' : '',
-        \ 'a' : '',
-        \ 'k' : '',
-        \ 'l' : ':Leaderf rg --nowrap -e "%s" %s %s'
+        \ 'sr' : '',
+        \ 'sa' : '',
+        \ 'sk' : '',
+        \ 'sl' : ':Leaderf rg --nowrap -e "%s" %s %s',
+        \ 'ff' : '',
+        \ 'fh' : ''
     \ },
     \ 'args' : {
         \ 'root'    : '',
@@ -1793,17 +1802,17 @@ let s:fw = {
         \ },
     \ 'rg' : {
         \ 'asyncrun' : {
-            \ 'r' : ':botright copen | :AsyncRun! rg --vimgrep "%s" %s %s',
-            \ 'a' : ':botright copen | :AsyncRun! -append rg --vimgrep "%s" %s %s',
-            \ 'k' : ':AsyncStop'},
+            \ 'sr' : ':botright copen | :AsyncRun! rg --vimgrep "%s" %s %s',
+            \ 'sa' : ':botright copen | :AsyncRun! -append rg --vimgrep "%s" %s %s',
+            \ 'sk' : ':AsyncStop'},
         \ 'grep' : {
-            \ 'r' : ':Rg %s %s %s',
-            \ 'a' : ':RgAdd %s %s %s',
-            \ 'k' : ':GrepStop'},
+            \ 'sr' : ':Rg %s %s %s',
+            \ 'sa' : ':RgAdd %s %s %s',
+            \ 'sk' : ':GrepStop'},
         \ 'grepper' : {
-            \ 'r' : ':Grepper -noprompt -tool rg -query "%s" %s %s',
-            \ 'a' : ':Grepper -noprompt -tool rg -append -query "%s" %s %s',
-            \ 'k' : ':Grepper -stop'},
+            \ 'sr' : ':Grepper -noprompt -tool rg -query "%s" %s %s',
+            \ 'sa' : ':Grepper -noprompt -tool rg -append -query "%s" %s %s',
+            \ 'sk' : ':Grepper -stop'},
         \ 'sel' : {
             \ 'opt' : ['select rg engine'],
             \ 'lst' : ['asyncrun', 'grep', 'grepper'],
@@ -1811,6 +1820,20 @@ let s:fw = {
             \ 'pre' : 0
             \ }
         \ },
+    \ 'fuzzy' : {
+        \ 'fzf' : {
+            \ 'ff' : ':FzfFiles',
+            \ 'fh' : ':FzfRg'},
+        \ 'leaderf' : {
+            \ 'ff' : ':LeaderfFile',
+            \ 'fh' : ':Leaderf rg --nowrap'},
+        \ 'sel' : {
+            \ 'opt' : ['select fuzzy engine'],
+            \ 'lst' : ['fzf', 'leaderf'],
+            \ 'cmd' : {sopt, arg -> extend(s:fw.engine, s:fw.fuzzy[arg], 'force')},
+            \ 'pre' : 0
+        \ }
+    \ },
     \ 'misc' : {
         \ 'markers' : ['.root', '.popc', '.git', '.svn'],
         \ 'strings' : [],
@@ -1822,6 +1845,7 @@ if IsVim()
 else
     call extend(s:fw.engine, s:fw.rg.grepper, 'force')
 endif
+call extend(s:fw.engine, s:fw.fuzzy.leaderf, 'force')
 
 " s:fw.mappings {{{
 let s:fw.mappings = [
@@ -1971,11 +1995,11 @@ function! FindWow(keys, mode)
     " FUNCTION: s:parseCommand() closure {{{
     function! s:parseCommand() closure
         if a:keys =~# 'l'
-            let l:cmd = s:fw.engine.l
+            let l:cmd = s:fw.engine.sl
         elseif a:keys =~# 'a'
-            let l:cmd = s:fw.engine.a
+            let l:cmd = s:fw.engine.sa
         else
-            let l:cmd = s:fw.engine.r
+            let l:cmd = s:fw.engine.sr
             let s:fw.misc.strings = []
         endif
         return l:cmd
@@ -2037,13 +2061,13 @@ endfunction
 
 " FUNCTION: FindWowKill() {{{ 停止超速查找
 function! FindWowKill()
-    execute s:fw.engine.k
+    execute s:fw.engine.sk
 endfunction
 " }}}
 
-" FUNCTION: FindWowFile(r) {{{ 查找文件
-" @param r: 是否设置查找目录s:fw.args.root
-function! FindWowFile(r)
+" FUNCTION: FindWowFuzzy(keys, r) {{{ 模糊搜索
+" @param r: 是否设置搜索目录s:fw.args.root
+function! FindWowFuzzy(keys, r)
     if !a:r && empty(s:fw.args.root)
         call FindWowRoot()
     endif
@@ -2051,14 +2075,27 @@ function! FindWowFile(r)
         call FindWowSetArgs('r')
     endif
     if !empty(s:fw.args.root)
-        execute ':LeaderfFile ' . s:fw.args.root
+        execute 'lcd ' . s:fw.args.root
+        execute s:fw.engine[a:keys]
     endif
 endfunction
 " }}}
 
 " FUNCTION: FindWowSetEngine(type) {{{ 设置engine
 function! FindWowSetEngine(type)
-    call PopSelection(s:fw[a:type]['sel'])
+    if a:type ==# 'engine'
+        let l:sel = {
+            \ 'opt' : ['select the engine'],
+            \ 'lst' : ['rg', 'fuzzy'],
+            \ 'sub' : {
+                \ 'rg'    : s:fw.rg.sel,
+                \ 'fuzzy' : s:fw.fuzzy.sel},
+            \ 'cmd' : 'popset#set#SubPopSelection'
+        \ }
+        call PopSelection(l:sel)
+    else
+        call PopSelection(s:fw[a:type]['sel'])
+    endif
 endfunction
 " }}}
 
@@ -2761,13 +2798,17 @@ endif
         execute 'vnoremap <leader>' . key ':call FindWow("' . key . '", "v")<CR>'
     endfor
     nnoremap <leader>fk :call FindWowKill()<CR>
-    nnoremap <leader>ff :call FindWowFile(0)<CR>
-    nnoremap <leader>frf :call FindWowFile(1)<CR>
-    nnoremap <leader>fee :call FindWowSetEngine('rg')<CR>
+    nnoremap <leader>ff :call FindWowFuzzy('ff', 0)<CR>
+    nnoremap <leader>fh :call FindWowFuzzy('fh', 0)<CR>
+    nnoremap <leader>frf :call FindWowFuzzy('ff', 1)<CR>
+    nnoremap <leader>frh :call FindWowFuzzy('fh', 1)<CR>
+    nnoremap <leader>fee :call FindWowSetEngine('engine')<CR>
+    nnoremap <leader>fes :call FindWowSetEngine('rg')<CR>
+    nnoremap <leader>fez :call FindWowSetEngine('fuzzy')<CR>
     nnoremap <leader>fet :call FindWowRoot()<CR>
+    nnoremap <leader>fea :call FindWowSetArgs('rfg')<CR>
     nnoremap <leader>fer :call FindWowSetArgs('r')<CR>
     nnoremap <leader>fef :call FindWowSetArgs('f')<CR>
     nnoremap <leader>feg :call FindWowSetArgs('g')<CR>
-    nnoremap <leader>fea :call FindWowSetArgs('rfg')<CR>
 " }}}
 " }}}
