@@ -477,8 +477,9 @@ else
                 \           ['msg_right']],
                 \ },
         \ 'inactive': {
-                \ 'left' : [['absolutepath']],
-                \ 'right': [['lite_info']],
+                \ 'left' : [['msg_left']],
+                \ 'right': [['lite_info'],
+                \           ['msg_right']],
                 \ },
         \ 'tabline' : {
                 \ 'left' : [['tabs']],
@@ -486,7 +487,7 @@ else
                 \ },
         \ 'component': {
                 \ 'all_filesign': '%{winnr()},%-n%{&ro?" ":""}%M',
-                \ 'all_format'  : '%{&ft!=#""?&ft." • ":""}%{&fenc!=#""?&fenc:&enc}[%{&ff}]',
+                \ 'all_format'  : '%{&ft!=#""?&ft."":""}%{&fenc!=#""?&fenc:&enc}%{&ff}',
                 \ 'all_lineinfo': '0x%02B ≡%3p%%  %04l/%L  %-2v',
                 \ 'lite_info'   : '%p%%≡%L',
                 \ },
@@ -557,7 +558,7 @@ else
         else
             let l:fw = FindWowGetArgs()
             let l:fp = expand('%:p')
-            return empty(l:fw) ? l:fp : substitute(l:fp, escape(l:fw[0], '\'), '...', '')
+            return empty(l:fw) ? l:fp : substitute(l:fp, escape(l:fw[0], '\'), '', '')
         endif
     endfunction
     " }}}
@@ -708,7 +709,7 @@ if s:gset.use_startify
                                     \ '~/.config/nvim/init.vim'
                                     \]
     elseif IsWin()
-        let g:startify_bookmarks = [ {'c': '$VIM/_vimrc'},
+        let g:startify_bookmarks = [ {'c': '$DotVimPath/../_vimrc'},
                                     \ '$DotVimPath/.ycm_extra_conf.py',
                                     \ '$LOCALAPPDATA/nvim/init.vim'
                                     \]
@@ -884,11 +885,7 @@ if s:gset.use_lcn
         \ 'for': 'dart'
         \ }
     " LCN使用omnifunc(LanguageClient#complete)
-    let g:LanguageClient_serverCommands = {
-        \ 'dart' : ['dart',
-                  \ IsWin() ? 'C:/MyApps/dart-sdk/bin/snapshots/analysis_server.dart.snapshot' : '/opt/dart-sdk/bin/snapshots/analysis_server.dart.snapshot',
-                  \ '--lsp'],
-        \ }
+    let g:LanguageClient_serverCommands = {}
     let g:LanguageClient_diagnosticsDisplay = {}                " 禁用语法检测
     let g:LanguageClient_diagnosticsSignsMax = 0
     let g:LanguageClient_diagnosticsEnable = 0
@@ -1115,6 +1112,7 @@ endif
 
 " julia {{{ Julia支持
     Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
+    let g:default_julia_version = 'devel'
     let g:latex_to_unicode_tab = 1      " 使用<Tab>输入unicode字符
     nnoremap <leader>tn :call LaTeXtoUnicode#Toggle()<CR>
 " }}}
@@ -1552,10 +1550,12 @@ let s:cpl = {
                 \ 'retab',
                 \ '%s/\s\+$//g',
                 \ '%s/\r//g',
+                \ 'AsyncRun python -m json.tool %',
                 \ 'AsyncRun go mod init %:r',
                 \ 'AsyncRun cflow -T %'
                 \ ],
         \ 'dic' : {
+                \ 'retab'       : 'retab with expandtab',
                 \ '%s/\s\+$//g' : 'remove trailing space',
                 \ '%s/\r//g'    : 'remove ^M',
                 \ },
@@ -2519,8 +2519,6 @@ augroup UserSettingsCmd
     autocmd!
 
     autocmd BufNewFile *                set fileformat=unix
-    autocmd BufRead,BufNewFile *.jl     set filetype=julia
-    autocmd BufRead,BufNewFile *.dart   set filetype=dart
     autocmd BufRead,BufNewFile *.tex    set filetype=tex
     autocmd BufRead,BufNewFile *.tikz   set filetype=tex
     autocmd BufRead,BufNewFile *.gv     set filetype=dot
