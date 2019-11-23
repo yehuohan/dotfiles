@@ -78,10 +78,8 @@ set $bp 3
 for_window [window_role="pop-up"] floating enable
 for_window [class="^.*" tiling] border pixel $bp
 # Touchpad Off|On
-set $TPadOff "XTerm|Gnome-terminal|Gvim"
-set $TPadOn  "^(?!((XTerm)|(Gnome-terminal)|(Gvim)))"
-#set $TPadOff "XTerm|Xfce4-terminal|Gvim"
-#set $TPadOn  "^(?!((XTerm)|(Xfce4-terminal)|(Gvim)))"
+set $TPadOff "XTerm|Gnome-terminal|Xfce4-terminal|Gvim"
+set $TPadOn  "^(?!((XTerm)|(Gnome-terminal)|(Xfce4-terminal)|(Gvim)))"
 for_window [class=$TPadOff] exec ToggleTouchPad off
 #for_window [class=$TPadOn] exec ToggleTouchPad on
 
@@ -305,10 +303,9 @@ floating_modifier $mod
 #===============================================================================
 #{{{
 # terminal
-bindsym $mod+Return exec gnome-terminal
-bindsym $mod+mod1+Return exec xterm || gnome-terminal
-#bindsym $mod+Return exec xfce4-terminal
-#bindsym $mod+mod1+Return exec xterm || xfce4-terminal
+#bindsym $mod+Return exec gnome-terminal
+bindsym $mod+Return exec xfce4-terminal
+bindsym $mod+mod1+Return exec xterm || xfce4-terminal || gnome-terminal
 
 # file manager
 bindsym $mod+e exec nautilus
