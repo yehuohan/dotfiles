@@ -103,7 +103,7 @@ if IsVim()
     "<2> nnoremap <Esc>x :CmdTest<CR>   " 按映射超时时间检测
     "<3> nnoremap x  :CmdTest<CR>     " 按映射超时时间检测
     for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
-        execute 'set <M-e>=' . t
+        execute 'set <M-'. t . '>=' . t
     endfor
     set <M-,>=,
     set <M-.>=.
@@ -705,8 +705,8 @@ if s:gset.use_startify
     if IsLinux()
         let g:startify_bookmarks = [ {'c': '~/.vimrc'},
                                     \ '~/.zshrc',
-                                    \ '~/.config/i3/config',
-                                    \ '~/.config/nvim/init.vim'
+                                    \ '~/.config/nvim/init.vim',
+                                    \ '~/.config/i3/config'
                                     \]
     elseif IsWin()
         let g:startify_bookmarks = [ {'c': '$DotVimPath/../_vimrc'},
@@ -1498,8 +1498,8 @@ let s:cpl = {
     \ 'srcf' : '',
     \ 'outf' : '',
     \ 'type' : {
-        \ 'c'          : ['gcc %s -o %s %s && %s'              , 'args' , 'outf' , 'srcf' , 'outf' ],
-        \ 'cpp'        : ['g++ -std=c++11 %s -o %s %s && %s'   , 'args' , 'outf' , 'srcf' , 'outf' ],
+        \ 'c'          : ['gcc %s -o %s %s && ./%s'            , 'args' , 'outf' , 'srcf' , 'outf' ],
+        \ 'cpp'        : ['g++ -std=c++11 %s -o %s %s && ./%s' , 'args' , 'outf' , 'srcf' , 'outf' ],
         \ 'java'       : ['javac %s && java %s %s'             , 'srcf' , 'outf' , 'args'          ],
         \ 'python'     : ['python %s %s'                       , 'srcf' , 'args'                   ],
         \ 'julia'      : ['julia %s %s'                        , 'srcf' , 'args'                   ],
@@ -1577,7 +1577,7 @@ function! s:cpl.printf(type, wdir, args, srcf, outf) dict
         \ || ('dosbatch' ==? a:type && !IsWin())
         throw 's:cpl.type doesn''t support "' . a:type . '"'
     endif
-    let self.wdir = '"' . fnameescape(a:wdir) . '"'
+    let self.wdir = fnameescape(a:wdir)
     let self.args = a:args
     let self.srcf = '"' . a:srcf . '"'
     let self.outf = '"' . a:outf . '"'
@@ -1776,7 +1776,7 @@ augroup END
 "            sk : search kill
 "            sl : search lines with fuzzy
 "            ff : fuzzy files
-"            fh : fuzzy text
+"            fh : fuzzy huge linestext
 " @attribute args: 搜索参数
 " @attribute rg: 预置的rg搜索命令，用于搜索指定文本
 " @attribute fuzzy: 预置的模糊搜索命令，用于文件和文本等模糊搜索
@@ -1791,7 +1791,7 @@ let s:fw = {
         \ 'sr' : '',
         \ 'sa' : '',
         \ 'sk' : '',
-        \ 'sl' : ':Leaderf rg --nowrap -e "%s" %s %s',
+        \ 'sl' : ':Leaderf rg --nowrap -e "%s" "%s" %s',
         \ 'ff' : '',
         \ 'fh' : ''
     \ },
@@ -1802,16 +1802,16 @@ let s:fw = {
         \ },
     \ 'rg' : {
         \ 'asyncrun' : {
-            \ 'sr' : ':botright copen | :AsyncRun! rg --vimgrep "%s" %s %s',
-            \ 'sa' : ':botright copen | :AsyncRun! -append rg --vimgrep "%s" %s %s',
+            \ 'sr' : ':botright copen | :AsyncRun! rg --vimgrep "%s" "%s" %s',
+            \ 'sa' : ':botright copen | :AsyncRun! -append rg --vimgrep "%s" "%s" %s',
             \ 'sk' : ':AsyncStop'},
         \ 'grep' : {
-            \ 'sr' : ':Rg %s %s %s',
-            \ 'sa' : ':RgAdd %s %s %s',
+            \ 'sr' : ':execute '':Rg '' . escape("%s", " ") . '' "%s" %s''',
+            \ 'sa' : ':execute '':RgAdd '' . escape("%s", " ") . '' "%s" %s''',
             \ 'sk' : ':GrepStop'},
         \ 'grepper' : {
-            \ 'sr' : ':Grepper -noprompt -tool rg -query "%s" %s %s',
-            \ 'sa' : ':Grepper -noprompt -tool rg -append -query "%s" %s %s',
+            \ 'sr' : ':Grepper -noprompt -tool rg -query "%s" "%s" %s',
+            \ 'sa' : ':Grepper -noprompt -tool rg -append -query "%s" "%s" %s',
             \ 'sk' : ':Grepper -stop'},
         \ 'sel' : {
             \ 'opt' : ['select rg engine'],
