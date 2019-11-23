@@ -1498,8 +1498,10 @@ let s:cpl = {
     \ 'srcf' : '',
     \ 'outf' : '',
     \ 'type' : {
-        \ 'c'          : ['gcc %s -o %s %s && ./%s'            , 'args' , 'outf' , 'srcf' , 'outf' ],
-        \ 'cpp'        : ['g++ -std=c++11 %s -o %s %s && ./%s' , 'args' , 'outf' , 'srcf' , 'outf' ],
+        \ 'c'          : [IsWin() ? 'gcc %s -o %s %s && %s' : 'gcc %s -o %s %s && ./%s',
+                                                               \ 'args' , 'outf' , 'srcf' , 'outf' ],
+        \ 'cpp'        : [IsWin() ? 'g++ -std=c++11 %s -o %s %s && %s' : 'g++ -std=c++11 %s -o %s %s && ./%s',
+                                                               \ 'args' , 'outf' , 'srcf' , 'outf' ],
         \ 'java'       : ['javac %s && java %s %s'             , 'srcf' , 'outf' , 'args'          ],
         \ 'python'     : ['python %s %s'                       , 'srcf' , 'args'                   ],
         \ 'julia'      : ['julia %s %s'                        , 'srcf' , 'args'                   ],
@@ -1531,7 +1533,7 @@ let s:cpl = {
         \ 'sphinx' : [IsWin() ? 'make.bat' : '[mM]akefile', 'CFnSphinx'],
         \ },
     \ 'pat' : {
-        \ 'make' : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z_][a-zA-Z0-9_]*\)',
+        \ 'target' : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z_][a-zA-Z0-9_\-]*\)',
         \ },
     \ 'sel_arg' : {
         \ 'opt' : ['select args to CompileFile'],
@@ -1577,31 +1579,30 @@ function! s:cpl.printf(type, wdir, args, srcf, outf) dict
         \ || ('dosbatch' ==? a:type && !IsWin())
         throw 's:cpl.type doesn''t support "' . a:type . '"'
     endif
-    let self.wdir = fnameescape(a:wdir)
+    let self.wdir = a:wdir
     let self.args = a:args
     let self.srcf = '"' . a:srcf . '"'
     let self.outf = '"' . a:outf . '"'
     let l:pstr = copy(self.type[a:type])
     call map(l:pstr, {key, val -> (key == 0) ? val : get(self, val, '')})
     " create exec string
-    return self.run(self.wdir, a:type, call('printf', l:pstr))
+    return self.run(a:type, self.wdir, call('printf', l:pstr))
 endfunction
 " }}}
 
-" FUNCTION: s:cpl.run(wdir, efm, cmd) dict {{{
+" FUNCTION: s:cpl.run(type, wdir, cmd) dict {{{
 " 生成运行命令字符串。
 " @param wdir: 命令运行目录
-" @param efm: errorformat类型
+" @param type: errorformat类型，在s:cpl.efm中
 " @param cmd: 命令字符串
 " @return 返回运行命令
-function! s:cpl.run(wdir, efm, cmd) dict
-    if has_key(s:cpl.efm, a:efm)
-        execute 'setlocal efm=' . s:cpl.efm[a:efm]
+function! s:cpl.run(type, wdir, cmd) dict
+    if has_key(s:cpl.efm, a:type)
+        execute 'setlocal efm=' . s:cpl.efm[a:type]
     endif
     let l:exec = ':AsyncRun '
     if !empty(a:wdir)
-        let l:exec .= '-cwd=' . a:wdir
-        execute 'lcd ' . a:wdir
+        execute 'lcd ' . fnameescape(a:wdir)
     endif
     return join([l:exec, a:cmd])
 endfunction
@@ -1684,7 +1685,7 @@ endfunction
 " FUNCTION: CFnQt(sopt, sel, args) {{{
 function! CFnQt(sopt, sel, args)
     let l:srcfile = fnamemodify(a:sel, ':p:t')
-    let l:outfile = GetFileContent(a:sel, s:cpl.pat.make, 'first')
+    let l:outfile = GetFileContent(a:sel, s:cpl.pat.target, 'first')
     let l:outfile = empty(l:outfile) ? fnamemodify(a:sel, ':t:r') : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
@@ -1698,13 +1699,13 @@ function! CFnQt(sopt, sel, args)
     if empty(a:args)
         let l:cmd .= ' && "' . l:outfile .'"'
     endif
-    execute s:cpl.run(l:workdir, 'cpp', l:cmd)
+    execute s:cpl.run('cpp', l:workdir, l:cmd)
 endfunction
 " }}}
 
 " FUNCTION: CFnMake(sopt, sel, args) {{{
 function! CFnMake(sopt, sel, args)
-    let l:outfile = GetFileContent(a:sel, s:cpl.pat.make, 'first')
+    let l:outfile = GetFileContent(a:sel, s:cpl.pat.target, 'first')
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
@@ -1712,7 +1713,7 @@ function! CFnMake(sopt, sel, args)
     if empty(a:args)
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:cpl.run(l:workdir, 'cpp', l:cmd)
+    execute s:cpl.run('cpp', l:workdir, l:cmd)
 endfunction
 "}}}
 
@@ -1727,7 +1728,7 @@ function! CFnVs(sopt, sel, args)
     if a:args[0] !=# 'Clean'
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:cpl.run(l:workdir, 'cpp', l:cmd)
+    execute s:cpl.run('cpp', l:workdir, l:cmd)
 endfunction
 " }}}
 
@@ -1741,7 +1742,7 @@ function! CFnSphinx(sopt, sel, args)
     if a:args[0]
         let l:cmd .= join([' && firefox', l:outfile])
     endif
-    execute s:cpl.run(l:workdir, '', l:cmd)
+    execute s:cpl.run('', l:workdir, l:cmd)
 endfunction
 "}}}
 
