@@ -2664,12 +2664,12 @@ endif
     nnoremap <leader>bl <C-^>
     " 打开/关闭Quickfix
     nnoremap <leader>qo :botright copen<Bar>call FindWowHighlight()<CR>
-    nnoremap <leader>qc :cclose<Bar>wincmd p<CR>
+    nnoremap <leader>qc :if &filetype==#'qf'<Bar>wincmd p<Bar>endif<Bar>cclose<CR>
     nnoremap <leader>qj :cnext<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
     nnoremap <leader>qk :cprevious<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
     " 打开/关闭Location-list
     nnoremap <leader>lo :botright lopen<Bar>call FindWowHighlight()<CR>
-    nnoremap <leader>lc :lclose<Bar>wincmd p<CR>
+    nnoremap <leader>lc :if &filetype==#'qf'<Bar>wincmd p<Bar>endif<Bar>lclose<CR>
     nnoremap <leader>lj :lnext<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
     nnoremap <leader>lk :lprevious<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
     " 在新Tab中打开列表项
