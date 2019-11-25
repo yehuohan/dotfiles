@@ -1807,8 +1807,8 @@ let s:fw = {
             \ 'sa' : ':botright copen | :AsyncRun! -append rg --vimgrep "%s" "%s" %s',
             \ 'sk' : ':AsyncStop'},
         \ 'grep' : {
-            \ 'sr' : ':execute '':Rg '' . escape("%s", " ") . '' "%s" %s''',
-            \ 'sa' : ':execute '':RgAdd '' . escape("%s", " ") . '' "%s" %s''',
+            \ 'sr' : ':execute '':Rg '' . escape(''%s'', " ") . '' "%s" %s''',
+            \ 'sa' : ':execute '':RgAdd '' . escape(''%s'', " ") . '' "%s" %s''',
             \ 'sk' : ':GrepStop'},
         \ 'grepper' : {
             \ 'sr' : ':Grepper -noprompt -tool rg -query "%s" "%s" %s',
