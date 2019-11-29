@@ -28,7 +28,7 @@
     " - 尽量不映射偏远的按键（F1~F12，数字键等），且集中于'j,k,i,o'键位附近
     " - 调换Esc和CapsLock键
 " }}}
-" }}}
+" }}} End
 
 " Platform {{{
 " vim or nvim, with or without gui {{{
@@ -68,7 +68,7 @@ function! IsTermType(tt)
     return (&term ==? a:tt) ? 1 : 0
 endfunction
 " }}}
-" }}}
+" }}} End
 
 " Global Settings {{{
 let s:home = resolve(expand('<sfile>:p:h'))
@@ -164,7 +164,7 @@ command! -nargs=0 GSInit :call s:gsetInit()
 command! -nargs=0 GSShow :call s:gsetShow()
 call s:gsetLoad()
 " }}}
-" }}}
+" }}} End
 
 " Plug Settings {{{
 call plug#begin($DotVimPath.'/bundle')  " 可以指定插件安装位置
@@ -515,12 +515,13 @@ else
     endtry
     let s:lightline_check_flg = 1       " 是否检测Tab和Trailing
     nnoremap <leader>tl :call lightline#toggle()<CR>
+    nnoremap <leader>tk :call Plug_ll_toggleCheck()<CR>
 
     " Augroup: PluginLightline {{{
     augroup PluginLightline
         autocmd!
         autocmd ColorScheme * call s:Plug_ll_colorScheme()
-        autocmd BufReadPre * call s:Plug_ll_check(getfsize(expand('<afile>')))
+        autocmd BufReadPre * call s:Plug_ll_checkSize(getfsize(expand('<afile>')))
     augroup END
     function! s:Plug_ll_colorScheme()
         if !exists('g:loaded_lightline')
@@ -535,8 +536,14 @@ else
         catch /^Vim\%((\a\+)\)\=:E117/
         endtry
     endfunction
-    function! s:Plug_ll_check(size)
+    function! s:Plug_ll_checkSize(size)
         let s:lightline_check_flg = (a:size > 1024*1024*2 || a:size == -2) ? 0 : 1
+    endfunction
+    " }}}
+    " FUNCTION: Plug_ll_toggleCheck() {{{
+    function! Plug_ll_toggleCheck()
+        let s:lightline_check_flg = !s:lightline_check_flg
+        echo 's:lightline_check_flg = ' . s:lightline_check_flg
     endfunction
     " }}}
     " FUNCTION: Plug_ll_mode() {{{
@@ -1241,7 +1248,7 @@ endif
 " }}}
 
 call plug#end()
-" }}}
+" }}} End
 
 " User Functions {{{
 " Execute function {{{
@@ -2362,7 +2369,7 @@ function! Misc_holdTopLine()
 endfunction
 " }}}
 " }}}
-" }}}
+" }}} End
 
 " User Settings {{{
 " Term {{{
@@ -2538,7 +2545,7 @@ augroup UserSettingsCmd
     autocmd Filetype qf       nnoremap <buffer> <M-Space> :call QuickfixPreview()<CR>
 augroup END
 " }}}
-" }}}
+" }}} End
 
 " User Mappings {{{
 " Basic {{{
@@ -2810,4 +2817,4 @@ endif
     nnoremap <leader>fef :call FindWowSetArgs('f')<CR>
     nnoremap <leader>feg :call FindWowSetArgs('g')<CR>
 " }}}
-" }}}
+" }}} End
