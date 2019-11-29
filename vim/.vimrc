@@ -72,12 +72,10 @@ endfunction
 
 " Global Settings {{{
 let s:home = resolve(expand('<sfile>:p:h'))
-if (IsLinux() || IsMac())
+if (IsLinux() || IsMac() || IsGw())
     let $DotVimPath=s:home . '/.vim'
 elseif IsWin()
     let $DotVimPath=s:home . '\vimfiles'
-elseif IsGw()
-    let $DotVimPath='/c/MyApps/Vim/vimfiles'
 endif
 set rtp+=$DotVimPath
 
@@ -120,6 +118,7 @@ let s:gset = {
     \ 'use_lightline': 1,
     \ 'use_startify' : 1,
     \ 'use_fzf' : 1,
+    \ 'use_leaderf' : 1,
     \ 'use_ycm' : 1,
     \ 'use_ultisnips' : 1,
     \ 'use_lcn' : 0,
@@ -293,6 +292,7 @@ endif
 " }}}
 
 " LeaderF {{{ 模糊查找
+if s:gset.use_leaderf
 if IsLinux()
     Plug 'Yggdroot/LeaderF', {'do': './install.sh'}
     augroup PluginLeaderF
@@ -332,6 +332,7 @@ endif
     nnoremap <leader>lr :LeaderfRgInteractive<CR>
     nnoremap <leader>ls ::LeaderfSelf<CR>
     nnoremap <leader>lh ::LeaderfHelp<CR>
+endif
 " }}}
 
 " grep {{{ 大范围查找
