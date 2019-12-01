@@ -660,8 +660,6 @@ endif
     let g:Popc_separator = {'left' : '', 'right': ''}
     let g:Popc_subSeparator = {'left' : '', 'right': ''}
     let s:popc_tabline_layout = 1
-    nnoremap <C-Space> :Popc<CR>
-    inoremap <C-Space> <Esc>:Popc<CR>
     nnoremap <leader><leader>h :PopcBuffer<CR>
     nnoremap <M-i> :PopcBufferSwitchLeft<CR>
     nnoremap <M-o> :PopcBufferSwitchRight<CR>
@@ -856,6 +854,7 @@ if s:gset.use_ycm
     let g:ycm_key_list_stop_completion = ['<C-y>']              " 关闭补全menu
     let g:ycm_key_invoke_completion = '<C-l>'                   " 显示补全内容，YCM使用completefunc（C-X C-U）
                                                                 " YCM不支持的补全，通过omnifunc(C-X C-O)集成到YCM上
+    imap <C-Space> <C-l>
     nnoremap <leader>gg :YcmCompleter<CR>
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
     nnoremap <leader>gI :YcmCompleter GoToInclude<CR>
