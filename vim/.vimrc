@@ -549,9 +549,8 @@ else
     " }}}
     " FUNCTION: Plug_ll_mode() {{{
     function! Plug_ll_mode()
-        let fname = expand('%:t')
-        return fname == '__Tagbar__' ? 'Tagbar' :
-            \ fname =~ 'NERD_tree' ? 'NERDTree' :
+        return &ft ==# 'tagbar' ? 'Tagbar' :
+            \ &ft ==# 'nerdtree' ? 'NERDTree' :
             \ &ft ==# 'qf' ? (QuickfixGet()[0] ==# 'q' ? 'Quickfix' : 'Location') :
             \ &ft ==# 'help' ? 'Help' :
             \ &ft ==# 'Popc' ? popc#ui#GetStatusLineSegments('l')[0] :
@@ -1089,12 +1088,18 @@ endif
     xmap <leader>hw <Plug>(quickhl-manual-this)
     nmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
     xmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
-    nmap <leader>hm <Plug>(quickhl-cword-toggle)
-    nnoremap <leader>hc :call quickhl#manual#clear_this('n')<CR>
-    vnoremap <leader>hc :call quickhl#manual#clear_this('v')<CR>
+    nmap <leader>hc <Plug>(quickhl-manual-clear)
+    xmap <leader>hc <Plug>(quickhl-manual-clear)
     nmap <leader>hr <Plug>(quickhl-manual-reset)
+    nmap <leader>th <Plug>(quickhl-manual-toggle)
+" }}}
 
-    nnoremap <leader>th :QuickhlManualLockWindowToggle<CR>
+" illuminate {{{ 自动高亮
+    Plug 'RRethy/vim-illuminate'
+    let g:Illuminate_delay = 250
+    let g:Illuminate_ftblacklist = ['nerdtree', 'tagbar']
+    highlight link illuminatedWord MatchParen
+    nnoremap <leader>tg :IlluminationToggle<CR>
 " }}}
 
 " colorizer {{{ 颜色预览
