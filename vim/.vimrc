@@ -330,8 +330,10 @@ endif
     nnoremap <leader>lb :LeaderfBuffer<CR>
     nnoremap <leader>lB :LeaderfBufferAll<CR>
     nnoremap <leader>lr :LeaderfRgInteractive<CR>
-    nnoremap <leader>ls ::LeaderfSelf<CR>
-    nnoremap <leader>lh ::LeaderfHelp<CR>
+    nnoremap <leader>lm :LeaderfMru<CR>
+    nnoremap <leader>lM :LeaderfMruCwd<CR>
+    nnoremap <leader>ls :LeaderfSelf<CR>
+    nnoremap <leader>lh :LeaderfHelp<CR>
 endif
 " }}}
 
