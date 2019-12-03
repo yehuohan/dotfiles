@@ -465,7 +465,7 @@ if !s:gset.use_lightline
         silent! colorscheme desert
     endtry
 else
-    Plug 'epheien/lightline.vim'
+    Plug 'yehuohan/lightline.vim'
     "                    
     " ► ✘ ❖ ⌘ ▫ ▪ ★ ☆ • ≡ ፨ ♥
     let g:lightline = {
@@ -516,6 +516,7 @@ else
         silent! colorscheme desert
         let g:lightline.colorscheme = 'solarized'
     endtry
+    let g:lightline.blacklist = {'tagbar':0, 'nerdtree':0, 'Popc':0}
     let s:lightline_check_flg = 1       " 是否检测Tab和Trailing
     nnoremap <leader>tl :call lightline#toggle()<CR>
     nnoremap <leader>tk :call Plug_ll_toggleCheck()<CR>
