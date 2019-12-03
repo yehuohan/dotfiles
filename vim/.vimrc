@@ -553,7 +553,7 @@ else
     function! Plug_ll_mode()
         return &ft ==# 'tagbar' ? 'Tagbar' :
             \ &ft ==# 'nerdtree' ? 'NERDTree' :
-            \ &ft ==# 'qf' ? (QuickfixGet()[0] ==# 'q' ? 'Quickfix' : 'Location') :
+            \ &ft ==# 'qf' ? (QuickfixGet()[0] ==# 'c' ? 'Quickfix' : 'Location') :
             \ &ft ==# 'help' ? 'Help' :
             \ &ft ==# 'Popc' ? popc#ui#GetStatusLineSegments('l')[0] :
             \ &ft ==# 'startify' ? 'Startify' :
