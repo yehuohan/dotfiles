@@ -1258,7 +1258,7 @@ call plug#end()
 " }}} End
 
 " User Functions {{{
-" Execute function {{{
+" Funcs {{{
 " FUNCTION: GetSelected() {{{ 获取选区内容
 function! GetSelected()
     let l:reg_var = getreg('0', 1)
@@ -2099,15 +2099,14 @@ endfunction
 " FUNCTION: FindWowSetEngine(type) {{{ 设置engine
 function! FindWowSetEngine(type)
     if a:type ==# 'engine'
-        let l:sel = {
+        call PopSelection({
             \ 'opt' : ['select the engine'],
             \ 'lst' : ['rg', 'fuzzy'],
             \ 'sub' : {
                 \ 'rg'    : s:fw.rg.sel,
                 \ 'fuzzy' : s:fw.fuzzy.sel},
             \ 'cmd' : 'popset#set#SubPopSelection'
-        \ }
-        call PopSelection(l:sel)
+            \ })
     else
         call PopSelection(s:fw[a:type]['sel'])
     endif
@@ -2181,6 +2180,32 @@ function! FindWowHighlight(...)
     endif
 endfunction
 " }}}
+" }}}
+
+" Output {{{
+" FUNCTION: QuickfixBasic(kyes) {{{ 基本操作
+function! QuickfixBasic(keys)
+    let l:type = a:keys[0]
+    let l:oprt = a:keys[1]
+    if l:oprt == 'o'
+        execute 'botright ' . l:type . 'open'
+        call FindWowHighlight()
+    elseif l:oprt == 'c'
+        if &filetype==#'qf'
+            wincmd p
+        endif
+        execute l:type . 'close'
+    elseif l:oprt == 'j'
+        execute l:type . 'next'
+        silent! normal! zO
+        normal! zz
+    elseif l:oprt == 'k'
+        execute l:type . 'previous'
+        silent! normal! zO
+        normal! zz
+    endif
+endfunction
+" }}}
 
 " FUNCTION: QuickfixGet() {{{ 类型与编号
 function! QuickfixGet()
@@ -2191,36 +2216,13 @@ function! QuickfixGet()
     if &filetype ==# 'qf'
         let l:dict = getwininfo(win_getid())
         if l:dict[0].quickfix && !l:dict[0].loclist
-            let l:type = 'q'
+            let l:type = 'c'
         elseif l:dict[0].quickfix && l:dict[0].loclist
             let l:type = 'l'
         endif
         let l:line = line('.')
     endif
     return [l:type, l:line]
-endfunction
-" }}}
-
-" FUNCTION: QuickfixTabEdit() {{{ 新建Tab打开窗口
-function! QuickfixTabEdit()
-    let [l:type, l:line] = QuickfixGet()
-    if empty(l:type)
-        return
-    endif
-
-    execute 'tabedit'
-    if l:type ==# 'q'
-        execute 'crewind ' . l:line
-        silent! normal! zO
-        silent! normal! zz
-        execute 'botright copen'
-    elseif l:type ==# 'l'
-        execute 'lrewind ' . l:line
-        silent! normal! zO
-        silent! normal! zz
-        execute 'botright lopen'
-    endif
-    call FindWowHighlight()
 endfunction
 " }}}
 
@@ -2232,14 +2234,61 @@ function! QuickfixPreview()
     endif
 
     let l:last_winnr = winnr()
-    if l:type ==# 'q'
-        execute 'crewind ' . l:line
-    elseif l:type ==# 'l'
-        execute 'lrewind ' . l:line
-    endif
+    execute l:type . 'rewind ' . l:line
     silent! normal! zO
     silent! normal! zz
     execute l:last_winnr . 'wincmd w'
+endfunction
+" }}}
+
+" FUNCTION: QuickfixTabEdit() {{{ 新建Tab打开窗口
+function! QuickfixTabEdit()
+    let [l:type, l:line] = QuickfixGet()
+    if empty(l:type)
+        return
+    endif
+
+    tabedit
+    execute l:type . 'rewind ' . l:line
+    silent! normal! zO
+    silent! normal! zz
+    execute 'botright ' . l:type . 'open'
+    call FindWowHighlight()
+endfunction
+" }}}
+
+" FUNCTION: QuickfixMakeIconv() {{{ 编码转换
+function! QuickfixMakeIconv(sopt, argstr, type)
+    let [l:from, l:to] = GetArgs(a:argstr)
+    if a:type[0] ==# 'c'
+        let l:list = getqflist()
+        for t in l:list
+            let t.text = iconv(t.text, l:from, l:to)
+        endfor
+        call setqflist(l:list)
+    elseif a:type[0] ==# 'l'
+        let l:list = getloclist(0)
+        for t in l:list
+            let t.text = iconv(t.text, l:from, l:to)
+        endfor
+        call setloclist(0, l:list)
+    endif
+endfunction
+" }}}
+
+" FUNCTION: QuickfixIconv() {{{ 编码转换
+function! QuickfixIconv()
+    let l:type = QuickfixGet()[0]
+    if empty(l:type)
+        return
+    endif
+    call PopSelection({
+        \ 'opt' : ['Select encoding'],
+        \ 'lst' : ['"cp936", "utf-8"', '"utf-8", "cp936"'],
+        \ 'cmd' : 'QuickfixMakeIconv',
+        \ 'pre' : 1,
+        \ 'arg' : [l:type,]
+        \ })
 endfunction
 " }}}
 " }}}
@@ -2548,8 +2597,6 @@ augroup UserSettingsCmd
     " Help keys
     autocmd Filetype vim,help nnoremap <buffer> <S-k> :call Misc_gotoKeyword('n')<CR>
     autocmd Filetype vim,help vnoremap <buffer> <S-k> :call Misc_gotoKeyword('v')<CR>
-    " 预览Quickfix和Location-list
-    autocmd Filetype qf       nnoremap <buffer> <M-Space> :call QuickfixPreview()<CR>
 augroup END
 " }}}
 " }}} End
@@ -2677,20 +2724,23 @@ endif
     nnoremap <leader>bp :bprevious<CR>
     nnoremap <leader>bl <C-^>
     " 打开/关闭Quickfix
-    nnoremap <leader>qo :botright copen<Bar>call FindWowHighlight()<CR>
-    nnoremap <leader>qc :if &filetype==#'qf'<Bar>wincmd p<Bar>endif<Bar>cclose<CR>
-    nnoremap <leader>qj :cnext<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
-    nnoremap <leader>qk :cprevious<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
+    nnoremap <leader>qo :call QuickfixBasic('co')<CR>
+    nnoremap <leader>qc :call QuickfixBasic('cc')<CR>
+    nnoremap <leader>qj :call QuickfixBasic('cj')<CR>
+    nnoremap <leader>qk :call QuickfixBasic('ck')<CR>
     " 打开/关闭Location-list
-    nnoremap <leader>lo :botright lopen<Bar>call FindWowHighlight()<CR>
-    nnoremap <leader>lc :if &filetype==#'qf'<Bar>wincmd p<Bar>endif<Bar>lclose<CR>
-    nnoremap <leader>lj :lnext<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
-    nnoremap <leader>lk :lprevious<Bar>execute'silent! normal! zO'<Bar>execute'normal! zz'<CR>
+    nnoremap <leader>lo :call QuickfixBasic('lo')<CR>
+    nnoremap <leader>lc :call QuickfixBasic('lc')<CR>
+    nnoremap <leader>lj :call QuickfixBasic('lj')<CR>
+    nnoremap <leader>lk :call QuickfixBasic('lk')<CR>
+    " 预览Quickfix和Location-list
+    nnoremap <M-Space> :call QuickfixPreview()<CR>
     " 在新Tab中打开列表项
     nnoremap <leader>qt :call QuickfixTabEdit()<CR>
-    nnoremap <leader>lt :call QuickfixTabEdit()<CR>
-    " 将Quickfix中的内容放到Location-list中打开
+    " 将Quickfix中的内容复制Location-list
     nnoremap <leader>ql :call setloclist(0, getqflist())<Bar>vertical botright lopen 35<CR>
+    " 编码转换
+    nnoremap <leader>qi :call QuickfixIconv()<CR>
     " 分割窗口
     nnoremap <leader>ws <C-w>s
     nnoremap <leader>wv <C-W>v
