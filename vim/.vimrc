@@ -2189,17 +2189,21 @@ endfunction
 " @param type: r-root, f-filters, g-glob
 " @return 0表示异常结束函数（root无效），1表示正常结束函数
 function! FindWowSetArgs(type)
-    if a:type =~? 'r'
+    if a:type =~# 'r'
         let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
         if empty(l:root)
             return 0
         endif
-        let s:fw.args.root = fnamemodify(l:root, ':p')
+        let l:root = fnamemodify(l:root, ':p')
+        if l:root =~# '[/\\]$'
+            let l:root = strcharpart(l:root, 0, strchars(l:root) - 1)
+        endif
+        let s:fw.args.root = l:root
     endif
-    if a:type =~? 'f'
+    if a:type =~# 'f'
         let s:fw.args.filters = GetInput(' Which (Filter) to find: ')
     endif
-    if a:type =~? 'g'
+    if a:type =~# 'g'
         let s:fw.args.globlst = split(GetInput(' What (Glob) to append: '), ',')
     endif
     return 1
