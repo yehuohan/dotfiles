@@ -1755,13 +1755,13 @@ function! CFnQt(sopt, sel, args)
 
     if IsWin()
         let l:cmd = printf('cd "%s" && qmake -r "%s" && vcvars64.bat && nmake -f Makefile.Debug %s',
-                    \ l:workdir, l:srcfile, join(a:args))
+                    \ l:workdir, l:srcfile, join(a:args[1]))
     else
         let l:cmd = printf('cd "%s" && qmake "%s" && make %s'
-                    \ l:workdir, l:srcfile, join(a:args))
+                    \ l:workdir, l:srcfile, join(a:args[1]))
     endif
-    if empty(a:args)
-        let l:cmd .= ' && "' . l:outfile .'"'
+    if a:args[0]
+        let l:cmd .= ' && "./' . l:outfile .'"'
     endif
     execute s:cpl.run('cpp', l:workdir, l:cmd)
 endfunction
@@ -1773,8 +1773,8 @@ function! CFnMake(sopt, sel, args)
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
-    let l:cmd = printf('cd "%s" && make %s', l:workdir, join(a:args))
-    if empty(a:args)
+    let l:cmd = printf('cd "%s" && make %s', l:workdir, join(a:args[1]))
+    if a:args[0]
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
     execute s:cpl.run('cpp', l:workdir, l:cmd)
@@ -1788,8 +1788,8 @@ function! CFnVs(sopt, sel, args)
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
     let l:cmd = printf('cd "%s" && vcvars64.bat && devenv "%s" /%s',
-                    \ l:workdir, l:srcfile, join(a:args))
-    if a:args[0] !=# 'Clean'
+                    \ l:workdir, l:srcfile, join(a:args[1]))
+    if a:args[0]
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
     execute s:cpl.run('cpp', l:workdir, l:cmd)
@@ -1813,12 +1813,15 @@ endfunction
 " Run compiler
 let RcArg         = function('popset#set#PopSelection', [s:cpl.sel_arg])
 let RcExe         = function('popset#set#PopSelection', [s:cpl.sel_exe])
-let RcQt          = function('CompileProject', ['qt', []])
-let RcQtClean     = function('CompileProject', ['qt', ['distclean']])
-let RcVs          = function('CompileProject', ['vs', ['Build']])
-let RcVsClean     = function('CompileProject', ['vs', ['Clean']])
-let RcMake        = function('CompileProject', ['mk', []])
-let RcMakeClean   = function('CompileProject', ['mk', ['clean']])
+let RcQt          = function('CompileProject', ['qt', [0, []]])
+let RcQtRun       = function('CompileProject', ['qt', [1, []]])
+let RcQtClean     = function('CompileProject', ['qt', [0, ['distclean']]])
+let RcMake        = function('CompileProject', ['mk', [0, []]])
+let RcMakeRun     = function('CompileProject', ['mk', [1, []]])
+let RcMakeClean   = function('CompileProject', ['mk', [0, ['clean']]])
+let RcVs          = function('CompileProject', ['vs', [0, ['Build']]])
+let RcVsRun       = function('CompileProject', ['vs', [1, ['Build']]])
+let RcVsClean     = function('CompileProject', ['vs', [0, ['Clean']]])
 let RcSphinx      = function('CompileProject', ['sphinx', [0, 'html']])
 let RcSphinxRun   = function('CompileProject', ['sphinx', [1, 'html']])
 let RcSphinxClean = function('CompileProject', ['sphinx', [0, 'clean']])
@@ -2857,14 +2860,17 @@ endif
     nnoremap <leader>rj :call CompileCell()<CR>
     nnoremap <leader>ra :call RcArg()<CR>
     nnoremap <leader>re :call RcExe()<CR>
-    nnoremap <leader>rq :call RcQt()<CR>
-    nnoremap <leader>rv :call RcVs()<CR>
-    nnoremap <leader>rm :call RcMake()<CR>
-    nnoremap <leader>rp :call RcSphinx()<CR>
-    nnoremap <leader>rP :call RcSphinxRun()<CR>
+    nnoremap <leader>rQ  :call RcQt()<CR>
+    nnoremap <leader>rq  :call RcQtRun()<CR>
     nnoremap <leader>rcq :call RcQtClean()<CR>
-    nnoremap <leader>rcv :call RcVsClean()<CR>
+    nnoremap <leader>rM  :call RcMake()<CR>
+    nnoremap <leader>rm  :call RcMakeRun()<CR>
     nnoremap <leader>rcm :call RcMakeClean()<CR>
+    nnoremap <leader>rV  :call RcVs()<CR>
+    nnoremap <leader>rv  :call RcVsRun()<CR>
+    nnoremap <leader>rcv :call RcVsClean()<CR>
+    nnoremap <leader>rp  :call RcSphinx()<CR>
+    nnoremap <leader>rP  :call RcSphinxRun()<CR>
     nnoremap <leader>rcp :call RcSphinxClean()<CR>
     " 调试
 if IsVim()
