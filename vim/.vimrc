@@ -644,7 +644,7 @@ endif
             \ 'opt' : ['colorscheme', 'colo'],
             \ 'lst' : ['forest-night', 'gruvbox', 'seoul256', 'seoul256-light', 'solarized', 'srcery'],
             \ 'cmd' : '',
-        \},
+        \}
     \ ]
     " set option with PopSet
     nnoremap <leader><leader>s :call feedkeys(':PopSet ', 'n')<CR>
@@ -1492,6 +1492,51 @@ endfunction
 let FuncAppendExecResult = function('FuncExecInput', [['Input command = ', '', 'command'] , 'FuncAppendCmd', 'exec'])
 let FuncAppendCallResult = function('FuncExecInput', [['Input function = ', '', 'function'], 'FuncAppendCmd', 'call'])
 " }}}
+
+" FUNCTION: MiscFcitx2en() MiscFcitx2zh() {{{ 切换Fcitx输入法
+if IsLinux()
+function! MiscFcitx2en()
+    if 2 == system('fcitx-remote')
+        let l:t = system('fcitx-remote -c')
+    endif
+endfunction
+function! MiscFcitx2zh()
+    if 1 == system('fcitx-remote')
+        let l:t = system('fcitx-remote -o')
+    endif
+endfunction
+endif
+" }}}
+
+" FUNCTION: MiscGotoKeyword(mode) {{{ 查找Vim关键字
+function! MiscGotoKeyword(mode)
+    let l:exec = 'help '
+    if a:mode ==# 'n'
+        let l:word = expand('<cword>')
+    elseif a:mode ==# 'v'
+        let l:word = GetSelected()
+    endif
+
+    " 添加关键字
+    let l:exec .= l:word
+    if IsNVim()
+        " nvim用自己的帮助文件，只有英文的
+        let l:exec .= '@en'
+    endif
+
+    execute l:exec
+endfunction
+" }}}
+
+" FUNCTION: MiscHoldTopLine() {{{ 冻结顶行
+function! MiscHoldTopLine()
+    let l:line = line('.')
+    split %
+    resize 1
+    call cursor(l:line, 1)
+    wincmd p
+endfunction
+" }}}
 " }}}
 
 " Project {{{
@@ -2298,72 +2343,96 @@ endfunction
 " }}}
 " }}}
 
-" Misc {{{
-" FUNCTION: InvConceallevel() {{{ 切换显示隐藏字符
-function! InvConceallevel()
-    if &conceallevel == 0
-        set conceallevel=2
-    else
-        set conceallevel=0              " 显示markdown等格式中的隐藏字符
-    endif
-    echo 'conceallevel = ' . &conceallevel
+" Option {{{
+" Required: 'yehuohan/popset'
+
+" s:opt {{{
+let s:opt = {
+    \ 'lst' : {
+        \ 'conceallevel' : [2, 0],
+        \ 'foldcolumn'   : [1, 0],
+        \ 'virtualedit'  : ['all', ''],
+        \ 'signcolumn'   : ['no', 'auto'],
+        \ },
+    \ 'func' : {
+        \ 'number' : 'OptFuncNumber',
+        \ 'syntax' : 'OptFuncSyntax',
+        \ },
+    \ 'sel_inv' : {
+        \ 'opt' : ['option invert value'],
+        \ 'lst' : ['wrap', 'list', 'ignorecase', 'expandtab'],
+        \ 'cmd' : {sopt, arg -> OptionInv(arg)},
+        \ },
+    \ 'sel_lst' : {
+        \ 'opt' : ['option list value'],
+        \ 'lst' : ['conceallevel', 'virtualedit', 'foldcolumn', 'signcolumn'],
+        \ 'cmd' : {sopt, arg -> OptionLst(arg)},
+        \ },
+    \ 'sel_func' : {
+        \ 'opt' : ['option function'],
+        \ 'lst' : ['number', 'syntax'],
+        \ 'cmd' : {sopt, arg -> OptionFunc(arg)},
+        \ },
+    \ }
+" }}}
+
+" FUNCTION: OptionSel() {{{ 设置参数
+function! OptionSel()
+    call PopSelection({
+        \ 'opt' : ['Option select'],
+        \ 'lst' : ['inv', 'lst', 'func'],
+        \ 'sub' : {
+            \ 'inv' : s:opt.sel_inv,
+            \ 'lst' : s:opt.sel_lst,
+            \ 'func' : s:opt.sel_func},
+        \ 'cmd' : 'popset#set#SubPopSelection'
+        \ })
 endfunction
 " }}}
 
-" FUNCTION: InvVirtualedit() {{{ 切换虚拟编辑
-function! InvVirtualedit()
-    if &virtualedit == ''
-        set virtualedit=all
-    else
-        set virtualedit=""
-    endif
-    echo 'virtualedit = ' . &virtualedit
+" FUNCTION: OptionInv(opt) {{{ 切换参数值（bool取反）
+function! OptionInv(opt)
+    execute printf('set inv%s', a:opt)
+    execute printf('echo "%s = " . &%s', a:opt, a:opt)
 endfunction
 " }}}
 
-" FUNCTION: InvNumber() {{{ 切换显示行号
-let s:misc_number_type = 1
-function! InvNumber()
-    if s:misc_number_type == 1
-        let s:misc_number_type = 2
+" FUNCTION: OptionLst(opt) {{{ 切换参数值（列表循环取值）
+function! OptionLst(opt)
+    let l:lst = s:opt.lst[a:opt]
+    let l:idx = index(l:lst, eval('&' . a:opt))
+    let l:idx = (l:idx + 1) % len(l:lst)
+    execute printf('set %s=%s', a:opt, l:lst[l:idx])
+    execute printf('echo "%s = " . &%s', a:opt, a:opt)
+endfunction
+" }}}
+
+" FUNCTION: OptionFunc(opt) {{{ 切换参数值（函数取值）
+function! OptionFunc(opt)
+    let Fn = function(s:opt.func[a:opt])
+    call Fn()
+endfunction
+" }}}
+
+" FUNCTION: OptFuncNumber() {{{ 切换显示行号
+let s:opt_number = 0
+function! OptFuncNumber()
+    if s:opt_number == 0
         set nonumber
         set norelativenumber
-    elseif s:misc_number_type == 2
-        let s:misc_number_type = 3
+    elseif s:opt_number == 1
         set number
         set norelativenumber
-    elseif s:misc_number_type == 3
-        let s:misc_number_type = 1
+    elseif s:opt_number == 2
         set number
         set relativenumber
     endif
+    let s:opt_number = (s:opt_number + 1) % 3
 endfunction
 " }}}
 
-" FUNCTION: InvFoldColumn() {{{ 切换显示折叠列
-function! InvFoldColumn()
-    if &foldcolumn == 0
-        set foldcolumn=1
-    else
-        set foldcolumn=0
-    endif
-    echo 'foldcolumn = ' . &foldcolumn
-endfunction
-" }}}
-
-" FUNCTION: InvSigncolumn() {{{ 切换显示标志列
-function! InvSigncolumn()
-    if &signcolumn == 'auto'
-        set signcolumn=no
-    else
-        set signcolumn=auto
-    endif
-    echo 'signcolumn = ' . &signcolumn
-endfunction
-" }}}
-
-" FUNCTION: InvHighLight() {{{ 切换高亮
-function! InvHighLight()
+" FUNCTION: OptFuncSyntax() {{{ 切换高亮
+function! OptFuncSyntax()
     if exists('g:syntax_on')
         syntax off
         echo 'syntax off'
@@ -2374,61 +2443,6 @@ function! InvHighLight()
 endfunction
 " }}}
 
-" FUNCTION: InvScrollBind() bind {{{ 切换滚屏bind
-function! InvScrollBind()
-    if &scrollbind == 1
-        set noscrollbind
-    else
-        set scrollbind
-    endif
-    echo 'scrollbind = ' . &scrollbind
-endfunction
-" }}}
-
-" FUNCTION: Misc_fcitx2en() Misc_fcitx2zh() {{{ 切换Fcitx输入法
-if IsLinux()
-function! Misc_fcitx2en()
-    if 2 == system('fcitx-remote')
-        let l:t = system('fcitx-remote -c')
-    endif
-endfunction
-function! Misc_fcitx2zh()
-    if 1 == system('fcitx-remote')
-        let l:t = system('fcitx-remote -o')
-    endif
-endfunction
-endif
-" }}}
-
-" FUNCTION: Misc_gotoKeyword(mode) {{{ 查找Vim关键字
-function! Misc_gotoKeyword(mode)
-    let l:exec = 'help '
-    if a:mode ==# 'n'
-        let l:word = expand('<cword>')
-    elseif a:mode ==# 'v'
-        let l:word = GetSelected()
-    endif
-
-    " 添加关键字
-    let l:exec .= l:word
-    if IsNVim()
-        " nvim用自己的帮助文件，只有英文的
-        let l:exec .= '@en'
-    endif
-
-    execute l:exec
-endfunction
-" }}}
-
-" FUNCTION: Misc_holdTopLine() {{{ 冻结顶行
-function! Misc_holdTopLine()
-    let l:line = line('.')
-    split %
-    resize 1
-    call cursor(l:line, 1)
-    wincmd p
-endfunction
-" }}}
 " }}}
 " }}} End
 
@@ -2600,8 +2614,8 @@ augroup UserSettingsCmd
     autocmd FileType javascript setlocal foldmethod=syntax
 
     " Help keys
-    autocmd Filetype vim,help nnoremap <buffer> <S-k> :call Misc_gotoKeyword('n')<CR>
-    autocmd Filetype vim,help vnoremap <buffer> <S-k> :call Misc_gotoKeyword('v')<CR>
+    autocmd Filetype vim,help nnoremap <buffer> <S-k> :call MiscGotoKeyword('n')<CR>
+    autocmd Filetype vim,help vnoremap <buffer> <S-k> :call MiscGotoKeyword('v')<CR>
 augroup END
 " }}}
 " }}} End
@@ -2673,20 +2687,22 @@ endif
     nnoremap <leader>xx :%!xxd<CR>
     nnoremap <leader>xr :%!xxd -r<CR>
     " Misc
-    nnoremap <leader>iw :set invwrap<CR>
-    nnoremap <leader>il :set invlist<CR>
-    nnoremap <leader>ii :set invignorecase<Bar>echo 'ignorecase = ' . &ignorecase<CR>
-    nnoremap <leader>iv :call InvVirtualedit()<CR>
-    nnoremap <leader>ic :call InvConceallevel()<CR>
-    nnoremap <leader>in :call InvNumber()<CR>
-    nnoremap <leader>if :call InvFoldColumn()<CR>
-    nnoremap <leader>is :call InvSigncolumn()<CR>
-    nnoremap <leader>ih :call InvHighLight()<CR>
-    nnoremap <leader>ib :call InvScrollBind()<CR>
+    nnoremap <leader>io :call OptionSel()<CR>
+    nnoremap <leader>iw :call OptionInv('wrap')<CR>
+    nnoremap <leader>il :call OptionInv('list')<CR>
+    nnoremap <leader>ii :call OptionInv('ignorecase')<CR>
+    nnoremap <leader>ie :call OptionInv('expandtab')<CR>
+    nnoremap <leader>ib :call OptionInv('scrollbind')<CR>
+    nnoremap <leader>iv :call OptionLst('virtualedit')<CR>
+    nnoremap <leader>ic :call OptionLst('conceallevel')<CR>
+    nnoremap <leader>if :call OptionLst('foldcolumn')<CR>
+    nnoremap <leader>is :call OptionLst('signcolumn')<CR>
+    nnoremap <leader>in :call OptionFunc('number')<CR>
+    nnoremap <leader>ih :call OptionFunc('syntax')<CR>
     if IsLinux()
-        inoremap <Esc> <Esc>:call Misc_fcitx2en()<CR>
+        inoremap <Esc> <Esc>:call MiscFcitx2en()<CR>
     endif
-    nnoremap <leader>hl :call Misc_holdTopLine()<CR>
+    nnoremap <leader>hl :call MiscHoldTopLine()<CR>
 " }}}
 
 " Copy and paste{{{
