@@ -6,7 +6,7 @@
 " Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-" Readme {{{
+" README {{{
 " Help {{{
     " help/h        : 查看Vim帮助
     " <S-k>         : 快速查看光标所在cword或选择内容的vim帮助
@@ -79,7 +79,7 @@ elseif IsWin()
 endif
 set rtp+=$DotVimPath
 
-" First {{{
+" first {{{
 set encoding=utf-8                      " 内部使用utf-8编码
 if IsVim()
     set nocompatible                    " 不兼容vi
@@ -1282,7 +1282,7 @@ call s:plug.init()
 " }}} End
 
 " User Functions {{{
-" Funcs {{{
+" funcs {{{
 " FUNCTION: GetSelected() {{{ 获取选区内容
 function! GetSelected()
     let l:reg_var = getreg('0', 1)
@@ -1507,7 +1507,6 @@ function! FuncAppendCmd(str, flg)
             let l:result = string(l:result)
         endif
     elseif a:flg ==# 'exec'
-        let l:str = ':' . a:str
         let l:result = execute(a:str)
     endif
     call append(line('.'), split(l:result, "\n"))
@@ -1562,7 +1561,7 @@ endfunction
 " }}}
 " }}}
 
-" Project {{{
+" project {{{
 " Required: 'skywind3000/asyncrun.vim'
 "           'yehuohan/popset'
 
@@ -1849,7 +1848,7 @@ let RcSphinxRun   = function('CompileProject', ['sphinx', [1, 'html']])
 let RcSphinxClean = function('CompileProject', ['sphinx', [0, 'clean']])
 " }}}
 
-" Search {{{
+" find&search {{{
 " Required: 'skywind3000/asyncrun.vim' or 'yegappan/grep' or 'mhinz/vim-grepper'
 "           'Yggdroot/LeaderF', 'junegunn/fzf.vim'
 "           'yehuohan/popc'
@@ -2259,7 +2258,7 @@ endfunction
 " }}}
 " }}}
 
-" Output {{{
+" output {{{
 " FUNCTION: QuickfixBasic(kyes) {{{ 基本操作
 function! QuickfixBasic(keys)
     let l:type = a:keys[0]
@@ -2369,7 +2368,7 @@ endfunction
 " }}}
 " }}}
 
-" Option {{{
+" option {{{
 " Required: 'yehuohan/popset'
 
 " s:opt {{{
@@ -2441,7 +2440,7 @@ endfunction
 " }}} End
 
 " User Settings {{{
-" Term {{{
+" basic {{{
     syntax on                           " 语法高亮
     filetype plugin indent on           " 打开文件类型检测
     set number                          " 显示行号
@@ -2499,11 +2498,9 @@ endif
     set visualbell t_vb=                " 关闭响铃(vb, visualbell)和可视闪铃(t_vb，即闪屏)，即normal模式时按esc会有响铃
     set belloff=all                     " 关闭所有事件的响铃
     set helplang=cn,en                  " 优先查找中文帮助
-
-    " 终端光标设置
 if IsVim()
     if IsTermType('xterm') || IsTermType('xterm-256color')
-        " 适用于urxvt,st,xterm,gnome-termial
+        " 终端光标设置，适用于urxvt,st,xterm,gnome-termial
         " 5,6: 竖线，  3,4: 横线，  1,2: 方块
         let &t_SI = "\<Esc>[6 q"        " 进入Insert模式
         let &t_EI = "\<Esc>[2 q"        " 退出Insert模式
@@ -2511,7 +2508,7 @@ if IsVim()
 endif
 " }}}
 
-" Gui {{{
+" gui {{{
 let s:gui_fontsize = 12
 
 " Gui-vim {{{
@@ -2589,7 +2586,7 @@ endif
 " }}}
 " }}}
 
-" Auto command {{{
+" auto command {{{
 augroup UserSettingsCmd
     "autocmd[!]  [group]  {event}     {pattern}  {nested}  {cmd}
     "autocmd              BufNewFile  *                    set fileformat=unix
@@ -2607,7 +2604,6 @@ augroup UserSettingsCmd
     autocmd FileType go         setlocal expandtab
     autocmd FileType javascript setlocal foldmethod=syntax
 
-    " Help keys
     autocmd Filetype vim,help nnoremap <buffer> <S-k> :call MiscGotoKeyword('n')<CR>
     autocmd Filetype vim,help vnoremap <buffer> <S-k> :call MiscGotoKeyword('v')<CR>
 augroup END
@@ -2615,7 +2611,7 @@ augroup END
 " }}} End
 
 " User Mappings {{{
-" Basic {{{
+" basic {{{
     " 回退操作
     nnoremap <S-u> <C-r>
     " 大小写转换
@@ -2680,7 +2676,7 @@ endif
     " HEX编辑
     nnoremap <leader>xx :%!xxd<CR>
     nnoremap <leader>xr :%!xxd -r<CR>
-    " Misc
+    " 参数设置
     nnoremap <leader>iw :call OptionInv('wrap')<CR>
     nnoremap <leader>il :call OptionInv('list')<CR>
     nnoremap <leader>ii :call OptionInv('ignorecase')<CR>
@@ -2698,7 +2694,7 @@ endif
     nnoremap <leader>hl :call MiscHoldTopLine()<CR>
 " }}}
 
-" Copy and paste{{{
+" copy&paste {{{
     " yank & put
     vnoremap <leader>y ygv
     nnoremap ya :<C-U>execute 'let @0.=join(getline(line("."), line(".")+v:count), "\n")."\n"'<CR>
@@ -2729,29 +2725,29 @@ endif
     endfor
 " }}}
 
-" Tab, Buffer, Quickfix, Windows {{{
-    " Tab切换
+" tabs, buffers, quickfix, windows {{{
+    " tab切换
     nnoremap <M-u> gT
     nnoremap <M-p> gt
-    " Buffer切换
+    " buffer切换
     nnoremap <leader>bn :bnext<CR>
     nnoremap <leader>bp :bprevious<CR>
     nnoremap <leader>bl <C-^>
-    " 打开/关闭Quickfix
+    " 打开/关闭quickfix
     nnoremap <leader>qo :call QuickfixBasic('co')<CR>
     nnoremap <leader>qc :call QuickfixBasic('cc')<CR>
     nnoremap <leader>qj :call QuickfixBasic('cj')<CR>
     nnoremap <leader>qk :call QuickfixBasic('ck')<CR>
-    " 打开/关闭Location-list
+    " 打开/关闭location-list
     nnoremap <leader>lo :call QuickfixBasic('lo')<CR>
     nnoremap <leader>lc :call QuickfixBasic('lc')<CR>
     nnoremap <leader>lj :call QuickfixBasic('lj')<CR>
     nnoremap <leader>lk :call QuickfixBasic('lk')<CR>
-    " 预览Quickfix和Location-list
+    " 预览quickfix和location-list
     nnoremap <M-Space> :call QuickfixPreview()<CR>
-    " 在新Tab中打开列表项
+    " 在新tab中打开列表项
     nnoremap <leader>qt :call QuickfixTabEdit()<CR>
-    " 将Quickfix中的内容复制Location-list
+    " 将quickfix中的内容复制location-list
     nnoremap <leader>ql :call setloclist(0, getqflist())<Bar>vertical botright lopen 35<CR>
     " 编码转换
     nnoremap <leader>qi :call QuickfixIconv()<CR>
@@ -2777,7 +2773,7 @@ endif
     nnoremap <leader>wK <C-w>K
     nnoremap <leader>wL <C-w>L
     nnoremap <leader>wT <C-w>T
-    " 修改尺寸
+    " 改变窗口大小
     nnoremap <leader>w= <C-w>=
     nnoremap <M-Up> :resize+5<CR>
     nnoremap <M-Down> :resize-5<CR>
@@ -2785,7 +2781,7 @@ endif
     nnoremap <M-Right> :vertical resize+5<CR>
 " }}}
 
-" File diff {{{
+" file diff {{{
     " 文件比较，自动补全文件和目录
     nnoremap <leader>ds :call FuncExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 's')<CR>
     nnoremap <leader>dv :call FuncExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 'v')<CR>
@@ -2805,7 +2801,7 @@ endif
     nnoremap <leader>dk [c
 " }}}
 
-" Terminal {{{
+" terminal {{{
 if IsWin()
     nnoremap <leader>tz :terminal<CR>
 else
@@ -2820,7 +2816,7 @@ else
 endif
 " }}}
 
-" Coding {{{
+" project {{{
     " 创建临时文件
     nnoremap <leader>ei :call FuncExecInput(['Temp file suffix: '], 'FuncEditTempFile', 0)<CR>
     nnoremap <leader>eti :call FuncExecInput(['Temp file suffix: '], 'FuncEditTempFile', 1)<CR>
@@ -2864,12 +2860,10 @@ if IsVim()
 endif
 " }}}
 
-" Find and search {{{
-    " 查找选择的内容
-    vnoremap / "*y<Bar>:execute'let g:__str__=getreg("*")'<Bar>execute'/' . g:__str__<CR>
-    " 查找当前光标下的内容
-    nnoremap <leader>/ :execute'let g:__str__=expand("<cword>")'<Bar>execute '/' . g:__str__<CR>
-
+" find&search {{{
+    " 正向查找
+    vnoremap / "*y<Bar>:execute '/' . @*<CR>
+    nnoremap <leader>/ :execute '/' . expand('<cword>')<CR>
     " FindWow查找
     for key in s:fw.mappings
         execute 'nnoremap <leader>' . key ':call FindWow("' . key . '", "n")<CR>'
