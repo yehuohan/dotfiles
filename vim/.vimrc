@@ -660,11 +660,12 @@ endif
                     \ 'html'       : 'Html file',
                     \},
             \ 'cmd' : 'popset#data#SetEqual',
+            \ 'get' : 'popset#data#GetOptValue'
         \},
         \{
             \ 'opt' : ['colorscheme', 'colo'],
             \ 'lst' : ['forest-night', 'gruvbox', 'seoul256', 'seoul256-light', 'solarized', 'srcery'],
-            \ 'cmd' : '',
+            \ 'cmd' : ''
         \}
     \ ]
     " set option with PopSet
@@ -1853,6 +1854,7 @@ let RcSphinxClean = function('CompileProject', ['sphinx', [0, 'clean']])
 "           'Yggdroot/LeaderF', 'junegunn/fzf.vim'
 "           'yehuohan/popc'
 "           'yehuohan/popset'
+
 augroup UserFunctionSearch
     autocmd!
     autocmd User Grepper call FindWowHighlight(s:fw.pat)
@@ -1877,12 +1879,14 @@ let s:fw = {
     \ 'loc' : '',
     \ 'opt' : '',
     \ 'engine' : {
-        \ 'sr' : '',
-        \ 'sa' : '',
-        \ 'sk' : '',
-        \ 'sl' : ':Leaderf rg --nowrap -e "%s" "%s" %s',
-        \ 'ff' : '',
-        \ 'fh' : ''
+        \ 'rg'    : '',
+        \ 'fuzzy' : '',
+        \ 'sr'    : '',
+        \ 'sa'    : '',
+        \ 'sk'    : '',
+        \ 'sl'    : ':Leaderf rg --nowrap -e "%s" "%s" %s',
+        \ 'ff'    : '',
+        \ 'fh'    : ''
     \ },
     \ 'args' : {
         \ 'root'    : '',
@@ -1893,32 +1897,39 @@ let s:fw = {
         \ 'asyncrun' : {
             \ 'sr' : ':botright copen | :AsyncRun! rg --vimgrep "%s" "%s" %s',
             \ 'sa' : ':botright copen | :AsyncRun! -append rg --vimgrep "%s" "%s" %s',
-            \ 'sk' : ':AsyncStop'},
+            \ 'sk' : ':AsyncStop'
+            \ },
         \ 'grep' : {
             \ 'sr' : ':execute '':Rg '' . escape(''%s'', " ") . '' "%s" %s''',
             \ 'sa' : ':execute '':RgAdd '' . escape(''%s'', " ") . '' "%s" %s''',
-            \ 'sk' : ':GrepStop'},
+            \ 'sk' : ':GrepStop'
+            \ },
         \ 'grepper' : {
             \ 'sr' : ':Grepper -noprompt -tool rg -query "%s" "%s" %s',
             \ 'sa' : ':Grepper -noprompt -tool rg -append -query "%s" "%s" %s',
-            \ 'sk' : ':Grepper -stop'},
+            \ 'sk' : ':Grepper -stop'
+            \ },
         \ 'sel' : {
             \ 'opt' : ['select rg engine'],
             \ 'lst' : ['asyncrun', 'grep', 'grepper'],
-            \ 'cmd' : {sopt, arg -> extend(s:fw.engine, s:fw.rg[arg], 'force')},
+            \ 'cmd' : {sopt, arg -> s:fw.setEngine('rg', arg)},
+            \ 'get' : {sopt -> s:fw.engine.rg}
             \ }
         \ },
     \ 'fuzzy' : {
         \ 'fzf' : {
             \ 'ff' : ':FzfFiles',
-            \ 'fh' : ':FzfRg'},
+            \ 'fh' : ':FzfRg'
+            \ },
         \ 'leaderf' : {
             \ 'ff' : ':LeaderfFile',
-            \ 'fh' : ':Leaderf rg --nowrap'},
+            \ 'fh' : ':Leaderf rg --nowrap'
+            \ },
         \ 'sel' : {
             \ 'opt' : ['select fuzzy engine'],
             \ 'lst' : ['fzf', 'leaderf'],
-            \ 'cmd' : {sopt, arg -> extend(s:fw.engine, s:fw.fuzzy[arg], 'force')},
+            \ 'cmd' : {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
+            \ 'get' : {sopt -> s:fw.engine.fuzzy}
         \ }
     \ },
     \ 'misc' : {
@@ -1927,13 +1938,6 @@ let s:fw = {
         \ },
     \ 'mappings' : []
     \ }
-if IsVim()
-    call extend(s:fw.engine, s:fw.rg.grep, 'force')
-else
-    call extend(s:fw.engine, s:fw.rg.grepper, 'force')
-endif
-call extend(s:fw.engine, s:fw.fuzzy.leaderf, 'force')
-
 " s:fw.mappings {{{
 let s:fw.mappings = [
                 \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fri',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'frI',
@@ -1967,6 +1971,24 @@ let s:fw.mappings = [
                 \ ]
 " }}}
 
+" FUNCTION: s:fw.init() dict {{{
+function! s:fw.init() dict
+    if IsVim()
+        call s:fw.setEngine('rg', 'grep')
+    else
+        call s:fw.setEngine('rg', 'grepper')
+    endif
+    call s:fw.setEngine('fuzzy', 'leaderf')
+endfunction
+" }}}
+
+" FUNCTION: s:fw.setEngine(type, engine) dict {{{
+function! s:fw.setEngine(type, engine) dict
+    let self.engine[a:type] = a:engine
+    call extend(self.engine, self[a:type][a:engine], 'force')
+endfunction
+" }}}
+
 " FUNCTION: s:fw.exec() dict {{{
 function! s:fw.exec() dict
     let l:exec = printf(self.cmd, escape(self.pat, '"-#%\'), self.loc, self.opt)
@@ -1975,6 +1997,8 @@ function! s:fw.exec() dict
     call Plug_rpt_setExecution(l:exec)
 endfunction
 " }}}
+
+call s:fw.init()
 " }}}
 
 " FUNCTION: FindWow(keys, mode) {{{ 超速查找
