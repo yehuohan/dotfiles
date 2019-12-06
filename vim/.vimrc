@@ -166,6 +166,27 @@ call s:gsetLoad()
 " }}} End
 
 " Plug Settings {{{
+" s:plug {{{
+let s:plug = {
+    \ 'timer' : 0,
+    \ 'delay' : 700,
+    \ 'list'  : []
+    \ }
+" FUNCTION: s:plug.append(name) dict {{{
+function! s:plug.append(name) dict
+    call add(self.list, a:name)
+endfunction
+" }}}
+
+" FUNCTION: s:plug.init() dict {{{
+function! s:plug.init() dict
+    if !empty(self.list)
+        let s:plug.timer = timer_start(s:plug.delay, {timer -> call('plug#load', self.list)})
+    endif
+endfunction
+" }}}
+" }}}
+
 call plug#begin($DotVimPath.'/bundle')  " 可以指定插件安装位置
 
 " 基本编辑 {{{
@@ -797,7 +818,8 @@ if s:gset.use_ycm
         endif
     endfunction
     " }}}
-    Plug 'ycm-core/YouCompleteMe', { 'do': function('Plug_ycm_build') }
+    Plug 'ycm-core/YouCompleteMe', {'do': function('Plug_ycm_build'), 'on': []}
+    call s:plug.append('YouCompleteMe')
     let g:ycm_global_ycm_extra_conf=$DotVimPath.'/.ycm_extra_conf.py'
                                                                 " C-family补全路径
     let g:ycm_enable_diagnostic_signs = 1                       " 开启语法检测
@@ -1256,6 +1278,7 @@ endif
 " }}}
 
 call plug#end()
+call s:plug.init()
 " }}} End
 
 " User Functions {{{
@@ -1543,7 +1566,7 @@ endfunction
 " Required: 'skywind3000/asyncrun.vim'
 "           'yehuohan/popset'
 
-" s:cpl {{{ Compiler command of project
+" s:cpl {{{
 " @attribute type: 文件类型
 " @attribute wdir, args, srcf, outf: 用于type的参数
 " @attribute cell: 用于type的cell类型
