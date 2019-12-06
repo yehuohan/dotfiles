@@ -1627,7 +1627,6 @@ let s:cpl = {
                 \ '-fPIC -shared'
                 \ ],
         \ 'cmd' : {sopt, arg -> call('CompileFile', [arg])},
-        \ 'pre' : 0
         \ },
     \ 'sel_exe' : {
         \ 'opt' : ['select execution to run'],
@@ -1649,7 +1648,6 @@ let s:cpl = {
                 \ 'edit ++enc=cp936' : 'load as cp936',
                 \ },
         \ 'cmd' : {sopt, arg -> execute(arg)},
-        \ 'pre' : 1,
         \ }
     \}
 " FUNCTION: s:cpl.printf(type, args, srcf, outf) dict {{{
@@ -1760,7 +1758,6 @@ function! CompileProject(type, args)
             \ 'opt' : ['Please select the project file'],
             \ 'lst' : l:prj,
             \ 'cmd' : a:fn,
-            \ 'pre' : 0,
             \ 'arg' : a:args
             \})
     else
@@ -1908,7 +1905,6 @@ let s:fw = {
             \ 'opt' : ['select rg engine'],
             \ 'lst' : ['asyncrun', 'grep', 'grepper'],
             \ 'cmd' : {sopt, arg -> extend(s:fw.engine, s:fw.rg[arg], 'force')},
-            \ 'pre' : 0
             \ }
         \ },
     \ 'fuzzy' : {
@@ -1922,7 +1918,6 @@ let s:fw = {
             \ 'opt' : ['select fuzzy engine'],
             \ 'lst' : ['fzf', 'leaderf'],
             \ 'cmd' : {sopt, arg -> extend(s:fw.engine, s:fw.fuzzy[arg], 'force')},
-            \ 'pre' : 0
         \ }
     \ },
     \ 'misc' : {
@@ -2366,7 +2361,6 @@ function! QuickfixIconv()
         \ 'opt' : ['Select encoding'],
         \ 'lst' : ['"cp936", "utf-8"', '"utf-8", "cp936"'],
         \ 'cmd' : 'QuickfixMakeIconv',
-        \ 'pre' : 1,
         \ 'arg' : [l:type,]
         \ })
 endfunction
@@ -2388,36 +2382,7 @@ let s:opt = {
         \ 'number' : 'OptFuncNumber',
         \ 'syntax' : 'OptFuncSyntax',
         \ },
-    \ 'sel_inv' : {
-        \ 'opt' : ['option invert value'],
-        \ 'lst' : ['wrap', 'list', 'ignorecase', 'expandtab'],
-        \ 'cmd' : {sopt, arg -> OptionInv(arg)},
-        \ },
-    \ 'sel_lst' : {
-        \ 'opt' : ['option list value'],
-        \ 'lst' : ['conceallevel', 'virtualedit', 'foldcolumn', 'signcolumn'],
-        \ 'cmd' : {sopt, arg -> OptionLst(arg)},
-        \ },
-    \ 'sel_func' : {
-        \ 'opt' : ['option function'],
-        \ 'lst' : ['number', 'syntax'],
-        \ 'cmd' : {sopt, arg -> OptionFunc(arg)},
-        \ },
     \ }
-" }}}
-
-" FUNCTION: OptionSel() {{{ 设置参数
-function! OptionSel()
-    call PopSelection({
-        \ 'opt' : ['Option select'],
-        \ 'lst' : ['inv', 'lst', 'func'],
-        \ 'sub' : {
-            \ 'inv' : s:opt.sel_inv,
-            \ 'lst' : s:opt.sel_lst,
-            \ 'func' : s:opt.sel_func},
-        \ 'cmd' : 'popset#set#SubPopSelection'
-        \ })
-endfunction
 " }}}
 
 " FUNCTION: OptionInv(opt) {{{ 切换参数值（bool取反）
@@ -2445,19 +2410,17 @@ endfunction
 " }}}
 
 " FUNCTION: OptFuncNumber() {{{ 切换显示行号
-let s:opt_number = 0
 function! OptFuncNumber()
-    if s:opt_number == 0
+    if (&number) && (&relativenumber)
         set nonumber
         set norelativenumber
-    elseif s:opt_number == 1
+    elseif !(&number) && !(&relativenumber)
         set number
         set norelativenumber
-    elseif s:opt_number == 2
+    elseif (&number) && !(&relativenumber)
         set number
         set relativenumber
     endif
-    let s:opt_number = (s:opt_number + 1) % 3
 endfunction
 " }}}
 
@@ -2472,7 +2435,6 @@ function! OptFuncSyntax()
     endif
 endfunction
 " }}}
-
 " }}}
 " }}} End
 
@@ -2717,7 +2679,6 @@ endif
     nnoremap <leader>xx :%!xxd<CR>
     nnoremap <leader>xr :%!xxd -r<CR>
     " Misc
-    nnoremap <leader>io :call OptionSel()<CR>
     nnoremap <leader>iw :call OptionInv('wrap')<CR>
     nnoremap <leader>il :call OptionInv('list')<CR>
     nnoremap <leader>ii :call OptionInv('ignorecase')<CR>
