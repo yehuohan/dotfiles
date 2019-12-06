@@ -1687,7 +1687,9 @@ function! s:cpl.run(type, wdir, cmd) dict
     endif
     let l:exec = ':AsyncRun '
     if !empty(a:wdir)
-        execute 'lcd ' . fnameescape(a:wdir)
+        let l:wdir = fnameescape(a:wdir)
+        let l:exec .= '-cwd=' . l:wdir
+        execute 'lcd ' . l:wdir
     endif
     return join([l:exec, a:cmd])
 endfunction
