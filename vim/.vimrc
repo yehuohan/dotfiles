@@ -2737,15 +2737,11 @@ endif
 
     for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
         " 寄存器快速复制与粘贴
-        execute "vnoremap <leader>'" . t            .   ' "' . t . 'y'
-        execute "nnoremap <leader>'" . t            .   ' "' . t . 'p'
-        execute "nnoremap <leader>'" . toupper(t)   .   ' "' . t . 'P'
+        execute "vnoremap <leader>'" . t          . ' "' . t . 'y'
+        execute "nnoremap <leader>'" . t          . ' "' . t . 'p'
+        execute "nnoremap <leader>'" . toupper(t) . ' "' . t . 'P'
         " 快速执行宏
-        execute "nnoremap <leader>2" . t            .   ' @' . t
-    endfor
-    for t in split('1 2 3 4 5 6 7 8 9 0', ' ')
-        execute "vnoremap <leader>'" . t            .   ' "' . t . 'y'
-        execute "nnoremap <leader>'" . t            .   ' "' . t . 'p'
+        execute "nnoremap <leader>2" . t . ' @' . t
     endfor
 " }}}
 
