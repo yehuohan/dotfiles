@@ -90,12 +90,10 @@ endsnippet
 #===============================================================================
 # algorithm for c/c++
 #===============================================================================
-snippet aquick-sort "quick sort in c/c++"
-int partition(int* pdata, int lo, int hi)
-{
+snippet dsa-quick-sort "quick sort in c/c++"
+int partition(int* pdata, int lo, int hi) {
     int pivot = pdata[lo];
-    while(lo < hi)
-    {
+    while(lo < hi) {
         while(lo < hi && pdata[hi] >= pivot) hi--;
         pdata[lo] = pdata[hi];
         while(lo < hi && pdata[lo] <= pivot) lo++;
@@ -104,8 +102,7 @@ int partition(int* pdata, int lo, int hi)
     pdata[lo] = pivot;
     return lo;
 }
-void quick_sort(int* pdata, int lo, int hi)
-{
+void quick_sort(int* pdata, int lo, int hi) {
     if (hi - lo < 2)
         return;
     int mi = partition(pdata, lo, hi-1);
@@ -114,15 +111,12 @@ void quick_sort(int* pdata, int lo, int hi)
 }
 endsnippet
 
-snippet ainsert-sort "insertion sort in c/c++"
-void insertion_sort(int* pdata, int lo, int hi)
-{
-    for (int k = lo + 1; k < hi; k ++)
-    {
+snippet dsa-insert-sort "insertion sort in c/c++"
+void insertion_sort(int* pdata, int lo, int hi) {
+    for (int k = lo + 1; k < hi; k ++) {
         int n = k;
         int tmp = pdata[n];
-        while (n > lo && tmp < pdata[n-1])
-        {
+        while (n > lo && tmp < pdata[n-1]) {
             pdata[n] = pdata[n-1];
             n--;
         }
@@ -131,24 +125,20 @@ void insertion_sort(int* pdata, int lo, int hi)
 }
 endsnippet
 
-snippet apre-order "pre-order sort in c/c++"
-typedef struct node_s
-{
+snippet dsa-pre-order "binary tree pre-order"
+typedef struct node_s {
     int data;
     struct node_s* parent;
     struct node_s* left;
     struct node_s* right;
 }node_t;
-void traverse_preorder(node_t* root, void (*visit)(node_t*))
-{
+void traverse_preorder(node_t* root, void (*visit)(node_t*)) {
     node_t* d = root;
     std::stack<node_t*> s;
     s.push(d);
-    while (!s.empty())
-    {
+    while (!s.empty()) {
         d = s.top(); s.pop();
-        while (d)
-        {
+        while (d) {
             visit(d);
             s.push(d->right);
             d = d->left;
@@ -157,28 +147,23 @@ void traverse_preorder(node_t* root, void (*visit)(node_t*))
 }
 endsnippet
 
-snippet ain-order "in-order sort in c/c++"
-typedef struct node_s
-{
+snippet dsa-in-order "binary tree in-order"
+typedef struct node_s {
     int data;
     struct node_s* parent;
     struct node_s* left;
     struct node_s* right;
 }node_t;
-void traverse_inorder(node_t* root, void (*visit)(node_t*))
-{
+void traverse_inorder(node_t* root, void (*visit)(node_t*)) {
     node_t* d = root;
     std::stack<node_t*> s;
-    while (true)
-    {
-        while (d)
-        {
+    while (true) {
+        while (d) {
             s.push(d);
             d = d->left;
         }
         if (s.empty()) break;
-        else
-        {
+        else {
             d = s.top(); s.pop();
             visit(d);
             d = d->right;
@@ -187,36 +172,28 @@ void traverse_inorder(node_t* root, void (*visit)(node_t*))
 }
 endsnippet
 
-snippet apost-order "post-order sort in c/c++"
-typedef struct node_s
-{
+snippet dsa-post-order "binary tree post-order"
+typedef struct node_s {
     int data;
     struct node_s* parent;
     struct node_s* left;
     struct node_s* right;
 }node_t;
-void traverse_postorder(node_t* root, void (*visit)(node_t*))
-{
+void traverse_postorder(node_t* root, void (*visit)(node_t*)) {
     node_t* d = root;
     node_t* last = nullptr;
     std::stack<node_t*> s;
-    while (true)
-    {
-        while (d)
-        {
+    while (true) {
+        while (d) {
             s.push(d);
             d = d->left;
         }
-        while (!s.empty())
-        {
+        while (!s.empty()) {
             d = s.top(); s.pop();
-            if (!d->right || last == d->right)
-            {
+            if (!d->right || last == d->right) {
                 visit(d);
                 last = d;
-            }
-            else
-            {
+            } else {
                 s.push(d);
                 d = d->right;
                 break;
@@ -227,25 +204,143 @@ void traverse_postorder(node_t* root, void (*visit)(node_t*))
 }
 endsnippet
 
-snippet alayer-order "layer-order sort in c/c++"
-typedef struct node_s
-{
+snippet dsa-layer-order "binary tree layer-order"
+typedef struct node_s {
     int data;
     struct node_s* parent;
     struct node_s* left;
     struct node_s* right;
 }node_t;
-void traverse_layerorder(node_t* root, void (*visit)(node_t*))
-{
+void traverse_layerorder(node_t* root, void (*visit)(node_t*)) {
     node_t* d = root;
     std::queue<node_t*> q;
     q.push(d);
-    while (!q.empty())
-    {
+    while (!q.empty()) {
         d = q.front(); q.pop();
         visit(d);
         if (d->left) q.push(d->left);
         if (d->right) q.push(d->right);
+    }
+}
+endsnippet
+
+snippet dsa-dfs "graph dfs"
+typedef struct Vertex {
+    int     data;
+    uint8_t status;
+}Vertex;
+typedef struct Edge {
+    int     data;
+    uint8_t status;
+}Edge;
+typedef Edge* EdgePtr;
+typedef struct Graph {
+    Vertex*     v;
+    EdgePtr**   e;
+    int         v_num;
+    int         e_num;
+}Graph;
+static void DFS(Graph* g, int v) {
+    // TODO:visit g->v[v];
+    g->v[v].status = 1;
+    for (int k = 0; k < g->v_num; k ++) {
+        if (g->e[v][k] != NULL) {
+            if (g->v[k].status == 0)
+                DFS(g, k);
+        }
+    }
+}
+void graph_dfs(Graph* g, int s) {
+    int v = s;
+    do {
+        if (g->v[v].status == 0)
+            DFS(g, v);
+        v = (v+1) % g->v_num;
+    }while(s != v);
+}
+endsnippet
+
+snippet dsa-bfs "graph bfs"
+typedef struct Vertex {
+    int     data;
+    uint8_t status;
+}Vertex;
+typedef struct Edge {
+    int     data;
+    uint8_t status;
+}Edge;
+typedef Edge* EdgePtr;
+typedef struct Graph {
+    Vertex*     v;
+    EdgePtr**   e;
+    int         v_num;
+    int         e_num;
+}Graph;
+static void BFS(Graph* g, int v) {
+    std::queue<int> q;
+    q.push(v);
+    while (!q.empty()) {
+        v = q.front();
+        q.pop();
+        for (int k = 0; k < g->v_num; k ++) {
+            if (g->e[v][k] != NULL) {
+				if (g->v[k].status == 0) {
+					g->v[v].status = 1;
+                    q.push(k);
+				}
+            }
+        }
+        // TODO:visit g->v[v];
+        g->v[v].status = 2;
+    }
+}
+void graph_bfs(Graph* g, int s) {
+    int v = s;
+    do {
+        if (g->v[v].status == 0)
+            BFS(g, v);
+        v = (v+1) % g->v_num;
+    }while(s != v);
+}
+endsnippet
+
+snippet dsa-dijkstra "graph dijkstra"
+typedef struct Vertex {
+    int     data;
+    uint8_t status;
+}Vertex;
+typedef struct Edge {
+    int     data;
+    uint8_t status;
+}Edge;
+typedef Edge* EdgePtr;
+typedef struct Graph {
+    Vertex*     v;
+    EdgePtr**   e;
+    int         v_num;
+    int         e_num;
+}Graph;
+void graph_dijkstra(Graph* g, int s, int dist[]) {
+    for (int k = 0; k < g->v_num; k ++)
+        dist[k] = INT_MAX;
+    dist[s] = 0;
+    int v = s;
+    for (int i = 0; i < g->v_num; i ++) {
+        g->v[v].status = 1;
+        // min(v->k)
+        for (int k = 0; k < g->v_num; k ++) {
+            if (g->e[v][k] != NULL && g->v[k].status == 0) {
+                if (dist[k] > dist[v] + g->e[v][k]->data)
+                    dist[k] = dist[v] + g->e[v][k]->data;
+            }
+        }
+        // v = argmin(v->k)
+        for (int min = INT_MAX, k = 0; k < g->v_num; k ++) {
+            if (g->v[k].status == 0 && min > dist[k]) {
+                min = dist[k];
+                v = k;
+            }
+        }
     }
 }
 endsnippet
