@@ -1082,7 +1082,7 @@ endif
     vnoremap <leader><leader>r :AsyncRun
     nnoremap <leader>rr :call feedkeys(':AsyncRun ', 'n')<CR>
     vnoremap <leader>rr :AsyncRun
-    nnoremap <leader>rs :AsyncStop<CR>
+    nnoremap <leader>rk :AsyncStop<CR>
 " }}}
 
 " easydebugger {{{ NodeJS, Go, Python调试器(Vim only)
@@ -1283,7 +1283,7 @@ call s:plug.init()
 " }}} End
 
 " User Functions {{{
-" funcs {{{
+" libs {{{
 " FUNCTION: GetSelected() {{{ 获取选区内容
 function! GetSelected()
     let l:reg_var = getreg('0', 1)
@@ -1419,11 +1419,11 @@ function! GetInput(prompt, ...)
 endfunction
 " }}}
 
-" FUNCTION: FuncExecInput(iargs, fn, [fargs...]) range {{{
+" FUNCTION: ExecInput(iargs, fn, [fargs...]) range {{{
 " @param iargs: 用于GetInput的参数列表
 " @param fn: 要运行的函数，第一个参数必须为GetInput的输入
 " @param fargs: fn的附加参数
-function! FuncExecInput(iargs, fn, ...) range
+function! ExecInput(iargs, fn, ...) range
     let l:inpt = call('GetInput', a:iargs)
     if empty(l:inpt)
         return
@@ -1435,6 +1435,60 @@ function! FuncExecInput(iargs, fn, ...) range
     let l:range = (a:firstline == a:lastline) ? '' : (string(a:firstline) . ',' . string(a:lastline))
     let Fn = function(a:fn, l:fargs)
     execute l:range . 'call Fn()'
+endfunction
+" }}}
+" }}}
+
+" funcs {{{
+" s:fs {{{
+let s:fs = {
+    \ 'sel' : {
+        \ 'opt' : ['select scripts to run'],
+        \ 'lst' : [
+                \ 'retab',
+                \ '%s/\s\+$//ge',
+                \ '%s/\r//ge',
+                \ 'edit ++enc=utf-8',
+                \ 'edit ++enc=cp936',
+                \ 'clearUndo',
+                \ 'lineToTop',
+                \ ],
+        \ 'dic' : {
+                \ 'retab'            : 'retab with expandtab',
+                \ '%s/\s\+$//ge'     : 'remove trailing space',
+                \ '%s/\r//ge'        : 'remove ^M',
+                \ 'edit ++enc=utf-8' : 'reload as utf-8',
+                \ 'edit ++enc=cp936' : 'reload as cp936',
+                \ 'clearUndo'        : 'clear undo history',
+                \ 'lineToTop'        : 'frozen current line to top',
+                \ },
+        \ 'cmd' : {sopt, arg -> has_key(s:fs.scripts, arg) ? s:fs.scripts[arg]() : execute(arg)},
+        \ },
+    \ 'scripts' : {}
+    \ }
+" FUNCTION: s:fs.scripts.clearUndo() dict {{{ 清除undo数据
+function! s:fs.scripts.clearUndo() dict
+    let l:ulbak = &undolevels
+    set undolevels=-1
+    execute "normal! a\<Space>\<BS>\<Esc>"
+    let &undolevels = l:ulbak
+endfunction
+" }}}
+
+" FUNCTION: s:fs.scripts.lineToTop() dict {{{ 冻结顶行
+function! s:fs.scripts.lineToTop() dict
+    let l:line = line('.')
+    split %
+    resize 1
+    call cursor(l:line, 1)
+    wincmd p
+endfunction
+" }}}
+" }}}
+
+" FUNCTION: FuncRunScript() {{{ 常用函数脚本代码
+function! FuncRunScript()
+    call PopSelection(s:fs.sel)
 endfunction
 " }}}
 
@@ -1490,10 +1544,10 @@ function! FuncDivideSpace(string, pos) range
     endfor
     call Plug_rpt_setExecution('call FuncDivideSpace("' . a:string . '", "' . a:pos . '")')
 endfunction
-let FuncDivideSpaceH = function('FuncExecInput', [['Divide H Space(split with space): '], 'FuncDivideSpace', 'h'])
-let FuncDivideSpaceC = function('FuncExecInput', [['Divide C Space(split with space): '], 'FuncDivideSpace', 'c'])
-let FuncDivideSpaceL = function('FuncExecInput', [['Divide L Space(split with space): '], 'FuncDivideSpace', 'l'])
-let FuncDivideSpaceD = function('FuncExecInput', [['Delete D Space(split with space): '], 'FuncDivideSpace', 'd'])
+let FuncDivideSpaceH = function('ExecInput', [['Divide H Space(split with space): '], 'FuncDivideSpace', 'h'])
+let FuncDivideSpaceC = function('ExecInput', [['Divide C Space(split with space): '], 'FuncDivideSpace', 'c'])
+let FuncDivideSpaceL = function('ExecInput', [['Divide L Space(split with space): '], 'FuncDivideSpace', 'l'])
+let FuncDivideSpaceD = function('ExecInput', [['Delete D Space(split with space): '], 'FuncDivideSpace', 'd'])
 " }}}
 
 " FUNCTION: FuncAppendCmd(str, flg) {{{ 将命令结果作为文本插入
@@ -1512,27 +1566,12 @@ function! FuncAppendCmd(str, flg)
     endif
     call append(line('.'), split(l:result, "\n"))
 endfunction
-let FuncAppendExecResult = function('FuncExecInput', [['Input command = ', '', 'command'] , 'FuncAppendCmd', 'exec'])
-let FuncAppendCallResult = function('FuncExecInput', [['Input function = ', '', 'function'], 'FuncAppendCmd', 'call'])
+let FuncAppendExecResult = function('ExecInput', [['Input command = ', '', 'command'] , 'FuncAppendCmd', 'exec'])
+let FuncAppendCallResult = function('ExecInput', [['Input function = ', '', 'function'], 'FuncAppendCmd', 'call'])
 " }}}
 
-" FUNCTION: MiscFcitx2en() MiscFcitx2zh() {{{ 切换Fcitx输入法
-if IsLinux()
-function! MiscFcitx2en()
-    if 2 == system('fcitx-remote')
-        let l:t = system('fcitx-remote -c')
-    endif
-endfunction
-function! MiscFcitx2zh()
-    if 1 == system('fcitx-remote')
-        let l:t = system('fcitx-remote -o')
-    endif
-endfunction
-endif
-" }}}
-
-" FUNCTION: MiscGotoKeyword(mode) {{{ 查找Vim关键字
-function! MiscGotoKeyword(mode)
+" FUNCTION: FuncGotoKeyword(mode) {{{ 查找Vim关键字
+function! FuncGotoKeyword(mode)
     let l:exec = 'help '
     if a:mode ==# 'n'
         let l:word = expand('<cword>')
@@ -1551,14 +1590,19 @@ function! MiscGotoKeyword(mode)
 endfunction
 " }}}
 
-" FUNCTION: MiscHoldTopLine() {{{ 冻结顶行
-function! MiscHoldTopLine()
-    let l:line = line('.')
-    split %
-    resize 1
-    call cursor(l:line, 1)
-    wincmd p
+" FUNCTION: FuncFcitx2en() FuncFcitx2zh() {{{ 切换Fcitx输入法
+if IsLinux()
+function! FuncFcitx2en()
+    if 2 == system('fcitx-remote')
+        let l:t = system('fcitx-remote -c')
+    endif
 endfunction
+function! FuncFcitx2zh()
+    if 1 == system('fcitx-remote')
+        let l:t = system('fcitx-remote -o')
+    endif
+endfunction
+endif
 " }}}
 " }}}
 
@@ -1631,25 +1675,13 @@ let s:cpl = {
     \ 'sel_exe' : {
         \ 'opt' : ['select execution to run'],
         \ 'lst' : [
-                \ 'retab',
-                \ '%s/\s\+$//g',
-                \ '%s/\r//g',
-                \ 'edit ++enc=utf-8',
-                \ 'edit ++enc=cp936',
-                \ 'AsyncRun python -m json.tool %',
-                \ 'AsyncRun go mod init %:r',
-                \ 'AsyncRun cflow -T %'
+                \ 'python -m json.tool %',
+                \ 'go mod init %:r',
+                \ 'cflow -T %'
                 \ ],
-        \ 'dic' : {
-                \ 'retab'            : 'retab with expandtab',
-                \ '%s/\s\+$//g'      : 'remove trailing space',
-                \ '%s/\r//g'         : 'remove ^M',
-                \ 'edit ++enc=utf-8' : 'load as utf-8',
-                \ 'edit ++enc=cp936' : 'load as cp936',
-                \ },
-        \ 'cmd' : {sopt, arg -> execute(arg)},
+        \ 'cmd' : {sopt, arg -> execute(':AsyncRun ' . arg)},
         \ }
-    \}
+    \ }
 " FUNCTION: s:cpl.printf(type, args, srcf, outf) dict {{{
 " 生成文件编译或执行命令字符串。
 " @param type: 编译类型，需要包含于s:cpl.type中
@@ -1832,7 +1864,6 @@ function! CFnSphinx(sopt, sel, args)
 endfunction
 "}}}
 
-" Run compiler
 let RcArg         = function('popset#set#PopSelection', [s:cpl.sel_arg])
 let RcExe         = function('popset#set#PopSelection', [s:cpl.sel_exe])
 let RcQt          = function('CompileProject', ['qt', [0, []]])
@@ -2628,8 +2659,8 @@ augroup UserSettingsCmd
     autocmd FileType go         setlocal expandtab
     autocmd FileType javascript setlocal foldmethod=syntax
 
-    autocmd Filetype vim,help nnoremap <buffer> <S-k> :call MiscGotoKeyword('n')<CR>
-    autocmd Filetype vim,help vnoremap <buffer> <S-k> :call MiscGotoKeyword('v')<CR>
+    autocmd Filetype vim,help nnoremap <buffer> <S-k> :call FuncGotoKeyword('n')<CR>
+    autocmd Filetype vim,help vnoremap <buffer> <S-k> :call FuncGotoKeyword('v')<CR>
 augroup END
 " }}}
 " }}} End
@@ -2713,9 +2744,8 @@ endif
     nnoremap <leader>in :call OptionFunc('number')<CR>
     nnoremap <leader>ih :call OptionFunc('syntax')<CR>
     if IsLinux()
-        inoremap <Esc> <Esc>:call MiscFcitx2en()<CR>
+        inoremap <Esc> <Esc>:call FuncFcitx2en()<CR>
     endif
-    nnoremap <leader>hl :call MiscHoldTopLine()<CR>
 " }}}
 
 " copy&paste {{{
@@ -2803,8 +2833,8 @@ endif
 
 " file diff {{{
     " 文件比较，自动补全文件和目录
-    nnoremap <leader>ds :call FuncExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 's')<CR>
-    nnoremap <leader>dv :call FuncExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 'v')<CR>
+    nnoremap <leader>ds :call ExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 's')<CR>
+    nnoremap <leader>dv :call ExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 'v')<CR>
     " 比较当前文件（已经分屏）
     nnoremap <leader>dt :diffthis<CR>
     " 关闭文件比较，与diffthis互为逆命令
@@ -2838,8 +2868,8 @@ endif
 
 " project {{{
     " 创建临时文件
-    nnoremap <leader>ei :call FuncExecInput(['Temp file suffix: '], 'FuncEditTempFile', 0)<CR>
-    nnoremap <leader>eti :call FuncExecInput(['Temp file suffix: '], 'FuncEditTempFile', 1)<CR>
+    nnoremap <leader>ei :call ExecInput(['Temp file suffix: '], 'FuncEditTempFile', 0)<CR>
+    nnoremap <leader>eti :call ExecInput(['Temp file suffix: '], 'FuncEditTempFile', 1)<CR>
     for [key, val] in items({
             \ 'n' : '',
             \ 'c' : 'c',
@@ -2850,18 +2880,21 @@ endif
         execute 'nnoremap <leader>e'  . key . ' :call FuncEditTempFile("' . val . '", 0)<CR>'
         execute 'nnoremap <leader>et' . key . ' :call FuncEditTempFile("' . val . '", 1)<CR>'
     endfor
+    " 常用操作
     nnoremap <leader>dh :call FuncDivideSpaceH()<CR>
     nnoremap <leader>dc :call FuncDivideSpaceC()<CR>
     nnoremap <leader>dl :call FuncDivideSpaceL()<CR>
     nnoremap <leader>dd :call FuncDivideSpaceD()<CR>
     nnoremap <leader>ae :call FuncAppendExecResult()<CR>
     nnoremap <leader>af :call FuncAppendCallResult()<CR>
-    " 编译运行当前文件或项目
+    nnoremap <leader>rs :call FuncRunScript()<CR>
+    " 编译运行当前文件
     nnoremap <leader>rf :call CompileFile('')<CR>
-    nnoremap <leader>ri :call FuncExecInput(['Compile/Run args: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h')], 'CompileFile')<CR>
+    nnoremap <leader>ri :call ExecInput(['Compile/Run args: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h')], 'CompileFile')<CR>
     nnoremap <leader>rj :call CompileCell()<CR>
     nnoremap <leader>ra :call RcArg()<CR>
     nnoremap <leader>re :call RcExe()<CR>
+    " 编译运行当前项目
     nnoremap <leader>rQ  :call RcQt()<CR>
     nnoremap <leader>rq  :call RcQtRun()<CR>
     nnoremap <leader>rcq :call RcQtClean()<CR>
