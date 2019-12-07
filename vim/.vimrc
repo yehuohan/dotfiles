@@ -121,7 +121,6 @@ let s:gset = {
     \ 'use_leaderf' : 1,
     \ 'use_ycm' : 1,
     \ 'use_ultisnips' : 1,
-    \ 'use_lcn' : 0,
     \ 'use_utils' : 1,
     \ }
 " FUNCTION: s:gsetLoad() {{{
@@ -906,22 +905,6 @@ if s:gset.use_ycm
         endif
         execute 'edit ' . a:filename
     endfunction
-endif
-" }}}
-
-" LanguageClient-neovim {{{ 代码补全（使用LSP）
-if s:gset.use_lcn
-    Plug 'autozimu/LanguageClient-neovim', {
-        \ 'branch': 'next',
-        \ 'do': IsWin() ? 'powershell -executionpolicy bypass -File install.ps1' : 'bash install.sh',
-        \ 'for': 'dart'
-        \ }
-    " LCN使用omnifunc(LanguageClient#complete)
-    let g:LanguageClient_serverCommands = {}
-    let g:LanguageClient_diagnosticsDisplay = {}                " 禁用语法检测
-    let g:LanguageClient_diagnosticsSignsMax = 0
-    let g:LanguageClient_diagnosticsEnable = 0
-    let g:LanguageClient_hasSnippetSupport = 0                  " 禁用snippet支持
 endif
 " }}}
 
