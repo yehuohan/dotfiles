@@ -849,14 +849,6 @@ if s:gset.use_ycm
     let g:ycm_filetype_whitelist = {'*': 1}                     " YCM只在白名单出现且黑名单未出现的filetype工作
     let g:ycm_language_server = [
         \ {
-            \ 'name': 'dart',
-            \ 'cmdline': ['dart',
-            \       IsWin() ? 'C:/MyApps/dart-sdk/bin/snapshots/analysis_server.dart.snapshot' :
-            \                 '/opt/dart-sdk/bin/snapshots/analysis_server.dart.snapshot',
-            \       '--lsp'],
-            \ 'filetypes': ['dart']
-        \ },
-        \ {
             \ 'name': 'julia',
             \ 'cmdline': ['julia', '--startup-file=no', '--history-file=no', '-e', '
             \       using LanguageServer;
@@ -870,8 +862,7 @@ if s:gset.use_ycm
             \       run(server);
             \       '],
             \ 'filetypes': ['julia']
-        \ },
-        \ ]                                                     " LSP支持
+        \ }]                                                    " LSP支持
     let g:ycm_key_detailed_diagnostics = ''                     " 直接使用:YcmShowDetailedDiagnostic命令
     let g:ycm_key_list_select_completion = ['<C-j>', '<C-n>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-k>', '<C-p>', '<Up>']
@@ -1136,10 +1127,6 @@ endif
     let g:default_julia_version = 'devel'
     let g:latex_to_unicode_tab = 1      " 使用<Tab>输入unicode字符
     nnoremap <leader>tn :call LaTeXtoUnicode#Toggle()<CR>
-" }}}
-
-" dart-plugin {{{ dart语法高亮
-    Plug 'dart-lang/dart-vim-plugin', {'for': 'dart'}
 " }}}
 " }}}
 
