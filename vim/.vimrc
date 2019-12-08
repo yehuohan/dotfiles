@@ -103,6 +103,7 @@ if IsVim()
     for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
         execute 'set <M-'. t . '>=' . t
     endfor
+    set <M-Space>=<Space>
     set <M-,>=,
     set <M-.>=.
     set <M-;>=;
@@ -2885,7 +2886,7 @@ endif
 
 " find&search {{{
     " 正向查找
-    vnoremap / "*y<Bar>:execute '/' . @*<CR>
+    vnoremap / ""y<Bar>:execute '/' . @"<CR>
     nnoremap <leader>/ :execute '/' . expand('<cword>')<CR>
     " FindWow查找
     for key in s:fw.mappings
