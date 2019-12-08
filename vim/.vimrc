@@ -1857,11 +1857,6 @@ let RcSphinxClean = function('CompileProject', ['sphinx', [0, 'clean']])
 "           'yehuohan/popc'
 "           'yehuohan/popset'
 
-augroup UserFunctionSearch
-    autocmd!
-    autocmd User Grepper call FindWowHighlight(s:fw.pat)
-augroup END
-
 " s:fw {{{
 " @attribute engine: 搜索程序，命令格式为：printf('cmd %s %s %s',<pat>,<loc>,<opt>)
 "            sr : search
@@ -1975,11 +1970,13 @@ let s:fw.mappings = [
 
 " FUNCTION: s:fw.init() dict {{{
 function! s:fw.init() dict
-    if IsVim()
-        call s:fw.setEngine('rg', 'grep')
-    else
-        call s:fw.setEngine('rg', 'grepper')
-    endif
+    " 设置搜索结果高亮
+    augroup UserFunctionSearch
+        autocmd!
+        autocmd User Grepper call FindWowHighlight(s:fw.pat)
+    augroup END
+    " 设置搜索引擎
+    call s:fw.setEngine('rg', IsWin() ? 'grep' : 'grepper')
     call s:fw.setEngine('fuzzy', 'leaderf')
 endfunction
 " }}}
@@ -2153,21 +2150,12 @@ function! FindWow(keys, mode)
     " try use vimgrep first
     if s:parseVimgrep() | return | endif
 
-    " find pattern
     let s:fw.pat = s:parsePattern()
     if empty(s:fw.pat) | return | endif
-
-    " find location
     let s:fw.loc = s:parseLocation()
     if empty(s:fw.loc) | return | endif
-
-    " find options
     let s:fw.opt = s:parseOptions()
-
-    " find command
     let s:fw.cmd = s:parseCommand()
-
-    " Find Working
     call s:fw.exec()
 endfunction
 " }}}
