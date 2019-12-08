@@ -677,24 +677,29 @@ endif
     Plug 'yehuohan/popc'
     set hidden
     let g:Popc_jsonPath = $DotVimPath
-    let g:Popc_useGlobalPath = 1
     let g:Popc_useTabline = 1
     let g:Popc_useStatusline = 1
     let g:Popc_usePowerFont = s:gset.use_powerfont
     let g:Popc_separator = {'left' : '', 'right': ''}
     let g:Popc_subSeparator = {'left' : '', 'right': ''}
+    let g:Popc_useLayerPath = 0
     let s:popc_tabline_layout = 1
     nnoremap <leader><leader>h :PopcBuffer<CR>
     nnoremap <M-i> :PopcBufferSwitchLeft<CR>
     nnoremap <M-o> :PopcBufferSwitchRight<CR>
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
-    nnoremap <leader>wf :call Plug_popc_wksSearch()<CR>
+    nnoremap <leader>wf :call Plug_popc_wksSearch('file')<CR>
+    nnoremap <leader>wt :call Plug_popc_wksSearch('text')<CR>
     nnoremap <leader>ty :call Plug_popc_toggleLayout()<CR>
-    function! Plug_popc_wksSearch()
+    function! Plug_popc_wksSearch(type)
         let l:wks_root = popc#layer#wks#GetCurrentWks()[1]
         if !empty(l:wks_root)
-            execute ':LeaderfFile ' . l:wks_root
+            if a:type ==# 'file'
+                execute ':LeaderfFile ' . l:wks_root
+            elseif a:type ==# 'text'
+                execute ':Leaderf rg -e "" ' . l:wks_root
+            endif
         endif
     endfunction
     function! Plug_popc_toggleLayout()
