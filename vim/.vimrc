@@ -1976,7 +1976,7 @@ function! s:fw.init() dict
         autocmd User Grepper call FindWowHighlight(s:fw.pat)
     augroup END
     " 设置搜索引擎
-    call s:fw.setEngine('rg', IsWin() ? 'grep' : 'grepper')
+    call s:fw.setEngine('rg', IsVim() ? 'grep' : 'grepper')
     call s:fw.setEngine('fuzzy', 'leaderf')
 endfunction
 " }}}
