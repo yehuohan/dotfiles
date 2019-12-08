@@ -37,4 +37,7 @@ ColorBold=#93a1a1
 TabActivityColor=#dc322f
 ColorBoldIsBright=FALSE
 ColorBoldUseDefault=FALSE
+ShortcutsNoMnemonics=TRUE
+ShortcutsNoHelpkey=TRUE
+ShortcutsNoMenukey=TRUE
 
