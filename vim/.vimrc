@@ -12,6 +12,7 @@
     " <S-k>         : 快速查看光标所在cword或选择内容的vim帮助
     " h *@en        : 指定查看英文(en，cn即为中文)帮助
     " h index       : 帮助列表
+    " h script      :  VimL脚本语法
     " h range       : Command范围
     " h pattern     : 匹配模式
     " h magic       : Magic匹配模式
@@ -1256,6 +1257,7 @@ endfunction
 " }}}
 
 " FUNCTION: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{ 多文件自动补全
+" 多个文件或目录时，返回的补全字符串使用'|'分隔，使用时需要将'|'转回空格
 function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
     let l:complete = []
     let l:arglead_list = ['']
@@ -1266,7 +1268,7 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
     " process glob path-string
     if !empty(a:arglead)
         let l:arglead_list = split(a:arglead, ' ')
-        let l:arglead_first = join(l:arglead_list[0:-2], ' ')
+        let l:arglead_first = join(l:arglead_list[0:-2], '|')
         let l:arglead_glob = l:arglead_list[-1]
     endif
 
@@ -1280,7 +1282,7 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
         let l:complete = l:files_list
     else
         for item in l:files_list
-            call add(l:complete, l:arglead_first . ' ' . item)
+            call add(l:complete, l:arglead_first . '|' . item)
         endfor
     endif
     return l:complete
@@ -1645,7 +1647,8 @@ let s:cpl = {
                 \ '-static',
                 \ '-fPIC -shared'
                 \ ],
-        \ 'cmd' : {sopt, arg -> call('CompileFile', [arg])},
+        \ 'cpl' : 'customlist,GetMultiFilesCompletion',
+        \ 'cmd' : {sopt, arg -> call('CompileFile', [substitute(arg, '|', ' ', 'ge')])},
         \ },
     \ 'sel_exe' : {
         \ 'opt' : ['select execution to run'],
@@ -2096,8 +2099,14 @@ function! FindWow(keys, mode)
             let l:loc = join(popc#layer#buf#GetFiles('alltab'), '" "')
         elseif a:keys =~# 'p'
             let l:loc = GetInput(' Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
-            if l:loc =~# '[/\\]$'
-                let l:loc = strcharpart(l:loc, 0, strchars(l:loc) - 1)
+            if !empty(l:loc)
+                let l:loc = split(l:loc, '|')
+                for k in range(len(l:loc))
+                    if l:loc[k] =~# '[/\\]$'
+                        let l:loc[k] = strcharpart(l:loc[k], 0, strchars(l:loc[k]) - 1)
+                    endif
+                endfor
+                let l:loc = join(l:loc, '" "')
             endif
         elseif a:keys =~# 'r'
             let l:loc = FindWowSetArgs('rf') ? s:fw.args.root : ''
@@ -2884,7 +2893,6 @@ endif
     nnoremap <leader>rs :call FuncRunScript()<CR>
     " 编译运行当前文件
     nnoremap <leader>rf :call CompileFile('')<CR>
-    nnoremap <leader>ri :call ExecInput(['Compile/Run args: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h')], 'CompileFile')<CR>
     nnoremap <leader>rj :call CompileCell()<CR>
     nnoremap <leader>ra :call RcArg()<CR>
     nnoremap <leader>re :call RcExe()<CR>
