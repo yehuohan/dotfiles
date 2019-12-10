@@ -1889,11 +1889,19 @@ let s:fw = {
         \ 'sl'    : ':Leaderf rg --nowrap -e "%s" "%s" %s',
         \ 'ff'    : '',
         \ 'fh'    : ''
-    \ },
+        \ },
     \ 'args' : {
         \ 'root'    : '',
         \ 'filters' : '',
         \ 'globlst' : []
+        \ },
+    \ 'param' : {
+        \ 'sel' : '',
+        \ 'F' : {
+            \ 'opt' : ['select search options'],
+            \ 'lst' : ['-F', '--hidden', '--no-ignore'],
+            \ 'cmd' : {sopt, arg -> s:fw.setParam('opt', arg)}
+            \ }
         \ },
     \ 'rg' : {
         \ 'asyncrun' : {
@@ -1993,12 +2001,27 @@ function! s:fw.setEngine(type, engine) dict
 endfunction
 " }}}
 
+" FUNCTION: s:fw.setParam(key, val) dict {{{
+function! s:fw.setParam(key, val) dict
+    if a:key == 'F'
+        let l:self[a:key] .= a:val
+    endif
+    call self.exec()
+endfunction
+" }}}
+
 " FUNCTION: s:fw.exec() dict {{{
 function! s:fw.exec() dict
-    let l:exec = printf(self.cmd, escape(self.pat, '"-#%\'), self.loc, self.opt)
-    execute l:exec
-    call FindWowHighlight(self.pat)
-    call Plug_rpt_setExecution(l:exec)
+    if empty(self.param.sel)
+        let l:exec = printf(self.cmd, escape(self.pat, '"-#%\'), self.loc, self.opt)
+        execute l:exec
+        call FindWowHighlight(self.pat)
+        call Plug_rpt_setExecution(l:exec)
+    else
+        let l:sel = self.param.sel[0]
+        let self.param.sel = self.param.sel[1:-1]
+        call PopSelection(self.param[l:sel])
+    endif
 endfunction
 " }}}
 
@@ -2069,11 +2092,14 @@ function! FindWow(keys, mode)
         if a:keys =~# 'b'
             let l:loc = expand('%:p')
         elseif a:keys =~# 't'
-            let l:loc = join(popc#layer#buf#GetFiles('sigtab'), ' ')
+            let l:loc = join(popc#layer#buf#GetFiles('sigtab'), '" "')
         elseif a:keys =~# 'o'
-            let l:loc = join(popc#layer#buf#GetFiles('alltab'), ' ')
+            let l:loc = join(popc#layer#buf#GetFiles('alltab'), '" "')
         elseif a:keys =~# 'p'
             let l:loc = GetInput(' Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
+            if l:loc =~# '[/\\]$'
+                let l:loc = strcharpart(l:loc, 0, strchars(l:loc) - 1)
+            endif
         elseif a:keys =~# 'r'
             let l:loc = FindWowSetArgs('rf') ? s:fw.args.root : ''
         else
@@ -2102,7 +2128,7 @@ function! FindWow(keys, mode)
             endif
         endif
         if a:keys =~# 'F'
-            let l:opt .= GetInput(' Args(-F, --hidden ...) to append: ')
+            let s:fw.param.sel .= 'F'
         endif
         return l:opt
     endfunction
@@ -2161,6 +2187,7 @@ function! FindWow(keys, mode)
     if empty(s:fw.loc) | return | endif
     let s:fw.opt = s:parseOptions()
     let s:fw.cmd = s:parseCommand()
+
     call s:fw.exec()
 endfunction
 " }}}
