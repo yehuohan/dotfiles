@@ -443,22 +443,6 @@ endif
 
 " repeat {{{ 重复命令
     Plug 'tpope/vim-repeat'
-    function! Plug_rpt_setExecution(string)
-        let s:execution = a:string
-        try
-            call repeat#set("\<Plug>Plug_rpt_execute", v:count)
-        " E117: 函数不存在
-        catch /^Vim\%((\a\+)\)\=:E117/
-        endtry
-    endfunction
-    function! Plug_rpt_execute()
-        if exists('s:execution') && !empty(s:execution)
-            execute s:execution
-            echo s:execution
-        endif
-    endfunction
-    nnoremap <Plug>Plug_rpt_execute :call Plug_rpt_execute()<CR>
-    nnoremap <leader>. :call Plug_rpt_execute()<CR>
 " }}}
 " }}}
 
@@ -1413,6 +1397,21 @@ function! ExecInput(iargs, fn, ...) range
     execute l:range . 'call Fn()'
 endfunction
 " }}}
+
+" FUNCTION: SetExecLast(string) {{{
+function! SetExecLast(string)
+    let s:execution = a:string
+endfunction
+" }}}
+
+" FUNCTION: ExecLast() {{{
+function! ExecLast()
+    if exists('s:execution') && !empty(s:execution)
+        execute s:execution
+        echo s:execution
+    endif
+endfunction
+" }}}
 " }}}
 
 " funcs {{{
@@ -1518,7 +1517,7 @@ function! FuncDivideSpace(string, pos) range
         endfor
         call setline(k, l:line)
     endfor
-    call Plug_rpt_setExecution('call FuncDivideSpace("' . a:string . '", "' . a:pos . '")')
+    call SetExecLast('call FuncDivideSpace(''' . a:string . ''', ''' . a:pos . ''')')
 endfunction
 let FuncDivideSpaceH = function('ExecInput', [['Divide H Space(split with space): '], 'FuncDivideSpace', 'h'])
 let FuncDivideSpaceC = function('ExecInput', [['Divide C Space(split with space): '], 'FuncDivideSpace', 'c'])
@@ -1729,7 +1728,7 @@ function! CompileFile(argstr)
     try
         let l:exec = s:cpl.printf(l:type, l:workdir, a:argstr, l:srcfile, l:outfile)
         execute l:exec
-        call Plug_rpt_setExecution(l:exec)
+        call SetExecLast(l:exec)
     catch
         echo v:exception
     endtry
@@ -1742,7 +1741,7 @@ function! CompileCell()
         let l:exec = s:cpl.runcell(&filetype)
         execute l:exec
         echo l:exec
-        call Plug_rpt_setExecution(l:exec)
+        call SetExecLast(l:exec)
     catch
         echo v:exception
     endtry
@@ -2016,7 +2015,7 @@ function! s:fw.exec() dict
         let l:exec = printf(self.cmd, escape(self.pat, '"-#%\'), self.loc, self.opt)
         execute l:exec
         call FindWowHighlight(self.pat)
-        call Plug_rpt_setExecution(l:exec)
+        call SetExecLast(l:exec)
     else
         let l:sel = self.param.sel[0]
         let self.param.sel = self.param.sel[1:-1]
@@ -2658,6 +2657,8 @@ augroup END
 
 " User Mappings {{{
 " basic {{{
+    " 重复上次操作命令
+    nnoremap <leader>. :call ExecLast()<CR>
     " 回退操作
     nnoremap <S-u> <C-r>
     " 大小写转换
