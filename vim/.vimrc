@@ -1420,7 +1420,7 @@ endfunction
 " s:fs {{{
 let s:fs = {
     \ 'sel' : {
-        \ 'opt' : ['select scripts to run'],
+        \ 'opt' : 'select scripts to run',
         \ 'lst' : [
                 \ 'retab',
                 \ '%s/\s\+$//ge',
@@ -1447,7 +1447,7 @@ let s:fs = {
 function! s:fs.scripts.clearUndo() dict
     let l:ulbak = &undolevels
     set undolevels=-1
-    execute "normal! a\<Space>\<BS>\<Esc>"
+    execute "normal! a\<Bar>\<BS>\<Esc>"
     let &undolevels = l:ulbak
 endfunction
 " }}}
@@ -1640,7 +1640,7 @@ let s:cpl = {
         \ 'target' : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z_][a-zA-Z0-9_\-]*\)',
         \ },
     \ 'sel_arg' : {
-        \ 'opt' : ['select args to CompileFile'],
+        \ 'opt' : 'select args to CompileFile',
         \ 'lst' : [
                 \ '-g',
                 \ '-finput-charset=utf-8 -fexec-charset=gbk',
@@ -1651,7 +1651,7 @@ let s:cpl = {
         \ 'cmd' : {sopt, arg -> call('CompileFile', [substitute(arg, '|', ' ', 'ge')])},
         \ },
     \ 'sel_exe' : {
-        \ 'opt' : ['select execution to run'],
+        \ 'opt' : 'select execution to run',
         \ 'lst' : [
                 \ 'python -m json.tool %',
                 \ 'go mod init %:r',
@@ -1767,7 +1767,7 @@ function! CompileProject(type, args)
         call Fn('', l:prj[0], a:args)
     elseif len(l:prj) > 1
         call PopSelection({
-            \ 'opt' : ['Please select the project file'],
+            \ 'opt' : 'Please select the project file',
             \ 'lst' : l:prj,
             \ 'cmd' : a:fn,
             \ 'arg' : a:args
@@ -1900,7 +1900,7 @@ let s:fw = {
     \ 'param' : {
         \ 'sel' : '',
         \ 'F' : {
-            \ 'opt' : ['select search options'],
+            \ 'opt' : 'select search options',
             \ 'lst' : ['-F', '--hidden', '--no-ignore'],
             \ 'cmd' : {sopt, arg -> s:fw.setParam('opt', arg)}
             \ }
@@ -1922,7 +1922,7 @@ let s:fw = {
             \ 'sk' : ':Grepper -stop'
             \ },
         \ 'sel' : {
-            \ 'opt' : ['select rg engine'],
+            \ 'opt' : 'select rg engine',
             \ 'lst' : ['asyncrun', 'grep', 'grepper'],
             \ 'cmd' : {sopt, arg -> s:fw.setEngine('rg', arg)},
             \ 'get' : {sopt -> s:fw.engine.rg}
@@ -1938,7 +1938,7 @@ let s:fw = {
             \ 'fh' : ':Leaderf rg --nowrap'
             \ },
         \ 'sel' : {
-            \ 'opt' : ['select fuzzy engine'],
+            \ 'opt' : 'select fuzzy engine',
             \ 'lst' : ['fzf', 'leaderf'],
             \ 'cmd' : {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
             \ 'get' : {sopt -> s:fw.engine.fuzzy}
@@ -2226,7 +2226,7 @@ endfunction
 function! FindWowSetEngine(type)
     if a:type ==# 'engine'
         call PopSelection({
-            \ 'opt' : ['select the engine'],
+            \ 'opt' : 'select the engine',
             \ 'lst' : ['rg', 'fuzzy'],
             \ 'sub' : {
                 \ 'rg'    : s:fw.rg.sel,
@@ -2413,7 +2413,7 @@ function! QuickfixIconv()
         return
     endif
     call PopSelection({
-        \ 'opt' : ['Select encoding'],
+        \ 'opt' : 'Select encoding',
         \ 'lst' : ['"cp936", "utf-8"', '"utf-8", "cp936"'],
         \ 'cmd' : 'QuickfixMakeIconv',
         \ 'arg' : [l:type,]
