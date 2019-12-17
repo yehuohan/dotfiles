@@ -1654,6 +1654,7 @@ let s:cpl = {
         \ 'opt' : 'select execution to run',
         \ 'lst' : [
                 \ 'python -m json.tool %',
+                \ 'python setup.py build',
                 \ 'go mod init %:r',
                 \ 'cflow -T %'
                 \ ],

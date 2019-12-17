@@ -237,47 +237,61 @@ DIR_INC := ./inc
 DIR_SRC := ./src
 DIR_OBJ := ./obj
 DIR_BIN := .
-DIR_3RD := ./3party
-DIR_LIB := ./lib
 
 #===============================================================================
 # settings
 #===============================================================================
+define make_dir
+	$(foreach str, \
+		$(addprefix ${DIR_OBJ}/,${DIR_SRC}), \
+		$(shell mkdir -p ${str}))
+endef
+$(call make_dir)
+
+## get src files in directories: (#src_dirs, #types)
+get_src = $(filter $(addprefix %.,$(2)),$(wildcard $(addsuffix /*,$(1))))
+
+## get obj from src files: (#obj_dir, #src_files)
+get_obj = $(addprefix $(1)/,$(addsuffix .o,$(basename $(2))))
+
+## create obj target: (#obj_dir, #src_files, #cxxflags)
+define do_create_obj_target
+$(1)/$(basename $(2)).o: $(2)
+	$(V)$(CC) $(3) -c $$< -o $$@
+endef
+create_obj_target = $(foreach line,$(2),$(eval $(call do_create_obj_target,$(1),$(line),$(3))))
+
 CC         := ${1:g++}
 TARGET     := ${2:main}
-ifeq ($(CC), g++)
+ifeq (${CC}, g++)
 CC_SUF     := cpp
 else
 CC_SUF     := c
 endif
-BIN		   := ${DIR_BIN}/${TARGET}
-SRC        := $(wildcard ${DIR_SRC}/*.${CC_SUF})
-OBJ        := $(patsubst %.${CC_SUF},${DIR_OBJ}/%.o,$(notdir ${SRC}))
+BIN        := ${DIR_BIN}/${TARGET}
+SRC        := $(call get_src,${DIR_SRC},${CC_SUF})
+OBJ        := $(call get_obj,${DIR_OBJ},${SRC})
 LIBS       :=
 #-lpthread \`pkg-config opencv --libs\`
 PKGFLAGS   :=
 #\`pkg-config opencv --cflags\`
-CXXFLAGS   := -g -Wall -I${DIR_INC} -I${DIR_SRC} -I${DIR_3RD} ${PKGFLAGS}
-LDFLAGS    := -L${DIR_LIB} ${LIBS}
-
-define init_make
-	$(shell mkdir -p ${DIR_OBJ})
-endef
-$(call init_make)
+CXXFLAGS   := -g -Wall 
+CXXFLAGS   += $(addprefix -I, $(DIR_INC))
+CXXFLAGS   += ${PKGFLAGS}
+LDFLAGS    := ${LIBS}
 
 #===============================================================================
 # target
 #===============================================================================
 ${BIN}: ${OBJ}
-	${CC} ${OBJ} -o $@ ${LDFLAGS}
+	${CC} ${OBJ} -o $@ ${CXXFLAGS} ${LDFLAGS}
 
-${DIR_OBJ}/%.o: ${DIR_SRC}/%.${CC_SUF}
-	${CC} ${CXXFLAGS} -c $< -o $@
+$(call create_obj_target,${DIR_OBJ},${SRC},${CXXFLAGS})
 
 .phony: clean
 clean:
 	rm -r ${DIR_OBJ}
-	rm $(BIN)
+	rm ${BIN}
 endsnippet
 
 
