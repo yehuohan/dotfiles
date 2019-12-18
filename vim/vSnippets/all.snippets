@@ -218,11 +218,10 @@ QMAKE_EXTRA_TARGETS += cudapp
 endsnippet
 
 
-
 #===============================================================================
 # makefile
 #===============================================================================
-snippet makf "makefile template"
+snippet mkf "makefile template"
 
 #-------------------------------------------------
 #
@@ -284,7 +283,7 @@ LDFLAGS    := ${LIBS}
 # target
 #===============================================================================
 ${BIN}: ${OBJ}
-	${CC} ${OBJ} -o $@ ${CXXFLAGS} ${LDFLAGS}
+	${CC} $^ -o $@ ${CXXFLAGS} ${LDFLAGS}
 
 $(call create_obj_target,${DIR_OBJ},${SRC},${CXXFLAGS})
 
@@ -294,6 +293,29 @@ clean:
 	rm ${BIN}
 endsnippet
 
+snippet cmk "cmake template"
+
+#-------------------------------------------------
+#
+# Project created by Vim `!v strftime("%Y-%m-%d %X")`
+#
+#-------------------------------------------------
+
+cmake_minimum_required(VERSION 3.5)
+
+project(${1:main})
+
+set(DIR_INC
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc
+)
+include_directories(${DIR_INC})
+
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/src SRC)
+
+add_compile_options(-g -Wall)
+
+add_executable(${PROJECT_NAME} ${SRC})
+endsnippet
 
 
 #===============================================================================
