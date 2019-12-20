@@ -894,7 +894,7 @@ endif
     Plug 'Shougo/echodoc.vim'
     let g:echodoc_enable_at_startup = 1
 if IsVim()
-    let g:echodoc#type = 'echo'
+    let g:echodoc#type = 'popup'
 else
     let g:echodoc#type = 'floating'
 endif
@@ -1400,18 +1400,26 @@ function! ExecInput(iargs, fn, ...) range
 endfunction
 " }}}
 
-" FUNCTION: SetExecLast(string) {{{
+" FUNCTION: SetExecLast(string) {{{ 设置execution
 function! SetExecLast(string)
     let s:execution = a:string
 endfunction
 " }}}
 
-" FUNCTION: ExecLast() {{{
+" FUNCTION: ExecLast() {{{ 执行上一次的execution
 function! ExecLast()
     if exists('s:execution') && !empty(s:execution)
         execute s:execution
         echo s:execution
     endif
+endfunction
+" }}}
+
+" FUNCTION: ExecMacro(key) {{{ 执行宏
+function! ExecMacro(key)
+    let l:mstr = 'normal! @' . a:key
+    execute l:mstr
+    call SetExecLast(l:mstr)
 endfunction
 " }}}
 " }}}
@@ -2775,7 +2783,7 @@ endif
         execute "nnoremap <leader>'" . t          . ' "' . t . 'p'
         execute "nnoremap <leader>'" . toupper(t) . ' "' . t . 'P'
         " 快速执行宏
-        execute "nnoremap <leader>2" . t . ' @' . t
+        execute "nnoremap <leader>2" . t . ' :call ExecMacro("' . t . '")<CR>'
     endfor
 " }}}
 
