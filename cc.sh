@@ -4,7 +4,7 @@
 # cd to <dotconfigs> first before execute this file;
 # this file must be in '~/dotconfigs/'.
 
-if [ `uname` == "Linux" ]; then
+if [[ `uname` == "Linux" ]]; then
 
     if [[ $(cd `dirname "$0"`;pwd) != ~/dotconfigs ]]; then
         echo 'Is Not in ~/dotconfigs'
@@ -66,7 +66,7 @@ if [ `uname` == "Linux" ]; then
         echo "Ubuntu: Copy was completed!"
     fi
 
-elif [ `uname -o` == "Msys" ]; then
+elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
 
     # vim
     if [ ! -d "../Vim" ]; then
@@ -86,6 +86,6 @@ elif [ `uname -o` == "Msys" ]; then
     cp ~/.zshrc         ./root/home-gw/
     cp /msys2_shell.cmd ./root/home-gw/
 
-    echo "Msys: Copy was completed!"
+    echo "Gw: Copy was completed!"
 fi
 

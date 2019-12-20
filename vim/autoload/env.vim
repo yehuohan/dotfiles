@@ -18,7 +18,6 @@ let s:env.hp.win = [
     \ 'C:/MyApps/Python37',
     \ 'C:/MyApps/Julia/bin',
     \ 'C:/MyApps/cygwin64/bin',
-    \ 'C:/MyApps/msys64/usr/bin',
     \ 'C:/MyApps/Go/bin',
     \ 'C:/MyApps/lua',
     \ 'C:/Program Files (x86)/Google/Chrome/Application',
