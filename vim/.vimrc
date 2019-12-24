@@ -262,42 +262,14 @@ call plug#begin($DotVimPath.'/bundle')  " 可以指定插件安装位置
     " 支持:s, :g, :v, :sort, :range预览
 " }}}
 
-" incsearch {{{ 查找预览
+" incsearch {{{ 模糊查找预览
     Plug 'haya14busa/incsearch.vim'
     Plug 'haya14busa/incsearch-fuzzy.vim'
-    let g:incsearch#auto_nohlsearch = 1 " 停止搜索时，自动关闭高亮
-
-    " 设置查找时页面滚动映射
-    augroup PluginIncsearch
-        autocmd!
-        autocmd VimEnter * call s:Plug_incs_keymap()
-    augroup END
-    function! s:Plug_incs_keymap()
-        if exists('g:loaded_incsearch')
-            IncSearchNoreMap <C-j> <Over>(incsearch-next)
-            IncSearchNoreMap <C-k> <Over>(incsearch-prev)
-            IncSearchNoreMap <M-j> <Over>(incsearch-scroll-f)
-            IncSearchNoreMap <M-k> <Over>(incsearch-scroll-b)
-        endif
-    endfunction
-
-    nmap /  <Plug>(incsearch-forward)
-    nmap ?  <Plug>(incsearch-backward)
-    nmap g/ <Plug>(incsearch-stay)
+    let g:incsearch#auto_nohlsearch = 0 " 停止搜索时，是否自动关闭高亮
+                                        " 停止搜索时，nohl中的feedkeys会影响Popc-popup模式
     nmap z/ <Plug>(incsearch-fuzzy-/)
     nmap z? <Plug>(incsearch-fuzzy-?)
     nmap zg/ <Plug>(incsearch-fuzzy-stay)
-    nmap n  <Plug>(incsearch-nohl-n)
-    nmap N  <Plug>(incsearch-nohl-N)
-    " *,#使用\< \>，而g*,g# 不使用\< \>
-    nmap *  <Plug>(incsearch-nohl-*)
-    nmap #  <Plug>(incsearch-nohl-#)
-    nmap g* <Plug>(incsearch-nohl-g*)
-    nmap g# <Plug>(incsearch-nohl-g#)
-    nmap <leader>8  <Plug>(incsearch-nohl-*)
-    nmap <leader>3  <Plug>(incsearch-nohl-#)
-    nmap <leader>g8 <Plug>(incsearch-nohl-g*)
-    nmap <leader>g3 <Plug>(incsearch-nohl-g#)
 " }}}
 
 " fzf {{{ 模糊查找
@@ -2116,7 +2088,7 @@ function! FindWow(keys, mode)
                         let l:loc[k] = strcharpart(l:loc[k], 0, strchars(l:loc[k]) - 1)
                     endif
                 endfor
-                let l:loc = join(l:loc, '" "')
+                let l:loc = join(l:loc, '" "') " for \"l:loc\"
             endif
         elseif a:keys =~# 'r'
             let l:loc = FindWowSetArgs('rf') ? s:fw.args.root : ''
@@ -2512,6 +2484,7 @@ endfunction
     set cursorline                      " 高亮当前行
     set cursorcolumn                    " 高亮当前列
     set hlsearch                        " 设置高亮显示查找到的文本
+    set incsearch                       " 预览当前的搜索内容
     set termguicolors                   " 在终端中使用24位彩色
 if IsVim()
     set renderoptions=                  " 设置正常显示unicode字符
@@ -2926,10 +2899,17 @@ endif
 " }}}
 
 " find&search {{{
-    " 正向查找
+    " /?
+    nnoremap <leader><Esc> :nohlsearch<CR>
+    nnoremap i :nohlsearch<CR>i
+    " *,#使用\< \>，而g*,g# 不使用\< \>
+    nnoremap <leader>8  *
+    nnoremap <leader>3  #
+    nnoremap <leader>g8 g*
+    nnoremap <leader>g3 g#
     vnoremap / ""y<Bar>:execute '/' . @"<CR>
     nnoremap <leader>/ :execute '/' . expand('<cword>')<CR>
-    " FindWow查找
+    " FindWow
     for key in s:fw.mappings
         execute 'nnoremap <leader>' . key ':call FindWow("' . key . '", "n")<CR>'
     endfor
