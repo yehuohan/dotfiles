@@ -662,6 +662,7 @@ endif
     Plug 'yehuohan/popc'
     set hidden
     let g:Popc_jsonPath = $DotVimPath
+    let g:Popc_useFloatingWin = 1
     let g:Popc_useTabline = 1
     let g:Popc_useStatusline = 1
     let g:Popc_usePowerFont = s:gset.use_powerfont
