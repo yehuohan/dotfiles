@@ -80,11 +80,10 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp -r ../Vim/vimfiles/vBin            ./vim/
     cp -r ../Vim/vimfiles/autoload        ./vim/
 
-    # cf-msys2
+    # cygwin
     cp ~/.minttyrc      ./root/home-gw/
     cp ~/.gitconfig     ./root/home-gw/
     cp ~/.zshrc         ./root/home-gw/
-    cp /msys2_shell.cmd ./root/home-gw/
 
     echo "Gw: Copy was completed!"
 fi
