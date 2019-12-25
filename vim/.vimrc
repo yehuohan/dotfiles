@@ -638,16 +638,10 @@ endif
     set hidden
     let g:Popc_jsonPath = $DotVimPath
     let g:Popc_useFloatingWin = 1
-    "let g:Popc_highlight = {
-    "    \ 'text'        : 'PmenuSbar',
-    "    \ 'selected'    : 'MoreMsg',
-    "    \ 'lineTxt'     : 'PmenuSbar',
-    "    \ 'lineSel'     : 'PmenuSel',
-    "    \ 'modifiedTxt' : '',
-    "    \ 'modifiedSel' : 'DiffAdd',
-    "    \ 'labelTxt'    : 'IncSearch',
-    "    \ 'blankTxt'    : 'Normal',
-    "    \ }
+    let g:Popc_highlight = {
+        \ 'text'        : 'PmenuSbar',
+        \ 'selected'    : 'MoreMsg',
+        \ }
     let g:Popc_useTabline = 1
     let g:Popc_useStatusline = 1
     let g:Popc_usePowerFont = s:gset.use_powerfont
@@ -1508,10 +1502,10 @@ function! FuncDivideSpace(string, pos) range
     endfor
     call SetExecLast('call FuncDivideSpace(''' . a:string . ''', ''' . a:pos . ''')')
 endfunction
-let FuncDivideSpaceH = function('ExecInput', [['Divide H Space(split with space): '], 'FuncDivideSpace', 'h'])
-let FuncDivideSpaceC = function('ExecInput', [['Divide C Space(split with space): '], 'FuncDivideSpace', 'c'])
-let FuncDivideSpaceL = function('ExecInput', [['Divide L Space(split with space): '], 'FuncDivideSpace', 'l'])
-let FuncDivideSpaceD = function('ExecInput', [['Delete D Space(split with space): '], 'FuncDivideSpace', 'd'])
+let FuncDivideSpaceH = function('ExecInput', [['Divide H: '], 'FuncDivideSpace', 'h'])
+let FuncDivideSpaceC = function('ExecInput', [['Divide C: '], 'FuncDivideSpace', 'c'])
+let FuncDivideSpaceL = function('ExecInput', [['Divide L: '], 'FuncDivideSpace', 'l'])
+let FuncDivideSpaceD = function('ExecInput', [['Delete D: '], 'FuncDivideSpace', 'd'])
 " }}}
 
 " FUNCTION: FuncAppendCmd(str, flg) {{{ 将命令结果作为文本插入
@@ -1530,8 +1524,8 @@ function! FuncAppendCmd(str, flg)
     endif
     call append(line('.'), split(l:result, "\n"))
 endfunction
-let FuncAppendExecResult = function('ExecInput', [['Input command = ', '', 'command'] , 'FuncAppendCmd', 'exec'])
-let FuncAppendCallResult = function('ExecInput', [['Input function = ', '', 'function'], 'FuncAppendCmd', 'call'])
+let FuncAppendCmdExec = function('ExecInput', [['Command: ', '', 'command'] , 'FuncAppendCmd', 'exec'])
+let FuncAppendCmdCall = function('ExecInput', [['Function: ', '', 'function'], 'FuncAppendCmd', 'call'])
 " }}}
 
 " FUNCTION: FuncSwitchFile() {{{ 切换文件
@@ -1741,12 +1735,13 @@ endfunction
 " }}}
 " }}}
 
-" FUNCTION: CompileFile(argstr) {{{
-function! CompileFile(argstr)
+" FUNCTION: CompileFile(...) {{{
+function! CompileFile(...)
     let l:type    = &filetype           " 文件类型
     let l:srcfile = expand('%:t')       " 文件名，不带路径，带扩展名
     let l:outfile = expand('%:t:r')     " 文件名，不带路径，不带扩展名
     let l:workdir = expand('%:p:h')     " 当前文件目录
+    let l:argstr  = a:0 > 0 ? a:1 : ''
     try
         let l:exec = s:cpl.printf(l:type, l:workdir, a:argstr, l:srcfile, l:outfile)
         execute l:exec
@@ -2891,8 +2886,8 @@ endif
 
 " project {{{
     " 创建临时文件
-    nnoremap <leader>ei :call ExecInput(['Temp file suffix: '], 'FuncEditTempFile', 0)<CR>
-    nnoremap <leader>eti :call ExecInput(['Temp file suffix: '], 'FuncEditTempFile', 1)<CR>
+    nnoremap <leader>ei :call ExecInput(['Suffix: '], 'FuncEditTempFile', 0)<CR>
+    nnoremap <leader>eti :call ExecInput(['Suffix: '], 'FuncEditTempFile', 1)<CR>
     for [key, val] in items({
             \ 'n' : '',
             \ 'c' : 'c',
@@ -2908,12 +2903,12 @@ endif
     nnoremap <leader>dc :call FuncDivideSpaceC()<CR>
     nnoremap <leader>dl :call FuncDivideSpaceL()<CR>
     nnoremap <leader>dd :call FuncDivideSpaceD()<CR>
-    nnoremap <leader>ae :call FuncAppendExecResult()<CR>
-    nnoremap <leader>af :call FuncAppendCallResult()<CR>
+    nnoremap <leader>ae :call FuncAppendCmdExec()<CR>
+    nnoremap <leader>af :call FuncAppendCmdCall()<CR>
     nnoremap <leader>rs :call FuncRunScript()<CR>
     nnoremap <leader>sf :call FuncSwitchFile()<CR>
     " 编译运行当前文件
-    nnoremap <leader>rf :call CompileFile('')<CR>
+    nnoremap <leader>rf :call CompileFile()<CR>
     nnoremap <leader>rj :call CompileCell()<CR>
     nnoremap <leader>ra :call RcArg()<CR>
     nnoremap <leader>re :call RcExe()<CR>
