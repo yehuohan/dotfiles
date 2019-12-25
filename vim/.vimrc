@@ -306,6 +306,9 @@ else
     Plug 'Yggdroot/LeaderF'
 endif
     let g:Lf_CacheDirectory = $DotVimPath
+    "let g:Lf_WindowPosition = 'popup'
+    "let g:Lf_PreviewInPopup = 1
+    "let g:Lf_PreviewResult = {'Function': 1, 'BufTag': 1}
 if s:gset.use_powerfont
     let g:Lf_StlSeparator = {'left': '', 'right': ''}
 else
@@ -635,6 +638,16 @@ endif
     set hidden
     let g:Popc_jsonPath = $DotVimPath
     let g:Popc_useFloatingWin = 1
+    "let g:Popc_highlight = {
+    "    \ 'text'        : 'PmenuSbar',
+    "    \ 'selected'    : 'MoreMsg',
+    "    \ 'lineTxt'     : 'PmenuSbar',
+    "    \ 'lineSel'     : 'PmenuSel',
+    "    \ 'modifiedTxt' : '',
+    "    \ 'modifiedSel' : 'DiffAdd',
+    "    \ 'labelTxt'    : 'IncSearch',
+    "    \ 'blankTxt'    : 'Normal',
+    "    \ }
     let g:Popc_useTabline = 1
     let g:Popc_useStatusline = 1
     let g:Popc_usePowerFont = s:gset.use_powerfont
@@ -999,13 +1012,6 @@ endif
     nmap <leader>ca <Plug>NERDCommenterAppend
     nmap <leader>ct <Plug>NERDCommenterAltDelims
     nmap <leader>cu <Plug>NERDCommenterUncomment
-" }}}
-
-" fswitch {{{ c/c++文件切换
-    Plug 'derekwyatt/vim-fswitch', {'for': ['cpp', 'c']}
-    nnoremap <Leader>of :FSHere<CR>
-    nnoremap <Leader>os :FSSplitRight<CR>
-    let g:fsnonewfiles='on'
 " }}}
 
 " asyncrun {{{ 导步运行程序
@@ -1398,8 +1404,9 @@ endfunction
 " }}}
 
 " funcs {{{
-" s:fs {{{
-let s:fs = {
+" FUNCTION: FuncRunScript() {{{ 常用函数脚本代码
+" s:rs {{{
+let s:rs = {
     \ 'sel' : {
         \ 'opt' : 'select scripts to run',
         \ 'lst' : [
@@ -1420,12 +1427,12 @@ let s:fs = {
                 \ 'lineToTop'        : 'frozen current line to top',
                 \ 'clearUndo'        : 'clear undo history',
                 \ },
-        \ 'cmd' : {sopt, arg -> has_key(s:fs.scripts, arg) ? s:fs.scripts[arg]() : execute(arg)},
+        \ 'cmd' : {sopt, arg -> has_key(s:rs.scripts, arg) ? s:rs.scripts[arg]() : execute(arg)},
         \ },
     \ 'scripts' : {}
     \ }
-" FUNCTION: s:fs.scripts.clearUndo() dict {{{ 清除undo数据
-function! s:fs.scripts.clearUndo() dict
+" FUNCTION: s:rs.scripts.clearUndo() dict {{{ 清除undo数据
+function! s:rs.scripts.clearUndo() dict
     let l:ulbak = &undolevels
     set undolevels=-1
     execute "normal! a\<Bar>\<BS>\<Esc>"
@@ -1433,8 +1440,8 @@ function! s:fs.scripts.clearUndo() dict
 endfunction
 " }}}
 
-" FUNCTION: s:fs.scripts.lineToTop() dict {{{ 冻结顶行
-function! s:fs.scripts.lineToTop() dict
+" FUNCTION: s:rs.scripts.lineToTop() dict {{{ 冻结顶行
+function! s:rs.scripts.lineToTop() dict
     let l:line = line('.')
     split %
     resize 1
@@ -1444,9 +1451,8 @@ endfunction
 " }}}
 " }}}
 
-" FUNCTION: FuncRunScript() {{{ 常用函数脚本代码
 function! FuncRunScript()
-    call PopSelection(s:fs.sel)
+    call PopSelection(s:rs.sel)
 endfunction
 " }}}
 
@@ -1526,6 +1532,37 @@ function! FuncAppendCmd(str, flg)
 endfunction
 let FuncAppendExecResult = function('ExecInput', [['Input command = ', '', 'command'] , 'FuncAppendCmd', 'exec'])
 let FuncAppendCallResult = function('ExecInput', [['Input function = ', '', 'function'], 'FuncAppendCmd', 'call'])
+" }}}
+
+" FUNCTION: FuncSwitchFile() {{{ 切换文件
+let s:sf = [
+    \ {'lhs': ['c', 'cc', 'cpp', 'cxx'],
+    \  'rhs': ['h', 'hh', 'hpp', 'hxx']},
+    \ ]
+function! FuncSwitchFile()
+    let l:ext = expand('%:e')
+    let l:file = expand('%:p:r')
+    let l:try = []
+    for k in range(len(s:sf))
+        if index(s:sf[k].lhs, l:ext, 0, 1) >= 0
+            let l:try = s:sf[0].rhs
+            break
+        elseif index(s:sf[k].rhs, l:ext, 0, 1) >= 0
+            let l:try = s:sf[0].lhs
+            break
+        endif
+    endfor
+    for e in l:try
+        if filereadable(l:file . '.' . e)
+            execute 'edit ' . l:file . '.' . e
+            break
+        endif
+        if filereadable(l:file . '.' . toupper(e))
+            execute 'edit ' . l:file . '.' . e
+            break
+        endif
+    endfor
+endfunction
 " }}}
 
 " FUNCTION: FuncGotoKeyword(mode) {{{ 查找Vim关键字
@@ -2874,6 +2911,7 @@ endif
     nnoremap <leader>ae :call FuncAppendExecResult()<CR>
     nnoremap <leader>af :call FuncAppendCallResult()<CR>
     nnoremap <leader>rs :call FuncRunScript()<CR>
+    nnoremap <leader>sf :call FuncSwitchFile()<CR>
     " 编译运行当前文件
     nnoremap <leader>rf :call CompileFile('')<CR>
     nnoremap <leader>rj :call CompileCell()<CR>
