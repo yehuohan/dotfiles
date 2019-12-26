@@ -639,8 +639,8 @@ endif
     let g:Popc_jsonPath = $DotVimPath
     let g:Popc_useFloatingWin = 1
     let g:Popc_highlight = {
-        \ 'text'        : 'PmenuSbar',
-        \ 'selected'    : 'MoreMsg',
+        \ 'text'     : 'PmenuSbar',
+        \ 'selected' : 'CursorLineNr',
         \ }
     let g:Popc_useTabline = 1
     let g:Popc_useStatusline = 1
@@ -1743,7 +1743,7 @@ function! CompileFile(...)
     let l:workdir = expand('%:p:h')     " 当前文件目录
     let l:argstr  = a:0 > 0 ? a:1 : ''
     try
-        let l:exec = s:cpl.printf(l:type, l:workdir, a:argstr, l:srcfile, l:outfile)
+        let l:exec = s:cpl.printf(l:type, l:workdir, l:argstr, l:srcfile, l:outfile)
         execute l:exec
         call SetExecLast(l:exec)
     catch
