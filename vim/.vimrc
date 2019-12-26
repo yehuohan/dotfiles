@@ -2940,8 +2940,8 @@ endif
     nnoremap <leader>3  #
     nnoremap <leader>g8 g*
     nnoremap <leader>g3 g#
-    vnoremap / ""y<Bar>:execute '/' . @"<CR>
-    nnoremap <leader>/ :execute '/' . expand('<cword>')<CR>
+    vnoremap / ""y<Bar>:execute '/\c' . @"<CR>
+    nnoremap <leader>/ :execute '/\c' . expand('<cword>')<CR>
     " FindWow
     for key in s:fw.mappings
         execute 'nnoremap <leader>' . key ':call FindWow("' . key . '", "n")<CR>'
