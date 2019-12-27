@@ -275,7 +275,7 @@ LIBS       :=
 #-lpthread \`pkg-config opencv --libs\`
 PKGFLAGS   :=
 #\`pkg-config opencv --cflags\`
-CXXFLAGS   := -g -Wall 
+CXXFLAGS   := -g -Wall
 CXXFLAGS   += $(addprefix -I, $(DIR_INC))
 CXXFLAGS   += ${PKGFLAGS}
 LDFLAGS    := ${LIBS}

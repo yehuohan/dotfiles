@@ -63,12 +63,6 @@ function! IsMac()
     return (has('mac'))
 endfunction
 " }}}
-
-" term {{{
-function! IsTermType(tt)
-    return (&term ==? a:tt) ? 1 : 0
-endfunction
-" }}}
 " }}} End
 
 " Global Settings {{{
@@ -639,7 +633,7 @@ endif
     let g:Popc_jsonPath = $DotVimPath
     let g:Popc_useFloatingWin = 1
     let g:Popc_highlight = {
-        \ 'text'     : 'PmenuSbar',
+        \ 'text'     : 'Pmenu',
         \ 'selected' : 'CursorLineNr',
         \ }
     let g:Popc_useTabline = 1
@@ -891,14 +885,14 @@ endif
 
 " ultisnips {{{ 代码片段
 if s:gset.use_ultisnips
-    Plug 'yehuohan/ultisnips'           " snippet引擎（vmap的映射，与vim-textmanip的<C-i>有冲突）
+    Plug 'SirVer/ultisnips'
     Plug 'honza/vim-snippets'           " snippet合集
+    " 删除UltiSnips#map_keys#MapKeys中的xnoremap <Tab>，和textmanip <C-i>冲突
     " 使用:UltiSnipsEdit编辑g:UltiSnipsSnippetsDir中的snippet文件
-    let g:UltiSnipsSnippetsDir = $DotVimPath . '/vSnippets'
-    let g:UltiSnipsSnippetDirectories=['UltiSnips', 'vSnippets']
-                                        " 自定义mySnippets合集
+    let g:UltiSnipsEditSplit="vertical"
+    let g:UltiSnipsSnippetDirectories=[$DotVimPath . '/vSnippets']
     let g:UltiSnipsExpandTrigger='<Tab>'
-    let g:UltiSnipsListSnippets='<C-Tab>'
+    let g:UltiSnipsListSnippets='<C-o>'
     let g:UltiSnipsJumpForwardTrigger='<C-j>'
     let g:UltiSnipsJumpBackwardTrigger='<C-k>'
 endif
@@ -2084,14 +2078,14 @@ function! FindWow(keys, mode)
         let l:pat = ''
         if a:mode ==# 'n'
             if a:keys =~? 'i'
-                let l:pat = GetInput(' What to find: ')
+                let l:pat = GetInput('What to find: ')
             elseif a:keys =~? '[ws]'
                 let l:pat = expand('<cword>')
             endif
         elseif a:mode ==# 'v'
             let l:selected = GetSelected()
             if a:keys =~? 'i'
-                let l:pat = GetInput(' What to find: ', l:selected)
+                let l:pat = GetInput('What to find: ', l:selected)
             elseif a:keys =~? '[ws]'
                 let l:pat = l:selected
             endif
@@ -2112,7 +2106,7 @@ function! FindWow(keys, mode)
         elseif a:keys =~# 'o'
             let l:loc = join(popc#layer#buf#GetFiles('alltab'), '" "')
         elseif a:keys =~# 'p'
-            let l:loc = GetInput(' Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
+            let l:loc = GetInput('Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
             if !empty(l:loc)
                 let l:loc = split(l:loc, '|')
                 for k in range(len(l:loc))
@@ -2183,7 +2177,7 @@ function! FindWow(keys, mode)
         " set loaction
         let l:loc = '%'
         if a:keys =~# 'p'
-            let l:loc = GetInput(' Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
+            let l:loc = GetInput('Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
             if empty(l:loc) | return 0 | endif
         endif
 
@@ -2280,7 +2274,7 @@ endfunction
 " @return 0表示异常结束函数（root无效），1表示正常结束函数
 function! FindWowSetArgs(type)
     if a:type =~# 'r'
-        let l:root = GetInput(' Where (Root) to find: ', '', 'dir', expand('%:p:h'))
+        let l:root = GetInput('Root: ', '', 'dir', expand('%:p:h'))
         if empty(l:root)
             return 0
         endif
@@ -2291,10 +2285,10 @@ function! FindWowSetArgs(type)
         let s:fw.args.root = l:root
     endif
     if a:type =~# 'f'
-        let s:fw.args.filters = GetInput(' Which (Filter) to find: ')
+        let s:fw.args.filters = GetInput('Filter: ')
     endif
     if a:type =~# 'g'
-        let s:fw.args.globlst = split(GetInput(' What (Glob) to append: '), ',')
+        let s:fw.args.globlst = split(GetInput('Glob: '), ',')
     endif
     return 1
 endfunction
@@ -2518,9 +2512,6 @@ endfunction
     set hlsearch                        " 设置高亮显示查找到的文本
     set incsearch                       " 预览当前的搜索内容
     set termguicolors                   " 在终端中使用24位彩色
-if IsVim()
-    set renderoptions=                  " 设置正常显示unicode字符
-endif
     set expandtab                       " 将Tab用Space代替，方便显示缩进标识indentLine
     set tabstop=4                       " 设置Tab键宽4个空格
     set softtabstop=4                   " 设置按<Tab>或<BS>移动的空格数
@@ -2535,12 +2526,6 @@ endif
     set foldenable                      " 充许折叠
     set foldcolumn=0                    " 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
     set foldmethod=indent               " 设置折叠，默认为缩进折叠
-                                        " manual : 手工定义折叠
-                                        " indent : 更多的缩进表示更高级别的折叠
-                                        " expr   : 用表达式来定义折叠
-                                        " syntax : 用语法高亮来定义折叠
-                                        " diff   : 对没有更改的文本进行折叠
-                                        " marker : 对文中的标记折叠，默认使用{{{,}}}标记
     set scrolloff=3                     " 光标上下保留的行数
     set laststatus=2                    " 一直显示状态栏
     set noshowmode                      " 命令行栏不显示VISUAL等字样
@@ -2555,7 +2540,7 @@ endif
     set noautowrite                     " 禁止自动保存文件
     set noautowriteall                  " 禁止自动保存文件
     set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
-                                        " 尝试解码序列
+                                        " 解码尝试序列
     set fileformat=unix                 " 以unix格式保存文本文件，即CR作为换行符
     set magic                           " 默认使用magic匹配
     set ignorecase                      " 不区别大小写搜索
@@ -2568,7 +2553,8 @@ endif
     set belloff=all                     " 关闭所有事件的响铃
     set helplang=cn,en                  " 优先查找中文帮助
 if IsVim()
-    if IsTermType('xterm') || IsTermType('xterm-256color')
+    set renderoptions=                  " 设置正常显示unicode字符
+    if &term == 'xterm' || &term == 'xterm-256color'
         " 终端光标设置，适用于urxvt,st,xterm,gnome-termial
         " 5,6: 竖线，  3,4: 横线，  1,2: 方块
         let &t_SI = "\<Esc>[6 q"        " 进入Insert模式
@@ -2759,9 +2745,9 @@ endif
     nnoremap <leader>is :call OptionLst('signcolumn')<CR>
     nnoremap <leader>in :call OptionFunc('number')<CR>
     nnoremap <leader>ih :call OptionFunc('syntax')<CR>
-    if IsLinux()
-        inoremap <Esc> <Esc>:call FuncFcitx2en()<CR>
-    endif
+if IsLinux()
+    inoremap <Esc> <Esc>:call FuncFcitx2en()<CR>
+endif
 " }}}
 
 " copy&paste {{{
