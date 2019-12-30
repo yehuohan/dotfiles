@@ -765,10 +765,11 @@ if s:gset.use_ycm
     " Linux: 需要python-dev, python3-dev, cmake, llvm, clang
     " Windows: 需要python, cmake, VS, 7-zip
     " Params: install.py安装参数
-    "   --clang-completer : C-famlily，基于Clang补全
-    "   --go-completer    : Go，基于Gocode/Godef补全，需要安装Go
-    "   --ts-completer    : Javascript和TypeScript，基于TSServer补全，需要安装node和npm
-    "   --java-completer  : Java补全，需要安装JDK8
+    "   --clang-completer  : C-famlily，基于libclang补全
+    "   --clangd-completer : C-famlily，基于clangd补全
+    "   --go-completer     : Go补全，需要安装Go
+    "   --ts-completer     : Javascript和TypeScript，基于TSServer补全，需要安装node和npm
+    "   --java-completer   : Java补全，需要安装JDK8
     function! Plug_ycm_build(info)
         " info is a dictionary with 3 fields
         " - name:   name of the plugin
@@ -776,9 +777,9 @@ if s:gset.use_ycm
         " - force:  set on PlugInstall! or PlugUpdate!
         if a:info.status == 'installed' || a:info.force
             if IsLinux()
-                !python install.py --clang-completer --go-completer --java-completer --build-dir ycm_build
+                !python install.py --clangd-completer --go-completer --java-completer --build-dir ycm_build
             elseif IsWin()
-                !python install.py --clang-completer --go-completer --java-completer --ts-completer --msvc 15 --build-dir ycm_build
+                !python install.py --clangd-completer --go-completer --java-completer --ts-completer --msvc 15 --build-dir ycm_build
             endif
         endif
     endfunction
@@ -815,6 +816,8 @@ if s:gset.use_ycm
     let g:ycm_language_server = [
         \ {
             \ 'name': 'julia',
+            \ 'filetypes': ['julia'],
+            \ 'project_root_files': ['Project.toml'],
             \ 'cmdline': ['julia', '--startup-file=no', '--history-file=no', '-e', '
             \       using LanguageServer;
             \       using Pkg;
@@ -825,8 +828,7 @@ if s:gset.use_ycm
             \       server = LanguageServer.LanguageServerInstance(stdin, stdout, debug, env_path, "", Dict());
             \       server.runlinter = true;
             \       run(server);
-            \       '],
-            \ 'filetypes': ['julia']
+            \       ']
         \ }]                                                    " LSP支持
     let g:ycm_key_detailed_diagnostics = ''                     " 直接使用:YcmShowDetailedDiagnostic命令
     let g:ycm_key_list_select_completion = ['<C-j>', '<C-n>', '<Down>']
@@ -849,8 +851,8 @@ if s:gset.use_ycm
     nnoremap <leader>gc :YcmCompleter ClearCompilationFlagCache<CR>
     nnoremap <leader>gs :YcmCompleter RestartServer<CR>
     nnoremap <leader>yr :YcmRestartServer<CR>
-    nnoremap <leader>yd :YcmShowDetailedDiagnostic<CR>
-    nnoremap <leader>yD :YcmDiags<CR>
+    nnoremap <leader>yd :YcmDiags<CR>
+    nnoremap <leader>yD :YcmDebugInfo<CR>
     nnoremap <leader>yc :call Plug_ycm_createConf('.ycm_extra_conf.py')<CR>
     nnoremap <leader>yj :call Plug_ycm_createConf('jsconfig.json')<CR>
     function! Plug_ycm_createConf(filename)
@@ -2721,15 +2723,17 @@ endif
     nnoremap <C-l> 2zl
     nnoremap <M-h> 16zh
     nnoremap <M-l> 16zl
-    " 命令行移动
+    " 命令行
     cnoremap <C-j> <Down>
     cnoremap <C-k> <Up>
+    cnoremap <C-v> <C-r>+
+    cnoremap <C-p> <C-r>0
     cnoremap <M-h> <Left>
     cnoremap <M-l> <Right>
     cnoremap <M-k> <C-Right>
     cnoremap <M-j> <C-Left>
-    cnoremap <M-i> <C-B>
-    cnoremap <M-o> <C-E>
+    cnoremap <M-i> <C-b>
+    cnoremap <M-o> <C-e>
     " HEX编辑
     nnoremap <leader>xx :%!xxd<CR>
     nnoremap <leader>xr :%!xxd -r<CR>
