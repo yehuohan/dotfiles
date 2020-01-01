@@ -19,6 +19,7 @@
     " h Visual      : Visual模式
     " h map-listing : 映射命令
     " h registers   : 寄存器列表
+    " h v:count     : 普通模式命令计数
 " }}}
 
 " Map {{{
@@ -228,17 +229,16 @@ call plug#begin($DotVimPath.'/bundle')  " 可以指定插件安装位置
 " textmanip {{{ 块编辑
     Plug 't9md/vim-textmanip'
     let g:textmanip_enable_mappings = 0
-    function! Plug_tm_setMode(mode)
-        let g:textmanip_current_mode = a:mode
-        echo 'textmanip mode: ' . g:textmanip_current_mode
-    endfunction
-
     " 切换Insert/Replace Mode
-    xnoremap <M-i> :<C-U>call Plug_tm_setMode('insert')<CR>gv
-    xnoremap <M-o> :<C-U>call Plug_tm_setMode('replace')<CR>gv
+    xnoremap <silent> <M-i>
+        \ :<C-U>let g:textmanip_current_mode = 'insert'<Bar>
+        \ :echo 'textmanip mode: ' . g:textmanip_current_mode<CR>gv
+    xnoremap <silent> <M-o>
+        \ :<C-U>let g:textmanip_current_mode = 'replace'<Bar>
+        \ :echo 'textmanip mode: ' . g:textmanip_current_mode<CR>gv
     " C-i 与 <Tab>等价
-    xnoremap <C-i> :<C-U>call Plug_tm_setMode('insert')<CR>gv
-    xnoremap <C-o> :<C-U>call Plug_tm_setMode('replace')<CR>gv
+    xmap <silent> <C-i> <M-i>
+    xmap <silent> <C-o> <M-o>
     " 更据Mode使用Move-Insert或Move-Replace
     xmap <C-j> <Plug>(textmanip-move-down)
     xmap <C-k> <Plug>(textmanip-move-up)
@@ -256,16 +256,6 @@ call plug#begin($DotVimPath.'/bundle')  " 可以指定插件安装位置
     " 支持:s, :g, :v, :sort, :range预览
 " }}}
 
-" incsearch {{{ 模糊查找预览
-    Plug 'haya14busa/incsearch.vim'
-    Plug 'haya14busa/incsearch-fuzzy.vim'
-    let g:incsearch#auto_nohlsearch = 0 " 停止搜索时，是否自动关闭高亮
-                                        " 停止搜索时，nohl中的feedkeys会影响Popc-popup模式
-    nmap z/ <Plug>(incsearch-fuzzy-/)
-    nmap z? <Plug>(incsearch-fuzzy-?)
-    nmap zg/ <Plug>(incsearch-fuzzy-stay)
-" }}}
-
 " fzf {{{ 模糊查找
 if s:gset.use_fzf
     " linux下直接pacman -S fzf
@@ -275,7 +265,7 @@ if s:gset.use_fzf
     endif
     Plug 'junegunn/fzf.vim', {'on': ['FzfFiles', 'FzfRg']}
     let g:fzf_command_prefix = 'Fzf'
-    nnoremap <leader><leader>f :call feedkeys(':FzfFiles ', 'n')<CR>
+    nnoremap <silent> <leader><leader>f :call feedkeys(':FzfFiles ', 'n')<CR>
 endif
 " }}}
 
@@ -312,7 +302,7 @@ endif
     let g:Lf_ShortcutB = ''
     let g:Lf_ReverseOrder = 1
     let g:Lf_ShowHidden = 1             " 搜索隐藏文件和目录
-    nnoremap <leader><leader>l :call feedkeys(':LeaderfFile ', 'n')<CR>
+    nnoremap <silent> <leader><leader>l :call feedkeys(':LeaderfFile ', 'n')<CR>
     nnoremap <leader>lf :LeaderfFile<CR>
     nnoremap <leader>lu :LeaderfFunction<CR>
     nnoremap <leader>lU :LeaderfFunctionAll<CR>
@@ -345,7 +335,6 @@ endif
     Plug 'brooth/far.vim', {'on': 'Farp'}
     let g:far#file_mask_favorites = ['%', '*.txt']
     nnoremap <leader>sr :Farp<CR>
-                                        " Search and Replace, 使用Fardo和Farundo来更改替换结果
     nnoremap <leader>fd :Fardo<CR>
     nnoremap <leader>fu :Farundo<CR>
 " }}}
@@ -357,7 +346,7 @@ endif
     "               第3个field又重新从第1个对齐符开始（对齐符可以有多个，循环使用）
     "               这样就相当于：需对齐的field使用第1个对齐符，分割符(,)field使用第2个对齐符
     " /,\zs     -   将分割符(,)作为对齐内容field里的字符
-    nnoremap <leader><leader>a :call feedkeys(':Tabularize /', 'n')<CR>
+    nnoremap <silent> <leader><leader>a :call feedkeys(':Tabularize /', 'n')<CR>
     vnoremap <leader><leader>a :Tabularize /
 " }}}
 
@@ -369,16 +358,17 @@ endif
     " 命令格式
     ":EasyAlign[!] [N-th]DELIMITER_KEY[OPTIONS]
     ":EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
-    nnoremap <leader><leader>g :call feedkeys(':' . join(GetContentRange('^[ \t]*$', '^[ \t]*$'), ',') . 'EasyAlign', 'n')<CR>
+    nnoremap <silent> <leader><leader>g
+        \ :call feedkeys(':' . join(GetContentRange('^[ \t]*$', '^[ \t]*$'), ',') . 'EasyAlign', 'n')<CR>
     vnoremap <leader><leader>g :EasyAlign
 " }}}
 
 " smooth-scroll {{{ 平滑滚动
     Plug 'terryma/vim-smooth-scroll'
-    nnoremap <M-n> :call smooth_scroll#down(&scroll, 0, 2)<CR>
-    nnoremap <M-m> :call smooth_scroll#up(&scroll, 0, 2)<CR>
-    nnoremap <M-j> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
-    nnoremap <M-k> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
+    nnoremap <silent> <M-n> :call smooth_scroll#down(&scroll, 0, 2)<CR>
+    nnoremap <silent> <M-m> :call smooth_scroll#up(&scroll, 0, 2)<CR>
+    nnoremap <silent> <M-j> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
+    nnoremap <silent> <M-k> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
 " }}}
 
 " expand-region {{{ 快速块选择
@@ -450,7 +440,7 @@ else
                 \ 'left' : [['mode'],
                 \           ['all_filesign'],
                 \           ['msg_left']],
-                \ 'right': [['all_lineinfo', 'chk_indent', 'chk_trailing'],
+                \ 'right': [['chk_trailing', 'chk_indent', 'all_lineinfo'],
                 \           ['all_format'],
                 \           ['msg_right']],
                 \ },
@@ -473,8 +463,14 @@ else
                 \ 'mode'        : 'Plug_ll_mode',
                 \ 'msg_left'    : 'Plug_ll_msgLeft',
                 \ 'msg_right'   : 'Plug_ll_msgRight',
+                \ },
+        \ 'component_expand': {
                 \ 'chk_indent'  : 'Plug_ll_checkMixedIndent',
                 \ 'chk_trailing': 'Plug_ll_checkTrailing',
+                \ },
+        \ 'component_type': {
+                \ 'chk_indent'  : 'error',
+                \ 'chk_trailing': 'error',
                 \ },
         \ }
     if s:gset.use_powerfont
@@ -492,7 +488,6 @@ else
         let g:lightline.colorscheme = 'solarized'
     endtry
     let g:lightline.blacklist = {'tagbar':0, 'nerdtree':0, 'Popc':0}
-    let s:lightline_check_flg = 1       " 是否检测Tab和Trailing
     nnoremap <leader>tl :call lightline#toggle()<CR>
     nnoremap <leader>tk :call Plug_ll_toggleCheck()<CR>
 
@@ -500,8 +495,9 @@ else
     augroup PluginLightline
         autocmd!
         autocmd ColorScheme * call s:Plug_ll_colorScheme()
-        autocmd BufReadPre * call s:Plug_ll_checkSize(getfsize(expand('<afile>')))
+        autocmd CursorHold,BufWritePost * call s:Plug_ll_checkRefresh()
     augroup END
+
     function! s:Plug_ll_colorScheme()
         if !exists('g:loaded_lightline')
             return
@@ -515,17 +511,26 @@ else
         catch /^Vim\%((\a\+)\)\=:E117/
         endtry
     endfunction
-    function! s:Plug_ll_checkSize(size)
-        let s:lightline_check_flg = (a:size > 1024*1024*2 || a:size == -2) ? 0 : 1
+
+    function! s:Plug_ll_checkRefresh()
+        if get(b:, 'lightline_changedtick', 0) == b:changedtick
+            return
+        endif
+        unlet! b:lightline_changedtick
+        call lightline#update()
+        let b:lightline_changedtick = b:changedtick
     endfunction
     " }}}
+
     " FUNCTION: Plug_ll_toggleCheck() {{{
     function! Plug_ll_toggleCheck()
-        let s:lightline_check_flg = !s:lightline_check_flg
-        echo 's:lightline_check_flg = ' . s:lightline_check_flg
+        let b:lightline_check_flg = !get(b:, 'lightline_check_flg', 1)
+        call lightline#update()
+        echo 'b:lightline_check_flg = ' . b:lightline_check_flg
     endfunction
     " }}}
-    " FUNCTION: Plug_ll_mode() {{{
+
+    " FUNCTION: lightline components {{{
     function! Plug_ll_mode()
         return &ft ==# 'tagbar' ? 'Tagbar' :
             \ &ft ==# 'nerdtree' ? 'NERDTree' :
@@ -535,36 +540,32 @@ else
             \ &ft ==# 'startify' ? 'Startify' :
             \ winwidth(0) > 60 ? lightline#mode() : ''
     endfunction
-    " }}}
-    " FUNCTION: Plug_ll_msgLeft() {{{
+
     function! Plug_ll_msgLeft()
         if &ft ==# 'qf'
-            return 'CWD = ' . getcwd()
+            return 'cwd = ' . getcwd()
         else
             let l:fw = FindWowGetArgs()
             let l:fp = expand('%:p')
             return empty(l:fw) ? l:fp : substitute(l:fp, escape(l:fw[0], '\'), '', '')
         endif
     endfunction
-    " }}}
-    " FUNCTION: Plug_ll_msgRight() {{{
+
     function! Plug_ll_msgRight()
         let l:fw = FindWowGetArgs()
         return empty(l:fw) ? '' : (l:fw[0] . '[' . l:fw[1] . '(' . join(l:fw[2],',') . ')]')
     endfunction
-    " }}}
-    " FUNCTION: Plug_ll_checkMixedIndent() {{{
+
     function! Plug_ll_checkMixedIndent()
-        if !s:lightline_check_flg
+        if !get(b:, 'lightline_check_flg', 1)
             return ''
         endif
         let l:ret = search('\t', 'nw')
         return (l:ret == 0) ? '' : 'I:'.string(l:ret)
     endfunction
-    " }}}
-    " FUNCTION: Plug_ll_checkTrailing() {{{
+
     function! Plug_ll_checkTrailing()
-        if !s:lightline_check_flg
+        if !get(b:, 'lightline_check_flg', 1)
             return ''
         endif
         let ret = search('\s\+$', 'nw')
@@ -623,7 +624,7 @@ endif
         \}
     \ ]
     " set option with PopSet
-    nnoremap <leader><leader>s :call feedkeys(':PopSet ', 'n')<CR>
+    nnoremap <silent> <leader><leader>s :call feedkeys(':PopSet ', 'n')<CR>
     nnoremap <leader>sa :PopSet popset<CR>
 " }}}
 
@@ -642,37 +643,21 @@ endif
     let g:Popc_separator = {'left' : '', 'right': ''}
     let g:Popc_subSeparator = {'left' : '', 'right': ''}
     let g:Popc_useLayerPath = 0
-    let s:popc_tabline_layout = 1
     nnoremap <leader><leader>h :PopcBuffer<CR>
     nnoremap <M-i> :PopcBufferSwitchLeft<CR>
     nnoremap <M-o> :PopcBufferSwitchRight<CR>
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
-    nnoremap <leader>wf :call Plug_popc_wksSearch('file')<CR>
-    nnoremap <leader>wt :call Plug_popc_wksSearch('text')<CR>
-    nnoremap <leader>ty :call Plug_popc_toggleLayout()<CR>
-    function! Plug_popc_wksSearch(type)
-        let l:wks_root = popc#layer#wks#GetCurrentWks()[1]
-        if !empty(l:wks_root)
-            if a:type ==# 'file'
-                execute ':LeaderfFile ' . l:wks_root
-            elseif a:type ==# 'text'
-                execute ':Leaderf rg -e "" ' . l:wks_root
-            endif
-        endif
-    endfunction
-    function! Plug_popc_toggleLayout()
-        if s:popc_tabline_layout == 0
-            call popc#ui#TabLineSetLayout('buffer', 'tab')
-            let s:popc_tabline_layout = 1
-        elseif s:popc_tabline_layout == 1
-            call popc#ui#TabLineSetLayout('buffer', '')
-            let s:popc_tabline_layout = 2
-        elseif s:popc_tabline_layout == 2
-            call popc#ui#TabLineSetLayout('', 'tab')
-            let s:popc_tabline_layout = 0
-        endif
-    endfunction
+    nnoremap <silent> <leader>wf
+        \ :let g:popc_wks_root = popc#layer#wks#GetCurrentWks()[1]<Bar>
+        \ :execute empty(g:popc_wks_root) ? '' : ':LeaderfFile ' . g:popc_wks_root<CR>
+    nnoremap <silent> <leader>wt
+        \ :let g:popc_wks_root = popc#layer#wks#GetCurrentWks()[1]<Bar>
+        \ :execute empty(g:popc_wks_root) ? '' : ':Leaderf rg -e "" ' . g:popc_wks_root<CR>
+    nnoremap <silent> <leader>ty
+        \ :let g:popc_tabline_layout = (get(g:, 'popc_tabline_layout', 0) + 1) % 3<Bar>
+        \ :call call('popc#ui#TabLineSetLayout',
+        \           [['buffer', 'tab'], ['buffer', ''], ['', 'tab']][g:popc_tabline_layout])<CR>
 " }}}
 
 " nerdtree {{{ 目录树导航
@@ -855,6 +840,7 @@ if s:gset.use_ycm
     nnoremap <leader>yD :YcmDebugInfo<CR>
     nnoremap <leader>yc :call Plug_ycm_createConf('.ycm_extra_conf.py')<CR>
     nnoremap <leader>yj :call Plug_ycm_createConf('jsconfig.json')<CR>
+
     function! Plug_ycm_createConf(filename)
         " 在当前目录下创建配置文件
         if !filereadable(a:filename)
@@ -875,6 +861,7 @@ else
     let g:echodoc#type = 'floating'
 endif
     nnoremap <leader>td :call Plug_ed_toggle()<CR>
+
     function! Plug_ed_toggle()
         if echodoc#is_enabled()
             call echodoc#disable()
@@ -902,8 +889,6 @@ endif
 
 " ale {{{ 语法检测
     Plug 'dense-analysis/ale', {'on': 'ALEToggle'}
-    " 语法引擎:
-    "   VimScript : vint
     let g:ale_completion_enabled = 0    " 使能ale补全(只支持TypeScript)
     let g:ale_linters = {'java' : []}   " 禁用Java检测（与YCM冲突）
     let g:ale_sign_error = '✘'
@@ -913,7 +898,9 @@ endif
     let g:ale_echo_delay = 10           " 显示语文错误的延时时间
     let g:ale_lint_delay = 300          " 文本更改后的延时检测时间
     let g:ale_enabled = 0               " 默认关闭ALE检测
-    nnoremap <leader>ta :execute ':ALEToggle'<Bar>echo 'AleToggle: ' . g:ale_enabled<CR>
+    nnoremap <silent> <leader>ta
+        \ :execute ':ALEToggle'<Bar>
+        \ :echo 'AleToggle: ' . g:ale_enabled<CR>
 " }}}
 
 " neoformat {{{ 代码格式化
@@ -980,7 +967,7 @@ endif
 "}}}
 
 " tagbar {{{ 代码结构查看
-    Plug 'majutsushi/tagbar'
+    Plug 'majutsushi/tagbar', {'on': 'TagbarToggle'}
     let g:tagbar_width=30
     let g:tagbar_map_showproto=''       " 取消tagbar对<Space>的占用
     nnoremap <leader>tt :TagbarToggle<CR>
@@ -1012,9 +999,9 @@ endif
     let g:asyncrun_open = 8             " 自动打开quickfix window
     let g:asyncrun_save = 1             " 自动保存当前文件
     let g:asyncrun_local = 1            " 使用setlocal的efm
-    nnoremap <leader><leader>r :call feedkeys(':AsyncRun ', 'n')<CR>
+    nnoremap <silent> <leader><leader>r :call feedkeys(':AsyncRun ', 'n')<CR>
     vnoremap <leader><leader>r :AsyncRun
-    nnoremap <leader>rr :call feedkeys(':AsyncRun ', 'n')<CR>
+    nnoremap <silent> <leader>rr :call feedkeys(':AsyncRun ', 'n')<CR>
     vnoremap <leader>rr :AsyncRun
     nnoremap <leader>rk :AsyncStop<CR>
 " }}}
@@ -1028,8 +1015,8 @@ if IsVim()
     " 暂停继续
     nmap <F6>   <Plug>EasyDebuggerContinue
     tmap <F6>   <Plug>EasyDebuggerContinue
-    nmap <S-F6>   <Plug>EasyDebuggerPause
-    tmap <S-F6>   <Plug>EasyDebuggerPause
+    nmap <S-F6> <Plug>EasyDebuggerPause
+    tmap <S-F6> <Plug>EasyDebuggerPause
     " 设置断点
     nmap <F9>   <Plug>EasyDebuggerSetBreakPoint
     " 单步：Step over, into, out
@@ -1110,47 +1097,28 @@ if s:gset.use_utils
     let g:mkdp_refresh_slow = 0         " 即时预览MarkDown
     let g:mkdp_command_for_global = 0   " 只有markdown文件可以预览
     let g:mkdp_browser = 'firefox'
-    nnoremap <leader>vm :call Plug_md_view()<CR>
-    nnoremap <leader>tb :call Plug_md_toggleBrowser()<CR>
-    function! Plug_md_view() abort
-        if !get(b:, 'MarkdownPreviewToggleBool')
-            echo 'Open markdown preview'
-        else
-            echo 'Close markdown preview'
-        endif
-        call mkdp#util#toggle_preview()
-    endfunction
-    function! Plug_md_toggleBrowser()
-        if g:mkdp_browser ==# 'firefox'
-            let g:mkdp_browser = 'chrome'
-        else
-            let g:mkdp_browser = 'firefox'
-        endif
-        let g:mkdp_browser = g:mkdp_browser
-        echo 'Browser toggle to ' . g:mkdp_browser
-    endfunction
+    nnoremap <silent> <leader>vm
+        \ :echo get(b:, 'MarkdownPreviewToggleBool') ? 'Close markdown preview' : 'Open markdown preview'<Bar>
+        \ :call mkdp#util#toggle_preview()<CR>
+    nnoremap <silent> <leader>tb
+        \ :let g:mkdp_browser = (g:mkdp_browser ==# 'firefox') ? 'chrome' : 'firefox'<Bar>
+        \ :echo 'Browser: ' . g:mkdp_browser<CR>
 " }}}
 
 " reStructruedText {{{
-if !(IsWin() && IsNVim())
-    " 需要安装 https://github.com/Rykka/instant-rst.py
     Plug 'Rykka/riv.vim', {'for': 'rst'}
     Plug 'Rykka/InstantRst', {'for': 'rst'}
     let g:instant_rst_browser = 'firefox'
 if IsWin()
     " 需要安装 https://github.com/mgedmin/restview
-    nnoremap <leader>vr :execute ':AsyncRun restview ' . expand('%:p:t')<Bar>cclose<CR>
+    nnoremap <silent> <leader>vr
+        \ :execute ':AsyncRun restview ' . expand('%:p:t')<Bar>
+        \ :cclose<CR>
 else
-    nnoremap <leader>vr :call Plug_rst_view()<CR>
-    function! Plug_rst_view() abort
-        if g:_instant_rst_daemon_started
-            StopInstantRst
-            echo 'StopInstantRst'
-        else
-            InstantRst
-        endif
-    endfunction
-endif
+    " 需要安装 https://github.com/Rykka/instant-rst.py
+    nnoremap <silent> <leader>vr
+        \ :echo g:_instant_rst_daemon_started ? 'CLose rst' : 'Open rst'<Bar>
+        \ :execute g:_instant_rst_daemon_started ? 'StopInstantRst' : 'InstantRst'<CR>
 endif
 " }}}
 
@@ -1187,7 +1155,17 @@ endif
     let g:openbrowser_default_search='baidu'
     nmap <leader>bs <Plug>(openbrowser-smart-search)
     vmap <leader>bs <Plug>(openbrowser-smart-search)
-    " search funtion - google, baidu, github
+    nnoremap <silent> <leader>big :call feedkeys(':OpenBrowserSearch -google ', 'n')<CR>
+    nnoremap <silent> <leader>bib :call feedkeys(':OpenBrowserSearch -baidu ', 'n')<CR>
+    nnoremap <silent> <leader>bih :call feedkeys(':OpenBrowserSearch -github ', 'n')<CR>
+    nnoremap <leader>bg  :call Plug_brw_search('google', 'n')<CR>
+    vnoremap <leader>bg  :call Plug_brw_search('google', 'v')<CR>
+    nnoremap <leader>bb  :call Plug_brw_search('baidu', 'n')<CR>
+    vnoremap <leader>bb  :call Plug_brw_search('baidu', 'v')<CR>
+    nnoremap <leader>bh  :call Plug_brw_search('github', 'n')<CR>
+    vnoremap <leader>bh  :call Plug_brw_search('github', 'v')<CR>
+
+    " 搜索引擎- google, baidu, github
     function! Plug_brw_search(engine, mode)
         if a:mode ==# 'n'
             call openbrowser#search(expand('<cword>'), a:engine)
@@ -1195,15 +1173,6 @@ endif
             call openbrowser#search(GetSelected(), a:engine)
         endif
     endfunction
-    nnoremap <leader>big :call feedkeys(':OpenBrowserSearch -google ', 'n')<CR>
-    nnoremap <leader>bg  :call Plug_brw_search('google', 'n')<CR>
-    vnoremap <leader>bg  :call Plug_brw_search('google', 'v')<CR>
-    nnoremap <leader>bib :call feedkeys(':OpenBrowserSearch -baidu ', 'n')<CR>
-    nnoremap <leader>bb  :call Plug_brw_search('baidu', 'n')<CR>
-    vnoremap <leader>bb  :call Plug_brw_search('baidu', 'v')<CR>
-    nnoremap <leader>bih :call feedkeys(':OpenBrowserSearch -github ', 'n')<CR>
-    nnoremap <leader>bh  :call Plug_brw_search('github', 'n')<CR>
-    vnoremap <leader>bh  :call Plug_brw_search('github', 'v')<CR>
 "}}}
 endif
 " }}}
@@ -2526,6 +2495,7 @@ endfunction
     set nobreakindent                   " 折行时不缩进
     set conceallevel=0                  " 显示markdown等格式中的隐藏字符
     set foldenable                      " 充许折叠
+    set foldopen-=search                " 查找时不自动展开折叠
     set foldcolumn=0                    " 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
     set foldmethod=indent               " 设置折叠，默认为缩进折叠
     set scrolloff=3                     " 光标上下保留的行数
@@ -2757,8 +2727,12 @@ endif
 " copy&paste {{{
     " yank & put
     vnoremap <leader>y ygv
-    nnoremap ya :<C-U>execute 'let @0.=join(getline(line("."), line(".")+v:count), "\n")."\n"'<CR>
-    nnoremap yd dd<Bar>:execute 'let @0.=@"'<CR>
+    nnoremap <silent> ya
+        \ :<C-U>execute 'let @0 .= join(getline(line("."), line(".") + v:count), "\n") . "\n"'<Bar>
+        \ :echo v:count1 . ' lines append'<CR>
+    nnoremap <silent> yd
+        \ dd<Bar>:execute 'let @0 .= @"'<Bar>
+        \ :echo 'deleted lines append'<CR>
     nnoremap <leader>p "0p
     nnoremap <leader>P "0P
     " ctrl-c & ctrl-v
@@ -2806,7 +2780,9 @@ endif
     " 在新tab中打开列表项
     nnoremap <leader>qt :call QuickfixTabEdit()<CR>
     " 将quickfix中的内容复制location-list
-    nnoremap <leader>ql :call setloclist(0, getqflist())<Bar>vertical botright lopen 35<CR>
+    nnoremap <leader>ql
+        \ :call setloclist(0, getqflist())<Bar>
+        \ :vertical botright lopen 35<CR>
     " 编码转换
     nnoremap <leader>qi :call QuickfixIconv()<CR>
     " 分割窗口
@@ -2841,8 +2817,10 @@ endif
 
 " file diff {{{
     " 文件比较，自动补全文件和目录
-    nnoremap <leader>ds :call ExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 's')<CR>
-    nnoremap <leader>dv :call ExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 'v')<CR>
+    nnoremap <silent> <leader>ds
+        \ :call ExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 's')<CR>
+    nnoremap <silent> <leader>dv
+        \ :call ExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 'v')<CR>
     " 比较当前文件（已经分屏）
     nnoremap <leader>dt :diffthis<CR>
     " 关闭文件比较，与diffthis互为逆命令
@@ -2850,9 +2828,11 @@ endif
     " 更新比较结果
     nnoremap <leader>du :diffupdate<CR>
     " 应用差异到别一文件，[range]<leader>dp，range默认为1行
-    nnoremap <leader>dp :<C-U>execute '.,+' . string(v:count1-1) . 'diffput'<CR>
+    nnoremap <leader>dp
+        \ :<C-U>execute '.,+' . string(v:count1-1) . 'diffput'<CR>
     " 拉取差异到当前文件，[range]<leader>dg，range默认为1行
-    nnoremap <leader>dg :<C-U>execute '.,+' . string(v:count1-1) . 'diffget'<CR>
+    nnoremap <leader>dg
+        \ :<C-U>execute '.,+' . string(v:count1-1) . 'diffget'<CR>
     " 下一个diff
     nnoremap <leader>dj ]c
     " 前一个diff
@@ -2876,8 +2856,10 @@ endif
 
 " project {{{
     " 创建临时文件
-    nnoremap <leader>ei :call ExecInput(['Suffix: '], 'FuncEditTempFile', 0)<CR>
-    nnoremap <leader>eti :call ExecInput(['Suffix: '], 'FuncEditTempFile', 1)<CR>
+    nnoremap <silent> <leader>ei
+        \ :call ExecInput(['Suffix: '], 'FuncEditTempFile', 0)<CR>
+    nnoremap <silent> <leader>eti
+        \ :call ExecInput(['Suffix: '], 'FuncEditTempFile', 1)<CR>
     for [key, val] in items({
             \ 'n' : '',
             \ 'c' : 'c',
@@ -2885,8 +2867,8 @@ endif
             \ 'p' : 'py',
             \ 'g' : 'go',
             \})
-        execute 'nnoremap <leader>e'  . key . ' :call FuncEditTempFile("' . val . '", 0)<CR>'
-        execute 'nnoremap <leader>et' . key . ' :call FuncEditTempFile("' . val . '", 1)<CR>'
+        execute 'nnoremap <silent> <leader>e'  . key . ' :call FuncEditTempFile("' . val . '", 0)<CR>'
+        execute 'nnoremap <silent> <leader>et' . key . ' :call FuncEditTempFile("' . val . '", 1)<CR>'
     endfor
     " 常用操作
     nnoremap <leader>dh :call FuncDivideSpaceH()<CR>
@@ -2930,8 +2912,10 @@ endif
     nnoremap <leader>3  #
     nnoremap <leader>g8 g*
     nnoremap <leader>g3 g#
-    vnoremap / ""y<Bar>:execute '/\c' . @"<CR>
-    nnoremap <leader>/ :execute '/\c' . expand('<cword>')<CR>
+    vnoremap <silent> /
+        \ ""y<Bar>:execute '/\c' . @"<CR>
+    nnoremap <silent> <leader>/
+        \ :execute '/\c' . expand('<cword>')<CR>
     " FindWow
     for key in s:fw.mappings
         execute 'nnoremap <leader>' . key ':call FindWow("' . key . '", "n")<CR>'
