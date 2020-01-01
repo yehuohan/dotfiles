@@ -1195,49 +1195,70 @@ endfunction
 " }}}
 
 " FUNCTION: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{ 多文件自动补全
-" 多个文件或目录时，返回的补全字符串使用'|'分隔，使用时需要将'|'转回空格
+" 多个文件或目录时，返回的补全字符串使用'|'分隔，使用时需要将'|'转回空格；
+" 不支含空格的文件或目录；
 function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
-    let l:complete = []
-    let l:arglead_list = ['']
-    let l:arglead_first = ''
-    let l:arglead_glob = ''
-    let l:files_list = []
-
-    " process glob path-string
-    if !empty(a:arglead)
-        let l:arglead_list = split(a:arglead, ' ')
-        let l:arglead_first = join(l:arglead_list[0:-2], '|')
-        let l:arglead_glob = l:arglead_list[-1]
+    let l:arglead_true = ''             " 真正用于补全的arglead
+    let l:arglead_head = ''             " arglead_true之前的部分
+    let l:arglead_list = []             " arglead_true开头的文件和目录补全列表
+    " arglead   : _true : _head
+    " $$        : ''    : ''     -> strridx('|') == -1 -> empty()
+    " $ $       : ''    : ''     -> strridx('|') == -1 -> count() == strchars()
+    " $xx$      : xx    : ''     -> strridx('|') == -1 -> arglead[-1:] != ' '
+    " $xx yy$   : yy    : xx|    -> strridx('|') == -1 -> arglead[-1:] != ' '
+    " $xx $     : ''    : xx|    -> strridx('|') == -1 -> arglead[-1:] == ' '
+    " $xx yy $  : ''    : xx|yy| -> strridx('|') == -1 -> arglead[-1:] == ' '
+    " $xx|**$   : ''    : xx|    -> strridx('|') != -1 -> strcharpart('|') -> no '|' case
+    " 转换成 no '|' case
+    let l:idx = strridx(a:arglead, '|')
+    if l:idx == -1
+        let l:arglead = a:arglead
+    else
+        let l:arglead = strcharpart(a:arglead, l:idx + 1)
+        let l:arglead_head = strcharpart(a:arglead, 0, l:idx + 1)
     endif
-
-    " glob non-hidden and hidden files(but no . and ..) with ignorecase
+    " 获取_true和_head
+    if !empty(l:arglead) && strchars(l:arglead) > count(l:arglead, ' ')
+        if l:arglead[-1:] !=# ' '
+            let l:arglead = split(l:arglead)
+            let l:arglead_true = l:arglead[-1]
+            if len(l:arglead) > 1
+                let l:arglead_head .= join(l:arglead[0:-2], '|') . '|'
+            endif
+        else
+            let l:arglead_head .= join(split(l:arglead), '|') . '|'
+        endif
+    endif
+    " 获取_list，包括<.*>隐藏文件，忽略大小写
+    let l:wicSave = &wildignorecase
     set wildignorecase
     set wildignore+=.,..
-    let l:files_list = split(glob(l:arglead_glob . "*") . "\n" . glob(l:arglead_glob . "\.[^.]*"), "\n")
+    let l:arglead_list = split(glob(l:arglead_true . "*") . "\n" . glob(l:arglead_true . "\.[^.]*"), "\n")
+    let &wildignorecase = l:wicSave
     set wildignore-=.,..
-
-    if len(l:arglead_list) == 1
-        let l:complete = l:files_list
-    else
-        for item in l:files_list
-            call add(l:complete, l:arglead_first . '|' . item)
-        endfor
+    "  返回补全列表
+    if !empty(l:arglead_head)
+        call map(l:arglead_list, 'l:arglead_head . v:val')
     endif
-    return l:complete
+    return l:arglead_list
 endfunction
 " }}}
 
-" FUNCTION: GetFileList(pat, sdir) {{{ 获取文件列表
+" FUNCTION: GetFileList(pat, [sdir]) {{{ 获取文件列表
 " @param pat: 文件匹配模式，如*.pro
-" @param sdir: 查找起始目录，默认从当前目录向上查找到根目录
+" @param sdir: 查找起始目录，默认从当前文件所在目录向上查找到根目录
 " @return 返回找到的文件列表
-function! GetFileList(pat, sdir)
-    let l:dir      = empty(a:sdir) ? expand('%:p:h') : a:sdir
+function! GetFileList(pat, ...)
+    let l:dir      = a:0 >= 1 ? a:1 : expand('%:p:h')
     let l:dir_last = ''
     let l:pfile    = ''
 
     while l:dir !=# l:dir_last
+        let l:wicSave = &wildignorecase
+        set wildignorecase
         let l:pfile = glob(l:dir . '/' . a:pat)
+        let &wildignorecase = l:wicSave
+
         if !empty(l:pfile)
             break
         endif
@@ -1265,7 +1286,7 @@ function! GetFileContent(fp, pat, flg)
                     call add(l:content, l:result[1])
                 endif
             elseif a:flg ==# 'first'
-                return empty(l:result[1]) ? [] : [result[1]]
+                return empty(l:result[1]) ? [] : [l:result[1]]
             endif
         endif
     endfor
@@ -1608,13 +1629,15 @@ let s:cpl = {
         \ 'python' : '%*\\sFile\ \"%f\"\\,\ line\ %l\\,\ %m',
         \ },
     \ 'pro' : {
-        \ 'qt'     : ['*.pro', 'CFnQt'],
+        \ 'qmake'  : ['*.pro', 'CFnQMake'],
+        \ 'cmake'  : ['cmakelists.txt', 'CFnCMake'],
+        \ 'make'   : ['makefile', 'CFnMake'],
         \ 'vs'     : ['*.sln', 'CFnVs'],
-        \ 'mk'     : ['[mM]akefile', 'CFnMake'],
-        \ 'sphinx' : [IsWin() ? 'make.bat' : '[mM]akefile', 'CFnSphinx'],
+        \ 'sphinx' : [IsWin() ? 'make.bat' : 'makefile', 'CFnSphinx'],
         \ },
     \ 'pat' : {
-        \ 'target' : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z_][a-zA-Z0-9_\-]*\)',
+        \ 'target'  : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
+        \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ },
     \ 'sel_arg' : {
         \ 'opt' : 'select args to CompileFile',
@@ -1740,7 +1763,7 @@ endfunction
 " @param args: 编译工程文件函数的附加参数，需要采用popset插件
 function! CompileProject(type, args)
     let [l:pat, l:fn] = s:cpl.pro[a:type]
-    let l:prj = GetFileList(l:pat, '')
+    let l:prj = GetFileList(l:pat)
     if len(l:prj) == 1
         let Fn = function(l:fn)
         call Fn('', l:prj[0], a:args)
@@ -1757,8 +1780,8 @@ function! CompileProject(type, args)
 endfunction
 " }}}
 
-" FUNCTION: CFnQt(sopt, sel, args) {{{
-function! CFnQt(sopt, sel, args)
+" FUNCTION: CFnQMake(sopt, sel, args) {{{
+function! CFnQMake(sopt, sel, args)
     let l:srcfile = fnamemodify(a:sel, ':p:t')
     let l:outfile = GetFileContent(a:sel, s:cpl.pat.target, 'first')
     let l:outfile = empty(l:outfile) ? fnamemodify(a:sel, ':t:r') : l:outfile[0]
@@ -1778,6 +1801,28 @@ function! CFnQt(sopt, sel, args)
 endfunction
 " }}}
 
+" FUNCTION: CFnCMake(sopt, sel, args) {{{
+function! CFnCMake(sopt, sel, args)
+    let l:outfile = GetFileContent(a:sel, s:cpl.pat.project, 'first')
+    let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
+    let l:workdir = fnamemodify(a:sel, ':p:h')
+
+    if a:args[0] == 0
+        " clean
+        call delete(l:workdir . '/CMakeBuildOut', 'rf')
+    elseif a:args[0] >= 1
+        "build
+        silent! call mkdir('CMakeBuildOut')
+        let l:cmd = printf('cd "%s" && cd CMakeBuildOut && cmake -G "Unix Makefiles" .. && make', l:workdir)
+        if a:args[0] >= 2
+            "run
+            let l:cmd .= ' && "./' . l:outfile .'"'
+        endif
+        execute s:cpl.run('', l:workdir, l:cmd)
+    endif
+endfunction
+" }}}
+
 " FUNCTION: CFnMake(sopt, sel, args) {{{
 function! CFnMake(sopt, sel, args)
     let l:outfile = GetFileContent(a:sel, s:cpl.pat.target, 'first')
@@ -1788,7 +1833,7 @@ function! CFnMake(sopt, sel, args)
     if a:args[0]
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:cpl.run('cpp', l:workdir, l:cmd)
+    execute s:cpl.run('', l:workdir, l:cmd)
 endfunction
 "}}}
 
@@ -1823,12 +1868,15 @@ endfunction
 
 let RcArg         = function('popset#set#PopSelection', [s:cpl.sel_arg])
 let RcExe         = function('popset#set#PopSelection', [s:cpl.sel_exe])
-let RcQt          = function('CompileProject', ['qt', [0, []]])
-let RcQtRun       = function('CompileProject', ['qt', [1, []]])
-let RcQtClean     = function('CompileProject', ['qt', [0, ['distclean']]])
-let RcMake        = function('CompileProject', ['mk', [0, []]])
-let RcMakeRun     = function('CompileProject', ['mk', [1, []]])
-let RcMakeClean   = function('CompileProject', ['mk', [0, ['clean']]])
+let RcQMake       = function('CompileProject', ['qmake', [0, []]])
+let RcQMakeRun    = function('CompileProject', ['qmake', [1, []]])
+let RcQMakeClean  = function('CompileProject', ['qmake', [0, ['distclean']]])
+let RcCMake       = function('CompileProject', ['cmake', [1]])
+let RcCMakeRun    = function('CompileProject', ['cmake', [2]])
+let RcCMakeClean  = function('CompileProject', ['cmake', [0]])
+let RcMake        = function('CompileProject', ['make', [0, []]])
+let RcMakeRun     = function('CompileProject', ['make', [1, []]])
+let RcMakeClean   = function('CompileProject', ['make', [0, ['clean']]])
 let RcVs          = function('CompileProject', ['vs', [0, ['Build']]])
 let RcVsRun       = function('CompileProject', ['vs', [1, ['Build']]])
 let RcVsClean     = function('CompileProject', ['vs', [0, ['Clean']]])
@@ -2080,11 +2128,7 @@ function! FindWow(keys, mode)
             let l:loc = GetInput('Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
             if !empty(l:loc)
                 let l:loc = split(l:loc, '|')
-                for k in range(len(l:loc))
-                    if l:loc[k] =~# '[/\\]$'
-                        let l:loc[k] = strcharpart(l:loc[k], 0, strchars(l:loc[k]) - 1)
-                    endif
-                endfor
+                call map(l:loc, {key, val -> (val =~# '[/\\]$') ? strcharpart(val, 0, strchars(val) - 1) : val})
                 let l:loc = join(l:loc, '" "') " for \"l:loc\"
             endif
         elseif a:keys =~# 'r'
@@ -2259,7 +2303,7 @@ function! FindWowSetArgs(type)
         let s:fw.args.filters = GetInput('Filter: ')
     endif
     if a:type =~# 'g'
-        let s:fw.args.globlst = split(GetInput('Glob: '), ',')
+        let s:fw.args.globlst = split(GetInput('Glob: '))
     endif
     return 1
 endfunction
@@ -2885,9 +2929,12 @@ endif
     nnoremap <leader>ra :call RcArg()<CR>
     nnoremap <leader>re :call RcExe()<CR>
     " 编译运行当前项目
-    nnoremap <leader>rQ  :call RcQt()<CR>
-    nnoremap <leader>rq  :call RcQtRun()<CR>
-    nnoremap <leader>rcq :call RcQtClean()<CR>
+    nnoremap <leader>rQ  :call RcQMake()<CR>
+    nnoremap <leader>rq  :call RcQMakeRun()<CR>
+    nnoremap <leader>rcq :call RcQMakeClean()<CR>
+    nnoremap <leader>rG  :call RcCMake()<CR>
+    nnoremap <leader>rg  :call RcCMakeRun()<CR>
+    nnoremap <leader>rcg :call RcCMakeClean()<CR>
     nnoremap <leader>rM  :call RcMake()<CR>
     nnoremap <leader>rm  :call RcMakeRun()<CR>
     nnoremap <leader>rcm :call RcMakeClean()<CR>

@@ -306,18 +306,22 @@ snippet cmk "cmake template"
 
 cmake_minimum_required(VERSION 3.5)
 
-project(${1:main})
+project(${1:main} LANGUAGES ${2:CXX})
 
+#set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 set(DIR_INC
     ${CMAKE_CURRENT_SOURCE_DIR}/inc
 )
 include_directories(${DIR_INC})
-
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/src SRC)
 
 add_compile_options(-g -Wall)
-
 add_executable(${PROJECT_NAME} ${SRC})
+#add_library(${PROJECT_NAME} <SHARED,STATIC,MODULE>
+#    ${SRC}
+#)
+#target_link_libraries(${PROJECT_NAME} <libs>)
+#add_dependencies(${PROJECT_NAME} <libs>)
 endsnippet
 
 
