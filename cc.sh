@@ -77,7 +77,6 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp ../Vim/vimfiles/.ycm_extra_conf.py ./vim/
     cp ../Vim/vimfiles/jsconfig.json      ./vim/
     cp -r ../Vim/vimfiles/vSnippets       ./vim/
-    cp -r ../Vim/vimfiles/vBin            ./vim/
     cp -r ../Vim/vimfiles/autoload        ./vim/
 
     # cygwin
