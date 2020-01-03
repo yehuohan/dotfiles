@@ -261,9 +261,9 @@ if s:gset.use_fzf
     " linux下直接pacman -S fzf
     " win下载fzf.exe放入bundle/fzf/bin/下
     if IsWin()
-        Plug 'junegunn/fzf', {'on': ['FzfFiles', 'FzfRg']}
+        Plug 'junegunn/fzf', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
     endif
-    Plug 'junegunn/fzf.vim', {'on': ['FzfFiles', 'FzfRg']}
+    Plug 'junegunn/fzf.vim', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
     let g:fzf_command_prefix = 'Fzf'
     nnoremap <silent> <leader><leader>f :call feedkeys(':FzfFiles ', 'n')<CR>
 endif
@@ -292,7 +292,7 @@ endif
     let g:Lf_CacheDirectory = $DotVimPath
     "let g:Lf_WindowPosition = 'popup'
     "let g:Lf_PreviewInPopup = 1
-    "let g:Lf_PreviewResult = {'Function': 1, 'BufTag': 1}
+    let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0}
 if s:gset.use_powerfont
     let g:Lf_StlSeparator = {'left': '', 'right': ''}
 else
@@ -306,6 +306,8 @@ endif
     nnoremap <leader>lf :LeaderfFile<CR>
     nnoremap <leader>lu :LeaderfFunction<CR>
     nnoremap <leader>lU :LeaderfFunctionAll<CR>
+    nnoremap <leader>lt :LeaderfBufTag<CR>
+    nnoremap <leader>lT :LeaderfBufTagAll<CR>
     nnoremap <leader>ll :LeaderfLine<CR>
     nnoremap <leader>lL :LeaderfLineAll<CR>
     nnoremap <leader>lb :LeaderfBuffer<CR>
@@ -625,7 +627,7 @@ endif
     \ ]
     " set option with PopSet
     nnoremap <silent> <leader><leader>s :call feedkeys(':PopSet ', 'n')<CR>
-    nnoremap <leader>sa :PopSet popset<CR>
+    nnoremap <leader>sp :PopSet popset<CR>
 " }}}
 
 " popc {{{ buffer管理
@@ -932,8 +934,8 @@ endif
     let g:neoformat_enabled_cpp = ['astyle']
     let g:neoformat_enabled_java = ['astyle']
     let g:neoformat_enabled_python = ['autopep8']
-    nnoremap <leader>fc :Neoformat<CR>
-    vnoremap <leader>fc :Neoformat<CR>
+    nnoremap <leader>cf :Neoformat<CR>
+    vnoremap <leader>cf :Neoformat<CR>
 " }}}
 
 " surround {{{ 添加包围符
@@ -1383,218 +1385,19 @@ endfunction
 " }}}
 " }}}
 
-" funcs {{{
-" FUNCTION: FuncRunScript() {{{ 常用函数脚本代码
-" s:rs {{{
-let s:rs = {
-    \ 'sel' : {
-        \ 'opt' : 'select scripts to run',
-        \ 'lst' : [
-                \ 'retab',
-                \ '%s/\s\+$//ge',
-                \ '%s/\r//ge',
-                \ 'edit ++enc=utf-8',
-                \ 'edit ++enc=cp936',
-                \ 'lineToTop',
-                \ 'clearUndo',
-                \ ],
-        \ 'dic' : {
-                \ 'retab'            : 'retab with expandtab',
-                \ '%s/\s\+$//ge'     : 'remove trailing space',
-                \ '%s/\r//ge'        : 'remove ^M',
-                \ 'edit ++enc=utf-8' : 'reload as utf-8',
-                \ 'edit ++enc=cp936' : 'reload as cp936',
-                \ 'lineToTop'        : 'frozen current line to top',
-                \ 'clearUndo'        : 'clear undo history',
-                \ },
-        \ 'cmd' : {sopt, arg -> has_key(s:rs.scripts, arg) ? s:rs.scripts[arg]() : execute(arg)},
-        \ },
-    \ 'scripts' : {}
-    \ }
-" FUNCTION: s:rs.scripts.clearUndo() dict {{{ 清除undo数据
-function! s:rs.scripts.clearUndo() dict
-    let l:ulbak = &undolevels
-    set undolevels=-1
-    execute "normal! a\<Bar>\<BS>\<Esc>"
-    let &undolevels = l:ulbak
-endfunction
-" }}}
-
-" FUNCTION: s:rs.scripts.lineToTop() dict {{{ 冻结顶行
-function! s:rs.scripts.lineToTop() dict
-    let l:line = line('.')
-    split %
-    resize 1
-    call cursor(l:line, 1)
-    wincmd p
-endfunction
-" }}}
-" }}}
-
-function! FuncRunScript()
-    call PopSelection(s:rs.sel)
-endfunction
-" }}}
-
-" FUNCTION: FuncEditTempFile(suffix, ntab) {{{ 编辑临时文件
-" @param suffix: 临时文件附加后缀
-" @param ntab: 在新tab中打开
-function! FuncEditTempFile(suffix, ntab)
-    let l:tempfile = fnamemodify(tempname(), ':r')
-    if empty(a:suffix)
-        let l:tempfile .= '.tmp'
-    else
-        let l:tempfile .= '.' . a:suffix
-    endif
-    if a:ntab
-        execute 'tabedit ' . l:tempfile
-    else
-        execute 'edit ' . l:tempfile
-    endif
-endfunction
-"}}}
-
-" FUNCTION: FuncDiffFile(filename, mode) {{{ 文件对比
-function! FuncDiffFile(filename, mode)
-    if a:mode ==# 's'
-        execute 'diffsplit ' . a:filename
-    elseif a:mode ==# 'v'
-        execute 'vertical diffsplit ' . a:filename
-    endif
-endfunction
-" }}}
-
-" FUNCTION: FuncDivideSpace(string, pos) range {{{ 添加分隔符
-function! FuncDivideSpace(string, pos) range
-    let l:chars = split(a:string)
-
-    for k in range(a:firstline, a:lastline)
-        let l:line = getline(k)
-        let l:fie = ' '
-        for ch in l:chars
-            let l:pch = '\m\s*\M' . escape(ch, '\') . '\m\s*\C'
-            if a:pos == 'h'
-                let l:sch = l:fie . escape(ch, '&\')
-            elseif a:pos == 'c'
-                let l:sch = l:fie . escape(ch, '&\') . l:fie
-            elseif a:pos == 'l'
-                let l:sch = escape(ch, '&\') . l:fie
-            elseif a:pos == 'd'
-                let l:sch = escape(ch, '&\')
-            endif
-            let l:line = substitute(l:line, l:pch, l:sch, 'g')
-        endfor
-        call setline(k, l:line)
-    endfor
-    call SetExecLast('call FuncDivideSpace(''' . a:string . ''', ''' . a:pos . ''')')
-endfunction
-let FuncDivideSpaceH = function('ExecInput', [['Divide H: '], 'FuncDivideSpace', 'h'])
-let FuncDivideSpaceC = function('ExecInput', [['Divide C: '], 'FuncDivideSpace', 'c'])
-let FuncDivideSpaceL = function('ExecInput', [['Divide L: '], 'FuncDivideSpace', 'l'])
-let FuncDivideSpaceD = function('ExecInput', [['Delete D: '], 'FuncDivideSpace', 'd'])
-" }}}
-
-" FUNCTION: FuncAppendCmd(str, flg) {{{ 将命令结果作为文本插入
-function! FuncAppendCmd(str, flg)
-    if a:flg ==# 'call'
-        let l:as = match(a:str, '(')
-        let l:ae = -1   " match(a:str, ')') - 1
-        let l:str = a:str[0 : l:as - 1]
-        let l:args = GetArgs(a:str[l:as + 1 : l:ae - 1])
-        let l:result = call(l:str, l:args)
-        if type(l:result) != v:t_string
-            let l:result = string(l:result)
-        endif
-    elseif a:flg ==# 'exec'
-        let l:result = execute(a:str)
-    endif
-    call append(line('.'), split(l:result, "\n"))
-endfunction
-let FuncAppendCmdExec = function('ExecInput', [['Command: ', '', 'command'] , 'FuncAppendCmd', 'exec'])
-let FuncAppendCmdCall = function('ExecInput', [['Function: ', '', 'function'], 'FuncAppendCmd', 'call'])
-" }}}
-
-" FUNCTION: FuncSwitchFile() {{{ 切换文件
-let s:sf = [
-    \ {'lhs': ['c', 'cc', 'cpp', 'cxx'],
-    \  'rhs': ['h', 'hh', 'hpp', 'hxx']},
-    \ ]
-function! FuncSwitchFile()
-    let l:ext = expand('%:e')
-    let l:file = expand('%:p:r')
-    let l:try = []
-    for k in range(len(s:sf))
-        if index(s:sf[k].lhs, l:ext, 0, 1) >= 0
-            let l:try = s:sf[0].rhs
-            break
-        elseif index(s:sf[k].rhs, l:ext, 0, 1) >= 0
-            let l:try = s:sf[0].lhs
-            break
-        endif
-    endfor
-    for e in l:try
-        if filereadable(l:file . '.' . e)
-            execute 'edit ' . l:file . '.' . e
-            break
-        endif
-        if filereadable(l:file . '.' . toupper(e))
-            execute 'edit ' . l:file . '.' . e
-            break
-        endif
-    endfor
-endfunction
-" }}}
-
-" FUNCTION: FuncGotoKeyword(mode) {{{ 查找Vim关键字
-function! FuncGotoKeyword(mode)
-    let l:exec = 'help '
-    if a:mode ==# 'n'
-        let l:word = expand('<cword>')
-    elseif a:mode ==# 'v'
-        let l:word = GetSelected()
-    endif
-
-    " 添加关键字
-    let l:exec .= l:word
-    if IsNVim()
-        " nvim用自己的帮助文件，只有英文的
-        let l:exec .= '@en'
-    endif
-
-    execute l:exec
-endfunction
-" }}}
-
-" FUNCTION: FuncFcitx2en() FuncFcitx2zh() {{{ 切换Fcitx输入法
-if IsLinux()
-function! FuncFcitx2en()
-    if 2 == system('fcitx-remote')
-        let l:t = system('fcitx-remote -c')
-    endif
-endfunction
-function! FuncFcitx2zh()
-    if 1 == system('fcitx-remote')
-        let l:t = system('fcitx-remote -o')
-    endif
-endfunction
-endif
-" }}}
-" }}}
-
 " project {{{
 " Required: 'skywind3000/asyncrun.vim'
 "           'yehuohan/popset'
 
-" s:cpl {{{
+" s:rp {{{
 " @attribute type: 文件类型
 " @attribute wdir, args, srcf, outf: 用于type的参数
 " @attribute cell: 用于type的cell类型
 " @attribute efm: 用于type的errorformat类型
 " @attribute pro: 项目类型
 " @attribute pat: 匹配模式字符串
-" @attribute sel_arg: 预置CompileFile参数输入
-" @attribute sel_exe: 预置命令
-let s:cpl = {
+" @attribute sel: 预置RunFile参数输入
+let s:rp = {
     \ 'wdir' : '',
     \ 'args' : '',
     \ 'srcf' : '',
@@ -1629,18 +1432,18 @@ let s:cpl = {
         \ 'python' : '%*\\sFile\ \"%f\"\\,\ line\ %l\\,\ %m',
         \ },
     \ 'pro' : {
-        \ 'qmake'  : ['*.pro', 'CFnQMake'],
-        \ 'cmake'  : ['cmakelists.txt', 'CFnCMake'],
-        \ 'make'   : ['makefile', 'CFnMake'],
-        \ 'vs'     : ['*.sln', 'CFnVs'],
-        \ 'sphinx' : [IsWin() ? 'make.bat' : 'makefile', 'CFnSphinx'],
+        \ 'qmake'  : ['*.pro', 'FnQMake'],
+        \ 'cmake'  : ['cmakelists.txt', 'FnCMake'],
+        \ 'make'   : ['makefile', 'FnMake'],
+        \ 'vs'     : ['*.sln', 'FnVs'],
+        \ 'sphinx' : [IsWin() ? 'make.bat' : 'makefile', 'FnSphinx'],
         \ },
     \ 'pat' : {
         \ 'target'  : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ },
-    \ 'sel_arg' : {
-        \ 'opt' : 'select args to CompileFile',
+    \ 'sel' : {
+        \ 'opt' : 'select args to RunFile',
         \ 'lst' : [
                 \ '-g',
                 \ '-finput-charset=utf-8 -fexec-charset=gbk',
@@ -1648,32 +1451,22 @@ let s:cpl = {
                 \ '-fPIC -shared'
                 \ ],
         \ 'cpl' : 'customlist,GetMultiFilesCompletion',
-        \ 'cmd' : {sopt, arg -> call('CompileFile', [substitute(arg, '|', ' ', 'ge')])},
-        \ },
-    \ 'sel_exe' : {
-        \ 'opt' : 'select execution to run',
-        \ 'lst' : [
-                \ 'python -m json.tool %',
-                \ 'python setup.py build',
-                \ 'go mod init %:r',
-                \ 'cflow -T %'
-                \ ],
-        \ 'cmd' : {sopt, arg -> execute(':AsyncRun ' . arg)},
+        \ 'cmd' : {sopt, arg -> call('RunFile', [substitute(arg, '|', ' ', 'ge')])},
         \ }
     \ }
-" FUNCTION: s:cpl.printf(type, args, srcf, outf) dict {{{
+" FUNCTION: s:rp.printf(type, args, srcf, outf) dict {{{
 " 生成文件编译或执行命令字符串。
-" @param type: 编译类型，需要包含于s:cpl.type中
+" @param type: 编译类型，需要包含于s:rp.type中
 " @param wdir: 命令运行目录
 " @param args: 参数
 " @param srcf: 源文件
 " @param outf: 目标文件
 " @return 返回编译或执行命令
-function! s:cpl.printf(type, wdir, args, srcf, outf) dict
-    if !has_key(s:cpl.type, a:type)
+function! s:rp.printf(type, wdir, args, srcf, outf) dict
+    if !has_key(s:rp.type, a:type)
         \ || ('sh' ==? a:type && !(IsLinux() || IsGw() || IsMac()))
         \ || ('dosbatch' ==? a:type && !IsWin())
-        throw 's:cpl.type doesn''t support "' . a:type . '"'
+        throw 's:rp.type doesn''t support "' . a:type . '"'
     endif
     let self.wdir = a:wdir
     let self.args = a:args
@@ -1686,15 +1479,15 @@ function! s:cpl.printf(type, wdir, args, srcf, outf) dict
 endfunction
 " }}}
 
-" FUNCTION: s:cpl.run(type, wdir, cmd) dict {{{
+" FUNCTION: s:rp.run(type, wdir, cmd) dict {{{
 " 生成运行命令字符串。
 " @param wdir: 命令运行目录
-" @param type: errorformat类型，在s:cpl.efm中
+" @param type: errorformat类型，在s:rp.efm中
 " @param cmd: 命令字符串
 " @return 返回运行命令
-function! s:cpl.run(type, wdir, cmd) dict
-    if has_key(s:cpl.efm, a:type)
-        execute 'setlocal efm=' . s:cpl.efm[a:type]
+function! s:rp.run(type, wdir, cmd) dict
+    if has_key(s:rp.efm, a:type)
+        execute 'setlocal efm=' . s:rp.efm[a:type]
     endif
     let l:exec = ':AsyncRun '
     if !empty(a:wdir)
@@ -1706,16 +1499,16 @@ function! s:cpl.run(type, wdir, cmd) dict
 endfunction
 " }}}
 
-" FUNCTION: s:cpl.runcell(type) dict {{{
+" FUNCTION: s:rp.runcell(type) dict {{{
 " @param type: cell类型，同时也是efm类型
-function! s:cpl.runcell(type) dict
-    if !has_key(s:cpl.cell, a:type)
-        throw 's:cpl.cell doesn''t support "' . a:type . '"'
+function! s:rp.runcell(type) dict
+    if !has_key(s:rp.cell, a:type)
+        throw 's:rp.cell doesn''t support "' . a:type . '"'
     endif
-    if has_key(s:cpl.efm, a:type)
-        execute 'setlocal efm=' . s:cpl.efm[a:type]
+    if has_key(s:rp.efm, a:type)
+        execute 'setlocal efm=' . s:rp.efm[a:type]
     endif
-    let [l:bin, l:pats, l:pate] = s:cpl.cell[a:type]
+    let [l:bin, l:pats, l:pate] = s:rp.cell[a:type]
     let l:range = GetContentRange(l:pats, l:pate)
     " create exec string
     return ':' . join(l:range, ',') . 'AsyncRun '. l:bin
@@ -1723,15 +1516,15 @@ endfunction
 " }}}
 " }}}
 
-" FUNCTION: CompileFile(...) {{{
-function! CompileFile(...)
+" FUNCTION: RunFile(...) {{{
+function! RunFile(...)
     let l:type    = &filetype           " 文件类型
     let l:srcfile = expand('%:t')       " 文件名，不带路径，带扩展名
     let l:outfile = expand('%:t:r')     " 文件名，不带路径，不带扩展名
     let l:workdir = expand('%:p:h')     " 当前文件目录
     let l:argstr  = a:0 > 0 ? a:1 : ''
     try
-        let l:exec = s:cpl.printf(l:type, l:workdir, l:argstr, l:srcfile, l:outfile)
+        let l:exec = s:rp.printf(l:type, l:workdir, l:argstr, l:srcfile, l:outfile)
         execute l:exec
         call SetExecLast(l:exec)
     catch
@@ -1740,10 +1533,10 @@ function! CompileFile(...)
 endfunction
 " }}}
 
-" FUNCTION: CompileCell(argstr) {{{
-function! CompileCell()
+" FUNCTION: RunCell(argstr) {{{
+function! RunCell()
     try
-        let l:exec = s:cpl.runcell(&filetype)
+        let l:exec = s:rp.runcell(&filetype)
         execute l:exec
         echo l:exec
         call SetExecLast(l:exec)
@@ -1753,7 +1546,7 @@ function! CompileCell()
 endfunction
 " }}}
 
-" FUNCTION: CompileProject(type, args) {{{
+" FUNCTION: RunProject(type, args) {{{
 " 当找到多个Project文件时，会弹出选项以供选择。
 " @param type: 工程类型，用于获取工程运行回调函数
 "   项目回调函数需要3个参数(可能用于popset插件)：
@@ -1761,8 +1554,8 @@ endfunction
 "   - sel: Project文件路径
 "   - args: Project的附加参数列表
 " @param args: 编译工程文件函数的附加参数，需要采用popset插件
-function! CompileProject(type, args)
-    let [l:pat, l:fn] = s:cpl.pro[a:type]
+function! RunProject(type, args)
+    let [l:pat, l:fn] = s:rp.pro[a:type]
     let l:prj = GetFileList(l:pat)
     if len(l:prj) == 1
         let Fn = function(l:fn)
@@ -1780,10 +1573,10 @@ function! CompileProject(type, args)
 endfunction
 " }}}
 
-" FUNCTION: CFnQMake(sopt, sel, args) {{{
-function! CFnQMake(sopt, sel, args)
+" FUNCTION: FnQMake(sopt, sel, args) {{{
+function! FnQMake(sopt, sel, args)
     let l:srcfile = fnamemodify(a:sel, ':p:t')
-    let l:outfile = GetFileContent(a:sel, s:cpl.pat.target, 'first')
+    let l:outfile = GetFileContent(a:sel, s:rp.pat.target, 'first')
     let l:outfile = empty(l:outfile) ? fnamemodify(a:sel, ':t:r') : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
@@ -1797,13 +1590,13 @@ function! CFnQMake(sopt, sel, args)
     if a:args[0]
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:cpl.run('cpp', l:workdir, l:cmd)
+    execute s:rp.run('cpp', l:workdir, l:cmd)
 endfunction
 " }}}
 
-" FUNCTION: CFnCMake(sopt, sel, args) {{{
-function! CFnCMake(sopt, sel, args)
-    let l:outfile = GetFileContent(a:sel, s:cpl.pat.project, 'first')
+" FUNCTION: FnCMake(sopt, sel, args) {{{
+function! FnCMake(sopt, sel, args)
+    let l:outfile = GetFileContent(a:sel, s:rp.pat.project, 'first')
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
@@ -1818,14 +1611,14 @@ function! CFnCMake(sopt, sel, args)
             "run
             let l:cmd .= ' && "./' . l:outfile .'"'
         endif
-        execute s:cpl.run('', l:workdir, l:cmd)
+        execute s:rp.run('', l:workdir, l:cmd)
     endif
 endfunction
 " }}}
 
-" FUNCTION: CFnMake(sopt, sel, args) {{{
-function! CFnMake(sopt, sel, args)
-    let l:outfile = GetFileContent(a:sel, s:cpl.pat.target, 'first')
+" FUNCTION: FnMake(sopt, sel, args) {{{
+function! FnMake(sopt, sel, args)
+    let l:outfile = GetFileContent(a:sel, s:rp.pat.target, 'first')
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
@@ -1833,12 +1626,12 @@ function! CFnMake(sopt, sel, args)
     if a:args[0]
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:cpl.run('', l:workdir, l:cmd)
+    execute s:rp.run('', l:workdir, l:cmd)
 endfunction
 "}}}
 
-" FUNCTION: CFnVs(sopt, sel, args) {{{
-function! CFnVs(sopt, sel, args)
+" FUNCTION: FnVs(sopt, sel, args) {{{
+function! FnVs(sopt, sel, args)
     let l:srcfile = fnamemodify(a:sel, ':p:t')
     let l:outfile = fnamemodify(a:sel, ':p:t:r')
     let l:workdir = fnamemodify(a:sel, ':p:h')
@@ -1848,13 +1641,13 @@ function! CFnVs(sopt, sel, args)
     if a:args[0]
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:cpl.run('cpp', l:workdir, l:cmd)
+    execute s:rp.run('cpp', l:workdir, l:cmd)
 endfunction
 " }}}
 
-" FUNCTION: CFnSphinx(sopt, sel, args) {{{
+" FUNCTION: FnSphinx(sopt, sel, args) {{{
 " @param args[0]: 是否直接打开sphinx文档
-function! CFnSphinx(sopt, sel, args)
+function! FnSphinx(sopt, sel, args)
     let l:outfile = 'build/html/index.html'
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
@@ -1862,27 +1655,26 @@ function! CFnSphinx(sopt, sel, args)
     if a:args[0]
         let l:cmd .= join([' && firefox', l:outfile])
     endif
-    execute s:cpl.run('', l:workdir, l:cmd)
+    execute s:rp.run('', l:workdir, l:cmd)
 endfunction
 "}}}
 
-let RcArg         = function('popset#set#PopSelection', [s:cpl.sel_arg])
-let RcExe         = function('popset#set#PopSelection', [s:cpl.sel_exe])
-let RcQMake       = function('CompileProject', ['qmake', [0, []]])
-let RcQMakeRun    = function('CompileProject', ['qmake', [1, []]])
-let RcQMakeClean  = function('CompileProject', ['qmake', [0, ['distclean']]])
-let RcCMake       = function('CompileProject', ['cmake', [1]])
-let RcCMakeRun    = function('CompileProject', ['cmake', [2]])
-let RcCMakeClean  = function('CompileProject', ['cmake', [0]])
-let RcMake        = function('CompileProject', ['make', [0, []]])
-let RcMakeRun     = function('CompileProject', ['make', [1, []]])
-let RcMakeClean   = function('CompileProject', ['make', [0, ['clean']]])
-let RcVs          = function('CompileProject', ['vs', [0, ['Build']]])
-let RcVsRun       = function('CompileProject', ['vs', [1, ['Build']]])
-let RcVsClean     = function('CompileProject', ['vs', [0, ['Clean']]])
-let RcSphinx      = function('CompileProject', ['sphinx', [0, 'html']])
-let RcSphinxRun   = function('CompileProject', ['sphinx', [1, 'html']])
-let RcSphinxClean = function('CompileProject', ['sphinx', [0, 'clean']])
+let RpArg         = function('popset#set#PopSelection', [s:rp.sel])
+let RpQMake       = function('RunProject', ['qmake', [0, []]])
+let RpQMakeRun    = function('RunProject', ['qmake', [1, []]])
+let RpQMakeClean  = function('RunProject', ['qmake', [0, ['distclean']]])
+let RpCMake       = function('RunProject', ['cmake', [1]])
+let RpCMakeRun    = function('RunProject', ['cmake', [2]])
+let RpCMakeClean  = function('RunProject', ['cmake', [0]])
+let RpMake        = function('RunProject', ['make', [0, []]])
+let RpMakeRun     = function('RunProject', ['make', [1, []]])
+let RpMakeClean   = function('RunProject', ['make', [0, ['clean']]])
+let RpVs          = function('RunProject', ['vs', [0, ['Build']]])
+let RpVsRun       = function('RunProject', ['vs', [1, ['Build']]])
+let RpVsClean     = function('RunProject', ['vs', [0, ['Clean']]])
+let RpSphinx      = function('RunProject', ['sphinx', [0, 'html']])
+let RpSphinxRun   = function('RunProject', ['sphinx', [1, 'html']])
+let RpSphinxClean = function('RunProject', ['sphinx', [0, 'clean']])
 " }}}
 
 " find&search {{{
@@ -1898,7 +1690,9 @@ let RcSphinxClean = function('CompileProject', ['sphinx', [0, 'clean']])
 "            sk : search kill
 "            sl : search lines with fuzzy
 "            ff : fuzzy files
-"            fh : fuzzy huge linestext
+"            fh : fuzzy huge lines-text
+"            fg : fuzzy ctags
+"            fc : fuzzy ctags with <cword>
 " @attribute args: 搜索参数
 " @attribute rg: 预置的rg搜索命令，用于搜索指定文本
 " @attribute fuzzy: 预置的模糊搜索命令，用于文件和文本等模糊搜索
@@ -1917,7 +1711,9 @@ let s:fw = {
         \ 'sk'    : '',
         \ 'sl'    : ':Leaderf rg --nowrap -e "%s" "%s" %s',
         \ 'ff'    : '',
-        \ 'fh'    : ''
+        \ 'fh'    : '',
+        \ 'fg'    : '',
+        \ 'fc'    : '',
         \ },
     \ 'args' : {
         \ 'root'    : '',
@@ -1958,11 +1754,15 @@ let s:fw = {
     \ 'fuzzy' : {
         \ 'fzf' : {
             \ 'ff' : ':FzfFiles',
-            \ 'fh' : ':FzfRg'
+            \ 'fh' : ':FzfRg',
+            \ 'fg' : ':FzfTags',
+            \ 'fc' : ':execute "FzfTags " . expand("<cword>")'
             \ },
         \ 'leaderf' : {
             \ 'ff' : ':LeaderfFile',
-            \ 'fh' : ':Leaderf rg --nowrap'
+            \ 'fh' : ':Leaderf rg --nowrap',
+            \ 'fg' : ':Leaderf tag',
+            \ 'fc' : ':Leaderf tag --cword'
             \ },
         \ 'sel' : {
             \ 'opt' : 'select fuzzy engine',
@@ -2077,7 +1877,7 @@ function! FindWow(keys, mode)
     "   o : find in buffers of all tabs via popc
     "   p : find with inputing path
     "   r : find with inputing working root and filter
-    "  '' : find with working root-filter
+    "  '' : find with s:fw.args
     " Pattern: %4
     "   = : find text from clipboard
     "   Normal Mode: mode='n'
@@ -2335,6 +2135,82 @@ endfunction
 " }}}
 " }}}
 
+" scripts {{{
+" s:rs {{{
+let s:rs = {
+    \ 'sel' : {
+        \ 'exe' : {
+            \ 'opt' : 'select scripts to run',
+            \ 'lst' : [
+                    \ 'retab',
+                    \ '%s/\s\+$//ge',
+                    \ '%s/\r//ge',
+                    \ 'edit ++enc=utf-8',
+                    \ 'edit ++enc=cp936',
+                    \ 'lineToTop',
+                    \ 'clearUndo',
+                    \ ],
+            \ 'dic' : {
+                    \ 'retab'                  : 'retab with expandtab',
+                    \ '%s/\s\+$//ge'           : 'remove trailing space',
+                    \ '%s/\r//ge'              : 'remove ^M',
+                    \ 'edit ++enc=utf-8'       : 'reload as utf-8',
+                    \ 'edit ++enc=cp936'       : 'reload as cp936',
+                    \ 'lineToTop'              : 'frozen current line to top',
+                    \ 'clearUndo'              : 'clear undo history',
+                    \ },
+            \ 'cmd' : {sopt, arg -> has_key(s:rs.funcs, arg) ? s:rs.funcs[arg]() : execute(arg)},
+        \ },
+        \ 'async' : {
+            \ 'opt' : 'select execution to run',
+            \ 'lst' : [
+                    \ 'python -m json.tool %',
+                    \ 'python setup.py build',
+                    \ 'go mod init %:r',
+                    \ 'cflow -T %',
+                    \ 'createCtags',
+                    \ ],
+            \ 'cmd' : {sopt, arg -> has_key(s:rs.funcs, arg) ? s:rs.funcs[arg]() : execute(':AsyncRun ' . arg)},
+            \ },
+        \ },
+    \ 'funcs' : {}
+    \ }
+" FUNCTION: s:rs.funcs.clearUndo() dict {{{ 清除undo数据
+function! s:rs.funcs.clearUndo() dict
+    let l:ulbak = &undolevels
+    set undolevels=-1
+    execute "normal! a\<Bar>\<BS>\<Esc>"
+    let &undolevels = l:ulbak
+endfunction
+" }}}
+
+" FUNCTION: s:rs.funcs.lineToTop() dict {{{ 冻结顶行
+function! s:rs.funcs.lineToTop() dict
+    let l:line = line('.')
+    split %
+    resize 1
+    call cursor(l:line, 1)
+    wincmd p
+endfunction
+" }}}
+
+" FUNCTION: s:rs.funcs.createCtags() dict {{{ 生成tags
+function! s:rs.funcs.createCtags() dict
+    let l:fw = FindWowGetArgs()
+    if !empty(l:fw)
+        execute(':AsyncRun cd '. l:fw[0] . ' && ctags -R')
+    else
+        echo 'No root in s:fw'
+    endif
+endfunction
+" }}}
+" }}}
+
+function! RunScript(type)
+    call PopSelection(s:rs.sel[a:type])
+endfunction
+" }}}
+
 " output {{{
 " FUNCTION: QuickfixBasic(kyes) {{{ 基本操作
 function! QuickfixBasic(keys)
@@ -2512,6 +2388,152 @@ function! OptFuncSyntax()
         echo 'syntax on'
     endif
 endfunction
+" }}}
+" }}}
+
+" funcs {{{
+" FUNCTION: FuncEditTempFile(suffix, ntab) {{{ 编辑临时文件
+" @param suffix: 临时文件附加后缀
+" @param ntab: 在新tab中打开
+function! FuncEditTempFile(suffix, ntab)
+    let l:tempfile = fnamemodify(tempname(), ':r')
+    if empty(a:suffix)
+        let l:tempfile .= '.tmp'
+    else
+        let l:tempfile .= '.' . a:suffix
+    endif
+    if a:ntab
+        execute 'tabedit ' . l:tempfile
+    else
+        execute 'edit ' . l:tempfile
+    endif
+endfunction
+"}}}
+
+" FUNCTION: FuncDiffFile(filename, mode) {{{ 文件对比
+function! FuncDiffFile(filename, mode)
+    if a:mode ==# 's'
+        execute 'diffsplit ' . a:filename
+    elseif a:mode ==# 'v'
+        execute 'vertical diffsplit ' . a:filename
+    endif
+endfunction
+" }}}
+
+" FUNCTION: FuncDivideSpace(string, pos) range {{{ 添加分隔符
+function! FuncDivideSpace(string, pos) range
+    let l:chars = split(a:string)
+
+    for k in range(a:firstline, a:lastline)
+        let l:line = getline(k)
+        let l:fie = ' '
+        for ch in l:chars
+            let l:pch = '\m\s*\M' . escape(ch, '\') . '\m\s*\C'
+            if a:pos == 'h'
+                let l:sch = l:fie . escape(ch, '&\')
+            elseif a:pos == 'c'
+                let l:sch = l:fie . escape(ch, '&\') . l:fie
+            elseif a:pos == 'l'
+                let l:sch = escape(ch, '&\') . l:fie
+            elseif a:pos == 'd'
+                let l:sch = escape(ch, '&\')
+            endif
+            let l:line = substitute(l:line, l:pch, l:sch, 'g')
+        endfor
+        call setline(k, l:line)
+    endfor
+    call SetExecLast('call FuncDivideSpace(''' . a:string . ''', ''' . a:pos . ''')')
+endfunction
+let FuncDivideSpaceH = function('ExecInput', [['Divide H: '], 'FuncDivideSpace', 'h'])
+let FuncDivideSpaceC = function('ExecInput', [['Divide C: '], 'FuncDivideSpace', 'c'])
+let FuncDivideSpaceL = function('ExecInput', [['Divide L: '], 'FuncDivideSpace', 'l'])
+let FuncDivideSpaceD = function('ExecInput', [['Delete D: '], 'FuncDivideSpace', 'd'])
+" }}}
+
+" FUNCTION: FuncAppendCmd(str, flg) {{{ 将命令结果作为文本插入
+function! FuncAppendCmd(str, flg)
+    if a:flg ==# 'call'
+        let l:as = match(a:str, '(')
+        let l:ae = -1   " match(a:str, ')') - 1
+        let l:str = a:str[0 : l:as - 1]
+        let l:args = GetArgs(a:str[l:as + 1 : l:ae - 1])
+        let l:result = call(l:str, l:args)
+        if type(l:result) != v:t_string
+            let l:result = string(l:result)
+        endif
+    elseif a:flg ==# 'exec'
+        let l:result = execute(a:str)
+    endif
+    call append(line('.'), split(l:result, "\n"))
+endfunction
+let FuncAppendCmdExec = function('ExecInput', [['Command: ', '', 'command'] , 'FuncAppendCmd', 'exec'])
+let FuncAppendCmdCall = function('ExecInput', [['Function: ', '', 'function'], 'FuncAppendCmd', 'call'])
+" }}}
+
+" FUNCTION: FuncSwitchFile() {{{ 切换文件
+let s:sf = [
+    \ {'lhs': ['c', 'cc', 'cpp', 'cxx'],
+    \  'rhs': ['h', 'hh', 'hpp', 'hxx']},
+    \ ]
+function! FuncSwitchFile()
+    let l:ext = expand('%:e')
+    let l:file = expand('%:p:r')
+    let l:try = []
+    for k in range(len(s:sf))
+        if index(s:sf[k].lhs, l:ext, 0, 1) >= 0
+            let l:try = s:sf[0].rhs
+            break
+        elseif index(s:sf[k].rhs, l:ext, 0, 1) >= 0
+            let l:try = s:sf[0].lhs
+            break
+        endif
+    endfor
+    for e in l:try
+        if filereadable(l:file . '.' . e)
+            execute 'edit ' . l:file . '.' . e
+            break
+        endif
+        if filereadable(l:file . '.' . toupper(e))
+            execute 'edit ' . l:file . '.' . e
+            break
+        endif
+    endfor
+endfunction
+" }}}
+
+" FUNCTION: FuncGotoKeyword(mode) {{{ 查找Vim关键字
+function! FuncGotoKeyword(mode)
+    let l:exec = 'help '
+    if a:mode ==# 'n'
+        let l:word = expand('<cword>')
+    elseif a:mode ==# 'v'
+        let l:word = GetSelected()
+    endif
+
+    " 添加关键字
+    let l:exec .= l:word
+    if IsNVim()
+        " nvim用自己的帮助文件，只有英文的
+        let l:exec .= '@en'
+    endif
+
+    execute l:exec
+endfunction
+" }}}
+
+" FUNCTION: FuncFcitx2en() FuncFcitx2zh() {{{ 切换Fcitx输入法
+if IsLinux()
+function! FuncFcitx2en()
+    if 2 == system('fcitx-remote')
+        let l:t = system('fcitx-remote -c')
+    endif
+endfunction
+function! FuncFcitx2zh()
+    if 1 == system('fcitx-remote')
+        let l:t = system('fcitx-remote -o')
+    endif
+endfunction
+endif
 " }}}
 " }}}
 " }}} End
@@ -2921,29 +2943,28 @@ endif
     nnoremap <leader>dd :call FuncDivideSpaceD()<CR>
     nnoremap <leader>ae :call FuncAppendCmdExec()<CR>
     nnoremap <leader>af :call FuncAppendCmdCall()<CR>
-    nnoremap <leader>rs :call FuncRunScript()<CR>
     nnoremap <leader>sf :call FuncSwitchFile()<CR>
-    " 编译运行当前文件
-    nnoremap <leader>rf :call CompileFile()<CR>
-    nnoremap <leader>rj :call CompileCell()<CR>
-    nnoremap <leader>ra :call RcArg()<CR>
-    nnoremap <leader>re :call RcExe()<CR>
-    " 编译运行当前项目
-    nnoremap <leader>rQ  :call RcQMake()<CR>
-    nnoremap <leader>rq  :call RcQMakeRun()<CR>
-    nnoremap <leader>rcq :call RcQMakeClean()<CR>
-    nnoremap <leader>rG  :call RcCMake()<CR>
-    nnoremap <leader>rg  :call RcCMakeRun()<CR>
-    nnoremap <leader>rcg :call RcCMakeClean()<CR>
-    nnoremap <leader>rM  :call RcMake()<CR>
-    nnoremap <leader>rm  :call RcMakeRun()<CR>
-    nnoremap <leader>rcm :call RcMakeClean()<CR>
-    nnoremap <leader>rV  :call RcVs()<CR>
-    nnoremap <leader>rv  :call RcVsRun()<CR>
-    nnoremap <leader>rcv :call RcVsClean()<CR>
-    nnoremap <leader>rp  :call RcSphinx()<CR>
-    nnoremap <leader>rP  :call RcSphinxRun()<CR>
-    nnoremap <leader>rcp :call RcSphinxClean()<CR>
+    nnoremap <leader>se :call RunScript('exe')<CR>
+    nnoremap <leader>sa :call RunScript('async')<CR>
+    " 编译运行当前文件或项目
+    nnoremap <leader>rf  :call RunFile()<CR>
+    nnoremap <leader>rj  :call RunCell()<CR>
+    nnoremap <leader>ra  :call RpArg()<CR>
+    nnoremap <leader>rQ  :call RpQMake()<CR>
+    nnoremap <leader>rq  :call RpQMakeRun()<CR>
+    nnoremap <leader>rcq :call RpQMakeClean()<CR>
+    nnoremap <leader>rG  :call RpCMake()<CR>
+    nnoremap <leader>rg  :call RpCMakeRun()<CR>
+    nnoremap <leader>rcg :call RpCMakeClean()<CR>
+    nnoremap <leader>rM  :call RpMake()<CR>
+    nnoremap <leader>rm  :call RpMakeRun()<CR>
+    nnoremap <leader>rcm :call RpMakeClean()<CR>
+    nnoremap <leader>rV  :call RpVs()<CR>
+    nnoremap <leader>rv  :call RpVsRun()<CR>
+    nnoremap <leader>rcv :call RpVsClean()<CR>
+    nnoremap <leader>rh  :call RpSphinx()<CR>
+    nnoremap <leader>rH  :call RpSphinxRun()<CR>
+    nnoremap <leader>rch :call RpSphinxClean()<CR>
     " 调试
 if IsVim()
     packadd termdebug
@@ -2973,8 +2994,12 @@ endif
     nnoremap <leader>fk :call FindWowKill()<CR>
     nnoremap <leader>ff :call FindWowFuzzy('ff', 0)<CR>
     nnoremap <leader>fh :call FindWowFuzzy('fh', 0)<CR>
+    nnoremap <leader>fg :call FindWowFuzzy('fg', 0)<CR>
+    nnoremap <leader>fc :call FindWowFuzzy('fc', 0)<CR>
     nnoremap <leader>frf :call FindWowFuzzy('ff', 1)<CR>
     nnoremap <leader>frh :call FindWowFuzzy('fh', 1)<CR>
+    nnoremap <leader>frg :call FindWowFuzzy('fg', 1)<CR>
+    nnoremap <leader>frc :call FindWowFuzzy('fc', 1)<CR>
     nnoremap <leader>fee :call FindWowSetEngine('engine')<CR>
     nnoremap <leader>fes :call FindWowSetEngine('rg')<CR>
     nnoremap <leader>fez :call FindWowSetEngine('fuzzy')<CR>
