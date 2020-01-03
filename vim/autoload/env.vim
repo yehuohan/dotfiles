@@ -15,6 +15,7 @@ let s:env = {
 " hp with windows10 {{{
 let s:env.hp.win = [
     \ $DotVimPath . '/vBin',
+    \ $DotVimPath . '/vBin/bin',
     \ 'C:/MyApps/Python37',
     \ 'C:/MyApps/Julia/bin',
     \ 'C:/MyApps/cygwin64/bin',
@@ -44,6 +45,9 @@ function! env#env(dev, os)
         " IsWin() is from vimrc
         if IsWin()
             let $PATH .= ';' . join(l:e, ';')
+            let $VimYcmCygwin = 'C:/MyApps/cygwin64'
+            let $VimYcmQt = 'D:/Qt/5.12.5/msvc2017_64'
+            let $VimYcmVs = 'D:/VS2017/VC/Tools/MSVC/14.13.26128'
         else
             let $PATH .= ':' . join(l:e, ':')
         endif

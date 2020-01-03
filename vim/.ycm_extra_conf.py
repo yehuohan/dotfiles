@@ -11,7 +11,6 @@
 import os
 import platform
 import re
-import ycm_core
 
 LOC_DIR = os.path.dirname(
         os.path.abspath(__file__))  # Local working path
@@ -95,9 +94,9 @@ def GetCfamilyFlags():
         # '-Werror',                # Take all errors as warnings
         # '-Wno-unused-variable',   # Show warning of unused variable
         # '-Wno-unused-parameter',  # Show warning of unused parameter
+        # '-DXX=XX'                 # define macro to elimate some errors
         # '-std=c++17',             # std parameter with 'c++17', 'c++14', 'c++11', 'c99'
         '-xc++',                    # Set language: 'c', 'c++', 'objc', 'cuda',
-        # '-DXX=XX'                 # define macro to elimate some errors
     ]
 
     local_flags = GetDirsRecursive('-isystem',
@@ -112,16 +111,18 @@ def GetCfamilyFlags():
                         os.listdir('/usr/include/c++')))[0])
         QT_DIR = '/usr/include/qt/'
     elif platform.system() == "Windows":
-        UNIX_DIR = 'C:/MyApps/cygwin64/usr/include'
-        GCC_DIR = os.path.join('C:/MyApps/cygwin64/lib/gcc/x86_64-pc-cygwin',
+        # $VimYcm is from env#env
+        UNIX_DIR = os.getenv('VimYcmCygwin') + '/usr/include'
+        GCC_DIR = os.path.join(os.getenv('VimYcmCygwin') + '/lib/gcc/x86_64-pc-cygwin',
                     list(filter(lambda dir: re.compile(r'^\d{1,2}\.\d{1,2}\.\d{1,2}$').match(dir),
-                        os.listdir('C:/MyApps/cygwin64/lib/gcc/x86_64-pc-cygwin')))[0]) + '/include'
-        # GCC_DIR = 'D:/VS2017/VC/Tools/MSVC/14.13.26128/include/'
-        QT_DIR = 'D:/Qt/5.12.5/msvc2017_64/include/'
+                        os.listdir(os.getenv('VimYcmCygwin') + '/lib/gcc/x86_64-pc-cygwin')))[0]) + '/include'
+        VS_DIR = os.getenv('VimYcmVs') + '/include/'
+        QT_DIR = os.getenv('VimYcmQt') + '/include/'
 
     global_flags = [
-            '-isystem', GCC_DIR,
+            # '-isystem', GCC_DIR,
             # '-isystem', UNIX_DIR,
+            # '-isystem', VS_DIR,
             # '-isystem', QT_DIR,
         ] + GetDirsRecursive('-isystem',
         [
@@ -134,7 +135,7 @@ def GetCfamilyFlags():
 
     if log_out:
         with open(os.path.join(LOC_DIR, "log.txt"), 'w+') as flog:
-            flog.write("Try to use :YcmDiags(<leader>yD) to find out where's the error!\n")
+            flog.write("Try to use :YcmDiags(<leader>yd) to find out where's the error!\n")
             for k in range(len(flags_cfamily)):
                 flog.write(flags_cfamily[k] + '\n')
 

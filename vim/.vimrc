@@ -302,6 +302,9 @@ endif
     let g:Lf_ShortcutB = ''
     let g:Lf_ReverseOrder = 1
     let g:Lf_ShowHidden = 1             " 搜索隐藏文件和目录
+    let g:Lf_GtagsAutoGenerate = 0
+    let g:Lf_Gtagslabel = 'native-pygments'
+                                        " gtags需要安装 pip install Pygments
     nnoremap <silent> <leader><leader>l :call feedkeys(':LeaderfFile ', 'n')<CR>
     nnoremap <leader>lf :LeaderfFile<CR>
     nnoremap <leader>lu :LeaderfFunction<CR>
@@ -2568,7 +2571,7 @@ endif
     set laststatus=2                    " 一直显示状态栏
     set noshowmode                      " 命令行栏不显示VISUAL等字样
     set completeopt=menuone,preview     " 补全显示设置
-    set backspace=2                     " Insert模式下使用BackSpace删除
+    set backspace=indent,eol,start      " Insert模式下使用BackSpace删除
     set title                           " 允许设置titlestring
     set hidden                          " 允许在未保存文件时切换buffer
     set bufhidden=                      " 跟随hidden设置
