@@ -385,6 +385,8 @@ endif
 " }}}
 
 " textobj-user {{{ 文本对象
+    " vdc-ia-wWsp(b[<t{B"'`
+    " vdc-ia-ifcmu
     Plug 'kana/vim-textobj-user'
     Plug 'kana/vim-textobj-indent'
     let g:textobj_indent_no_default_key_mappings=1
@@ -404,6 +406,18 @@ endif
     omap iu <Plug>(textobj-underscore-i)
     vmap au <Plug>(textobj-underscore-a)
     vmap iu <Plug>(textobj-underscore-i)
+    nnoremap <leader>ov :call Plug_to_motion('v')<CR>
+    nnoremap <leader>oV :call Plug_to_motion('V')<CR>
+    nnoremap <leader>od :call Plug_to_motion('d')<CR>
+    nnoremap <leader>oD :call Plug_to_motion('D')<CR>
+
+    function! Plug_to_motion(motion)
+        call PopSelection({
+            \ 'opt' : 'select text object motion',
+            \ 'lst' : split('w W s p ( b [ < t { B " '' ` i f c m u', ' '),
+            \ 'cmd' : {sopt, arg -> execute('normal! ' . tolower(a:motion) . (a:motion =~# '\l' ? 'i' : 'a' ) . arg)}
+            \ })
+    endfunction
 " }}}
 
 " repeat {{{ 重复命令
@@ -1454,7 +1468,7 @@ let s:rp = {
                 \ '-fPIC -shared'
                 \ ],
         \ 'cpl' : 'customlist,GetMultiFilesCompletion',
-        \ 'cmd' : {sopt, arg -> call('RunFile', [substitute(arg, '|', ' ', 'ge')])},
+        \ 'cmd' : {sopt, arg -> call('RunFile', [tr(arg, '|', ' ')])},
         \ }
     \ }
 " FUNCTION: s:rp.printf(type, args, srcf, outf) dict {{{
@@ -1996,6 +2010,7 @@ function! FindWow(keys, mode)
         let l:loc = '%'
         if a:keys =~# 'p'
             let l:loc = GetInput('Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
+            let l:loc = tr(l:loc, '|', ' ')
             if empty(l:loc) | return 0 | endif
         endif
 
