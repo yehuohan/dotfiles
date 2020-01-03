@@ -2914,6 +2914,7 @@ if IsWin()
 else
     nnoremap <leader>tz :terminal zsh<CR>
 endif
+    nnoremap <silent> <leader><leader>z :call feedkeys(':terminal ', 'n')<CR>
 if IsVim()
     set termwinkey=<C-l>
     tnoremap <Esc> <C-l>N
