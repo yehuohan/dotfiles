@@ -18,7 +18,7 @@ Some requirements:
     - [Ripgrep](https://github.com/BurntSushi/ripgrep)
     - [Ag](https://github.com/k-takata/the_silver_searcher-win32)
     - [Astyle](http://astyle.sourceforge.net)
-    - [Ctags](http://ctags.sourceforge.net)
+    - [Ctags](https://github.com/universal-ctags/ctags)
     - [Cflow](http://www.gnu.org/software/cflow)
 
  - Others:
@@ -26,4 +26,3 @@ Some requirements:
     - [Typora](https://typora.io/)
     - [MuPDF](https://www.mupdf.com)
     - [SumatraPDF](https://www.sumatrapdfreader.org)
-    - [Rapid Environment](https://www.rapidee.com)

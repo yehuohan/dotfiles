@@ -1109,7 +1109,6 @@ if s:gset.use_utils
     let g:markdown_enable_spell_checking = 0
     let g:markdown_enable_folding = 1   " 感觉MarkDown折叠引起卡顿时，关闭此项
     let g:markdown_enable_conceal = 1   " 在Vim中显示MarkDown预览
-
     Plug 'iamcco/markdown-preview.nvim', {'for': 'markdown', 'do': { -> mkdp#util#install()}}
     let g:mkdp_auto_start = 0
     let g:mkdp_auto_close = 1
@@ -1122,9 +1121,10 @@ if s:gset.use_utils
     nnoremap <silent> <leader>tb
         \ :let g:mkdp_browser = (g:mkdp_browser ==# 'firefox') ? 'chrome' : 'firefox'<Bar>
         \ :echo 'Browser: ' . g:mkdp_browser<CR>
+    Plug 'joker1007/vim-markdown-quote-syntax'
 " }}}
 
-" reStructruedText {{{
+" ReStructruedText {{{
     Plug 'Rykka/riv.vim', {'for': 'rst'}
     Plug 'Rykka/InstantRst', {'for': 'rst'}
     let g:instant_rst_browser = 'firefox'
@@ -1169,7 +1169,7 @@ endif
     endfunction
 " }}}
 
-" open-browser.vim {{{ 在线搜索
+" open-browser {{{ 在线搜索
     Plug 'tyru/open-browser.vim'
     let g:openbrowser_default_search='baidu'
     nmap <leader>bs <Plug>(openbrowser-smart-search)
