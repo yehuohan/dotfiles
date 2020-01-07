@@ -82,8 +82,8 @@ if IsVim()
 endif
 let mapleader="\<Space>"
 nnoremap ; :
-nnoremap : ;
 vnoremap ; :
+nnoremap : ;
 set timeout                             " 打开映射超时检测
 set ttimeout                            " 打开键码超时检测
 set timeoutlen=1000                     " 映射超时时间为1000ms
@@ -211,7 +211,7 @@ call plug#begin($DotVimPath.'/bundle')  " 可以指定插件安装位置
     " C-n: 进入cursor模式
     " C-Up/Down: 进入extend模式
     " Tab: 切换cursor/extend模式
-    let g:VM_leader = ','
+    let g:VM_leader = '\'
     let g:VM_maps = {
         \ 'Find Under'         : '<C-n>',
         \ 'Find Subword Under' : '<C-n>',
@@ -430,16 +430,16 @@ endif
     Plug 'morhetz/gruvbox'
     set rtp+=$DotVimPath/bundle/gruvbox
     let g:gruvbox_contrast_dark='soft'  " 背景选项：dark, medium, soft
-    Plug 'junegunn/seoul256.vim'
-    set rtp+=$DotVimPath/bundle/seoul256.vim
-    let g:seoul256_background=236       " 233(暗) ~ 239(亮)
-    let g:seoul256_light_background=256 " 252(暗) ~ 256(亮)
-    Plug 'altercation/vim-colors-solarized'
-    set rtp+=$DotVimPath/bundle/vim-colors-solarized
+    let g:gruvbox_italic = 1
     Plug 'sainnhe/vim-color-forest-night'
     set rtp+=$DotVimPath/bundle/vim-color-forest-night
+    let g:forest_night_use_italic = 1
     Plug 'srcery-colors/srcery-vim'
     set rtp+=$DotVimPath/bundle/srcery-vim
+    let g:srcery_italic = 1
+    Plug 'rakr/vim-one'
+    set rtp+=$DotVimPath/bundle/vim-one
+    let g:one_allow_italics = 1
 if !s:gset.use_lightline
     try
         set background=dark
@@ -504,7 +504,7 @@ else
     " E185: 找不到主题
     catch /^Vim\%((\a\+)\)\=:E185/
         silent! colorscheme desert
-        let g:lightline.colorscheme = 'solarized'
+        let g:lightline.colorscheme = 'one'
     endtry
     let g:lightline.blacklist = {'tagbar':0, 'nerdtree':0, 'Popc':0}
     nnoremap <leader>tl :call lightline#toggle()<CR>
@@ -638,7 +638,7 @@ endif
         \},
         \{
             \ 'opt' : ['colorscheme', 'colo'],
-            \ 'lst' : ['forest-night', 'gruvbox', 'seoul256', 'seoul256-light', 'solarized', 'srcery'],
+            \ 'lst' : ['forest-night', 'gruvbox', 'srcery', 'one'],
             \ 'cmd' : ''
         \}
     \ ]
