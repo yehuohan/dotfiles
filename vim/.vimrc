@@ -163,20 +163,35 @@ call s:gsetLoad()
 " Plug Settings {{{
 " s:plug {{{
 let s:plug = {
-    \ 'timer' : 0,
-    \ 'delay' : 700,
-    \ 'list'  : []
+    \ 'onInit'     : {'exec': []},
+    \ 'onVimEnter' : {'exec': []},
+    \ 'onDelay'    : {'delay': 700, 'load': []},
     \ }
-" FUNCTION: s:plug.append(name) dict {{{
-function! s:plug.append(name) dict
-    call add(self.list, a:name)
+" FUNCTION: s:plug.reg(event, type, name) dict {{{
+function! s:plug.reg(event, type, name) dict
+    call add(self[a:event][a:type], a:name)
+endfunction
+" }}}
+
+" FUNCTION: s:plug.run(timer) dict {{{
+function! s:plug.run(timer) dict
+    call plug#load(self.onDelay.load)
 endfunction
 " }}}
 
 " FUNCTION: s:plug.init() dict {{{
 function! s:plug.init() dict
-    if !empty(self.list)
-        let s:plug.timer = timer_start(s:plug.delay, {timer -> call('plug#load', self.list)})
+    if !empty(self.onInit.exec)
+        call execute(self.onInit.exec)
+    endif
+    if !empty(self.onVimEnter.exec)
+        augroup PluginPlug
+            autocmd!
+            autocmd VimEnter * call execute(s:plug.onVimEnter.exec)
+        augroup END
+    endif
+    if !empty(self.onDelay.load)
+        call timer_start(self.onDelay.delay, funcref('s:plug.run', [], s:plug))
     endif
 endfunction
 " }}}
@@ -272,17 +287,7 @@ endif
 if s:gset.use_leaderf
 if IsLinux()
     Plug 'Yggdroot/LeaderF', {'do': './install.sh'}
-    augroup PluginLeaderF
-        autocmd!
-        autocmd VimEnter * call s:Plug_lf_removeMru()
-    augroup END
-    function! s:Plug_lf_removeMru()
-        try
-            autocmd! LeaderF_Mru
-        " E216:事件组不存在
-        catch /^Vim\%((\a\+)\)\=:E216/
-        endtry
-    endfunction
+    call s:plug.reg('onVimEnter', 'exec', 'autocmd! LeaderF_Mru')
 elseif IsWin()
     Plug 'Yggdroot/LeaderF', {'do': './install.bat'}
 else
@@ -388,7 +393,7 @@ endif
     " vdc-ia-ifcmu
     Plug 'kana/vim-textobj-user'
     Plug 'kana/vim-textobj-indent'
-    let g:textobj_indent_no_default_key_mappings=1
+    let g:textobj_indent_no_default_key_mappings = 1
     omap aI <Plug>(textobj-indent-a)
     omap iI <Plug>(textobj-indent-i)
     omap ai <Plug>(textobj-indent-same-a)
@@ -718,7 +723,12 @@ if s:gset.use_startify
             \ {'type': 'files',     'header': ['   Recent Files']},
             \ ]
     let g:startify_files_number = 7
+    let g:startify_custom_header = 'startify#pad(startify#fortune#cowsay("", "─", "│", "┌", "┐", "┘", "└"))'
     nnoremap <leader>su :Startify<CR>
+    augroup PluginLightline
+        autocmd!
+        autocmd User StartifyReady setlocal conceallevel=0
+    augroup END
 endif
 " }}}
 
@@ -788,7 +798,7 @@ if s:gset.use_ycm
     endfunction
     " }}}
     Plug 'ycm-core/YouCompleteMe', {'do': function('Plug_ycm_build'), 'on': []}
-    call s:plug.append('YouCompleteMe')
+    call s:plug.reg('onDelay', 'load', 'YouCompleteMe')
     let g:ycm_global_ycm_extra_conf=$DotVimPath.'/.ycm_extra_conf.py'
                                                                 " C-family补全路径
     let g:ycm_enable_diagnostic_signs = 1                       " 开启语法检测
@@ -1078,8 +1088,8 @@ endif
     Plug 'Konfekt/FastFold'
     nmap <leader>zu <Plug>(FastFoldUpdate)
     let g:fastfold_savehook = 0         " 只允许手动更新folds
-    "let g:fastfold_fold_command_suffixes =  ['x','X','a','A','o','O','c','C']
-    "let g:fastfold_fold_movement_commands = [']z', '[z', 'zj', 'zk']
+    let g:fastfold_fold_command_suffixes =  ['x','X','a','A','o','O','c','C']
+    let g:fastfold_fold_movement_commands = ['z[', 'z]', 'zj', 'zk']
                                         " 允许指定的命令更新folds
 " }}}
 
@@ -1155,17 +1165,7 @@ endif
     nmap <leader>av <Plug>(vimtex-view)
     nmap <leader>am <Plug>(vimtex-toggle-main)
     " 添加YCM集成
-    augroup PluginVimtex
-        autocmd!
-        autocmd VimEnter * call s:Plug_vt_setYcmTrigger()
-    augroup END
-    function! s:Plug_vt_setYcmTrigger()
-        try
-            let g:ycm_semantic_triggers.tex=g:vimtex#re#youcompleteme
-        " E121:变量不存在
-        catch /^Vim\%((\a\+)\)\=:E121/
-        endtry
-    endfunction
+    call s:plug.reg('onInit', 'exec', 'let g:ycm_semantic_triggers = {"tex" : g:vimtex#re#youcompleteme}')
 " }}}
 
 " open-browser {{{ 在线搜索
@@ -2768,6 +2768,8 @@ endif
     nnoremap <leader>zn zN
     nnoremap <leader>zr zR
     nnoremap <leader>zx zX
+    nnoremap z[ [z
+    nnoremap z] ]z
     " 滚屏
     nnoremap <C-j> <C-e>
     nnoremap <C-k> <C-y>
