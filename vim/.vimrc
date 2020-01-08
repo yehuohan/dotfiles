@@ -154,7 +154,6 @@ function! s:gsetShow()
     echo l:str
 endfunction
 " }}}
-command! -nargs=0 GSLoad :call s:gsetLoad()
 command! -nargs=0 GSInit :call s:gsetInit()
 command! -nargs=0 GSShow :call s:gsetShow()
 call s:gsetLoad()
@@ -1420,10 +1419,10 @@ let s:rp = {
     \ 'srcf' : '',
     \ 'outf' : '',
     \ 'type' : {
-        \ 'c'          : [IsWin() ? 'gcc %s -o %s %s && %s' : 'gcc %s -o %s %s && ./%s',
-                                                               \ 'args' , 'outf' , 'srcf' , 'outf' ],
-        \ 'cpp'        : [IsWin() ? 'g++ -std=c++11 %s -o %s %s && %s' : 'g++ -std=c++11 %s -o %s %s && ./%s',
-                                                               \ 'args' , 'outf' , 'srcf' , 'outf' ],
+        \ 'c'          : [IsWin() ? 'gcc %s %s -o %s && %s' : 'gcc %s %s -o %s && ./%s',
+                                                               \ 'args' , 'srcf' , 'outf' , 'outf' ],
+        \ 'cpp'        : [IsWin() ? 'g++ -std=c++11 %s %s -o %s && %s' : 'g++ -std=c++11 %s %s -o %s && ./%s',
+                                                               \ 'args' , 'srcf' , 'outf' , 'outf' ],
         \ 'java'       : ['javac %s && java %s %s'             , 'srcf' , 'outf' , 'args'          ],
         \ 'python'     : ['python %s %s'                       , 'srcf' , 'args'                   ],
         \ 'julia'      : ['julia %s %s'                        , 'srcf' , 'args'                   ],
@@ -2184,6 +2183,7 @@ let s:rs = {
             \ 'lst' : [
                     \ 'python -m json.tool %',
                     \ 'python setup.py build',
+                    \ 'objdump -D -S -C %:r > %.asm',
                     \ 'go mod init %:r',
                     \ 'cflow -T %',
                     \ 'createCtags',
