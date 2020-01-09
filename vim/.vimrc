@@ -725,7 +725,7 @@ if s:gset.use_startify
     let g:startify_files_number = 7
     let g:startify_custom_header = 'startify#pad(startify#fortune#cowsay("", "─", "│", "┌", "┐", "┘", "└"))'
     nnoremap <leader>su :Startify<CR>
-    augroup PluginLightline
+    augroup PluginStartify
         autocmd!
         autocmd User StartifyReady setlocal conceallevel=0
     augroup END
@@ -1788,7 +1788,7 @@ let s:fw = {
         \ }
     \ },
     \ 'misc' : {
-        \ 'markers' : ['.root', '.popc', '.git', '.svn'],
+        \ 'markers' : ['.popc', '.git', '.svn', 'tags'],
         \ 'strings' : [],
         \ },
     \ 'mappings' : []
