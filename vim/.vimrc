@@ -279,7 +279,7 @@ if s:gset.use_fzf
     endif
     Plug 'junegunn/fzf.vim', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
     let g:fzf_command_prefix = 'Fzf'
-    nnoremap <silent> <leader><leader>f :call feedkeys(':FzfFiles ', 'n')<CR>
+    nnoremap <leader><leader>f :FzfFiles<Space>
 endif
 " }}}
 
@@ -309,7 +309,7 @@ endif
     let g:Lf_GtagsAutoGenerate = 0
     let g:Lf_Gtagslabel = 'native-pygments'
                                         " gtags需要安装 pip install Pygments
-    nnoremap <silent> <leader><leader>l :call feedkeys(':LeaderfFile ', 'n')<CR>
+    nnoremap <leader><leader>l :LeaderfFile<Space>
     nnoremap <leader>lf :LeaderfFile<CR>
     nnoremap <leader>lu :LeaderfFunction<CR>
     nnoremap <leader>lU :LeaderfFunctionAll<CR>
@@ -355,7 +355,7 @@ endif
     "               第3个field又重新从第1个对齐符开始（对齐符可以有多个，循环使用）
     "               这样就相当于：需对齐的field使用第1个对齐符，分割符(,)field使用第2个对齐符
     " /,\zs     -   将分割符(,)作为对齐内容field里的字符
-    nnoremap <silent> <leader><leader>a :call feedkeys(':Tabularize /', 'n')<CR>
+    nnoremap <leader><leader>a :Tabularize /
     vnoremap <leader><leader>a :Tabularize /
 " }}}
 
@@ -617,25 +617,14 @@ endif
         \{
             \ 'opt' : ['filetype', 'ft'],
             \ 'dsr' : 'When this option is set, the FileType autocommand event is triggered.',
-            \ 'lst' : ['cpp', 'c', 'python', 'julia', 'vim', 'go', 'markdown', 'help', 'text',
-                     \ 'sh', 'conf', 'make', 'cmake', 'javascript', 'json', 'html'],
+            \ 'lst' : ['vim', 'make', 'markdown', 'conf',  'json', 'help'],
             \ 'dic' : {
-                    \ 'cpp'        : 'Cpp file',
-                    \ 'c'          : 'C file',
-                    \ 'python'     : 'Python script file',
-                    \ 'julia'      : 'Julia script file',
-                    \ 'vim'        : 'Vim script file',
-                    \ 'go'         : 'Go Language',
-                    \ 'markdown'   : 'MarkDown file',
-                    \ 'help'       : 'Vim help doc',
-                    \ 'text'       : 'Simple text',
-                    \ 'sh'         : 'Linux shell script',
-                    \ 'conf'       : 'Config file',
-                    \ 'make'       : 'Makefile of .mak file',
-                    \ 'cmake'      : 'CMakeLists.txt file',
-                    \ 'javascript' : 'JavaScript file',
-                    \ 'json'       : 'Json file',
-                    \ 'html'       : 'Html file',
+                    \ 'vim'      : 'Vim script file',
+                    \ 'make'     : 'Makefile of .mak file',
+                    \ 'markdown' : 'MarkDown file',
+                    \ 'conf'     : 'Config file',
+                    \ 'json'     : 'Json file',
+                    \ 'help'     : 'Vim help doc',
                     \},
             \ 'cmd' : 'popset#data#SetEqual',
             \ 'get' : 'popset#data#GetOptValue'
@@ -646,8 +635,7 @@ endif
             \ 'cmd' : ''
         \}
     \ ]
-    " set option with PopSet
-    nnoremap <silent> <leader><leader>s :call feedkeys(':PopSet ', 'n')<CR>
+    nnoremap <leader><leader>s :PopSet<Space>
     nnoremap <leader>sp :PopSet popset<CR>
 " }}}
 
@@ -673,10 +661,10 @@ endif
     nnoremap <leader><leader>w :PopcWorkspace<CR>
     nnoremap <silent> <leader>wf
         \ :let g:popc_wks_root = popc#layer#wks#GetCurrentWks()[1]<Bar>
-        \ :execute empty(g:popc_wks_root) ? '' : ':LeaderfFile ' . g:popc_wks_root<CR>
+        \ :execute empty(g:popc_wks_root) ? '' : ':Leaderf file ' . g:popc_wks_root<CR>
     nnoremap <silent> <leader>wt
         \ :let g:popc_wks_root = popc#layer#wks#GetCurrentWks()[1]<Bar>
-        \ :execute empty(g:popc_wks_root) ? '' : ':Leaderf rg -e "" ' . g:popc_wks_root<CR>
+        \ :execute empty(g:popc_wks_root) ? '' : ':Leaderf rg --nowrap -e "" ' . g:popc_wks_root<CR>
     nnoremap <silent> <leader>ty
         \ :let g:popc_tabline_layout = (get(g:, 'popc_tabline_layout', 0) + 1) % 3<Bar>
         \ :call call('popc#ui#TabLineSetLayout',
@@ -1027,10 +1015,8 @@ endif
     let g:asyncrun_open = 8             " 自动打开quickfix window
     let g:asyncrun_save = 1             " 自动保存当前文件
     let g:asyncrun_local = 1            " 使用setlocal的efm
-    nnoremap <silent> <leader><leader>r :call feedkeys(':AsyncRun ', 'n')<CR>
-    vnoremap <leader><leader>r :AsyncRun
-    nnoremap <silent> <leader>rr :call feedkeys(':AsyncRun ', 'n')<CR>
-    vnoremap <leader>rr :AsyncRun
+    nnoremap <leader><leader>r :AsyncRun<Space>
+    vnoremap <leader><leader>r :AsyncRun<Space>
     nnoremap <leader>rk :AsyncStop<CR>
 " }}}
 
@@ -1173,9 +1159,9 @@ endif
     let g:openbrowser_default_search='baidu'
     nmap <leader>bs <Plug>(openbrowser-smart-search)
     vmap <leader>bs <Plug>(openbrowser-smart-search)
-    nnoremap <silent> <leader>big :call feedkeys(':OpenBrowserSearch -google ', 'n')<CR>
-    nnoremap <silent> <leader>bib :call feedkeys(':OpenBrowserSearch -baidu ', 'n')<CR>
-    nnoremap <silent> <leader>bih :call feedkeys(':OpenBrowserSearch -github ', 'n')<CR>
+    nnoremap <leader>big :OpenBrowserSearch -google<Space>
+    nnoremap <leader>bib :OpenBrowserSearch -baidu<Space>
+    nnoremap <leader>bih :OpenBrowserSearch -github<Space>
     nnoremap <leader>bg  :call Plug_brw_search('google', 'n')<CR>
     vnoremap <leader>bg  :call Plug_brw_search('google', 'v')<CR>
     nnoremap <leader>bb  :call Plug_brw_search('baidu', 'n')<CR>
@@ -1775,10 +1761,10 @@ let s:fw = {
             \ 'fc' : ':execute "FzfTags " . expand("<cword>")'
             \ },
         \ 'leaderf' : {
-            \ 'ff' : ':LeaderfFile',
+            \ 'ff' : ':Leaderf file',
             \ 'fh' : ':Leaderf rg --nowrap',
-            \ 'fg' : ':Leaderf tag',
-            \ 'fc' : ':Leaderf tag --cword'
+            \ 'fg' : ':Leaderf tag --nowrap',
+            \ 'fc' : ':Leaderf tag --nowrap --cword'
             \ },
         \ 'sel' : {
             \ 'opt' : 'select fuzzy engine',
@@ -2931,7 +2917,7 @@ if IsWin()
 else
     nnoremap <leader>tz :terminal zsh<CR>
 endif
-    nnoremap <silent> <leader><leader>z :call feedkeys(':terminal ', 'n')<CR>
+    nnoremap <leader><leader>z :terminal<Space>
 if IsVim()
     set termwinkey=<C-l>
     tnoremap <Esc> <C-l>N
