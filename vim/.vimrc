@@ -2754,6 +2754,8 @@ endif
     nnoremap <leader>zn zN
     nnoremap <leader>zr zR
     nnoremap <leader>zx zX
+    nnoremap <leader>zf zF
+    nnoremap <leader>zd zD
     nnoremap z[ [z
     nnoremap z] ]z
     " 滚屏
@@ -2988,9 +2990,9 @@ endif
     nnoremap <leader>g8 g*
     nnoremap <leader>g3 g#
     vnoremap <silent> /
-        \ ""y<Bar>:execute '/\c' . @"<CR>
+        \ ""y<Bar>:execute '/\V\c' . escape(@", '\/')<CR>
     nnoremap <silent> <leader>/
-        \ :execute '/\c' . expand('<cword>')<CR>
+        \ :execute '/\V\c' . escape(expand('<cword>'), '\/')<CR>
     " FindWow
     for key in s:fw.mappings
         execute 'nnoremap <leader>' . key ':call FindWow("' . key . '", "n")<CR>'
