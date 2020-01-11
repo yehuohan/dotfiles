@@ -2163,7 +2163,7 @@ let s:rs = {
             \ 'cmd' : {sopt, arg -> has_key(s:rs.funcs, arg) ? s:rs.funcs[arg]() : execute(arg)},
             \ },
         \ 'async' : {
-            \ 'opt' : 'select execution to run',
+            \ 'opt' : 'select scripts to run',
             \ 'lst' : [
                     \ 'python -m json.tool %',
                     \ 'python setup.py build',
