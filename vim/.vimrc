@@ -1252,12 +1252,16 @@ function! GetFileList(pat, ...)
     let l:dir_last = ''
     let l:pfile    = ''
 
-    while l:dir !=# l:dir_last
-        let l:wicSave = &wildignorecase
-        set wildignorecase
-        let l:pfile = glob(l:dir . '/' . a:pat)
-        let &wildignorecase = l:wicSave
+    if IsWin()
+        " widows文件不区分大小写
+        let l:pat = a:pat
+    else
+        let l:pat = join(map(split(a:pat, '\zs'),
+                    \ {k,c -> (c =~? '[a-z]') ? '[' . toupper(c) . tolower(c) . ']' : c}), '')
+    endif
 
+    while l:dir !=# l:dir_last
+        let l:pfile = glob(l:dir . '/' . l:pat)
         if !empty(l:pfile)
             break
         endif
