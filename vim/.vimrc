@@ -160,7 +160,7 @@ call s:gsetLoad()
 " }}}
 " }}} End
 
-" Plug Settings {{{
+" Plugin Settings {{{
 " s:plug {{{
 let s:plug = {
     \ 'onInit'     : {'exec': []},
@@ -280,6 +280,10 @@ if s:gset.use_fzf
     Plug 'junegunn/fzf.vim', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
     let g:fzf_command_prefix = 'Fzf'
     nnoremap <leader><leader>f :FzfFiles<Space>
+    augroup PluginFzf
+        autocmd!
+        autocmd Filetype fzf tnoremap <buffer> <Esc> <C-c>
+    augroup END
 endif
 " }}}
 
@@ -987,7 +991,6 @@ endif
     let g:tagbar_width=30
     let g:tagbar_map_showproto=''       " 取消tagbar对<Space>的占用
     nnoremap <leader>tt :TagbarToggle<CR>
-                                        " 可以 ctags -R 命令自行生成tags
 " }}}
 
 " nerdcommenter {{{ 批量注释
