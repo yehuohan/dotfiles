@@ -344,14 +344,6 @@ endif
         \}
 " }}}
 
-" far {{{ 查找与替换
-    Plug 'brooth/far.vim', {'on': 'Farp'}
-    let g:far#file_mask_favorites = ['%', '*.txt']
-    nnoremap <leader>sr :Farp<CR>
-    nnoremap <leader>fd :Fardo<CR>
-    nnoremap <leader>fu :Farundo<CR>
-" }}}
-
 " tabular {{{ 字符对齐
     Plug 'godlygeek/tabular', {'on': 'Tabularize'}
     " /,/r2l0   -   第1个field使用第1个对齐符（右对齐），再插入2个空格
