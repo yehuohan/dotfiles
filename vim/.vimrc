@@ -1682,17 +1682,16 @@ let RpSphinxClean = function('RunProject', ['sphinx', [0, 'clean']])
 " find&search {{{
 " Required: 'skywind3000/asyncrun.vim' or 'yegappan/grep' or 'mhinz/vim-grepper'
 "           'Yggdroot/LeaderF', 'junegunn/fzf.vim'
-"           'yehuohan/popc'
-"           'yehuohan/popset'
+"           'yehuohan/popc', 'yehuohan/popset'
 
 " s:fw {{{
-" @attribute engine: 搜索程序，命令格式为：printf('cmd %s %s %s',<pat>,<loc>,<opt>)
+" @attribute engine: 搜索程序，命令格式为：printf('cmd %s %s %s',<opt>,<pat>,<loc>)
 "            sr : search
 "            sa : search append
 "            sk : search kill
-"            sl : search lines with fuzzy
 "            ff : fuzzy files
-"            fh : fuzzy huge lines-text
+"            fh : fuzzy huge text
+"            fl : fuzzy line text
 "            fg : fuzzy ctags
 "            fc : fuzzy ctags with <cword>
 " @attribute args: 搜索参数
@@ -1702,20 +1701,20 @@ let RpSphinxClean = function('RunProject', ['sphinx', [0, 'clean']])
 " @attribute mappings: 映射按键
 let s:fw = {
     \ 'cmd' : '',
+    \ 'opt' : '',
     \ 'pat' : '',
     \ 'loc' : '',
-    \ 'opt' : '',
     \ 'engine' : {
-        \ 'rg'    : '',
+        \ 'rg' : '',
         \ 'fuzzy' : '',
-        \ 'sr'    : '',
-        \ 'sa'    : '',
-        \ 'sk'    : '',
-        \ 'sl'    : ':Leaderf rg --nowrap -e "%s" "%s" %s',
-        \ 'ff'    : '',
-        \ 'fh'    : '',
-        \ 'fg'    : '',
-        \ 'fc'    : '',
+        \ 'sr' : '',
+        \ 'sa' : '',
+        \ 'sk' : '',
+        \ 'ff' : '',
+        \ 'fh' : '',
+        \ 'fl' : '',
+        \ 'fg' : '',
+        \ 'fc' : '',
         \ },
     \ 'args' : {
         \ 'root'    : '',
@@ -1726,24 +1725,27 @@ let s:fw = {
         \ 'sel' : '',
         \ 'F' : {
             \ 'opt' : 'select search options',
-            \ 'lst' : ['-F', '--hidden', '--no-ignore'],
+            \ 'lst' : ['--no-fixed-strings', '--hidden', '--no-ignore'],
             \ 'cmd' : {sopt, arg -> s:fw.setParam('opt', arg)}
             \ }
         \ },
     \ 'rg' : {
         \ 'asyncrun' : {
-            \ 'sr' : ':botright copen | :AsyncRun! rg --vimgrep "%s" "%s" %s',
-            \ 'sa' : ':botright copen | :AsyncRun! -append rg --vimgrep "%s" "%s" %s',
+            \ 'ch' : '"#%',
+            \ 'sr' : ':botright copen | :AsyncRun! rg --vimgrep -F %s -e "%s" "%s"',
+            \ 'sa' : ':botright copen | :AsyncRun! -append rg --vimgrep -F %s -e "%s" "%s"',
             \ 'sk' : ':AsyncStop'
             \ },
         \ 'grep' : {
-            \ 'sr' : ':execute '':Rg '' . escape(''%s'', " ") . '' "%s" %s''',
-            \ 'sa' : ':execute '':RgAdd '' . escape(''%s'', " ") . '' "%s" %s''',
+            \ 'ch' : '#% ',
+            \ 'sr' : ':Rg -F %s %s "%s"',
+            \ 'sa' : ':RgAdd -F %s %s "%s"',
             \ 'sk' : ':GrepStop'
             \ },
         \ 'grepper' : {
-            \ 'sr' : ':Grepper -noprompt -tool rg -query "%s" "%s" %s',
-            \ 'sa' : ':Grepper -noprompt -tool rg -append -query "%s" "%s" %s',
+            \ 'ch' : '"',
+            \ 'sr' : ':Grepper -noprompt -tool rg -query -F %s -e "%s" "%s"',
+            \ 'sa' : ':Grepper -noprompt -tool rg -append -query -F %s -e "%s" "%s"',
             \ 'sk' : ':Grepper -stop'
             \ },
         \ 'sel' : {
@@ -1757,12 +1759,14 @@ let s:fw = {
         \ 'fzf' : {
             \ 'ff' : ':FzfFiles',
             \ 'fh' : ':FzfRg',
+            \ 'fl' : ':execute "FzfRg " . expand("<cword>")',
             \ 'fg' : ':FzfTags',
             \ 'fc' : ':execute "FzfTags " . expand("<cword>")'
             \ },
         \ 'leaderf' : {
             \ 'ff' : ':Leaderf file',
             \ 'fh' : ':Leaderf rg --nowrap',
+            \ 'fl' : ':Leaderf rg --nowrap --cword',
             \ 'fg' : ':Leaderf tag --nowrap',
             \ 'fc' : ':Leaderf tag --nowrap --cword'
             \ },
@@ -1781,35 +1785,27 @@ let s:fw = {
     \ }
 " s:fw.mappings {{{
 let s:fw.mappings = [
-                \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fri',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'frI',
-                \  'fw',  'fbw',  'ftw',  'fow',  'fpw',  'frw',  'fW',  'fbW',  'ftW',  'foW',  'fpW',  'frW',
-                \  'fs',  'fbs',  'fts',  'fos',  'fps',  'frs',  'fS',  'fbS',  'ftS',  'foS',  'fpS',  'frS',
-                \  'f=',  'fb=',  'ft=',  'fo=',  'fp=',  'fr=',  'f=',  'fb=',  'ft=',  'fo=',  'fp=',  'fr=',
-                \  'Fi',  'Fbi',  'Fti',  'Foi',  'Fpi',  'Fri',  'FI',  'FbI',  'FtI',  'FoI',  'FpI',  'FrI',
-                \  'Fw',  'Fbw',  'Ftw',  'Fow',  'Fpw',  'Frw',  'FW',  'FbW',  'FtW',  'FoW',  'FpW',  'FrW',
-                \  'Fs',  'Fbs',  'Fts',  'Fos',  'Fps',  'Frs',  'FS',  'FbS',  'FtS',  'FoS',  'FpS',  'FrS',
-                \  'F=',  'Fb=',  'Ft=',  'Fo=',  'Fp=',  'Fr=',  'F=',  'Fb=',  'Ft=',  'Fo=',  'Fp=',  'Fr=',
-                \ 'fli', 'flbi', 'flti', 'floi', 'flpi', 'flri', 'flI', 'flbI', 'fltI', 'floI', 'flpI', 'flrI',
-                \ 'flw', 'flbw', 'fltw', 'flow', 'flpw', 'flrw', 'flW', 'flbW', 'fltW', 'floW', 'flpW', 'flrW',
-                \ 'fls', 'flbs', 'flts', 'flos', 'flps', 'flrs', 'flS', 'flbS', 'fltS', 'floS', 'flpS', 'flrS',
-                \ 'fl=', 'flb=', 'flt=', 'flo=', 'flp=', 'flr=', 'fl=', 'flb=', 'flt=', 'flo=', 'flp=', 'flr=',
-                \ 'Fli', 'Flbi', 'Flti', 'Floi', 'Flpi', 'Flri', 'FlI', 'FlbI', 'FltI', 'FloI', 'FlpI', 'FlrI',
-                \ 'Flw', 'Flbw', 'Fltw', 'Flow', 'Flpw', 'Flrw', 'FlW', 'FlbW', 'FltW', 'FloW', 'FlpW', 'FlrW',
-                \ 'Fls', 'Flbs', 'Flts', 'Flos', 'Flps', 'Flrs', 'FlS', 'FlbS', 'FltS', 'FloS', 'FlpS', 'FlrS',
-                \ 'Fl=', 'Flb=', 'Flt=', 'Flo=', 'Flp=', 'Flr=', 'Fl=', 'Flb=', 'Flt=', 'Flo=', 'Flp=', 'Flr=',
-                \ 'fai', 'fabi', 'fati', 'faoi', 'fapi', 'fari', 'faI', 'fabI', 'fatI', 'faoI', 'fapI', 'farI',
-                \ 'faw', 'fabw', 'fatw', 'faow', 'fapw', 'farw', 'faW', 'fabW', 'fatW', 'faoW', 'fapW', 'farW',
-                \ 'fas', 'fabs', 'fats', 'faos', 'faps', 'fars', 'faS', 'fabS', 'fatS', 'faoS', 'fapS', 'farS',
-                \ 'fa=', 'fab=', 'fat=', 'fao=', 'fap=', 'far=', 'fa=', 'fab=', 'fat=', 'fao=', 'fap=', 'far=',
-                \ 'Fai', 'Fabi', 'Fati', 'Faoi', 'Fapi', 'Fari', 'FaI', 'FabI', 'FatI', 'FaoI', 'FapI', 'FarI',
-                \ 'Faw', 'Fabw', 'Fatw', 'Faow', 'Fapw', 'Farw', 'FaW', 'FabW', 'FatW', 'FaoW', 'FapW', 'FarW',
-                \ 'Fas', 'Fabs', 'Fats', 'Faos', 'Faps', 'Fars', 'FaS', 'FabS', 'FatS', 'FaoS', 'FapS', 'FarS',
-                \ 'Fa=', 'Fab=', 'Fat=', 'Fao=', 'Fap=', 'Far=', 'Fa=', 'Fab=', 'Fat=', 'Fao=', 'Fap=', 'Far=',
-                \ 'fvi', 'fvpi', 'fvI',  'fvpI',
-                \ 'fvw', 'fvpw', 'fvW',  'fvpW',
-                \ 'fvs', 'fvps', 'fvS',  'fvpS',
-                \ 'fv=', 'fvp=', 'fv=',  'fvp=',
-                \ ]
+    \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fri',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'frI',
+    \  'fw',  'fbw',  'ftw',  'fow',  'fpw',  'frw',  'fW',  'fbW',  'ftW',  'foW',  'fpW',  'frW',
+    \  'fs',  'fbs',  'fts',  'fos',  'fps',  'frs',  'fS',  'fbS',  'ftS',  'foS',  'fpS',  'frS',
+    \  'f=',  'fb=',  'ft=',  'fo=',  'fp=',  'fr=',  'f=',  'fb=',  'ft=',  'fo=',  'fp=',  'fr=',
+    \  'Fi',  'Fbi',  'Fti',  'Foi',  'Fpi',  'Fri',  'FI',  'FbI',  'FtI',  'FoI',  'FpI',  'FrI',
+    \  'Fw',  'Fbw',  'Ftw',  'Fow',  'Fpw',  'Frw',  'FW',  'FbW',  'FtW',  'FoW',  'FpW',  'FrW',
+    \  'Fs',  'Fbs',  'Fts',  'Fos',  'Fps',  'Frs',  'FS',  'FbS',  'FtS',  'FoS',  'FpS',  'FrS',
+    \  'F=',  'Fb=',  'Ft=',  'Fo=',  'Fp=',  'Fr=',  'F=',  'Fb=',  'Ft=',  'Fo=',  'Fp=',  'Fr=',
+    \ 'fai', 'fabi', 'fati', 'faoi', 'fapi', 'fari', 'faI', 'fabI', 'fatI', 'faoI', 'fapI', 'farI',
+    \ 'faw', 'fabw', 'fatw', 'faow', 'fapw', 'farw', 'faW', 'fabW', 'fatW', 'faoW', 'fapW', 'farW',
+    \ 'fas', 'fabs', 'fats', 'faos', 'faps', 'fars', 'faS', 'fabS', 'fatS', 'faoS', 'fapS', 'farS',
+    \ 'fa=', 'fab=', 'fat=', 'fao=', 'fap=', 'far=', 'fa=', 'fab=', 'fat=', 'fao=', 'fap=', 'far=',
+    \ 'Fai', 'Fabi', 'Fati', 'Faoi', 'Fapi', 'Fari', 'FaI', 'FabI', 'FatI', 'FaoI', 'FapI', 'FarI',
+    \ 'Faw', 'Fabw', 'Fatw', 'Faow', 'Fapw', 'Farw', 'FaW', 'FabW', 'FatW', 'FaoW', 'FapW', 'FarW',
+    \ 'Fas', 'Fabs', 'Fats', 'Faos', 'Faps', 'Fars', 'FaS', 'FabS', 'FatS', 'FaoS', 'FapS', 'FarS',
+    \ 'Fa=', 'Fab=', 'Fat=', 'Fao=', 'Fap=', 'Far=', 'Fa=', 'Fab=', 'Fat=', 'Fao=', 'Fap=', 'Far=',
+    \ 'fvi', 'fvpi', 'fvI',  'fvpI',
+    \ 'fvw', 'fvpw', 'fvW',  'fvpW',
+    \ 'fvs', 'fvps', 'fvS',  'fvpS',
+    \ 'fv=', 'fvp=', 'fv=',  'fvp=',
+    \ ]
 " }}}
 
 " FUNCTION: s:fw.init() dict {{{
@@ -1820,7 +1816,7 @@ function! s:fw.init() dict
         autocmd User Grepper call FindWowHighlight(s:fw.pat)
     augroup END
     " 设置搜索引擎
-    call s:fw.setEngine('rg', IsVim() ? 'grep' : 'grepper')
+    call s:fw.setEngine('rg', 'asyncrun')
     call s:fw.setEngine('fuzzy', 'leaderf')
 endfunction
 " }}}
@@ -1844,7 +1840,7 @@ endfunction
 " FUNCTION: s:fw.exec() dict {{{
 function! s:fw.exec() dict
     if empty(self.param.sel)
-        let l:exec = printf(self.cmd, escape(self.pat, '"-#%\'), self.loc, self.opt)
+        let l:exec = printf(self.cmd, self.opt, escape(self.pat, self.engine.ch), self.loc)
         execute l:exec
         call FindWowHighlight(self.pat)
         call SetExecLast(l:exec)
@@ -1863,14 +1859,13 @@ call s:fw.init()
 function! FindWow(keys, mode)
     " doc
     " {{{
-    " MapKeys: [fF][lav][btopr][IiWwSs=]
-    "          [%1][%2 ][%3   ][4%     ]
+    " MapKeys: [fF][av][btopr][IiWwSs=]
+    "          [%1][%2][%3   ][4%     ]
     " Find: %1
     "   f : find working
     "   F : find working with inputing args
     " Command: %2
     "   '': find with rg by default
-    "   l : find with rg in working root-filter and pass result to Leaderf
     "   a : find with rg append
     "   v : find with vimgrep
     " Location: %3
@@ -1968,9 +1963,7 @@ function! FindWow(keys, mode)
     " }}}
     " FUNCTION: s:parseCommand() closure {{{
     function! s:parseCommand() closure
-        if a:keys =~# 'l'
-            let l:cmd = s:fw.engine.sl
-        elseif a:keys =~# 'a'
+        if a:keys =~# 'a'
             let l:cmd = s:fw.engine.sa
         else
             let l:cmd = s:fw.engine.sr
@@ -2128,10 +2121,10 @@ function! FindWowHighlight(...)
         " use leaderf's highlight
     elseif &filetype ==# 'qf'
         if a:0 >= 1
-            call add(s:fw.misc.strings, escape(a:1, '/*'))
+            call add(s:fw.misc.strings, a:1)
         endif
         for str in s:fw.misc.strings
-            execute 'syntax match IncSearch /' . str . '/'
+            execute 'syntax match IncSearch /\V' . escape(str, '\/') . '/'
         endfor
     endif
 endfunction
@@ -3003,10 +2996,12 @@ endif
     nnoremap <leader>fk :call FindWowKill()<CR>
     nnoremap <leader>ff :call FindWowFuzzy('ff', 0)<CR>
     nnoremap <leader>fh :call FindWowFuzzy('fh', 0)<CR>
+    nnoremap <leader>fl :call FindWowFuzzy('fl', 0)<CR>
     nnoremap <leader>fg :call FindWowFuzzy('fg', 0)<CR>
     nnoremap <leader>fc :call FindWowFuzzy('fc', 0)<CR>
     nnoremap <leader>frf :call FindWowFuzzy('ff', 1)<CR>
     nnoremap <leader>frh :call FindWowFuzzy('fh', 1)<CR>
+    nnoremap <leader>frl :call FindWowFuzzy('fl', 1)<CR>
     nnoremap <leader>frg :call FindWowFuzzy('fg', 1)<CR>
     nnoremap <leader>frc :call FindWowFuzzy('fc', 1)<CR>
     nnoremap <leader>fee :call FindWowSetEngine('engine')<CR>
