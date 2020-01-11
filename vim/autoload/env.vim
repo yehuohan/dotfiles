@@ -1,6 +1,6 @@
 
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-" Env: configuration for environment variable for vim and neovim.
+" Env: environment variable for vim and neovim.
 " Github: https://github.com/yehuohan/dotconfigs
 " Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,6 +45,7 @@ function! env#env(dev, os)
         " IsWin() is from vimrc
         if IsWin()
             let $PATH .= ';' . join(l:e, ';')
+            let $VimYcmPython = 'C:/MyApps/Python37'
             let $VimYcmCygwin = 'C:/MyApps/cygwin64'
             let $VimYcmQt = 'D:/Qt/5.12.5/msvc2017_64'
             let $VimYcmVs = 'D:/VS2017/VC/Tools/MSVC/14.13.26128'
@@ -54,4 +55,3 @@ function! env#env(dev, os)
     endif
 endfunction
 " }}}
-

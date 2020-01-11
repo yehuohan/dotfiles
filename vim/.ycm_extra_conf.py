@@ -17,7 +17,7 @@ LOC_DIR = os.path.dirname(
 log_out = False                     # Print log or not
 
 #===============================================================================
-# cfamily flags
+# cfamily
 #===============================================================================
 def NewWalk(top, suffixs, exdirs):
     """
@@ -142,13 +142,20 @@ def GetCfamilyFlags():
     return flags_cfamily
 
 #===============================================================================
-# Python flags
+# python
 #===============================================================================
 def GetPythonPath():
     if platform.system() == "Linux":
         return '/usr/bin/python'
     elif platform.system() == "Windows":
-        return 'C:/MyApps/Python37/python.exe'
+        return os.getenv('VimYcmPython') + '/python.exe'
+
+def GetPythonSysPath():
+    return [
+        LOC_DIR,
+        os.getenv('VimYcmPython') + '/Lib/site-packages',
+        os.getenv('VimYcmPython') + '/Scripts'
+        ]
 
 #===============================================================================
 # Settings function called by ycmd to return language flags.
@@ -162,7 +169,7 @@ def Settings( **kwargs ):
     elif language == 'python':
         return {
             # 'interpreter_path': GetPythonPath(),
-            # 'sys_path': [LOC_DIR, ],
+            # 'sys_path': GetPythonSysPath(),
             }
     return {}
 
