@@ -948,8 +948,8 @@ endif
     let g:neoformat_enabled_cpp = ['astyle']
     let g:neoformat_enabled_java = ['astyle']
     let g:neoformat_enabled_python = ['autopep8']
-    nnoremap <leader>cf :Neoformat<CR>
-    vnoremap <leader>cf :Neoformat<CR>
+    nnoremap <leader>fc :Neoformat<CR>
+    vnoremap <leader>fc :Neoformat<CR>
 " }}}
 
 " surround {{{ 添加包围符
@@ -1685,15 +1685,15 @@ let RpSphinxClean = function('RunProject', ['sphinx', [0, 'clean']])
 "           'yehuohan/popc', 'yehuohan/popset'
 
 " s:fw {{{
-" @attribute engine: 搜索程序，命令格式为：printf('cmd %s %s %s',<opt>,<pat>,<loc>)
+" @attribute engine: 搜索程序
 "            sr : search
 "            sa : search append
 "            sk : search kill
 "            ff : fuzzy files
-"            fh : fuzzy huge text
-"            fl : fuzzy line text
-"            fg : fuzzy ctags
-"            fc : fuzzy ctags with <cword>
+"            fl : fuzzy line text with <cword>
+"            fL : fuzzy line text
+"            fh : fuzzy ctags with <cword>
+"            fH : fuzzy ctags
 " @attribute args: 搜索参数
 " @attribute rg: 预置的rg搜索命令，用于搜索指定文本
 " @attribute fuzzy: 预置的模糊搜索命令，用于文件和文本等模糊搜索
@@ -1711,10 +1711,10 @@ let s:fw = {
         \ 'sa' : '',
         \ 'sk' : '',
         \ 'ff' : '',
-        \ 'fh' : '',
         \ 'fl' : '',
-        \ 'fg' : '',
-        \ 'fc' : '',
+        \ 'fL' : '',
+        \ 'fh' : '',
+        \ 'fH' : ''
         \ },
     \ 'args' : {
         \ 'root'    : '',
@@ -1758,33 +1758,36 @@ let s:fw = {
     \ 'fuzzy' : {
         \ 'fzf' : {
             \ 'ff' : ':FzfFiles',
-            \ 'fh' : ':FzfRg',
             \ 'fl' : ':execute "FzfRg " . expand("<cword>")',
-            \ 'fg' : ':FzfTags',
-            \ 'fc' : ':execute "FzfTags " . expand("<cword>")'
+            \ 'fL' : ':FzfRg',
+            \ 'fh' : ':execute "FzfTags " . expand("<cword>")',
+            \ 'fH' : ':FzfTags'
             \ },
         \ 'leaderf' : {
             \ 'ff' : ':Leaderf file',
-            \ 'fh' : ':Leaderf rg --nowrap',
             \ 'fl' : ':Leaderf rg --nowrap --cword',
-            \ 'fg' : ':Leaderf tag --nowrap',
-            \ 'fc' : ':Leaderf tag --nowrap --cword'
+            \ 'fL' : ':Leaderf rg --nowrap',
+            \ 'fh' : ':Leaderf tag --nowrap --cword',
+            \ 'fH' : ':Leaderf tag --nowrap'
             \ },
         \ 'sel' : {
             \ 'opt' : 'select fuzzy engine',
             \ 'lst' : ['fzf', 'leaderf'],
             \ 'cmd' : {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
             \ 'get' : {sopt -> s:fw.engine.fuzzy}
-        \ }
-    \ },
+            \ }
+        \ },
     \ 'misc' : {
         \ 'markers' : ['.popc', '.git', '.svn', 'tags'],
         \ 'strings' : [],
         \ },
-    \ 'mappings' : []
+    \ 'mappings' : {
+        \ 'rg' :[],
+        \ 'fuzzy' : []
+        \ }
     \ }
 " s:fw.mappings {{{
-let s:fw.mappings = [
+let s:fw.mappings.rg = [
     \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fri',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'frI',
     \  'fw',  'fbw',  'ftw',  'fow',  'fpw',  'frw',  'fW',  'fbW',  'ftW',  'foW',  'fpW',  'frW',
     \  'fs',  'fbs',  'fts',  'fos',  'fps',  'frs',  'fS',  'fbS',  'ftS',  'foS',  'fpS',  'frS',
@@ -1805,6 +1808,10 @@ let s:fw.mappings = [
     \ 'fvw', 'fvpw', 'fvW',  'fvpW',
     \ 'fvs', 'fvps', 'fvS',  'fvpS',
     \ 'fv=', 'fvp=', 'fv=',  'fvp=',
+    \ ]
+let s:fw.mappings.fuzzy = [
+    \  'ff',  'fl',  'fL',  'fh',  'fH',
+    \ 'frf', 'frl', 'frL', 'frh', 'frH',
     \ ]
 " }}}
 
@@ -1840,6 +1847,7 @@ endfunction
 " FUNCTION: s:fw.exec() dict {{{
 function! s:fw.exec() dict
     if empty(self.param.sel)
+        " format: printf('cmd %s %s %s',<opt>,<pat>,<loc>)
         let l:exec = printf(self.cmd, self.opt, escape(self.pat, self.engine.ch), self.loc)
         execute l:exec
         call FindWowHighlight(self.pat)
@@ -2025,18 +2033,20 @@ function! FindWowKill()
 endfunction
 " }}}
 
-" FUNCTION: FindWowFuzzy(keys, r) {{{ 模糊搜索
-" @param r: 是否设置搜索目录s:fw.args.root
-function! FindWowFuzzy(keys, r)
-    if !a:r && empty(s:fw.args.root)
+" FUNCTION: FindWowFuzzy(keys) {{{ 模糊搜索
+function! FindWowFuzzy(keys)
+    let l:r = (a:keys[1] ==# 'r') ? 1 : 0
+    let l:root = s:fw.args.root
+    if !l:r && empty(l:root)
         call FindWowRoot()
+        let l:root = s:fw.args.root
     endif
-    if a:r || empty(s:fw.args.root)
-        call FindWowSetArgs('r')
+    if l:r || empty(l:root)
+        let l:root = FindWowSetArgs('r') ? s:fw.args.root : ''
     endif
-    if !empty(s:fw.args.root)
-        execute 'lcd ' . s:fw.args.root
-        execute s:fw.engine[a:keys]
+    if !empty(l:root)
+        execute 'lcd ' . l:root
+        execute s:fw.engine[a:keys[0] . a:keys[-1:]]
     endif
 endfunction
 " }}}
@@ -2124,7 +2134,7 @@ function! FindWowHighlight(...)
             call add(s:fw.misc.strings, a:1)
         endif
         for str in s:fw.misc.strings
-            execute 'syntax match IncSearch /\V' . escape(str, '\/') . '/'
+            execute 'syntax match IncSearch /\V\c' . escape(str, '\/') . '/'
         endfor
     endif
 endfunction
@@ -2156,7 +2166,7 @@ let s:rs = {
                     \ 'clearUndo'              : 'clear undo history',
                     \ },
             \ 'cmd' : {sopt, arg -> has_key(s:rs.funcs, arg) ? s:rs.funcs[arg]() : execute(arg)},
-        \ },
+            \ },
         \ 'async' : {
             \ 'opt' : 'select execution to run',
             \ 'lst' : [
@@ -2816,11 +2826,11 @@ endif
 
     for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
         " 寄存器快速复制与粘贴
-        execute "vnoremap <leader>'" . t          . ' "' . t . 'y'
-        execute "nnoremap <leader>'" . t          . ' "' . t . 'p'
-        execute "nnoremap <leader>'" . toupper(t) . ' "' . t . 'P'
+        execute printf('vnoremap <leader>''%s "%sy', t, t)
+        execute printf('nnoremap <leader>''%s "%sp', t, t)
+        execute printf('nnoremap <leader>''%s "%sP', toupper(t), t)
         " 快速执行宏
-        execute "nnoremap <leader>2" . t . ' :call ExecMacro("' . t . '")<CR>'
+        execute printf('nnoremap <leader>2%s :call ExecMacro("%s")<CR>', t, t)
     endfor
 " }}}
 
@@ -2987,26 +2997,17 @@ endif
     nnoremap <silent> <leader>/
         \ :execute '/\V\c' . escape(expand('<cword>'), '\/')<CR>
     " FindWow
-    for key in s:fw.mappings
-        execute 'nnoremap <leader>' . key ':call FindWow("' . key . '", "n")<CR>'
+    for key in s:fw.mappings.rg
+        execute printf('nnoremap <leader>%s :call FindWow("%s", "n")<CR>', key, key)
+        execute printf('vnoremap <leader>%s :call FindWow("%s", "v")<CR>', key, key)
     endfor
-    for key in s:fw.mappings
-        execute 'vnoremap <leader>' . key ':call FindWow("' . key . '", "v")<CR>'
+    for key in s:fw.mappings.fuzzy
+        execute printf('nnoremap <leader>%s :call FindWowFuzzy("%s")<CR>', key, key)
     endfor
     nnoremap <leader>fk :call FindWowKill()<CR>
-    nnoremap <leader>ff :call FindWowFuzzy('ff', 0)<CR>
-    nnoremap <leader>fh :call FindWowFuzzy('fh', 0)<CR>
-    nnoremap <leader>fl :call FindWowFuzzy('fl', 0)<CR>
-    nnoremap <leader>fg :call FindWowFuzzy('fg', 0)<CR>
-    nnoremap <leader>fc :call FindWowFuzzy('fc', 0)<CR>
-    nnoremap <leader>frf :call FindWowFuzzy('ff', 1)<CR>
-    nnoremap <leader>frh :call FindWowFuzzy('fh', 1)<CR>
-    nnoremap <leader>frl :call FindWowFuzzy('fl', 1)<CR>
-    nnoremap <leader>frg :call FindWowFuzzy('fg', 1)<CR>
-    nnoremap <leader>frc :call FindWowFuzzy('fc', 1)<CR>
     nnoremap <leader>fee :call FindWowSetEngine('engine')<CR>
     nnoremap <leader>fes :call FindWowSetEngine('rg')<CR>
-    nnoremap <leader>fez :call FindWowSetEngine('fuzzy')<CR>
+    nnoremap <leader>feu :call FindWowSetEngine('fuzzy')<CR>
     nnoremap <leader>fet :call FindWowRoot()<CR>
     nnoremap <leader>fea :call FindWowSetArgs('rfg')<CR>
     nnoremap <leader>fer :call FindWowSetArgs('r')<CR>
