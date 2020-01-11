@@ -750,7 +750,7 @@ endif
 " }}}
 
 " undotree {{{ 撤消历史
-    Plug 'mbbill/undotree'
+    Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
     nnoremap <leader>tu :UndotreeToggle<CR>
 " }}}
 " }}}
