@@ -2222,20 +2222,28 @@ endfunction
 function! QuickfixBasic(keys)
     let l:type = a:keys[0]
     let l:oprt = a:keys[1]
-    if l:oprt == 'o'
+    if l:oprt ==# 'o'
         execute 'botright ' . l:type . 'open'
         call FindWowHighlight()
-    elseif l:oprt == 'c'
+    elseif l:oprt ==# 'c'
         if &filetype==#'qf'
             wincmd p
         endif
         execute l:type . 'close'
-    elseif l:oprt == 'j'
+    elseif l:oprt ==# 'j'
         execute l:type . 'next'
         silent! normal! zO
         normal! zz
-    elseif l:oprt == 'k'
+    elseif l:oprt ==# 'J'
+        execute l:type . 'last'
+        silent! normal! zO
+        normal! zz
+    elseif l:oprt ==# 'k'
         execute l:type . 'previous'
+        silent! normal! zO
+        normal! zz
+    elseif l:oprt ==# 'K'
+        execute l:type . 'first'
         silent! normal! zO
         normal! zz
     endif
@@ -2845,12 +2853,16 @@ endif
     nnoremap <leader>qo :call QuickfixBasic('co')<CR>
     nnoremap <leader>qc :call QuickfixBasic('cc')<CR>
     nnoremap <leader>qj :call QuickfixBasic('cj')<CR>
+    nnoremap <leader>qJ :call QuickfixBasic('cJ')<CR>
     nnoremap <leader>qk :call QuickfixBasic('ck')<CR>
+    nnoremap <leader>qK :call QuickfixBasic('cK')<CR>
     " 打开/关闭location-list
     nnoremap <leader>lo :call QuickfixBasic('lo')<CR>
     nnoremap <leader>lc :call QuickfixBasic('lc')<CR>
     nnoremap <leader>lj :call QuickfixBasic('lj')<CR>
+    nnoremap <leader>lJ :call QuickfixBasic('lJ')<CR>
     nnoremap <leader>lk :call QuickfixBasic('lk')<CR>
+    nnoremap <leader>lK :call QuickfixBasic('lK')<CR>
     " 预览quickfix和location-list
     nnoremap <M-Space> :call QuickfixPreview()<CR>
     " 在新tab中打开列表项
