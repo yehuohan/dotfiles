@@ -2591,16 +2591,18 @@ endif
     set notildeop                       " 使切换大小写的~，类似于c,y,d等操作符
     set nrformats=bin,octal,hex,alpha   " CTRL-A-X支持数字和字母
     set noimdisable                     " 切换Normal模式时，自动换成英文输入法
+    set visualbell                      " 使用可视响铃代替鸣声
     set noerrorbells                    " 关闭错误信息响铃
-    set visualbell t_vb=                " 关闭响铃(vb, visualbell)和可视闪铃(t_vb，即闪屏)，即normal模式时按esc会有响铃
     set belloff=all                     " 关闭所有事件的响铃
     set helplang=cn,en                  " 优先查找中文帮助
 if IsVim()
     set renderoptions=                  " 设置正常显示unicode字符
     if &term == 'xterm' || &term == 'xterm-256color'
-        " 终端光标设置，适用于urxvt,st,xterm,gnome-termial
+        set t_vb=                       " 关闭终端可视闪铃，即normal模式时按esc会有响铃
+        " 终端光标设置，适用于urxvt,xterm,gnome-termial
         " 5,6: 竖线，  3,4: 横线，  1,2: 方块
         let &t_SI = "\<Esc>[6 q"        " 进入Insert模式
+        let &t_SR = "\<Esc>[3 q"        " 进入Replace模式
         let &t_EI = "\<Esc>[2 q"        " 退出Insert模式
     endif
 endif
