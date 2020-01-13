@@ -2515,23 +2515,14 @@ function! FuncSwitchFile()
 endfunction
 " }}}
 
-" FUNCTION: FuncGotoKeyword(mode) {{{ 查找Vim关键字
-function! FuncGotoKeyword(mode)
-    let l:exec = 'help '
+" FUNCTION: FuncHelp(mode) {{{ 查找Vim关键字
+function! FuncHelp(mode)
     if a:mode ==# 'n'
         let l:word = expand('<cword>')
     elseif a:mode ==# 'v'
         let l:word = GetSelected()
     endif
-
-    " 添加关键字
-    let l:exec .= l:word
-    if IsNVim()
-        " nvim用自己的帮助文件，只有英文的
-        let l:exec .= '@en'
-    endif
-
-    execute l:exec
+    execute printf('help %s%s', l:word, IsNVim() ? '@en' : '')
 endfunction
 " }}}
 
@@ -2711,8 +2702,8 @@ augroup UserSettingsCmd
     autocmd FileType go         setlocal expandtab
     autocmd FileType javascript setlocal foldmethod=syntax
 
-    autocmd Filetype vim,help nnoremap <buffer> <S-k> :call FuncGotoKeyword('n')<CR>
-    autocmd Filetype vim,help vnoremap <buffer> <S-k> :call FuncGotoKeyword('v')<CR>
+    autocmd Filetype vim,help nnoremap <buffer> <S-k> :call FuncHelp('n')<CR>
+    autocmd Filetype vim,help vnoremap <buffer> <S-k> :call FuncHelp('v')<CR>
 augroup END
 " }}}
 " }}} End
