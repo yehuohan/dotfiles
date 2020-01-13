@@ -1376,14 +1376,6 @@ function! ExecLast()
     endif
 endfunction
 " }}}
-
-" FUNCTION: ExecMacro(key) {{{ 执行宏
-function! ExecMacro(key)
-    let l:mstr = 'normal! @' . a:key
-    execute l:mstr
-    call SetExecLast(l:mstr)
-endfunction
-" }}}
 " }}}
 
 " project {{{
@@ -2164,7 +2156,7 @@ let s:rs = {
                     \ 'lineToTop'              : 'frozen current line to top',
                     \ 'clearUndo'              : 'clear undo history',
                     \ },
-            \ 'cmd' : {sopt, arg -> has_key(s:rs.funcs, arg) ? s:rs.funcs[arg]() : execute(arg)},
+            \ 'cmd' : {sopt, arg -> has_key(s:rs.func, arg) ? s:rs.func[arg]() : execute(arg)},
             \ },
         \ 'async' : {
             \ 'opt' : 'select scripts to run',
@@ -2176,13 +2168,13 @@ let s:rs = {
                     \ 'cflow -T %',
                     \ 'createCtags',
                     \ ],
-            \ 'cmd' : {sopt, arg -> has_key(s:rs.funcs, arg) ? s:rs.funcs[arg]() : execute(':AsyncRun ' . arg)},
+            \ 'cmd' : {sopt, arg -> has_key(s:rs.func, arg) ? s:rs.func[arg]() : execute(':AsyncRun ' . arg)},
             \ },
         \ },
-    \ 'funcs' : {}
+    \ 'func' : {}
     \ }
-" FUNCTION: s:rs.funcs.clearUndo() dict {{{ 清除undo数据
-function! s:rs.funcs.clearUndo() dict
+" FUNCTION: s:rs.func.clearUndo() dict {{{ 清除undo数据
+function! s:rs.func.clearUndo() dict
     let l:ulbak = &undolevels
     set undolevels=-1
     execute "normal! a\<Bar>\<BS>\<Esc>"
@@ -2190,8 +2182,8 @@ function! s:rs.funcs.clearUndo() dict
 endfunction
 " }}}
 
-" FUNCTION: s:rs.funcs.lineToTop() dict {{{ 冻结顶行
-function! s:rs.funcs.lineToTop() dict
+" FUNCTION: s:rs.func.lineToTop() dict {{{ 冻结顶行
+function! s:rs.func.lineToTop() dict
     let l:line = line('.')
     split %
     resize 1
@@ -2200,8 +2192,8 @@ function! s:rs.funcs.lineToTop() dict
 endfunction
 " }}}
 
-" FUNCTION: s:rs.funcs.createCtags() dict {{{ 生成tags
-function! s:rs.funcs.createCtags() dict
+" FUNCTION: s:rs.func.createCtags() dict {{{ 生成tags
+function! s:rs.func.createCtags() dict
     let l:fw = FindWowGetArgs()
     if !empty(l:fw)
         execute(':AsyncRun cd '. l:fw[0] . ' && ctags -R')
@@ -2212,9 +2204,141 @@ endfunction
 " }}}
 " }}}
 
+" FUNCTION: RunScript(type) " {{{
 function! RunScript(type)
     call PopSelection(s:rs.sel[a:type])
 endfunction
+" }}}
+
+" FUNCTION: FuncMacro(key) {{{ 执行宏
+function! FuncMacro(key)
+    let l:mstr = 'normal! @' . a:key
+    execute l:mstr
+    call SetExecLast(l:mstr)
+endfunction
+" }}}
+
+" FUNCTION: FuncEditFile(suffix, ntab) {{{ 编辑临时文件
+" @param suffix: 临时文件附加后缀
+" @param ntab: 在新tab中打开
+function! FuncEditFile(suffix, ntab)
+    execute printf('%s %s.%s',
+                \ a:ntab ? 'tabedit' : 'edit',
+                \ fnamemodify(tempname(), ':r'),
+                \ empty(a:suffix) ? 'tmp' : a:suffix)
+endfunction
+function! RunEditFile(key)
+    let l:suffix = {
+                \ 'c': 'c',
+                \ 'a': 'cpp',
+                \ 'p': 'py'}[a:key[-1:]]
+    let l:ntab = a:key[0] ==# 't'
+    call FuncEditFile(l:suffix, l:ntab)
+endfunction
+"}}}
+
+" FUNCTION: FuncDiffFile(file, mode) {{{ 文件对比
+function! FuncDiffFile(file, mode)
+    execute printf('%s diffsplit %s', (a:mode ==# 'v') ? 'vertical ' : '' , a:file)
+endfunction
+" }}}
+
+" FUNCTION: FuncDivideSpace(string, pos) range {{{ 添加分隔符
+" @param string: 分割字符，以空格分隔
+" @param pos: 分割的位置
+function! FuncDivideSpace(string, pos) range
+    let l:chars = split(a:string)
+
+    for k in range(a:firstline, a:lastline)
+        let l:line = getline(k)
+        let l:fie = ' '
+        for ch in l:chars
+            let l:pch = '\m\s*\M' . escape(ch, '\') . '\m\s*\C'
+            if a:pos == 'h'
+                let l:sch = l:fie . escape(ch, '&\')
+            elseif a:pos == 'c'
+                let l:sch = l:fie . escape(ch, '&\') . l:fie
+            elseif a:pos == 'l'
+                let l:sch = escape(ch, '&\') . l:fie
+            elseif a:pos == 'd'
+                let l:sch = escape(ch, '&\')
+            endif
+            let l:line = substitute(l:line, l:pch, l:sch, 'g')
+        endfor
+        call setline(k, l:line)
+    endfor
+    call SetExecLast('call FuncDivideSpace(''' . a:string . ''', ''' . a:pos . ''')')
+endfunction
+let RunDivideSpaceH = function('ExecInput', [['Divide H: '], 'FuncDivideSpace', 'h'])
+let RunDivideSpaceC = function('ExecInput', [['Divide C: '], 'FuncDivideSpace', 'c'])
+let RunDivideSpaceL = function('ExecInput', [['Divide L: '], 'FuncDivideSpace', 'l'])
+let RunDivideSpaceD = function('ExecInput', [['Delete D: '], 'FuncDivideSpace', 'd'])
+" }}}
+
+" FUNCTION: FuncAppendCmd(str, type) {{{ 将命令结果作为文本插入
+function! FuncAppendCmd(str, type)
+    if a:type ==# 'call'
+        let l:as = match(a:str, '(')
+        let l:ae = -1   " match(a:str, ')') - 1
+        let l:str = a:str[0 : l:as - 1]
+        let l:args = GetArgs(a:str[l:as + 1 : l:ae - 1])
+        let l:result = call(l:str, l:args)
+        if type(l:result) != v:t_string
+            let l:result = string(l:result)
+        endif
+    elseif a:type ==# 'exec'
+        let l:result = execute(a:str)
+    endif
+    call append(line('.'), split(l:result, "\n"))
+endfunction
+let RunAppendCmdE = function('ExecInput', [['Command: ', '', 'command'], 'FuncAppendCmd', 'exec'])
+let RunAppendCmdF = function('ExecInput', [['Function: ', '', 'function'], 'FuncAppendCmd', 'call'])
+" }}}
+
+" FUNCTION: FuncSwitchFile(sf) {{{ 切换文件
+function! FuncSwitchFile(sf)
+    let l:ext = expand('%:e')
+    let l:file = expand('%:p:r')
+    let l:try = []
+    if index(a:sf.lhs, l:ext, 0, 1) >= 0
+        let l:try = a:sf.rhs
+    elseif index(a:sf.rhs, l:ext, 0, 1) >= 0
+        let l:try = a:sf.lhs
+    endif
+    for e in l:try
+        if filereadable(l:file . '.' . e)
+            execute 'edit ' . l:file . '.' . e
+            break
+        endif
+        if filereadable(l:file . '.' . toupper(e))
+            execute 'edit ' . l:file . '.' . e
+            break
+        endif
+    endfor
+endfunction
+let RunSwitchFile = function('FuncSwitchFile', [
+            \ {'lhs': ['c', 'cc', 'cpp', 'cxx'],
+            \  'rhs': ['h', 'hh', 'hpp', 'hxx']}])
+" }}}
+
+" FUNCTION: FuncHelp(mode) {{{ 查找Vim关键字
+function! FuncHelp(mode)
+    execute printf('help %s%s',
+                \ (a:mode ==# 'v') ? GetSelected() : expand('<cword>'),
+                \ IsNVim() ? '@en' : '')
+endfunction
+" }}}
+
+" FUNCTION: FuncFcitx() {{{ 切换Fcitx输入法
+if IsLinux()
+" @param input: 1为zh，2为en
+function! FuncFcitx(input)
+    if a:input == system('fcitx-remote')
+        call system('fcitx-remote -'. ['o', 'c'][a:input - 1])
+    endif
+endfunction
+endif
+" }}}
 " }}}
 
 " output {{{
@@ -2402,143 +2526,6 @@ function! OptFuncSyntax()
         echo 'syntax on'
     endif
 endfunction
-" }}}
-" }}}
-
-" funcs {{{
-" FUNCTION: FuncEditTempFile(suffix, ntab) {{{ 编辑临时文件
-" @param suffix: 临时文件附加后缀
-" @param ntab: 在新tab中打开
-function! FuncEditTempFile(suffix, ntab)
-    let l:tempfile = fnamemodify(tempname(), ':r')
-    if empty(a:suffix)
-        let l:tempfile .= '.tmp'
-    else
-        let l:tempfile .= '.' . a:suffix
-    endif
-    if a:ntab
-        execute 'tabedit ' . l:tempfile
-    else
-        execute 'edit ' . l:tempfile
-    endif
-endfunction
-"}}}
-
-" FUNCTION: FuncDiffFile(filename, mode) {{{ 文件对比
-function! FuncDiffFile(filename, mode)
-    if a:mode ==# 's'
-        execute 'diffsplit ' . a:filename
-    elseif a:mode ==# 'v'
-        execute 'vertical diffsplit ' . a:filename
-    endif
-endfunction
-" }}}
-
-" FUNCTION: FuncDivideSpace(string, pos) range {{{ 添加分隔符
-function! FuncDivideSpace(string, pos) range
-    let l:chars = split(a:string)
-
-    for k in range(a:firstline, a:lastline)
-        let l:line = getline(k)
-        let l:fie = ' '
-        for ch in l:chars
-            let l:pch = '\m\s*\M' . escape(ch, '\') . '\m\s*\C'
-            if a:pos == 'h'
-                let l:sch = l:fie . escape(ch, '&\')
-            elseif a:pos == 'c'
-                let l:sch = l:fie . escape(ch, '&\') . l:fie
-            elseif a:pos == 'l'
-                let l:sch = escape(ch, '&\') . l:fie
-            elseif a:pos == 'd'
-                let l:sch = escape(ch, '&\')
-            endif
-            let l:line = substitute(l:line, l:pch, l:sch, 'g')
-        endfor
-        call setline(k, l:line)
-    endfor
-    call SetExecLast('call FuncDivideSpace(''' . a:string . ''', ''' . a:pos . ''')')
-endfunction
-let FuncDivideSpaceH = function('ExecInput', [['Divide H: '], 'FuncDivideSpace', 'h'])
-let FuncDivideSpaceC = function('ExecInput', [['Divide C: '], 'FuncDivideSpace', 'c'])
-let FuncDivideSpaceL = function('ExecInput', [['Divide L: '], 'FuncDivideSpace', 'l'])
-let FuncDivideSpaceD = function('ExecInput', [['Delete D: '], 'FuncDivideSpace', 'd'])
-" }}}
-
-" FUNCTION: FuncAppendCmd(str, flg) {{{ 将命令结果作为文本插入
-function! FuncAppendCmd(str, flg)
-    if a:flg ==# 'call'
-        let l:as = match(a:str, '(')
-        let l:ae = -1   " match(a:str, ')') - 1
-        let l:str = a:str[0 : l:as - 1]
-        let l:args = GetArgs(a:str[l:as + 1 : l:ae - 1])
-        let l:result = call(l:str, l:args)
-        if type(l:result) != v:t_string
-            let l:result = string(l:result)
-        endif
-    elseif a:flg ==# 'exec'
-        let l:result = execute(a:str)
-    endif
-    call append(line('.'), split(l:result, "\n"))
-endfunction
-let FuncAppendCmdExec = function('ExecInput', [['Command: ', '', 'command'] , 'FuncAppendCmd', 'exec'])
-let FuncAppendCmdCall = function('ExecInput', [['Function: ', '', 'function'], 'FuncAppendCmd', 'call'])
-" }}}
-
-" FUNCTION: FuncSwitchFile() {{{ 切换文件
-let s:sf = [
-    \ {'lhs': ['c', 'cc', 'cpp', 'cxx'],
-    \  'rhs': ['h', 'hh', 'hpp', 'hxx']},
-    \ ]
-function! FuncSwitchFile()
-    let l:ext = expand('%:e')
-    let l:file = expand('%:p:r')
-    let l:try = []
-    for k in range(len(s:sf))
-        if index(s:sf[k].lhs, l:ext, 0, 1) >= 0
-            let l:try = s:sf[0].rhs
-            break
-        elseif index(s:sf[k].rhs, l:ext, 0, 1) >= 0
-            let l:try = s:sf[0].lhs
-            break
-        endif
-    endfor
-    for e in l:try
-        if filereadable(l:file . '.' . e)
-            execute 'edit ' . l:file . '.' . e
-            break
-        endif
-        if filereadable(l:file . '.' . toupper(e))
-            execute 'edit ' . l:file . '.' . e
-            break
-        endif
-    endfor
-endfunction
-" }}}
-
-" FUNCTION: FuncHelp(mode) {{{ 查找Vim关键字
-function! FuncHelp(mode)
-    if a:mode ==# 'n'
-        let l:word = expand('<cword>')
-    elseif a:mode ==# 'v'
-        let l:word = GetSelected()
-    endif
-    execute printf('help %s%s', l:word, IsNVim() ? '@en' : '')
-endfunction
-" }}}
-
-" FUNCTION: FuncFcitx2en() FuncFcitx2zh() {{{ 切换Fcitx输入法
-if IsLinux()
-function! FuncFcitx2en()
-    if 2 == system('fcitx-remote')
-        let l:t = system('fcitx-remote -c')
-    endif
-endfunction
-function! FuncFcitx2zh()
-    if 1 == system('fcitx-remote')
-        let l:t = system('fcitx-remote -o')
-    endif
-endfunction
-endif
 " }}}
 " }}}
 " }}} End
@@ -2797,7 +2784,7 @@ endif
     nnoremap <leader>in :call OptionFunc('number')<CR>
     nnoremap <leader>ih :call OptionFunc('syntax')<CR>
 if IsLinux()
-    inoremap <Esc> <Esc>:call FuncFcitx2en()<CR>
+    inoremap <Esc> <Esc>:call FuncFcitx(2)<CR>
 endif
 " }}}
 
@@ -2830,7 +2817,7 @@ endif
         execute printf('nnoremap <leader>''%s "%sp', t, t)
         execute printf('nnoremap <leader>''%s "%sP', toupper(t), t)
         " 快速执行宏
-        execute printf('nnoremap <leader>2%s :call ExecMacro("%s")<CR>', t, t)
+        execute printf('nnoremap <leader>2%s :call FuncMacro("%s")<CR>', t, t)
     endfor
 " }}}
 
@@ -2937,29 +2924,24 @@ endif
 " }}}
 
 " project {{{
-    " 创建临时文件
-    nnoremap <silent> <leader>ei
-        \ :call ExecInput(['Suffix: '], 'FuncEditTempFile', 0)<CR>
-    nnoremap <silent> <leader>eti
-        \ :call ExecInput(['Suffix: '], 'FuncEditTempFile', 1)<CR>
-    for [key, val] in items({
-            \ 'n' : '',
-            \ 'c' : 'c',
-            \ 'a' : 'cpp',
-            \ 'p' : 'py',
-            \ 'g' : 'go',
-            \})
-        execute 'nnoremap <silent> <leader>e'  . key . ' :call FuncEditTempFile("' . val . '", 0)<CR>'
-        execute 'nnoremap <silent> <leader>et' . key . ' :call FuncEditTempFile("' . val . '", 1)<CR>'
-    endfor
     " 常用操作
-    nnoremap <leader>dh :call FuncDivideSpaceH()<CR>
-    nnoremap <leader>dc :call FuncDivideSpaceC()<CR>
-    nnoremap <leader>dl :call FuncDivideSpaceL()<CR>
-    nnoremap <leader>dd :call FuncDivideSpaceD()<CR>
-    nnoremap <leader>ae :call FuncAppendCmdExec()<CR>
-    nnoremap <leader>af :call FuncAppendCmdCall()<CR>
-    nnoremap <leader>sf :call FuncSwitchFile()<CR>
+    nnoremap <silent> <leader>ei
+        \ :call ExecInput(['Suffix: '], 'FuncEditFile', 0)<CR>
+    nnoremap <silent> <leader>eti
+        \ :call ExecInput(['Suffix: '], 'FuncEditFile', 1)<CR>
+    nnoremap <leader>ec :call RunEditFile('c')<CR>
+    nnoremap <leader>ea :call RunEditFile('a')<CR>
+    nnoremap <leader>ep :call RunEditFile('p')<CR>
+    nnoremap <leader>etc :call RunEditFile('tc')<CR>
+    nnoremap <leader>eta :call RunEditFile('ta')<CR>
+    nnoremap <leader>etp :call RunEditFile('tp')<CR>
+    nnoremap <leader>dh :call RunDivideSpaceH()<CR>
+    nnoremap <leader>dc :call RunDivideSpaceC()<CR>
+    nnoremap <leader>dl :call RunDivideSpaceL()<CR>
+    nnoremap <leader>dd :call RunDivideSpaceD()<CR>
+    nnoremap <leader>ae :call RunAppendCmdE()<CR>
+    nnoremap <leader>af :call RunAppendCmdF()<CR>
+    nnoremap <leader>sf :call RunSwitchFile()<CR>
     nnoremap <leader>se :call RunScript('exe')<CR>
     nnoremap <leader>sa :call RunScript('async')<CR>
     " 编译运行当前文件或项目
