@@ -2329,7 +2329,7 @@ function! FuncHelp(mode)
 endfunction
 " }}}
 
-" FUNCTION: FuncFcitx() {{{ 切换Fcitx输入法
+" FUNCTION: FuncFcitx(input) {{{ 切换Fcitx输入法
 if IsLinux()
 " @param input: 1为zh，2为en
 function! FuncFcitx(input)
