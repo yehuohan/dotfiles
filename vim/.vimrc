@@ -690,23 +690,22 @@ if s:gset.use_startify
     Plug 'mhinz/vim-startify'
     if IsLinux()
         let g:startify_bookmarks = [ {'c': '~/.vimrc'},
-                                    \ '~/.zshrc',
-                                    \ '~/.config/nvim/init.vim',
-                                    \ '~/.config/i3/config'
+                                    \{'d': '~/.config/nvim/init.vim'},
+                                    \{'e': '~/.zshrc'},
+                                    \{'f': '~/.config/i3/config'}
                                     \]
     elseif IsWin()
         let g:startify_bookmarks = [ {'c': '$DotVimPath/../_vimrc'},
-                                    \ '$DotVimPath/.ycm_extra_conf.py',
-                                    \ '$LOCALAPPDATA/nvim/init.vim'
+                                    \{'d': '$LOCALAPPDATA/nvim/init.vim'},
                                     \]
     elseif IsMac()
-        let g:startify_bookmarks = [ {'c': '~/.vimrc'}, '~/.zshrc']
+        let g:startify_bookmarks = [ {'c': '~/.vimrc'}, {'d': '~/.zshrc'}]
     endif
     let g:startify_lists = [
             \ {'type': 'bookmarks', 'header': ['   Bookmarks']},
             \ {'type': 'files',     'header': ['   Recent Files']},
             \ ]
-    let g:startify_files_number = 7
+    let g:startify_files_number = 8
     let g:startify_custom_header = 'startify#pad(startify#fortune#cowsay("", "─", "│", "┌", "┐", "┘", "└"))'
     nnoremap <leader>su :Startify<CR>
     augroup PluginStartify
