@@ -921,7 +921,7 @@ endif
     let g:neoformat_basic_format_trim = 1
     let g:neoformat_c_astyle = {
         \ 'exe' : 'astyle',
-        \ 'args' : ['--style=allman', '--pad-oper'],
+        \ 'args' : ['--style=attach', '--pad-oper'],
         \ 'stdin' : 1,
         \ }
     let g:neoformat_cpp_astyle = g:neoformat_c_astyle
@@ -2883,26 +2883,19 @@ endif
 " }}}
 
 " file diff {{{
-    " 文件比较，自动补全文件和目录
     nnoremap <silent> <leader>ds
         \ :call ExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 's')<CR>
     nnoremap <silent> <leader>dv
         \ :call ExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 'v')<CR>
     " 比较当前文件（已经分屏）
     nnoremap <leader>dt :diffthis<CR>
-    " 关闭文件比较，与diffthis互为逆命令
     nnoremap <leader>do :diffoff<CR>
-    " 更新比较结果
     nnoremap <leader>du :diffupdate<CR>
-    " 应用差异到别一文件，[range]<leader>dp，range默认为1行
     nnoremap <leader>dp
         \ :<C-U>execute '.,+' . string(v:count1-1) . 'diffput'<CR>
-    " 拉取差异到当前文件，[range]<leader>dg，range默认为1行
     nnoremap <leader>dg
         \ :<C-U>execute '.,+' . string(v:count1-1) . 'diffget'<CR>
-    " 下一个diff
     nnoremap <leader>dj ]c
-    " 前一个diff
     nnoremap <leader>dk [c
 " }}}
 
