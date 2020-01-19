@@ -827,12 +827,14 @@ if s:gset.use_ycm
             \       ']
         \ }]                                                    " LSP支持
     let g:ycm_key_detailed_diagnostics = ''                     " 直接使用:YcmShowDetailedDiagnostic命令
-    let g:ycm_key_list_select_completion = ['<C-j>', '<C-n>', '<Down>']
-    let g:ycm_key_list_previous_completion = ['<C-k>', '<C-p>', '<Up>']
+    let g:ycm_key_list_select_completion = ['<C-j>', '<M-j>', '<C-n>', '<Down>']
+    let g:ycm_key_list_previous_completion = ['<C-k>', '<M-k>', '<C-p>', '<Up>']
     let g:ycm_key_list_stop_completion = ['<C-y>']              " 关闭补全menu
-    let g:ycm_key_invoke_completion = '<C-l>'                   " 显示补全内容，YCM使用completefunc（C-X C-U）
+    let g:ycm_key_invoke_completion = '<C-Space>'               " 显示补全内容，YCM使用completefunc（C-X C-U）
                                                                 " YCM不支持的补全，通过omnifunc(C-X C-O)集成到YCM上
-    imap <C-Space> <C-l>
+    imap <C-l> <C-Space>
+    imap <M-l> <C-Space>
+    imap <M-y> <C-y>
     nnoremap <leader>gg :YcmCompleter<CR>
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
     nnoremap <leader>gI :YcmCompleter GoToInclude<CR>
@@ -887,7 +889,7 @@ endif
 if s:gset.use_ultisnips
     Plug 'SirVer/ultisnips'
     Plug 'honza/vim-snippets'           " snippet合集
-    " 删除UltiSnips#map_keys#MapKeys中的xnoremap <Tab>，和textmanip <C-i>冲突
+    " 删除UltiSnips#map_keys#MapKeys中的xnoremap <Tab>（和textmanip的<C-i>冲突）
     " 使用:UltiSnipsEdit编辑g:UltiSnipsSnippetsDir中的snippet文件
     let g:UltiSnipsEditSplit="vertical"
     let g:UltiSnipsSnippetDirectories=[$DotVimPath . '/vSnippets']
@@ -2857,10 +2859,6 @@ endif
     nnoremap <leader>wv <C-W>v
     nnoremap <leader>wc <C-w>c
     " 移动焦点
-    nnoremap <M-s> <C-w>h
-    nnoremap <M-d> <C-w>j
-    nnoremap <M-e> <C-w>k
-    nnoremap <M-f> <C-w>l
     nnoremap <leader>wh <C-w>h
     nnoremap <leader>wj <C-w>j
     nnoremap <leader>wk <C-w>k
@@ -2876,10 +2874,14 @@ endif
     nnoremap <leader>wT <C-w>T
     " 改变窗口大小
     nnoremap <leader>w= <C-w>=
-    nnoremap <M-Up> :resize+5<CR>
-    nnoremap <M-Down> :resize-5<CR>
-    nnoremap <M-Left> :vertical resize-5<CR>
-    nnoremap <M-Right> :vertical resize+5<CR>
+    nnoremap <M-e> :resize+5<CR>
+    nnoremap <M-d> :resize-5<CR>
+    nnoremap <M-s> :vertical resize-5<CR>
+    nnoremap <M-f> :vertical resize+5<CR>
+    nnoremap <M-Up> :resize+1<CR>
+    nnoremap <M-Down> :resize-1<CR>
+    nnoremap <M-Left> :vertical resize-1<CR>
+    nnoremap <M-Right> :vertical resize+1<CR>
 " }}}
 
 " file diff {{{
