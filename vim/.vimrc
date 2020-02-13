@@ -313,6 +313,10 @@ endif
     let g:Lf_GtagsAutoGenerate = 0
     let g:Lf_Gtagslabel = 'native-pygments'
                                         " gtags需要安装 pip install Pygments
+    let g:Lf_WildIgnore = {
+        \ 'dir': ['.git', '.svn', '.hg'],
+        \ 'file': []
+        \ }
     nnoremap <leader><leader>l :LeaderfFile<Space>
     nnoremap <leader>lf :LeaderfFile<CR>
     nnoremap <leader>lu :LeaderfFunction<CR>
@@ -1418,18 +1422,18 @@ let s:rp = {
         \ 'dot'        : ['dotty %s && dot -Tpng %s -o %s.png' , 'srcf' , 'srcf' , 'outf'          ],
         \ },
     \ 'cell' : {
-        \ 'python' : ['python', '^#%%', '^#%%'],
-        \ 'julia'  : ['julia', '^#%%', '^#%%'],
-        \ 'lua'    : ['lua', '^--%%', '^--%%'],
+        \ 'python' : ['python', '^#%%' , '^#%%' ],
+        \ 'julia'  : ['julia' , '^#%%' , '^#%%' ],
+        \ 'lua'    : ['lua'   , '^--%%', '^--%%'],
         \ },
     \ 'efm' : {
         \ 'python' : '%*\\sFile\ \"%f\"\\,\ line\ %l\\,\ %m',
         \ },
     \ 'pro' : {
-        \ 'qmake'  : ['*.pro', 'FnQMake'],
-        \ 'cmake'  : ['cmakelists.txt', 'FnCMake'],
-        \ 'make'   : ['makefile', 'FnMake'],
-        \ 'vs'     : ['*.sln', 'FnVs'],
+        \ 'qmake'  : ['*.pro'                          , 'FnQMake' ],
+        \ 'cmake'  : ['cmakelists.txt'                 , 'FnCMake' ],
+        \ 'make'   : ['makefile'                       , 'FnMake'  ],
+        \ 'vs'     : ['*.sln'                          , 'FnVs'    ],
         \ 'sphinx' : [IsWin() ? 'make.bat' : 'makefile', 'FnSphinx'],
         \ },
     \ 'pat' : {
@@ -1770,7 +1774,7 @@ let s:fw = {
             \ }
         \ },
     \ 'misc' : {
-        \ 'markers' : ['.popc', '.git', '.svn', 'tags'],
+        \ 'markers' : ['.popc', '.git', '.svn', '.hg', 'tags'],
         \ 'strings' : [],
         \ },
     \ 'mappings' : {
