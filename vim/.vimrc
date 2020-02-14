@@ -2282,22 +2282,18 @@ let RunDivideSpaceD = function('ExecInput', [['Delete D: '], 'FuncDivideSpace', 
 
 " FUNCTION: FuncAppendCmd(str, type) {{{ 将命令结果作为文本插入
 function! FuncAppendCmd(str, type)
-    if a:type ==# 'call'
-        let l:as = match(a:str, '(')
-        let l:ae = -1   " match(a:str, ')') - 1
-        let l:str = a:str[0 : l:as - 1]
-        let l:args = GetArgs(a:str[l:as + 1 : l:ae - 1])
-        let l:result = call(l:str, l:args)
-        if type(l:result) != v:t_string
-            let l:result = string(l:result)
-        endif
-    elseif a:type ==# 'exec'
+    if a:type ==# 'e'
         let l:result = execute(a:str)
+    elseif a:type ==# 'f'
+        let l:result = eval(a:str)
+    endif
+    if type(l:result) != v:t_string
+        let l:result = string(l:result)
     endif
     call append(line('.'), split(l:result, "\n"))
 endfunction
-let RunAppendCmdE = function('ExecInput', [['Command: ', '', 'command'], 'FuncAppendCmd', 'exec'])
-let RunAppendCmdF = function('ExecInput', [['Function: ', '', 'function'], 'FuncAppendCmd', 'call'])
+let RunAppendCmdE = function('ExecInput', [['Command: ', '', 'command'], 'FuncAppendCmd', 'e'])
+let RunAppendCmdF = function('ExecInput', [['Function: ', '', 'function'], 'FuncAppendCmd', 'f'])
 " }}}
 
 " FUNCTION: FuncSwitchFile(sf) {{{ 切换文件
