@@ -692,18 +692,14 @@ endif
 " startify {{{ vim会话界面
 if s:gset.use_startify
     Plug 'mhinz/vim-startify'
-    if IsLinux()
+    if IsLinux() || IsMac()
         let g:startify_bookmarks = [ {'c': '~/.vimrc'},
                                     \{'d': '~/.config/nvim/init.vim'},
-                                    \{'e': '~/.zshrc'},
-                                    \{'f': '~/.config/i3/config'}
                                     \]
     elseif IsWin()
         let g:startify_bookmarks = [ {'c': '$DotVimPath/../_vimrc'},
                                     \{'d': '$LOCALAPPDATA/nvim/init.vim'},
                                     \]
-    elseif IsMac()
-        let g:startify_bookmarks = [ {'c': '~/.vimrc'}, {'d': '~/.zshrc'}]
     endif
     let g:startify_lists = [
             \ {'type': 'bookmarks', 'header': ['   Bookmarks']},
