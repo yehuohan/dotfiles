@@ -1076,7 +1076,7 @@ endif
 " }}}
 
 " cpp-enhanced-highlight {{{ c++语法高亮
-    Plug 'octol/vim-cpp-enhanced-highlight', {'for': 'cpp'}
+    Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
 " }}}
 
 " julia {{{ Julia支持
