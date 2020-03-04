@@ -695,10 +695,12 @@ if s:gset.use_startify
     if IsLinux() || IsMac()
         let g:startify_bookmarks = [ {'c': '~/.vimrc'},
                                     \{'d': '~/.config/nvim/init.vim'},
+                                    \{'o': '$DotVimPath/todo.md'},
                                     \]
     elseif IsWin()
         let g:startify_bookmarks = [ {'c': '$DotVimPath/../_vimrc'},
                                     \{'d': '$LOCALAPPDATA/nvim/init.vim'},
+                                    \{'o': '$DotVimPath/todo.md'},
                                     \]
     endif
     let g:startify_lists = [
@@ -706,12 +708,22 @@ if s:gset.use_startify
             \ {'type': 'files',     'header': ['   Recent Files']},
             \ ]
     let g:startify_files_number = 8
-    let g:startify_custom_header = 'startify#pad(startify#fortune#cowsay("", "─", "│", "┌", "┐", "┘", "└"))'
+    let g:startify_custom_header = 'startify#pad(startify#fortune#cowsay(Plug_stt_todo(), "─", "│", "┌", "┐", "┘", "└"))'
     nnoremap <leader>su :Startify<CR>
     augroup PluginStartify
         autocmd!
         autocmd User StartifyReady setlocal conceallevel=0
     augroup END
+
+    function! Plug_stt_todo()
+        if filereadable($DotVimPath.'/todo.md')
+            let l:lines = readfile($DotVimPath.'/todo.md')
+            return filter(l:lines, 'v:val !~ "\\m^[ \t]*$"')
+            return lines
+        else
+            return ''
+        endif
+    endfunction
 endif
 " }}}
 
