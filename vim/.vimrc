@@ -331,7 +331,8 @@ endif
     nnoremap <leader>lm :LeaderfMru<CR>
     nnoremap <leader>lM :LeaderfMruCwd<CR>
     nnoremap <leader>ls :LeaderfSelf<CR>
-    nnoremap <leader>lh :LeaderfHelp<CR>
+    nnoremap <leader>lh :LeaderfHistorySearch<CR>
+    nnoremap <leader>le :LeaderfHistoryCmd<CR>
 endif
 " }}}
 
@@ -914,7 +915,7 @@ endif
 
 " ale {{{ 语法检测
     Plug 'dense-analysis/ale', {'on': 'ALEToggle'}
-    let g:ale_completion_enabled = 0    " 使能ale补全(只支持TypeScript)
+    let g:ale_completion_enabled = 0    " 使能ale补全
     let g:ale_linters = {'java' : []}   " 禁用Java检测（与YCM冲突）
     let g:ale_sign_error = '✘'
     let g:ale_sign_warning = '►'
