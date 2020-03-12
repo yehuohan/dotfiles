@@ -2982,7 +2982,7 @@ endif
     nnoremap <leader>g8 g*
     nnoremap <leader>g3 g#
     vnoremap <silent> /
-        \ ""y<Bar>:execute '/\V\c' . escape(@", '\/')<CR>
+        \ "9y<Bar>:execute '/\V\c' . escape(@9, '\/')<CR>
     nnoremap <silent> <leader>/
         \ :execute '/\V\c' . escape(expand('<cword>'), '\/')<CR>
     " FindWow
