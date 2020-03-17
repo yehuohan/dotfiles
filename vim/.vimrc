@@ -33,7 +33,7 @@
 " }}} End
 
 " Platform {{{
-" vim or nvim, with or without gui {{{
+" Vim or NVim, with or without Gui {{{
 function! IsVim()
     return !(has('nvim'))
 endfunction
@@ -49,7 +49,7 @@ function! IsNVimQt()
 endfunction
 " }}}
 
-" linux or win {{{
+" Linux or Win {{{
 function! IsLinux()
     return (has('unix') && !has('macunix') && !has('win32unix'))
 endfunction
@@ -75,7 +75,7 @@ elseif IsWin()
 endif
 set rtp+=$DotVimPath
 
-" first {{{
+" First {{{
 set encoding=utf-8                      " 内部使用utf-8编码
 if IsVim()
     set nocompatible                    " 不兼容vi
@@ -197,9 +197,9 @@ endfunction
 " }}}
 " }}}
 
-call plug#begin($DotVimPath.'/bundle')  " 可以指定插件安装位置
+call plug#begin($DotVimPath.'/bundle')  " 设置插件位置
 
-" 基本编辑 {{{
+" Basic {{{
 " easy-motion {{{ 快速跳转
     Plug 'easymotion/vim-easymotion'
     let g:EasyMotion_do_mapping = 0     " 禁止默认map
@@ -430,7 +430,7 @@ endif
 " }}}
 " }}}
 
-" 界面管理 {{{
+" UI & Manager {{{
 " theme {{{ Vim主题(ColorScheme, StatusLine, TabLine)
     Plug 'morhetz/gruvbox'
     set rtp+=$DotVimPath/bundle/gruvbox
@@ -690,7 +690,7 @@ endif
     nnoremap <leader>tE :execute ':NERDTree ' . expand('%:p:h')<CR>
 " }}}
 
-" startify {{{ vim会话界面
+" startify {{{ Vim启动首页
 if s:gset.use_startify
     Plug 'mhinz/vim-startify'
     if IsLinux() || IsMac()
@@ -767,7 +767,7 @@ endif
 " }}}
 " }}}
 
-" 代码编写 {{{
+" Coding {{{
 " YouCompleteMe {{{ 自动补全
 if s:gset.use_ycm
     " FUNCTION: Plug_ycm_build(info) {{{
@@ -1101,7 +1101,7 @@ endif
 " }}}
 " }}}
 
-" 软件工具 {{{
+" Utils {{{
 if s:gset.use_utils
 " vimcdoc {{{ 中文帮助文档
     Plug 'yianwillis/vimcdoc', {'for': 'help'}
@@ -1196,7 +1196,7 @@ call s:plug.init()
 " }}} End
 
 " User Functions {{{
-" libs {{{
+" Libs {{{
 " FUNCTION: GetSelected() {{{ 获取选区内容
 function! GetSelected()
     let l:reg_var = getreg('0', 1)
@@ -1393,7 +1393,7 @@ endfunction
 " }}}
 " }}}
 
-" project {{{
+" Project {{{
 " Required: 'skywind3000/asyncrun.vim'
 "           'yehuohan/popset'
 
@@ -1685,7 +1685,7 @@ let RpSphinxRun   = function('RunProject', ['sphinx', [1, 'html']])
 let RpSphinxClean = function('RunProject', ['sphinx', [0, 'clean']])
 " }}}
 
-" find&search {{{
+" Find & Search {{{
 " Required: 'skywind3000/asyncrun.vim' or 'yegappan/grep' or 'mhinz/vim-grepper'
 "           'Yggdroot/LeaderF', 'junegunn/fzf.vim'
 "           'yehuohan/popc', 'yehuohan/popset'
@@ -2150,7 +2150,7 @@ endfunction
 " }}}
 " }}}
 
-" scripts {{{
+" Scripts {{{
 " s:rs {{{
 let s:rs = {
     \ 'sel' : {
@@ -2355,7 +2355,7 @@ endif
 " }}}
 " }}}
 
-" output {{{
+" Output {{{
 " FUNCTION: QuickfixBasic(kyes) {{{ 基本操作
 function! QuickfixBasic(keys)
     let l:type = a:keys[0]
@@ -2473,7 +2473,7 @@ endfunction
 " }}}
 " }}}
 
-" option {{{
+" Option {{{
 " Required: 'yehuohan/popset'
 
 " s:opt {{{
@@ -2545,7 +2545,7 @@ endfunction
 " }}} End
 
 " User Settings {{{
-" basic {{{
+" Basic {{{
     syntax on                           " 语法高亮
     filetype plugin indent on           " 打开文件类型检测
     set number                          " 显示行号
@@ -2609,7 +2609,7 @@ if IsVim()
 endif
 " }}}
 
-" gui {{{
+" Gui {{{
 let s:gui_fontsize = 12
 
 " Gui-vim {{{
@@ -2680,6 +2680,8 @@ if IsNVimQt()
     nnoremap <leader>tm :call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>
     nnoremap <kPlus> :call GuiAdjustFontSize(1)<CR>
     nnoremap <kMinus> :call GuiAdjustFontSize(-1)<CR>
+    " Qt-Gui中使用<S-lt>代替<映射
+    nnoremap <S-Lt> <<
 endif
 endfunction
 " }}}
@@ -2687,7 +2689,7 @@ endif
 " }}}
 " }}}
 
-" auto command {{{
+" Autocmd {{{
 augroup UserSettingsCmd
     "autocmd[!]  [group]  {event}     {pattern}  {nested}  {cmd}
     "autocmd              BufNewFile  *                    set fileformat=unix
@@ -2712,7 +2714,7 @@ augroup END
 " }}} End
 
 " User Mappings {{{
-" basic {{{
+" Basic {{{
     " 重复上次操作命令
     nnoremap <leader>. :call ExecLast()<CR>
     " 回退操作
@@ -2802,7 +2804,7 @@ if IsLinux()
 endif
 " }}}
 
-" copy&paste {{{
+" Copy & Paste {{{
     " yank & put
     vnoremap <leader>y ygv
     nnoremap <silent> ya
@@ -2835,7 +2837,7 @@ endif
     endfor
 " }}}
 
-" tabs, buffers, quickfix, windows {{{
+" Tab, Buffer, Quickfix, Window {{{
     " tab切换
     nnoremap <M-u> gT
     nnoremap <M-p> gt
@@ -2897,7 +2899,7 @@ endif
     nnoremap <M-Right> :vertical resize+1<CR>
 " }}}
 
-" file diff {{{
+" Diff {{{
     nnoremap <silent> <leader>ds
         \ :call ExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 's')<CR>
     nnoremap <silent> <leader>dv
@@ -2914,7 +2916,7 @@ endif
     nnoremap <leader>dk [c
 " }}}
 
-" terminal {{{
+" Terminal {{{
 if IsWin()
     nnoremap <leader>tz :terminal<CR>
 else
@@ -2930,7 +2932,7 @@ else
 endif
 " }}}
 
-" project {{{
+" Project {{{
     " 常用操作
     nnoremap <silent> <leader>ei
         \ :call ExecInput(['Suffix: '], 'FuncEditFile', 0)<CR>
@@ -2976,7 +2978,7 @@ if IsVim()
 endif
 " }}}
 
-" find&search {{{
+" Find & Search {{{
     " /?
     nnoremap <leader><Esc> :nohlsearch<CR>
     nnoremap i :nohlsearch<CR>i
