@@ -820,6 +820,7 @@ if s:gset.use_ycm
         \ 'pandoc': 1,
         \ 'infolog': 1,
         \ 'mail': 1,
+        \ 'markdown': 1,
         \ }                                                     " 禁用YCM的列表
     let g:ycm_filetype_whitelist = {'*': 1}                     " YCM只在白名单出现且黑名单未出现的filetype工作
     let g:ycm_language_server = [
@@ -1716,6 +1717,7 @@ let s:fw = {
         \ 'sa' : '',
         \ 'sk' : '',
         \ 'ff' : '',
+        \ 'fF' : '',
         \ 'fl' : '',
         \ 'fL' : '',
         \ 'fh' : '',
@@ -1763,6 +1765,7 @@ let s:fw = {
     \ 'fuzzy' : {
         \ 'fzf' : {
             \ 'ff' : ':FzfFiles',
+            \ 'fF' : ':FzfFiles',
             \ 'fl' : ':execute "FzfRg " . expand("<cword>")',
             \ 'fL' : ':FzfRg',
             \ 'fh' : ':execute "FzfTags " . expand("<cword>")',
@@ -1770,6 +1773,7 @@ let s:fw = {
             \ },
         \ 'leaderf' : {
             \ 'ff' : ':Leaderf file',
+            \ 'fF' : ':Leaderf file --cword',
             \ 'fl' : ':Leaderf rg --nowrap --cword',
             \ 'fL' : ':Leaderf rg --nowrap',
             \ 'fh' : ':Leaderf tag --nowrap --cword',
@@ -1815,8 +1819,8 @@ let s:fw.mappings.rg = [
     \ 'fv=', 'fvp=', 'fv=',  'fvp=',
     \ ]
 let s:fw.mappings.fuzzy = [
-    \  'ff',  'fl',  'fL',  'fh',  'fH',
-    \ 'frf', 'frl', 'frL', 'frh', 'frH',
+    \  'ff',  'fF',  'fl',  'fL',  'fh',  'fH',
+    \ 'frf', 'frF', 'frl', 'frL', 'frh', 'frH',
     \ ]
 " }}}
 
