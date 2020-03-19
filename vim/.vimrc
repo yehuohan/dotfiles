@@ -1026,7 +1026,8 @@ endif
     let g:asyncrun_save = 1             " 自动保存当前文件
     let g:asyncrun_local = 1            " 使用setlocal的efm
     nnoremap <leader><leader>r :AsyncRun<Space>
-    vnoremap <leader><leader>r :AsyncRun<Space>
+    vnoremap <leader><leader>r
+        \ :call feedkeys(':AsyncRun ' . GetSelected(), 'n')<CR>
     nnoremap <leader>rk :AsyncStop<CR>
 " }}}
 
