@@ -1189,6 +1189,16 @@ endif
         endif
     endfunction
 "}}}
+
+" crunch {{{ 计算器
+    Plug 'arecarn/vim-crunch'
+    Plug 'arecarn/vim-selection'
+    let g:crunch_user_variables = {
+        \ 'e': '2.718281828459045',
+        \ 'pi': '3.141592653589793'
+        \ }
+"}}}
+
 endif
 " }}}
 
