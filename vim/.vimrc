@@ -719,8 +719,8 @@ if s:gset.use_startify
     function! Plug_stt_todo()
         if filereadable($DotVimPath.'/todo.md')
             let l:lines = readfile($DotVimPath.'/todo.md')
-            return filter(l:lines, 'v:val !~ "\\m^[ \t]*$"')
-            return lines
+            call filter(l:lines, 'v:val !~ "\\m^[ \t]*$"')
+            return l:lines
         else
             return ''
         endif
