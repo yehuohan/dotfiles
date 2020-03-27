@@ -1197,6 +1197,9 @@ endif
         \ 'e': '2.718281828459045',
         \ 'pi': '3.141592653589793'
         \ }
+    nnoremap <silent> <leader>ev
+        \ :<C-U>execute '.,+' . string(v:count1-1) . 'Crunch'<CR>
+    vnoremap <silent> <leader>ev :Crunch<CR>
 "}}}
 
 endif
