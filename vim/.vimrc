@@ -1985,10 +1985,10 @@ function! FindWow(keys, mode)
         if a:keys =~# '[iws]' | let l:opt .= '-i ' | elseif a:keys =~# '[IWS]' | let l:opt .= '-s ' | endif
         if a:keys !~# '[btop]'
             if !empty(s:fw.args.filters)
-                let l:opt .= '-g "*.{' . s:fw.args.filters . '}" '
+                let l:opt .= '-g"*.{' . s:fw.args.filters . '}" '
             endif
             if !empty(s:fw.args.globlst)
-                let l:opt .= '-g ' . join(s:fw.args.globlst, ' -g ')
+                let l:opt .= '-g' . join(s:fw.args.globlst, ' -g')
             endif
         endif
         if a:keys =~# 'F'
