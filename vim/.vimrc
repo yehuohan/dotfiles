@@ -1398,10 +1398,15 @@ endfunction
 " }}}
 
 " FUNCTION: ExecLast() {{{ 执行上一次的execution
-function! ExecLast()
+" @param eager: 1:立接执行, 0:用户执行
+function! ExecLast(eager)
     if exists('s:execution') && !empty(s:execution)
-        execute s:execution
-        echo s:execution
+        if a:eager
+            execute s:execution
+            echo s:execution
+        else
+            call feedkeys(s:execution, 'n')
+        endif
     endif
 endfunction
 " }}}
@@ -2730,7 +2735,8 @@ augroup END
 " User Mappings {{{
 " Basic {{{
     " 重复上次操作命令
-    nnoremap <leader>. :call ExecLast()<CR>
+    nnoremap <leader>. :call ExecLast(1)<CR>
+    nnoremap <leader><leader>. :call ExecLast(0)<CR>
     " 回退操作
     nnoremap <S-u> <C-r>
     " 大小写转换
