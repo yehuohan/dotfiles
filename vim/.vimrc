@@ -511,7 +511,7 @@ else
         silent! colorscheme desert
         let g:lightline.colorscheme = 'one'
     endtry
-    let g:lightline.blacklist = {'tagbar':0, 'nerdtree':0, 'Popc':0}
+    let g:lightline.blacklist = {'tagbar':0, 'nerdtree':0, 'Popc':0, 'defx':0}
     nnoremap <leader>tl :call lightline#toggle()<CR>
     nnoremap <leader>tk :call Plug_ll_toggleCheck()<CR>
 
@@ -672,22 +672,65 @@ endif
         \           [['buffer', 'tab'], ['buffer', ''], ['', 'tab']][g:popc_tabline_layout])<CR>
 " }}}
 
-" nerdtree {{{ 目录树导航
-    Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTree']}
-    let g:NERDTreeShowHidden = 1
-    let g:NERDTreeMapPreview = 'go'
-    let g:NERDTreeMapOpenInTabSilent = 'gt'
-    let g:NERDTreeMapOpenSplit = 's'
-    let g:NERDTreeMapPreviewSplit = 'gs'
-    let g:NERDTreeMapOpenVSplit = 'i'
-    let g:NERDTreeMapPreviewVSplit = 'gi'
-    let g:NERDTreeMapJumpNextSibling = '<C-n>'
-    let g:NERDTreeMapJumpPrevSibling = '<C-p>'
-    let g:NERDTreeMapChangeRoot = 'cd'  " 更改根目录
-    let g:NERDTreeMapChdir = 'CW'       " 更改CWD
-    let g:NERDTreeMapCWD = 'CD'         " 更改根目录为CWD
-    nnoremap <leader>te :NERDTreeToggle<CR>
-    nnoremap <leader>tE :execute ':NERDTree ' . expand('%:p:h')<CR>
+" defx {{{ 目录导航
+if IsVim()
+    Plug 'Shougo/defx.nvim', {'on': 'Defx'}
+    Plug 'roxma/nvim-yarp', {'on': 'Defx'}
+    Plug 'roxma/vim-hug-neovim-rpc', {'on': 'Defx'}
+else
+    Plug 'Shougo/defx.nvim', {'do': ':UpdateRemotePlugins', 'on': 'Defx'}
+endif
+    nnoremap <silent> <leader>te :Defx -toggle -show-ignored-files -split=vertical -winwidth=30<CR>
+    nnoremap <silent> <leader>tE :execute ':Defx -show-ignored-files -split=vertical -winwidth=30 ' . expand('%:p:h')<CR>
+    augroup PluginDefx
+        autocmd!
+        autocmd FileType defx call s:Plug_defx_settings()
+    augroup END
+
+    function! s:Plug_defx_settings()
+        setlocal statusline=defx
+        call defx#custom#column('icon', {
+            \ 'directory_icon': '▸',
+            \ 'opened_icon': '▾',
+            \ 'root_icon': ' '
+            \ })
+        call defx#custom#column('mark', {
+            \ 'readonly_icon': '',
+            \ 'selected_icon': '✓',
+            \ })
+        " 基本操作
+        nnoremap <nowait><silent><buffer><expr> <CR> defx#do_action('drop')
+        nnoremap <nowait><silent><buffer><expr> cd  defx#is_directory() ? defx#do_action('drop') : ''
+        nnoremap <nowait><silent><buffer><expr> o   defx#is_directory() ? defx#do_action('open_or_close_tree') : defx#do_action('drop')
+        nnoremap <nowait><silent><buffer><expr> O   defx#is_directory() ? defx#do_action('open_tree_recursive') : ''
+        nnoremap <nowait><silent><buffer><expr> s   defx#do_action('drop', 'split')
+        nnoremap <nowait><silent><buffer><expr> v   defx#do_action('drop', 'vsplit')
+        nnoremap <nowait><silent><buffer><expr> ~   defx#do_action('cd')
+        nnoremap <nowait><silent><buffer><expr> u   defx#do_action('cd', ['..'])
+        nnoremap <nowait><silent><buffer><expr> j   line('.') == line('$') ? 'gg' : 'j'
+        nnoremap <nowait><silent><buffer><expr> k   line('.') == 1 ? 'G' : 'k'
+        nnoremap <nowait><silent><buffer><expr> .   defx#do_action('toggle_ignored_files')
+        nnoremap <nowait><silent><buffer><expr> q   defx#do_action('quit')
+        nnoremap <nowait><silent><buffer><expr> yp  defx#do_action('yank_path')
+        nnoremap <nowait><silent><buffer><expr> r   defx#do_action('redraw')
+        " 列表排序
+        nnoremap <nowait><silent><buffer><expr> ge  defx#do_action('multi', [['toggle_sort', 'extension'], 'redraw'])
+        nnoremap <nowait><silent><buffer><expr> gf  defx#do_action('multi', [['toggle_sort', 'filename'], 'redraw'])
+        nnoremap <nowait><silent><buffer><expr> gs  defx#do_action('multi', [['toggle_sort', 'size'], 'redraw'])
+        nnoremap <nowait><silent><buffer><expr> gt  defx#do_action('multi', [['toggle_sort', 'time'], 'redraw'])
+        " 文件操作
+        nnoremap <nowait><silent><buffer><expr> i   defx#do_action('toggle_select') . 'j'
+        nnoremap <nowait><silent><buffer><expr> a   defx#do_action('toggle_select_all')
+        nnoremap <nowait><silent><buffer><expr> C   defx#do_action('copy')
+        nnoremap <nowait><silent><buffer><expr> M   defx#do_action('move')
+        nnoremap <nowait><silent><buffer><expr> P   defx#do_action('paste')
+        nnoremap <nowait><silent><buffer><expr> D   defx#do_action('remove')
+        nnoremap <nowait><silent><buffer><expr> R   defx#do_action('rename')
+        nnoremap <nowait><silent><buffer><expr> N   defx#do_action('new_file')
+        nnoremap <nowait><silent><buffer><expr> K   defx#do_action('new_directory')
+        nnoremap <nowait><silent><buffer><expr> !   defx#do_action('execute_command')
+        nnoremap <nowait><silent><buffer><expr> X   defx#do_action('execute_system')
+    endfunction
 " }}}
 
 " startify {{{ Vim启动首页
