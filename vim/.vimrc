@@ -680,8 +680,10 @@ if IsVim()
 else
     Plug 'Shougo/defx.nvim', {'do': ':UpdateRemotePlugins', 'on': 'Defx'}
 endif
-    nnoremap <silent> <leader>te :Defx -toggle -show-ignored-files -split=vertical -winwidth=30<CR>
-    nnoremap <silent> <leader>tE :execute ':Defx -show-ignored-files -split=vertical -winwidth=30 ' . expand('%:p:h')<CR>
+    nnoremap <silent> <leader>te
+        \ :Defx -toggle -root-marker='> ' -show-ignored-files -split=vertical -winwidth=30<CR>
+    nnoremap <silent> <leader>tE
+        \ :execute ':Defx -root-marker=''> '' -show-ignored-files -split=vertical -winwidth=30 ' . expand('%:p:h')<CR>
     augroup PluginDefx
         autocmd!
         autocmd FileType defx call s:Plug_defx_settings()
@@ -1074,6 +1076,8 @@ endif
     nnoremap <leader>rk :AsyncStop<CR>
 " }}}
 
+    Plug 'puremourning/vimspector'
+
 " easydebugger {{{ NodeJS, Go, Python调试器(Vim only)
 if IsVim()
     Plug 'jayli/vim-easydebugger', {'for': ['python', 'go']}
@@ -1252,7 +1256,7 @@ call plug#end()
 call s:plug.init()
 " }}} End
 
-" User Functions {{{
+" User Modules {{{
 " Libs {{{
 " FUNCTION: GetSelected() {{{ 获取选区内容
 function! GetSelected()
