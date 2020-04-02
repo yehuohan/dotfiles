@@ -661,15 +661,15 @@ endif
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
     nnoremap <silent> <leader>wf
-        \ :let g:popc_wks_root = popc#layer#wks#GetCurrentWks()[1]<Bar>
-        \ :execute empty(g:popc_wks_root) ? '' : ':Leaderf file ' . g:popc_wks_root<CR>
+        \ :let g:Popc_wks_root = popc#layer#wks#GetCurrentWks()[1]<Bar>
+        \ :execute empty(g:Popc_wks_root) ? '' : ':Leaderf file ' . g:Popc_wks_root<CR>
     nnoremap <silent> <leader>wt
-        \ :let g:popc_wks_root = popc#layer#wks#GetCurrentWks()[1]<Bar>
-        \ :execute empty(g:popc_wks_root) ? '' : ':Leaderf rg --nowrap -e "" ' . g:popc_wks_root<CR>
+        \ :let g:Popc_wks_root = popc#layer#wks#GetCurrentWks()[1]<Bar>
+        \ :execute empty(g:Popc_wks_root) ? '' : ':Leaderf rg --nowrap -e "" ' . g:Popc_wks_root<CR>
     nnoremap <silent> <leader>ty
-        \ :let g:popc_tabline_layout = (get(g:, 'popc_tabline_layout', 0) + 1) % 3<Bar>
+        \ :let g:Popc_tabline_layout = (get(g:, 'Popc_tabline_layout', 0) + 1) % 3<Bar>
         \ :call call('popc#ui#TabLineSetLayout',
-        \           [['buffer', 'tab'], ['buffer', ''], ['', 'tab']][g:popc_tabline_layout])<CR>
+        \           [['buffer', 'tab'], ['buffer', ''], ['', 'tab']][g:Popc_tabline_layout])<CR>
 " }}}
 
 " defx {{{ 目录导航
@@ -680,10 +680,11 @@ if IsVim()
 else
     Plug 'Shougo/defx.nvim', {'do': ':UpdateRemotePlugins', 'on': 'Defx'}
 endif
+    let g:defx_command = 'Defx %s -root-marker=''> '' -show-ignored-files -winwidth=30 %s'
     nnoremap <silent> <leader>te
-        \ :Defx -toggle -root-marker='> ' -show-ignored-files -split=vertical -winwidth=30<CR>
+        \ :execute printf(g:defx_command, (bufwinnr('defx') > 0 ? '-toggle' : '-resume') . ' -split=vertical', '')<CR>
     nnoremap <silent> <leader>tE
-        \ :execute ':Defx -root-marker=''> '' -show-ignored-files -split=vertical -winwidth=30 ' . expand('%:p:h')<CR>
+        \ :execute printf(g:defx_command, '-resume -split=vertical', expand('%:p:h'))<CR>
     augroup PluginDefx
         autocmd!
         autocmd FileType defx call s:Plug_defx_settings()
@@ -700,6 +701,8 @@ endif
             \ 'readonly_icon': '',
             \ 'selected_icon': '✓',
             \ })
+        nnoremap <nowait><silent><buffer> S
+            \ :execute printf(g:defx_command, '-new -split=horizontal -winheight=10', expand('%:p:h'))<CR>
         " 基本操作
         nnoremap <nowait><silent><buffer><expr> <CR> defx#do_action('drop')
         nnoremap <nowait><silent><buffer><expr> cd  defx#is_directory() ? defx#do_action('drop') : ''
@@ -910,17 +913,10 @@ if s:gset.use_ycm
     nnoremap <leader>yr :YcmRestartServer<CR>
     nnoremap <leader>yd :YcmDiags<CR>
     nnoremap <leader>yD :YcmDebugInfo<CR>
-    nnoremap <leader>yc :call Plug_ycm_createConf('.ycm_extra_conf.py')<CR>
-    nnoremap <leader>yj :call Plug_ycm_createConf('jsconfig.json')<CR>
-
-    function! Plug_ycm_createConf(filename)
-        " 在当前目录下创建配置文件
-        if !filereadable(a:filename)
-            let l:file = readfile($DotVimPath . '/' . a:filename)
-            call writefile(l:file, a:filename)
-        endif
-        execute 'edit ' . a:filename
-    endfunction
+    nnoremap <leader>yc
+        \ :execute 'edit ' . GetConfCopy('.ycm_extra_conf.py')<CR>
+    nnoremap <leader>yj
+        \ :execute 'edit ' . GetConfCopy('jsconfig.json')<CR>
 endif
 " }}}
 
@@ -1076,29 +1072,37 @@ endif
     nnoremap <leader>rk :AsyncStop<CR>
 " }}}
 
-    Plug 'puremourning/vimspector'
-
-" easydebugger {{{ NodeJS, Go, Python调试器(Vim only)
-if IsVim()
-    Plug 'jayli/vim-easydebugger', {'for': ['python', 'go']}
-    " 启动关闭NodeJS/Python/Go调试
-    nmap <F5>   <Plug>EasyDebuggerInspect
-    nmap <S-F5> <Plug>EasyDebuggerExit
-    " 暂停继续
-    nmap <F6>   <Plug>EasyDebuggerContinue
-    tmap <F6>   <Plug>EasyDebuggerContinue
-    nmap <S-F6> <Plug>EasyDebuggerPause
-    tmap <S-F6> <Plug>EasyDebuggerPause
-    " 设置断点
-    nmap <F9>   <Plug>EasyDebuggerSetBreakPoint
-    " 单步：Step over, into, out
-    nmap <F10>  <Plug>EasyDebuggerNext
-    tmap <F10>  <Plug>EasyDebuggerNext
-    nmap <F11>  <Plug>EasyDebuggerStepIn
-    tmap <F11>  <Plug>EasyDebuggerStepIn
-    nmap <S-F11>    <Plug>EasyDebuggerStepOut
-    tmap <S-F11>    <Plug>EasyDebuggerStepOut
-endif
+" vimspector {{{ C, C++, Python, Go调试
+    function! Plug_spector_build(info)
+        if a:info.status == 'installed' || a:info.force
+            !python install_gadget.py --enable-c --enable-python
+        endif
+    endfunction
+    Plug 'puremourning/vimspector', {'do': function('Plug_spector_build')}
+    sign define vimspectorBP text=🔴 texthl=WarningMsg
+    sign define vimspectorBPDisabled text=🔴 texthl=MoreMsg
+    sign define vimspectorPC text=🔶 texthl=Question
+    nmap <F3>   <Plug>VimspectorStop
+    nmap <F4>   <Plug>VimspectorRestart
+    nmap <F5>   <Plug>VimspectorContinue
+    nmap <F6>   <Plug>VimspectorPause
+    nmap <F8>   <Plug>VimspectorAddFunctionBreakpoint
+    nmap <F9>   <Plug>VimspectorToggleBreakpoint
+    nmap <F10>  <Plug>VimspectorStepOver
+    nmap <F11>  <Plug>VimspectorStepInto
+    nmap <F12>  <Plug>VimspectorStepOut
+    nnoremap <leader>dr :VimspectorReset<CR>
+    nnoremap <leader>de :VimspectorEval<Space>
+    nnoremap <leader>dw :VimspectorWatch<Space>
+    nnoremap <leader>dh :VimspectorShowOutput<Space>
+    nnoremap <leader>dc
+        \ :execute 'edit ' . GetConfCopy('.vimspector.json')<CR>
+    nnoremap <silent><leader>db
+        \ :call PopSelection({
+            \ 'opt' : 'select debug configuration',
+            \ 'lst' : keys(json_decode(join(readfile('.vimspector.json'))).configurations),
+            \ 'cmd' : {sopt, arg -> vimspector#LaunchWithSettings({'configuration': arg})}
+            \})<CR>
 " }}}
 
 " quickhl {{{ 单词高亮
@@ -1387,6 +1391,17 @@ function! GetContentRange(pats, pate)
         let l:end = line('$')
     endif
     return [l:start, l:end]
+endfunction
+" }}}
+
+" FUNCTION: GetConfCopy(filename) {{{ 复制配置文件到当前目录
+function! GetConfCopy(filename)
+    let l:srcfile = $DotVimPath . '/' . a:filename
+    let l:dstfile = expand('%:p:h') . '/' . a:filename
+    if !filereadable(l:dstfile)
+        call writefile(readfile(l:srcfile), l:dstfile)
+    endif
+    return l:dstfile
 endfunction
 " }}}
 
@@ -2327,10 +2342,10 @@ function! FuncDiffFile(file, mode)
 endfunction
 " }}}
 
-" FUNCTION: FuncDivideSpace(string, pos) range {{{ 添加分隔符
+" FUNCTION: FuncInsertSpace(string, pos) range {{{ 插入分隔符
 " @param string: 分割字符，以空格分隔
 " @param pos: 分割的位置
-function! FuncDivideSpace(string, pos) range
+function! FuncInsertSpace(string, pos) range
     let l:chars = split(a:string)
 
     for k in range(a:firstline, a:lastline)
@@ -2340,7 +2355,7 @@ function! FuncDivideSpace(string, pos) range
             let l:pch = '\m\s*\M' . escape(ch, '\') . '\m\s*\C'
             if a:pos == 'h'
                 let l:sch = l:fie . escape(ch, '&\')
-            elseif a:pos == 'c'
+            elseif a:pos == 'b'
                 let l:sch = l:fie . escape(ch, '&\') . l:fie
             elseif a:pos == 'l'
                 let l:sch = escape(ch, '&\') . l:fie
@@ -2351,12 +2366,12 @@ function! FuncDivideSpace(string, pos) range
         endfor
         call setline(k, l:line)
     endfor
-    call SetExecLast('call FuncDivideSpace(''' . a:string . ''', ''' . a:pos . ''')')
+    call SetExecLast('call FuncInsertSpace(''' . a:string . ''', ''' . a:pos . ''')')
 endfunction
-let RunDivideSpaceH = function('ExecInput', [['Divide H: '], 'FuncDivideSpace', 'h'])
-let RunDivideSpaceC = function('ExecInput', [['Divide C: '], 'FuncDivideSpace', 'c'])
-let RunDivideSpaceL = function('ExecInput', [['Divide L: '], 'FuncDivideSpace', 'l'])
-let RunDivideSpaceD = function('ExecInput', [['Delete D: '], 'FuncDivideSpace', 'd'])
+let RunInsertSpaceH = function('ExecInput', [['Divide H: '], 'FuncInsertSpace', 'h'])
+let RunInsertSpaceB = function('ExecInput', [['Divide B: '], 'FuncInsertSpace', 'b'])
+let RunInsertSpaceL = function('ExecInput', [['Divide L: '], 'FuncInsertSpace', 'l'])
+let RunInsertSpaceD = function('ExecInput', [['Delete D: '], 'FuncInsertSpace', 'd'])
 " }}}
 
 " FUNCTION: FuncAppendCmd(str, type) {{{ 将命令结果作为文本插入
@@ -2403,9 +2418,8 @@ let RunSwitchFile = function('FuncSwitchFile', [
 
 " FUNCTION: FuncHelp(mode) {{{ 查找Vim关键字
 function! FuncHelp(mode)
-    execute printf('help %s%s',
-                \ (a:mode ==# 'v') ? GetSelected() : expand('<cword>'),
-                \ IsNVim() ? '@en' : '')
+    execute printf('help %s',
+                \ (a:mode ==# 'v') ? GetSelected() : expand('<cword>'))
 endfunction
 " }}}
 
@@ -3011,10 +3025,10 @@ endif
     nnoremap <leader>etc :call RunEditFile('tc')<CR>
     nnoremap <leader>eta :call RunEditFile('ta')<CR>
     nnoremap <leader>etp :call RunEditFile('tp')<CR>
-    nnoremap <leader>dh :call RunDivideSpaceH()<CR>
-    nnoremap <leader>dc :call RunDivideSpaceC()<CR>
-    nnoremap <leader>dl :call RunDivideSpaceL()<CR>
-    nnoremap <leader>dd :call RunDivideSpaceD()<CR>
+    nnoremap <leader>eh :call RunInsertSpaceH()<CR>
+    nnoremap <leader>eb :call RunInsertSpaceB()<CR>
+    nnoremap <leader>el :call RunInsertSpaceL()<CR>
+    nnoremap <leader>ed :call RunInsertSpaceD()<CR>
     nnoremap <leader>ae :call RunAppendCmdE()<CR>
     nnoremap <leader>af :call RunAppendCmdF()<CR>
     nnoremap <leader>sf :call RunSwitchFile()<CR>
@@ -3039,10 +3053,6 @@ endif
     nnoremap <leader>rh  :call RpSphinx()<CR>
     nnoremap <leader>rH  :call RpSphinxRun()<CR>
     nnoremap <leader>rch :call RpSphinxClean()<CR>
-    " 调试
-if IsVim()
-    packadd termdebug
-endif
 " }}}
 
 " Find & Search {{{
