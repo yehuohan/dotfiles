@@ -1080,7 +1080,7 @@ if s:gset.use_spector
             !python install_gadget.py --enable-c --enable-python
         endif
     endfunction
-    Plug 'puremourning/vimspector', {'do': function('Plug_spector_build')}
+    Plug 'puremourning/vimspector', {'do': function('Plug_spector_build'), 'for': ['c', 'cpp', 'python']}
     sign define vimspectorBP text=🔴 texthl=WarningMsg
     sign define vimspectorBPDisabled text=🔴 texthl=MoreMsg
     sign define vimspectorPC text=🔶 texthl=Question
