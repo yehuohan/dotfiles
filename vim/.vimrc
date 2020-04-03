@@ -118,8 +118,9 @@ let s:gset = {
     \ 'use_leaderf' : 1,
     \ 'use_ycm' : 1,
     \ 'use_ultisnips' : 1,
-    \ 'use_utils' : 1,
+    \ 'use_coc' : 0,
     \ 'use_spector' : 1,
+    \ 'use_utils' : 1,
     \ }
 " FUNCTION: s:gsetLoad() {{{
 function! s:gsetLoad()
@@ -412,12 +413,12 @@ endif
     omap iu <Plug>(textobj-underscore-i)
     vmap au <Plug>(textobj-underscore-a)
     vmap iu <Plug>(textobj-underscore-i)
-    nnoremap <leader>ov :call Plug_to_motion('v')<CR>
-    nnoremap <leader>oV :call Plug_to_motion('V')<CR>
-    nnoremap <leader>od :call Plug_to_motion('d')<CR>
-    nnoremap <leader>oD :call Plug_to_motion('D')<CR>
+    nnoremap <leader>ov :call <SID>Plug_to_motion('v')<CR>
+    nnoremap <leader>oV :call <SID>Plug_to_motion('V')<CR>
+    nnoremap <leader>od :call <SID>Plug_to_motion('d')<CR>
+    nnoremap <leader>oD :call <SID>Plug_to_motion('D')<CR>
 
-    function! Plug_to_motion(motion)
+    function! s:Plug_to_motion(motion)
         call PopSelection({
             \ 'opt' : 'select text object motion',
             \ 'lst' : split('w W s p ( b [ < t { B " '' ` i f c m u', ' '),
@@ -431,8 +432,12 @@ endif
 " }}}
 " }}}
 
-" UI & Manager {{{
+" Ui & Manager {{{
 " theme {{{ Vim主题(ColorScheme, StatusLine, TabLine)
+    " Unicode字符：
+    "                    
+    " ► ✘ ❖ ▫ ▪ ★ ☆ • ≡ ፨ ♥
+    "❤️ ❌ ⭕️ 🚫 💯 ⚠️  ❗️❓ 🔴 🔺 🔻 🔸 🔶
     Plug 'morhetz/gruvbox'
     set rtp+=$DotVimPath/bundle/gruvbox
     let g:gruvbox_contrast_dark='soft'  " 背景选项：dark, medium, soft
@@ -456,8 +461,6 @@ if !s:gset.use_lightline
     endtry
 else
     Plug 'yehuohan/lightline.vim'
-    "                    
-    " ► ✘ ❖ ⌘ ▫ ▪ ★ ☆ • ≡ ፨ ♥
     let g:lightline = {
         \ 'enable' : {'statusline': 1, 'tabline': 0},
         \ 'colorscheme' : 'gruvbox',
@@ -514,7 +517,7 @@ else
     endtry
     let g:lightline.blacklist = {'tagbar':0, 'nerdtree':0, 'Popc':0, 'defx':0}
     nnoremap <leader>tl :call lightline#toggle()<CR>
-    nnoremap <leader>tk :call Plug_ll_toggleCheck()<CR>
+    nnoremap <leader>tk :call <SID>Plug_ll_toggleCheck()<CR>
 
     " Augroup: PluginLightline {{{
     augroup PluginLightline
@@ -547,8 +550,8 @@ else
     endfunction
     " }}}
 
-    " FUNCTION: Plug_ll_toggleCheck() {{{
-    function! Plug_ll_toggleCheck()
+    " FUNCTION: s:Plug_ll_toggleCheck() {{{
+    function! s:Plug_ll_toggleCheck()
         let b:lightline_check_flg = !get(b:, 'lightline_check_flg', 1)
         call lightline#update()
         echo 'b:lightline_check_flg = ' . b:lightline_check_flg
@@ -921,26 +924,6 @@ if s:gset.use_ycm
 endif
 " }}}
 
-" echodoc {{{ 参数文档显示
-    Plug 'Shougo/echodoc.vim'
-    let g:echodoc_enable_at_startup = 1
-if IsVim()
-    let g:echodoc#type = 'popup'
-else
-    let g:echodoc#type = 'floating'
-endif
-    nnoremap <leader>td :call Plug_ed_toggle()<CR>
-
-    function! Plug_ed_toggle()
-        if echodoc#is_enabled()
-            call echodoc#disable()
-        else
-            call echodoc#enable()
-        endif
-        echo 'Echo doc: ' . string(echodoc#is_enabled())
-    endfunction
-" }}}
-
 " ultisnips {{{ 代码片段
 if s:gset.use_ultisnips
     Plug 'SirVer/ultisnips'
@@ -956,20 +939,76 @@ if s:gset.use_ultisnips
 endif
 " }}}
 
-" ale {{{ 语法检测
-    Plug 'dense-analysis/ale', {'on': 'ALEToggle'}
-    let g:ale_completion_enabled = 0    " 使能ale补全
-    let g:ale_linters = {'java' : []}   " 禁用Java检测（与YCM冲突）
-    let g:ale_sign_error = '✘'
-    let g:ale_sign_warning = '►'
-    let g:ale_set_loclist = 1
-    let g:ale_set_quickfix = 0
-    let g:ale_echo_delay = 10           " 显示语文错误的延时时间
-    let g:ale_lint_delay = 300          " 文本更改后的延时检测时间
-    let g:ale_enabled = 0               " 默认关闭ALE检测
-    nnoremap <silent> <leader>ta
-        \ :execute ':ALEToggle'<Bar>
-        \ :echo 'AleToggle: ' . g:ale_enabled<CR>
+" coc {{{ 自动补全
+if s:gset.use_coc
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    Plug 'neoclide/jsonc.vim'
+    Plug 'honza/vim-snippets'
+    let g:coc_config_home = $DotVimPath
+    let g:coc_data_home = $DotVimPath . '/.coc'
+    let g:coc_global_extensions = [
+        \ 'coc-lists', 'coc-snippets', 'coc-yank',
+        \ 'coc-clangd', 'coc-python', 'coc-tsserver', 'coc-java',
+        \ 'coc-vimlsp', 'coc-cmake', 'coc-json', 'coc-calc', 'coc-pairs'
+        \ ]
+    let g:coc_status_error_sign = '✘'
+    let g:coc_status_warning_sign = '!'
+    let g:coc_filetype_map = {}
+    let g:coc_snippet_next = '<C-j>'
+    let g:coc_snippet_prev = '<C-k>'
+    " <Tab>: first item > snippet expand > tab key > show completion
+    inoremap <silent><expr> <Tab>
+        \ pumvisible() ? "\<Tab>" :
+        \ coc#expandable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+        \ "\<Tab>"
+        "\ pumvisible() ? coc#_select_confirm() :
+        "\ coc#expandable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+        "\ <SID>Plug_coc_check_bs() ? "\<Tab>" :
+        "\ coc#refresh()
+    "function! s:Plug_coc_check_bs() abort
+    "    let col = col('.') - 1
+    "    return !col || getline('.')[col - 1]  =~# '\s'
+    "endfunction
+    inoremap <expr> <M-j> pumvisible() ? "\<C-n>" : "\<C-j>"
+    inoremap <expr> <M-k> pumvisible() ? "\<C-p>" : "\<C-k>"
+    imap <C-j> <M-j>
+    imap <C-k> <M-k>
+    inoremap <silent><expr> <C-Space>
+        \ pumvisible() ? "\<C-g>u" : coc#refresh()
+    imap <C-l> <C-Space>
+    imap <M-l> <C-Space>
+    nmap <leader>gd <Plug>(coc-definition)
+    nmap <leader>gD <Plug>(coc-declaration)
+    nmap <leader>gi <Plug>(coc-implementation)
+    nmap <leader>gr <Plug>(coc-references)
+    nmap <leader>gy <Plug>(coc-type-definition)
+    nnoremap <leader>or :CocRestart<CR>
+    nnoremap <leader>oc :CocCommand<Space>
+    nnoremap <leader>on :CocConfig<CR>
+    " coc-extensions
+    nnoremap <silent> <leader>yl  :<C-u>CocList --normal yank<CR>
+    nmap <leader>oa <Plug>(coc-calc-result-append)
+endif
+" }}}
+
+" echodoc {{{ 参数文档显示
+    Plug 'Shougo/echodoc.vim'
+    let g:echodoc_enable_at_startup = 1
+if IsVim()
+    let g:echodoc#type = 'popup'
+else
+    let g:echodoc#type = 'floating'
+endif
+    nnoremap <leader>td :call <SID>Plug_ed_toggle()<CR>
+
+    function! s:Plug_ed_toggle()
+        if echodoc#is_enabled()
+            call echodoc#disable()
+        else
+            call echodoc#enable()
+        endif
+        echo 'Echo doc: ' . string(echodoc#is_enabled())
+    endfunction
 " }}}
 
 " neoformat {{{ 代码格式化
@@ -1227,15 +1266,15 @@ endif
     nnoremap <leader>big :OpenBrowserSearch -google<Space>
     nnoremap <leader>bib :OpenBrowserSearch -baidu<Space>
     nnoremap <leader>bih :OpenBrowserSearch -github<Space>
-    nnoremap <leader>bg  :call Plug_brw_search('google', 'n')<CR>
-    vnoremap <leader>bg  :call Plug_brw_search('google', 'v')<CR>
-    nnoremap <leader>bb  :call Plug_brw_search('baidu', 'n')<CR>
-    vnoremap <leader>bb  :call Plug_brw_search('baidu', 'v')<CR>
-    nnoremap <leader>bh  :call Plug_brw_search('github', 'n')<CR>
-    vnoremap <leader>bh  :call Plug_brw_search('github', 'v')<CR>
+    nnoremap <leader>bg  :call <SID>Plug_brw_search('google', 'n')<CR>
+    vnoremap <leader>bg  :call <SID>Plug_brw_search('google', 'v')<CR>
+    nnoremap <leader>bb  :call <SID>Plug_brw_search('baidu', 'n')<CR>
+    vnoremap <leader>bb  :call <SID>Plug_brw_search('baidu', 'v')<CR>
+    nnoremap <leader>bh  :call <SID>Plug_brw_search('github', 'n')<CR>
+    vnoremap <leader>bh  :call <SID>Plug_brw_search('github', 'v')<CR>
 
     " 搜索引擎- google, baidu, github
-    function! Plug_brw_search(engine, mode)
+    function! s:Plug_brw_search(engine, mode)
         if a:mode ==# 'n'
             call openbrowser#search(expand('<cword>'), a:engine)
         elseif a:mode ==# 'v'
@@ -1255,7 +1294,6 @@ endif
         \ :<C-U>execute '.,+' . string(v:count1-1) . 'Crunch'<CR>
     vnoremap <silent> <leader>ev :Crunch<CR>
 "}}}
-
 endif
 " }}}
 
@@ -2717,7 +2755,7 @@ endfunction
     set guioptions-=L                   " 隐藏左侧滚动条
     set guioptions-=r                   " 隐藏右侧滚动条
     set guioptions-=b                   " 隐藏底部滚动条
-    set guioptions-=e                   " 不使用GUI标签
+    set guioptions-=e                   " 不使用Gui标签
     call GuiAdjustFontSize(0)
     set lines=25
     set columns=90

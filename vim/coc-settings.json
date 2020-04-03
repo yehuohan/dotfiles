@@ -1,0 +1,36 @@
+{
+    /* coc */
+    "suggest.autoTrigger": "trigger",
+	"suggest.enablePreview": true,
+    "suggest.snippetIndicator": " ★",
+    "suggest.echodocSupport": true,
+    "diagnostic.enable": true,
+    "diagnostic.level": "hint",
+    "diagnostic.enableSign": true,
+    "diagnostic.errorSign": "✘",
+    "diagnostic.warningSign": "►",
+    "diagnostic.infoSign": "►",
+    "diagnostic.hintSign": "►",
+    "diagnostic.messageTarget": "float",
+    "coc.preferences.snippets.enable": true,
+
+    /* coc-lists */
+    "session.saveOnVimLeave" : false,
+    "session.restartOnSessionLoad" : false,
+    "list.source.grep.command": "rg",
+
+    /* coc-snippets */
+    "snippets.ultisnips.enable": true,
+    "snippets.ultisnips.directories": ["vSnippets"],
+    "snippets.snipmate.enable": false,
+
+    /* coc-yank */
+    "yank.highlight.enable": true,
+    "yank.highlight.duration": 200,
+
+    /* coc-python */
+
+    /* lsp */
+    "languageserver": {
+    }
+}

@@ -243,7 +243,7 @@ DIR_BIN := .
 define make_dir
 	$(foreach str, \
 		$(addprefix ${DIR_OBJ}/,${DIR_SRC}), \
-		$(shell mkdir -p ${str}))
+		$(shell mkdir -p $(str)))
 endef
 $(call make_dir)
 
