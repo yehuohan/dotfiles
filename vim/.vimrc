@@ -119,6 +119,7 @@ let s:gset = {
     \ 'use_ycm' : 1,
     \ 'use_ultisnips' : 1,
     \ 'use_utils' : 1,
+    \ 'use_spector' : 1,
     \ }
 " FUNCTION: s:gsetLoad() {{{
 function! s:gsetLoad()
@@ -1073,6 +1074,7 @@ endif
 " }}}
 
 " vimspector {{{ C, C++, Python, Go调试
+if s:gset.use_spector
     function! Plug_spector_build(info)
         if a:info.status == 'installed' || a:info.force
             !python install_gadget.py --enable-c --enable-python
@@ -1103,6 +1105,7 @@ endif
             \ 'lst' : keys(json_decode(join(readfile('.vimspector.json'))).configurations),
             \ 'cmd' : {sopt, arg -> vimspector#LaunchWithSettings({'configuration': arg})}
             \})<CR>
+endif
 " }}}
 
 " quickhl {{{ 单词高亮

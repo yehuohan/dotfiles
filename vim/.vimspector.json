@@ -1,0 +1,41 @@
+{
+    "configurations": {
+        "cpp-launch": {
+            "adapter": "vscode-cpptools",
+            "configuration": {
+                "name": "cpp-launch",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceRoot}/main",
+                "args": [],
+                "cwd": "${workspaceRoot}",
+                "environment": [],
+                "externalConsole": true,
+                "MIMode": "gdb"
+            }
+        },
+        "cpp-attach": {
+            "adapter": "vscode-cpptools",
+            "configuration": {
+                "name": "cpp-attach",
+                "type": "cppdbg",
+                "request": "attach",
+                "program": "${workspaceRoot}/main",
+                "MIMode": "gdb"
+            }
+        },
+        "python-launch": {
+            "adapter": "debugpy",
+            "configuration": {
+                "name": "python-launch",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceRoot}/test.py",
+                "cwd": "${workspaceRoot}",
+                "stopOnEntry": true,
+                "console": "externalTerminal",
+                "debugOptions": []
+            }
+        }
+    }
+}
