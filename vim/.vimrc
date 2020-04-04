@@ -117,8 +117,8 @@ let s:gset = {
     \ 'use_fzf' : 1,
     \ 'use_leaderf' : 1,
     \ 'use_ycm' : 1,
-    \ 'use_ultisnips' : 1,
-    \ 'use_coc' : 0,
+    \ 'use_snip' : 1,
+    \ 'use_coc' : 1,
     \ 'use_spector' : 1,
     \ 'use_utils' : 1,
     \ }
@@ -413,10 +413,10 @@ endif
     omap iu <Plug>(textobj-underscore-i)
     vmap au <Plug>(textobj-underscore-a)
     vmap iu <Plug>(textobj-underscore-i)
-    nnoremap <leader>ov :call <SID>Plug_to_motion('v')<CR>
-    nnoremap <leader>oV :call <SID>Plug_to_motion('V')<CR>
-    nnoremap <leader>od :call <SID>Plug_to_motion('d')<CR>
-    nnoremap <leader>oD :call <SID>Plug_to_motion('D')<CR>
+    nnoremap <leader>tv :call <SID>Plug_to_motion('v')<CR>
+    nnoremap <leader>tV :call <SID>Plug_to_motion('V')<CR>
+    nnoremap <leader>td :call <SID>Plug_to_motion('d')<CR>
+    nnoremap <leader>tD :call <SID>Plug_to_motion('D')<CR>
 
     function! s:Plug_to_motion(motion)
         call PopSelection({
@@ -925,7 +925,7 @@ endif
 " }}}
 
 " ultisnips {{{ 代码片段
-if s:gset.use_ultisnips
+if s:gset.use_snip
     Plug 'SirVer/ultisnips'
     Plug 'honza/vim-snippets'           " snippet合集
     " 删除UltiSnips#map_keys#MapKeys中的xnoremap <Tab>（和textmanip的<C-i>冲突）
@@ -941,6 +941,8 @@ endif
 
 " coc {{{ 自动补全
 if s:gset.use_coc
+    " coc-clangd: 需要自行下载llvm
+    " coc-java: 最好自行下载jdt.ls
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
     Plug 'neoclide/jsonc.vim'
     Plug 'honza/vim-snippets'
@@ -948,7 +950,7 @@ if s:gset.use_coc
     let g:coc_data_home = $DotVimPath . '/.coc'
     let g:coc_global_extensions = [
         \ 'coc-lists', 'coc-snippets', 'coc-yank',
-        \ 'coc-clangd', 'coc-python', 'coc-tsserver', 'coc-java',
+        \ 'coc-clangd', 'coc-python', 'coc-java', 'coc-tsserver',
         \ 'coc-vimlsp', 'coc-cmake', 'coc-json', 'coc-calc', 'coc-pairs'
         \ ]
     let g:coc_status_error_sign = '✘'
@@ -956,9 +958,7 @@ if s:gset.use_coc
     let g:coc_filetype_map = {}
     let g:coc_snippet_next = '<C-j>'
     let g:coc_snippet_prev = '<C-k>'
-    " <Tab>: first item > snippet expand > tab key > show completion
     inoremap <silent><expr> <Tab>
-        \ pumvisible() ? "\<Tab>" :
         \ coc#expandable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
         \ "\<Tab>"
         "\ pumvisible() ? coc#_select_confirm() :
@@ -982,16 +982,25 @@ if s:gset.use_coc
     nmap <leader>gi <Plug>(coc-implementation)
     nmap <leader>gr <Plug>(coc-references)
     nmap <leader>gy <Plug>(coc-type-definition)
-    nnoremap <leader>or :CocRestart<CR>
+    nmap <leader>gf <Plug>(coc-fix-current)
+    nnoremap <silent> <leader>gs :CocCommand clangd.switchSourceHeader<CR>
+    nnoremap <silent> <leader>gb :CocCommand clangd.symbolInfo<CR>
+    nmap <leader>oi <Plug>(coc-diagnostic-info)
+    nmap <leader>or <Plug>(coc-rename)
+    vnoremap <silent> <leader>of :call CocAction('formatSelected', 'v')<CR>
+    nnoremap <silent> <leader>of :call CocAction('format')<CR>
+    nnoremap <leader>oR :CocRestart<CR>
     nnoremap <leader>oc :CocCommand<Space>
     nnoremap <leader>on :CocConfig<CR>
+    nnoremap <leader>oN :CocLocalConfig<CR>
     " coc-extensions
-    nnoremap <silent> <leader>yl  :<C-u>CocList --normal yank<CR>
+    nnoremap <silent> <leader>oy :<C-u>CocList --normal yank<CR>
     nmap <leader>oa <Plug>(coc-calc-result-append)
 endif
 " }}}
 
 " echodoc {{{ 参数文档显示
+if !s:gset.use_coc
     Plug 'Shougo/echodoc.vim'
     let g:echodoc_enable_at_startup = 1
 if IsVim()
@@ -999,7 +1008,7 @@ if IsVim()
 else
     let g:echodoc#type = 'floating'
 endif
-    nnoremap <leader>td :call <SID>Plug_ed_toggle()<CR>
+    nnoremap <leader>to :call <SID>Plug_ed_toggle()<CR>
 
     function! s:Plug_ed_toggle()
         if echodoc#is_enabled()
@@ -1009,7 +1018,19 @@ endif
         endif
         echo 'Echo doc: ' . string(echodoc#is_enabled())
     endfunction
+endif
 " }}}
+
+" auto-pairs {{{ 自动括号
+if !s:gset.use_coc
+    Plug 'jiangmiao/auto-pairs'
+    let g:AutoPairsShortcutToggle=''
+    let g:AutoPairsShortcutFastWrap=''
+    let g:AutoPairsShortcutJump=''
+    let g:AutoPairsShortcutFastBackInsert=''
+    nnoremap <leader>tp :call AutoPairsToggle()<CR>
+endif
+"}}}
 
 " neoformat {{{ 代码格式化
     Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
@@ -1064,15 +1085,6 @@ endif
     xmap <leader>sw <Plug>VSurround
     xmap <leader>sW <Plug>VgSurround
 " }}}
-
-" auto-pairs {{{ 自动括号
-    Plug 'jiangmiao/auto-pairs'
-    let g:AutoPairsShortcutToggle=''
-    let g:AutoPairsShortcutFastWrap=''
-    let g:AutoPairsShortcutJump=''
-    let g:AutoPairsShortcutFastBackInsert=''
-    nnoremap <leader>tp :call AutoPairsToggle()<CR>
-"}}}
 
 " tagbar {{{ 代码结构查看
     Plug 'majutsushi/tagbar', {'on': 'TagbarToggle'}
@@ -1543,6 +1555,7 @@ let s:rp = {
         \ 'lua'        : ['lua %s %s'                          , 'srcf' , 'args'                   ],
         \ 'go'         : ['go run %s %s'                       , 'srcf' , 'args'                   ],
         \ 'javascript' : ['node %s %s'                         , 'srcf' , 'args'                   ],
+        \ 'typescript' : ['node %s %s'                         , 'srcf' , 'args'                   ],
         \ 'dart'       : ['dart %s %s'                         , 'srcf' , 'args'                   ],
         \ 'tex'        : ['pdfLatex %s && SumatraPDF %s.pdf'   , 'srcf' , 'outf'                   ],
         \ 'sh'         : ['./%s %s'                            , 'srcf' , 'args'                   ],

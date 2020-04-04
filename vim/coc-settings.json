@@ -1,9 +1,9 @@
 {
     /* coc */
     "suggest.autoTrigger": "trigger",
-	"suggest.enablePreview": true,
+    "suggest.enablePreview": true,
     "suggest.snippetIndicator": " ★",
-    "suggest.echodocSupport": true,
+    "suggest.echodocSupport": false,
     "diagnostic.enable": true,
     "diagnostic.level": "hint",
     "diagnostic.enableSign": true,
@@ -12,25 +12,48 @@
     "diagnostic.infoSign": "►",
     "diagnostic.hintSign": "►",
     "diagnostic.messageTarget": "float",
+    "signature.enable": true,
+    "coc.preferences.extensionUpdateCheck": "weekly",
+    "coc.preferences.enableFloatHighlight": true,
+    "coc.preferences.rootPatterns": [".popc", "tags", ".git", ".hg", ".svn", ".projections.json"],
+    "coc.preferences.jumpCommand": "edit",
     "coc.preferences.snippets.enable": true,
 
     /* coc-lists */
     "session.saveOnVimLeave" : false,
     "session.restartOnSessionLoad" : false,
+    "list.nextKeymap": "<C-j>",
+    "list.previousKeymap": "<C-k>",
     "list.source.grep.command": "rg",
 
     /* coc-snippets */
     "snippets.ultisnips.enable": true,
-    "snippets.ultisnips.directories": ["vSnippets"],
+    "snippets.ultisnips.directories": ["vSnippets", "UltiSnips"],
     "snippets.snipmate.enable": false,
 
     /* coc-yank */
     "yank.highlight.enable": true,
     "yank.highlight.duration": 200,
 
+    /* coc-clangd */
+    "clangd.enabled": true,
+    "clangd.path": "clangd",
+
     /* coc-python */
+    "python.autoComplete.extraPaths": [],
+    "python.pythonPath": "python",
 
     /* lsp */
     "languageserver": {
+        "julia": {
+            "command": "julia",
+            "args": [
+                "--startup-file=no",
+                "--history-file=no",
+                "-e",
+                "using LanguageServer;\n       using Pkg;\n       import StaticLint;\n       import SymbolServer;\n       env_path = dirname(Pkg.Types.Context().env.project_file);\n       debug = false;\n       server = LanguageServer.LanguageServerInstance(stdin, stdout, debug, env_path, \"\", Dict());\n       server.runlinter = true;\n       run(server);"
+            ],
+            "filetypes": ["julia"]
+        }
     }
 }
