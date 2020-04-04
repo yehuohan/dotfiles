@@ -371,7 +371,7 @@ endif
     ":EasyAlign[!] [N-th]DELIMITER_KEY[OPTIONS]
     ":EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
     nnoremap <silent> <leader><leader>g
-        \ :call feedkeys(':' . join(GetContentRange('^[ \t]*$', '^[ \t]*$'), ',') . 'EasyAlign', 'n')<CR>
+        \ :call feedkeys(':' . join(GetRange('^[ \t]*$', '^[ \t]*$'), ',') . 'EasyAlign', 'n')<CR>
     vnoremap <leader><leader>g :EasyAlign
 " }}}
 
@@ -917,9 +917,9 @@ if s:gset.use_ycm
     nnoremap <leader>yr :YcmRestartServer<CR>
     nnoremap <leader>yd :YcmDiags<CR>
     nnoremap <leader>yD :YcmDebugInfo<CR>
-    nnoremap <leader>yc
+    nnoremap <silent><leader>yc
         \ :execute 'edit ' . GetConfCopy('.ycm_extra_conf.py')<CR>
-    nnoremap <leader>yj
+    nnoremap <silent><leader>yj
         \ :execute 'edit ' . GetConfCopy('jsconfig.json')<CR>
 endif
 " }}}
@@ -1376,6 +1376,35 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
 endfunction
 " }}}
 
+" FUNCTION: GetRoot([markers]) {{{ 查找root目录
+" @param markers: 匹配root目录的列表参数
+function! GetRoot(...)
+    let l:root = popc#layer#wks#GetCurrentWks()[1]
+    if !empty(l:root)
+        return l:root
+    endif
+
+    if a:0 == 0 || empty(a:1)
+        return ''
+    endif
+    let l:dir = expand('%:p:h')
+    let l:dir_last = ''
+    while l:dir !=# l:dir_last
+        let l:dir_last = l:dir
+        for m in a:1
+            let l:val = l:dir . '/' . m
+            if filereadable(l:val) || isdirectory(l:val)
+                let l:root = fnameescape(l:dir)
+                return l:root
+            endif
+        endfor
+        let l:dir = fnamemodify(l:dir, ':p:h:h')
+    endwhile
+
+    return l:root
+endfunction
+" }}}
+
 " FUNCTION: GetFileList(pat, [sdir]) {{{ 获取文件列表
 " @param pat: 文件匹配模式，如*.pro
 " @param sdir: 查找起始目录，默认从当前文件所在目录向上查找到根目录
@@ -1430,11 +1459,11 @@ function! GetFileContent(fp, pat, flg)
 endfunction
 " }}}
 
-" FUNCTION: GetContentRange(pats, pate) {{{ 获取特定的内容的范围
+" FUNCTION: GetRange(pats, pate) {{{ 获取特定的内容的范围
 " @param pats: 起始行匹配模式，start为pats所在行
 " @param pate: 结束行匹配模式，end为pate所在行
 " @return 返回列表[start, end]
-function! GetContentRange(pats, pate)
+function! GetRange(pats, pate)
     let l:start = search(a:pats, 'bcnW')
     let l:end = search(a:pate, 'cnW')
     if l:start == 0
@@ -1652,7 +1681,7 @@ function! s:rp.runcell(type) dict
         execute 'setlocal efm=' . s:rp.efm[a:type]
     endif
     let [l:bin, l:pats, l:pate] = s:rp.cell[a:type]
-    let l:range = GetContentRange(l:pats, l:pate)
+    let l:range = GetRange(l:pats, l:pate)
     " create exec string
     return ':' . join(l:range, ',') . 'AsyncRun '. l:bin
 endfunction
@@ -1676,7 +1705,7 @@ function! RunFile(...)
 endfunction
 " }}}
 
-" FUNCTION: RunCell(argstr) {{{
+" FUNCTION: RunCell() {{{
 function! RunCell()
     try
         let l:exec = s:rp.runcell(&filetype)
@@ -1725,12 +1754,12 @@ function! FnQMake(sopt, sel, args)
 
     if IsWin()
         let l:cmd = printf('cd "%s" && qmake -r "%s" && vcvars64.bat && nmake -f Makefile.Debug %s',
-                    \ l:workdir, l:srcfile, join(a:args[1]))
+                    \ l:workdir, l:srcfile, get(a:args, 'args', ''))
     else
-        let l:cmd = printf('cd "%s" && qmake "%s" && make %s'
-                    \ l:workdir, l:srcfile, join(a:args[1]))
+        let l:cmd = printf('cd "%s" && qmake "%s" && make %s',
+                    \ l:workdir, l:srcfile, get(a:args, 'args', ''))
     endif
-    if a:args[0]
+    if a:args.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
     execute s:rp.run('cpp', l:workdir, l:cmd)
@@ -1743,14 +1772,14 @@ function! FnCMake(sopt, sel, args)
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
-    if a:args[0] == 0
+    if a:args.cmd == 0
         " clean
         call delete(l:workdir . '/CMakeBuildOut', 'rf')
-    elseif a:args[0] >= 1
+    elseif a:args.cmd>= 1
         "build
         silent! call mkdir('CMakeBuildOut')
         let l:cmd = printf('cd "%s" && cd CMakeBuildOut && cmake -G "Unix Makefiles" .. && make', l:workdir)
-        if a:args[0] >= 2
+        if a:args.cmd >= 2
             "run
             let l:cmd .= ' && "./' . l:outfile .'"'
         endif
@@ -1765,8 +1794,8 @@ function! FnMake(sopt, sel, args)
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
-    let l:cmd = printf('cd "%s" && make %s', l:workdir, join(a:args[1]))
-    if a:args[0]
+    let l:cmd = printf('cd "%s" && make %s', l:workdir, get(a:args, 'args', ''))
+    if a:args.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
     execute s:rp.run('', l:workdir, l:cmd)
@@ -1780,8 +1809,8 @@ function! FnVs(sopt, sel, args)
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
     let l:cmd = printf('cd "%s" && vcvars64.bat && devenv "%s" /%s',
-                    \ l:workdir, l:srcfile, join(a:args[1]))
-    if a:args[0]
+                    \ l:workdir, l:srcfile, get(a:args, 'args', ''))
+    if a:args.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
     execute s:rp.run('cpp', l:workdir, l:cmd)
@@ -1789,13 +1818,12 @@ endfunction
 " }}}
 
 " FUNCTION: FnSphinx(sopt, sel, args) {{{
-" @param args[0]: 是否直接打开sphinx文档
 function! FnSphinx(sopt, sel, args)
     let l:outfile = 'build/html/index.html'
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
-    let l:cmd = printf('cd "%s" && make %s', l:workdir, a:args[1])
-    if a:args[0]
+    let l:cmd = printf('cd "%s" && make %s', l:workdir, get(a:args, 'args', ''))
+    if a:args.run
         let l:cmd .= join([' && firefox', l:outfile])
     endif
     execute s:rp.run('', l:workdir, l:cmd)
@@ -1803,21 +1831,21 @@ endfunction
 "}}}
 
 let RpArg         = function('popset#set#PopSelection', [s:rp.sel])
-let RpQMake       = function('RunProject', ['qmake', [0, []]])
-let RpQMakeRun    = function('RunProject', ['qmake', [1, []]])
-let RpQMakeClean  = function('RunProject', ['qmake', [0, ['distclean']]])
-let RpCMake       = function('RunProject', ['cmake', [1]])
-let RpCMakeRun    = function('RunProject', ['cmake', [2]])
-let RpCMakeClean  = function('RunProject', ['cmake', [0]])
-let RpMake        = function('RunProject', ['make', [0, []]])
-let RpMakeRun     = function('RunProject', ['make', [1, []]])
-let RpMakeClean   = function('RunProject', ['make', [0, ['clean']]])
-let RpVs          = function('RunProject', ['vs', [0, ['Build']]])
-let RpVsRun       = function('RunProject', ['vs', [1, ['Build']]])
-let RpVsClean     = function('RunProject', ['vs', [0, ['Clean']]])
-let RpSphinx      = function('RunProject', ['sphinx', [0, 'html']])
-let RpSphinxRun   = function('RunProject', ['sphinx', [1, 'html']])
-let RpSphinxClean = function('RunProject', ['sphinx', [0, 'clean']])
+let RpQMake       = function('RunProject', ['qmake' , {'run':0}])
+let RpQMakeRun    = function('RunProject', ['qmake' , {'run':1}])
+let RpQMakeClean  = function('RunProject', ['qmake' , {'run':0, 'args':'distclean'}])
+let RpCMake       = function('RunProject', ['cmake' , {'cmd':1}])
+let RpCMakeRun    = function('RunProject', ['cmake' , {'cmd':2}])
+let RpCMakeClean  = function('RunProject', ['cmake' , {'cmd':0}])
+let RpMake        = function('RunProject', ['make'  , {'run':0}])
+let RpMakeRun     = function('RunProject', ['make'  , {'run':1}])
+let RpMakeClean   = function('RunProject', ['make'  , {'run':0, 'args':'clean'}])
+let RpVs          = function('RunProject', ['vs'    , {'run':0, 'args':'Build'}])
+let RpVsRun       = function('RunProject', ['vs'    , {'run':1, 'args':'Build'}])
+let RpVsClean     = function('RunProject', ['vs'    , {'run':0, 'args':'Clean'}])
+let RpSphinx      = function('RunProject', ['sphinx', {'run':0, 'args':'html'}])
+let RpSphinxRun   = function('RunProject', ['sphinx', {'run':1, 'args':'html'}])
+let RpSphinxClean = function('RunProject', ['sphinx', {'run':0, 'args':'clean'}])
 " }}}
 
 " Find & Search {{{
@@ -2214,27 +2242,11 @@ endfunction
 
 " FUNCTION: FindWowRoot() {{{ 查找root路径
 function! FindWowRoot()
-    if empty(s:fw.misc.markers)
-        return
-    endif
-
-    let l:dir = expand('%:p:h')
-    let l:dir_last = ''
-    while l:dir !=# l:dir_last
-        let l:dir_last = l:dir
-        for m in s:fw.misc.markers
-            let l:root = l:dir . '/' . m
-            if filereadable(l:root) || isdirectory(l:root)
-                let s:fw.args.root = fnameescape(l:dir)
-                return
-            endif
-        endfor
-        let l:dir = fnamemodify(l:dir, ':p:h:h')
-    endwhile
+    let s:fw.args.root = GetRoot(s:fw.misc.markers)
 endfunction
 " }}}
 
-" FUNCTION: FindWowSetArgs() {{{ 设置args
+" FUNCTION: FindWowSetArgs(type) {{{ 设置args
 " @param type: r-root, f-filters, g-glob
 " @return 0表示异常结束函数（root无效），1表示正常结束函数
 function! FindWowSetArgs(type)
