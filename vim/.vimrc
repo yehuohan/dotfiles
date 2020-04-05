@@ -1886,7 +1886,25 @@ let s:fw = {
         \ 'fl' : '',
         \ 'fL' : '',
         \ 'fh' : '',
-        \ 'fH' : ''
+        \ 'fH' : '',
+        \ 'sel': {
+            \ 'opt' : 'select the engine',
+            \ 'lst' : ['rg', 'fuzzy'],
+            \ 'dic' : {
+                \ 'rg' : {
+                    \ 'opt' : 'select rg engine',
+                    \ 'lst' : ['asyncrun', 'grep', 'grepper'],
+                    \ 'cmd' : {sopt, arg -> s:fw.setEngine('rg', arg)},
+                    \ 'get' : {sopt -> s:fw.engine.rg}
+                    \ },
+                \ 'fuzzy' : {
+                    \ 'opt' : 'select fuzzy engine',
+                    \ 'lst' : ['fzf', 'leaderf'],
+                    \ 'cmd' : {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
+                    \ 'get' : {sopt -> s:fw.engine.fuzzy}
+                    \ }
+                \ },
+            \ }
         \ },
     \ 'args' : {
         \ 'root'    : '',
@@ -1919,12 +1937,6 @@ let s:fw = {
             \ 'sr' : ':Grepper -noprompt -tool rg -query -F %s -e "%s" "%s"',
             \ 'sa' : ':Grepper -noprompt -tool rg -append -query -F %s -e "%s" "%s"',
             \ 'sk' : ':Grepper -stop'
-            \ },
-        \ 'sel' : {
-            \ 'opt' : 'select rg engine',
-            \ 'lst' : ['asyncrun', 'grep', 'grepper'],
-            \ 'cmd' : {sopt, arg -> s:fw.setEngine('rg', arg)},
-            \ 'get' : {sopt -> s:fw.engine.rg}
             \ }
         \ },
     \ 'fuzzy' : {
@@ -1943,12 +1955,6 @@ let s:fw = {
             \ 'fL' : ':Leaderf rg --nowrap',
             \ 'fh' : ':Leaderf tag --nowrap --cword',
             \ 'fH' : ':Leaderf tag --nowrap'
-            \ },
-        \ 'sel' : {
-            \ 'opt' : 'select fuzzy engine',
-            \ 'lst' : ['fzf', 'leaderf'],
-            \ 'cmd' : {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
-            \ 'get' : {sopt -> s:fw.engine.fuzzy}
             \ }
         \ },
     \ 'misc' : {
@@ -2228,16 +2234,9 @@ endfunction
 " FUNCTION: FindWowSetEngine(type) {{{ 设置engine
 function! FindWowSetEngine(type)
     if a:type ==# 'engine'
-        call PopSelection({
-            \ 'opt' : 'select the engine',
-            \ 'lst' : ['rg', 'fuzzy'],
-            \ 'sub' : {
-                \ 'rg'    : s:fw.rg.sel,
-                \ 'fuzzy' : s:fw.fuzzy.sel},
-            \ 'cmd' : 'popset#set#SubPopSelection'
-            \ })
+        call PopSelection(s:fw.engine.sel)
     else
-        call PopSelection(s:fw[a:type]['sel'])
+        call PopSelection(s:fw.engine.sel.dic[a:type])
     endif
 endfunction
 " }}}
@@ -2321,7 +2320,12 @@ let s:rs = {
                     \ '%s/\r//ge'        : 'remove ^M',
                     \ 'edit ++enc=utf-8' : 'reload as utf-8',
                     \ 'edit ++enc=cp936' : 'reload as cp936',
-                    \ 'copyConfig'       : 'copy config file',
+                    \ 'copyConfig'       : {
+                        \ 'opt' : 'select config',
+                        \ 'dsr' : 'copy config file',
+                        \ 'lst' : ['.ycm_extra_conf.py', 'jsconfig.json', '.vimspector.json'],
+                        \ 'cmd' : {sopt, arg -> execute('edit ' . GetConfCopy(arg))},
+                        \ },
                     \ 'lineToTop'        : 'frozen current line to top',
                     \ 'clearUndo'        : 'clear undo history',
                     \ },
@@ -2342,16 +2346,6 @@ let s:rs = {
         \ },
     \ 'func' : {}
     \ }
-" FUNCTION: s:rs.func.copyConfig() dict {{{ 复制config文件
-function! s:rs.func.copyConfig() dict
-    call PopSelection({
-        \ 'opt' : 'select config',
-        \ 'lst' : ['.ycm_extra_conf.py', 'jsconfig.json', '.vimspector.json'],
-        \ 'cmd' : {sopt, arg -> execute('edit ' . GetConfCopy(arg))},
-        \ })
-endfunction
-" }}}
-
 " FUNCTION: s:rs.func.lineToTop() dict {{{ 冻结顶行
 function! s:rs.func.lineToTop() dict
     let l:line = line('.')
