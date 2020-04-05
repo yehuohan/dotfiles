@@ -23,6 +23,8 @@ let s:env.hp.win = [
     \ 'C:/MyApps/Go/bin',
     \ 'C:/MyApps/lua',
     \ 'C:/Program Files (x86)/Google/Chrome/Application',
+    \ 'D:/cmake/bin',
+    \ 'D:/nodejs',
     \ 'D:/Java/jdk1.8.0_201/bin',
     \ 'D:/Qt/5.12.5/msvc2017_64/bin',
     \ 'D:/VS2017/MSBuild/15.0/Bin',
@@ -30,7 +32,6 @@ let s:env.hp.win = [
     \ 'D:/VS2017/VC/Auxiliary/Build',
     \ 'D:/Mozilla Firefox',
     \ 'D:/Typora',
-    \ 'D:/nodejs',
     \ 'E:/texlive/bin/win32',
     \ 'E:/SumatraPDF',
     \ 'E:/MATLAB/R2015b/bin',
@@ -46,10 +47,10 @@ function! env#env(dev, os)
         " IsWin() is from vimrc
         if IsWin()
             let $PATH .= ';' . join(l:e, ';')
-            let $VimYcmPython = 'C:/MyApps/Python37'
-            let $VimYcmCygwin = 'C:/MyApps/cygwin64'
-            let $VimYcmQt = 'D:/Qt/5.12.5/msvc2017_64'
-            let $VimYcmVs = 'D:/VS2017/VC/Tools/MSVC/14.13.26128'
+            let $VPathPython = 'C:/MyApps/Python37'
+            let $VPathCygwin = 'C:/MyApps/cygwin64'
+            let $VPathQt = 'D:/Qt/5.12.5/msvc2017_64'
+            let $VPathVs = 'D:/VS2017/VC/Tools/MSVC/14.13.26128'
         else
             let $PATH .= ':' . join(l:e, ':')
         endif

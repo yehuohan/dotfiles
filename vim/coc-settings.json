@@ -41,7 +41,6 @@
 
     /* coc-python */
     "python.autoComplete.extraPaths": [],
-    "python.pythonPath": "python",
 
     /* lsp */
     "languageserver": {

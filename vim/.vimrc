@@ -165,7 +165,6 @@ call s:gsetLoad()
 " Plugin Settings {{{
 " s:plug {{{
 let s:plug = {
-    \ 'onInit'     : {'exec': []},
     \ 'onVimEnter' : {'exec': []},
     \ 'onDelay'    : {'delay': 700, 'load': []},
     \ }
@@ -183,9 +182,6 @@ endfunction
 
 " FUNCTION: s:plug.init() dict {{{
 function! s:plug.init() dict
-    if !empty(self.onInit.exec)
-        call execute(self.onInit.exec)
-    endif
     if !empty(self.onVimEnter.exec)
         augroup PluginPlug
             autocmd!
@@ -199,11 +195,125 @@ endfunction
 " }}}
 " }}}
 
+" Vim-plug {{{
 call plug#begin($DotVimPath.'/bundle')  " 设置插件位置
-
-" Basic {{{
-" easy-motion {{{ 快速跳转
+    " editing
     Plug 'easymotion/vim-easymotion'
+    Plug 'mg979/vim-visual-multi'
+    Plug 't9md/vim-textmanip'
+    Plug 'markonm/traces.vim'
+    Plug 'godlygeek/tabular', {'on': 'Tabularize'}
+    Plug 'junegunn/vim-easy-align'
+    Plug 'terryma/vim-smooth-scroll'
+    Plug 'terryma/vim-expand-region'
+    Plug 'kana/vim-textobj-user'
+    Plug 'kana/vim-textobj-indent'
+    Plug 'kana/vim-textobj-function'
+    Plug 'glts/vim-textobj-comment'
+    Plug 'adriaanzon/vim-textobj-matchit'
+    Plug 'lucapette/vim-textobj-underscore'
+    Plug 'tpope/vim-repeat'
+    Plug 'kshenoy/vim-signature'
+    Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
+
+    " ui and managers
+    Plug 'morhetz/gruvbox'
+    Plug 'sainnhe/vim-color-forest-night'
+    Plug 'srcery-colors/srcery-vim'
+    Plug 'rakr/vim-one'
+if s:gset.use_lightline
+    Plug 'yehuohan/lightline.vim'
+endif
+    Plug 'luochen1990/rainbow'
+    Plug 'Yggdroot/indentLine'
+    Plug 'yehuohan/popset'
+    Plug 'yehuohan/popc'
+if IsVim()
+    Plug 'Shougo/defx.nvim', {'on': 'Defx'}
+    Plug 'roxma/nvim-yarp', {'on': 'Defx'}
+    Plug 'roxma/vim-hug-neovim-rpc', {'on': 'Defx'}
+else
+    Plug 'Shougo/defx.nvim', {'do': ':UpdateRemotePlugins', 'on': 'Defx'}
+endif
+    Plug 'mhinz/vim-startify'
+if s:gset.use_fzf
+if IsWin()
+    Plug 'junegunn/fzf', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
+endif
+    Plug 'junegunn/fzf.vim', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
+endif
+if s:gset.use_leaderf
+    Plug 'Yggdroot/LeaderF', {'do': IsWin() ? './install.bat' : './install.sh'}
+endif
+if IsVim()
+    Plug 'yehuohan/grep'
+endif
+    Plug 'mhinz/vim-grepper', {'on': ['Grepper', '<plug>(GrepperOperator)']}
+
+    " codings
+if s:gset.use_ycm
+    function! Plug_ycm_build(info)
+        " (first installed) or (PlugInstall! or PlugUpdate!)
+        if a:info.status == 'installed' || a:info.force
+            if IsLinux()
+                !python install.py --clangd-completer --go-completer --java-completer --build-dir ycm_build
+            elseif IsWin()
+                !python install.py --clangd-completer --go-completer --java-completer --ts-completer --msvc 15 --build-dir ycm_build
+            endif
+        endif
+    endfunction
+    Plug 'ycm-core/YouCompleteMe', {'do': function('Plug_ycm_build'), 'on': []}
+endif
+if s:gset.use_snip
+    Plug 'SirVer/ultisnips'
+    Plug 'honza/vim-snippets'
+endif
+if s:gset.use_coc
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    Plug 'neoclide/jsonc.vim'
+    Plug 'honza/vim-snippets'
+else
+    Plug 'Shougo/echodoc.vim'
+    Plug 'jiangmiao/auto-pairs'
+endif
+    Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
+    Plug 'tpope/vim-surround'
+    Plug 'majutsushi/tagbar', {'on': 'TagbarToggle'}
+    Plug 'scrooloose/nerdcommenter'
+    Plug 'skywind3000/asyncrun.vim'
+if s:gset.use_spector
+    function! Plug_spector_build(info)
+        if a:info.status == 'installed' || a:info.force
+            !python install_gadget.py --enable-c --enable-python
+        endif
+    endfunction
+    Plug 'puremourning/vimspector', {'do': function('Plug_spector_build'), 'for': ['c', 'cpp', 'python']}
+endif
+    Plug 't9md/vim-quickhl'
+    Plug 'RRethy/vim-illuminate'
+    Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
+    Plug 'Konfekt/FastFold'
+    Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
+    Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
+
+    " utils
+if s:gset.use_utils
+    Plug 'yianwillis/vimcdoc', {'for': 'help'}
+    Plug 'gabrielelana/vim-markdown', {'for': 'markdown'}
+    Plug 'iamcco/markdown-preview.nvim', {'for': 'markdown', 'do': { -> mkdp#util#install()}}
+    Plug 'joker1007/vim-markdown-quote-syntax'
+    Plug 'Rykka/riv.vim', {'for': 'rst'}
+    Plug 'Rykka/InstantRst', {'for': 'rst'}
+    Plug 'lervag/vimtex', {'for': 'tex'}
+    Plug 'tyru/open-browser.vim'
+    Plug 'arecarn/vim-crunch'
+    Plug 'arecarn/vim-selection'
+endif
+call plug#end()
+" }}}
+
+" Editing {{{
+" easy-motion {{{ 快速跳转
     let g:EasyMotion_do_mapping = 0     " 禁止默认map
     let g:EasyMotion_smartcase = 1      " 不区分大小写
     nmap s <Plug>(easymotion-overwin-f)
@@ -222,7 +332,6 @@ call plug#begin($DotVimPath.'/bundle')  " 设置插件位置
 " }}}
 
 " vim-visual-multi {{{ 多光标编辑
-    Plug 'mg979/vim-visual-multi'
     let g:VM_mouse_mappings = 0         " 禁用鼠标
     " C-n: 进入cursor模式
     " C-Up/Down: 进入extend模式
@@ -243,7 +352,6 @@ call plug#begin($DotVimPath.'/bundle')  " 设置插件位置
 " }}}
 
 " textmanip {{{ 块编辑
-    Plug 't9md/vim-textmanip'
     let g:textmanip_enable_mappings = 0
     " 切换Insert/Replace Mode
     xnoremap <silent> <M-i>
@@ -268,91 +376,10 @@ call plug#begin($DotVimPath.'/bundle')  " 设置插件位置
 "}}}
 
 " traces {{{ 预览增强
-    Plug 'markonm/traces.vim'
     " 支持:s, :g, :v, :sort, :range预览
 " }}}
 
-" fzf {{{ 模糊查找
-if s:gset.use_fzf
-    " linux下直接pacman -S fzf
-    " win下载fzf.exe放入bundle/fzf/bin/下
-    if IsWin()
-        Plug 'junegunn/fzf', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
-    endif
-    Plug 'junegunn/fzf.vim', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
-    let g:fzf_command_prefix = 'Fzf'
-    nnoremap <leader><leader>f :FzfFiles<Space>
-    augroup PluginFzf
-        autocmd!
-        autocmd Filetype fzf tnoremap <buffer> <Esc> <C-c>
-    augroup END
-endif
-" }}}
-
-" LeaderF {{{ 模糊查找
-if s:gset.use_leaderf
-if IsLinux()
-    Plug 'Yggdroot/LeaderF', {'do': './install.sh'}
-    call s:plug.reg('onVimEnter', 'exec', 'autocmd! LeaderF_Mru')
-elseif IsWin()
-    Plug 'Yggdroot/LeaderF', {'do': './install.bat'}
-else
-    Plug 'Yggdroot/LeaderF'
-endif
-    let g:Lf_CacheDirectory = $DotVimPath
-    "let g:Lf_WindowPosition = 'popup'
-    "let g:Lf_PreviewInPopup = 1
-    let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0}
-if s:gset.use_powerfont
-    let g:Lf_StlSeparator = {'left': '', 'right': ''}
-else
-    let g:Lf_StlSeparator = {'left': '', 'right': ''}
-endif
-    let g:Lf_ShortcutF = ''
-    let g:Lf_ShortcutB = ''
-    let g:Lf_ReverseOrder = 1
-    let g:Lf_ShowHidden = 1             " 搜索隐藏文件和目录
-    let g:Lf_GtagsAutoGenerate = 0
-    let g:Lf_Gtagslabel = 'native-pygments'
-                                        " gtags需要安装 pip install Pygments
-    let g:Lf_WildIgnore = {
-        \ 'dir': ['.git', '.svn', '.hg'],
-        \ 'file': []
-        \ }
-    nnoremap <leader><leader>l :LeaderfFile<Space>
-    nnoremap <leader>lf :LeaderfFile<CR>
-    nnoremap <leader>lu :LeaderfFunction<CR>
-    nnoremap <leader>lU :LeaderfFunctionAll<CR>
-    nnoremap <leader>lt :LeaderfBufTag<CR>
-    nnoremap <leader>lT :LeaderfBufTagAll<CR>
-    nnoremap <leader>ll :LeaderfLine<CR>
-    nnoremap <leader>lL :LeaderfLineAll<CR>
-    nnoremap <leader>lb :LeaderfBuffer<CR>
-    nnoremap <leader>lB :LeaderfBufferAll<CR>
-    nnoremap <leader>lr :LeaderfRgInteractive<CR>
-    nnoremap <leader>lm :LeaderfMru<CR>
-    nnoremap <leader>lM :LeaderfMruCwd<CR>
-    nnoremap <leader>ls :LeaderfSelf<CR>
-    nnoremap <leader>lh :LeaderfHistorySearch<CR>
-    nnoremap <leader>le :LeaderfHistoryCmd<CR>
-endif
-" }}}
-
-" grep {{{ 大范围查找
-if IsVim()
-    Plug 'yehuohan/grep'                " 不支持neovim
-endif
-    Plug 'mhinz/vim-grepper', {'on': ['Grepper', '<plug>(GrepperOperator)']}
-    let g:grepper = {
-        \ 'rg': {
-            \ 'grepprg':    'rg -H --no-heading --vimgrep' . (has('win32') ? ' $*' : ''),
-            \ 'grepformat': '%f:%l:%c:%m',
-            \ 'escape':     '\^$.*+?()[]{}|'}
-        \}
-" }}}
-
 " tabular {{{ 字符对齐
-    Plug 'godlygeek/tabular', {'on': 'Tabularize'}
     " /,/r2l0   -   第1个field使用第1个对齐符（右对齐），再插入2个空格
     "               第2个field使用第2个对齐符（左对齐），再插入0个空格
     "               第3个field又重新从第1个对齐符开始（对齐符可以有多个，循环使用）
@@ -363,7 +390,6 @@ endif
 " }}}
 
 " easy-align {{{ 字符对齐
-    Plug 'junegunn/vim-easy-align'
     " 默认对齐内含段落（Text Object: vip）
     nmap <leader>ga <Plug>(EasyAlign)ip
     xmap <leader>ga <Plug>(EasyAlign)
@@ -376,7 +402,6 @@ endif
 " }}}
 
 " smooth-scroll {{{ 平滑滚动
-    Plug 'terryma/vim-smooth-scroll'
     nnoremap <silent> <M-n> :call smooth_scroll#down(&scroll, 0, 2)<CR>
     nnoremap <silent> <M-m> :call smooth_scroll#up(&scroll, 0, 2)<CR>
     nnoremap <silent> <M-j> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
@@ -384,7 +409,6 @@ endif
 " }}}
 
 " expand-region {{{ 快速块选择
-    Plug 'terryma/vim-expand-region'
     nmap <C-p> <Plug>(expand_region_expand)
     vmap <C-p> <Plug>(expand_region_expand)
     nmap <C-u> <Plug>(expand_region_shrink)
@@ -394,8 +418,6 @@ endif
 " textobj-user {{{ 文本对象
     " vdc-ia-wWsp(b[<t{B"'`
     " vdc-ia-ifcmu
-    Plug 'kana/vim-textobj-user'
-    Plug 'kana/vim-textobj-indent'
     let g:textobj_indent_no_default_key_mappings = 1
     omap aI <Plug>(textobj-indent-a)
     omap iI <Plug>(textobj-indent-i)
@@ -405,20 +427,16 @@ endif
     vmap iI <Plug>(textobj-indent-i)
     vmap ai <Plug>(textobj-indent-same-a)
     vmap ii <Plug>(textobj-indent-same-i)
-    Plug 'kana/vim-textobj-function'
-    Plug 'glts/vim-textobj-comment'
-    Plug 'adriaanzon/vim-textobj-matchit'
-    Plug 'lucapette/vim-textobj-underscore'
     omap au <Plug>(textobj-underscore-a)
     omap iu <Plug>(textobj-underscore-i)
     vmap au <Plug>(textobj-underscore-a)
     vmap iu <Plug>(textobj-underscore-i)
-    nnoremap <leader>tv :call <SID>Plug_to_motion('v')<CR>
-    nnoremap <leader>tV :call <SID>Plug_to_motion('V')<CR>
-    nnoremap <leader>td :call <SID>Plug_to_motion('d')<CR>
-    nnoremap <leader>tD :call <SID>Plug_to_motion('D')<CR>
+    nnoremap <leader>tv :call Plug_to_motion('v')<CR>
+    nnoremap <leader>tV :call Plug_to_motion('V')<CR>
+    nnoremap <leader>td :call Plug_to_motion('d')<CR>
+    nnoremap <leader>tD :call Plug_to_motion('D')<CR>
 
-    function! s:Plug_to_motion(motion)
+    function! Plug_to_motion(motion)
         call PopSelection({
             \ 'opt' : 'select text object motion',
             \ 'lst' : split('w W s p ( b [ < t { B " '' ` i f c m u', ' '),
@@ -428,7 +446,42 @@ endif
 " }}}
 
 " repeat {{{ 重复命令
-    Plug 'tpope/vim-repeat'
+" }}}
+
+" signature {{{ 书签管理
+    let g:SignatureMap = {
+        \ 'Leader'             :  "m",
+        \ 'PlaceNextMark'      :  "m,",
+        \ 'ToggleMarkAtLine'   :  "m.",
+        \ 'PurgeMarksAtLine'   :  "m-",
+        \ 'DeleteMark'         :  "dm",
+        \ 'PurgeMarks'         :  "m<Space>",
+        \ 'PurgeMarkers'       :  "m<BS>",
+        \ 'GotoNextLineAlpha'  :  "']",
+        \ 'GotoPrevLineAlpha'  :  "'[",
+        \ 'GotoNextSpotAlpha'  :  "`]",
+        \ 'GotoPrevSpotAlpha'  :  "`[",
+        \ 'GotoNextLineByPos'  :  "]'",
+        \ 'GotoPrevLineByPos'  :  "['",
+        \ 'GotoNextSpotByPos'  :  "]`",
+        \ 'GotoPrevSpotByPos'  :  "[`",
+        \ 'GotoNextMarker'     :  "]-",
+        \ 'GotoPrevMarker'     :  "[-",
+        \ 'GotoNextMarkerAny'  :  "]=",
+        \ 'GotoPrevMarkerAny'  :  "[=",
+        \ 'ListBufferMarks'    :  "m/",
+        \ 'ListBufferMarkers'  :  "m?"
+    \ }
+    nnoremap <leader>ts :SignatureToggleSigns<CR>
+    nnoremap <leader>ma :SignatureListBufferMarks<CR>
+    nnoremap <leader>mc :<C-U>call signature#mark#Purge('all')<CR>
+    nnoremap <leader>mx :<C-U>call signature#marker#Purge()<CR>
+    nnoremap <M-,> :<C-U>call signature#mark#Goto('prev', 'line', 'pos')<CR>
+    nnoremap <M-.> :<C-U>call signature#mark#Goto('next', 'line', 'pos')<CR>
+" }}}
+
+" undotree {{{ 撤消历史
+    nnoremap <leader>tu :UndotreeToggle<CR>
 " }}}
 " }}}
 
@@ -438,18 +491,10 @@ endif
     "                    
     " ► ✘ ❖ ▫ ▪ ★ ☆ • ≡ ፨ ♥
     "❤️ ❌ ⭕️ 🚫 💯 ⚠️  ❗️❓ 🔴 🔺 🔻 🔸 🔶
-    Plug 'morhetz/gruvbox'
-    set rtp+=$DotVimPath/bundle/gruvbox
     let g:gruvbox_contrast_dark='soft'  " 背景选项：dark, medium, soft
     let g:gruvbox_italic = 1
-    Plug 'sainnhe/vim-color-forest-night'
-    set rtp+=$DotVimPath/bundle/vim-color-forest-night
     let g:forest_night_use_italic = 1
-    Plug 'srcery-colors/srcery-vim'
-    set rtp+=$DotVimPath/bundle/srcery-vim
     let g:srcery_italic = 1
-    Plug 'rakr/vim-one'
-    set rtp+=$DotVimPath/bundle/vim-one
     let g:one_allow_italics = 1
 if !s:gset.use_lightline
     try
@@ -460,7 +505,6 @@ if !s:gset.use_lightline
         silent! colorscheme desert
     endtry
 else
-    Plug 'yehuohan/lightline.vim'
     let g:lightline = {
         \ 'enable' : {'statusline': 1, 'tabline': 0},
         \ 'colorscheme' : 'gruvbox',
@@ -517,16 +561,16 @@ else
     endtry
     let g:lightline.blacklist = {'tagbar':0, 'nerdtree':0, 'Popc':0, 'defx':0}
     nnoremap <leader>tl :call lightline#toggle()<CR>
-    nnoremap <leader>tk :call <SID>Plug_ll_toggleCheck()<CR>
+    nnoremap <leader>tk :call Plug_ll_toggleCheck()<CR>
 
     " Augroup: PluginLightline {{{
     augroup PluginLightline
         autocmd!
-        autocmd ColorScheme * call s:Plug_ll_colorScheme()
-        autocmd CursorHold,BufWritePost * call s:Plug_ll_checkRefresh()
+        autocmd ColorScheme * call Plug_ll_colorScheme()
+        autocmd CursorHold,BufWritePost * call Plug_ll_checkRefresh()
     augroup END
 
-    function! s:Plug_ll_colorScheme()
+    function! Plug_ll_colorScheme()
         if !exists('g:loaded_lightline')
             return
         endif
@@ -540,7 +584,7 @@ else
         endtry
     endfunction
 
-    function! s:Plug_ll_checkRefresh()
+    function! Plug_ll_checkRefresh()
         if get(b:, 'lightline_changedtick', 0) == b:changedtick
             return
         endif
@@ -550,8 +594,8 @@ else
     endfunction
     " }}}
 
-    " FUNCTION: s:Plug_ll_toggleCheck() {{{
-    function! s:Plug_ll_toggleCheck()
+    " FUNCTION: Plug_ll_toggleCheck() {{{
+    function! Plug_ll_toggleCheck()
         let b:lightline_check_flg = !get(b:, 'lightline_check_flg', 1)
         call lightline#update()
         echo 'b:lightline_check_flg = ' . b:lightline_check_flg
@@ -604,20 +648,17 @@ endif
 " }}}
 
 " rainbow {{{ 彩色括号
-    Plug 'luochen1990/rainbow'
     let g:rainbow_active = 1
     nnoremap <leader>tr :RainbowToggle<CR>
 " }}}
 
 " indentLine {{{ 显示缩进标识
-    Plug 'Yggdroot/indentLine'
     "let g:indentLine_char = '|'        " 设置标识符样式
     let g:indentLinet_color_term=200    " 设置标识符颜色
     nnoremap <leader>ti :IndentLinesToggle<CR>
 " }}}
 
 " popset {{{ 弹出选项
-    Plug 'yehuohan/popset'
     let g:Popset_SelectionData = [
         \{
             \ 'opt' : ['filetype', 'ft'],
@@ -645,8 +686,6 @@ endif
 " }}}
 
 " popc {{{ buffer管理
-    Plug 'yehuohan/popc'
-    set hidden
     let g:Popc_jsonPath = $DotVimPath
     let g:Popc_useFloatingWin = 1
     let g:Popc_highlight = {
@@ -677,13 +716,6 @@ endif
 " }}}
 
 " defx {{{ 目录导航
-if IsVim()
-    Plug 'Shougo/defx.nvim', {'on': 'Defx'}
-    Plug 'roxma/nvim-yarp', {'on': 'Defx'}
-    Plug 'roxma/vim-hug-neovim-rpc', {'on': 'Defx'}
-else
-    Plug 'Shougo/defx.nvim', {'do': ':UpdateRemotePlugins', 'on': 'Defx'}
-endif
     let g:defx_command = 'Defx %s -root-marker=''> '' -show-ignored-files -winwidth=30 %s'
     nnoremap <silent> <leader>te
         \ :execute printf(g:defx_command, (bufwinnr('defx') > 0 ? '-toggle' : '-resume') . ' -split=vertical', '')<CR>
@@ -691,10 +723,10 @@ endif
         \ :execute printf(g:defx_command, '-resume -split=vertical', expand('%:p:h'))<CR>
     augroup PluginDefx
         autocmd!
-        autocmd FileType defx call s:Plug_defx_settings()
+        autocmd FileType defx call Plug_defx_settings()
     augroup END
 
-    function! s:Plug_defx_settings()
+    function! Plug_defx_settings()
         setlocal statusline=defx
         call defx#custom#column('icon', {
             \ 'directory_icon': '▸',
@@ -744,18 +776,17 @@ endif
 
 " startify {{{ Vim启动首页
 if s:gset.use_startify
-    Plug 'mhinz/vim-startify'
-    if IsLinux() || IsMac()
-        let g:startify_bookmarks = [ {'c': '~/.vimrc'},
-                                    \{'d': '~/.config/nvim/init.vim'},
-                                    \{'o': '$DotVimPath/todo.md'},
-                                    \]
-    elseif IsWin()
-        let g:startify_bookmarks = [ {'c': '$DotVimPath/../_vimrc'},
-                                    \{'d': '$LOCALAPPDATA/nvim/init.vim'},
-                                    \{'o': '$DotVimPath/todo.md'},
-                                    \]
-    endif
+if IsLinux() || IsMac()
+    let g:startify_bookmarks = [ {'c': '~/.vimrc'},
+                                \{'d': '~/.config/nvim/init.vim'},
+                                \{'o': '$DotVimPath/todo.md'},
+                                \]
+elseif IsWin()
+    let g:startify_bookmarks = [ {'c': '$DotVimPath/../_vimrc'},
+                                \{'d': '$LOCALAPPDATA/nvim/init.vim'},
+                                \{'o': '$DotVimPath/todo.md'},
+                                \]
+endif
     let g:startify_lists = [
             \ {'type': 'bookmarks', 'header': ['   Bookmarks']},
             \ {'type': 'files',     'header': ['   Recent Files']},
@@ -780,72 +811,74 @@ if s:gset.use_startify
 endif
 " }}}
 
-" signature {{{ 书签管理
-    Plug 'kshenoy/vim-signature'
-    let g:SignatureMap = {
-        \ 'Leader'             :  "m",
-        \ 'PlaceNextMark'      :  "m,",
-        \ 'ToggleMarkAtLine'   :  "m.",
-        \ 'PurgeMarksAtLine'   :  "m-",
-        \ 'DeleteMark'         :  "dm",
-        \ 'PurgeMarks'         :  "m<Space>",
-        \ 'PurgeMarkers'       :  "m<BS>",
-        \ 'GotoNextLineAlpha'  :  "']",
-        \ 'GotoPrevLineAlpha'  :  "'[",
-        \ 'GotoNextSpotAlpha'  :  "`]",
-        \ 'GotoPrevSpotAlpha'  :  "`[",
-        \ 'GotoNextLineByPos'  :  "]'",
-        \ 'GotoPrevLineByPos'  :  "['",
-        \ 'GotoNextSpotByPos'  :  "]`",
-        \ 'GotoPrevSpotByPos'  :  "[`",
-        \ 'GotoNextMarker'     :  "]-",
-        \ 'GotoPrevMarker'     :  "[-",
-        \ 'GotoNextMarkerAny'  :  "]=",
-        \ 'GotoPrevMarkerAny'  :  "[=",
-        \ 'ListBufferMarks'    :  "m/",
-        \ 'ListBufferMarkers'  :  "m?"
-    \ }
-    nnoremap <leader>ts :SignatureToggleSigns<CR>
-    nnoremap <leader>ma :SignatureListBufferMarks<CR>
-    nnoremap <leader>mc :<C-U>call signature#mark#Purge('all')<CR>
-    nnoremap <leader>mx :<C-U>call signature#marker#Purge()<CR>
-    nnoremap <M-,> :<C-U>call signature#mark#Goto('prev', 'line', 'pos')<CR>
-    nnoremap <M-.> :<C-U>call signature#mark#Goto('next', 'line', 'pos')<CR>
+" fzf {{{ 模糊查找
+if s:gset.use_fzf
+    " linux下直接pacman -S fzf
+    " win下载fzf.exe放入bundle/fzf/bin/下
+    let g:fzf_command_prefix = 'Fzf'
+    nnoremap <leader><leader>f :FzfFiles<Space>
+    augroup PluginFzf
+        autocmd!
+        autocmd Filetype fzf tnoremap <buffer> <Esc> <C-c>
+    augroup END
+endif
 " }}}
 
-" undotree {{{ 撤消历史
-    Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
-    nnoremap <leader>tu :UndotreeToggle<CR>
+" LeaderF {{{ 模糊查找
+if s:gset.use_leaderf
+    call s:plug.reg('onVimEnter', 'exec', 'autocmd! LeaderF_Mru')
+    let g:Lf_CacheDirectory = $DotVimPath
+    "let g:Lf_WindowPosition = 'popup'
+    "let g:Lf_PreviewInPopup = 1
+    let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0}
+if s:gset.use_powerfont
+    let g:Lf_StlSeparator = {'left': '', 'right': ''}
+else
+    let g:Lf_StlSeparator = {'left': '', 'right': ''}
+endif
+    let g:Lf_ShortcutF = ''
+    let g:Lf_ShortcutB = ''
+    let g:Lf_ReverseOrder = 1
+    let g:Lf_ShowHidden = 1             " 搜索隐藏文件和目录
+    let g:Lf_GtagsAutoGenerate = 0
+    let g:Lf_Gtagslabel = 'native-pygments'
+                                        " gtags需要安装 pip install Pygments
+    let g:Lf_WildIgnore = {
+        \ 'dir': ['.git', '.svn', '.hg'],
+        \ 'file': []
+        \ }
+    nnoremap <leader><leader>l :LeaderfFile<Space>
+    nnoremap <leader>lf :LeaderfFile<CR>
+    nnoremap <leader>lu :LeaderfFunction<CR>
+    nnoremap <leader>lU :LeaderfFunctionAll<CR>
+    nnoremap <leader>lt :LeaderfBufTag<CR>
+    nnoremap <leader>lT :LeaderfBufTagAll<CR>
+    nnoremap <leader>ll :LeaderfLine<CR>
+    nnoremap <leader>lL :LeaderfLineAll<CR>
+    nnoremap <leader>lb :LeaderfBuffer<CR>
+    nnoremap <leader>lB :LeaderfBufferAll<CR>
+    nnoremap <leader>lr :LeaderfRgInteractive<CR>
+    nnoremap <leader>lm :LeaderfMru<CR>
+    nnoremap <leader>lM :LeaderfMruCwd<CR>
+    nnoremap <leader>ls :LeaderfSelf<CR>
+    nnoremap <leader>lh :LeaderfHistorySearch<CR>
+    nnoremap <leader>le :LeaderfHistoryCmd<CR>
+endif
+" }}}
+
+" grep {{{ 大范围查找
+    let g:grepper = {
+        \ 'rg': {
+            \ 'grepprg':    'rg -H --no-heading --vimgrep' . (has('win32') ? ' $*' : ''),
+            \ 'grepformat': '%f:%l:%c:%m',
+            \ 'escape':     '\^$.*+?()[]{}|'}
+        \}
 " }}}
 " }}}
 
-" Coding {{{
+" Codings {{{
 " YouCompleteMe {{{ 自动补全
 if s:gset.use_ycm
-    " FUNCTION: Plug_ycm_build(info) {{{
-    " Linux: 需要python-dev, python3-dev, cmake, llvm, clang
-    " Windows: 需要python, cmake, VS, 7-zip
-    " Params: install.py安装参数
-    "   --clang-completer  : C-famlily，基于libclang补全
-    "   --clangd-completer : C-famlily，基于clangd补全
-    "   --go-completer     : Go补全，需要安装Go
-    "   --ts-completer     : Javascript和TypeScript，基于TSServer补全，需要安装node和npm
-    "   --java-completer   : Java补全，需要安装JDK8
-    function! Plug_ycm_build(info)
-        " info is a dictionary with 3 fields
-        " - name:   name of the plugin
-        " - status: 'installed', 'updated', or 'unchanged'
-        " - force:  set on PlugInstall! or PlugUpdate!
-        if a:info.status == 'installed' || a:info.force
-            if IsLinux()
-                !python install.py --clangd-completer --go-completer --java-completer --build-dir ycm_build
-            elseif IsWin()
-                !python install.py --clangd-completer --go-completer --java-completer --ts-completer --msvc 15 --build-dir ycm_build
-            endif
-        endif
-    endfunction
-    " }}}
-    Plug 'ycm-core/YouCompleteMe', {'do': function('Plug_ycm_build'), 'on': []}
     call s:plug.reg('onDelay', 'load', 'YouCompleteMe')
     let g:ycm_global_ycm_extra_conf=$DotVimPath.'/.ycm_extra_conf.py'
                                                                 " C-family补全路径
@@ -892,6 +925,9 @@ if s:gset.use_ycm
             \       run(server);
             \       ']
         \ }]                                                    " LSP支持
+    let g:ycm_semantic_triggers = {
+        \ 'tex' : g:vimtex#re#youcompleteme
+        \ }
     let g:ycm_key_detailed_diagnostics = ''                     " 直接使用:YcmShowDetailedDiagnostic命令
     let g:ycm_key_list_select_completion = ['<C-j>', '<M-j>', '<C-n>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-k>', '<M-k>', '<C-p>', '<Up>']
@@ -917,25 +953,18 @@ if s:gset.use_ycm
     nnoremap <leader>yr :YcmRestartServer<CR>
     nnoremap <leader>yd :YcmDiags<CR>
     nnoremap <leader>yD :YcmDebugInfo<CR>
-    nnoremap <silent><leader>yc
-        \ :execute 'edit ' . GetConfCopy('.ycm_extra_conf.py')<CR>
-    nnoremap <silent><leader>yj
-        \ :execute 'edit ' . GetConfCopy('jsconfig.json')<CR>
 endif
 " }}}
 
 " ultisnips {{{ 代码片段
 if s:gset.use_snip
-    Plug 'SirVer/ultisnips'
-    Plug 'honza/vim-snippets'           " snippet合集
     " 删除UltiSnips#map_keys#MapKeys中的xnoremap <Tab>（和textmanip的<C-i>冲突）
-    " 使用:UltiSnipsEdit编辑g:UltiSnipsSnippetsDir中的snippet文件
-    let g:UltiSnipsEditSplit="vertical"
-    let g:UltiSnipsSnippetDirectories=[$DotVimPath . '/vSnippets']
-    let g:UltiSnipsExpandTrigger='<Tab>'
-    let g:UltiSnipsListSnippets='<C-o>'
-    let g:UltiSnipsJumpForwardTrigger='<C-j>'
-    let g:UltiSnipsJumpBackwardTrigger='<C-k>'
+    let g:UltiSnipsEditSplit = "vertical"
+    let g:UltiSnipsSnippetDirectories = [$DotVimPath . '/vSnippets']
+    let g:UltiSnipsExpandTrigger = '<Tab>'
+    let g:UltiSnipsListSnippets = '<C-o>'
+    let g:UltiSnipsJumpForwardTrigger = '<C-j>'
+    let g:UltiSnipsJumpBackwardTrigger = '<C-k>'
 endif
 " }}}
 
@@ -943,9 +972,6 @@ endif
 if s:gset.use_coc
     " coc-clangd: 需要自行下载llvm
     " coc-java: 最好自行下载jdt.ls
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
-    Plug 'neoclide/jsonc.vim'
-    Plug 'honza/vim-snippets'
     let g:coc_config_home = $DotVimPath
     let g:coc_data_home = $DotVimPath . '/.coc'
     let g:coc_global_extensions = [
@@ -958,14 +984,17 @@ if s:gset.use_coc
     let g:coc_filetype_map = {}
     let g:coc_snippet_next = '<C-j>'
     let g:coc_snippet_prev = '<C-k>'
+    call coc#config('python', {
+        \ 'pythonPath': $VPathPython . '/python',
+        \ })
     inoremap <silent><expr> <Tab>
         \ coc#expandable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
         \ "\<Tab>"
         "\ pumvisible() ? coc#_select_confirm() :
         "\ coc#expandable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-        "\ <SID>Plug_coc_check_bs() ? "\<Tab>" :
+        "\ Plug_coc_check_bs() ? "\<Tab>" :
         "\ coc#refresh()
-    "function! s:Plug_coc_check_bs() abort
+    "function! Plug_coc_check_bs() abort
     "    let col = col('.') - 1
     "    return !col || getline('.')[col - 1]  =~# '\s'
     "endfunction
@@ -1001,16 +1030,15 @@ endif
 
 " echodoc {{{ 参数文档显示
 if !s:gset.use_coc
-    Plug 'Shougo/echodoc.vim'
     let g:echodoc_enable_at_startup = 1
 if IsVim()
     let g:echodoc#type = 'popup'
 else
     let g:echodoc#type = 'floating'
 endif
-    nnoremap <leader>to :call <SID>Plug_ed_toggle()<CR>
+    nnoremap <leader>to :call Plug_ed_toggle()<CR>
 
-    function! s:Plug_ed_toggle()
+    function! Plug_ed_toggle()
         if echodoc#is_enabled()
             call echodoc#disable()
         else
@@ -1023,7 +1051,6 @@ endif
 
 " auto-pairs {{{ 自动括号
 if !s:gset.use_coc
-    Plug 'jiangmiao/auto-pairs'
     let g:AutoPairsShortcutToggle=''
     let g:AutoPairsShortcutFastWrap=''
     let g:AutoPairsShortcutJump=''
@@ -1033,7 +1060,6 @@ endif
 "}}}
 
 " neoformat {{{ 代码格式化
-    Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
     let g:neoformat_basic_format_align = 1
     let g:neoformat_basic_format_retab = 1
     let g:neoformat_basic_format_trim = 1
@@ -1066,7 +1092,6 @@ endif
 " }}}
 
 " surround {{{ 添加包围符
-    Plug 'tpope/vim-surround'
     let g:surround_no_mappings = 1      " 取消默认映射
     " 修改和删除Surround
     nmap <leader>sd <Plug>Dsurround
@@ -1087,14 +1112,12 @@ endif
 " }}}
 
 " tagbar {{{ 代码结构查看
-    Plug 'majutsushi/tagbar', {'on': 'TagbarToggle'}
     let g:tagbar_width=30
     let g:tagbar_map_showproto=''       " 取消tagbar对<Space>的占用
     nnoremap <leader>tt :TagbarToggle<CR>
 " }}}
 
 " nerdcommenter {{{ 批量注释
-    Plug 'scrooloose/nerdcommenter'
     let g:NERDCreateDefaultMappings = 0
     let g:NERDSpaceDelims = 0           " 在Comment后添加Space
     nmap <leader>cc <Plug>NERDCommenterComment
@@ -1111,10 +1134,9 @@ endif
 " }}}
 
 " asyncrun {{{ 导步运行程序
-    Plug 'skywind3000/asyncrun.vim'
-    if IsWin()
-        let g:asyncrun_encs = 'cp936'   " 即'gbk'编码
-    endif
+if IsWin()
+    let g:asyncrun_encs = 'cp936'   " 即'gbk'编码
+endif
     let g:asyncrun_open = 8             " 自动打开quickfix window
     let g:asyncrun_save = 1             " 自动保存当前文件
     let g:asyncrun_local = 1            " 使用setlocal的efm
@@ -1126,12 +1148,6 @@ endif
 
 " vimspector {{{ C, C++, Python, Go调试
 if s:gset.use_spector
-    function! Plug_spector_build(info)
-        if a:info.status == 'installed' || a:info.force
-            !python install_gadget.py --enable-c --enable-python
-        endif
-    endfunction
-    Plug 'puremourning/vimspector', {'do': function('Plug_spector_build'), 'for': ['c', 'cpp', 'python']}
     sign define vimspectorBP text=🔴 texthl=WarningMsg
     sign define vimspectorBPDisabled text=🔴 texthl=MoreMsg
     sign define vimspectorPC text=🔶 texthl=Question
@@ -1148,8 +1164,6 @@ if s:gset.use_spector
     nnoremap <leader>de :VimspectorEval<Space>
     nnoremap <leader>dw :VimspectorWatch<Space>
     nnoremap <leader>dh :VimspectorShowOutput<Space>
-    nnoremap <leader>dc
-        \ :execute 'edit ' . GetConfCopy('.vimspector.json')<CR>
     nnoremap <silent><leader>db
         \ :call PopSelection({
             \ 'opt' : 'select debug configuration',
@@ -1160,7 +1174,6 @@ endif
 " }}}
 
 " quickhl {{{ 单词高亮
-    Plug 't9md/vim-quickhl'
     nmap <leader>hw <Plug>(quickhl-manual-this)
     xmap <leader>hw <Plug>(quickhl-manual-this)
     nmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
@@ -1172,7 +1185,6 @@ endif
 " }}}
 
 " illuminate {{{ 自动高亮
-    Plug 'RRethy/vim-illuminate'
     let g:Illuminate_delay = 250
     let g:Illuminate_ftblacklist = ['nerdtree', 'tagbar']
     highlight link illuminatedWord MatchParen
@@ -1180,14 +1192,12 @@ endif
 " }}}
 
 " colorizer {{{ 颜色预览
-    Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
     let g:colorizer_nomap = 1
     let g:colorizer_startup = 0
     nnoremap <leader>tc :ColorToggle<CR>
 " }}}
 
 " FastFold {{{ 更新折叠
-    Plug 'Konfekt/FastFold'
     nmap <leader>zu <Plug>(FastFoldUpdate)
     let g:fastfold_savehook = 0         " 只允许手动更新folds
     let g:fastfold_fold_command_suffixes =  ['x','X','a','A','o','O','c','C']
@@ -1195,12 +1205,10 @@ endif
                                         " 允许指定的命令更新folds
 " }}}
 
-" cpp-enhanced-highlight {{{ c++语法高亮
-    Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
+" cpp-modern {{{ c++语法高亮
 " }}}
 
 " julia {{{ Julia支持
-    Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
     let g:default_julia_version = 'devel'
     let g:latex_to_unicode_tab = 1      " 使用<Tab>输入unicode字符
     nnoremap <leader>tn :call LaTeXtoUnicode#Toggle()<CR>
@@ -1210,17 +1218,14 @@ endif
 " Utils {{{
 if s:gset.use_utils
 " vimcdoc {{{ 中文帮助文档
-    Plug 'yianwillis/vimcdoc', {'for': 'help'}
 " }}}
 
 " MarkDown {{{
-    Plug 'gabrielelana/vim-markdown', {'for': 'markdown'}
     let g:markdown_include_jekyll_support = 0
     let g:markdown_enable_mappings = 0
     let g:markdown_enable_spell_checking = 0
     let g:markdown_enable_folding = 1   " 感觉MarkDown折叠引起卡顿时，关闭此项
     let g:markdown_enable_conceal = 1   " 在Vim中显示MarkDown预览
-    Plug 'iamcco/markdown-preview.nvim', {'for': 'markdown', 'do': { -> mkdp#util#install()}}
     let g:mkdp_auto_start = 0
     let g:mkdp_auto_close = 1
     let g:mkdp_refresh_slow = 0         " 即时预览MarkDown
@@ -1232,12 +1237,9 @@ if s:gset.use_utils
     nnoremap <silent> <leader>tb
         \ :let g:mkdp_browser = (g:mkdp_browser ==# 'firefox') ? 'chrome' : 'firefox'<Bar>
         \ :echo 'Browser: ' . g:mkdp_browser<CR>
-    Plug 'joker1007/vim-markdown-quote-syntax'
 " }}}
 
 " ReStructruedText {{{
-    Plug 'Rykka/riv.vim', {'for': 'rst'}
-    Plug 'Rykka/InstantRst', {'for': 'rst'}
     let g:instant_rst_browser = 'firefox'
 if IsWin()
     " 需要安装 https://github.com/mgedmin/restview
@@ -1253,7 +1255,6 @@ endif
 " }}}
 
 " vimtex {{{ Latex支持
-    Plug 'lervag/vimtex', {'for': 'tex'}
     let g:vimtex_view_general_viewer = 'SumatraPDF'
     let g:vimtex_complete_enabled = 1   " 使用vimtex#complete#omnifunc补全
     let g:vimtex_complete_close_braces = 1
@@ -1266,27 +1267,24 @@ endif
     nmap <leader>as <Plug>(vimtex-stop)
     nmap <leader>av <Plug>(vimtex-view)
     nmap <leader>am <Plug>(vimtex-toggle-main)
-    " 添加YCM集成
-    call s:plug.reg('onInit', 'exec', 'let g:ycm_semantic_triggers = {"tex" : g:vimtex#re#youcompleteme}')
 " }}}
 
 " open-browser {{{ 在线搜索
-    Plug 'tyru/open-browser.vim'
     let g:openbrowser_default_search='baidu'
     nmap <leader>bs <Plug>(openbrowser-smart-search)
     vmap <leader>bs <Plug>(openbrowser-smart-search)
     nnoremap <leader>big :OpenBrowserSearch -google<Space>
     nnoremap <leader>bib :OpenBrowserSearch -baidu<Space>
     nnoremap <leader>bih :OpenBrowserSearch -github<Space>
-    nnoremap <leader>bg  :call <SID>Plug_brw_search('google', 'n')<CR>
-    vnoremap <leader>bg  :call <SID>Plug_brw_search('google', 'v')<CR>
-    nnoremap <leader>bb  :call <SID>Plug_brw_search('baidu', 'n')<CR>
-    vnoremap <leader>bb  :call <SID>Plug_brw_search('baidu', 'v')<CR>
-    nnoremap <leader>bh  :call <SID>Plug_brw_search('github', 'n')<CR>
-    vnoremap <leader>bh  :call <SID>Plug_brw_search('github', 'v')<CR>
+    nnoremap <leader>bg  :call Plug_brw_search('google', 'n')<CR>
+    vnoremap <leader>bg  :call Plug_brw_search('google', 'v')<CR>
+    nnoremap <leader>bb  :call Plug_brw_search('baidu', 'n')<CR>
+    vnoremap <leader>bb  :call Plug_brw_search('baidu', 'v')<CR>
+    nnoremap <leader>bh  :call Plug_brw_search('github', 'n')<CR>
+    vnoremap <leader>bh  :call Plug_brw_search('github', 'v')<CR>
 
     " 搜索引擎- google, baidu, github
-    function! s:Plug_brw_search(engine, mode)
+    function! Plug_brw_search(engine, mode)
         if a:mode ==# 'n'
             call openbrowser#search(expand('<cword>'), a:engine)
         elseif a:mode ==# 'v'
@@ -1296,8 +1294,6 @@ endif
 "}}}
 
 " crunch {{{ 计算器
-    Plug 'arecarn/vim-crunch'
-    Plug 'arecarn/vim-selection'
     let g:crunch_user_variables = {
         \ 'e': '2.718281828459045',
         \ 'pi': '3.141592653589793'
@@ -1309,7 +1305,6 @@ endif
 endif
 " }}}
 
-call plug#end()
 call s:plug.init()
 " }}} End
 
@@ -1535,9 +1530,14 @@ function! ExecInput(iargs, fn, ...) range
 endfunction
 " }}}
 
-" FUNCTION: SetExecLast(string) {{{ 设置execution
-function! SetExecLast(string)
+" FUNCTION: SetExecLast(string, [execution_echo]) {{{ 设置execution
+function! SetExecLast(string, ...)
     let s:execution = a:string
+    if a:0 >= 1
+        let s:execution_echo = a:1
+    else
+        let s:execution_echo = a:string
+    endif
 endfunction
 " }}}
 
@@ -1546,8 +1546,10 @@ endfunction
 function! ExecLast(eager)
     if exists('s:execution') && !empty(s:execution)
         if a:eager
-            execute s:execution
-            echo s:execution
+            silent execute s:execution
+            if s:execution_echo != v:none && s:execution_echo != v:null:
+                echo s:execution_echo
+            endif
         else
             call feedkeys(s:execution, 'n')
         endif
@@ -2309,17 +2311,19 @@ let s:rs = {
                     \ '%s/\r//ge',
                     \ 'edit ++enc=utf-8',
                     \ 'edit ++enc=cp936',
+                    \ 'copyConfig',
                     \ 'lineToTop',
                     \ 'clearUndo',
                     \ ],
             \ 'dic' : {
-                    \ 'retab'                  : 'retab with expandtab',
-                    \ '%s/\s\+$//ge'           : 'remove trailing space',
-                    \ '%s/\r//ge'              : 'remove ^M',
-                    \ 'edit ++enc=utf-8'       : 'reload as utf-8',
-                    \ 'edit ++enc=cp936'       : 'reload as cp936',
-                    \ 'lineToTop'              : 'frozen current line to top',
-                    \ 'clearUndo'              : 'clear undo history',
+                    \ 'retab'            : 'retab with expandtab',
+                    \ '%s/\s\+$//ge'     : 'remove trailing space',
+                    \ '%s/\r//ge'        : 'remove ^M',
+                    \ 'edit ++enc=utf-8' : 'reload as utf-8',
+                    \ 'edit ++enc=cp936' : 'reload as cp936',
+                    \ 'copyConfig'       : 'copy config file',
+                    \ 'lineToTop'        : 'frozen current line to top',
+                    \ 'clearUndo'        : 'clear undo history',
                     \ },
             \ 'cmd' : {sopt, arg -> has_key(s:rs.func, arg) ? s:rs.func[arg]() : execute(arg)},
             \ },
@@ -2338,12 +2342,13 @@ let s:rs = {
         \ },
     \ 'func' : {}
     \ }
-" FUNCTION: s:rs.func.clearUndo() dict {{{ 清除undo数据
-function! s:rs.func.clearUndo() dict
-    let l:ulbak = &undolevels
-    set undolevels=-1
-    execute "normal! a\<Bar>\<BS>\<Esc>"
-    let &undolevels = l:ulbak
+" FUNCTION: s:rs.func.copyConfig() dict {{{ 复制config文件
+function! s:rs.func.copyConfig() dict
+    call PopSelection({
+        \ 'opt' : 'select config',
+        \ 'lst' : ['.ycm_extra_conf.py', 'jsconfig.json', '.vimspector.json'],
+        \ 'cmd' : {sopt, arg -> execute('edit ' . GetConfCopy(arg))},
+        \ })
 endfunction
 " }}}
 
@@ -2354,6 +2359,15 @@ function! s:rs.func.lineToTop() dict
     resize 1
     call cursor(l:line, 1)
     wincmd p
+endfunction
+" }}}
+
+" FUNCTION: s:rs.func.clearUndo() dict {{{ 清除undo数据
+function! s:rs.func.clearUndo() dict
+    let l:ulbak = &undolevels
+    set undolevels=-1
+    execute "normal! a\<Bar>\<BS>\<Esc>"
+    let &undolevels = l:ulbak
 endfunction
 " }}}
 
@@ -2432,7 +2446,7 @@ function! FuncInsertSpace(string, pos) range
         endfor
         call setline(k, l:line)
     endfor
-    call SetExecLast('call FuncInsertSpace(''' . a:string . ''', ''' . a:pos . ''')')
+    call SetExecLast('call FuncInsertSpace(''' . a:string . ''', ''' . a:pos . ''')', v:none)
 endfunction
 let RunInsertSpaceH = function('ExecInput', [['Divide H: '], 'FuncInsertSpace', 'h'])
 let RunInsertSpaceB = function('ExecInput', [['Divide B: '], 'FuncInsertSpace', 'b'])
@@ -2610,7 +2624,7 @@ function! QuickfixIconv()
         return
     endif
     call PopSelection({
-        \ 'opt' : 'Select encoding',
+        \ 'opt' : 'select encoding',
         \ 'lst' : ['"cp936", "utf-8"', '"utf-8", "cp936"'],
         \ 'cmd' : 'QuickfixMakeIconv',
         \ 'arg' : [l:type,]
