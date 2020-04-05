@@ -15,6 +15,7 @@ import re
 LOC_DIR = os.path.dirname(
         os.path.abspath(__file__))  # Local working path
 log_out = False                     # Print log or not
+txt_out = False                     # Create compile_flags.txt
 
 #===============================================================================
 # cfamily
@@ -111,13 +112,13 @@ def GetCfamilyFlags():
                         os.listdir('/usr/include/c++')))[0])
         QT_DIR = '/usr/include/qt/'
     elif platform.system() == "Windows":
-        # $VimYcm is from env#env
-        UNIX_DIR = os.getenv('VimYcmCygwin') + '/usr/include'
-        GCC_DIR = os.path.join(os.getenv('VimYcmCygwin') + '/lib/gcc/x86_64-pc-cygwin',
+        # $VPath is from env#env
+        UNIX_DIR = os.getenv('VPathCygwin') + '/usr/include'
+        GCC_DIR = os.path.join(os.getenv('VPathCygwin') + '/lib/gcc/x86_64-pc-cygwin',
                     list(filter(lambda dir: re.compile(r'^\d{1,2}\.\d{1,2}\.\d{1,2}$').match(dir),
-                        os.listdir(os.getenv('VimYcmCygwin') + '/lib/gcc/x86_64-pc-cygwin')))[0]) + '/include'
-        VS_DIR = os.getenv('VimYcmVs') + '/include/'
-        QT_DIR = os.getenv('VimYcmQt') + '/include/'
+                        os.listdir(os.getenv('VPathCygwin') + '/lib/gcc/x86_64-pc-cygwin')))[0]) + '/include'
+        VS_DIR = os.getenv('VPathVs') + '/include/'
+        QT_DIR = os.getenv('VPathQt') + '/include/'
 
     global_flags = [
             # '-isystem', GCC_DIR,
@@ -141,6 +142,10 @@ def GetCfamilyFlags():
 
     return flags_cfamily
 
+if txt_out:
+    with open('compile_flags.txt', 'w') as fp:
+        fp.write('\n'.join(GetCfamilyFlags()))
+
 #===============================================================================
 # python
 #===============================================================================
@@ -148,13 +153,13 @@ def GetPythonPath():
     if platform.system() == "Linux":
         return '/usr/bin/python'
     elif platform.system() == "Windows":
-        return os.getenv('VimYcmPython') + '/python.exe'
+        return os.getenv('VPathPython') + '/python.exe'
 
 def GetPythonSysPath():
     return [
         LOC_DIR,
-        os.getenv('VimYcmPython') + '/Lib/site-packages',
-        os.getenv('VimYcmPython') + '/Scripts'
+        os.getenv('VPathPython') + '/Lib/site-packages',
+        os.getenv('VPathPython') + '/Scripts'
         ]
 
 #===============================================================================
