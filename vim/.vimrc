@@ -628,7 +628,7 @@ else
             \ &ft ==# 'nerdtree' ? 'NERDTree' :
             \ &ft ==# 'qf' ? (QuickfixGet()[0] ==# 'c' ? 'Quickfix' : 'Location') :
             \ &ft ==# 'help' ? 'Help' :
-            \ &ft ==# 'Popc' ? popc#ui#GetStatusLineSegments('l')[0] :
+            \ &ft ==# 'Popc' ? 'Popc' :
             \ &ft ==# 'startify' ? 'Startify' :
             \ winwidth(0) > 60 ? lightline#mode() : ''
     endfunction
@@ -1648,7 +1648,7 @@ let s:rp = {
         \ 'cmd' : {sopt, arg -> call('RunFile', [tr(arg, '|', ' ')])},
         \ }
     \ }
-" FUNCTION: s:rp.printf(type, args, srcf, outf) dict {{{
+" FUNCTION: s:rp.printf(type, wdir, args, srcf, outf) dict {{{
 " 生成文件编译或执行命令字符串。
 " @param type: 编译类型，需要包含于s:rp.type中
 " @param wdir: 命令运行目录
@@ -2316,6 +2316,46 @@ function! FindWowHighlight(...)
     endif
 endfunction
 " }}}
+" }}}
+
+" Workspace {{{
+let s:ws = {
+    \ 'settings': {
+        \ 'root' : '',
+        \ 'fw' : v:null,
+        \ 'rp' : v:null,
+        \ 'execution' : v:null,
+        \ }
+    \ }
+" FUNCTION: s:ws.init() {{{
+function! s:ws.init()
+    augroup UserFunctionWorkspace
+        autocmd!
+        autocmd User PopcLayerWksSavePre call s:ws.save()
+        autocmd User PopcLayerWksLoaded call s:ws.load()
+    augroup END
+endfunction
+" }}}
+
+" FUNCTION: s:ws.save() {{{
+function! s:ws.save()
+    let s:ws.settings.fw = s:fw.args
+    let s:ws.settings.rp = s:rp.args
+    let s:ws.settings.execution = exists('s:execution') ? s:execution : ''
+    call popc#layer#wks#SetSettings(s:ws.settings)
+endfunction
+" }}}
+
+" FUNCTION: s:ws.load() {{{
+function! s:ws.load()
+    let s:ws.settings = popc#layer#wks#GetSettings()
+    let s:fw.args = s:ws.settings.fw
+    let s:rp.args = s:ws.settings.rp
+    let s:execution = s:ws.settings.execution
+endfunction
+" }}}
+
+call s:ws.init()
 " }}}
 
 " Scripts {{{
