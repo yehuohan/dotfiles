@@ -109,18 +109,18 @@ endif
 " s:gset {{{
 let s:gset_file = $DotVimPath . '/.gset.json'
 let s:gset = {
-    \ 'set_dev' : v:null,
-    \ 'set_os' : v:null,
+    \ 'set_dev'       : v:none,
+    \ 'set_os'        : v:none,
     \ 'use_powerfont' : 1,
-    \ 'use_lightline': 1,
-    \ 'use_startify' : 1,
-    \ 'use_fzf' : 1,
-    \ 'use_leaderf' : 1,
-    \ 'use_ycm' : 1,
-    \ 'use_snip' : 1,
-    \ 'use_coc' : 1,
-    \ 'use_spector' : 1,
-    \ 'use_utils' : 1,
+    \ 'use_lightline' : 1,
+    \ 'use_startify'  : 1,
+    \ 'use_fzf'       : 1,
+    \ 'use_leaderf'   : 1,
+    \ 'use_ycm'       : 1,
+    \ 'use_snip'      : 1,
+    \ 'use_coc'       : 1,
+    \ 'use_spector'   : 1,
+    \ 'use_utils'     : 1,
     \ }
 " FUNCTION: s:gsetLoad() {{{
 function! s:gsetLoad()
@@ -140,11 +140,31 @@ endfunction
 " }}}
 " FUNCTION: s:gsetInit() {{{
 function! s:gsetInit()
-    for [key, val] in sort(items(s:gset))
-        let s:gset[key] = input('let s:gset.'. key . ' = ', val)
-    endfor
-    redraw
-    call s:gsetSave()
+    function! InitSet(sopt, arg)
+        let s:gset[a:sopt] = a:arg
+    endfunction
+    function! InitGet(sopt)
+        return s:gset[a:sopt]
+    endfunction
+    call PopSelection({
+        \ 'opt' : 'select settings',
+        \ 'lst' : add(sort(keys(s:gset)), '[OK]') ,
+        \ 'dic' : {
+            \ 'set_dev'       : {'opt': 'set_dev'      , 'lst': ['hp']         , 'cmd': 'InitSet', 'get': 'InitGet'},
+            \ 'set_os'        : {'opt': 'set_os'       , 'lst': ['win', 'arch'], 'cmd': 'InitSet', 'get': 'InitGet'},
+            \ 'use_powerfont' : {'opt': 'use_powerfont', 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
+            \ 'use_lightline' : {'opt': 'use_lightline', 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
+            \ 'use_startify'  : {'opt': 'use_startify' , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
+            \ 'use_fzf'       : {'opt': 'use_fzf'      , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
+            \ 'use_leaderf'   : {'opt': 'use_leaderf'  , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
+            \ 'use_ycm'       : {'opt': 'use_ycm'      , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
+            \ 'use_snip'      : {'opt': 'use_snip'     , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
+            \ 'use_coc'       : {'opt': 'use_coc'      , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
+            \ 'use_spector'   : {'opt': 'use_spector'  , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
+            \ 'use_utils'     : {'opt': 'use_utils'    , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
+            \ },
+        \ 'cmd' : {sopt, arg -> (arg ==# '[OK]') ? s:gsetSave() : v:none}
+        \ })
 endfunction
 " }}}
 " FUNCTION: s:gsetShow() {{{
@@ -1547,7 +1567,7 @@ function! ExecLast(eager)
     if exists('s:execution') && !empty(s:execution)
         if a:eager
             silent execute s:execution
-            if s:execution_echo != v:none && s:execution_echo != v:null:
+            if s:execution_echo != v:none
                 echo s:execution_echo
             endif
         else
