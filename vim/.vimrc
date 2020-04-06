@@ -109,8 +109,8 @@ endif
 " s:gset {{{
 let s:gset_file = $DotVimPath . '/.gset.json'
 let s:gset = {
-    \ 'set_dev'       : v:none,
-    \ 'set_os'        : v:none,
+    \ 'set_dev'       : v:null,
+    \ 'set_os'        : v:null,
     \ 'use_powerfont' : 1,
     \ 'use_lightline' : 1,
     \ 'use_startify'  : 1,
@@ -163,7 +163,7 @@ function! s:gsetInit()
             \ 'use_spector'   : {'opt': 'use_spector'  , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
             \ 'use_utils'     : {'opt': 'use_utils'    , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
             \ },
-        \ 'cmd' : {sopt, arg -> (arg ==# '[OK]') ? s:gsetSave() : v:none}
+        \ 'cmd' : {sopt, arg -> (arg ==# '[OK]') ? s:gsetSave() : v:null}
         \ })
 endfunction
 " }}}
@@ -1567,7 +1567,7 @@ function! ExecLast(eager)
     if exists('s:execution') && !empty(s:execution)
         if a:eager
             silent execute s:execution
-            if s:execution_echo != v:none
+            if s:execution_echo != v:null
                 echo s:execution_echo
             endif
         else
@@ -2460,7 +2460,7 @@ function! FuncInsertSpace(string, pos) range
         endfor
         call setline(k, l:line)
     endfor
-    call SetExecLast('call FuncInsertSpace(''' . a:string . ''', ''' . a:pos . ''')', v:none)
+    call SetExecLast('call FuncInsertSpace(''' . a:string . ''', ''' . a:pos . ''')', v:null)
 endfunction
 let RunInsertSpaceH = function('ExecInput', [['Divide H: '], 'FuncInsertSpace', 'h'])
 let RunInsertSpaceB = function('ExecInput', [['Divide B: '], 'FuncInsertSpace', 'b'])
