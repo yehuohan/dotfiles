@@ -15,7 +15,6 @@ import re
 LOC_DIR = os.path.dirname(
         os.path.abspath(__file__))  # Local working path
 log_out = False                     # Print log or not
-txt_out = False                     # Create compile_flags.txt
 
 #===============================================================================
 # cfamily
@@ -142,7 +141,8 @@ def GetCfamilyFlags():
 
     return flags_cfamily
 
-if txt_out:
+if __name__ == "__main__":
+    # Create compile_flags.txt
     with open('compile_flags.txt', 'w') as fp:
         fp.write('\n'.join(GetCfamilyFlags()))
 
