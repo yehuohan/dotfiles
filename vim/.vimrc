@@ -186,7 +186,7 @@ call s:gsetLoad()
 " s:plug {{{
 let s:plug = {
     \ 'onVimEnter' : {'exec': []},
-    \ 'onDelay'    : {'delay': 700, 'load': []},
+    \ 'onDelay'    : {'delay': 700, 'load': [], 'exec': []},
     \ }
 " FUNCTION: s:plug.reg(event, type, name) dict {{{
 function! s:plug.reg(event, type, name) dict
@@ -197,6 +197,7 @@ endfunction
 " FUNCTION: s:plug.run(timer) dict {{{
 function! s:plug.run(timer) dict
     call plug#load(self.onDelay.load)
+    call execute(self.onDelay.exec)
 endfunction
 " }}}
 
@@ -283,9 +284,8 @@ if s:gset.use_snip
     Plug 'honza/vim-snippets'
 endif
 if s:gset.use_coc
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
     Plug 'neoclide/jsonc.vim'
-    Plug 'honza/vim-snippets'
 else
     Plug 'Shougo/echodoc.vim'
     Plug 'jiangmiao/auto-pairs'
@@ -464,34 +464,34 @@ call plug#end()
 
 " signature {{{ 书签管理
     let g:SignatureMap = {
-        \ 'Leader'             :  "m",
-        \ 'PlaceNextMark'      :  "m,",
-        \ 'ToggleMarkAtLine'   :  "m.",
-        \ 'PurgeMarksAtLine'   :  "m-",
-        \ 'DeleteMark'         :  "dm",
-        \ 'PurgeMarks'         :  "m<Space>",
-        \ 'PurgeMarkers'       :  "m<BS>",
-        \ 'GotoNextLineAlpha'  :  "']",
-        \ 'GotoPrevLineAlpha'  :  "'[",
-        \ 'GotoNextSpotAlpha'  :  "`]",
-        \ 'GotoPrevSpotAlpha'  :  "`[",
-        \ 'GotoNextLineByPos'  :  "]'",
-        \ 'GotoPrevLineByPos'  :  "['",
-        \ 'GotoNextSpotByPos'  :  "]`",
-        \ 'GotoPrevSpotByPos'  :  "[`",
-        \ 'GotoNextMarker'     :  "]-",
-        \ 'GotoPrevMarker'     :  "[-",
-        \ 'GotoNextMarkerAny'  :  "]=",
-        \ 'GotoPrevMarkerAny'  :  "[=",
-        \ 'ListBufferMarks'    :  "m/",
-        \ 'ListBufferMarkers'  :  "m?"
+        \ 'Leader'            : "m",
+        \ 'PlaceNextMark'     : "m,",
+        \ 'ToggleMarkAtLine'  : "m.",
+        \ 'PurgeMarksAtLine'  : "m-",
+        \ 'DeleteMark'        : '',
+        \ 'PurgeMarks'        : '',
+        \ 'PurgeMarkers'      : '',
+        \ 'GotoNextLineAlpha' : '',
+        \ 'GotoPrevLineAlpha' : '',
+        \ 'GotoNextSpotAlpha' : '',
+        \ 'GotoPrevSpotAlpha' : '',
+        \ 'GotoNextLineByPos' : '',
+        \ 'GotoPrevLineByPos' : '',
+        \ 'GotoNextSpotByPos' : '',
+        \ 'GotoPrevSpotByPos' : '',
+        \ 'GotoNextMarker'    : '',
+        \ 'GotoPrevMarker'    : '',
+        \ 'GotoNextMarkerAny' : '',
+        \ 'GotoPrevMarkerAny' : '',
+        \ 'ListBufferMarks'   : '',
+        \ 'ListBufferMarkers' : '',
     \ }
     nnoremap <leader>ts :SignatureToggleSigns<CR>
     nnoremap <leader>ma :SignatureListBufferMarks<CR>
-    nnoremap <leader>mc :<C-U>call signature#mark#Purge('all')<CR>
-    nnoremap <leader>mx :<C-U>call signature#marker#Purge()<CR>
-    nnoremap <M-,> :<C-U>call signature#mark#Goto('prev', 'line', 'pos')<CR>
-    nnoremap <M-.> :<C-U>call signature#mark#Goto('next', 'line', 'pos')<CR>
+    nnoremap <leader>mc :call signature#mark#Purge('all')<CR>
+    nnoremap <leader>ml :call signature#mark#Purge('line')<CR>
+    nnoremap <M-,>      :call signature#mark#Goto('prev', 'line', 'pos')<CR>
+    nnoremap <M-.>      :call signature#mark#Goto('next', 'line', 'pos')<CR>
 " }}}
 
 " undotree {{{ 撤消历史
@@ -731,10 +731,12 @@ endif
 
 " nerdtree {{{ 目录树导航
     let g:NERDTreeShowHidden = 1
+    let NERDTreeDirArrowExpandable = '▸'
+    let NERDTreeDirArrowCollapsible = '▾'
     let g:NERDTreeMapActivateNode = 'o'
     let g:NERDTreeMapOpenRecursively = 'O'
-    let g:NERDTreeMapCloseDir = 'x'
     let g:NERDTreeMapPreview = 'go'
+    let g:NERDTreeMapCloseDir = 'x'
     let g:NERDTreeMapOpenInTab = 't'
     let g:NERDTreeMapOpenInTabSilent = 'gt'
     let g:NERDTreeMapOpenSplit = 's'
@@ -756,6 +758,7 @@ endif
     let g:NERDTreeMapToggleHidden = '.'
     let g:NERDTreeMapToggleZoom = 'Z'
     let g:NERDTreeMapQuit = 'q'
+    let g:NERDTreeMapToggleFiles = 'F'
     let g:NERDTreeMapMenu = 'M'
     nnoremap <leader>te :NERDTreeToggle<CR>
     nnoremap <leader>tE :execute ':NERDTree ' . expand('%:p:h')<CR>
@@ -957,6 +960,8 @@ endif
 
 " coc {{{ 自动补全
 if s:gset.use_coc
+    call s:plug.reg('onDelay', 'load', 'coc.nvim')
+    call s:plug.reg('onDelay', 'exec', 'call coc#config("python", {"pythonPath": $VPathPython . "/python"})')
     " coc-clangd: 需要自行下载llvm
     " coc-java: 最好自行下载jdt.ls
     let g:coc_config_home = $DotVimPath
@@ -971,12 +976,10 @@ if s:gset.use_coc
     let g:coc_filetype_map = {}
     let g:coc_snippet_next = '<C-j>'
     let g:coc_snippet_prev = '<C-k>'
-    call coc#config('python', {
-        \ 'pythonPath': $VPathPython . '/python',
-        \ })
-    inoremap <silent><expr> <Tab>
-        \ coc#expandable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-        \ "\<Tab>"
+    "inoremap <silent><expr> <Tab>
+        "\ coc#expandable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+        "\ "\<Tab>"
+    "inoremap <silent><expr> <Tab>
         "\ pumvisible() ? coc#_select_confirm() :
         "\ coc#expandable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
         "\ Plug_coc_check_bs() ? "\<Tab>" :

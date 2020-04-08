@@ -1,6 +1,6 @@
 {
     /* coc */
-    "suggest.autoTrigger": "trigger",
+    "suggest.autoTrigger": "always",
     "suggest.enablePreview": true,
     "suggest.snippetIndicator": " ★",
     "suggest.echodocSupport": false,
