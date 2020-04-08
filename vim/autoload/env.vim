@@ -51,8 +51,11 @@ function! env#env(dev, os)
             let $VPathCygwin = 'C:/MyApps/cygwin64'
             let $VPathQt = 'D:/Qt/5.12.5/msvc2017_64'
             let $VPathVs = 'D:/VS2017/VC/Tools/MSVC/14.13.26128'
+            let $VPathLuaLsp = $HOME . '/.vscode/extensions/sumneko.lua-0.16.2'
         else
             let $PATH .= ':' . join(l:e, ':')
+            let $VPathPython = '/usr/bin'
+            let $VPathLuaLsp = '~/.vscode/extensions/sumneko.lua-0.16.2'
         endif
     endif
 endfunction

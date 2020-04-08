@@ -870,7 +870,7 @@ endif
 " YouCompleteMe {{{ 自动补全
 if s:gset.use_ycm
     call s:plug.reg('onDelay', 'load', 'YouCompleteMe')
-    let g:ycm_global_ycm_extra_conf=$DotVimPath.'/.ycm_extra_conf.py'
+    let g:ycm_global_ycm_extra_conf = $DotVimPath.'/.ycm_extra_conf.py'
                                                                 " C-family补全路径
     let g:ycm_enable_diagnostic_signs = 1                       " 开启语法检测
     let g:ycm_max_diagnostics_to_display = 30
@@ -960,10 +960,24 @@ endif
 
 " coc {{{ 自动补全
 if s:gset.use_coc
-    call s:plug.reg('onDelay', 'load', 'coc.nvim')
-    call s:plug.reg('onDelay', 'exec', 'call coc#config("python", {"pythonPath": $VPathPython . "/python"})')
     " coc-clangd: 需要自行下载llvm
     " coc-java: 最好自行下载jdt.ls
+    call s:plug.reg('onDelay', 'load', 'coc.nvim')
+    call s:plug.reg('onDelay', 'exec', 'call s:Plug_coc_settings()')
+    function! s:Plug_coc_settings()
+        call coc#config("python", {
+            \ "pythonPath": $VPathPython . "/python"
+            \ })
+        call coc#config('languageserver', {
+            \ 'lua-language-server': {
+                \ 'cwd': $VPathLuaLsp,
+                \ 'command': $VPathLuaLsp . (IsWin() ? '/server/bin/Windows/lua-language-server.exe' : '/server/bin/Linux/lua-language-server'),
+                \ 'args': ['-E', '-e', 'LANG="zh-cn"', $VPathLuaLsp . '/server/main.lua'],
+                \ 'filetypes': ['lua'],
+                \ }
+            \ })
+    endfunction
+
     let g:coc_config_home = $DotVimPath
     let g:coc_data_home = $DotVimPath . '/.coc'
     let g:coc_global_extensions = [
