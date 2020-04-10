@@ -70,18 +70,18 @@ if [[ `uname` == "Linux" ]]; then
 
 elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
 
-    # vim
-    if [ ! -d "../Vim" ]; then
-        echo "../Vim is not existed."
+    # vim & neovim
+    if [ ! -d "../VConfig" ]; then
+        echo "../VConfig is not existed."
         exit
     fi
-    cp ../Vim/_vimrc                      ./vim/.vimrc
-    cp ../Vim/vimfiles/.ycm_extra_conf.py ./vim/
-    cp ../Vim/vimfiles/jsconfig.json      ./vim/
-    cp ../Vim/vimfiles/.vimspector.json   ./vim/
-    cp ../Vim/vimfiles/coc-settings.json  ./vim/
-    cp -r ../Vim/vimfiles/vSnippets       ./vim/
-    cp -r ../Vim/vimfiles/autoload        ./vim/
+    cp ../VConfig/.init.vim                     ./vim/
+    cp ../VConfig/.vim/.ycm_extra_conf.py       ./vim/
+    cp ../VConfig/.vim/jsconfig.json            ./vim/
+    cp ../VConfig/.vim/.vimspector.json         ./vim/
+    cp ../VConfig/.vim/coc-settings.json        ./vim/
+    cp -r ../VConfig/.vim/vSnippets             ./vim/
+    cp -r ../VConfig/.vim/autoload              ./vim/
 
     # cygwin
     cp ~/.minttyrc      ./root/home-gw/

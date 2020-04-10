@@ -1,7 +1,7 @@
 
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-" Vimrc: configuration for vim and neovim.
-"        set 'Global settings' before using this vimrc.
+" .init.vim: configuration for vim and neovim.
+"        set 'Global settings' before using this script.
 " Github: https://github.com/yehuohan/dotconfigs
 " Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -68,11 +68,7 @@ endfunction
 
 " Global Settings {{{
 let s:home = resolve(expand('<sfile>:p:h'))
-if (IsLinux() || IsMac() || IsGw())
-    let $DotVimPath=s:home . '/.vim'
-elseif IsWin()
-    let $DotVimPath=s:home . '\vimfiles'
-endif
+let $DotVimPath=s:home . '/.vim'
 set rtp+=$DotVimPath
 
 " First {{{
@@ -772,7 +768,7 @@ if IsLinux() || IsMac()
                                 \{'o': '$DotVimPath/todo.md'},
                                 \]
 elseif IsWin()
-    let g:startify_bookmarks = [ {'c': '$DotVimPath/../_vimrc'},
+    let g:startify_bookmarks = [ {'c': '$DotVimPath/../.init.vim'},
                                 \{'d': '$LOCALAPPDATA/nvim/init.vim'},
                                 \{'o': '$DotVimPath/todo.md'},
                                 \]

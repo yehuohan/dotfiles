@@ -1,6 +1,6 @@
 
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-" Vimrc: init.vim for neovim which use .vimrc.
+" Vimrc: init.vim for neovim.
 " Github: https://github.com/yehuohan/dotconfigs
 " Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -15,8 +15,8 @@ if (has('unix') && !has('macunix') && !has('win32unix')) || (has('mac'))
 elseif (has('win32') || has('win64'))
     " Path 'C:\Users\<user>\AppData\Local\nvim\'
     let g:python3_host_prog = 'C:/MyApps/Python37/python.exe'
-    set rtp^=C:/MyApps/vim/vimfiles
-    set rtp+=C:/MyApps/vim/vimfiles/after
+    set rtp^=C:/MyApps/VConfig/.vim
+    set rtp+=C:/MyApps/VConfig/.vim/after
     let &packpath = &rtp
-    source C:/MyApps/vim/_vimrc
+    source C:/MyApps/VConfig/.init.vim
 endif

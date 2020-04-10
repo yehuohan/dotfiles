@@ -13,6 +13,8 @@
     "diagnostic.hintSign": "►",
     "diagnostic.messageTarget": "float",
     "signature.enable": true,
+    "coc.source.file.enable": true,
+    "coc.source.file.ignoreHidden": false,
     "coc.preferences.extensionUpdateCheck": "weekly",
     "coc.preferences.enableFloatHighlight": true,
     "coc.preferences.rootPatterns": [".popc", "tags", ".git", ".hg", ".svn", ".projections.json"],
