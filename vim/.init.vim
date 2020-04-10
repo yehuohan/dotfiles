@@ -301,7 +301,11 @@ if s:gset.use_spector
 endif
     Plug 't9md/vim-quickhl'
     Plug 'RRethy/vim-illuminate'
+if IsNVim()
+    Plug 'norcalli/nvim-colorizer.lua', {'on': 'ColorizerToggle'}
+else
     Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
+endif
     Plug 'Konfekt/FastFold'
     Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
     Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
@@ -1195,10 +1199,18 @@ endif
     nnoremap <leader>tg :IlluminationToggle<CR>
 " }}}
 
+" colorizer.lua {{{ 颜色预览
+if IsNVim()
+    nnoremap <leader>tc :ColorizerToggle<CR>
+endif
+" }}}
+
 " colorizer {{{ 颜色预览
+if IsVim()
     let g:colorizer_nomap = 1
     let g:colorizer_startup = 0
     nnoremap <leader>tc :ColorToggle<CR>
+endif
 " }}}
 
 " FastFold {{{ 更新折叠
