@@ -95,7 +95,6 @@ if IsVim()
     for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
         execute 'set <M-'. t . '>=' . t
     endfor
-    set <M-Space>=<Space>
     set <M-,>=,
     set <M-.>=.
     set <M-;>=;
@@ -922,10 +921,9 @@ if s:gset.use_ycm
     let g:ycm_key_list_select_completion = ['<C-j>', '<M-j>', '<C-n>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-k>', '<M-k>', '<C-p>', '<Up>']
     let g:ycm_key_list_stop_completion = ['<C-y>']              " 关闭补全menu
-    let g:ycm_key_invoke_completion = '<C-Space>'               " 显示补全内容，YCM使用completefunc（C-X C-U）
+    let g:ycm_key_invoke_completion = '<C-l>'                   " 显示补全内容，YCM使用completefunc（C-X C-U）
                                                                 " YCM不支持的补全，通过omnifunc(C-X C-O)集成到YCM上
-    imap <C-l> <C-Space>
-    imap <M-l> <C-Space>
+    imap <M-l> <C-l>
     imap <M-y> <C-y>
     nnoremap <leader>gg :YcmCompleter<CR>
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
@@ -1006,10 +1004,9 @@ if s:gset.use_coc
     inoremap <expr> <M-k> pumvisible() ? "\<C-p>" : "\<C-k>"
     imap <C-j> <M-j>
     imap <C-k> <M-k>
-    inoremap <silent><expr> <C-Space>
+    inoremap <silent><expr> <C-l>
         \ pumvisible() ? "\<C-g>u" : coc#refresh()
-    imap <C-l> <C-Space>
-    imap <M-l> <C-Space>
+    imap <M-l> <C-l>
     nmap <leader>gd <Plug>(coc-definition)
     nmap <leader>gD <Plug>(coc-declaration)
     nmap <leader>gi <Plug>(coc-implementation)
@@ -2868,12 +2865,12 @@ augroup END
 function! GuiAdjustFontSize(inc)
     let s:gui_fontsize += a:inc
     if IsLinux()
-        execute 'Guifont! WenQuanYi Micro Hei Mono:h' . s:gui_fontsize
-        execute 'Guifont! DejaVu Sans Mono for Powerline:h' . s:gui_fontsize
+        execute 'GuiFont! WenQuanYi Micro Hei Mono:h' . s:gui_fontsize
+        execute 'GuiFont! DejaVu Sans Mono for Powerline:h' . s:gui_fontsize
     elseif IsWin()
-        "Guifont! YaHei Mono For Powerline:h12
-        "Guifont! Microsoft YaHei Mono:h12
-        execute 'Guifont! Consolas For Powerline:h' . s:gui_fontsize
+        "GuiFont! YaHei Mono For Powerline:h12
+        "GuiFont! Microsoft YaHei Mono:h12
+        execute 'GuiFont! Consolas For Powerline:h' . s:gui_fontsize
     endif
 endfunction
 " }}}
@@ -3071,7 +3068,7 @@ endif
     nnoremap <leader>lk :call QuickfixBasic('lk')<CR>
     nnoremap <leader>lK :call QuickfixBasic('lK')<CR>
     " 预览quickfix和location-list
-    nnoremap <M-Space> :call QuickfixPreview()<CR>
+    nnoremap <C-Space> :call QuickfixPreview()<CR>
     " 在新tab中打开列表项
     nnoremap <leader>qt :call QuickfixTabEdit()<CR>
     " 将quickfix中的内容复制location-list
