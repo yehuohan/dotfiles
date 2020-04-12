@@ -12,33 +12,33 @@ if [[ `uname` == "Linux" ]]; then
     fi
 
     # vim
-    cp ../.vimrc                    ./vim/
-    cp ../.vim/.ycm_extra_conf.py   ./vim/
-    cp ../.vim/jsconfig.json        ./vim/
-    cp ../.vim/.vimspector.json     ./vim/
-    cp ../.vim/coc-settings.json    ./vim/
-    cp -r ../.vim/vSnippets         ./vim/
-    cp -r ../.vim/autoload          ./vim/
-    cp -r ../.config/nvim           ./vim/
+    cp ../.init.vim                                 ./vim/
+    cp ../.vim/.ycm_extra_conf.py                   ./vim/
+    cp ../.vim/jsconfig.json                        ./vim/
+    cp ../.vim/.vimspector.json                     ./vim/
+    cp ../.vim/coc-settings.json                    ./vim/
+    cp -r ../.vim/vSnippets                         ./vim/
+    cp -r ../.vim/autoload                          ./vim/
+    cp -r ../.config/nvim                           ./vim/
     # zsh
-    cp ../.zshrc                    ./root/home/
-    cp ../.zprofile                 ./root/home/
-    cp ../.Xmodmap                  ./root/home/
-    cp ../.gitconfig                ./root/home/
+    cp ../.zshrc                                    ./root/home/
+    cp ../.zprofile                                 ./root/home/
+    cp ../.Xmodmap                                  ./root/home/
+    cp ../.gitconfig                                ./root/home/
     # .config
-    cp -r ../.config/i3             ./root/home/.config/
-    cp -r ../.config/i3status       ./root/home/.config/
-    cp -r ../.config/rofi           ./root/home/.config/
+    cp -r ../.config/i3                             ./root/home/.config/
+    cp -r ../.config/i3status                       ./root/home/.config/
+    cp -r ../.config/rofi                           ./root/home/.config/
     # tmux
-    cp ../.tmux.conf                ./root/home/
-    cp ../.tmux-status.conf         ./root/home/
+    cp ../.tmux.conf                                ./root/home/
+    cp ../.tmux-status.conf                         ./root/home/
     # misc
-    cp ../my-apps/ToggleTouchPad.py ./misc/
+    cp ../my-apps/ToggleTouchPad.py                 ./misc/
 
     # Arch
     if [[ `uname -r` =~ "lts" ]]; then
         # home/.config
-        cp ../.config/xfce4/terminal/terminalrc    ./root/home-arch/.config/xfce4/terminal/
+        cp ../.config/xfce4/terminal/terminalrc     ./root/home-arch/.config/xfce4/terminal/
         # X11
         cp ../.Xresources                           ./root/home-arch/
         cp ../.xinitrc                              ./root/home-arch/
@@ -75,13 +75,13 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
         echo "../VConfig is not existed."
         exit
     fi
-    cp ../VConfig/.init.vim                     ./vim/
-    cp ../VConfig/.vim/.ycm_extra_conf.py       ./vim/
-    cp ../VConfig/.vim/jsconfig.json            ./vim/
-    cp ../VConfig/.vim/.vimspector.json         ./vim/
-    cp ../VConfig/.vim/coc-settings.json        ./vim/
-    cp -r ../VConfig/.vim/vSnippets             ./vim/
-    cp -r ../VConfig/.vim/autoload              ./vim/
+    cp ../VConfig/.init.vim                         ./vim/
+    cp ../VConfig/.vim/.ycm_extra_conf.py           ./vim/
+    cp ../VConfig/.vim/jsconfig.json                ./vim/
+    cp ../VConfig/.vim/.vimspector.json             ./vim/
+    cp ../VConfig/.vim/coc-settings.json            ./vim/
+    cp -r ../VConfig/.vim/vSnippets                 ./vim/
+    cp -r ../VConfig/.vim/autoload                  ./vim/
 
     # cygwin
     cp ~/.minttyrc      ./root/home-gw/

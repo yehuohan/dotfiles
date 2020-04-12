@@ -766,7 +766,7 @@ endif
 " startify {{{ Vim启动首页
 if s:gset.use_startify
 if IsLinux() || IsMac()
-    let g:startify_bookmarks = [ {'c': '~/.vimrc'},
+    let g:startify_bookmarks = [ {'c': '~/.init.vim'},
                                 \{'d': '~/.config/nvim/init.vim'},
                                 \{'o': '$DotVimPath/todo.md'},
                                 \]
