@@ -2914,8 +2914,8 @@ augroup UserSettingsCmd
     autocmd FileType go         setlocal expandtab
     autocmd FileType javascript setlocal foldmethod=syntax
 
-    autocmd Filetype vim,help nnoremap <buffer> <S-k> :call FuncHelp('n')<CR>
-    autocmd Filetype vim,help vnoremap <buffer> <S-k> :call FuncHelp('v')<CR>
+    autocmd Filetype vim,help,lua nnoremap <buffer> <S-k> :call FuncHelp('n')<CR>
+    autocmd Filetype vim,help,lua vnoremap <buffer> <S-k> :call FuncHelp('v')<CR>
 augroup END
 " }}}
 " }}} End
