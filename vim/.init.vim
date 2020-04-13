@@ -716,12 +716,6 @@ endif
     nnoremap <M-o> :PopcBufferSwitchRight<CR>
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
-    nnoremap <silent> <leader>wf
-        \ :let g:Popc_wks_root = popc#layer#wks#GetCurrentWks()[1]<Bar>
-        \ :execute empty(g:Popc_wks_root) ? '' : ':Leaderf file ' . g:Popc_wks_root<CR>
-    nnoremap <silent> <leader>wt
-        \ :let g:Popc_wks_root = popc#layer#wks#GetCurrentWks()[1]<Bar>
-        \ :execute empty(g:Popc_wks_root) ? '' : ':Leaderf rg --nowrap -e "" ' . g:Popc_wks_root<CR>
     nnoremap <silent> <leader>ty
         \ :let g:Popc_tabline_layout = (get(g:, 'Popc_tabline_layout', 0) + 1) % 3<Bar>
         \ :call call('popc#ui#TabLineSetLayout',
