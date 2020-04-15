@@ -711,6 +711,7 @@ endif
     let g:Popc_separator = {'left' : '', 'right': ''}
     let g:Popc_subSeparator = {'left' : '', 'right': ''}
     let g:Popc_useLayerPath = 0
+    let g:Popc_useLayerRoots = ['.popc', '.git', '.svn', '.hg', 'tags']
     nnoremap <leader><leader>h :PopcBuffer<CR>
     nnoremap <M-i> :PopcBufferSwitchLeft<CR>
     nnoremap <M-o> :PopcBufferSwitchRight<CR>
@@ -1378,35 +1379,6 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
 endfunction
 " }}}
 
-" FUNCTION: GetRoot([markers]) {{{ 查找root目录
-" @param markers: 匹配root目录的列表参数
-function! GetRoot(...)
-    let l:root = popc#layer#wks#GetCurrentWks()[1]
-    if !empty(l:root)
-        return l:root
-    endif
-
-    if a:0 == 0 || empty(a:1)
-        return ''
-    endif
-    let l:dir = expand('%:p:h')
-    let l:dir_last = ''
-    while l:dir !=# l:dir_last
-        let l:dir_last = l:dir
-        for m in a:1
-            let l:val = l:dir . '/' . m
-            if filereadable(l:val) || isdirectory(l:val)
-                let l:root = fnameescape(l:dir)
-                return l:root
-            endif
-        endfor
-        let l:dir = fnamemodify(l:dir, ':p:h:h')
-    endwhile
-
-    return l:root
-endfunction
-" }}}
-
 " FUNCTION: GetFileList(pat, [sdir]) {{{ 获取文件列表
 " @param pat: 文件匹配模式，如*.pro
 " @param sdir: 查找起始目录，默认从当前文件所在目录向上查找到根目录
@@ -1965,7 +1937,6 @@ let s:fw = {
             \ }
         \ },
     \ 'misc' : {
-        \ 'markers' : ['.popc', '.git', '.svn', '.hg', 'tags'],
         \ 'strings' : [],
         \ },
     \ 'mappings' : {
@@ -2250,7 +2221,7 @@ endfunction
 
 " FUNCTION: FindWowRoot() {{{ 查找root路径
 function! FindWowRoot()
-    let s:fw.args.root = GetRoot(s:fw.misc.markers)
+    let s:fw.args.root = popc#utils#FindRoot()
 endfunction
 " }}}
 
@@ -2306,6 +2277,8 @@ endfunction
 " }}}
 
 " Workspace {{{
+" Required: 'yehuohan/popc'
+
 let s:ws = {
     \ 'settings': {
         \ 'root' : '',
@@ -2681,7 +2654,6 @@ endfunction
 let s:opt = {
     \ 'lst' : {
         \ 'conceallevel' : [2, 0],
-        \ 'foldcolumn'   : [1, 0],
         \ 'virtualedit'  : ['all', ''],
         \ 'signcolumn'   : ['no', 'auto'],
         \ },
@@ -2997,7 +2969,6 @@ endif
     nnoremap <leader>ib :call OptionInv('scrollbind')<CR>
     nnoremap <leader>iv :call OptionLst('virtualedit')<CR>
     nnoremap <leader>ic :call OptionLst('conceallevel')<CR>
-    nnoremap <leader>if :call OptionLst('foldcolumn')<CR>
     nnoremap <leader>is :call OptionLst('signcolumn')<CR>
     nnoremap <leader>in :call OptionFunc('number')<CR>
     nnoremap <leader>ih :call OptionFunc('syntax')<CR>
