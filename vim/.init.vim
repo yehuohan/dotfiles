@@ -1542,16 +1542,15 @@ endfunction
 "           'yehuohan/popc', 'yehuohan/popset'
 
 " s:rp {{{
+" @attribute args: project参数
 " @attribute type: 文件类型
-" @attribute args, srcf, outf: 用于type的参数
 " @attribute cell: 用于type的cell类型
 " @attribute efm: 用于type的errorformat类型
 " @attribute pro: 项目类型
 " @attribute pat: 匹配模式字符串
 let s:rp = {
-    \ 'args' : '',
-    \ 'srcf' : '',
-    \ 'outf' : '',
+    \ 'args' : {
+        \ },
     \ 'type' : {
         \ 'c'          : [IsWin() ? 'gcc %s %s -o %s && %s' : 'gcc %s %s -o %s && ./%s',
                                                                \ 'args' , 'srcf' , 'outf' , 'outf' ],
@@ -1608,11 +1607,13 @@ function! s:rp.printf(type, wdir, args, srcf, outf) dict
         \ || ('dosbatch' ==? a:type && !IsWin())
         throw 's:rp.type doesn''t support "' . a:type . '"'
     endif
-    let self.args = a:args
-    let self.srcf = '"' . a:srcf . '"'
-    let self.outf = '"' . a:outf . '"'
+    let l:dict = {
+        \ 'args' : a:args,
+        \ 'srcf' : '"' . a:srcf . '"',
+        \ 'outf' : '"' . a:outf . '"'
+        \ }
     let l:pstr = copy(self.type[a:type])
-    call map(l:pstr, {key, val -> (key == 0) ? val : get(self, val, '')})
+    call map(l:pstr, {key, val -> (key == 0) ? val : get(l:dict, val, '')})
     " create exec string
     return self.run(a:type, a:wdir, call('printf', l:pstr))
 endfunction
