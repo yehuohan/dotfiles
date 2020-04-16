@@ -1543,14 +1543,12 @@ endfunction
 
 " s:rp {{{
 " @attribute type: 文件类型
-" @attribute wdir, args, srcf, outf: 用于type的参数
+" @attribute args, srcf, outf: 用于type的参数
 " @attribute cell: 用于type的cell类型
 " @attribute efm: 用于type的errorformat类型
 " @attribute pro: 项目类型
 " @attribute pat: 匹配模式字符串
-" @attribute sel: 预置RunFile参数输入
 let s:rp = {
-    \ 'wdir' : '',
     \ 'args' : '',
     \ 'srcf' : '',
     \ 'outf' : '',
@@ -1610,14 +1608,13 @@ function! s:rp.printf(type, wdir, args, srcf, outf) dict
         \ || ('dosbatch' ==? a:type && !IsWin())
         throw 's:rp.type doesn''t support "' . a:type . '"'
     endif
-    let self.wdir = a:wdir
     let self.args = a:args
     let self.srcf = '"' . a:srcf . '"'
     let self.outf = '"' . a:outf . '"'
     let l:pstr = copy(self.type[a:type])
     call map(l:pstr, {key, val -> (key == 0) ? val : get(self, val, '')})
     " create exec string
-    return self.run(a:type, self.wdir, call('printf', l:pstr))
+    return self.run(a:type, a:wdir, call('printf', l:pstr))
 endfunction
 " }}}
 
