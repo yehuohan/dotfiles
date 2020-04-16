@@ -1594,17 +1594,6 @@ let s:rp = {
     \ 'pat' : {
         \ 'target'  : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
-        \ },
-    \ 'sel' : {
-        \ 'opt' : 'select args to RunFile',
-        \ 'lst' : [
-                \ '-g',
-                \ '-finput-charset=utf-8 -fexec-charset=gbk',
-                \ '-static',
-                \ '-fPIC -shared'
-                \ ],
-        \ 'cpl' : 'customlist,GetMultiFilesCompletion',
-        \ 'cmd' : {sopt, arg -> call('RunFile', [tr(arg, '|', ' ')])},
         \ }
     \ }
 " FUNCTION: s:rp.printf(type, wdir, args, srcf, outf) dict {{{
@@ -1683,6 +1672,22 @@ function! RunFile(...)
     catch
         echo v:exception
     endtry
+endfunction
+" }}}
+
+" FUNCTION: RunArg() {{{
+function! RunArg()
+    call PopSelection({
+        \ 'opt' : 'select args to RunFile',
+        \ 'lst' : [
+                \ '-g',
+                \ '-finput-charset=utf-8 -fexec-charset=gbk',
+                \ '-static',
+                \ '-fPIC -shared'
+                \ ],
+        \ 'cpl' : 'customlist,GetMultiFilesCompletion',
+        \ 'cmd' : {sopt, arg -> call('RunFile', [tr(arg, '|', ' ')])}
+        \ })
 endfunction
 " }}}
 
@@ -1811,7 +1816,6 @@ function! FnSphinx(sopt, sel, args)
 endfunction
 "}}}
 
-let RpArg         = function('popset#set#PopSelection', [s:rp.sel])
 let RpQMake       = function('RunProject', ['qmake' , {'run':0}])
 let RpQMakeRun    = function('RunProject', ['qmake' , {'run':1}])
 let RpQMakeClean  = function('RunProject', ['qmake' , {'run':0, 'args':'distclean'}])
@@ -3119,8 +3123,8 @@ endif
     nnoremap <leader>sa :call RunScript('async')<CR>
     " 编译运行当前文件或项目
     nnoremap <leader>rf  :call RunFile()<CR>
+    nnoremap <leader>ra  :call RunArg()<CR>
     nnoremap <leader>rj  :call RunCell()<CR>
-    nnoremap <leader>ra  :call RpArg()<CR>
     nnoremap <leader>rQ  :call RpQMake()<CR>
     nnoremap <leader>rq  :call RpQMakeRun()<CR>
     nnoremap <leader>rcq :call RpQMakeClean()<CR>
