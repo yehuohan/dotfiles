@@ -2747,6 +2747,7 @@ endfunction
     set laststatus=2                    " 一直显示状态栏
     set noshowmode                      " 命令行栏不显示VISUAL等字样
     set completeopt=menuone,preview     " 补全显示设置
+    set wildmenu                        " 使能命令补全
     set backspace=indent,eol,start      " Insert模式下使用BackSpace删除
     set title                           " 允许设置titlestring
     set hidden                          " 允许在未保存文件时切换buffer
