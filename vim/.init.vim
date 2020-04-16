@@ -1539,7 +1539,7 @@ endfunction
 
 " Project {{{
 " Required: 'skywind3000/asyncrun.vim'
-"           'yehuohan/popset'
+"           'yehuohan/popc', 'yehuohan/popset'
 
 " s:rp {{{
 " @attribute type: 文件类型
@@ -1890,14 +1890,6 @@ let s:fw = {
         \ 'filters' : '',
         \ 'globlst' : []
         \ },
-    \ 'param' : {
-        \ 'sel' : '',
-        \ 'F' : {
-            \ 'opt' : 'select search options',
-            \ 'lst' : ['--no-fixed-strings', '--hidden', '--no-ignore'],
-            \ 'cmd' : {sopt, arg -> s:fw.setParam('opt', arg)}
-            \ }
-        \ },
     \ 'rg' : {
         \ 'asyncrun' : {
             \ 'ch' : '"#%',
@@ -1995,25 +1987,25 @@ endfunction
 
 " FUNCTION: s:fw.setParam(key, val) dict {{{
 function! s:fw.setParam(key, val) dict
-    if a:key == 'F'
-        let l:self[a:key] .= a:val
-    endif
-    call self.exec()
+    let l:self[a:key] .= a:val
+    call self.exec(0)
 endfunction
 " }}}
 
-" FUNCTION: s:fw.exec() dict {{{
-function! s:fw.exec() dict
-    if empty(self.param.sel)
+" FUNCTION: s:fw.exec(param) dict {{{
+function! s:fw.exec(param) dict
+    if a:param
+        call PopSelection({
+            \ 'opt' : 'select search options',
+            \ 'lst' : ['--no-fixed-strings', '--hidden', '--no-ignore'],
+            \ 'cmd' : {sopt, arg -> s:fw.setParam('opt', arg)}
+            \ })
+    else
         " format: printf('cmd %s %s %s',<opt>,<pat>,<loc>)
         let l:exec = printf(self.cmd, self.opt, escape(self.pat, self.engine.ch), self.loc)
         execute l:exec
         call FindWowHighlight(self.pat)
         call SetExecLast(l:exec)
-    else
-        let l:sel = self.param.sel[0]
-        let self.param.sel = self.param.sel[1:-1]
-        call PopSelection(self.param[l:sel])
     endif
 endfunction
 " }}}
@@ -2121,9 +2113,6 @@ function! FindWow(keys, mode)
                 let l:opt .= '-g' . join(s:fw.args.globlst, ' -g')
             endif
         endif
-        if a:keys =~# 'F'
-            let s:fw.param.sel .= 'F'
-        endif
         return l:opt
     endfunction
     " }}}
@@ -2181,7 +2170,7 @@ function! FindWow(keys, mode)
     let s:fw.opt = s:parseOptions()
     let s:fw.cmd = s:parseCommand()
 
-    call s:fw.exec()
+    call s:fw.exec(a:keys =~# 'F')
 endfunction
 " }}}
 
