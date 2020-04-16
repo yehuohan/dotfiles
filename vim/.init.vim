@@ -1543,15 +1543,27 @@ endfunction
 
 " s:rp {{{
 " @attribute args: project参数
-" @attribute type: 文件类型
-" @attribute cell: 用于type的cell类型
-" @attribute efm: 用于type的errorformat类型
-" @attribute pro: 项目类型
+" @attribute proj: project类型
+" @attribute filetype: 文件类型
+" @attribute cell: 用于filetype的cell类型
+" @attribute efm: 用于filetype的errorformat类型
 " @attribute pat: 匹配模式字符串
 let s:rp = {
     \ 'args' : {
+        \ 'root' : '',
+        \ 'proj' : '',
+        \ 'conf' : v:null,
         \ },
-    \ 'type' : {
+    \ 'proj' : {
+        \ 'file'   : [''                               , 'FnFile'  ],
+        \ 'cell'   : [''                               , 'FnCell'  ],
+        \ 'qmake'  : ['*.pro'                          , 'FnQMake' ],
+        \ 'cmake'  : ['cmakelists.txt'                 , 'FnCMake' ],
+        \ 'make'   : ['makefile'                       , 'FnMake'  ],
+        \ 'vs'     : ['*.sln'                          , 'FnVs'    ],
+        \ 'sphinx' : [IsWin() ? 'make.bat' : 'makefile', 'FnSphinx'],
+        \ },
+    \ 'filetype' : {
         \ 'c'          : [IsWin() ? 'gcc %s %s -o %s && %s' : 'gcc %s %s -o %s && ./%s',
                                                                \ 'args' , 'srcf' , 'outf' , 'outf' ],
         \ 'cpp'        : [IsWin() ? 'g++ -std=c++11 %s %s -o %s && %s' : 'g++ -std=c++11 %s %s -o %s && ./%s',
@@ -1581,13 +1593,6 @@ let s:rp = {
     \ 'efm' : {
         \ 'python' : '%*\\sFile\ \"%f\"\\,\ line\ %l\\,\ %m',
         \ },
-    \ 'pro' : {
-        \ 'qmake'  : ['*.pro'                          , 'FnQMake' ],
-        \ 'cmake'  : ['cmakelists.txt'                 , 'FnCMake' ],
-        \ 'make'   : ['makefile'                       , 'FnMake'  ],
-        \ 'vs'     : ['*.sln'                          , 'FnVs'    ],
-        \ 'sphinx' : [IsWin() ? 'make.bat' : 'makefile', 'FnSphinx'],
-        \ },
     \ 'pat' : {
         \ 'target'  : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
@@ -1595,24 +1600,24 @@ let s:rp = {
     \ }
 " FUNCTION: s:rp.printf(type, wdir, args, srcf, outf) dict {{{
 " 生成文件编译或执行命令字符串。
-" @param type: 编译类型，需要包含于s:rp.type中
+" @param type: 编译类型，需要包含于s:rp.filetype中
 " @param wdir: 命令运行目录
 " @param args: 参数
 " @param srcf: 源文件
 " @param outf: 目标文件
 " @return 返回编译或执行命令
 function! s:rp.printf(type, wdir, args, srcf, outf) dict
-    if !has_key(s:rp.type, a:type)
+    if !has_key(self.filetype, a:type)
         \ || ('sh' ==? a:type && !(IsLinux() || IsGw() || IsMac()))
         \ || ('dosbatch' ==? a:type && !IsWin())
-        throw 's:rp.type doesn''t support "' . a:type . '"'
+        throw 's:rp.filetype doesn''t support "' . a:type . '"'
     endif
     let l:dict = {
         \ 'args' : a:args,
         \ 'srcf' : '"' . a:srcf . '"',
         \ 'outf' : '"' . a:outf . '"'
         \ }
-    let l:pstr = copy(self.type[a:type])
+    let l:pstr = copy(self.filetype[a:type])
     call map(l:pstr, {key, val -> (key == 0) ? val : get(l:dict, val, '')})
     " create exec string
     return self.run(a:type, a:wdir, call('printf', l:pstr))
@@ -1626,8 +1631,8 @@ endfunction
 " @param cmd: 命令字符串
 " @return 返回运行命令
 function! s:rp.run(type, wdir, cmd) dict
-    if has_key(s:rp.efm, a:type)
-        execute 'setlocal efm=' . s:rp.efm[a:type]
+    if has_key(self.efm, a:type)
+        execute 'setlocal efm=' . self.efm[a:type]
     endif
     let l:exec = ':AsyncRun '
     if !empty(a:wdir)
@@ -1642,64 +1647,18 @@ endfunction
 " FUNCTION: s:rp.runcell(type) dict {{{
 " @param type: cell类型，同时也是efm类型
 function! s:rp.runcell(type) dict
-    if !has_key(s:rp.cell, a:type)
+    if !has_key(self.cell, a:type)
         throw 's:rp.cell doesn''t support "' . a:type . '"'
     endif
-    if has_key(s:rp.efm, a:type)
-        execute 'setlocal efm=' . s:rp.efm[a:type]
+    if has_key(self.efm, a:type)
+        execute 'setlocal efm=' . self.efm[a:type]
     endif
-    let [l:bin, l:pats, l:pate] = s:rp.cell[a:type]
+    let [l:bin, l:pats, l:pate] = self.cell[a:type]
     let l:range = GetRange(l:pats, l:pate)
     " create exec string
     return ':' . join(l:range, ',') . 'AsyncRun '. l:bin
 endfunction
 " }}}
-" }}}
-
-" FUNCTION: RunFile(...) {{{
-function! RunFile(...)
-    let l:type    = &filetype           " 文件类型
-    let l:srcfile = expand('%:t')       " 文件名，不带路径，带扩展名
-    let l:outfile = expand('%:t:r')     " 文件名，不带路径，不带扩展名
-    let l:workdir = expand('%:p:h')     " 当前文件目录
-    let l:argstr  = a:0 > 0 ? a:1 : ''
-    try
-        let l:exec = s:rp.printf(l:type, l:workdir, l:argstr, l:srcfile, l:outfile)
-        execute l:exec
-        call SetExecLast(l:exec)
-    catch
-        echo v:exception
-    endtry
-endfunction
-" }}}
-
-" FUNCTION: RunArg() {{{
-function! RunArg()
-    call PopSelection({
-        \ 'opt' : 'select args to RunFile',
-        \ 'lst' : [
-                \ '-g',
-                \ '-finput-charset=utf-8 -fexec-charset=gbk',
-                \ '-static',
-                \ '-fPIC -shared'
-                \ ],
-        \ 'cpl' : 'customlist,GetMultiFilesCompletion',
-        \ 'cmd' : {sopt, arg -> call('RunFile', [tr(arg, '|', ' ')])}
-        \ })
-endfunction
-" }}}
-
-" FUNCTION: RunCell() {{{
-function! RunCell()
-    try
-        let l:exec = s:rp.runcell(&filetype)
-        execute l:exec
-        echo l:exec
-        call SetExecLast(l:exec)
-    catch
-        echo v:exception
-    endtry
-endfunction
 " }}}
 
 " FUNCTION: RunProject(type, args) {{{
@@ -1711,8 +1670,9 @@ endfunction
 "   - args: Project的附加参数列表
 " @param args: 编译工程文件函数的附加参数，需要采用popset插件
 function! RunProject(type, args)
-    let [l:pat, l:fn] = s:rp.pro[a:type]
-    let l:prj = GetFileList(l:pat)
+    let [l:pat, l:fn] = s:rp.proj[a:type]
+    let l:prj = empty(l:pat) ? ['%'] : GetFileList(l:pat)
+
     if len(l:prj) == 1
         let Fn = function(l:fn)
         call Fn('', l:prj[0], a:args)
@@ -1722,10 +1682,54 @@ function! RunProject(type, args)
             \ 'lst' : l:prj,
             \ 'cmd' : a:fn,
             \ 'arg' : a:args
-            \})
+            \ })
     else
         echo 'None of ' . l:pat . ' was found!'
     endif
+endfunction
+" }}}
+
+" FUNCTION: FnFile(sopt, sel, args) {{{
+function! FnFile(sopt, sel, args, ...)
+    if a:args.args
+        call PopSelection({
+            \ 'opt' : 'select args to RunFile',
+            \ 'lst' : [
+                    \ '-g',
+                    \ '-finput-charset=utf-8 -fexec-charset=gbk',
+                    \ '-static',
+                    \ '-fPIC -shared'
+                    \ ],
+            \ 'cpl' : 'customlist,GetMultiFilesCompletion',
+            \ 'cmd' : {sopt, arg -> call('FnFile', [a:sopt, a:sel, {'args':0}, arg])}
+            \ })
+    else
+        let l:type    = &filetype           " 文件类型
+        let l:srcfile = expand('%:t')       " 文件名，不带路径，带扩展名
+        let l:outfile = expand('%:t:r')     " 文件名，不带路径，不带扩展名
+        let l:workdir = expand('%:p:h')     " 当前文件目录
+        let l:argstr  = a:0 > 0 ? a:1 : ''
+        try
+            let l:exec = s:rp.printf(l:type, l:workdir, l:argstr, l:srcfile, l:outfile)
+            execute l:exec
+            call SetExecLast(l:exec)
+        catch
+            echo v:exception
+        endtry
+    endif
+endfunction
+" }}}
+
+" FUNCTION: FnCell(sopt, sel, args) {{{
+function! FnCell(sopt, sel, args)
+    try
+        let l:exec = s:rp.runcell(&filetype)
+        execute l:exec
+        echo l:exec
+        call SetExecLast(l:exec)
+    catch
+        echo v:exception
+    endtry
 endfunction
 " }}}
 
@@ -1814,6 +1818,9 @@ function! FnSphinx(sopt, sel, args)
 endfunction
 "}}}
 
+let RpFile        = function('RunProject', ['file' ,  {'args': 0}])
+let RpFileArg     = function('RunProject', ['file' ,  {'args': 1}])
+let RpCell        = function('RunProject', ['cell' ,  {}])
 let RpQMake       = function('RunProject', ['qmake' , {'run':0}])
 let RpQMakeRun    = function('RunProject', ['qmake' , {'run':1}])
 let RpQMakeClean  = function('RunProject', ['qmake' , {'run':0, 'args':'distclean'}])
@@ -3120,9 +3127,9 @@ endif
     nnoremap <leader>se :call RunScript('exe')<CR>
     nnoremap <leader>sa :call RunScript('async')<CR>
     " 编译运行当前文件或项目
-    nnoremap <leader>rf  :call RunFile()<CR>
-    nnoremap <leader>ra  :call RunArg()<CR>
-    nnoremap <leader>rj  :call RunCell()<CR>
+    nnoremap <leader>rf  :call RpFile()<CR>
+    nnoremap <leader>ra  :call RpFileArg()<CR>
+    nnoremap <leader>rj  :call RpCell()<CR>
     nnoremap <leader>rQ  :call RpQMake()<CR>
     nnoremap <leader>rq  :call RpQMakeRun()<CR>
     nnoremap <leader>rcq :call RpQMakeClean()<CR>
