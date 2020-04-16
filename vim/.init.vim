@@ -645,7 +645,7 @@ else
         if !get(b:, 'lightline_check_flg', 1)
             return ''
         endif
-        let l:ret = search('\t', 'nw')
+        let l:ret = search('\m\(\t \| \t\)', 'nw')
         return (l:ret == 0) ? '' : 'I:'.string(l:ret)
     endfunction
 
@@ -653,7 +653,7 @@ else
         if !get(b:, 'lightline_check_flg', 1)
             return ''
         endif
-        let ret = search('\s\+$', 'nw')
+        let ret = search('\m\s\+$', 'nw')
         return (l:ret == 0) ? '' : 'T:'.string(l:ret)
     endfunction
     " }}}
@@ -2992,6 +2992,7 @@ endif
     " ctrl-c & ctrl-v
     vnoremap <leader>c "+y
     nnoremap <leader>cp "+p
+    nnoremap <leader>cP "+P
     vnoremap <C-c> "+y
     nnoremap <C-v> "+p
     inoremap <C-v> <Esc>"+pi
