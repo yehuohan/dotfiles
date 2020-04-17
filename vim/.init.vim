@@ -1598,32 +1598,6 @@ let s:rp = {
         \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ }
     \ }
-" FUNCTION: s:rp.printf(type, wdir, args, srcf, outf) dict {{{
-" 生成文件编译或执行命令字符串。
-" @param type: 编译类型，需要包含于s:rp.filetype中
-" @param wdir: 命令运行目录
-" @param args: 参数
-" @param srcf: 源文件
-" @param outf: 目标文件
-" @return 返回编译或执行命令
-function! s:rp.printf(type, wdir, args, srcf, outf) dict
-    if !has_key(self.filetype, a:type)
-        \ || ('sh' ==? a:type && !(IsLinux() || IsGw() || IsMac()))
-        \ || ('dosbatch' ==? a:type && !IsWin())
-        throw 's:rp.filetype doesn''t support "' . a:type . '"'
-    endif
-    let l:dict = {
-        \ 'args' : a:args,
-        \ 'srcf' : '"' . a:srcf . '"',
-        \ 'outf' : '"' . a:outf . '"'
-        \ }
-    let l:pstr = copy(self.filetype[a:type])
-    call map(l:pstr, {key, val -> (key == 0) ? val : get(l:dict, val, '')})
-    " create exec string
-    return self.run(a:type, a:wdir, call('printf', l:pstr))
-endfunction
-" }}}
-
 " FUNCTION: s:rp.run(type, wdir, cmd) dict {{{
 " 生成运行命令字符串。
 " @param wdir: 命令运行目录
@@ -1644,9 +1618,35 @@ function! s:rp.run(type, wdir, cmd) dict
 endfunction
 " }}}
 
-" FUNCTION: s:rp.runcell(type) dict {{{
+" FUNCTION: s:rp.runFile(type, wdir, args, srcf, outf) dict {{{
+" 生成文件编译或执行命令字符串。
+" @param type: 编译类型，需要包含于s:rp.filetype中
+" @param wdir: 命令运行目录
+" @param args: 参数
+" @param srcf: 源文件
+" @param outf: 目标文件
+" @return 返回编译或执行命令
+function! s:rp.runFile(type, wdir, args, srcf, outf) dict
+    if !has_key(self.filetype, a:type)
+        \ || ('sh' ==? a:type && !(IsLinux() || IsGw() || IsMac()))
+        \ || ('dosbatch' ==? a:type && !IsWin())
+        throw 's:rp.filetype doesn''t support "' . a:type . '"'
+    endif
+    let l:dict = {
+        \ 'args' : a:args,
+        \ 'srcf' : '"' . a:srcf . '"',
+        \ 'outf' : '"' . a:outf . '"'
+        \ }
+    let l:pstr = copy(self.filetype[a:type])
+    call map(l:pstr, {key, val -> (key == 0) ? val : get(l:dict, val, '')})
+    " create exec string
+    return self.run(a:type, a:wdir, call('printf', l:pstr))
+endfunction
+" }}}
+
+" FUNCTION: s:rp.runCell(type) dict {{{
 " @param type: cell类型，同时也是efm类型
-function! s:rp.runcell(type) dict
+function! s:rp.runCell(type) dict
     if !has_key(self.cell, a:type)
         throw 's:rp.cell doesn''t support "' . a:type . '"'
     endif
@@ -1710,7 +1710,7 @@ function! FnFile(sopt, sel, args, ...)
         let l:workdir = expand('%:p:h')     " 当前文件目录
         let l:argstr  = a:0 > 0 ? a:1 : ''
         try
-            let l:exec = s:rp.printf(l:type, l:workdir, l:argstr, l:srcfile, l:outfile)
+            let l:exec = s:rp.runFile(l:type, l:workdir, l:argstr, l:srcfile, l:outfile)
             execute l:exec
             call SetExecLast(l:exec)
         catch
@@ -1723,7 +1723,7 @@ endfunction
 " FUNCTION: FnCell(sopt, sel, args) {{{
 function! FnCell(sopt, sel, args)
     try
-        let l:exec = s:rp.runcell(&filetype)
+        let l:exec = s:rp.runCell(&filetype)
         execute l:exec
         echo l:exec
         call SetExecLast(l:exec)
