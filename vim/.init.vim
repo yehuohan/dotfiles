@@ -1555,18 +1555,18 @@ endfunction
 " @attribute pat: 匹配模式字符串
 let s:rp = {
     \ 'args' : {
-        \ 'root' : '',
         \ 'proj' : '',
+        \ 'file' : '',
         \ 'conf' : v:null,
         \ },
     \ 'proj' : {
-        \ 'file'   : [''                               , 'FnFile'  ],
-        \ 'cell'   : [''                               , 'FnCell'  ],
-        \ 'qmake'  : ['*.pro'                          , 'FnQMake' ],
-        \ 'cmake'  : ['cmakelists.txt'                 , 'FnCMake' ],
-        \ 'make'   : ['makefile'                       , 'FnMake'  ],
-        \ 'vs'     : ['*.sln'                          , 'FnVs'    ],
-        \ 'sphinx' : [IsWin() ? 'make.bat' : 'makefile', 'FnSphinx'],
+        \ 'filetype' : ['FnFile'  , ''                               ],
+        \ 'cell'     : ['FnCell'  , ''                               ],
+        \ 'qmake'    : ['FnQMake' , '*.pro'                          ],
+        \ 'cmake'    : ['FnCMake' , 'cmakelists.txt'                 ],
+        \ 'make'     : ['FnMake'  , 'makefile'                       ],
+        \ 'vs'       : ['FnVs'    , '*.sln'                          ],
+        \ 'sphinx'   : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
         \ },
     \ 'filetype' : {
         \ 'c'          : [IsWin() ? 'gcc %s %s -o %s && %s' : 'gcc %s %s -o %s && ./%s',
@@ -1603,15 +1603,15 @@ let s:rp = {
         \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ }
     \ }
-" FUNCTION: s:rp.run(type, wdir, cmd) dict {{{
+" FUNCTION: s:rp.run(proj, wdir, cmd) dict {{{
 " 生成运行命令字符串。
+" @param proj: errorformat类型，在s:rp.efm中
 " @param wdir: 命令运行目录
-" @param type: errorformat类型，在s:rp.efm中
 " @param cmd: 命令字符串
 " @return 返回运行命令
-function! s:rp.run(type, wdir, cmd) dict
-    if has_key(self.efm, a:type)
-        execute 'setlocal efm=' . self.efm[a:type]
+function! s:rp.run(proj, wdir, cmd) dict
+    if has_key(self.efm, a:proj)
+        execute 'setlocal efm=' . self.efm[a:proj]
     endif
     let l:exec = ':AsyncRun '
     if !empty(a:wdir)
@@ -1619,74 +1619,34 @@ function! s:rp.run(type, wdir, cmd) dict
         let l:exec .= '-cwd=' . l:wdir
         execute 'lcd ' . l:wdir
     endif
-    return join([l:exec, a:cmd])
-endfunction
-" }}}
-
-" FUNCTION: s:rp.runFile(type, wdir, args, srcf, outf) dict {{{
-" 生成文件编译或执行命令字符串。
-" @param type: 编译类型，需要包含于s:rp.filetype中
-" @param wdir: 命令运行目录
-" @param args: 参数
-" @param srcf: 源文件
-" @param outf: 目标文件
-" @return 返回编译或执行命令
-function! s:rp.runFile(type, wdir, args, srcf, outf) dict
-    if !has_key(self.filetype, a:type)
-        \ || ('sh' ==? a:type && !(IsLinux() || IsGw() || IsMac()))
-        \ || ('dosbatch' ==? a:type && !IsWin())
-        throw 's:rp.filetype doesn''t support "' . a:type . '"'
-    endif
-    let l:dict = {
-        \ 'args' : a:args,
-        \ 'srcf' : '"' . a:srcf . '"',
-        \ 'outf' : '"' . a:outf . '"'
-        \ }
-    let l:pstr = copy(self.filetype[a:type])
-    call map(l:pstr, {key, val -> (key == 0) ? val : get(l:dict, val, '')})
-    " create exec string
-    return self.run(a:type, a:wdir, call('printf', l:pstr))
-endfunction
-" }}}
-
-" FUNCTION: s:rp.runCell(type) dict {{{
-" @param type: cell类型，同时也是efm类型
-function! s:rp.runCell(type) dict
-    if !has_key(self.cell, a:type)
-        throw 's:rp.cell doesn''t support "' . a:type . '"'
-    endif
-    if has_key(self.efm, a:type)
-        execute 'setlocal efm=' . self.efm[a:type]
-    endif
-    let [l:bin, l:pats, l:pate] = self.cell[a:type]
-    let l:range = GetRange(l:pats, l:pate)
-    " create exec string
-    return ':' . join(l:range, ',') . 'AsyncRun '. l:bin
+    let l:exec = join([l:exec, a:cmd])
+    call SetExecLast(l:exec)
+    return l:exec
 endfunction
 " }}}
 " }}}
 
-" FUNCTION: RunProject(type, args) {{{
+" FUNCTION: RunProject(proj, conf) {{{
 " 当找到多个Project文件时，会弹出选项以供选择。
-" @param type: 工程类型，用于获取工程运行回调函数
+" @param proj: 工程类型，用于获取工程运行回调函数
 "   项目回调函数需要3个参数(可能用于popset插件)：
 "   - sopt: 自定义参数信息
 "   - sel: Project文件路径
 "   - args: Project的附加参数列表
-" @param args: 编译工程文件函数的附加参数，需要采用popset插件
-function! RunProject(type, args)
-    let [l:pat, l:fn] = s:rp.proj[a:type]
-    let l:prj = empty(l:pat) ? ['%'] : GetFileList(l:pat)
+" @param conf: 编译工程文件函数的配置参数
+function! RunProject(proj, conf)
+    let [l:fn, l:pat] = s:rp.proj[a:proj]
+    let l:prj = empty(l:pat) ? [expand('%:p')] : GetFileList(l:pat)
 
     if len(l:prj) == 1
         let Fn = function(l:fn)
-        call Fn('', l:prj[0], a:args)
+        call Fn('', l:prj[0], a:conf)
     elseif len(l:prj) > 1
         call PopSelection({
             \ 'opt' : 'Please select the project file',
             \ 'lst' : l:prj,
             \ 'cmd' : a:fn,
-            \ 'arg' : a:args
+            \ 'arg' : a:conf
             \ })
     else
         echo 'None of ' . l:pat . ' was found!'
@@ -1695,8 +1655,8 @@ endfunction
 " }}}
 
 " FUNCTION: FnFile(sopt, sel, args) {{{
-function! FnFile(sopt, sel, args, ...)
-    if a:args.args
+function! FnFile(sopt, sel, args)
+    if a:args.input
         call PopSelection({
             \ 'opt' : 'select args to RunFile',
             \ 'lst' : [
@@ -1706,35 +1666,48 @@ function! FnFile(sopt, sel, args, ...)
                     \ '-fPIC -shared'
                     \ ],
             \ 'cpl' : 'customlist,GetMultiFilesCompletion',
-            \ 'cmd' : {sopt, arg -> call('FnFile', [a:sopt, a:sel, {'args':0}, arg])}
+            \ 'cmd' : {sopt, arg -> call('FnFile', [a:sopt, a:sel, {'input':0, 'args': arg}])}
             \ })
     else
-        let l:type    = &filetype           " 文件类型
-        let l:srcfile = expand('%:t')       " 文件名，不带路径，带扩展名
-        let l:outfile = expand('%:t:r')     " 文件名，不带路径，不带扩展名
-        let l:workdir = expand('%:p:h')     " 当前文件目录
-        let l:argstr  = a:0 > 0 ? a:1 : ''
-        try
-            let l:exec = s:rp.runFile(l:type, l:workdir, l:argstr, l:srcfile, l:outfile)
-            execute l:exec
-            call SetExecLast(l:exec)
-        catch
-            echo v:exception
-        endtry
+        let l:type = &filetype
+        if !has_key(s:rp.filetype, l:type)
+            \ || ('sh' ==? l:type && !(IsLinux() || IsGw() || IsMac()))
+            \ || ('dosbatch' ==? l:type && !IsWin())
+            echo 's:rp.filetype doesn''t support "' . l:type . '"'
+            return
+        endif
+        let l:dict = {
+            \ 'args' : get(a:args, 'args', ''),
+            \ 'srcf' : '"' . fnamemodify(a:sel, ':t') . '"',
+            \ 'outf' : '"' . fnamemodify(a:sel, ':t:r') . '"'
+            \ }
+        let l:workdir = fnamemodify(a:sel, ':h')
+
+        " create exec string
+        let l:pstr = copy(s:rp.filetype[l:type])
+        call map(l:pstr, {key, val -> (key == 0) ? val : get(l:dict, val, '')})
+        execute s:rp.run(l:type, l:workdir, call('printf', l:pstr))
     endif
 endfunction
 " }}}
 
 " FUNCTION: FnCell(sopt, sel, args) {{{
 function! FnCell(sopt, sel, args)
-    try
-        let l:exec = s:rp.runCell(&filetype)
-        execute l:exec
-        echo l:exec
-        call SetExecLast(l:exec)
-    catch
-        echo v:exception
-    endtry
+    let l:type = &filetype
+    if !has_key(s:rp.cell, l:type)
+        echo 's:rp.cell doesn''t support "' . l:type . '"'
+        return
+    endif
+    if has_key(s:rp.efm, l:type)
+        execute 'setlocal efm=' . s:rp.efm[l:type]
+    endif
+    let [l:bin, l:pats, l:pate] = s:rp.cell[l:type]
+    let l:range = GetRange(l:pats, l:pate)
+
+    " create exec string
+    let l:exec = ':' . join(l:range, ',') . 'AsyncRun '. l:bin
+    execute l:exec
+    echo l:exec
 endfunction
 " }}}
 
@@ -1823,24 +1796,24 @@ function! FnSphinx(sopt, sel, args)
 endfunction
 "}}}
 
-let RpFile        = function('RunProject', ['file' ,  {'args': 0}])
-let RpFileArg     = function('RunProject', ['file' ,  {'args': 1}])
-let RpCell        = function('RunProject', ['cell' ,  {}])
-let RpQMake       = function('RunProject', ['qmake' , {'run':0}])
-let RpQMakeRun    = function('RunProject', ['qmake' , {'run':1}])
-let RpQMakeClean  = function('RunProject', ['qmake' , {'run':0, 'args':'distclean'}])
-let RpCMake       = function('RunProject', ['cmake' , {'cmd':1}])
-let RpCMakeRun    = function('RunProject', ['cmake' , {'cmd':2}])
-let RpCMakeClean  = function('RunProject', ['cmake' , {'cmd':0}])
-let RpMake        = function('RunProject', ['make'  , {'run':0}])
-let RpMakeRun     = function('RunProject', ['make'  , {'run':1}])
-let RpMakeClean   = function('RunProject', ['make'  , {'run':0, 'args':'clean'}])
-let RpVs          = function('RunProject', ['vs'    , {'run':0, 'args':'Build'}])
-let RpVsRun       = function('RunProject', ['vs'    , {'run':1, 'args':'Build'}])
-let RpVsClean     = function('RunProject', ['vs'    , {'run':0, 'args':'Clean'}])
-let RpSphinx      = function('RunProject', ['sphinx', {'run':0, 'args':'html'}])
-let RpSphinxRun   = function('RunProject', ['sphinx', {'run':1, 'args':'html'}])
-let RpSphinxClean = function('RunProject', ['sphinx', {'run':0, 'args':'clean'}])
+let RpFile        = function('RunProject', ['filetype', {'input': 0}])
+let RpFileArg     = function('RunProject', ['filetype', {'input': 1}])
+let RpCell        = function('RunProject', ['cell'    , {}])
+let RpQMake       = function('RunProject', ['qmake'   , {'run':0}])
+let RpQMakeRun    = function('RunProject', ['qmake'   , {'run':1}])
+let RpQMakeClean  = function('RunProject', ['qmake'   , {'run':0, 'args':'distclean'}])
+let RpCMake       = function('RunProject', ['cmake'   , {'cmd':1}])
+let RpCMakeRun    = function('RunProject', ['cmake'   , {'cmd':2}])
+let RpCMakeClean  = function('RunProject', ['cmake'   , {'cmd':0}])
+let RpMake        = function('RunProject', ['make'    , {'run':0}])
+let RpMakeRun     = function('RunProject', ['make'    , {'run':1}])
+let RpMakeClean   = function('RunProject', ['make'    , {'run':0, 'args':'clean'}])
+let RpVs          = function('RunProject', ['vs'      , {'run':0, 'args':'Build'}])
+let RpVsRun       = function('RunProject', ['vs'      , {'run':1, 'args':'Build'}])
+let RpVsClean     = function('RunProject', ['vs'      , {'run':0, 'args':'Clean'}])
+let RpSphinx      = function('RunProject', ['sphinx'  , {'run':0, 'args':'html'}])
+let RpSphinxRun   = function('RunProject', ['sphinx'  , {'run':1, 'args':'html'}])
+let RpSphinxClean = function('RunProject', ['sphinx'  , {'run':0, 'args':'clean'}])
 " }}}
 
 " Find & Search {{{
@@ -2284,7 +2257,6 @@ endfunction
 
 let s:ws = {
     \ 'settings': {
-        \ 'root' : '',
         \ 'fw' : v:null,
         \ 'rp' : v:null,
         \ 'execution' : v:null,
