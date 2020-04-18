@@ -646,7 +646,7 @@ else
             return ''
         endif
         let l:ret = search('\m\(\t \| \t\)', 'nw')
-        return (l:ret == 0) ? '' : 'I:'.string(l:ret)
+        return (l:ret == 0) ? '' : 'M:'.string(l:ret)
     endfunction
 
     function! Plug_ll_checkTrailing()
@@ -1450,14 +1450,19 @@ function! GetRange(pats, pate)
 endfunction
 " }}}
 
-" FUNCTION: GetConfCopy(filename) {{{ 复制配置文件到当前目录
-function! GetConfCopy(filename)
-    let l:srcfile = $DotVimPath . '/' . a:filename
-    let l:dstfile = expand('%:p:h') . '/' . a:filename
-    if !filereadable(l:dstfile)
-        call writefile(readfile(l:srcfile), l:dstfile)
+" FUNCTION: GetEval(str, type) {{{ 获取计算结果
+function! GetEval(str, type)
+    if a:type ==# 'command'
+        let l:result = execute(a:str)
+    elseif a:type ==# 'function'
+        let l:result = eval(a:str)
+    elseif a:type ==# 'registers'
+        let l:result = eval('@' . a:str)
     endif
-    return l:dstfile
+    if type(l:result) != v:t_string
+        let l:result = string(l:result)
+    endif
+    return split(l:result, "\n")
 endfunction
 " }}}
 
@@ -2342,7 +2347,7 @@ let s:rs = {
                         \ 'opt' : 'select config',
                         \ 'dsr' : 'copy config file',
                         \ 'lst' : ['.ycm_extra_conf.py', 'jsconfig.json', '.vimspector.json'],
-                        \ 'cmd' : {sopt, arg -> execute('edit ' . GetConfCopy(arg))},
+                        \ 'cmd' : {sopt, arg -> execute('edit ' . s:rs.func.copyConfig(arg))},
                         \ },
                     \ 'lineToTop'        : 'frozen current line to top',
                     \ 'clearUndo'        : 'clear undo history',
@@ -2393,6 +2398,17 @@ function! s:rs.func.createCtags() dict
     endif
 endfunction
 " }}}
+
+" FUNCTION: s:rs.func.copyConfig(filename) {{{ 复制配置文件到当前目录
+function! s:rs.func.copyConfig(filename)
+    let l:srcfile = $DotVimPath . '/' . a:filename
+    let l:dstfile = expand('%:p:h') . '/' . a:filename
+    if !filereadable(l:dstfile)
+        call writefile(readfile(l:srcfile), l:dstfile)
+    endif
+    return l:dstfile
+endfunction
+" }}}
 " }}}
 
 " FUNCTION: RunScript(type) " {{{
@@ -2428,12 +2444,6 @@ function! RunEditFile(key)
 endfunction
 "}}}
 
-" FUNCTION: FuncDiffFile(file, mode) {{{ 文件对比
-function! FuncDiffFile(file, mode)
-    execute printf('%s diffsplit %s', (a:mode ==# 'v') ? 'vertical ' : '' , a:file)
-endfunction
-" }}}
-
 " FUNCTION: FuncInsertSpace(string, pos) range {{{ 插入分隔符
 " @param string: 分割字符，以空格分隔
 " @param pos: 分割的位置
@@ -2466,22 +2476,6 @@ let RunInsertSpaceL = function('ExecInput', [['Divide L: '], 'FuncInsertSpace', 
 let RunInsertSpaceD = function('ExecInput', [['Delete D: '], 'FuncInsertSpace', 'd'])
 " }}}
 
-" FUNCTION: FuncAppendCmd(str, type) {{{ 将命令结果作为文本插入
-function! FuncAppendCmd(str, type)
-    if a:type ==# 'e'
-        let l:result = execute(a:str)
-    elseif a:type ==# 'f'
-        let l:result = eval(a:str)
-    endif
-    if type(l:result) != v:t_string
-        let l:result = string(l:result)
-    endif
-    call append(line('.'), split(l:result, "\n"))
-endfunction
-let RunAppendCmdE = function('ExecInput', [['Command: ', '', 'command'], 'FuncAppendCmd', 'e'])
-let RunAppendCmdF = function('ExecInput', [['Function: ', '', 'function'], 'FuncAppendCmd', 'f'])
-" }}}
-
 " FUNCTION: FuncSwitchFile(sf) {{{ 切换文件
 function! FuncSwitchFile(sf)
     let l:ext = expand('%:e')
@@ -2506,24 +2500,6 @@ endfunction
 let RunSwitchFile = function('FuncSwitchFile', [
             \ {'lhs': ['c', 'cc', 'cpp', 'cxx'],
             \  'rhs': ['h', 'hh', 'hpp', 'hxx']}])
-" }}}
-
-" FUNCTION: FuncHelp(mode) {{{ 查找Vim关键字
-function! FuncHelp(mode)
-    execute printf('help %s',
-                \ (a:mode ==# 'v') ? GetSelected() : expand('<cword>'))
-endfunction
-" }}}
-
-" FUNCTION: FuncFcitx(input) {{{ 切换Fcitx输入法
-if IsLinux()
-" @param input: 1为zh，2为en
-function! FuncFcitx(input)
-    if a:input == system('fcitx-remote')
-        call system('fcitx-remote -'. ['o', 'c'][a:input - 1])
-    endif
-endfunction
-endif
 " }}}
 " }}}
 
@@ -2879,8 +2855,8 @@ augroup UserSettingsCmd
     autocmd FileType go         setlocal expandtab
     autocmd FileType javascript setlocal foldmethod=syntax
 
-    autocmd Filetype vim,help,lua nnoremap <buffer> <S-k> :call FuncHelp('n')<CR>
-    autocmd Filetype vim,help,lua vnoremap <buffer> <S-k> :call FuncHelp('v')<CR>
+    autocmd Filetype vim,help,lua nnoremap <buffer> <S-k> :call execute('help ' . expand('<cword>'))<CR>
+    autocmd Filetype vim,help,lua vnoremap <buffer> <S-k> :call execute('help ' . GetSelected())<CR>
 augroup END
 " }}}
 " }}} End
@@ -2890,6 +2866,7 @@ augroup END
     " 重复上次操作命令
     nnoremap <leader>. :call ExecLast(1)<CR>
     nnoremap <leader><leader>. :call ExecLast(0)<CR>
+    nnoremap <M-;> @:
     " 回退操作
     nnoremap <S-u> <C-r>
     " 大小写转换
@@ -2971,9 +2948,6 @@ endif
     nnoremap <leader>is :call OptionLst('signcolumn')<CR>
     nnoremap <leader>in :call OptionFunc('number')<CR>
     nnoremap <leader>ih :call OptionFunc('syntax')<CR>
-if IsLinux()
-    inoremap <Esc> <Esc>:call FuncFcitx(2)<CR>
-endif
 " }}}
 
 " Copy & Paste {{{
@@ -3074,9 +3048,9 @@ endif
 
 " Diff {{{
     nnoremap <silent> <leader>ds
-        \ :call ExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 's')<CR>
+        \ :call ExecInput(['File: ', '', 'file', expand('%:p:h')], {filename -> execute('diffsplit ' . filename)})<CR>
     nnoremap <silent> <leader>dv
-        \ :call ExecInput(['File: ', '', 'file', expand('%:p:h')], 'FuncDiffFile', 'v')<CR>
+        \ :call ExecInput(['File: ', '', 'file', expand('%:p:h')], {filename -> execute('vertical diffsplit ' . filename)})<CR>
     " 比较当前文件（已经分屏）
     nnoremap <leader>dt :diffthis<CR>
     nnoremap <leader>do :diffoff<CR>
@@ -3121,8 +3095,14 @@ endif
     nnoremap <leader>eb :call RunInsertSpaceB()<CR>
     nnoremap <leader>el :call RunInsertSpaceL()<CR>
     nnoremap <leader>ed :call RunInsertSpaceD()<CR>
-    nnoremap <leader>ae :call RunAppendCmdE()<CR>
-    nnoremap <leader>af :call RunAppendCmdF()<CR>
+    nnoremap <silent> <leader>ac
+        \ :call ExecInput(['Command: ', '', 'command'], {str -> append(line('.'), GetEval(str, 'command'))})<CR>
+    nnoremap <silent> <leader>af
+        \ :call ExecInput(['Function: ', '', 'function'], {str -> append(line('.'), GetEval(str, 'function'))})<CR>
+    vnoremap <silent> <leader>ac
+        \ :call append(line('.'), GetEval(GetSelected(), 'command'))<CR>
+    vnoremap <silent> <leader>af
+        \ :call append(line('.'), GetEval(GetSelected(), 'function'))<CR>
     nnoremap <leader>sf :call RunSwitchFile()<CR>
     nnoremap <leader>se :call RunScript('exe')<CR>
     nnoremap <leader>sa :call RunScript('async')<CR>
