@@ -1555,18 +1555,17 @@ endfunction
 " @attribute pat: 匹配模式字符串
 let s:rp = {
     \ 'args' : {
-        \ 'proj' : '',
-        \ 'file' : '',
-        \ 'conf' : v:null,
+        \ 'fn' : '',
+        \ 'file' : ''
         \ },
     \ 'proj' : {
-        \ 'filetype' : ['FnFile'  , ''                               ],
-        \ 'cell'     : ['FnCell'  , ''                               ],
-        \ 'qmake'    : ['FnQMake' , '*.pro'                          ],
-        \ 'cmake'    : ['FnCMake' , 'cmakelists.txt'                 ],
-        \ 'make'     : ['FnMake'  , 'makefile'                       ],
-        \ 'vs'       : ['FnVs'    , '*.sln'                          ],
-        \ 'sphinx'   : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
+        \ 'f' : ['FnFile'  , ''                               ],
+        \ 'j' : ['FnCell'  , ''                               ],
+        \ 'q' : ['FnQMake' , '*.pro'                          ],
+        \ 'g' : ['FnCMake' , 'cmakelists.txt'                 ],
+        \ 'm' : ['FnMake'  , 'makefile'                       ],
+        \ 'v' : ['FnVs'    , '*.sln'                          ],
+        \ 'h' : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile']
         \ },
     \ 'filetype' : {
         \ 'c'          : [IsWin() ? 'gcc %s %s -o %s && %s' : 'gcc %s %s -o %s && ./%s',
@@ -1601,7 +1600,14 @@ let s:rp = {
     \ 'pat' : {
         \ 'target'  : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
-        \ }
+        \ },
+    \ 'mappings' : [
+        \ 'rf' , 'rif', 'rj' ,
+        \ 'rp' , 'rq' , 'rg' , 'rm' , 'rv' , 'rh' ,
+        \ 'Rp' , 'Rq' , 'Rg' , 'Rm' , 'Rv' , 'Rh' ,
+        \ 'rip', 'riq', 'rig', 'rim', 'riv', 'rih',
+        \ 'rcp', 'rcq', 'rcg', 'rcm', 'rcv', 'rch',
+        \ ]
     \ }
 " FUNCTION: s:rp.run(proj, wdir, cmd) dict {{{
 " 生成运行命令字符串。
@@ -1626,37 +1632,74 @@ endfunction
 " }}}
 " }}}
 
-" FUNCTION: RunProject(proj, conf) {{{
-" 当找到多个Project文件时，会弹出选项以供选择。
-" @param proj: 工程类型，用于获取工程运行回调函数
-"   项目回调函数需要3个参数(可能用于popset插件)：
-"   - sopt: 自定义参数信息
-"   - sel: Project文件路径
-"   - args: Project的附加参数列表
-" @param conf: 编译工程文件函数的配置参数
-function! RunProject(proj, conf)
-    let [l:fn, l:pat] = s:rp.proj[a:proj]
-    let l:prj = empty(l:pat) ? [expand('%:p')] : GetFileList(l:pat)
+" FUNCTION: RunProject(keys) {{{
+function! RunProject(keys)
+    " doc
+    " {{{
+    " MapKeys: [rR][ci][pP fj qgmvh]
+    "          [%1][%2][%3         ]
+    " Run: %1
+    "   r : run
+    "   R : build without run
+    " Command: %2
+    "   c : clean project
+    "   i : input args to project
+    " Project: %3
+    "   pP : project
+    "   fj : filetype, cell
+    "   qqmvh : qmake, cmake, make, visual studio, sphinx
+    " }}}
+    let l:p = a:keys[-1:-1]
+    let l:file = ''
+    let l:conf = {
+        \ 'run': (a:keys =~# 'r') ? 1 : 0,
+        \ 'clean': 0,
+        \ 'input': (a:keys =~# 'i') ? 1 : 0,
+        \ 'args': ''
+        \ }
+    if a:keys =~# 'c'
+        let l:conf.run = 0
+        let l:conf.clean = 1
+        let l:conf.input = 0
+    endif
 
-    if len(l:prj) == 1
-        let Fn = function(l:fn)
-        call Fn('', l:prj[0], a:conf)
-    elseif len(l:prj) > 1
-        call PopSelection({
-            \ 'opt' : 'Please select the project file',
-            \ 'lst' : l:prj,
-            \ 'cmd' : a:fn,
-            \ 'arg' : a:conf
-            \ })
-    else
-        echo 'None of ' . l:pat . ' was found!'
+    if a:keys =~# '[fj]'
+        " file and cell
+        let l:fn = s:rp.proj[l:p][0]
+        let l:file = expand('%:p')
+        call function(l:fn)('', l:file, l:conf)
+    elseif a:keys =~? 'p'
+        " TODO
+        if a:keys =~# 'P'
+            let l:p = GetInput('Project: ')
+            let s:rp.args.fn = s:rp.proj[l:p][0]
+            let s:rp.args.file = GetInput('Project file: ')
+        endif
+        "let l:conf.args = s:rp.s:rp.args.args
+        call function(s:rp.args.fn)('', s:rp.args.file, l:conf)
+    elseif a:keys =~# '[qgmvh]'
+        " project
+        let [l:fn, l:pat] = s:rp.proj[l:p]
+        let l:file = GetFileList(l:pat)
+        if len(l:file) == 1
+            call function(l:fn)('', l:file[0], l:conf)
+        elseif len(l:file) > 1
+            call PopSelection({
+                \ 'opt' : 'Please select the project file',
+                \ 'lst' : l:file,
+                \ 'cmd' : l:fn,
+                \ 'arg' : l:conf
+                \ })
+        else
+            echo 'None of ' . l:pat . ' was found!'
+        endif
     endif
 endfunction
 " }}}
 
-" FUNCTION: FnFile(sopt, sel, args) {{{
-function! FnFile(sopt, sel, args)
-    if a:args.input
+" FUNCTION: FnFile(sopt, sel, conf) {{{
+function! FnFile(sopt, sel, conf)
+    if a:conf.input
         call PopSelection({
             \ 'opt' : 'select args to RunFile',
             \ 'lst' : [
@@ -1677,7 +1720,7 @@ function! FnFile(sopt, sel, args)
             return
         endif
         let l:dict = {
-            \ 'args' : get(a:args, 'args', ''),
+            \ 'args' : get(a:conf, 'args', ''),
             \ 'srcf' : '"' . fnamemodify(a:sel, ':t') . '"',
             \ 'outf' : '"' . fnamemodify(a:sel, ':t:r') . '"'
             \ }
@@ -1691,8 +1734,8 @@ function! FnFile(sopt, sel, args)
 endfunction
 " }}}
 
-" FUNCTION: FnCell(sopt, sel, args) {{{
-function! FnCell(sopt, sel, args)
+" FUNCTION: FnCell(sopt, sel, conf) {{{
+function! FnCell(sopt, sel, conf)
     let l:type = &filetype
     if !has_key(s:rp.cell, l:type)
         echo 's:rp.cell doesn''t support "' . l:type . '"'
@@ -1711,41 +1754,42 @@ function! FnCell(sopt, sel, args)
 endfunction
 " }}}
 
-" FUNCTION: FnQMake(sopt, sel, args) {{{
-function! FnQMake(sopt, sel, args)
+" FUNCTION: FnQMake(sopt, sel, conf) {{{
+function! FnQMake(sopt, sel, conf)
     let l:srcfile = fnamemodify(a:sel, ':p:t')
     let l:outfile = GetFileContent(a:sel, s:rp.pat.target, 'first')
     let l:outfile = empty(l:outfile) ? fnamemodify(a:sel, ':t:r') : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
     if IsWin()
-        let l:cmd = printf('cd "%s" && qmake -r "%s" && vcvars64.bat && nmake -f Makefile.Debug %s',
-                    \ l:workdir, l:srcfile, get(a:args, 'args', ''))
+        let l:cmd = printf('cd "%s" && qmake -r "%s" %s && vcvars64.bat && nmake -f Makefile.Debug %s',
+                    \ l:workdir, l:srcfile, a:conf.args, a:conf.clean ? 'distclean' : '')
     else
-        let l:cmd = printf('cd "%s" && qmake "%s" && make %s',
-                    \ l:workdir, l:srcfile, get(a:args, 'args', ''))
+        let l:cmd = printf('cd "%s" && qmake "%s" %s && make %s',
+                    \ l:workdir, l:srcfile, a:conf.args, a:conf.clean ? 'distclean' : '')
     endif
-    if a:args.run
+    if a:conf.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
     execute s:rp.run('cpp', l:workdir, l:cmd)
 endfunction
 " }}}
 
-" FUNCTION: FnCMake(sopt, sel, args) {{{
-function! FnCMake(sopt, sel, args)
+" FUNCTION: FnCMake(sopt, sel, conf) {{{
+function! FnCMake(sopt, sel, conf)
     let l:outfile = GetFileContent(a:sel, s:rp.pat.project, 'first')
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
-    if a:args.cmd == 0
+    if a:conf.clean
         " clean
         call delete(l:workdir . '/CMakeBuildOut', 'rf')
-    elseif a:args.cmd>= 1
+    else
         "build
         silent! call mkdir('CMakeBuildOut')
-        let l:cmd = printf('cd "%s" && cd CMakeBuildOut && cmake -G "Unix Makefiles" .. && make', l:workdir)
-        if a:args.cmd >= 2
+        let l:cmd = printf('cd "%s" && cd CMakeBuildOut && cmake %s -G "Unix Makefiles" .. && make',
+                    \ l:workdir, a:conf.args)
+        if a:conf.run
             "run
             let l:cmd .= ' && "./' . l:outfile .'"'
         endif
@@ -1754,66 +1798,49 @@ function! FnCMake(sopt, sel, args)
 endfunction
 " }}}
 
-" FUNCTION: FnMake(sopt, sel, args) {{{
-function! FnMake(sopt, sel, args)
+" FUNCTION: FnMake(sopt, sel, conf) {{{
+function! FnMake(sopt, sel, conf)
     let l:outfile = GetFileContent(a:sel, s:rp.pat.target, 'first')
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
-    let l:cmd = printf('cd "%s" && make %s', l:workdir, get(a:args, 'args', ''))
-    if a:args.run
+    let l:cmd = printf('cd "%s" && make %s %s',
+                \ l:workdir, a:conf.clean ? 'clean' : '', a:conf.args)
+    if a:conf.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
     execute s:rp.run('', l:workdir, l:cmd)
 endfunction
 "}}}
 
-" FUNCTION: FnVs(sopt, sel, args) {{{
-function! FnVs(sopt, sel, args)
+" FUNCTION: FnVs(sopt, sel, conf) {{{
+function! FnVs(sopt, sel, conf)
     let l:srcfile = fnamemodify(a:sel, ':p:t')
     let l:outfile = fnamemodify(a:sel, ':p:t:r')
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
-    let l:cmd = printf('cd "%s" && vcvars64.bat && devenv "%s" /%s',
-                    \ l:workdir, l:srcfile, get(a:args, 'args', ''))
-    if a:args.run
+    let l:cmd = printf('cd "%s" && vcvars64.bat && devenv "%s" /%s %s',
+                    \ l:workdir, l:srcfile, a:conf.clean ? 'Clean' : 'Build', a:conf.args)
+    if a:conf.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
     execute s:rp.run('cpp', l:workdir, l:cmd)
 endfunction
 " }}}
 
-" FUNCTION: FnSphinx(sopt, sel, args) {{{
-function! FnSphinx(sopt, sel, args)
+" FUNCTION: FnSphinx(sopt, sel, conf) {{{
+function! FnSphinx(sopt, sel, conf)
     let l:outfile = 'build/html/index.html'
     let l:workdir = fnamemodify(a:sel, ':p:h')
 
-    let l:cmd = printf('cd "%s" && make %s', l:workdir, get(a:args, 'args', ''))
-    if a:args.run
+    let l:cmd = printf('cd "%s" && make %s %s',
+                \ l:workdir, a:conf.clean ? 'clean' : 'html', a:conf.args)
+    if a:conf.run
         let l:cmd .= join([' && firefox', l:outfile])
     endif
     execute s:rp.run('', l:workdir, l:cmd)
 endfunction
 "}}}
-
-let RpFile        = function('RunProject', ['filetype', {'input': 0}])
-let RpFileArg     = function('RunProject', ['filetype', {'input': 1}])
-let RpCell        = function('RunProject', ['cell'    , {}])
-let RpQMake       = function('RunProject', ['qmake'   , {'run':0}])
-let RpQMakeRun    = function('RunProject', ['qmake'   , {'run':1}])
-let RpQMakeClean  = function('RunProject', ['qmake'   , {'run':0, 'args':'distclean'}])
-let RpCMake       = function('RunProject', ['cmake'   , {'cmd':1}])
-let RpCMakeRun    = function('RunProject', ['cmake'   , {'cmd':2}])
-let RpCMakeClean  = function('RunProject', ['cmake'   , {'cmd':0}])
-let RpMake        = function('RunProject', ['make'    , {'run':0}])
-let RpMakeRun     = function('RunProject', ['make'    , {'run':1}])
-let RpMakeClean   = function('RunProject', ['make'    , {'run':0, 'args':'clean'}])
-let RpVs          = function('RunProject', ['vs'      , {'run':0, 'args':'Build'}])
-let RpVsRun       = function('RunProject', ['vs'      , {'run':1, 'args':'Build'}])
-let RpVsClean     = function('RunProject', ['vs'      , {'run':0, 'args':'Clean'}])
-let RpSphinx      = function('RunProject', ['sphinx'  , {'run':0, 'args':'html'}])
-let RpSphinxRun   = function('RunProject', ['sphinx'  , {'run':1, 'args':'html'}])
-let RpSphinxClean = function('RunProject', ['sphinx'  , {'run':0, 'args':'clean'}])
 " }}}
 
 " Find & Search {{{
@@ -3078,25 +3105,10 @@ endif
     nnoremap <leader>sf :call RunSwitchFile()<CR>
     nnoremap <leader>se :call RunScript('exe')<CR>
     nnoremap <leader>sa :call RunScript('async')<CR>
-    " 编译运行当前文件或项目
-    nnoremap <leader>rf  :call RpFile()<CR>
-    nnoremap <leader>ra  :call RpFileArg()<CR>
-    nnoremap <leader>rj  :call RpCell()<CR>
-    nnoremap <leader>rQ  :call RpQMake()<CR>
-    nnoremap <leader>rq  :call RpQMakeRun()<CR>
-    nnoremap <leader>rcq :call RpQMakeClean()<CR>
-    nnoremap <leader>rG  :call RpCMake()<CR>
-    nnoremap <leader>rg  :call RpCMakeRun()<CR>
-    nnoremap <leader>rcg :call RpCMakeClean()<CR>
-    nnoremap <leader>rM  :call RpMake()<CR>
-    nnoremap <leader>rm  :call RpMakeRun()<CR>
-    nnoremap <leader>rcm :call RpMakeClean()<CR>
-    nnoremap <leader>rV  :call RpVs()<CR>
-    nnoremap <leader>rv  :call RpVsRun()<CR>
-    nnoremap <leader>rcv :call RpVsClean()<CR>
-    nnoremap <leader>rh  :call RpSphinx()<CR>
-    nnoremap <leader>rH  :call RpSphinxRun()<CR>
-    nnoremap <leader>rch :call RpSphinxClean()<CR>
+    " RunProject
+    for key in s:rp.mappings
+        execute printf('nnoremap <leader>%s :call RunProject("%s")<CR>', key, key)
+    endfor
 " }}}
 
 " Find & Search {{{
