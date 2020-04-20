@@ -162,17 +162,7 @@ function! s:gsetInit()
         \ })
 endfunction
 " }}}
-" FUNCTION: s:gsetShow() {{{
-function! s:gsetShow()
-    let l:str = 'Gset:'
-    for [key, val] in sort(items(s:gset))
-        let l:str .= "\n    " . key . ' = ' . val
-    endfor
-    echo l:str
-endfunction
-" }}}
 command! -nargs=0 GSInit :call s:gsetInit()
-command! -nargs=0 GSShow :call s:gsetShow()
 call s:gsetLoad()
 " }}}
 " }}} End
@@ -1556,7 +1546,8 @@ endfunction
 let s:rp = {
     \ 'args' : {
         \ 'fn' : '',
-        \ 'file' : ''
+        \ 'file' : '',
+        \ 'filetype' : ''
         \ },
     \ 'proj' : {
         \ 'f' : ['FnFile'  , ''                               ],
@@ -1603,6 +1594,7 @@ let s:rp = {
         \ },
     \ 'mappings' : [
         \ 'rf' , 'rif', 'rj' ,
+        \ 'rP' ,
         \ 'rp' , 'rq' , 'rg' , 'rm' , 'rv' , 'rh' ,
         \ 'Rp' , 'Rq' , 'Rg' , 'Rm' , 'Rv' , 'Rh' ,
         \ 'rip', 'riq', 'rig', 'rim', 'riv', 'rih',
@@ -1664,21 +1656,32 @@ function! RunProject(keys)
     endif
 
     if a:keys =~# '[fj]'
-        " file and cell
+        " filetype, cell
         let l:fn = s:rp.proj[l:p][0]
         let l:file = expand('%:p')
+        let l:conf.filetype = &filetype
         call function(l:fn)('', l:file, l:conf)
     elseif a:keys =~? 'p'
-        " TODO
-        if a:keys =~# 'P'
-            let l:p = GetInput('Project: ')
+        " project
+        if a:keys =~# 'P' || empty(s:rp.args.fn)
+            let l:p = GetInput('Project (f,q,g,m,v,h): ')[0:0]
+            if l:p !~# '[fqgmvh]'
+                return
+            endif
             let s:rp.args.fn = s:rp.proj[l:p][0]
-            let s:rp.args.file = GetInput('Project file: ')
+            let s:rp.args.filetype = &filetype
         endif
-        "let l:conf.args = s:rp.s:rp.args.args
+        if a:keys =~# 'P' || empty(s:rp.args.file)
+            let s:rp.args.file = GetInput('Project file: ', '', 'file')
+            if empty(s:rp.args.file)
+                return
+            endif
+            let s:rp.args.file = fnamemodify(s:rp.args.file, ':p')
+        endif
+        let l:conf.filetype = s:rp.args.filetype
         call function(s:rp.args.fn)('', s:rp.args.file, l:conf)
     elseif a:keys =~# '[qgmvh]'
-        " project
+        " qmake, cmake, make, visual studio, sphinx
         let [l:fn, l:pat] = s:rp.proj[l:p]
         let l:file = GetFileList(l:pat)
         if len(l:file) == 1
@@ -1709,10 +1712,10 @@ function! FnFile(sopt, sel, conf)
                     \ '-fPIC -shared'
                     \ ],
             \ 'cpl' : 'customlist,GetMultiFilesCompletion',
-            \ 'cmd' : {sopt, arg -> call('FnFile', [a:sopt, a:sel, {'input':0, 'args': arg}])}
+            \ 'cmd' : {sopt, arg -> call('FnFile', [a:sopt, a:sel, {'input':0, 'args': arg, 'filetype': a:conf.filetype}])}
             \ })
     else
-        let l:type = &filetype
+        let l:type = a:conf.filetype
         if !has_key(s:rp.filetype, l:type)
             \ || ('sh' ==? l:type && !(IsLinux() || IsGw() || IsMac()))
             \ || ('dosbatch' ==? l:type && !IsWin())
@@ -1736,7 +1739,7 @@ endfunction
 
 " FUNCTION: FnCell(sopt, sel, conf) {{{
 function! FnCell(sopt, sel, conf)
-    let l:type = &filetype
+    let l:type = a:conf.filetype
     if !has_key(s:rp.cell, l:type)
         echo 's:rp.cell doesn''t support "' . l:type . '"'
         return
@@ -1756,10 +1759,10 @@ endfunction
 
 " FUNCTION: FnQMake(sopt, sel, conf) {{{
 function! FnQMake(sopt, sel, conf)
-    let l:srcfile = fnamemodify(a:sel, ':p:t')
+    let l:srcfile = fnamemodify(a:sel, ':t')
     let l:outfile = GetFileContent(a:sel, s:rp.pat.target, 'first')
-    let l:outfile = empty(l:outfile) ? fnamemodify(a:sel, ':t:r') : l:outfile[0]
-    let l:workdir = fnamemodify(a:sel, ':p:h')
+    let l:outfile = empty(l:outfile) ? fnamemodify(a:sel, ':r') : l:outfile[0]
+    let l:workdir = fnamemodify(a:sel, ':h')
 
     if IsWin()
         let l:cmd = printf('cd "%s" && qmake -r "%s" %s && vcvars64.bat && nmake -f Makefile.Debug %s',
@@ -1779,14 +1782,14 @@ endfunction
 function! FnCMake(sopt, sel, conf)
     let l:outfile = GetFileContent(a:sel, s:rp.pat.project, 'first')
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
-    let l:workdir = fnamemodify(a:sel, ':p:h')
+    let l:workdir = fnamemodify(a:sel, ':h')
 
     if a:conf.clean
         " clean
         call delete(l:workdir . '/CMakeBuildOut', 'rf')
     else
         "build
-        silent! call mkdir('CMakeBuildOut')
+        silent! call mkdir(l:workdir . '/CMakeBuildOut', 'p')
         let l:cmd = printf('cd "%s" && cd CMakeBuildOut && cmake %s -G "Unix Makefiles" .. && make',
                     \ l:workdir, a:conf.args)
         if a:conf.run
@@ -1802,7 +1805,7 @@ endfunction
 function! FnMake(sopt, sel, conf)
     let l:outfile = GetFileContent(a:sel, s:rp.pat.target, 'first')
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
-    let l:workdir = fnamemodify(a:sel, ':p:h')
+    let l:workdir = fnamemodify(a:sel, ':h')
 
     let l:cmd = printf('cd "%s" && make %s %s',
                 \ l:workdir, a:conf.clean ? 'clean' : '', a:conf.args)
@@ -1815,9 +1818,9 @@ endfunction
 
 " FUNCTION: FnVs(sopt, sel, conf) {{{
 function! FnVs(sopt, sel, conf)
-    let l:srcfile = fnamemodify(a:sel, ':p:t')
-    let l:outfile = fnamemodify(a:sel, ':p:t:r')
-    let l:workdir = fnamemodify(a:sel, ':p:h')
+    let l:srcfile = fnamemodify(a:sel, ':t')
+    let l:outfile = fnamemodify(a:sel, ':t:r')
+    let l:workdir = fnamemodify(a:sel, ':h')
 
     let l:cmd = printf('cd "%s" && vcvars64.bat && devenv "%s" /%s %s',
                     \ l:workdir, l:srcfile, a:conf.clean ? 'Clean' : 'Build', a:conf.args)
@@ -1831,7 +1834,7 @@ endfunction
 " FUNCTION: FnSphinx(sopt, sel, conf) {{{
 function! FnSphinx(sopt, sel, conf)
     let l:outfile = 'build/html/index.html'
-    let l:workdir = fnamemodify(a:sel, ':p:h')
+    let l:workdir = fnamemodify(a:sel, ':h')
 
     let l:cmd = printf('cd "%s" && make %s %s',
                 \ l:workdir, a:conf.clean ? 'clean' : 'html', a:conf.args)
