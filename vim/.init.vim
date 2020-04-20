@@ -1601,15 +1601,14 @@ let s:rp = {
         \ 'rcp', 'rcq', 'rcg', 'rcm', 'rcv', 'rch',
         \ ]
     \ }
-" FUNCTION: s:rp.run(proj, wdir, cmd) dict {{{
-" 生成运行命令字符串。
-" @param proj: errorformat类型，在s:rp.efm中
+" FUNCTION: s:rp.run(wdir, cmd, [type]) dict {{{
 " @param wdir: 命令运行目录
 " @param cmd: 命令字符串
+" @param type: 用于设置errorformat
 " @return 返回运行命令
-function! s:rp.run(proj, wdir, cmd) dict
-    if has_key(self.efm, a:proj)
-        execute 'setlocal efm=' . self.efm[a:proj]
+function! s:rp.run(wdir, cmd, ...) dict
+    if a:0 >= 1 && has_key(self.efm, a:1)
+        execute 'setlocal efm=' . self.efm[a:1]
     endif
     let l:exec = ':AsyncRun '
     if !empty(a:wdir)
@@ -1617,6 +1616,8 @@ function! s:rp.run(proj, wdir, cmd) dict
         let l:exec .= '-cwd=' . l:wdir
         execute 'lcd ' . l:wdir
     endif
+
+    " create exec string
     let l:exec = join([l:exec, a:cmd])
     call SetExecLast(l:exec)
     return l:exec
@@ -1669,7 +1670,6 @@ function! RunProject(keys)
                 return
             endif
             let s:rp.args.fn = s:rp.proj[l:p][0]
-            let s:rp.args.filetype = &filetype
         endif
         if a:keys =~# 'P' || empty(s:rp.args.file)
             let s:rp.args.file = GetInput('Project file: ', '', 'file')
@@ -1677,6 +1677,7 @@ function! RunProject(keys)
                 return
             endif
             let s:rp.args.file = fnamemodify(s:rp.args.file, ':p')
+            let s:rp.args.filetype = getbufvar(fnamemodify(s:rp.args.file, ':t'), '&filetype', &filetype)
         endif
         let l:conf.filetype = s:rp.args.filetype
         call function(s:rp.args.fn)('', s:rp.args.file, l:conf)
@@ -1715,6 +1716,7 @@ function! FnFile(sopt, sel, conf)
             \ 'cmd' : {sopt, arg -> call('FnFile', [a:sopt, a:sel, {'input':0, 'args': arg, 'filetype': a:conf.filetype}])}
             \ })
     else
+        " create cmd string
         let l:type = a:conf.filetype
         if !has_key(s:rp.filetype, l:type)
             \ || ('sh' ==? l:type && !(IsLinux() || IsGw() || IsMac()))
@@ -1729,10 +1731,10 @@ function! FnFile(sopt, sel, conf)
             \ }
         let l:workdir = fnamemodify(a:sel, ':h')
 
-        " create exec string
+        " run exec string
         let l:pstr = copy(s:rp.filetype[l:type])
         call map(l:pstr, {key, val -> (key == 0) ? val : get(l:dict, val, '')})
-        execute s:rp.run(l:type, l:workdir, call('printf', l:pstr))
+        execute s:rp.run(l:workdir, call('printf', l:pstr), l:type)
     endif
 endfunction
 " }}}
@@ -1750,7 +1752,7 @@ function! FnCell(sopt, sel, conf)
     let [l:bin, l:pats, l:pate] = s:rp.cell[l:type]
     let l:range = GetRange(l:pats, l:pate)
 
-    " create exec string
+    " run exec string
     let l:exec = ':' . join(l:range, ',') . 'AsyncRun '. l:bin
     execute l:exec
     echo l:exec
@@ -1774,7 +1776,7 @@ function! FnQMake(sopt, sel, conf)
     if a:conf.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:rp.run('cpp', l:workdir, l:cmd)
+    execute s:rp.run(l:workdir, l:cmd, 'cpp')
 endfunction
 " }}}
 
@@ -1796,7 +1798,7 @@ function! FnCMake(sopt, sel, conf)
             "run
             let l:cmd .= ' && "./' . l:outfile .'"'
         endif
-        execute s:rp.run('', l:workdir, l:cmd)
+        execute s:rp.run(l:workdir, l:cmd)
     endif
 endfunction
 " }}}
@@ -1812,7 +1814,7 @@ function! FnMake(sopt, sel, conf)
     if a:conf.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:rp.run('', l:workdir, l:cmd)
+    execute s:rp.run(l:workdir, l:cmd)
 endfunction
 "}}}
 
@@ -1827,7 +1829,7 @@ function! FnVs(sopt, sel, conf)
     if a:conf.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:rp.run('cpp', l:workdir, l:cmd)
+    execute s:rp.run(l:workdir, l:cmd, 'cpp')
 endfunction
 " }}}
 
@@ -1841,7 +1843,7 @@ function! FnSphinx(sopt, sel, conf)
     if a:conf.run
         let l:cmd .= join([' && firefox', l:outfile])
     endif
-    execute s:rp.run('', l:workdir, l:cmd)
+    execute s:rp.run(l:workdir, l:cmd)
 endfunction
 "}}}
 " }}}
