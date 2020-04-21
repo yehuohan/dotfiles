@@ -571,6 +571,7 @@ else
         autocmd!
         autocmd ColorScheme * call Plug_ll_colorScheme()
         autocmd CursorHold,BufWritePost * call Plug_ll_checkRefresh()
+        autocmd BufAdd * call setbufvar(expand('<afile>'), 'lightline_check_flg', getfsize(expand('<afile>')) <= 5 * 1024 * 1024)
     augroup END
 
     function! Plug_ll_colorScheme()
