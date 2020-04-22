@@ -101,7 +101,7 @@ if IsVim()
 endif
 " }}}
 
-" s:gset {{{
+" Struct: s:gset {{{
 let s:gset_file = $DotVimPath . '/.gset.json'
 let s:gset = {
     \ 'set_dev'       : v:null,
@@ -117,7 +117,7 @@ let s:gset = {
     \ 'use_spector'   : 1,
     \ 'use_utils'     : 1,
     \ }
-" FUNCTION: s:gsetLoad() {{{
+" Function: s:gsetLoad() {{{
 function! s:gsetLoad()
     if filereadable(s:gset_file)
         call extend(s:gset, json_decode(join(readfile(s:gset_file))), 'force')
@@ -127,13 +127,13 @@ function! s:gsetLoad()
     call env#env(s:gset.set_dev, s:gset.set_os)
 endfunction
 " }}}
-" FUNCTION: s:gsetSave() {{{
+" Function: s:gsetSave() {{{
 function! s:gsetSave()
     call writefile([json_encode(s:gset)], s:gset_file)
     echo 's:gset save successful!'
 endfunction
 " }}}
-" FUNCTION: s:gsetInit() {{{
+" Function: s:gsetInit() {{{
 function! s:gsetInit()
     function! InitSet(sopt, arg)
         let s:gset[a:sopt] = a:arg
@@ -168,25 +168,25 @@ call s:gsetLoad()
 " }}} End
 
 " Plugin Settings {{{
-" s:plug {{{
+" Struct: s:plug {{{
 let s:plug = {
     \ 'onVimEnter' : {'exec': []},
     \ 'onDelay'    : {'delay': 700, 'load': [], 'exec': []},
     \ }
-" FUNCTION: s:plug.reg(event, type, name) dict {{{
+" Function: s:plug.reg(event, type, name) dict {{{
 function! s:plug.reg(event, type, name) dict
     call add(self[a:event][a:type], a:name)
 endfunction
 " }}}
 
-" FUNCTION: s:plug.run(timer) dict {{{
+" Function: s:plug.run(timer) dict {{{
 function! s:plug.run(timer) dict
     call plug#load(self.onDelay.load)
     call execute(self.onDelay.exec)
 endfunction
 " }}}
 
-" FUNCTION: s:plug.init() dict {{{
+" Function: s:plug.init() dict {{{
 function! s:plug.init() dict
     if !empty(self.onVimEnter.exec)
         augroup PluginPlug
@@ -571,7 +571,6 @@ else
         autocmd!
         autocmd ColorScheme * call Plug_ll_colorScheme()
         autocmd CursorHold,BufWritePost * call Plug_ll_checkRefresh()
-        autocmd BufAdd * call setbufvar(expand('<afile>'), 'lightline_check_flg', getfsize(expand('<afile>')) <= 5 * 1024 * 1024)
     augroup END
 
     function! Plug_ll_colorScheme()
@@ -598,7 +597,7 @@ else
     endfunction
     " }}}
 
-    " FUNCTION: Plug_ll_toggleCheck() {{{
+    " Function: Plug_ll_toggleCheck() {{{
     function! Plug_ll_toggleCheck()
         let b:lightline_check_flg = !get(b:, 'lightline_check_flg', 1)
         call lightline#update()
@@ -606,7 +605,7 @@ else
     endfunction
     " }}}
 
-    " FUNCTION: lightline components {{{
+    " Function: lightline components {{{
     function! Plug_ll_mode()
         return &ft ==# 'tagbar' ? 'Tagbar' :
             \ &ft ==# 'nerdtree' ? 'NERDTree' :
@@ -1309,7 +1308,7 @@ call s:plug.init()
 
 " User Modules {{{
 " Libs {{{
-" FUNCTION: GetSelected() {{{ 获取选区内容
+" Function: GetSelected() {{{ 获取选区内容
 function! GetSelected()
     let l:reg_var = getreg('0', 1)
     let l:reg_mode = getregtype('0')
@@ -1320,7 +1319,7 @@ function! GetSelected()
 endfunction
 " }}}
 
-" FUNCTION: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{ 多文件自动补全
+" Function: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{ 多文件自动补全
 " 多个文件或目录时，返回的补全字符串使用'|'分隔，使用时需要将'|'转回空格；
 " 不支含空格的文件或目录；
 function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
@@ -1370,7 +1369,7 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
 endfunction
 " }}}
 
-" FUNCTION: GetFileList(pat, [sdir]) {{{ 获取文件列表
+" Function: GetFileList(pat, [sdir]) {{{ 获取文件列表
 " @param pat: 文件匹配模式，如*.pro
 " @param sdir: 查找起始目录，默认从当前文件所在目录向上查找到根目录
 " @return 返回找到的文件列表
@@ -1401,7 +1400,7 @@ function! GetFileList(pat, ...)
 endfunction
 " }}}
 
-" FUNCTION: GetFileContent(fp, pat, flg) {{{ 获取文件中特定的内容
+" Function: GetFileContent(fp, pat, flg) {{{ 获取文件中特定的内容
 " @param fp: 目录文件
 " @param pat: 匹配模式，必须使用 \(\) 来提取字符串
 " @param flg: 匹配所有还是第一个
@@ -1424,7 +1423,7 @@ function! GetFileContent(fp, pat, flg)
 endfunction
 " }}}
 
-" FUNCTION: GetRange(pats, pate) {{{ 获取特定的内容的范围
+" Function: GetRange(pats, pate) {{{ 获取特定的内容的范围
 " @param pats: 起始行匹配模式，start为pats所在行
 " @param pate: 结束行匹配模式，end为pate所在行
 " @return 返回列表[start, end]
@@ -1441,7 +1440,7 @@ function! GetRange(pats, pate)
 endfunction
 " }}}
 
-" FUNCTION: GetEval(str, type) {{{ 获取计算结果
+" Function: GetEval(str, type) {{{ 获取计算结果
 function! GetEval(str, type)
     if a:type ==# 'command'
         let l:result = execute(a:str)
@@ -1457,7 +1456,7 @@ function! GetEval(str, type)
 endfunction
 " }}}
 
-" FUNCTION: GetArgs(str) {{{ 解析字符串参数到列表中
+" Function: GetArgs(str) {{{ 解析字符串参数到列表中
 " @param str: 参数字符串，如 '"Test", 10, g:a'
 " @return 返回参数列表，如 ["Test", 10, g:a]
 function! GetArgs(str)
@@ -1470,7 +1469,7 @@ function! GetArgs(str)
 endfunction
 " }}}
 
-" FUNCTION: GetInput(prompt, [text, completion, workdir]) {{{ 输入字符串
+" Function: GetInput(prompt, [text, completion, workdir]) {{{ 输入字符串
 " @param workdir: 设置工作目录，用于文件和目录补全
 function! GetInput(prompt, ...)
     if a:0 == 0
@@ -1486,7 +1485,7 @@ function! GetInput(prompt, ...)
 endfunction
 " }}}
 
-" FUNCTION: ExecInput(iargs, fn, [fargs...]) range {{{
+" Function: ExecInput(iargs, fn, [fargs...]) range {{{
 " @param iargs: 用于GetInput的参数列表
 " @param fn: 要运行的函数，第一个参数必须为GetInput的输入
 " @param fargs: fn的附加参数
@@ -1505,7 +1504,7 @@ function! ExecInput(iargs, fn, ...) range
 endfunction
 " }}}
 
-" FUNCTION: SetExecLast(string, [execution_echo]) {{{ 设置execution
+" Function: SetExecLast(string, [execution_echo]) {{{ 设置execution
 function! SetExecLast(string, ...)
     let s:execution = a:string
     if a:0 >= 1
@@ -1516,7 +1515,7 @@ function! SetExecLast(string, ...)
 endfunction
 " }}}
 
-" FUNCTION: ExecLast() {{{ 执行上一次的execution
+" Function: ExecLast() {{{ 执行上一次的execution
 " @param eager: 1:立接执行, 0:用户执行
 function! ExecLast(eager)
     if exists('s:execution') && !empty(s:execution)
@@ -1537,7 +1536,7 @@ endfunction
 " Required: 'skywind3000/asyncrun.vim'
 "           'yehuohan/popc', 'yehuohan/popset'
 
-" s:rp {{{
+" Struct: s:rp {{{
 " @attribute args: project参数
 " @attribute proj: project类型
 " @attribute filetype: 文件类型
@@ -1602,7 +1601,7 @@ let s:rp = {
         \ 'rcp', 'rcq', 'rcg', 'rcm', 'rcv', 'rch',
         \ ]
     \ }
-" FUNCTION: s:rp.run(wdir, cmd, [type]) dict {{{
+" Function: s:rp.run(wdir, cmd, [type]) dict {{{
 " @param wdir: 命令运行目录
 " @param cmd: 命令字符串
 " @param type: 用于设置errorformat
@@ -1626,7 +1625,7 @@ endfunction
 " }}}
 " }}}
 
-" FUNCTION: RunProject(keys) {{{
+" Function: RunProject(keys) {{{
 function! RunProject(keys)
     " doc
     " {{{
@@ -1702,7 +1701,7 @@ function! RunProject(keys)
 endfunction
 " }}}
 
-" FUNCTION: FnFile(sopt, sel, conf) {{{
+" Function: FnFile(sopt, sel, conf) {{{
 function! FnFile(sopt, sel, conf)
     if a:conf.input
         call PopSelection({
@@ -1740,7 +1739,7 @@ function! FnFile(sopt, sel, conf)
 endfunction
 " }}}
 
-" FUNCTION: FnCell(sopt, sel, conf) {{{
+" Function: FnCell(sopt, sel, conf) {{{
 function! FnCell(sopt, sel, conf)
     let l:type = a:conf.filetype
     if !has_key(s:rp.cell, l:type)
@@ -1760,7 +1759,7 @@ function! FnCell(sopt, sel, conf)
 endfunction
 " }}}
 
-" FUNCTION: FnQMake(sopt, sel, conf) {{{
+" Function: FnQMake(sopt, sel, conf) {{{
 function! FnQMake(sopt, sel, conf)
     let l:srcfile = fnamemodify(a:sel, ':t')
     let l:outfile = GetFileContent(a:sel, s:rp.pat.target, 'first')
@@ -1781,7 +1780,7 @@ function! FnQMake(sopt, sel, conf)
 endfunction
 " }}}
 
-" FUNCTION: FnCMake(sopt, sel, conf) {{{
+" Function: FnCMake(sopt, sel, conf) {{{
 function! FnCMake(sopt, sel, conf)
     let l:outfile = GetFileContent(a:sel, s:rp.pat.project, 'first')
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
@@ -1804,7 +1803,7 @@ function! FnCMake(sopt, sel, conf)
 endfunction
 " }}}
 
-" FUNCTION: FnMake(sopt, sel, conf) {{{
+" Function: FnMake(sopt, sel, conf) {{{
 function! FnMake(sopt, sel, conf)
     let l:outfile = GetFileContent(a:sel, s:rp.pat.target, 'first')
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
@@ -1819,7 +1818,7 @@ function! FnMake(sopt, sel, conf)
 endfunction
 "}}}
 
-" FUNCTION: FnVs(sopt, sel, conf) {{{
+" Function: FnVs(sopt, sel, conf) {{{
 function! FnVs(sopt, sel, conf)
     let l:srcfile = fnamemodify(a:sel, ':t')
     let l:outfile = fnamemodify(a:sel, ':t:r')
@@ -1834,7 +1833,7 @@ function! FnVs(sopt, sel, conf)
 endfunction
 " }}}
 
-" FUNCTION: FnSphinx(sopt, sel, conf) {{{
+" Function: FnSphinx(sopt, sel, conf) {{{
 function! FnSphinx(sopt, sel, conf)
     let l:outfile = 'build/html/index.html'
     let l:workdir = fnamemodify(a:sel, ':h')
@@ -1854,7 +1853,7 @@ endfunction
 "           'Yggdroot/LeaderF', 'junegunn/fzf.vim'
 "           'yehuohan/popc', 'yehuohan/popset'
 
-" s:fw {{{
+" Struct: s:fw {{{
 " @attribute engine: 搜索程序
 "            sr : search
 "            sa : search append
@@ -1985,7 +1984,7 @@ let s:fw.mappings.fuzzy = [
     \ ]
 " }}}
 
-" FUNCTION: s:fw.init() dict {{{
+" Function: s:fw.init() dict {{{
 function! s:fw.init() dict
     " 设置搜索结果高亮
     augroup UserFunctionSearch
@@ -1998,21 +1997,21 @@ function! s:fw.init() dict
 endfunction
 " }}}
 
-" FUNCTION: s:fw.setEngine(type, engine) dict {{{
+" Function: s:fw.setEngine(type, engine) dict {{{
 function! s:fw.setEngine(type, engine) dict
     let self.engine[a:type] = a:engine
     call extend(self.engine, self[a:type][a:engine], 'force')
 endfunction
 " }}}
 
-" FUNCTION: s:fw.setParam(key, val) dict {{{
+" Function: s:fw.setParam(key, val) dict {{{
 function! s:fw.setParam(key, val) dict
     let l:self[a:key] .= a:val
     call self.exec(0)
 endfunction
 " }}}
 
-" FUNCTION: s:fw.exec(param) dict {{{
+" Function: s:fw.exec(param) dict {{{
 function! s:fw.exec(param) dict
     if a:param
         call PopSelection({
@@ -2033,7 +2032,7 @@ endfunction
 call s:fw.init()
 " }}}
 
-" FUNCTION: FindWow(keys, mode) {{{ 超速查找
+" Function: FindWow(keys, mode) {{{ 超速查找
 function! FindWow(keys, mode)
     " doc
     " {{{
@@ -2067,7 +2066,7 @@ function! FindWow(keys, mode)
     "   UpperCase: [IWS] find in case match
     " }}}
     " parse function
-    " FUNCTION: s:parsePattern() closure {{{
+    " Function: s:parsePattern() closure {{{
     function! s:parsePattern() closure
         let l:pat = ''
         if a:mode ==# 'n'
@@ -2090,7 +2089,7 @@ function! FindWow(keys, mode)
         return l:pat
     endfunction
     " }}}
-    " FUNCTION: s:parseLocation() closure {{{
+    " Function: s:parseLocation() closure {{{
     function! s:parseLocation() closure
         let l:loc = ''
         if a:keys =~# 'b'
@@ -2120,7 +2119,7 @@ function! FindWow(keys, mode)
         return l:loc
     endfunction
     " }}}
-    " FUNCTION: s:parseOptions() closure {{{
+    " Function: s:parseOptions() closure {{{
     function! s:parseOptions() closure
         let l:opt = ''
         if a:keys =~? 's'     | let l:opt .= '-w ' | endif
@@ -2136,7 +2135,7 @@ function! FindWow(keys, mode)
         return l:opt
     endfunction
     " }}}
-    " FUNCTION: s:parseCommand() closure {{{
+    " Function: s:parseCommand() closure {{{
     function! s:parseCommand() closure
         if a:keys =~# 'a'
             let l:cmd = s:fw.engine.sa
@@ -2147,7 +2146,7 @@ function! FindWow(keys, mode)
         return l:cmd
     endfunction
     " }}}
-    " FUNCTION: s:parseVimgrep() closure {{{
+    " Function: s:parseVimgrep() closure {{{
     function! s:parseVimgrep() closure
         if a:keys !~# 'v'
             return 0
@@ -2194,13 +2193,13 @@ function! FindWow(keys, mode)
 endfunction
 " }}}
 
-" FUNCTION: FindWowKill() {{{ 停止超速查找
+" Function: FindWowKill() {{{ 停止超速查找
 function! FindWowKill()
     execute s:fw.engine.sk
 endfunction
 " }}}
 
-" FUNCTION: FindWowFuzzy(keys) {{{ 模糊搜索
+" Function: FindWowFuzzy(keys) {{{ 模糊搜索
 function! FindWowFuzzy(keys)
     let l:r = (a:keys[1] ==# 'r') ? 1 : 0
     let l:root = s:fw.args.root
@@ -2218,7 +2217,7 @@ function! FindWowFuzzy(keys)
 endfunction
 " }}}
 
-" FUNCTION: FindWowSetEngine(type) {{{ 设置engine
+" Function: FindWowSetEngine(type) {{{ 设置engine
 function! FindWowSetEngine(type)
     if a:type ==# 'engine'
         call PopSelection(s:fw.engine.sel)
@@ -2228,13 +2227,13 @@ function! FindWowSetEngine(type)
 endfunction
 " }}}
 
-" FUNCTION: FindWowRoot() {{{ 查找root路径
+" Function: FindWowRoot() {{{ 查找root路径
 function! FindWowRoot()
     let s:fw.args.root = popc#utils#FindRoot()
 endfunction
 " }}}
 
-" FUNCTION: FindWowSetArgs(type) {{{ 设置args
+" Function: FindWowSetArgs(type) {{{ 设置args
 " @param type: r-root, f-filters, g-glob
 " @return 0表示异常结束函数（root无效），1表示正常结束函数
 function! FindWowSetArgs(type)
@@ -2259,7 +2258,7 @@ function! FindWowSetArgs(type)
 endfunction
 " }}}
 
-" FUNCTION: FindWowGetArgs() {{{ 获取args
+" Function: FindWowGetArgs() {{{ 获取args
 function! FindWowGetArgs()
     if empty(s:fw.args.root)
         return []
@@ -2268,7 +2267,7 @@ function! FindWowGetArgs()
 endfunction
 " }}}
 
-" FUNCTION: FindWowHighlight([string]) {{{ 高亮字符串
+" Function: FindWowHighlight([string]) {{{ 高亮字符串
 " @param string: 若有字符串，则先添加到s:fw.misc.strings，再高亮
 function! FindWowHighlight(...)
     if &filetype ==# 'leaderf'
@@ -2295,7 +2294,7 @@ let s:ws = {
         \ 'execution' : v:null,
         \ }
     \ }
-" FUNCTION: s:ws.init() {{{
+" Function: s:ws.init() {{{
 function! s:ws.init()
     augroup UserFunctionWorkspace
         autocmd!
@@ -2305,7 +2304,7 @@ function! s:ws.init()
 endfunction
 " }}}
 
-" FUNCTION: s:ws.save() {{{
+" Function: s:ws.save() {{{
 function! s:ws.save()
     let s:ws.settings.fw = s:fw.args
     let s:ws.settings.rp = s:rp.args
@@ -2314,7 +2313,7 @@ function! s:ws.save()
 endfunction
 " }}}
 
-" FUNCTION: s:ws.load() {{{
+" Function: s:ws.load() {{{
 function! s:ws.load()
     let s:ws.settings = popc#layer#wks#GetSettings()
     let s:fw.args = s:ws.settings.fw
@@ -2327,7 +2326,7 @@ call s:ws.init()
 " }}}
 
 " Scripts {{{
-" s:rs {{{
+" Struct: s:rs {{{
 let s:rs = {
     \ 'sel' : {
         \ 'exe' : {
@@ -2374,7 +2373,7 @@ let s:rs = {
         \ },
     \ 'func' : {}
     \ }
-" FUNCTION: s:rs.func.lineToTop() dict {{{ 冻结顶行
+" Function: s:rs.func.lineToTop() dict {{{ 冻结顶行
 function! s:rs.func.lineToTop() dict
     let l:line = line('.')
     split %
@@ -2384,7 +2383,7 @@ function! s:rs.func.lineToTop() dict
 endfunction
 " }}}
 
-" FUNCTION: s:rs.func.clearUndo() dict {{{ 清除undo数据
+" Function: s:rs.func.clearUndo() dict {{{ 清除undo数据
 function! s:rs.func.clearUndo() dict
     let l:ulbak = &undolevels
     set undolevels=-1
@@ -2393,7 +2392,7 @@ function! s:rs.func.clearUndo() dict
 endfunction
 " }}}
 
-" FUNCTION: s:rs.func.createCtags() dict {{{ 生成tags
+" Function: s:rs.func.createCtags() dict {{{ 生成tags
 function! s:rs.func.createCtags() dict
     let l:fw = FindWowGetArgs()
     if !empty(l:fw)
@@ -2404,7 +2403,7 @@ function! s:rs.func.createCtags() dict
 endfunction
 " }}}
 
-" FUNCTION: s:rs.func.copyConfig(filename) {{{ 复制配置文件到当前目录
+" Function: s:rs.func.copyConfig(filename) {{{ 复制配置文件到当前目录
 function! s:rs.func.copyConfig(filename)
     let l:srcfile = $DotVimPath . '/' . a:filename
     let l:dstfile = expand('%:p:h') . '/' . a:filename
@@ -2416,13 +2415,13 @@ endfunction
 " }}}
 " }}}
 
-" FUNCTION: RunScript(type) " {{{
+" Function: RunScript(type) " {{{
 function! RunScript(type)
     call PopSelection(s:rs.sel[a:type])
 endfunction
 " }}}
 
-" FUNCTION: FuncMacro(key) {{{ 执行宏
+" Function: FuncMacro(key) {{{ 执行宏
 function! FuncMacro(key)
     let l:mstr = 'normal! @' . a:key
     execute l:mstr
@@ -2430,7 +2429,7 @@ function! FuncMacro(key)
 endfunction
 " }}}
 
-" FUNCTION: FuncEditFile(suffix, ntab) {{{ 编辑临时文件
+" Function: FuncEditFile(suffix, ntab) {{{ 编辑临时文件
 " @param suffix: 临时文件附加后缀
 " @param ntab: 在新tab中打开
 function! FuncEditFile(suffix, ntab)
@@ -2449,7 +2448,7 @@ function! RunEditFile(key)
 endfunction
 "}}}
 
-" FUNCTION: FuncInsertSpace(string, pos) range {{{ 插入分隔符
+" Function: FuncInsertSpace(string, pos) range {{{ 插入分隔符
 " @param string: 分割字符，以空格分隔
 " @param pos: 分割的位置
 function! FuncInsertSpace(string, pos) range
@@ -2481,7 +2480,7 @@ let RunInsertSpaceL = function('ExecInput', [['Divide L: '], 'FuncInsertSpace', 
 let RunInsertSpaceD = function('ExecInput', [['Delete D: '], 'FuncInsertSpace', 'd'])
 " }}}
 
-" FUNCTION: FuncSwitchFile(sf) {{{ 切换文件
+" Function: FuncSwitchFile(sf) {{{ 切换文件
 function! FuncSwitchFile(sf)
     let l:ext = expand('%:e')
     let l:file = expand('%:p:r')
@@ -2509,7 +2508,7 @@ let RunSwitchFile = function('FuncSwitchFile', [
 " }}}
 
 " Output {{{
-" FUNCTION: QuickfixBasic(kyes) {{{ 基本操作
+" Function: QuickfixBasic(kyes) {{{ 基本操作
 function! QuickfixBasic(keys)
     let l:type = a:keys[0]
     let l:oprt = a:keys[1]
@@ -2541,7 +2540,7 @@ function! QuickfixBasic(keys)
 endfunction
 " }}}
 
-" FUNCTION: QuickfixGet() {{{ 类型与编号
+" Function: QuickfixGet() {{{ 类型与编号
 function! QuickfixGet()
     " location-list : 每个窗口对应一个位置列表
     " quickfix      : 整个vim对应一个quickfix
@@ -2560,7 +2559,7 @@ function! QuickfixGet()
 endfunction
 " }}}
 
-" FUNCTION: QuickfixPreview() {{{ 预览
+" Function: QuickfixPreview() {{{ 预览
 function! QuickfixPreview()
     let [l:type, l:line] = QuickfixGet()
     if empty(l:type)
@@ -2575,7 +2574,7 @@ function! QuickfixPreview()
 endfunction
 " }}}
 
-" FUNCTION: QuickfixTabEdit() {{{ 新建Tab打开窗口
+" Function: QuickfixTabEdit() {{{ 新建Tab打开窗口
 function! QuickfixTabEdit()
     let [l:type, l:line] = QuickfixGet()
     if empty(l:type)
@@ -2591,7 +2590,7 @@ function! QuickfixTabEdit()
 endfunction
 " }}}
 
-" FUNCTION: QuickfixMakeIconv() {{{ 编码转换
+" Function: QuickfixMakeIconv() {{{ 编码转换
 function! QuickfixMakeIconv(sopt, argstr, type)
     let [l:from, l:to] = GetArgs(a:argstr)
     if a:type[0] ==# 'c'
@@ -2610,7 +2609,7 @@ function! QuickfixMakeIconv(sopt, argstr, type)
 endfunction
 " }}}
 
-" FUNCTION: QuickfixIconv() {{{ 编码转换
+" Function: QuickfixIconv() {{{ 编码转换
 function! QuickfixIconv()
     let l:type = QuickfixGet()[0]
     if empty(l:type)
@@ -2643,14 +2642,14 @@ let s:opt = {
     \ }
 " }}}
 
-" FUNCTION: OptionInv(opt) {{{ 切换参数值（bool取反）
+" Function: OptionInv(opt) {{{ 切换参数值（bool取反）
 function! OptionInv(opt)
     execute printf('set inv%s', a:opt)
     execute printf('echo "%s = " . &%s', a:opt, a:opt)
 endfunction
 " }}}
 
-" FUNCTION: OptionLst(opt) {{{ 切换参数值（列表循环取值）
+" Function: OptionLst(opt) {{{ 切换参数值（列表循环取值）
 function! OptionLst(opt)
     let l:lst = s:opt.lst[a:opt]
     let l:idx = index(l:lst, eval('&' . a:opt))
@@ -2660,14 +2659,14 @@ function! OptionLst(opt)
 endfunction
 " }}}
 
-" FUNCTION: OptionFunc(opt) {{{ 切换参数值（函数取值）
+" Function: OptionFunc(opt) {{{ 切换参数值（函数取值）
 function! OptionFunc(opt)
     let Fn = function(s:opt.func[a:opt])
     call Fn()
 endfunction
 " }}}
 
-" FUNCTION: OptFuncNumber() {{{ 切换显示行号
+" Function: OptFuncNumber() {{{ 切换显示行号
 function! OptFuncNumber()
     if (&number) && (&relativenumber)
         set nonumber
@@ -2682,7 +2681,7 @@ function! OptFuncNumber()
 endfunction
 " }}}
 
-" FUNCTION: OptFuncSyntax() {{{ 切换高亮
+" Function: OptFuncSyntax() {{{ 切换高亮
 function! OptFuncSyntax()
     if exists('g:syntax_on')
         syntax off
@@ -2767,7 +2766,7 @@ let s:gui_fontsize = 12
 
 " Gui-vim {{{
 if IsGVim()
-" FUNCTION: GuiAdjustFontSize(inc) {{{
+" Function: GuiAdjustFontSize(inc) {{{
 function! GuiAdjustFontSize(inc)
     let s:gui_fontsize += a:inc
     if IsLinux()
@@ -2807,7 +2806,7 @@ augroup UserSettingsGui
     autocmd VimEnter * call s:NVimQt_setGui()
 augroup END
 
-" FUNCTION: GuiAdjustFontSize(inc) {{{
+" Function: GuiAdjustFontSize(inc) {{{
 function! GuiAdjustFontSize(inc)
     let s:gui_fontsize += a:inc
     if IsLinux()
@@ -2821,7 +2820,7 @@ function! GuiAdjustFontSize(inc)
 endfunction
 " }}}
 
-" FUNCTION: s:NVimQt_setGui() {{{
+" Function: s:NVimQt_setGui() {{{
 function! s:NVimQt_setGui()
 if IsNVimQt()
     call GuiAdjustFontSize(0)
@@ -2844,25 +2843,36 @@ endif
 
 " Autocmd {{{
 augroup UserSettingsCmd
-    "autocmd[!]  [group]  {event}     {pattern}  {nested}  {cmd}
-    "autocmd              BufNewFile  *                    set fileformat=unix
     autocmd!
-
     autocmd BufNewFile *                set fileformat=unix
     autocmd BufRead,BufNewFile *.tex    set filetype=tex
-    autocmd BufRead,BufNewFile *.tikz   set filetype=tex
-    autocmd BufRead,BufNewFile *.gv     set filetype=dot
-
-    autocmd Filetype vim        setlocal foldmethod=marker
-    autocmd Filetype c          setlocal foldmethod=syntax
-    autocmd Filetype cpp        setlocal foldmethod=syntax
-    autocmd Filetype python     setlocal foldmethod=indent
-    autocmd FileType go         setlocal expandtab
-    autocmd FileType javascript setlocal foldmethod=syntax
-
-    autocmd Filetype vim,help,lua nnoremap <buffer> <S-k> :call execute('help ' . expand('<cword>'))<CR>
-    autocmd Filetype vim,help,lua vnoremap <buffer> <S-k> :call execute('help ' . GetSelected())<CR>
+    autocmd Filetype vim                setlocal foldmethod=marker
+    autocmd Filetype c,cpp,javascript   setlocal foldmethod=syntax
+    autocmd Filetype python             setlocal foldmethod=indent
+    autocmd FileType go                 setlocal expandtab
+    autocmd Filetype vim,help,lua       call s:onBufferMappings()
+    autocmd BufReadPre *                call s:onLargeFile()
 augroup END
+
+" Function: s:onBufferMappings() {{{
+function! s:onBufferMappings()
+    nnoremap <buffer> <S-k> :call execute('help ' . expand('<cword>'))<CR>
+    vnoremap <buffer> <S-k> :call execute('help ' . GetSelected())<CR>
+endfunction
+" }}}
+
+" Function: s:onLargeFile() {{{
+function! s:onLargeFile()
+    let l:fsize = getfsize(expand('<afile>'))
+    if l:fsize >= 5 * 1024 * 1024 || l:fsize == -2
+        call setbufvar(expand('<afile>'), 'lightline_check_flg', 0)
+        setlocal filetype=log
+        setlocal buftype=nowrite
+        setlocal undolevels=-1
+        setlocal noswapfile
+    endif
+endfunction
+" }}}
 " }}}
 " }}} End
 
