@@ -1,38 +1,11 @@
 
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " .init.vim: configuration for vim and neovim.
-"        set 'Global settings' before using this script.
 " Github: https://github.com/yehuohan/dotconfigs
 " Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-" README {{{
-" Help {{{
-    " help/h        : 查看Vim帮助
-    " <S-k>         : 快速查看光标所在cword或选择内容的vim帮助
-    " h *@en        : 指定查看英文(en，cn即为中文)帮助
-    " h index       : 帮助列表
-    " h script      :  VimL脚本语法
-    " h range       : Command范围
-    " h pattern     : 匹配模式
-    " h magic       : Magic匹配模式
-    " h Visual      : Visual模式
-    " h map-listing : 映射命令
-    " h registers   : 寄存器列表
-    " h v:count     : 普通模式命令计数
-" }}}
-
-" Map {{{
-    " - Normal模式下使用<leader>代替<C-?>,<S-?>,<A-?>，
-    " - Insert模式下map带ctrl,alt的快捷键
-    " - 尽量不改变vim原有键位的功能定义
-    " - 尽量一只手不同时按两个键，且连续按键相隔尽量近
-    " - 尽量不映射偏远的按键（F1~F12，数字键等），且集中于'j,k,i,o'键位附近
-    " - 调换Esc和CapsLock键
-" }}}
-" }}} End
-
-" Platform {{{
+" Platforms {{{
 " Vim or NVim, with or without Gui {{{
 function! IsVim()
     return !(has('nvim'))
@@ -66,7 +39,7 @@ endfunction
 " }}}
 " }}} End
 
-" Global Settings {{{
+" Globals {{{
 let s:home = resolve(expand('<sfile>:p:h'))
 let $DotVimPath=s:home . '/.vim'
 set rtp+=$DotVimPath
@@ -167,7 +140,7 @@ call s:gsetLoad()
 " }}}
 " }}} End
 
-" Plugin Settings {{{
+" Plugins {{{
 " Struct: s:plug {{{
 let s:plug = {
     \ 'onVimEnter' : {'exec': []},
