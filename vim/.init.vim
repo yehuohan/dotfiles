@@ -2865,7 +2865,7 @@ endfunction
 function! s:onLargeFile()
     let l:fsize = getfsize(expand('<afile>'))
     if l:fsize >= 5 * 1024 * 1024 || l:fsize == -2
-        call setbufvar(expand('<afile>'), 'lightline_check_flg', 0)
+        let b:lightline_check_flg = 0
         setlocal filetype=log
         setlocal buftype=nowrite
         setlocal undolevels=-1
