@@ -593,15 +593,15 @@ else
         if &ft ==# 'qf'
             return 'cwd = ' . getcwd()
         else
-            let l:fw = FindWowGetArgs()
             let l:fp = expand('%:p')
-            return empty(l:fw) ? l:fp : substitute(l:fp, escape(l:fw[0], '\'), '', '')
+            return empty(s:ws.fw.path) ? l:fp :
+                \ substitute(l:fp, escape(s:ws.fw.path, '\'), '', '')
         endif
     endfunction
 
     function! Plug_ll_msgRight()
-        let l:fw = FindWowGetArgs()
-        return empty(l:fw) ? '' : (l:fw[0] . '[' . l:fw[1] . '(' . join(l:fw[2],',') . ')]')
+        return empty(s:ws.fw.path) ? '' :
+            \ (s:ws.fw.path . '[' . s:ws.fw.filters . '(' . join(s:ws.fw.globlst,',') . ')]')
     endfunction
 
     function! Plug_ll_checkMixedIndent()
@@ -1479,7 +1479,7 @@ endfunction
 
 " Function: SetExecLast(string, [execution_echo]) {{{ 设置execution
 function! SetExecLast(string, ...)
-    let s:execution = a:string
+    let s:ws.execution = a:string
     if a:0 >= 1
         let s:execution_echo = a:1
     else
@@ -1491,18 +1491,51 @@ endfunction
 " Function: ExecLast() {{{ 执行上一次的execution
 " @param eager: 1:立接执行, 0:用户执行
 function! ExecLast(eager)
-    if exists('s:execution') && !empty(s:execution)
+    if !empty(s:ws.execution)
         if a:eager
-            silent execute s:execution
+            silent execute s:ws.execution
             if s:execution_echo != v:null
                 echo s:execution_echo
             endif
         else
-            call feedkeys(s:execution, 'n')
+            call feedkeys(s:ws.execution, 'n')
         endif
     endif
 endfunction
 " }}}
+" }}}
+
+" Workspace {{{
+" Required: 'yehuohan/popc'
+
+let s:ws = {
+    \ 'root' : '',
+    \ 'rp': {
+        \ 'fn'       : '',
+        \ 'file'     : '',
+        \ 'filetype' : '',
+        \ },
+    \ 'fw': {
+        \ 'path'    : '',
+        \ 'filters' : '',
+        \ 'globlst' : []
+        \ },
+    \ 'execution' : ''
+    \ }
+
+augroup UserFunctionWorkspace
+    autocmd!
+    autocmd User PopcLayerWksSavePre call popc#layer#wks#SetSettings(s:ws)
+    autocmd User PopcLayerWksLoaded  call s:wsInit()
+augroup END
+
+function! s:wsInit()
+    call extend(s:ws, popc#layer#wks#GetSettings(), 'force')
+    let s:ws.root = popc#layer#wks#GetCurrentWks()[1]
+    if empty(s:ws.fw.path)
+        let s:ws.fw.path = s:ws.root
+    endif
+endfunction
 " }}}
 
 " Project {{{
@@ -1517,11 +1550,6 @@ endfunction
 " @attribute efm: 用于filetype的errorformat类型
 " @attribute pat: 匹配模式字符串
 let s:rp = {
-    \ 'args' : {
-        \ 'fn' : '',
-        \ 'file' : '',
-        \ 'filetype' : ''
-        \ },
     \ 'proj' : {
         \ 'f' : ['FnFile'  , ''                               ],
         \ 'j' : ['FnCell'  , ''                               ],
@@ -1637,23 +1665,23 @@ function! RunProject(keys)
         call function(l:fn)('', l:file, l:conf)
     elseif a:keys =~? 'p'
         " project
-        if a:keys =~# 'P' || empty(s:rp.args.fn)
-            let l:p = GetInput('Project (f,q,g,m,v,h): ')[0:0]
+        if a:keys =~# 'P' || empty(s:ws.rp.fn)
+            let l:p = GetInput('rp.fn (f,q,g,m,v,h): ')[0:0]
             if l:p !~# '[fqgmvh]'
                 return
             endif
-            let s:rp.args.fn = s:rp.proj[l:p][0]
+            let s:ws.rp.fn = s:rp.proj[l:p][0]
         endif
-        if a:keys =~# 'P' || empty(s:rp.args.file)
-            let s:rp.args.file = GetInput('Project file: ', '', 'file')
-            if empty(s:rp.args.file)
+        if a:keys =~# 'P' || empty(s:ws.rp.file)
+            let s:ws.rp.file = GetInput('rp.file: ', '', 'file')
+            if empty(s:ws.rp.file)
                 return
             endif
-            let s:rp.args.file = fnamemodify(s:rp.args.file, ':p')
-            let s:rp.args.filetype = getbufvar(fnamemodify(s:rp.args.file, ':t'), '&filetype', &filetype)
+            let s:ws.rp.file = fnamemodify(s:ws.rp.file, ':p')
+            let s:ws.rp.filetype = getbufvar(fnamemodify(s:ws.rp.file, ':t'), '&filetype', &filetype)
         endif
-        let l:conf.filetype = s:rp.args.filetype
-        call function(s:rp.args.fn)('', s:rp.args.file, l:conf)
+        let l:conf.filetype = s:ws.rp.filetype
+        call function(s:ws.rp.fn)('', s:ws.rp.file, l:conf)
     elseif a:keys =~# '[qgmvh]'
         " qmake, cmake, make, visual studio, sphinx
         let [l:fn, l:pat] = s:rp.proj[l:p]
@@ -1877,11 +1905,6 @@ let s:fw = {
                 \ },
             \ }
         \ },
-    \ 'args' : {
-        \ 'root'    : '',
-        \ 'filters' : '',
-        \ 'globlst' : []
-        \ },
     \ 'rg' : {
         \ 'asyncrun' : {
             \ 'ch' : '"#%',
@@ -2023,8 +2046,8 @@ function! FindWow(keys, mode)
     "   t : find in buffers of tab via popc
     "   o : find in buffers of all tabs via popc
     "   p : find with inputing path
-    "   r : find with inputing working root and filter
-    "  '' : find with s:fw.args
+    "   r : find with inputing working path and filter
+    "  '' : find with s:ws.fw
     " Pattern: %4
     "   = : find text from clipboard
     "   Normal Mode: mode='n'
@@ -2079,15 +2102,15 @@ function! FindWow(keys, mode)
                 let l:loc = join(l:loc, '" "') " for \"l:loc\"
             endif
         elseif a:keys =~# 'r'
-            let l:loc = FindWowSetArgs('rf') ? s:fw.args.root : ''
+            let l:loc = FindWowSetArgs('rf') ? s:ws.fw.path : ''
         else
-            if empty(s:fw.args.root)
-                call FindWowRoot()
+            if empty(s:ws.fw.path)
+                let s:ws.fw.path = popc#utils#FindRoot()
             endif
-            if empty(s:fw.args.root)
+            if empty(s:ws.fw.path)
                 call FindWowSetArgs('r')
             endif
-            let l:loc = s:fw.args.root
+            let l:loc = s:ws.fw.path
         endif
         return l:loc
     endfunction
@@ -2098,11 +2121,11 @@ function! FindWow(keys, mode)
         if a:keys =~? 's'     | let l:opt .= '-w ' | endif
         if a:keys =~# '[iws]' | let l:opt .= '-i ' | elseif a:keys =~# '[IWS]' | let l:opt .= '-s ' | endif
         if a:keys !~# '[btop]'
-            if !empty(s:fw.args.filters)
-                let l:opt .= '-g"*.{' . s:fw.args.filters . '}" '
+            if !empty(s:ws.fw.filters)
+                let l:opt .= '-g"*.{' . s:ws.fw.filters . '}" '
             endif
-            if !empty(s:fw.args.globlst)
-                let l:opt .= '-g' . join(s:fw.args.globlst, ' -g')
+            if !empty(s:ws.fw.globlst)
+                let l:opt .= '-g' . join(s:ws.fw.globlst, ' -g')
             endif
         endif
         return l:opt
@@ -2175,16 +2198,16 @@ endfunction
 " Function: FindWowFuzzy(keys) {{{ 模糊搜索
 function! FindWowFuzzy(keys)
     let l:r = (a:keys[1] ==# 'r') ? 1 : 0
-    let l:root = s:fw.args.root
-    if !l:r && empty(l:root)
-        call FindWowRoot()
-        let l:root = s:fw.args.root
+    if !l:r && empty(s:ws.fw.path)
+        let s:ws.fw.path = popc#utils#FindRoot()
     endif
-    if l:r || empty(l:root)
-        let l:root = FindWowSetArgs('r') ? s:fw.args.root : ''
+    if l:r || empty(s:ws.fw.path)
+        if !FindWowSetArgs('r')
+            return
+        endif
     endif
-    if !empty(l:root)
-        execute 'lcd ' . l:root
+    if !empty(s:ws.fw.path)
+        execute 'lcd ' . s:ws.fw.path
         execute s:fw.engine[a:keys[0] . a:keys[-1:]]
     endif
 endfunction
@@ -2200,43 +2223,28 @@ function! FindWowSetEngine(type)
 endfunction
 " }}}
 
-" Function: FindWowRoot() {{{ 查找root路径
-function! FindWowRoot()
-    let s:fw.args.root = popc#utils#FindRoot()
-endfunction
-" }}}
-
 " Function: FindWowSetArgs(type) {{{ 设置args
-" @param type: r-root, f-filters, g-glob
-" @return 0表示异常结束函数（root无效），1表示正常结束函数
+" @param type: r-path, f-filters, g-glob
+" @return 0表示异常结束函数（path无效），1表示正常结束函数
 function! FindWowSetArgs(type)
     if a:type =~# 'r'
-        let l:root = GetInput('Root: ', '', 'dir', expand('%:p:h'))
-        if empty(l:root)
+        let l:path = GetInput('fw.path: ', '', 'dir', expand('%:p:h'))
+        if empty(l:path)
             return 0
         endif
-        let l:root = fnamemodify(l:root, ':p')
-        if l:root =~# '[/\\]$'
-            let l:root = strcharpart(l:root, 0, strchars(l:root) - 1)
+        let l:path = fnamemodify(l:path, ':p')
+        if l:path =~# '[/\\]$'
+            let l:path = strcharpart(l:path, 0, strchars(l:path) - 1)
         endif
-        let s:fw.args.root = l:root
+        let s:ws.fw.path = l:path
     endif
     if a:type =~# 'f'
-        let s:fw.args.filters = GetInput('Filter: ')
+        let s:ws.fw.filters = GetInput('fw.filters: ')
     endif
     if a:type =~# 'g'
-        let s:fw.args.globlst = split(GetInput('Glob: '))
+        let s:ws.fw.globlst = split(GetInput('fw.globlst: '))
     endif
     return 1
-endfunction
-" }}}
-
-" Function: FindWowGetArgs() {{{ 获取args
-function! FindWowGetArgs()
-    if empty(s:fw.args.root)
-        return []
-    endif
-    return [s:fw.args.root, s:fw.args.filters, s:fw.args.globlst]
 endfunction
 " }}}
 
@@ -2255,47 +2263,6 @@ function! FindWowHighlight(...)
     endif
 endfunction
 " }}}
-" }}}
-
-" Workspace {{{
-" Required: 'yehuohan/popc'
-
-let s:ws = {
-    \ 'settings': {
-        \ 'fw' : v:null,
-        \ 'rp' : v:null,
-        \ 'execution' : v:null,
-        \ }
-    \ }
-" Function: s:ws.init() {{{
-function! s:ws.init()
-    augroup UserFunctionWorkspace
-        autocmd!
-        autocmd User PopcLayerWksSavePre call s:ws.save()
-        autocmd User PopcLayerWksLoaded call s:ws.load()
-    augroup END
-endfunction
-" }}}
-
-" Function: s:ws.save() {{{
-function! s:ws.save()
-    let s:ws.settings.fw = s:fw.args
-    let s:ws.settings.rp = s:rp.args
-    let s:ws.settings.execution = exists('s:execution') ? s:execution : ''
-    call popc#layer#wks#SetSettings(s:ws.settings)
-endfunction
-" }}}
-
-" Function: s:ws.load() {{{
-function! s:ws.load()
-    let s:ws.settings = popc#layer#wks#GetSettings()
-    let s:fw.args = s:ws.settings.fw
-    let s:rp.args = s:ws.settings.rp
-    let s:execution = s:ws.settings.execution
-endfunction
-" }}}
-
-call s:ws.init()
 " }}}
 
 " Scripts {{{
@@ -2367,11 +2334,10 @@ endfunction
 
 " Function: s:rs.func.createCtags() dict {{{ 生成tags
 function! s:rs.func.createCtags() dict
-    let l:fw = FindWowGetArgs()
-    if !empty(l:fw)
-        execute(':AsyncRun cd '. l:fw[0] . ' && ctags -R')
+    if !empty(s:ws.root)
+        execute(':AsyncRun cd '. s:ws.root . ' && ctags -R')
     else
-        echo 'No root in s:fw'
+        echo 'No root in s:ws'
     endif
 endfunction
 " }}}
@@ -2599,9 +2565,7 @@ endfunction
 " }}}
 
 " Option {{{
-" Required: 'yehuohan/popset'
-
-" s:opt {{{
+" Struct: s:opt {{{
 let s:opt = {
     \ 'lst' : {
         \ 'conceallevel' : [2, 0],
@@ -3125,7 +3089,6 @@ endif
     nnoremap <leader>fee :call FindWowSetEngine('engine')<CR>
     nnoremap <leader>fes :call FindWowSetEngine('rg')<CR>
     nnoremap <leader>feu :call FindWowSetEngine('fuzzy')<CR>
-    nnoremap <leader>fet :call FindWowRoot()<CR>
     nnoremap <leader>fea :call FindWowSetArgs('rfg')<CR>
     nnoremap <leader>fer :call FindWowSetArgs('r')<CR>
     nnoremap <leader>fef :call FindWowSetArgs('f')<CR>
