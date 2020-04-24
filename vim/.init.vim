@@ -1526,16 +1526,12 @@ let s:ws = {
 augroup UserFunctionWorkspace
     autocmd!
     autocmd User PopcLayerWksSavePre call popc#layer#wks#SetSettings(s:ws)
-    autocmd User PopcLayerWksLoaded  call s:wsInit()
+    autocmd User PopcLayerWksLoaded call extend(s:ws, popc#layer#wks#GetSettings(), 'force') |
+                                    \ let s:ws.root = popc#layer#wks#GetCurrentWks()[1] |
+                                    \ if empty(s:ws.fw.path) |
+                                    \   let s:ws.fw.path = s:ws.root |
+                                    \ endif
 augroup END
-
-function! s:wsInit()
-    call extend(s:ws, popc#layer#wks#GetSettings(), 'force')
-    let s:ws.root = popc#layer#wks#GetCurrentWks()[1]
-    if empty(s:ws.fw.path)
-        let s:ws.fw.path = s:ws.root
-    endif
-endfunction
 " }}}
 
 " Project {{{
@@ -2299,7 +2295,7 @@ let s:rs = {
             \ 'cmd' : {sopt, arg -> has_key(s:rs.func, arg) ? s:rs.func[arg]() : execute(arg)},
             \ },
         \ 'async' : {
-            \ 'opt' : 'select scripts to run',
+            \ 'opt' : 'select scripts to run async',
             \ 'lst' : [
                     \ 'python -m json.tool %',
                     \ 'python setup.py build',
@@ -2309,7 +2305,7 @@ let s:rs = {
                     \ 'createCtags',
                     \ ],
             \ 'cmd' : {sopt, arg -> has_key(s:rs.func, arg) ? s:rs.func[arg]() : execute(':AsyncRun ' . arg)},
-            \ },
+            \ }
         \ },
     \ 'func' : {}
     \ }
@@ -2332,6 +2328,17 @@ function! s:rs.func.clearUndo() dict
 endfunction
 " }}}
 
+" Function: s:rs.func.copyConfig(filename) dict {{{ 复制配置文件到当前目录
+function! s:rs.func.copyConfig(filename) dict
+    let l:srcfile = $DotVimPath . '/' . a:filename
+    let l:dstfile = expand('%:p:h') . '/' . a:filename
+    if !filereadable(l:dstfile)
+        call writefile(readfile(l:srcfile), l:dstfile)
+    endif
+    return l:dstfile
+endfunction
+" }}}
+
 " Function: s:rs.func.createCtags() dict {{{ 生成tags
 function! s:rs.func.createCtags() dict
     if !empty(s:ws.root)
@@ -2339,17 +2346,6 @@ function! s:rs.func.createCtags() dict
     else
         echo 'No root in s:ws'
     endif
-endfunction
-" }}}
-
-" Function: s:rs.func.copyConfig(filename) {{{ 复制配置文件到当前目录
-function! s:rs.func.copyConfig(filename)
-    let l:srcfile = $DotVimPath . '/' . a:filename
-    let l:dstfile = expand('%:p:h') . '/' . a:filename
-    if !filereadable(l:dstfile)
-        call writefile(readfile(l:srcfile), l:dstfile)
-    endif
-    return l:dstfile
 endfunction
 " }}}
 " }}}
