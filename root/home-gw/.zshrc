@@ -90,6 +90,9 @@ export SAVEHIST=10000
 # 如果连续输入的命令相同，历史纪录中只保留一个
 setopt HIST_IGNORE_DUPS
 
+# 搜索时不显重复的命令，即使不相邻
+setopt HIST_FIND_NO_DUPS
+
 # 为历史纪录中的命令添加时间戳
 setopt EXTENDED_HISTORY     
 
