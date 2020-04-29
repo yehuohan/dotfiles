@@ -84,9 +84,11 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp -r ../VConfig/.vim/autoload                  ./vim/
 
     # cygwin
-    cp ~/.minttyrc      ./root/home-gw/
-    cp ~/.gitconfig     ./root/home-gw/
-    cp ~/.zshrc         ./root/home-gw/
+    cp ~/.minttyrc                                  ./root/home-gw/
+    cp ~/.gitconfig                                 ./root/home-gw/
+    cp ~/.zshrc                                     ./root/home-gw/
+    cp ~/.tmux.conf                                 ./root/home-gw/
+    cp ~/.tmux-status.conf                          ./root/home-gw/
 
     echo "Gw: Copy was completed!"
 fi
