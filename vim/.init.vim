@@ -535,7 +535,7 @@ else
         silent! colorscheme desert
         let g:lightline.colorscheme = 'one'
     endtry
-    let g:lightline.blacklist = {'tagbar':0, 'nerdtree':0, 'Popc':0}
+    let g:lightline.blacklist = {'tagbar':0, 'nerdtree':0, 'Popc':0, 'coc-explorer':0}
     nnoremap <leader>tl :call lightline#toggle()<CR>
     nnoremap <leader>tk :call Plug_ll_toggleCheck()<CR>
 
@@ -937,7 +937,7 @@ if s:gset.use_coc
     let g:coc_config_home = $DotVimPath
     let g:coc_data_home = $DotVimPath . '/.coc'
     let g:coc_global_extensions = [
-        \ 'coc-lists', 'coc-snippets', 'coc-yank',
+        \ 'coc-lists', 'coc-snippets', 'coc-yank', 'coc-explorer',
         \ 'coc-clangd', 'coc-python', 'coc-java', 'coc-tsserver',
         \ 'coc-vimlsp', 'coc-cmake', 'coc-json', 'coc-calc', 'coc-pairs'
         \ ]
@@ -987,6 +987,7 @@ if s:gset.use_coc
     nnoremap <leader>oN :CocLocalConfig<CR>
     " coc-extensions
     nnoremap <silent> <leader>oy :<C-u>CocList --normal yank<CR>
+    nnoremap <silent> <leader>oe :CocCommand explorer<CR>
     nmap <leader>oa <Plug>(coc-calc-result-append)
 endif
 " }}}
@@ -1241,27 +1242,23 @@ endif
 " }}}
 
 " open-browser {{{ 在线搜索
-    let g:openbrowser_default_search='baidu'
+    let g:openbrowser_default_search='bing'
+    let g:openbrowser_search_engines = {
+		\ 'google': 'https://google.com/search?q={query}',
+        \ 'bing'  : 'https://bing.com/search?q={query}',
+		\ 'github': 'https://github.com/search?q={query}'
+        \ }
     nmap <leader>bs <Plug>(openbrowser-smart-search)
     vmap <leader>bs <Plug>(openbrowser-smart-search)
     nnoremap <leader>big :OpenBrowserSearch -google<Space>
-    nnoremap <leader>bib :OpenBrowserSearch -baidu<Space>
+    nnoremap <leader>bib :OpenBrowserSearch -bing<Space>
     nnoremap <leader>bih :OpenBrowserSearch -github<Space>
-    nnoremap <leader>bg  :call Plug_brw_search('google', 'n')<CR>
-    vnoremap <leader>bg  :call Plug_brw_search('google', 'v')<CR>
-    nnoremap <leader>bb  :call Plug_brw_search('baidu', 'n')<CR>
-    vnoremap <leader>bb  :call Plug_brw_search('baidu', 'v')<CR>
-    nnoremap <leader>bh  :call Plug_brw_search('github', 'n')<CR>
-    vnoremap <leader>bh  :call Plug_brw_search('github', 'v')<CR>
-
-    " 搜索引擎- google, baidu, github
-    function! Plug_brw_search(engine, mode)
-        if a:mode ==# 'n'
-            call openbrowser#search(expand('<cword>'), a:engine)
-        elseif a:mode ==# 'v'
-            call openbrowser#search(GetSelected(), a:engine)
-        endif
-    endfunction
+    nnoremap <silent> <leader>bb  :call openbrowser#search(expand('<cword>'), 'bing')<CR>
+    nnoremap <silent> <leader>bg  :call openbrowser#search(expand('<cword>'), 'google')<CR>
+    nnoremap <silent> <leader>bh  :call openbrowser#search(expand('<cword>'), 'github')<CR>
+    vnoremap <silent> <leader>bb  :call openbrowser#search(GetSelected(), 'bing')<CR>
+    vnoremap <silent> <leader>bg  :call openbrowser#search(GetSelected(), 'google')<CR>
+    vnoremap <silent> <leader>bh  :call openbrowser#search(GetSelected(), 'github')<CR>
 "}}}
 
 " crunch {{{ 计算器

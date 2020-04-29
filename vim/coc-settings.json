@@ -37,6 +37,73 @@
     "yank.highlight.enable": true,
     "yank.highlight.duration": 200,
 
+    /* coc-explorer */
+    "explorer.toggle": true,
+    "explorer.width": 30,
+    "explorer.autoCollapseChildren": false,
+    "explorer.sources": [{"name": "file", "expand": true}],
+    "explorer.previewAction.onHover": false,
+    "explorer.icon.expanded": "▾",
+    "explorer.icon.collapsed": "▸",
+    "explorer.file.diagnosticCountMax": 0,
+    "explorer.file.autoReveal": true,
+    "explorer.file.showHiddenFiles": true,
+    "explorer.file.hiddenRules": {
+        "extensions": ["o", "a", "obj", "pyc"],
+        "filenames": [],
+        "patternMatches": [
+            "^\\."
+        ]
+    },
+    "explorer.file.root.template": "[root] [fullpath]",
+    "explorer.file.child.template": "[selection | clip | 1] [indent][icon | 1] [filename omitCenter 1][modified][readonly]",
+    "explorer.file.child.labelingTemplate": "[fullpath][link][size][timeAccessed][timeModified][timeCreated][readonly][modified]",
+    "explorer.file.column.indent.chars": " ",
+    "explorer.file.column.indent.indentLine": false,
+    "explorer.file.tabCD": false,
+    "explorer.keyMappings" : {
+        "j": "nodeNext",
+        "k": "nodePrev",
+        "gk": "expandablePrev",
+        "gj": "expandableNext",
+        "h": false,
+        "l": false,
+        "gl": "expandRecursive",
+        "gh": "collapseRecursive",
+
+        "o": ["expandable?", "expandOrCollapse", "open"],
+        "O": "expandRecursive",
+        "e": false,
+        "i": "open:vsplit",
+        "s": "open:split",
+        "t": "open:tab",
+        "u": "gotoParent",
+        "cd": "cd",
+        "r": "refresh",
+        "p": "preview:labeling",
+        ".": "toggleHidden",
+
+        "J": ["toggleSelection", "nodeNext"],
+        "K": ["toggleSelection", "nodePrev"],
+        "*": "toggleSelection",
+        "<Tab>": "actionMenu",
+        "a": "addFile",
+        "A": "addDirectory",
+        "R": "rename",
+        "yy": "copyFilename",
+        "Y": "copyFilepath",
+        "C": "copyFile",
+        "X": "cutFile",
+        "P": "pasteFile",
+        "D": "delete",
+        "y": false, "c": false, "x": false, "d": false,
+
+        "!": "systemExecute",
+        "gd": "listDrive",
+        "q": "quit",
+        "?": "help"
+    },
+
     /* coc-clangd */
     "clangd.enabled": true,
     "clangd.path": "clangd",
