@@ -1590,7 +1590,7 @@ let s:rp = {
         \ 'rf' , 'rif', 'rj' ,
         \ 'rP' ,
         \ 'rp' , 'rq' , 'rg' , 'rm' , 'rv' , 'rh' ,
-        \ 'Rp' , 'Rq' , 'Rg' , 'Rm' , 'Rv' , 'Rh' ,
+        \ 'rbp', 'rbq', 'rbg', 'rbm', 'rbv', 'rbh',
         \ 'rip', 'riq', 'rig', 'rim', 'riv', 'rih',
         \ 'rcp', 'rcq', 'rcg', 'rcm', 'rcv', 'rch',
         \ ]
@@ -1623,23 +1623,23 @@ endfunction
 function! RunProject(keys)
     " doc
     " {{{
-    " MapKeys: [rR][ci][pP fj qgmvh]
+    " MapKeys: [r ][ci][pP fj qgmvh]
     "          [%1][%2][%3         ]
     " Run: %1
-    "   r : run
-    "   R : build without run
+    "   r : build and run
     " Command: %2
+    "   b : build without run
     "   c : clean project
-    "   i : input args to project
+    "   i : input args
     " Project: %3
     "   pP : project
     "   fj : filetype, cell
-    "   qqmvh : qmake, cmake, make, visual studio, sphinx
+    "   qgmvh : qmake, cmake, make, visual studio, sphinx
     " }}}
     let l:p = a:keys[-1:-1]
     let l:file = ''
     let l:conf = {
-        \ 'run': (a:keys =~# 'r') ? 1 : 0,
+        \ 'run': (a:keys =~# 'b') ? 0 : 1,
         \ 'clean': 0,
         \ 'input': (a:keys =~# 'i') ? 1 : 0,
         \ 'args': ''

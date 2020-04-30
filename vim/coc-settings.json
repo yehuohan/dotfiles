@@ -17,7 +17,7 @@
     "coc.source.file.ignoreHidden": false,
     "coc.preferences.extensionUpdateCheck": "weekly",
     "coc.preferences.enableFloatHighlight": true,
-    "coc.preferences.rootPatterns": [".popc", "tags", ".git", ".hg", ".svn", ".projections.json"],
+    "coc.preferences.rootPatterns": [".popc", ".git", ".svn", ".hg", "tags"],
     "coc.preferences.jumpCommand": "edit",
     "coc.preferences.snippets.enable": true,
 
@@ -70,15 +70,16 @@
         "l": false,
         "gl": "expandRecursive",
         "gh": "collapseRecursive",
+        "gd": "listDrive",
+        "u": "gotoParent",
+        "cd": "cd",
 
         "o": ["expandable?", "expandOrCollapse", "open"],
-        "O": "expandRecursive",
+        "O": "systemExecute",
         "e": false,
         "i": "open:vsplit",
         "s": "open:split",
         "t": "open:tab",
-        "u": "gotoParent",
-        "cd": "cd",
         "r": "refresh",
         "p": "preview:labeling",
         ".": "toggleHidden",
@@ -98,8 +99,6 @@
         "D": "delete",
         "y": false, "c": false, "x": false, "d": false,
 
-        "!": "systemExecute",
-        "gd": "listDrive",
         "q": "quit",
         "?": "help"
     },
