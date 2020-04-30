@@ -1969,7 +1969,7 @@ let s:fw.mappings.rg = [
     \ ]
 let s:fw.mappings.fuzzy = [
     \  'ff',  'fF',  'fl',  'fL',  'fh',  'fH',
-    \ 'frf', 'frF', 'frl', 'frL', 'frh', 'frH',
+    \ 'fpf', 'fpF', 'fpl', 'fpL', 'fph', 'fpH',
     \ ]
 " }}}
 
@@ -2095,13 +2095,13 @@ function! FindWow(keys, mode)
                 let l:loc = join(l:loc, '" "') " for \"l:loc\"
             endif
         elseif a:keys =~# 'r'
-            let l:loc = FindWowSetArgs('rf') ? s:ws.fw.path : ''
+            let l:loc = FindWowSetArgs('pf') ? s:ws.fw.path : ''
         else
             if empty(s:ws.fw.path)
                 let s:ws.fw.path = popc#utils#FindRoot()
             endif
             if empty(s:ws.fw.path)
-                call FindWowSetArgs('r')
+                call FindWowSetArgs('p')
             endif
             let l:loc = s:ws.fw.path
         endif
@@ -2190,17 +2190,22 @@ endfunction
 
 " Function: FindWowFuzzy(keys) {{{ 模糊搜索
 function! FindWowFuzzy(keys)
-    let l:r = (a:keys[1] ==# 'r') ? 1 : 0
-    if !l:r && empty(s:ws.fw.path)
+    let l:p = (a:keys[1] ==# 'p') ? 1 : 0
+    let l:path = s:ws.fw.path
+    if !l:p && empty(l:path)
+        " 使用fw.path
         let s:ws.fw.path = popc#utils#FindRoot()
-    endif
-    if l:r || empty(s:ws.fw.path)
-        if !FindWowSetArgs('r')
+        if empty(s:ws.fw.path) && !FindWowSetArgs('p')
             return
         endif
+        let l:path = s:ws.fw.path
     endif
-    if !empty(s:ws.fw.path)
-        execute 'lcd ' . s:ws.fw.path
+    if l:p || empty(l:path)
+        " 使用临时目录
+        let l:path = GetInput('Where to find: ', '', 'dir', expand('%:p:h'))
+    endif
+    if !empty(l:path)
+        execute 'lcd ' . l:path
         execute s:fw.engine[a:keys[0] . a:keys[-1:]]
     endif
 endfunction
@@ -2217,10 +2222,10 @@ endfunction
 " }}}
 
 " Function: FindWowSetArgs(type) {{{ 设置args
-" @param type: r-path, f-filters, g-glob
+" @param type: p-path, f-filters, g-glob
 " @return 0表示异常结束函数（path无效），1表示正常结束函数
 function! FindWowSetArgs(type)
-    if a:type =~# 'r'
+    if a:type =~# 'p'
         let l:path = GetInput('fw.path: ', '', 'dir', expand('%:p:h'))
         if empty(l:path)
             return 0
@@ -3082,8 +3087,8 @@ endif
     nnoremap <leader>fee :call FindWowSetEngine('engine')<CR>
     nnoremap <leader>fes :call FindWowSetEngine('rg')<CR>
     nnoremap <leader>feu :call FindWowSetEngine('fuzzy')<CR>
-    nnoremap <leader>fea :call FindWowSetArgs('rfg')<CR>
-    nnoremap <leader>fer :call FindWowSetArgs('r')<CR>
+    nnoremap <leader>fea :call FindWowSetArgs('pfg')<CR>
+    nnoremap <leader>fer :call FindWowSetArgs('p')<CR>
     nnoremap <leader>fef :call FindWowSetArgs('f')<CR>
     nnoremap <leader>feg :call FindWowSetArgs('g')<CR>
 " }}}
