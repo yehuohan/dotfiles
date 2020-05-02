@@ -1588,24 +1588,29 @@ let s:rp = {
         \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ },
     \ 'mappings' : [
-        \ 'rf' , 'rif', 'rj' ,
+        \ 'rf' , 'rtf', 'rif', 'rj' ,
         \ 'rP' ,
         \ 'rp' , 'rq' , 'ru' , 'rn' , 'rm' , 'rv' , 'rh' ,
+        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rtv', 'rth',
         \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rbv', 'rbh',
         \ 'rip', 'riq', 'riu', 'rin', 'rim', 'riv', 'rih',
         \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rcv', 'rch',
         \ ]
     \ }
 " Function: s:rp.run(wdir, cmd, [type]) dict {{{
+" @param term: 在内置terminal中运行
 " @param wdir: 命令运行目录
 " @param cmd: 命令字符串
 " @param type: 用于设置errorformat
 " @return 返回运行命令
-function! s:rp.run(wdir, cmd, ...) dict
+function! s:rp.run(term, wdir, cmd, ...) dict
     if a:0 >= 1 && has_key(self.efm, a:1)
         execute 'setlocal efm=' . self.efm[a:1]
     endif
     let l:exec = ':AsyncRun '
+    if a:term
+        let l:exec .= '-mode=term -pos=right '
+    endif
     if !empty(a:wdir)
         let l:wdir = fnameescape(a:wdir)
         let l:exec .= '-cwd=' . l:wdir
@@ -1624,11 +1629,12 @@ endfunction
 function! RunProject(keys)
     " doc
     " {{{
-    " MapKeys: [r ][ci][pP fj qunmvh]
-    "          [%1][%2][%3         ]
+    " MapKeys: [r ][tbci][pP fj qunmvh]
+    "          [%1][%2  ][%3         ]
     " Run: %1
     "   r : build and run
     " Command: %2
+    "   t : run in terminal
     "   b : build without run
     "   c : clean project
     "   i : input args
@@ -1640,11 +1646,12 @@ function! RunProject(keys)
     let l:p = a:keys[-1:-1]
     let l:file = ''
     let l:conf = {
-        \ 'ch': l:p,
-        \ 'run': (a:keys =~# 'b') ? 0 : 1,
-        \ 'clean': 0,
-        \ 'input': (a:keys =~# 'i') ? 1 : 0,
-        \ 'args': ''
+        \ 'ch'    : l:p,
+        \ 'run'   : (a:keys =~# 'b') ? 0 : 1,
+        \ 'term'  : (a:keys =~# 't') ? 1 : 0,
+        \ 'clean' : 0,
+        \ 'input' : (a:keys =~# 'i') ? 1 : 0,
+        \ 'args'  : ''
         \ }
     if a:keys =~# 'c'
         let l:conf.run = 0
@@ -1730,7 +1737,7 @@ function! FnFile(sopt, sel, conf)
         " run exec string
         let l:pstr = copy(s:rp.filetype[l:type])
         call map(l:pstr, {key, val -> (key == 0) ? val : get(l:dict, val, '')})
-        execute s:rp.run(l:workdir, call('printf', l:pstr), l:type)
+        execute s:rp.run(a:conf.term, l:workdir, call('printf', l:pstr), l:type)
     endif
 endfunction
 " }}}
@@ -1772,7 +1779,7 @@ function! FnQMake(sopt, sel, conf)
     if a:conf.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:rp.run(l:workdir, l:cmd, 'cpp')
+    execute s:rp.run(a:conf.term, l:workdir, l:cmd, 'cpp')
 endfunction
 " }}}
 
@@ -1801,7 +1808,7 @@ function! FnCMake(sopt, sel, conf)
             "run
             let l:cmd .= ' && "./' . l:outfile .'"'
         endif
-        execute s:rp.run(l:workdir, l:cmd)
+        execute s:rp.run(a:conf.term, l:workdir, l:cmd)
     endif
 endfunction
 " }}}
@@ -1817,7 +1824,7 @@ function! FnMake(sopt, sel, conf)
     if a:conf.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:rp.run(l:workdir, l:cmd)
+    execute s:rp.run(a:conf.term, l:workdir, l:cmd)
 endfunction
 "}}}
 
@@ -1832,7 +1839,7 @@ function! FnVs(sopt, sel, conf)
     if a:conf.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:rp.run(l:workdir, l:cmd, 'cpp')
+    execute s:rp.run(a:conf.term, l:workdir, l:cmd, 'cpp')
 endfunction
 " }}}
 
@@ -1846,7 +1853,7 @@ function! FnSphinx(sopt, sel, conf)
     if a:conf.run
         let l:cmd .= join([' && firefox', l:outfile])
     endif
-    execute s:rp.run(l:workdir, l:cmd)
+    execute s:rp.run(a:conf.term, l:workdir, l:cmd)
 endfunction
 "}}}
 " }}}
