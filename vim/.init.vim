@@ -174,7 +174,7 @@ endfunction
 " }}}
 " }}}
 
-" Vim-plug {{{
+" Plug {{{
 call plug#begin($DotVimPath.'/bundle')  " 设置插件位置
     " editing
     Plug 'easymotion/vim-easymotion'
@@ -1105,7 +1105,7 @@ endif
     let g:asyncrun_save = 1             " 自动保存当前文件
     let g:asyncrun_local = 1            " 使用setlocal的efm
     nnoremap <leader><leader>r :AsyncRun<Space>
-    vnoremap <leader><leader>r
+    vnoremap <silent> <leader><leader>r
         \ :call feedkeys(':AsyncRun ' . GetSelected(), 'n')<CR>
     nnoremap <leader>rk :AsyncStop<CR>
 " }}}
@@ -2817,6 +2817,8 @@ endfunction
     nnoremap <leader>. :call ExecLast(1)<CR>
     nnoremap <leader><leader>. :call ExecLast(0)<CR>
     nnoremap <M-;> @:
+    vnoremap <silent> <leader><leader>;
+        \ :call feedkeys(':' . GetSelected(), 'n')<CR>
     " 回退操作
     nnoremap <S-u> <C-r>
     " 大小写转换
@@ -3071,10 +3073,12 @@ endif
     nnoremap <leader>3  #
     nnoremap <leader>g8 g*
     nnoremap <leader>g3 g#
-    vnoremap <silent> /
-        \ "9y<Bar>:execute '/\V\c' . escape(@9, '\/')<CR>
     nnoremap <silent> <leader>/
         \ :execute '/\V\c' . escape(expand('<cword>'), '\/')<CR>
+    vnoremap <silent> <leader>/
+        \ "9y<Bar>:execute '/\V\c' . escape(@9, '\/')<CR>
+    vnoremap <silent> <leader><leader>/
+        \ :call feedkeys('/' . GetSelected(), 'n')<CR>
     " FindWow
     for key in s:fw.mappings.rg
         execute printf('nnoremap <leader>%s :call FindWow("%s", "n")<CR>', key, key)
