@@ -1547,7 +1547,8 @@ let s:rp = {
         \ 'f' : ['FnFile'  , ''                               ],
         \ 'j' : ['FnCell'  , ''                               ],
         \ 'q' : ['FnQMake' , '*.pro'                          ],
-        \ 'g' : ['FnCMake' , 'cmakelists.txt'                 ],
+        \ 'u' : ['FnCMake' , 'cmakelists.txt'                 ],
+        \ 'n' : ['FnCMake' , 'cmakelists.txt'                 ],
         \ 'm' : ['FnMake'  , 'makefile'                       ],
         \ 'v' : ['FnVs'    , '*.sln'                          ],
         \ 'h' : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile']
@@ -1589,10 +1590,10 @@ let s:rp = {
     \ 'mappings' : [
         \ 'rf' , 'rif', 'rj' ,
         \ 'rP' ,
-        \ 'rp' , 'rq' , 'rg' , 'rm' , 'rv' , 'rh' ,
-        \ 'rbp', 'rbq', 'rbg', 'rbm', 'rbv', 'rbh',
-        \ 'rip', 'riq', 'rig', 'rim', 'riv', 'rih',
-        \ 'rcp', 'rcq', 'rcg', 'rcm', 'rcv', 'rch',
+        \ 'rp' , 'rq' , 'ru' , 'rn' , 'rm' , 'rv' , 'rh' ,
+        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rbv', 'rbh',
+        \ 'rip', 'riq', 'riu', 'rin', 'rim', 'riv', 'rih',
+        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rcv', 'rch',
         \ ]
     \ }
 " Function: s:rp.run(wdir, cmd, [type]) dict {{{
@@ -1623,7 +1624,7 @@ endfunction
 function! RunProject(keys)
     " doc
     " {{{
-    " MapKeys: [r ][ci][pP fj qgmvh]
+    " MapKeys: [r ][ci][pP fj qunmvh]
     "          [%1][%2][%3         ]
     " Run: %1
     "   r : build and run
@@ -1634,11 +1635,12 @@ function! RunProject(keys)
     " Project: %3
     "   pP : project
     "   fj : filetype, cell
-    "   qgmvh : qmake, cmake, make, visual studio, sphinx
+    "   qunmvh : qmake, cmake(unix), cmake(nmake) make, visual studio, sphinx
     " }}}
     let l:p = a:keys[-1:-1]
     let l:file = ''
     let l:conf = {
+        \ 'ch': l:p,
         \ 'run': (a:keys =~# 'b') ? 0 : 1,
         \ 'clean': 0,
         \ 'input': (a:keys =~# 'i') ? 1 : 0,
@@ -1659,7 +1661,7 @@ function! RunProject(keys)
     elseif a:keys =~? 'p'
         " project
         if a:keys =~# 'P' || empty(s:ws.rp.fn)
-            let l:p = GetInput('rp.fn (f,q,g,m,v,h): ')[0:0]
+            let l:p = GetInput('rp.fn (f,q,u,n,m,v,h): ')[0:0]
             if l:p !~# '[fqgmvh]'
                 return
             endif
@@ -1675,8 +1677,8 @@ function! RunProject(keys)
         endif
         let l:conf.filetype = s:ws.rp.filetype
         call function(s:ws.rp.fn)('', s:ws.rp.file, l:conf)
-    elseif a:keys =~# '[qgmvh]'
-        " qmake, cmake, make, visual studio, sphinx
+    elseif a:keys =~# '[qunmvh]'
+        " qmake, cmake(unix), cmake(nmake) make, visual studio, sphinx
         let [l:fn, l:pat] = s:rp.proj[l:p]
         let l:file = GetFileList(l:pat)
         if len(l:file) == 1
@@ -1786,8 +1788,15 @@ function! FnCMake(sopt, sel, conf)
     else
         "build
         silent! call mkdir(l:workdir . '/CMakeBuildOut', 'p')
-        let l:cmd = printf('cd "%s" && cd CMakeBuildOut && cmake %s -G "Unix Makefiles" .. && make',
-                    \ l:workdir, a:conf.args)
+        if a:conf.ch ==# 'u'
+            " generate unix makefiles
+            let l:cmd = printf('cd "%s" && cd CMakeBuildOut && cmake %s -G "Unix Makefiles" .. && make',
+                        \ l:workdir, a:conf.args)
+        elseif a:conf.ch ==# 'n'
+            " generate nmake makefiles
+            let l:cmd = printf('cd "%s" && cd CMakeBuildOut && vcvars64.bat && cmake %s -G "NMake Makefiles" .. && nmake',
+                        \ l:workdir, a:conf.args)
+        endif
         if a:conf.run
             "run
             let l:cmd .= ' && "./' . l:outfile .'"'
