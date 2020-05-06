@@ -306,6 +306,8 @@ snippet cmk "cmake template"
 
 cmake_minimum_required(VERSION 3.5)
 
+#set(CMAKE_C_COMPILER "clang")
+#set(CMAKE_CXX_COMPILER "clang++")
 project(${1:main} LANGUAGES ${2:CXX})
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

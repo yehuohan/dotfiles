@@ -22,6 +22,8 @@ let s:env.hp.win = [
     \ 'C:/MyApps/LLVM/bin',
     \ 'C:/MyApps/Go/bin',
     \ 'C:/MyApps/lua',
+    \ 'C:/MyApps/rust/toolchain/toolchains/stable-x86_64-pc-windows-msvc/bin',
+    \ 'C:/MyApps/rust/cargo-cache/bin',
     \ 'C:/Program Files (x86)/Google/Chrome/Application',
     \ 'D:/cmake/bin',
     \ 'D:/nodejs',
