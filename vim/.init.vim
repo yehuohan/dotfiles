@@ -1554,9 +1554,11 @@ let s:rp = {
         \ 'h' : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile']
         \ },
     \ 'filetype' : {
-        \ 'c'          : [IsWin() ? 'gcc %s %s -o %s && %s' : 'gcc %s %s -o %s && ./%s',
+        \ 'c'          : [IsWin() ? 'gcc %s %s -o %s.exe && %s' : 'gcc %s %s -o %s && ./%s',
                                                                \ 'args' , 'srcf' , 'outf' , 'outf' ],
-        \ 'cpp'        : [IsWin() ? 'g++ -std=c++11 %s %s -o %s && %s' : 'g++ -std=c++11 %s %s -o %s && ./%s',
+        \ 'cpp'        : [IsWin() ? 'g++ -std=c++11 %s %s -o %s.exe && %s' : 'g++ -std=c++11 %s %s -o %s && ./%s',
+                                                               \ 'args' , 'srcf' , 'outf' , 'outf' ],
+        \ 'rust'       : [IsWin() ? 'rustc %s %s -o %s.exe && %s' : 'rustc %s %s -o %s && ./%s',
                                                                \ 'args' , 'srcf' , 'outf' , 'outf' ],
         \ 'java'       : ['javac %s && java %s %s'             , 'srcf' , 'outf' , 'args'          ],
         \ 'python'     : ['python %s %s'                       , 'srcf' , 'args'                   ],
@@ -1597,7 +1599,7 @@ let s:rp = {
         \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rcv', 'rch',
         \ ]
     \ }
-" Function: s:rp.run(wdir, cmd, [type]) dict {{{
+" Function: s:rp.run(term, wdir, cmd, [type]) dict {{{
 " @param term: 在内置terminal中运行
 " @param wdir: 命令运行目录
 " @param cmd: 命令字符串
@@ -1716,7 +1718,10 @@ function! FnFile(sopt, sel, conf)
                     \ '-fPIC -shared'
                     \ ],
             \ 'cpl' : 'customlist,GetMultiFilesCompletion',
-            \ 'cmd' : {sopt, arg -> call('FnFile', [a:sopt, a:sel, {'input':0, 'args': arg, 'filetype': a:conf.filetype}])}
+            \ 'cmd' : {sopt, arg -> call(
+                        \ 'FnFile',
+                        \ [a:sopt, a:sel, {'term': a:conf.term, 'input': 0, 'args': arg, 'filetype': a:conf.filetype}]
+                        \ )}
             \ })
     else
         " create cmd string
