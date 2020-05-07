@@ -2729,8 +2729,8 @@ function! GuiAdjustFontSize(inc)
         execute 'set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ ' . s:gui_fontsize
         execute 'set guifontwide=WenQuanYi\ Micro\ Hei\ Mono\ ' . s:gui_fontsize
     elseif IsWin()
-        execute 'set guifont=Consolas_For_Powerline:h' . s:gui_fontsize . ':cANSI'
-        execute 'set guifontwide=Microsoft_YaHei_Mono:h' . (s:gui_fontsize - 1). ':cGB2312'
+        execute 'set guifont=Consolas\ For\ Powerline:h' . s:gui_fontsize
+        execute 'set guifontwide=Microsoft\ YaHei\ Mono:h' . (s:gui_fontsize - 1)
     elseif IsMac()
         execute 'set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h' . s:gui_fontsize
     endif
