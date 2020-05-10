@@ -466,7 +466,7 @@ call plug#end()
 " }}}
 " }}}
 
-" Ui & Manager {{{
+" Manager {{{
 " theme {{{ Vim主题(ColorScheme, StatusLine, TabLine)
     " Unicode字符：
     "                    
@@ -1525,7 +1525,7 @@ let s:ws = {
     \ 'execution' : ''
     \ }
 
-augroup UserFunctionWorkspace
+augroup UserModulesWorkspace
     autocmd!
     autocmd User PopcLayerWksSavePre call popc#layer#wks#SetSettings(s:ws)
     autocmd User PopcLayerWksLoaded call extend(s:ws, popc#layer#wks#GetSettings(), 'force') |
@@ -1881,7 +1881,7 @@ endfunction
 " }}}
 " }}}
 
-" Find & Search {{{
+" Find {{{
 " Required: 'skywind3000/asyncrun.vim' or 'yegappan/grep' or 'mhinz/vim-grepper'
 "           'Yggdroot/LeaderF', 'junegunn/fzf.vim'
 "           'yehuohan/popc', 'yehuohan/popset'
@@ -2015,7 +2015,7 @@ let s:fw.mappings.fuzzy = [
 " Function: s:fw.init() dict {{{
 function! s:fw.init() dict
     " 设置搜索结果高亮
-    augroup UserFunctionSearch
+    augroup UserModulesSearch
         autocmd!
         autocmd User Grepper call FindWowHighlight(s:fw.pat)
     augroup END
@@ -3100,7 +3100,7 @@ endif
     endfor
 " }}}
 
-" Find & Search {{{
+" Find {{{
     " /?
     nnoremap <leader><Esc> :nohlsearch<CR>
     nnoremap i :nohlsearch<CR>i
