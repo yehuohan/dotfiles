@@ -98,6 +98,7 @@ function! s:gsetLoad()
         call s:gsetSave()
     endif
     if IsVim() && s:gset.use_coc
+        " vim中coc容易卡，补全用ycm
         let s:gset.use_ycm = '1'
         let s:gset.use_coc = '0'
     endif
@@ -2092,14 +2093,14 @@ function! FindWow(keys, mode)
         let l:pat = ''
         if a:mode ==# 'n'
             if a:keys =~? 'i'
-                let l:pat = GetInput('What to find: ')
+                let l:pat = GetInput('Pattern: ')
             elseif a:keys =~? '[ws]'
                 let l:pat = expand('<cword>')
             endif
         elseif a:mode ==# 'v'
             let l:selected = GetSelected()
             if a:keys =~? 'i'
-                let l:pat = GetInput('What to find: ', l:selected)
+                let l:pat = GetInput('Pattern: ', l:selected)
             elseif a:keys =~? '[ws]'
                 let l:pat = l:selected
             endif
@@ -2120,7 +2121,7 @@ function! FindWow(keys, mode)
         elseif a:keys =~# 'o'
             let l:loc = join(popc#layer#buf#GetFiles('alltab'), '" "')
         elseif a:keys =~# 'p'
-            let l:loc = GetInput('Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
+            let l:loc = GetInput('Location: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
             if !empty(l:loc)
                 let l:loc = split(l:loc, '|')
                 call map(l:loc, {key, val -> (val =~# '[/\\]$') ? strcharpart(val, 0, strchars(val) - 1) : val})
@@ -2182,7 +2183,7 @@ function! FindWow(keys, mode)
         " set loaction
         let l:loc = '%'
         if a:keys =~# 'p'
-            let l:loc = GetInput('Where to find: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
+            let l:loc = GetInput('Location: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
             let l:loc = tr(l:loc, '|', ' ')
             if empty(l:loc) | return 0 | endif
         endif
@@ -2234,7 +2235,7 @@ function! FindWowFuzzy(keys)
     endif
     if l:p || empty(l:path)
         " 使用临时目录
-        let l:path = GetInput('Where to find: ', '', 'dir', expand('%:p:h'))
+        let l:path = GetInput('Location: ', '', 'dir', expand('%:p:h'))
     endif
     if !empty(l:path)
         execute 'lcd ' . l:path
