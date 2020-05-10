@@ -1775,11 +1775,11 @@ function! FnQMake(sopt, sel, conf)
     let l:workdir = fnamemodify(a:sel, ':h')
 
     if IsWin()
-        let l:cmd = printf('cd "%s" && qmake -r "%s" %s && vcvars64.bat && nmake -f Makefile.Debug %s',
-                    \ l:workdir, l:srcfile, a:conf.args, a:conf.clean ? 'distclean' : '')
+        let l:cmd = printf('qmake -r "%s" %s && vcvars64.bat && nmake -f Makefile.Debug %s',
+                    \ l:srcfile, a:conf.args, a:conf.clean ? 'distclean' : '')
     else
-        let l:cmd = printf('cd "%s" && qmake "%s" %s && make %s',
-                    \ l:workdir, l:srcfile, a:conf.args, a:conf.clean ? 'distclean' : '')
+        let l:cmd = printf('qmake "%s" %s && make %s',
+                    \ l:srcfile, a:conf.args, a:conf.clean ? 'distclean' : '')
     endif
     if a:conf.run
         let l:cmd .= ' && "./' . l:outfile .'"'
@@ -1802,12 +1802,12 @@ function! FnCMake(sopt, sel, conf)
         silent! call mkdir(l:workdir . '/CMakeBuildOut', 'p')
         if a:conf.ch ==# 'u'
             " generate unix makefiles
-            let l:cmd = printf('cd "%s" && cd CMakeBuildOut && cmake %s -G "Unix Makefiles" .. && make',
-                        \ l:workdir, a:conf.args)
+            let l:cmd = printf('cd CMakeBuildOut && cmake %s -G "Unix Makefiles" .. && make',
+                        \ a:conf.args)
         elseif a:conf.ch ==# 'n'
             " generate nmake makefiles
-            let l:cmd = printf('cd "%s" && cd CMakeBuildOut && vcvars64.bat && cmake %s -G "NMake Makefiles" .. && nmake',
-                        \ l:workdir, a:conf.args)
+            let l:cmd = printf('cd CMakeBuildOut && vcvars64.bat && cmake %s -G "NMake Makefiles" .. && nmake',
+                        \ a:conf.args)
         endif
         if a:conf.run
             "run
@@ -1824,8 +1824,7 @@ function! FnMake(sopt, sel, conf)
     let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
     let l:workdir = fnamemodify(a:sel, ':h')
 
-    let l:cmd = printf('cd "%s" && make %s %s',
-                \ l:workdir, a:conf.clean ? 'clean' : '', a:conf.args)
+    let l:cmd = printf('make %s %s', a:conf.clean ? 'clean' : '', a:conf.args)
     if a:conf.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
@@ -1839,8 +1838,8 @@ function! FnVs(sopt, sel, conf)
     let l:outfile = fnamemodify(a:sel, ':t:r')
     let l:workdir = fnamemodify(a:sel, ':h')
 
-    let l:cmd = printf('cd "%s" && vcvars64.bat && devenv "%s" /%s %s',
-                    \ l:workdir, l:srcfile, a:conf.clean ? 'Clean' : 'Build', a:conf.args)
+    let l:cmd = printf('vcvars64.bat && devenv "%s" /%s %s',
+                    \ l:srcfile, a:conf.clean ? 'Clean' : 'Build', a:conf.args)
     if a:conf.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
@@ -1853,8 +1852,8 @@ function! FnSphinx(sopt, sel, conf)
     let l:outfile = 'build/html/index.html'
     let l:workdir = fnamemodify(a:sel, ':h')
 
-    let l:cmd = printf('cd "%s" && make %s %s',
-                \ l:workdir, a:conf.clean ? 'clean' : 'html', a:conf.args)
+    let l:cmd = printf('make %s %s',
+                \ a:conf.clean ? 'clean' : 'html', a:conf.args)
     if a:conf.run
         let l:cmd .= join([' && firefox', l:outfile])
     endif
@@ -2802,6 +2801,7 @@ augroup UserSettingsCmd
     autocmd!
     autocmd BufNewFile *                set fileformat=unix
     autocmd BufRead,BufNewFile *.tex    set filetype=tex
+    autocmd BufRead,BufNewFile *.log    set filetype=log
     autocmd Filetype vim                setlocal foldmethod=marker
     autocmd Filetype c,cpp,javascript   setlocal foldmethod=syntax
     autocmd Filetype python             setlocal foldmethod=indent
