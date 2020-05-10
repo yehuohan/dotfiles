@@ -2743,11 +2743,8 @@ endif
 " }}}
 
 " Gui {{{
-let s:gui_fontsize = 12
-
-" Gui-vim {{{
-if IsGVim()
 " Function: GuiAdjustFontSize(inc) {{{
+let s:gui_fontsize = 12
 function! GuiAdjustFontSize(inc)
     let s:gui_fontsize += a:inc
     if IsLinux()
@@ -2762,6 +2759,8 @@ function! GuiAdjustFontSize(inc)
 endfunction
 " }}}
 
+" Gui-vim {{{
+if IsGVim()
     set guioptions-=m                   " 隐藏菜单栏
     set guioptions-=T                   " 隐藏工具栏
     set guioptions-=L                   " 隐藏左侧滚动条
@@ -2787,20 +2786,6 @@ augroup UserSettingsGui
     autocmd VimEnter * call s:NVimQt_setGui()
 augroup END
 
-" Function: GuiAdjustFontSize(inc) {{{
-function! GuiAdjustFontSize(inc)
-    let s:gui_fontsize += a:inc
-    if IsLinux()
-        execute 'GuiFont! WenQuanYi Micro Hei Mono:h' . s:gui_fontsize
-        execute 'GuiFont! DejaVu Sans Mono for Powerline:h' . s:gui_fontsize
-    elseif IsWin()
-        "GuiFont! YaHei Mono For Powerline:h12
-        "GuiFont! Microsoft YaHei Mono:h12
-        execute 'GuiFont! Consolas For Powerline:h' . s:gui_fontsize
-    endif
-endfunction
-" }}}
-
 " Function: s:NVimQt_setGui() {{{
 function! s:NVimQt_setGui()
 if IsNVimQt()
@@ -2808,7 +2793,6 @@ if IsNVimQt()
     GuiLinespace 0
     GuiTabline 0
     GuiPopupmenu 0
-    " 基于Qt-Gui的设置
     nnoremap <leader>tf :call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
     nnoremap <leader>tm :call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>
     nnoremap <kPlus> :call GuiAdjustFontSize(1)<CR>
