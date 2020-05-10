@@ -349,7 +349,7 @@ call plug#end()
     xmap <M-k> <Plug>(textmanip-duplicate-up)
     xmap <M-h> <Plug>(textmanip-duplicate-left)
     xmap <M-l> <Plug>(textmanip-duplicate-right)
-"}}}
+" }}}
 
 " traces {{{ 预览增强
     " 支持:s, :g, :v, :sort, :range预览
@@ -1021,7 +1021,7 @@ if !s:gset.use_coc
     let g:AutoPairsShortcutFastBackInsert=''
     nnoremap <leader>tp :call AutoPairsToggle()<CR>
 endif
-"}}}
+" }}}
 
 " neoformat {{{ 代码格式化
     let g:neoformat_basic_format_align = 1
@@ -1259,7 +1259,7 @@ endif
     vnoremap <silent> <leader>bb  :call openbrowser#search(GetSelected(), 'bing')<CR>
     vnoremap <silent> <leader>bg  :call openbrowser#search(GetSelected(), 'google')<CR>
     vnoremap <silent> <leader>bh  :call openbrowser#search(GetSelected(), 'github')<CR>
-"}}}
+" }}}
 
 " crunch {{{ 计算器
     let g:crunch_user_variables = {
@@ -1269,7 +1269,7 @@ endif
     nnoremap <silent> <leader>ev
         \ :<C-U>execute '.,+' . string(v:count1-1) . 'Crunch'<CR>
     vnoremap <silent> <leader>ev :Crunch<CR>
-"}}}
+" }}}
 endif
 " }}}
 
@@ -1590,13 +1590,12 @@ let s:rp = {
         \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ },
     \ 'mappings' : [
-        \ 'rf' , 'rtf', 'rif', 'rj' ,
+        \ 'rf' , 'rtf', 'Rf' , 'Rtf', 'rj' ,
         \ 'rP' ,
-        \ 'rp' , 'rq' , 'ru' , 'rn' , 'rm' , 'rv' , 'rh' ,
-        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rtv', 'rth',
-        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rbv', 'rbh',
-        \ 'rip', 'riq', 'riu', 'rin', 'rim', 'riv', 'rih',
-        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rcv', 'rch',
+        \ 'rp' , 'rq' , 'ru' , 'rn' , 'rm' , 'rv' , 'rh' , 'Rp' , 'Rq' , 'Ru' , 'Rn' , 'Rm' , 'Rv' , 'Rh' ,
+        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rtv', 'rth', 'Rtp', 'Rtq', 'Rtu', 'Rtn', 'Rtm', 'Rtv', 'Rth',
+        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rbv', 'rbh', 'Rbp', 'Rbq', 'Rbu', 'Rbn', 'Rbm', 'Rbv', 'Rbh',
+        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rcv', 'rch', 'Rcp', 'Rcq', 'Rcu', 'Rcn', 'Rcm', 'Rcv', 'Rch',
         \ ]
     \ }
 " Function: s:rp.run(term, wdir, cmd, [type]) dict {{{
@@ -1627,80 +1626,113 @@ endfunction
 " }}}
 " }}}
 
-" Function: RunProject(keys) {{{
-function! RunProject(keys)
+" Function: RunProject(keys, [args]) {{{
+function! RunProject(keys, ...)
     " doc
     " {{{
-    " MapKeys: [r ][tbci][pP fj qunmvh]
+    " MapKeys: [rR][tbci][pP fj qunmvh]
     "          [%1][%2  ][%3         ]
     " Run: %1
     "   r : build and run
+    "   R : input global args
     " Command: %2
     "   t : run in terminal
     "   b : build without run
     "   c : clean project
-    "   i : input args
     " Project: %3
     "   pP : project
     "   fj : filetype, cell
     "   qunmvh : qmake, cmake(unix), cmake(nmake) make, visual studio, sphinx
     " }}}
-    let l:p = a:keys[-1:-1]
-    let l:file = ''
-    let l:conf = {
-        \ 'ch'    : l:p,
-        \ 'run'   : (a:keys =~# 'b') ? 0 : 1,
-        \ 'term'  : (a:keys =~# 't') ? 1 : 0,
-        \ 'clean' : 0,
-        \ 'input' : (a:keys =~# 'i') ? 1 : 0,
-        \ 'args'  : ''
-        \ }
-    if a:keys =~# 'c'
-        let l:conf.run = 0
-        let l:conf.clean = 1
-        let l:conf.input = 0
-    endif
-
-    if a:keys =~# '[fj]'
-        " filetype, cell
-        let l:fn = s:rp.proj[l:p][0]
-        let l:file = expand('%:p')
-        let l:conf.filetype = &filetype
-        call function(l:fn)('', l:file, l:conf)
-    elseif a:keys =~? 'p'
-        " project
-        if a:keys =~# 'P' || empty(s:ws.rp.fn)
-            let l:p = GetInput('rp.fn (f,q,u,n,m,v,h): ')[0:0]
-            if l:p !~# '[fqgmvh]'
-                return
-            endif
-            let s:ws.rp.fn = s:rp.proj[l:p][0]
-        endif
-        if a:keys =~# 'P' || empty(s:ws.rp.file)
-            let s:ws.rp.file = GetInput('rp.file: ', '', 'file')
-            if empty(s:ws.rp.file)
-                return
-            endif
-            let s:ws.rp.file = fnamemodify(s:ws.rp.file, ':p')
-            let s:ws.rp.filetype = getbufvar(fnamemodify(s:ws.rp.file, ':t'), '&filetype', &filetype)
-        endif
-        let l:conf.filetype = s:ws.rp.filetype
-        call function(s:ws.rp.fn)('', s:ws.rp.file, l:conf)
-    elseif a:keys =~# '[qunmvh]'
-        " qmake, cmake(unix), cmake(nmake) make, visual studio, sphinx
-        let [l:fn, l:pat] = s:rp.proj[l:p]
-        let l:file = GetFileList(l:pat)
-        if len(l:file) == 1
-            call function(l:fn)('', l:file[0], l:conf)
-        elseif len(l:file) > 1
+    " Function: s:inputArgs() closure {{{
+    function! s:inputArgs() closure
+        if a:keys =~# '[fj]'
             call PopSelection({
-                \ 'opt' : 'Please select the project file',
-                \ 'lst' : l:file,
-                \ 'cmd' : l:fn,
-                \ 'arg' : l:conf
+                \ 'opt' : 'select args to RunFile',
+                \ 'lst' : [
+                        \ '-g',
+                        \ '-finput-charset=utf-8 -fexec-charset=gbk',
+                        \ '-static',
+                        \ '-fPIC -shared'
+                        \ ],
+                \ 'cpl' : 'customlist,GetMultiFilesCompletion',
+                \ 'cmd' : {sopt, arg -> call(
+                            \ 'RunProject',
+                            \ ['r' . a:keys[1:], arg]
+                            \ )}
                 \ })
+        elseif a:keys =~# '[pqunmvh]'
+        endif
+    endfunction
+    " }}}
+    " Function: s:parseKeys() closure {{{
+    function! s:parseKeys() closure
+        " parse conf
+        let l:conf = {
+            \ 'key'   : a:keys[-1:-1],
+            \ 'run'   : (a:keys =~# 'b' || a:keys =~# 'c') ? 0 : 1,
+            \ 'term'  : (a:keys =~# 't') ? 1 : 0,
+            \ 'clean' : (a:keys =~# 'c') ? 1 : 0,
+            \ 'args'  : (a:0 > 0) ? a:1 : ''
+            \ }
+
+        " parse fn and file
+        if a:keys =~# '[fj]'
+            " filetype, cell
+            let l:conf.filetype = &filetype
+            return [s:rp.proj[l:conf.key][0], expand('%:p'), l:conf]
+        elseif a:keys =~? 'p'
+            " project
+            if a:keys =~# 'P' || empty(s:ws.rp.fn)
+                let l:p = GetInput('rp.fn (f,q,u,n,m,v,h): ')[0:0]
+                if l:p !~# '[fqgmvh]'
+                    return 'Input nothing'
+                endif
+                let s:ws.rp.fn = s:rp.proj[l:p][0]
+            endif
+            if a:keys =~# 'P' || empty(s:ws.rp.file)
+                let s:ws.rp.file = GetInput('rp.file: ', '', 'file')
+                if empty(s:ws.rp.file)
+                    return 'Input nothing'
+                endif
+                let s:ws.rp.file = fnamemodify(s:ws.rp.file, ':p')
+                let s:ws.rp.filetype = getbufvar(fnamemodify(s:ws.rp.file, ':t'), '&filetype', &filetype)
+            endif
+            let l:conf.filetype = s:ws.rp.filetype
+            return [s:ws.rp.fn, s:ws.rp.file, l:conf]
+        elseif a:keys =~# '[qunmvh]'
+            " qmake, cmake(unix), cmake(nmake) make, visual studio, sphinx
+            let [l:fn, l:pat] = s:rp.proj[l:conf.key]
+            let l:file = GetFileList(l:pat)
+            if len(l:file) == 1
+                return [l:fn, l:file[0], l:conf]
+            elseif len(l:file) > 1
+                return [l:fn, l:file, l:conf]
+            else
+                return 'None of ' . l:pat . ' was found!'
+            endif
+        endif
+    endfunction
+    " }}}
+
+    if a:keys =~# 'R'
+        call s:inputArgs()
+    else
+        let l:ret = s:parseKeys()
+        if type(l:ret) == v:t_list
+            let [l:fn, l:file, l:conf] = l:ret
+            if type(l:file) == v:t_list
+                call PopSelection({
+                    \ 'opt' : 'select project file',
+                    \ 'lst' : l:file,
+                    \ 'cmd' : l:fn,
+                    \ 'arg' : l:conf
+                    \ })
+            else
+                call function(l:fn)('', l:file, l:conf)
+            endif
         else
-            echo 'None of ' . l:pat . ' was found!'
+            echo l:ret
         endif
     endif
 endfunction
@@ -1708,42 +1740,22 @@ endfunction
 
 " Function: FnFile(sopt, sel, conf) {{{
 function! FnFile(sopt, sel, conf)
-    if a:conf.input
-        call PopSelection({
-            \ 'opt' : 'select args to RunFile',
-            \ 'lst' : [
-                    \ '-g',
-                    \ '-finput-charset=utf-8 -fexec-charset=gbk',
-                    \ '-static',
-                    \ '-fPIC -shared'
-                    \ ],
-            \ 'cpl' : 'customlist,GetMultiFilesCompletion',
-            \ 'cmd' : {sopt, arg -> call(
-                        \ 'FnFile',
-                        \ [a:sopt, a:sel, {'term': a:conf.term, 'input': 0, 'args': arg, 'filetype': a:conf.filetype}]
-                        \ )}
-            \ })
-    else
-        " create cmd string
-        let l:type = a:conf.filetype
-        if !has_key(s:rp.filetype, l:type)
-            \ || ('sh' ==? l:type && !(IsLinux() || IsGw() || IsMac()))
-            \ || ('dosbatch' ==? l:type && !IsWin())
-            echo 's:rp.filetype doesn''t support "' . l:type . '"'
-            return
-        endif
-        let l:dict = {
-            \ 'args' : get(a:conf, 'args', ''),
-            \ 'srcf' : '"' . fnamemodify(a:sel, ':t') . '"',
-            \ 'outf' : '"' . fnamemodify(a:sel, ':t:r') . '"'
-            \ }
-        let l:workdir = fnamemodify(a:sel, ':h')
-
-        " run exec string
-        let l:pstr = copy(s:rp.filetype[l:type])
-        call map(l:pstr, {key, val -> (key == 0) ? val : get(l:dict, val, '')})
-        execute s:rp.run(a:conf.term, l:workdir, call('printf', l:pstr), l:type)
+    let l:type = a:conf.filetype
+    if !has_key(s:rp.filetype, l:type)
+        \ || ('sh' ==? l:type && !(IsLinux() || IsGw() || IsMac()))
+        \ || ('dosbatch' ==? l:type && !IsWin())
+        echo 's:rp.filetype doesn''t support "' . l:type . '"'
+        return
     endif
+
+    let l:dict = {
+        \ 'args' : a:conf.args,
+        \ 'srcf' : '"' . fnamemodify(a:sel, ':t') . '"',
+        \ 'outf' : '"' . fnamemodify(a:sel, ':t:r') . '"'
+        \ }
+    let l:pstr = map(copy(s:rp.filetype[l:type]), {key, val -> (key == 0) ? val : get(l:dict, val, '')})
+
+    execute s:rp.run(a:conf.term, fnamemodify(a:sel, ':h'), call('printf', l:pstr), l:type)
 endfunction
 " }}}
 
@@ -1800,11 +1812,11 @@ function! FnCMake(sopt, sel, conf)
     else
         "build
         silent! call mkdir(l:workdir . '/CMakeBuildOut', 'p')
-        if a:conf.ch ==# 'u'
+        if a:conf.key ==# 'u'
             " generate unix makefiles
             let l:cmd = printf('cd CMakeBuildOut && cmake %s -G "Unix Makefiles" .. && make',
                         \ a:conf.args)
-        elseif a:conf.ch ==# 'n'
+        elseif a:conf.key ==# 'n'
             " generate nmake makefiles
             let l:cmd = printf('cd CMakeBuildOut && vcvars64.bat && cmake %s -G "NMake Makefiles" .. && nmake',
                         \ a:conf.args)
@@ -1830,7 +1842,7 @@ function! FnMake(sopt, sel, conf)
     endif
     execute s:rp.run(a:conf.term, l:workdir, l:cmd)
 endfunction
-"}}}
+" }}}
 
 " Function: FnVs(sopt, sel, conf) {{{
 function! FnVs(sopt, sel, conf)
@@ -1859,7 +1871,7 @@ function! FnSphinx(sopt, sel, conf)
     endif
     execute s:rp.run(a:conf.term, l:workdir, l:cmd)
 endfunction
-"}}}
+" }}}
 " }}}
 
 " Find & Search {{{
@@ -2013,22 +2025,18 @@ function! s:fw.setEngine(type, engine) dict
 endfunction
 " }}}
 
-" Function: s:fw.setParam(key, val) dict {{{
-function! s:fw.setParam(key, val) dict
-    let l:self[a:key] .= a:val
-    call self.exec(0)
-endfunction
-" }}}
-
-" Function: s:fw.exec(param) dict {{{
-function! s:fw.exec(param) dict
-    if a:param
+" Function: s:fw.exec(input, ['opt']) dict {{{
+function! s:fw.exec(input, ...) dict
+    if a:input
         call PopSelection({
-            \ 'opt' : 'select search options',
+            \ 'opt' : 'select options',
             \ 'lst' : ['--no-fixed-strings', '--hidden', '--no-ignore'],
-            \ 'cmd' : {sopt, arg -> s:fw.setParam('opt', arg)}
+            \ 'cmd' : {sopt, arg -> s:fw.exec(0, arg)}
             \ })
     else
+        if a:0
+            let l:self.opt .= a:1
+        endif
         " format: printf('cmd %s %s %s',<opt>,<pat>,<loc>)
         let l:exec = printf(self.cmd, self.opt, escape(self.pat, self.engine.ch), self.loc)
         execute l:exec
@@ -2403,7 +2411,7 @@ function! RunEditFile(key)
     let l:ntab = a:key[0] ==# 't'
     call FuncEditFile(l:suffix, l:ntab)
 endfunction
-"}}}
+" }}}
 
 " Function: FuncInsertSpace(string, pos) range {{{ 插入分隔符
 " @param string: 分割字符，以空格分隔
