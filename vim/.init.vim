@@ -1556,7 +1556,8 @@ let s:rp = {
         \ 'n' : ['FnCMake' , 'cmakelists.txt'                 ],
         \ 'm' : ['FnMake'  , 'makefile'                       ],
         \ 'v' : ['FnVs'    , '*.sln'                          ],
-        \ 'h' : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile']
+        \ 'h' : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
+        \ 's' : ['FnTasks' , '.vscode'                        ]
         \ },
     \ 'filetype' : {
         \ 'c'          : [IsWin() ? 'gcc %s %s -o %s.exe && %s' : 'gcc %s %s -o %s && ./%s',
@@ -1597,10 +1598,10 @@ let s:rp = {
     \ 'mappings' : [
         \ 'rf' , 'rtf', 'Rf' , 'Rtf', 'rj' ,
         \ 'rP' ,
-        \ 'rp' , 'rq' , 'ru' , 'rn' , 'rm' , 'rv' , 'rh' , 'Rp' , 'Rq' , 'Ru' , 'Rn' , 'Rm' , 'Rv' , 'Rh' ,
-        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rtv', 'rth', 'Rtp', 'Rtq', 'Rtu', 'Rtn', 'Rtm', 'Rtv', 'Rth',
-        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rbv', 'rbh', 'Rbp', 'Rbq', 'Rbu', 'Rbn', 'Rbm', 'Rbv', 'Rbh',
-        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rcv', 'rch', 'Rcp', 'Rcq', 'Rcu', 'Rcn', 'Rcm', 'Rcv', 'Rch',
+        \ 'rp' , 'rq' , 'ru' , 'rn' , 'rm' , 'rv' , 'rh' , 'rs' , 'Rp' , 'Rq' , 'Ru' , 'Rn' , 'Rm' , 'Rv' , 'Rh' , 'Rs' ,
+        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rtv', 'rth', 'rts', 'Rtp', 'Rtq', 'Rtu', 'Rtn', 'Rtm', 'Rtv', 'Rth', 'Rts',
+        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rbv', 'rbh', 'rbs', 'Rbp', 'Rbq', 'Rbu', 'Rbn', 'Rbm', 'Rbv', 'Rbh', 'Rbs',
+        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rcv', 'rch', 'rcs', 'Rcp', 'Rcq', 'Rcu', 'Rcn', 'Rcm', 'Rcv', 'Rch', 'Rcs',
         \ ]
     \ }
 " Function: s:rp.run(term, wdir, cmd, [type]) dict {{{
@@ -1635,8 +1636,8 @@ endfunction
 function! RunProject(keys, ...)
     " doc
     " {{{
-    " MapKeys: [rR][tbci][pP fj qunmvh]
-    "          [%1][%2  ][%3         ]
+    " MapKeys: [rR][tbc][fj pP qunmvh s]
+    "          [%1][%2 ][%3            ]
     " Run: %1
     "   r : build and run
     "   R : input global args
@@ -1645,9 +1646,10 @@ function! RunProject(keys, ...)
     "   b : build without run
     "   c : clean project
     " Project: %3
-    "   pP : project
     "   fj : filetype, cell
+    "   pP : project
     "   qunmvh : qmake, cmake(unix), cmake(nmake) make, visual studio, sphinx
+    "   s : tasks from vscode
     " }}}
     " Function: s:inputArgs() closure {{{
     function! s:inputArgs() closure
@@ -1707,7 +1709,7 @@ function! RunProject(keys, ...)
             endif
             let l:conf.filetype = s:ws.rp.filetype
             return [s:ws.rp.fn, s:ws.rp.file, l:conf]
-        elseif a:keys =~# '[qunmvh]'
+        elseif a:keys =~# '[qunmvhs]'
             " qmake, cmake(unix), cmake(nmake) make, visual studio, sphinx
             let [l:fn, l:pat] = s:rp.proj[l:conf.key]
             let l:file = GetFileList(l:pat)
@@ -1877,6 +1879,15 @@ function! FnSphinx(sopt, sel, conf)
         let l:cmd .= join([' && firefox', l:outfile])
     endif
     execute s:rp.run(a:conf.term, l:workdir, l:cmd)
+endfunction
+" }}}
+
+" Function: FnTasks(sopt, sel, conf) {{{
+function! FnTasks(sopt, sel, conf)
+    execute s:rp.run(
+                \ a:conf.term,
+                \ fnamemodify(a:sel, ':h'),
+                \ printf('echo Not implemented(%s)', a:sel . '/tasks.json'))
 endfunction
 " }}}
 " }}}
