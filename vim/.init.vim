@@ -1653,7 +1653,7 @@ function! RunProject(keys, ...)
     function! s:inputArgs() closure
         if a:keys =~# '[fj]'
             call PopSelection({
-                \ 'opt' : 'select args to RunFile',
+                \ 'opt' : 'select args',
                 \ 'lst' : [
                         \ '-g',
                         \ '-finput-charset=utf-8 -fexec-charset=gbk',
@@ -1661,24 +1661,26 @@ function! RunProject(keys, ...)
                         \ '-fPIC -shared'
                         \ ],
                 \ 'cpl' : 'customlist,GetMultiFilesCompletion',
-                \ 'cmd' : {sopt, arg -> call(
-                            \ 'RunProject',
-                            \ ['r' . a:keys[1:], arg]
-                            \ )}
+                \ 'cmd' : {sopt, arg -> call('RunProject', ['r' . a:keys[1:], arg])}
                 \ })
         elseif a:keys =~# '[pqunmvh]'
+            call PopSelection({
+                \ 'opt' : 'select args',
+                \ 'lst' : ['all'],
+                \ 'cmd' : {sopt, arg -> call('RunProject', ['r' . a:keys[1:], arg])}
+                \ })
         endif
     endfunction
     " }}}
-    " Function: s:parseKeys() closure {{{
-    function! s:parseKeys() closure
+    " Function: s:parseKeys(args) closure {{{
+    function! s:parseKeys(args) closure
         " parse conf
         let l:conf = {
             \ 'key'   : a:keys[-1:-1],
             \ 'run'   : (a:keys =~# 'b' || a:keys =~# 'c') ? 0 : 1,
             \ 'term'  : (a:keys =~# 't') ? 1 : 0,
             \ 'clean' : (a:keys =~# 'c') ? 1 : 0,
-            \ 'args'  : (a:0 > 0) ? a:1 : ''
+            \ 'args'  : a:args
             \ }
 
         " parse fn and file
@@ -1723,7 +1725,7 @@ function! RunProject(keys, ...)
     if a:keys =~# 'R'
         call s:inputArgs()
     else
-        let l:ret = s:parseKeys()
+        let l:ret = s:parseKeys((a:0 > 0) ? a:1 : '')
         if type(l:ret) == v:t_list
             let [l:fn, l:file, l:conf] = l:ret
             if type(l:file) == v:t_list
