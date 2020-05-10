@@ -97,6 +97,10 @@ function! s:gsetLoad()
     else
         call s:gsetSave()
     endif
+    if IsVim() && s:gset.use_coc
+        let s:gset.use_ycm = '1'
+        let s:gset.use_coc = '0'
+    endif
     call env#env(s:gset.set_dev, s:gset.set_os)
 endfunction
 " }}}
