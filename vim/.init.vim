@@ -2678,12 +2678,16 @@ endfunction
 
 " User Settings {{{
 " Basic {{{
-    syntax on                           " 语法高亮
+    syntax enable                       " 语法高亮
     filetype plugin indent on           " 打开文件类型检测
+    set synmaxcol=512                   " 最大高亮列数
     set number                          " 显示行号
     set relativenumber                  " 显示相对行号
     set cursorline                      " 高亮当前行
     set cursorcolumn                    " 高亮当前列
+    set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
+        \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
+        \,sm:block-blinkwait175-blinkoff150-blinkon175
     set hlsearch                        " 设置高亮显示查找到的文本
     set incsearch                       " 预览当前的搜索内容
     set termguicolors                   " 在终端中使用24位彩色
