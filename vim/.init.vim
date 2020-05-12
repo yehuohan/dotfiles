@@ -1344,60 +1344,6 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
 endfunction
 " }}}
 
-" Function: GetFileList(pat, [sdir]) {{{ 获取文件列表
-" @param pat: 文件匹配模式，如*.pro
-" @param sdir: 查找起始目录，默认从当前文件所在目录向上查找到根目录
-" @return 返回找到的文件列表
-function! GetFileList(pat, ...)
-    let l:dir      = a:0 >= 1 ? a:1 : expand('%:p:h')
-    let l:dir_last = ''
-    let l:pfile    = ''
-
-    if IsWin()
-        " widows文件不区分大小写
-        let l:pat = a:pat
-    else
-        let l:pat = join(map(split(a:pat, '\zs'),
-                    \ {k,c -> (c =~? '[a-z]') ? '[' . toupper(c) . tolower(c) . ']' : c}), '')
-    endif
-
-    while l:dir !=# l:dir_last
-        let l:pfile = glob(l:dir . '/' . l:pat)
-        if !empty(l:pfile)
-            break
-        endif
-
-        let l:dir_last = l:dir
-        let l:dir = fnamemodify(l:dir, ':p:h:h')
-    endwhile
-
-    return split(l:pfile, "\n")
-endfunction
-" }}}
-
-" Function: GetFileContent(fp, pat, flg) {{{ 获取文件中特定的内容
-" @param fp: 目录文件
-" @param pat: 匹配模式，必须使用 \(\) 来提取字符串
-" @param flg: 匹配所有还是第一个
-" @return 返回匹配的内容列表
-function! GetFileContent(fp, pat, flg)
-    let l:content = []
-    for l:line in readfile(a:fp)
-        let l:result = matchlist(l:line, a:pat)
-        if !empty(l:result)
-            if a:flg ==# 'all'
-                if !empty(l:result[1])
-                    call add(l:content, l:result[1])
-                endif
-            elseif a:flg ==# 'first'
-                return empty(l:result[1]) ? [] : [l:result[1]]
-            endif
-        endif
-    endfor
-    return l:content
-endfunction
-" }}}
-
 " Function: GetRange(pats, pate) {{{ 获取特定的内容的范围
 " @param pats: 起始行匹配模式，start为pats所在行
 " @param pate: 结束行匹配模式，end为pate所在行
@@ -1541,7 +1487,6 @@ augroup END
 "           'yehuohan/popc', 'yehuohan/popset'
 
 " Struct: s:rp {{{
-" @attribute args: project参数
 " @attribute proj: project类型
 " @attribute filetype: 文件类型
 " @attribute cell: 用于filetype的cell类型
@@ -1549,12 +1494,13 @@ augroup END
 " @attribute pat: 匹配模式字符串
 let s:rp = {
     \ 'proj' : {
-        \ 'f' : ['FnFile'  , ''                               ],
-        \ 'j' : ['FnCell'  , ''                               ],
+        \ 'f' :  'FnFile',
+        \ 'j' :  'FnCell',
         \ 'q' : ['FnQMake' , '*.pro'                          ],
         \ 'u' : ['FnCMake' , 'cmakelists.txt'                 ],
         \ 'n' : ['FnCMake' , 'cmakelists.txt'                 ],
         \ 'm' : ['FnMake'  , 'makefile'                       ],
+        \ 'g' : ['FnCargo' , 'Cargo.toml'                     ],
         \ 'v' : ['FnVs'    , '*.sln'                          ],
         \ 'h' : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
         \ 's' : ['FnTasks' , '.vscode'                        ]
@@ -1604,6 +1550,47 @@ let s:rp = {
         \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rcv', 'rch', 'rcs', 'Rcp', 'Rcq', 'Rcu', 'Rcn', 'Rcm', 'Rcv', 'Rch', 'Rcs',
         \ ]
     \ }
+" Function: s:rp.glob(pat) {{{
+" @param pat: 文件匹配模式，如*.pro
+" @return 返回找到的文件列表
+function! s:rp.glob(pat) dict
+    let l:dir      = expand('%:p:h')
+    let l:dir_last = ''
+
+    if IsWin()
+        " widows文件不区分大小写
+        let l:pat = a:pat
+    else
+        let l:pat = join(map(split(a:pat, '\zs'),
+                    \ {k,c -> (c =~? '[a-z]') ? '[' . toupper(c) . tolower(c) . ']' : c}), '')
+    endif
+
+    while l:dir !=# l:dir_last
+        let l:res = glob(l:dir . '/' . l:pat)
+        if !empty(l:res)
+            break
+        endif
+        let l:dir_last = l:dir
+        let l:dir = fnamemodify(l:dir, ':p:h:h')
+    endwhile
+    return split(l:res, "\n")
+endfunction
+" }}}
+
+" Function: s:rp.pstr(file, pat) {{{
+" @param pat: 匹配模式，必须使用 \(\) 来提取字符串
+" @return 返回匹配的字符串结果
+function! s:rp.pstr(file, pat)
+    for l:line in readfile(a:file)
+        let l:res = matchlist(l:line, a:pat)
+        if !empty(l:res)
+            return l:res[1]
+        endif
+    endfor
+    return ''
+endfunction
+" }}}
+
 " Function: s:rp.run(term, wdir, cmd, [type]) dict {{{
 " @param term: 在内置terminal中运行
 " @param wdir: 命令运行目录
@@ -1689,11 +1676,11 @@ function! RunProject(keys, ...)
         if a:keys =~# '[fj]'
             " filetype, cell
             let l:conf.filetype = &filetype
-            return [s:rp.proj[l:conf.key][0], expand('%:p'), l:conf]
+            return [s:rp.proj[l:conf.key], expand('%:p'), l:conf]
         elseif a:keys =~? 'p'
             " project
             if a:keys =~# 'P' || empty(s:ws.rp.fn)
-                let l:p = GetInput('rp.fn (f,q,u,n,m,v,h): ')[0:0]
+                let l:p = GetInput('rp.fn (f,q,u,n,m,v,h,s): ')[0:0]
                 if l:p !~# '[fqgmvh]'
                     return 'Input nothing'
                 endif
@@ -1712,7 +1699,7 @@ function! RunProject(keys, ...)
         elseif a:keys =~# '[qunmvhs]'
             " qmake, cmake(unix), cmake(nmake) make, visual studio, sphinx
             let [l:fn, l:pat] = s:rp.proj[l:conf.key]
-            let l:file = GetFileList(l:pat)
+            let l:file = s:rp.glob(l:pat)
             if len(l:file) == 1
                 return [l:fn, l:file[0], l:conf]
             elseif len(l:file) > 1
@@ -1791,8 +1778,8 @@ endfunction
 " Function: FnQMake(sopt, sel, conf) {{{
 function! FnQMake(sopt, sel, conf)
     let l:srcfile = fnamemodify(a:sel, ':t')
-    let l:outfile = GetFileContent(a:sel, s:rp.pat.target, 'first')
-    let l:outfile = empty(l:outfile) ? fnamemodify(a:sel, ':r') : l:outfile[0]
+    let l:outfile = s:rp.pstr(a:sel, s:rp.pat.target)
+    let l:outfile = empty(l:outfile) ? fnamemodify(a:sel, ':r') : l:outfile
     let l:workdir = fnamemodify(a:sel, ':h')
 
     if IsWin()
@@ -1811,8 +1798,8 @@ endfunction
 
 " Function: FnCMake(sopt, sel, conf) {{{
 function! FnCMake(sopt, sel, conf)
-    let l:outfile = GetFileContent(a:sel, s:rp.pat.project, 'first')
-    let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
+    let l:outfile = s:rp.pstr(a:sel, s:rp.pat.project)
+    let l:outfile = empty(l:outfile) ? '' : l:outfile
     let l:workdir = fnamemodify(a:sel, ':h')
 
     if a:conf.clean
@@ -1841,8 +1828,8 @@ endfunction
 
 " Function: FnMake(sopt, sel, conf) {{{
 function! FnMake(sopt, sel, conf)
-    let l:outfile = GetFileContent(a:sel, s:rp.pat.target, 'first')
-    let l:outfile = empty(l:outfile) ? '' : l:outfile[0]
+    let l:outfile = s:rp.pstr(a:sel, s:rp.pat.target)
+    let l:outfile = empty(l:outfile) ? '' : l:outfile
     let l:workdir = fnamemodify(a:sel, ':h')
 
     let l:cmd = printf('make %s %s', a:conf.clean ? 'clean' : '', a:conf.args)
@@ -1850,6 +1837,15 @@ function! FnMake(sopt, sel, conf)
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
     execute s:rp.run(a:conf.term, l:workdir, l:cmd)
+endfunction
+" }}}
+
+" Function: FnCargo(sopt, sel, conf) {{{
+function! FnCargo(sopt, sel, conf)
+    execute s:rp.run(
+                \ a:conf.term,
+                \ fnamemodify(a:sel, ':h'),
+                \ printf('echo Not implemented(%s)', a:sel))
 endfunction
 " }}}
 
