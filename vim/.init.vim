@@ -1500,7 +1500,7 @@ let s:rp = {
         \ 'u' : ['FnCMake' , 'cmakelists.txt'                 ],
         \ 'n' : ['FnCMake' , 'cmakelists.txt'                 ],
         \ 'm' : ['FnMake'  , 'makefile'                       ],
-        \ 'g' : ['FnCargo' , 'Cargo.toml'                     ],
+        \ 'a' : ['FnCargo' , 'Cargo.toml'                     ],
         \ 'v' : ['FnVs'    , '*.sln'                          ],
         \ 'h' : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
         \ 's' : ['FnTasks' , '.vscode'                        ]
@@ -1540,35 +1540,46 @@ let s:rp = {
     \ 'pat' : {
         \ 'target'  : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
+        \ 'name'    : '\mname\s*=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)'
         \ },
     \ 'mappings' : [
-        \ 'rf' , 'rtf', 'Rf' , 'Rtf', 'rj' ,
-        \ 'rP' ,
-        \ 'rp' , 'rq' , 'ru' , 'rn' , 'rm' , 'rv' , 'rh' , 'rs' , 'Rp' , 'Rq' , 'Ru' , 'Rn' , 'Rm' , 'Rv' , 'Rh' , 'Rs' ,
-        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rtv', 'rth', 'rts', 'Rtp', 'Rtq', 'Rtu', 'Rtn', 'Rtm', 'Rtv', 'Rth', 'Rts',
-        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rbv', 'rbh', 'rbs', 'Rbp', 'Rbq', 'Rbu', 'Rbn', 'Rbm', 'Rbv', 'Rbh', 'Rbs',
-        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rcv', 'rch', 'rcs', 'Rcp', 'Rcq', 'Rcu', 'Rcn', 'Rcm', 'Rcv', 'Rch', 'Rcs',
+        \  'rf', 'rtf', 'Rf' , 'Rtf', 'rj' ,
+        \  'rP',
+        \  'rp',  'rq',  'ru',  'rn',  'rm',  'rv',  'ra',  'rh',  'rs',
+        \  'Rp',  'Rq',  'Ru',  'Rn',  'Rm',  'Rv',  'Ra',  'Rh',  'Rs',
+        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rtv', 'rta', 'rth', 'rts',
+        \ 'Rtp', 'Rtq', 'Rtu', 'Rtn', 'Rtm', 'Rtv', 'Rta', 'Rth', 'Rts',
+        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rbv', 'rba', 'rbh', 'rbs',
+        \ 'Rbp', 'Rbq', 'Rbu', 'Rbn', 'Rbm', 'Rbv', 'Rba', 'Rbh', 'Rbs',
+        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rcv', 'rca', 'rch', 'rcs',
+        \ 'Rcp', 'Rcq', 'Rcu', 'Rcn', 'Rcm', 'Rcv', 'Rca', 'Rch', 'Rcs',
+        \ 'rop', 'roq', 'rou', 'ron', 'rom', 'rov', 'roa', 'roh', 'ros',
+        \ 'Rop', 'Roq', 'Rou', 'Ron', 'Rom', 'Rov', 'Roa', 'Roh', 'Ros',
         \ ]
     \ }
-" Function: s:rp.glob(pat) {{{
+" Function: s:rp.glob(pat, low) {{{
 " @param pat: 文件匹配模式，如*.pro
+" @param low: true:查找到存在pat的最低层目录 false:查找到存在pat的最高层目录
 " @return 返回找到的文件列表
-function! s:rp.glob(pat) dict
+function! s:rp.glob(pat, low) dict
     let l:dir      = expand('%:p:h')
     let l:dir_last = ''
 
     if IsWin()
-        " widows文件不区分大小写
-        let l:pat = a:pat
+        let l:pat = a:pat               " widows文件不区分大小写
     else
         let l:pat = join(map(split(a:pat, '\zs'),
                     \ {k,c -> (c =~? '[a-z]') ? '[' . toupper(c) . tolower(c) . ']' : c}), '')
     endif
 
+    let l:res = ''
     while l:dir !=# l:dir_last
-        let l:res = glob(l:dir . '/' . l:pat)
-        if !empty(l:res)
-            break
+        let l:files = glob(l:dir . '/' . l:pat)
+        if !empty(l:files)
+            let l:res = l:files
+            if a:low
+                break
+            endif
         endif
         let l:dir_last = l:dir
         let l:dir = fnamemodify(l:dir, ':p:h:h')
@@ -1623,8 +1634,8 @@ endfunction
 function! RunProject(keys, ...)
     " doc
     " {{{
-    " MapKeys: [rR][tbc][fj pP qunmvh s]
-    "          [%1][%2 ][%3            ]
+    " MapKeys: [rR][tbco][fj pP qunmvah s]
+    "          [%1][%2  ][%3             ]
     " Run: %1
     "   r : build and run
     "   R : input global args
@@ -1632,10 +1643,11 @@ function! RunProject(keys, ...)
     "   t : run in terminal
     "   b : build without run
     "   c : clean project
+    "   o : search project file to low directory
     " Project: %3
     "   fj : filetype, cell
     "   pP : project
-    "   qunmvh : qmake, cmake(unix), cmake(nmake) make, visual studio, sphinx
+    "   qunmvah : qmake, cmake(unix), cmake(nmake), make, visual studio, cargo(rust), sphinx
     "   s : tasks from vscode
     " }}}
     " Function: s:inputArgs() closure {{{
@@ -1671,7 +1683,6 @@ function! RunProject(keys, ...)
             \ 'clean' : (a:keys =~# 'c') ? 1 : 0,
             \ 'args'  : a:args
             \ }
-
         " parse fn and file
         if a:keys =~# '[fj]'
             " filetype, cell
@@ -1696,10 +1707,10 @@ function! RunProject(keys, ...)
             endif
             let l:conf.filetype = s:ws.rp.filetype
             return [s:ws.rp.fn, s:ws.rp.file, l:conf]
-        elseif a:keys =~# '[qunmvhs]'
-            " qmake, cmake(unix), cmake(nmake) make, visual studio, sphinx
+        elseif a:keys =~# '[qunmvahs]'
+            " others
             let [l:fn, l:pat] = s:rp.proj[l:conf.key]
-            let l:file = s:rp.glob(l:pat)
+            let l:file = s:rp.glob(l:pat, (a:keys =~# 'o'))
             if len(l:file) == 1
                 return [l:fn, l:file[0], l:conf]
             elseif len(l:file) > 1
@@ -1840,15 +1851,6 @@ function! FnMake(sopt, sel, conf)
 endfunction
 " }}}
 
-" Function: FnCargo(sopt, sel, conf) {{{
-function! FnCargo(sopt, sel, conf)
-    execute s:rp.run(
-                \ a:conf.term,
-                \ fnamemodify(a:sel, ':h'),
-                \ printf('echo Not implemented(%s)', a:sel))
-endfunction
-" }}}
-
 " Function: FnVs(sopt, sel, conf) {{{
 function! FnVs(sopt, sel, conf)
     let l:srcfile = fnamemodify(a:sel, ':t')
@@ -1861,6 +1863,22 @@ function! FnVs(sopt, sel, conf)
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
     execute s:rp.run(a:conf.term, l:workdir, l:cmd, 'cpp')
+endfunction
+" }}}
+
+" Function: FnCargo(sopt, sel, conf) {{{
+function! FnCargo(sopt, sel, conf)
+    let l:workdir = fnamemodify(a:sel, ':h')
+
+    let l:cmd = 'cargo'
+    if a:conf.run
+        let l:cmd .= ' run'
+    elseif a:conf.clean
+        let l:cmd .= ' clean'
+    else
+        let l:cmd .= ' build'
+    endif
+    execute s:rp.run(a:conf.term, l:workdir, l:cmd)
 endfunction
 " }}}
 
@@ -1903,10 +1921,9 @@ endfunction
 "            fL : fuzzy line text
 "            fh : fuzzy ctags with <cword>
 "            fH : fuzzy ctags
-" @attribute args: 搜索参数
 " @attribute rg: 预置的rg搜索命令，用于搜索指定文本
 " @attribute fuzzy: 预置的模糊搜索命令，用于文件和文本等模糊搜索
-" @attribute misc: 搜索高亮等参数
+" @attribute strings: 高亮搜索字符串
 " @attribute mappings: 映射按键
 let s:fw = {
     \ 'cmd' : '',
@@ -1914,17 +1931,9 @@ let s:fw = {
     \ 'pat' : '',
     \ 'loc' : '',
     \ 'engine' : {
-        \ 'rg' : '',
-        \ 'fuzzy' : '',
-        \ 'sr' : '',
-        \ 'sa' : '',
-        \ 'sk' : '',
-        \ 'ff' : '',
-        \ 'fF' : '',
-        \ 'fl' : '',
-        \ 'fL' : '',
-        \ 'fh' : '',
-        \ 'fH' : '',
+        \ 'rg' : '', 'fuzzy' : '',
+        \ 'sr' : '', 'sa' : '', 'sk' : '',
+        \ 'ff' : '', 'fF' : '', 'fl' : '', 'fL' : '', 'fh' : '', 'fH' : '',
         \ 'sel': {
             \ 'opt' : 'select the engine',
             \ 'lst' : ['rg', 'fuzzy'],
@@ -1982,9 +1991,7 @@ let s:fw = {
             \ 'fH' : ':Leaderf tag --nowrap'
             \ }
         \ },
-    \ 'misc' : {
-        \ 'strings' : [],
-        \ },
+    \ 'strings' : [],
     \ 'mappings' : {
         \ 'rg' :[],
         \ 'fuzzy' : []
@@ -2172,7 +2179,7 @@ function! FindWow(keys, mode)
             let l:cmd = s:fw.engine.sa
         else
             let l:cmd = s:fw.engine.sr
-            let s:fw.misc.strings = []
+            let s:fw.strings = []
         endif
         return l:cmd
     endfunction
@@ -2289,15 +2296,15 @@ endfunction
 " }}}
 
 " Function: FindWowHighlight([string]) {{{ 高亮字符串
-" @param string: 若有字符串，则先添加到s:fw.misc.strings，再高亮
+" @param string: 若有字符串，则先添加到s:fw.strings，再高亮
 function! FindWowHighlight(...)
     if &filetype ==# 'leaderf'
         " use leaderf's highlight
     elseif &filetype ==# 'qf'
         if a:0 >= 1
-            call add(s:fw.misc.strings, a:1)
+            call add(s:fw.strings, a:1)
         endif
-        for str in s:fw.misc.strings
+        for str in s:fw.strings
             execute 'syntax match IncSearch /\V\c' . escape(str, '\/') . '/'
         endfor
     endif
@@ -2724,6 +2731,7 @@ endfunction
     set smartcase                       " 有大写字母时才区别大小写搜索
     set notildeop                       " 使切换大小写的~，类似于c,y,d等操作符
     set nrformats=bin,octal,hex,alpha   " CTRL-A-X支持数字和字母
+    set mouse=a                         " 使能鼠标
     set noimdisable                     " 切换Normal模式时，自动换成英文输入法
     set visualbell                      " 使用可视响铃代替鸣声
     set noerrorbells                    " 关闭错误信息响铃
@@ -2793,6 +2801,9 @@ if IsNVimQt()
     GuiLinespace 0
     GuiTabline 0
     GuiPopupmenu 0
+    nnoremap <silent> <RightMouse> :call GuiShowContextMenu()<CR>
+    inoremap <silent> <RightMouse> <Esc>:call GuiShowContextMenu()<CR>
+    vnoremap <silent> <RightMouse> :call GuiShowContextMenu()<CR>gv
     nnoremap <leader>tf :call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
     nnoremap <leader>tm :call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>
     nnoremap <kPlus> :call GuiAdjustFontSize(1)<CR>
