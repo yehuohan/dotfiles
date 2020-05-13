@@ -659,7 +659,6 @@ endif
         \{
             \ 'opt' : ['colorscheme', 'colo'],
             \ 'lst' : ['forest-night', 'gruvbox', 'srcery', 'one'],
-            \ 'cmd' : ''
         \}
     \ ]
     nnoremap <leader><leader>s :PopSet<Space>
