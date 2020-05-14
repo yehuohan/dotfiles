@@ -1503,8 +1503,7 @@ let s:rp = {
         \ 'a' : ['FnCargo' , 'Cargo.toml'                     ],
         \ 'h' : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
         \ 's' : ['FnTasks' , '.vscode'                        ],
-        \ 'seta' : '[fj]',
-        \ 'setb' : '[qunmvahs]'
+        \ 'sets' : '[qunmvahs]'
         \ },
     \ 'filetype' : {
         \ 'c'          : [IsWin() ? 'gcc %s %s -o %s.exe && %s' : 'gcc %s %s -o %s && ./%s',
@@ -1652,7 +1651,7 @@ function! RunProject(keys, ...)
     " }}}
     " Function: s:inputArgs() closure {{{
     function! s:inputArgs() closure
-        if a:keys =~# s:rp.proj.seta
+        if a:keys =~# '[fj]'
             call PopSelection({
                 \ 'opt' : 'select args',
                 \ 'lst' : [
@@ -1664,7 +1663,7 @@ function! RunProject(keys, ...)
                 \ 'cpl' : 'customlist,GetMultiFilesCompletion',
                 \ 'cmd' : {sopt, arg -> call('RunProject', ['r' . a:keys[1:], arg])}
                 \ })
-        elseif a:keys =~# s:rp.proj.setb
+        elseif a:keys =~# s:rp.proj.sets
             call PopSelection({
                 \ 'opt' : 'select args',
                 \ 'lst' : ['all'],
@@ -1684,15 +1683,15 @@ function! RunProject(keys, ...)
             \ 'args'  : a:args
             \ }
         " parse fn and file
-        if a:keys =~# s:rp.proj.seta
+        if a:keys =~# '[fj]'
             " filetype, cell
             let l:conf.filetype = &filetype
             return [s:rp.proj[l:conf.key][0], expand('%:p'), l:conf]
         elseif a:keys =~? 'p'
             " project
             if a:keys =~# 'P' || empty(s:ws.rp.fn)
-                let l:p = GetInput('rp.fn (f,' . join(split(s:rp.proj.setb[1:-2], '\zs'), ',') . '): ')[0:0]
-                if l:p !~# 'f' && l:p !~# s:rp.proj.setb
+                let l:p = GetInput('rp.fn (f,' . join(split(s:rp.proj.sets[1:-2], '\zs'), ',') . '): ')[0:0]
+                if l:p !~# 'f' && l:p !~# s:rp.proj.sets
                     return 'Invalid fn'
                 endif
                 let s:ws.rp.fn = s:rp.proj[l:p][0]
@@ -1707,7 +1706,7 @@ function! RunProject(keys, ...)
             endif
             let l:conf.filetype = s:ws.rp.filetype
             return [s:ws.rp.fn, s:ws.rp.file, l:conf]
-        elseif a:keys =~# s:rp.proj.setb
+        elseif a:keys =~# s:rp.proj.sets
             " others
             let [l:fn, l:pat] = s:rp.proj[l:conf.key]
             let l:file = s:rp.glob(l:pat, (a:keys =~# 'o'))
@@ -1811,25 +1810,23 @@ endfunction
 function! FnCMake(sopt, sel, conf)
     let l:outfile = s:rp.pstr(a:sel, s:rp.pat.project)
     let l:outfile = empty(l:outfile) ? '' : l:outfile
-    let l:workdir = fnamemodify(a:sel, ':h')
+    let l:workdir = fnamemodify(a:sel, ':h') . '/CMakeBuildOut'
 
     if a:conf.clean
         " clean
-        call delete(l:workdir . '/CMakeBuildOut', 'rf')
+        call delete(l:workdir, 'rf')
     else
         "build
-        silent! call mkdir(l:workdir . '/CMakeBuildOut', 'p')
+        silent! call mkdir(l:workdir, 'p')
         if a:conf.key ==# 'u'
             " generate unix makefiles
-            let l:cmd = printf('cd CMakeBuildOut && cmake %s -G "Unix Makefiles" .. && make',
-                        \ a:conf.args)
+            let l:cmd = printf('cmake %s -G "Unix Makefiles" .. && cmake --build .', a:conf.args)
         elseif a:conf.key ==# 'n'
             " generate nmake makefiles
-            let l:cmd = printf('cd CMakeBuildOut && vcvars64.bat && cmake %s -G "NMake Makefiles" .. && nmake',
-                        \ a:conf.args)
+            let l:cmd = printf('vcvars64.bat && cmake %s -G "NMake Makefiles" .. && cmake --build .', a:conf.args)
         endif
+        "run
         if a:conf.run
-            "run
             let l:cmd .= ' && "./' . l:outfile .'"'
         endif
         execute s:rp.run(a:conf.term, l:workdir, l:cmd)
@@ -2741,7 +2738,6 @@ if IsVim()
     set renderoptions=                  " 设置正常显示unicode字符
     if &term == 'xterm' || &term == 'xterm-256color'
         set t_vb=                       " 关闭终端可视闪铃，即normal模式时按esc会有响铃
-        " 终端光标设置，适用于urxvt,xterm,gnome-termial
         " 5,6: 竖线，  3,4: 横线，  1,2: 方块
         let &t_SI = "\<Esc>[6 q"        " 进入Insert模式
         let &t_SR = "\<Esc>[3 q"        " 进入Replace模式
