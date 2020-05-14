@@ -2733,7 +2733,7 @@ endfunction
     set visualbell                      " 使用可视响铃代替鸣声
     set noerrorbells                    " 关闭错误信息响铃
     set belloff=all                     " 关闭所有事件的响铃
-    set helplang=cn,en                  " 优先查找中文帮助
+    set helplang=en,cn                  " help-doc顺序
 if IsVim()
     set renderoptions=                  " 设置正常显示unicode字符
     if &term == 'xterm' || &term == 'xterm-256color'
