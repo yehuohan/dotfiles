@@ -1460,7 +1460,7 @@ let s:ws = {
     \ 'rp': {
         \ 'fn'       : '',
         \ 'file'     : '',
-        \ 'filetype' : '',
+        \ 'filetype' : ''
         \ },
     \ 'fw': {
         \ 'path'    : '',
@@ -1493,16 +1493,18 @@ augroup END
 " @attribute pat: 匹配模式字符串
 let s:rp = {
     \ 'proj' : {
-        \ 'f' :  'FnFile',
-        \ 'j' :  'FnCell',
+        \ 'f' : ['FnFile'                                     ],
+        \ 'j' : ['FnCell'                                     ],
         \ 'q' : ['FnQMake' , '*.pro'                          ],
         \ 'u' : ['FnCMake' , 'cmakelists.txt'                 ],
         \ 'n' : ['FnCMake' , 'cmakelists.txt'                 ],
         \ 'm' : ['FnMake'  , 'makefile'                       ],
-        \ 'a' : ['FnCargo' , 'Cargo.toml'                     ],
         \ 'v' : ['FnVs'    , '*.sln'                          ],
+        \ 'a' : ['FnCargo' , 'Cargo.toml'                     ],
         \ 'h' : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
-        \ 's' : ['FnTasks' , '.vscode'                        ]
+        \ 's' : ['FnTasks' , '.vscode'                        ],
+        \ 'seta' : '[fj]',
+        \ 'setb' : '[qunmvahs]'
         \ },
     \ 'filetype' : {
         \ 'c'          : [IsWin() ? 'gcc %s %s -o %s.exe && %s' : 'gcc %s %s -o %s && ./%s',
@@ -1633,8 +1635,8 @@ endfunction
 function! RunProject(keys, ...)
     " doc
     " {{{
-    " MapKeys: [rR][tbco][fj pP qunmvah s]
-    "          [%1][%2  ][%3             ]
+    " MapKeys: [rR][tbco][pP ...]
+    "          [%1][%2  ][%3    ]
     " Run: %1
     "   r : build and run
     "   R : input global args
@@ -1644,14 +1646,13 @@ function! RunProject(keys, ...)
     "   c : clean project
     "   o : search project file to low directory
     " Project: %3
-    "   fj : filetype, cell
-    "   pP : project
-    "   qunmvah : qmake, cmake(unix), cmake(nmake), make, visual studio, cargo(rust), sphinx
-    "   s : tasks from vscode
+    "   p : run project from s:ws.rp
+    "   P : set project to s:ws.rp
+    "   ... : supported project from s:rp.proj
     " }}}
     " Function: s:inputArgs() closure {{{
     function! s:inputArgs() closure
-        if a:keys =~# '[fj]'
+        if a:keys =~# s:rp.proj.seta
             call PopSelection({
                 \ 'opt' : 'select args',
                 \ 'lst' : [
@@ -1663,7 +1664,7 @@ function! RunProject(keys, ...)
                 \ 'cpl' : 'customlist,GetMultiFilesCompletion',
                 \ 'cmd' : {sopt, arg -> call('RunProject', ['r' . a:keys[1:], arg])}
                 \ })
-        elseif a:keys =~# '[pqunmvh]'
+        elseif a:keys =~# s:rp.proj.setb
             call PopSelection({
                 \ 'opt' : 'select args',
                 \ 'lst' : ['all'],
@@ -1683,30 +1684,30 @@ function! RunProject(keys, ...)
             \ 'args'  : a:args
             \ }
         " parse fn and file
-        if a:keys =~# '[fj]'
+        if a:keys =~# s:rp.proj.seta
             " filetype, cell
             let l:conf.filetype = &filetype
-            return [s:rp.proj[l:conf.key], expand('%:p'), l:conf]
+            return [s:rp.proj[l:conf.key][0], expand('%:p'), l:conf]
         elseif a:keys =~? 'p'
             " project
             if a:keys =~# 'P' || empty(s:ws.rp.fn)
-                let l:p = GetInput('rp.fn (f,q,u,n,m,v,h,s): ')[0:0]
-                if l:p !~# '[fqgmvh]'
-                    return 'Input nothing'
+                let l:p = GetInput('rp.fn (f,' . join(split(s:rp.proj.setb[1:-2], '\zs'), ',') . '): ')[0:0]
+                if l:p !~# 'f' && l:p !~# s:rp.proj.setb
+                    return 'Invalid fn'
                 endif
                 let s:ws.rp.fn = s:rp.proj[l:p][0]
             endif
             if a:keys =~# 'P' || empty(s:ws.rp.file)
                 let s:ws.rp.file = GetInput('rp.file: ', '', 'file')
                 if empty(s:ws.rp.file)
-                    return 'Input nothing'
+                    return 'Invalid file'
                 endif
                 let s:ws.rp.file = fnamemodify(s:ws.rp.file, ':p')
                 let s:ws.rp.filetype = getbufvar(fnamemodify(s:ws.rp.file, ':t'), '&filetype', &filetype)
             endif
             let l:conf.filetype = s:ws.rp.filetype
             return [s:ws.rp.fn, s:ws.rp.file, l:conf]
-        elseif a:keys =~# '[qunmvahs]'
+        elseif a:keys =~# s:rp.proj.setb
             " others
             let [l:fn, l:pat] = s:rp.proj[l:conf.key]
             let l:file = s:rp.glob(l:pat, (a:keys =~# 'o'))
