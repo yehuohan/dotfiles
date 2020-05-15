@@ -1154,7 +1154,7 @@ endif
 
 " illuminate {{{ 自动高亮
     let g:Illuminate_delay = 250
-    let g:Illuminate_ftblacklist = ['nerdtree', 'tagbar']
+    let g:Illuminate_ftblacklist = ['nerdtree', 'tagbar', 'coc-explorer']
     highlight link illuminatedWord MatchParen
     nnoremap <leader>tg :IlluminationToggle<CR>
 " }}}
