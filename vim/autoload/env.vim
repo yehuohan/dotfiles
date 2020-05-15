@@ -15,15 +15,15 @@ let s:env = {
 " hp with windows10 {{{
 let s:env.hp.win = [
     \ $DotVimPath . '/vBin',
-    \ $DotVimPath . '/vBin/bin',
-    \ 'C:/MyApps/Python37',
-    \ 'C:/MyApps/Julia/bin',
-    \ 'C:/MyApps/cygwin64/bin',
-    \ 'C:/MyApps/LLVM/bin',
-    \ 'C:/MyApps/Go/bin',
-    \ 'C:/MyApps/lua',
-    \ 'C:/MyApps/rust/toolchain/toolchains/stable-x86_64-pc-windows-msvc/bin',
-    \ 'C:/MyApps/rust/cargo-cache/bin',
+    \ 'C:/apps/bin',
+    \ 'C:/apps/Python',
+    \ 'C:/apps/Julia/bin',
+    \ 'C:/apps/cygwin64/bin',
+    \ 'C:/apps/LLVM/bin',
+    \ 'C:/apps/Go/bin',
+    \ 'C:/apps/lua',
+    \ 'C:/apps/rust/toolchain/toolchains/nightly-x86_64-pc-windows-msvc/bin',
+    \ 'C:/apps/rust/cargo/bin',
     \ 'C:/Program Files (x86)/Google/Chrome/Application',
     \ 'D:/cmake/bin',
     \ 'D:/nodejs',
@@ -51,8 +51,8 @@ function! env#env(dev, os)
         if !empty(l:e)
             let $PATH .= ';' . join(l:e, ';')
         endif
-        let $VPathPython = 'C:/MyApps/Python37'
-        let $VPathCygwin = 'C:/MyApps/cygwin64'
+        let $VPathPython = 'C:/cpps/Python'
+        let $VPathCygwin = 'C:/cpps/cygwin64'
         let $VPathQt = 'D:/Qt/5.12.5/msvc2017_64'
         let $VPathVs = 'D:/VS2017/VC/Tools/MSVC/14.13.26128'
         let $VPathLuaLsp = $HOME . '/.vscode/extensions/sumneko.lua-0.16.2'
