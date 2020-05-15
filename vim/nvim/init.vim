@@ -14,9 +14,9 @@ if (has('unix') && !has('macunix') && !has('win32unix')) || (has('mac'))
     source ~/.init.vim
 elseif (has('win32') || has('win64'))
     " Path 'C:\Users\<user>\AppData\Local\nvim\'
-    let g:python3_host_prog = 'C:/MyApps/Python37/python.exe'
-    set rtp^=C:/MyApps/VConfig/.vim
-    set rtp+=C:/MyApps/VConfig/.vim/after
+    let g:python3_host_prog = 'C:/apps/Python/python.exe'
+    set rtp^=C:/apps/VConfig/.vim
+    set rtp+=C:/apps/VConfig/.vim/after
     let &packpath = &rtp
-    source C:/MyApps/VConfig/.init.vim
+    source C:/apps/VConfig/.init.vim
 endif
