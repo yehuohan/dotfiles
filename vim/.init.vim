@@ -1625,7 +1625,7 @@ function! s:rp.run(term, wdir, cmd, ...) dict
     " create exec string
     let l:exec = join([l:exec, a:cmd])
     call SetExecLast(l:exec)
-    return l:exec
+    execute l:exec
 endfunction
 " }}}
 " }}}
@@ -1761,7 +1761,7 @@ function! FnFile(sopt, sel, conf)
         \ }
     let l:pstr = map(copy(s:rp.filetype[l:type]), {key, val -> (key == 0) ? val : get(l:dict, val, '')})
 
-    execute s:rp.run(a:conf.term, fnamemodify(a:sel, ':h'), call('printf', l:pstr), l:type)
+    call s:rp.run(a:conf.term, fnamemodify(a:sel, ':h'), call('printf', l:pstr), l:type)
 endfunction
 " }}}
 
@@ -1802,7 +1802,7 @@ function! FnQMake(sopt, sel, conf)
     if a:conf.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:rp.run(a:conf.term, l:workdir, l:cmd, 'cpp')
+    call s:rp.run(a:conf.term, l:workdir, l:cmd, 'cpp')
 endfunction
 " }}}
 
@@ -1829,7 +1829,7 @@ function! FnCMake(sopt, sel, conf)
         if a:conf.run
             let l:cmd .= ' && "./' . l:outfile .'"'
         endif
-        execute s:rp.run(a:conf.term, l:workdir, l:cmd)
+        call s:rp.run(a:conf.term, l:workdir, l:cmd)
     endif
 endfunction
 " }}}
@@ -1844,7 +1844,7 @@ function! FnMake(sopt, sel, conf)
     if a:conf.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:rp.run(a:conf.term, l:workdir, l:cmd)
+    call s:rp.run(a:conf.term, l:workdir, l:cmd)
 endfunction
 " }}}
 
@@ -1859,7 +1859,7 @@ function! FnVs(sopt, sel, conf)
     if a:conf.run
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
-    execute s:rp.run(a:conf.term, l:workdir, l:cmd, 'cpp')
+    call s:rp.run(a:conf.term, l:workdir, l:cmd, 'cpp')
 endfunction
 " }}}
 
@@ -1875,7 +1875,7 @@ function! FnCargo(sopt, sel, conf)
     else
         let l:cmd .= ' build'
     endif
-    execute s:rp.run(a:conf.term, l:workdir, l:cmd)
+    call s:rp.run(a:conf.term, l:workdir, l:cmd)
 endfunction
 " }}}
 
@@ -1889,13 +1889,13 @@ function! FnSphinx(sopt, sel, conf)
     if a:conf.run
         let l:cmd .= join([' && firefox', l:outfile])
     endif
-    execute s:rp.run(a:conf.term, l:workdir, l:cmd)
+    call s:rp.run(a:conf.term, l:workdir, l:cmd)
 endfunction
 " }}}
 
 " Function: FnTasks(sopt, sel, conf) {{{
 function! FnTasks(sopt, sel, conf)
-    execute s:rp.run(
+    call s:rp.run(
                 \ a:conf.term,
                 \ fnamemodify(a:sel, ':h'),
                 \ printf('echo Not implemented(%s)', a:sel . '/tasks.json'))
