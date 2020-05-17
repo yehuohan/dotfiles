@@ -2787,7 +2787,7 @@ endif
 if IsNVim()
 augroup UserSettingsGui
     autocmd!
-    autocmd VimEnter * call s:NVimQt_setGui()
+    autocmd UIEnter * call s:NVimQt_setGui()
 augroup END
 
 " Function: s:NVimQt_setGui() {{{
