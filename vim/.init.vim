@@ -2425,6 +2425,7 @@ function! RunEditFile(key)
     let l:suffix = {
                 \ 'c': 'c',
                 \ 'a': 'cpp',
+                \ 'r': 'rs',
                 \ 'p': 'py'}[a:key[-1:]]
     let l:ntab = a:key[0] ==# 't'
     call FuncEditFile(l:suffix, l:ntab)
@@ -3077,9 +3078,11 @@ endif
         \ :call ExecInput(['Suffix: '], 'FuncEditFile', 1)<CR>
     nnoremap <leader>ec :call RunEditFile('c')<CR>
     nnoremap <leader>ea :call RunEditFile('a')<CR>
+    nnoremap <leader>er :call RunEditFile('r')<CR>
     nnoremap <leader>ep :call RunEditFile('p')<CR>
     nnoremap <leader>etc :call RunEditFile('tc')<CR>
     nnoremap <leader>eta :call RunEditFile('ta')<CR>
+    nnoremap <leader>etr :call RunEditFile('tr')<CR>
     nnoremap <leader>etp :call RunEditFile('tp')<CR>
     nnoremap <leader>eh :call RunInsertSpaceH()<CR>
     nnoremap <leader>eb :call RunInsertSpaceB()<CR>
