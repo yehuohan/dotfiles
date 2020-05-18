@@ -234,9 +234,9 @@ if s:gset.use_ycm
         " (first installed) or (PlugInstall! or PlugUpdate!)
         if a:info.status == 'installed' || a:info.force
             if IsLinux()
-                !python install.py --clangd-completer --go-completer --java-completer --build-dir ycm_build
+                !python install.py --clangd-completer --build-dir ycm_build
             elseif IsWin()
-                !python install.py --clangd-completer --go-completer --java-completer --ts-completer --msvc 15 --build-dir ycm_build
+                !python install.py --clangd-completer --msvc 15 --build-dir ycm_build
             endif
         endif
     endfunction
@@ -832,7 +832,6 @@ endif
 if s:gset.use_ycm
     call s:plug.reg('onDelay', 'load', 'YouCompleteMe')
     let g:ycm_global_ycm_extra_conf = $DotVimPath.'/.ycm_extra_conf.py'
-                                                                " C-family补全路径
     let g:ycm_enable_diagnostic_signs = 1                       " 开启语法检测
     let g:ycm_max_diagnostics_to_display = 30
     let g:ycm_warning_symbol = '►'                              " Warning符号
@@ -846,36 +845,8 @@ if s:gset.use_ycm
     let g:ycm_seed_identifiers_with_syntax = 1                  " 收集语法关键字补全
     let g:ycm_use_ultisnips_completer = 1                       " 收集UltiSnips补全
     let g:ycm_autoclose_preview_window_after_insertion = 1      " 自动关闭预览窗口
-    let g:ycm_filetype_blacklist = {
-        \ 'tagbar': 1,
-        \ 'notes': 1,
-        \ 'netrw': 1,
-        \ 'unite': 1,
-        \ 'text': 1,
-        \ 'vimwiki': 1,
-        \ 'pandoc': 1,
-        \ 'infolog': 1,
-        \ 'mail': 1,
-        \ 'markdown': 1,
-        \ }                                                     " 禁用YCM的列表
-    let g:ycm_filetype_whitelist = {'*': 1}                     " YCM只在白名单出现且黑名单未出现的filetype工作
-    let g:ycm_language_server = [
-        \ {
-            \ 'name': 'julia',
-            \ 'filetypes': ['julia'],
-            \ 'project_root_files': ['Project.toml'],
-            \ 'cmdline': ['julia', '--startup-file=no', '--history-file=no', '-e', '
-            \       using LanguageServer;
-            \       using Pkg;
-            \       import StaticLint;
-            \       import SymbolServer;
-            \       env_path = dirname(Pkg.Types.Context().env.project_file);
-            \       debug = false;
-            \       server = LanguageServer.LanguageServerInstance(stdin, stdout, debug, env_path, "", Dict());
-            \       server.runlinter = true;
-            \       run(server);
-            \       ']
-        \ }]                                                    " LSP支持
+    let g:ycm_filetype_whitelist = {'*': 1}                     " YCM只在whitelist出现且blacklist未出现的filetype工作
+    let g:ycm_language_server = []                              " LSP支持
     let g:ycm_semantic_triggers = {
         \ 'tex' : g:vimtex#re#youcompleteme
         \ }
@@ -920,8 +891,6 @@ endif
 
 " coc {{{ 自动补全
 if s:gset.use_coc
-    " coc-clangd: 需要自行下载llvm
-    " coc-java: 最好自行下载jdt.ls
     call s:plug.reg('onDelay', 'load', 'coc.nvim')
     call s:plug.reg('onDelay', 'exec', 'call s:Plug_coc_settings()')
     function! s:Plug_coc_settings()
@@ -937,12 +906,14 @@ if s:gset.use_coc
                 \ }
             \ })
     endfunction
-
+    " coc-clangd: download llvm from https://releases.llvm.org
+    " coc-python: pip install jedi
+    " coc-java: download jdt.ls from https://download.eclipse.org/jdtls/snapshots
     let g:coc_config_home = $DotVimPath
     let g:coc_data_home = $DotVimPath . '/.coc'
     let g:coc_global_extensions = [
         \ 'coc-lists', 'coc-snippets', 'coc-yank', 'coc-explorer',
-        \ 'coc-clangd', 'coc-python', 'coc-java', 'coc-tsserver',
+        \ 'coc-clangd', 'coc-python', 'coc-java', 'coc-tsserver', 'coc-rls',
         \ 'coc-vimlsp', 'coc-cmake', 'coc-json', 'coc-calc', 'coc-pairs'
         \ ]
     let g:coc_status_error_sign = '✘'
@@ -986,13 +957,12 @@ if s:gset.use_coc
     vnoremap <silent> <leader>of :call CocAction('formatSelected', 'v')<CR>
     nnoremap <silent> <leader>of :call CocAction('format')<CR>
     nnoremap <leader>oR :CocRestart<CR>
-    nnoremap <leader>oc :CocCommand<Space>
     nnoremap <leader>on :CocConfig<CR>
     nnoremap <leader>oN :CocLocalConfig<CR>
     " coc-extensions
     nnoremap <silent> <leader>oy :<C-u>CocList --normal yank<CR>
     nnoremap <silent> <leader>oe :CocCommand explorer<CR>
-    nmap <leader>oa <Plug>(coc-calc-result-append)
+    nmap <leader>oc <Plug>(coc-calc-result-append)
 endif
 " }}}
 

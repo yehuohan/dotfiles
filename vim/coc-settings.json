@@ -110,6 +110,11 @@
     /* coc-python */
     "python.autoComplete.extraPaths": [],
 
+    /* coc-rls */
+    "rust-client.channel": "nightly",
+    "rust.unstable_features": true,
+    "rust.all_features": true,
+
     /* lsp */
     "languageserver": {
         "julia": {
