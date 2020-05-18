@@ -2,30 +2,14 @@
 ## Consolas For Powerline & YaHei Mono For Powerline
 
 ### **Introduction:**
-In windows gvim, the font `Consolas For Powerline` work nice with `Microsoft YaHei Mono` in gvim.
+For windows, `Consolas For Powerline` work nice with `Microsoft YaHei Mono` in vim.
 (`Consolas For Powerline` is based on [consolas v5.33](https://en.wikipedia.org/wiki/Consolas))
-
-Config for `_vimrc`:
-
-```vim
-set guifont=Consolas_For_Powerline:h13:cANSI
-set guifontwide=Microsoft_YaHei_Mono:h12:cGB2312
-```
 
 ![example](./example.png)
 
-In windows neovim-qt, the font `YaHei Mono For Powerline` work better.
-(`YaHei Mono For Powerline` is based on `Microsoft YaHei Mono`)
+For unix/linux, [DejaVu Sans Mono For Powerline](https://github.com/powerline/fonts/tree/master/DejaVuSansMono) is recommended.
 
-Config for `ginit.vim`:
-
-```vim
-GuiFont! YaHei Mono For Powerline:h13
-```
-
-And for unix/linux, [DejaVu Sans Mono For Powerline](https://github.com/powerline/fonts/tree/master/DejaVuSansMono) is recommended.
-
-### **Characters :**
+### **Characters:**
 
 | Codepoint  | Character                |
 | :---:      | :---                     |
