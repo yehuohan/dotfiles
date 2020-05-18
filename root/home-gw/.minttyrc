@@ -1,7 +1,7 @@
 BoldAsFont=yes
 Locale=C
 Charset=UTF-8
-Font=YaHei Mono For Powerline
+Font=Consolas For Powerline
 FontHeight=12
 CursorType=block
 BackgroundColour=221,221,210
