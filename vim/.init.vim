@@ -1506,6 +1506,15 @@ let s:rp = {
         \ },
     \ 'efm' : {
         \ 'python' : '%*\\sFile\ \"%f\"\\,\ line\ %l\\,\ %m',
+        \ 'rust'   : '%-G,
+                     \%-Gerror:\ aborting\ %.%#,
+                     \%-Gerror:\ Could\ not\ compile\ %.%#,
+                     \%Eerror:\ %m,
+                     \%Eerror[E%n]:\ %m,
+                     \%Wwarning:\ %m,
+                     \%Inote:\ %m,
+                     \%C\ %#-->\ %f:%l:%c,
+                     \%E\ \ left:%m,%C\ right:%m\ %f:%l:%c,%Z'
         \ },
     \ 'pat' : {
         \ 'target'  : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
@@ -1577,7 +1586,6 @@ endfunction
 " @param wdir: 命令运行目录
 " @param cmd: 命令字符串
 " @param type: 用于设置errorformat
-" @return 返回运行命令
 function! s:rp.run(term, wdir, cmd, ...) dict
     if a:0 >= 1 && has_key(self.efm, a:1)
         execute 'setlocal efm=' . self.efm[a:1]
@@ -1845,7 +1853,7 @@ function! FnCargo(sopt, sel, conf)
     else
         let l:cmd .= ' build'
     endif
-    call s:rp.run(a:conf.term, l:workdir, l:cmd)
+    call s:rp.run(a:conf.term, l:workdir, l:cmd, 'rust')
 endfunction
 " }}}
 
