@@ -1,5 +1,5 @@
 
-## Consolas For Powerline & YaHei Mono For Powerline
+## Consolas For Powerline
 
 ### **Introduction:**
 For windows, `Consolas For Powerline` work nice with `Microsoft YaHei Mono` in vim.
