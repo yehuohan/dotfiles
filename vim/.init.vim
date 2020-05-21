@@ -764,8 +764,6 @@ endif
 
 " fzf {{{ 模糊查找
 if s:gset.use_fzf
-    " linux下直接pacman -S fzf
-    " win下载fzf.exe放入bundle/fzf/bin/下
     let g:fzf_command_prefix = 'Fzf'
     nnoremap <leader><leader>f :FzfFiles<Space>
     augroup PluginFzf
@@ -1644,7 +1642,7 @@ function! RunProject(keys, ...)
         elseif a:keys =~# s:rp.proj.sets
             call PopSelection({
                 \ 'opt' : 'select args',
-                \ 'lst' : ['all'],
+                \ 'lst' : ['tags', '--target tags'],
                 \ 'cmd' : {sopt, arg -> call('RunProject', ['r' . a:keys[1:], arg])}
                 \ })
         endif
@@ -1798,10 +1796,10 @@ function! FnCMake(sopt, sel, conf)
         silent! call mkdir(l:workdir, 'p')
         if a:conf.key ==# 'u'
             " generate unix makefiles
-            let l:cmd = printf('cmake %s -G "Unix Makefiles" .. && cmake --build .', a:conf.args)
+            let l:cmd = printf('cmake -G "Unix Makefiles" .. && cmake --build . %s', a:conf.args)
         elseif a:conf.key ==# 'n'
             " generate nmake makefiles
-            let l:cmd = printf('vcvars64.bat && cmake %s -G "NMake Makefiles" .. && cmake --build .', a:conf.args)
+            let l:cmd = printf('vcvars64.bat && cmake -G "NMake Makefiles" .. && cmake --build . %s', a:conf.args)
         endif
         "run
         if a:conf.run
@@ -2328,7 +2326,7 @@ let s:rs = {
                     \ 'objdump -D -S -C %:r > %.asm',
                     \ 'go mod init %:r',
                     \ 'cflow -T %',
-                    \ 'createCtags',
+                    \ 'ctags -R',
                     \ ],
             \ 'cmd' : {sopt, arg -> has_key(s:rs.func, arg) ? s:rs.func[arg]() : execute(':AsyncRun ' . arg)},
             \ }
@@ -2362,16 +2360,6 @@ function! s:rs.func.copyConfig(filename) dict
         call writefile(readfile(l:srcfile), l:dstfile)
     endif
     return l:dstfile
-endfunction
-" }}}
-
-" Function: s:rs.func.createCtags() dict {{{ 生成tags
-function! s:rs.func.createCtags() dict
-    if !empty(s:ws.root)
-        execute(':AsyncRun cd '. s:ws.root . ' && ctags -R')
-    else
-        echo 'No root in s:ws'
-    endif
 endfunction
 " }}}
 " }}}

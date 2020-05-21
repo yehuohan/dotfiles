@@ -256,11 +256,12 @@ get_suf = $(addprefix $(1)/,$(addsuffix .$(2),$(basename $(3))))
 ## create obj target: (#obj_dir, #src_files, #cxxflags)
 define do_create_obj_target
 $(1)/$(basename $(2)).o: $(2)
-	$(V)$(CC) -c $$< $(3) -o $$@ -MD -MP -MT $$@ -MT $$*.d -MF $$*.d
+	$(CC) -c $$< $(3) -o $$@ -MD -MP -MT $$@ -MT $$*.d -MF $$*.d
 endef
 create_obj_target = $(foreach line,$(2),$(eval $(call do_create_obj_target,$(1),$(line),$(3))))
 
 CC         := ${1:g++}
+CTAGS	   := ctags
 TARGET     := ${2:main}
 ifeq (${CC}, g++)
 CC_SUF     := c cc cpp cxx
@@ -289,6 +290,9 @@ ${BIN}: ${OBJ}
 $(call create_obj_target,${DIR_OBJ},${SRC},${CXXFLAGS})
 
 -include ${DEP}
+
+tags:
+	${CTAGS} -R ${SRC} ${DIR_INC}
 
 .phony: clean
 clean:
@@ -326,6 +330,14 @@ add_executable(${PROJECT_NAME} ${SRC})
 #)
 #target_link_libraries(${PROJECT_NAME} <libs>)
 #add_dependencies(${PROJECT_NAME} <libs>)
+
+# tags
+set_source_files_properties(tags PROPERTIES GENERATED TRUE)
+add_custom_target(tags
+    COMMAND ctags -R ${SRC} ${DIR_INC}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 endsnippet
 
 

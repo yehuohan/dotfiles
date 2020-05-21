@@ -12,9 +12,7 @@ import os
 import platform
 import re
 
-LOC_DIR = os.path.dirname(
-        os.path.abspath(__file__))  # Local working path
-log_out = False                     # Print log or not
+LOC_DIR = os.path.dirname(os.path.abspath(__file__))  # Local working path
 
 #===============================================================================
 # cfamily
@@ -79,7 +77,7 @@ def GetDirsRecursive(flag, paths, suffixs=[], exdirs=[]):
                 flags.append(root)
     return flags
 
-def GetCfamilyFlags():
+def GetCfamilyFlags(gen='all'):
     """
     Collect all cfamily flags.
     All the header file should be in absolute path.
@@ -99,11 +97,15 @@ def GetCfamilyFlags():
         '-xc++',                    # Set language: 'c', 'c++', 'objc', 'cuda',
     ]
 
-    local_flags = GetDirsRecursive('-isystem',
+    # local flags from project
+    local_flags = GetDirsRecursive('-isystem' if gen == 'all' else '',
         [
-            # os.path.join(LOC_DIR, ''),
+            os.path.join(LOC_DIR, ''),
         ], ['.c', '.cpp', '.h', '.hpp' ], ['sample'])
+    if gen == 'tags':
+        return local_flags
 
+    # global flags from host-system, $VPath is from env#env
     if platform.system() == "Linux":
         UNIX_DIR = '/usr/include'
         GCC_DIR = os.path.join('/usr/include/c++',
@@ -111,7 +113,6 @@ def GetCfamilyFlags():
                         os.listdir('/usr/include/c++')))[0])
         QT_DIR = '/usr/include/qt/'
     elif platform.system() == "Windows":
-        # $VPath is from env#env
         UNIX_DIR = os.getenv('VPathCygwin') + '/usr/include'
         GCC_DIR = os.path.join(os.getenv('VPathCygwin') + '/lib/gcc/x86_64-pc-cygwin',
                     list(filter(lambda dir: re.compile(r'^\d{1,2}\.\d{1,2}\.\d{1,2}$').match(dir),
@@ -124,27 +125,21 @@ def GetCfamilyFlags():
             # '-isystem', UNIX_DIR,
             # '-isystem', VS_DIR,
             # '-isystem', QT_DIR,
-        ] + GetDirsRecursive('-isystem',
-        [
+        ] + GetDirsRecursive('-isystem', [
             # GCC_DIR,
             # UNIX_DIR,
             # QT_DIR,
         ])
 
+    # all flags
     flags_cfamily = project_flags + local_flags + global_flags
-
-    if log_out:
-        with open(os.path.join(LOC_DIR, "log.txt"), 'w+') as flog:
-            flog.write("Try to use :YcmDiags(<leader>yd) to find out where's the error!\n")
-            for k in range(len(flags_cfamily)):
-                flog.write(flags_cfamily[k] + '\n')
-
     return flags_cfamily
 
 if __name__ == "__main__":
-    # Create compile_flags.txt
+    # Create compile_flags.txt and tags
     with open('compile_flags.txt', 'w') as fp:
         fp.write('\n'.join(GetCfamilyFlags()))
+    os.system('ctags -R ' + ' '.join(GetCfamilyFlags('tags')))
 
 #===============================================================================
 # python

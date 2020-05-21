@@ -8,6 +8,7 @@ Some requirements:
     - [neovim/neovim](https://github.com/neovim/neovim)
     - [Python](https://www.python.org/)
     - [LLVM(Clang)](http://llvm.org/)
+    - [lua](https://www.lua.org/)
     - Git
       - [Msys2](http://www.msys2.org/)
       - [MinGW-w64](https://sourceforge.net/projects/mingw-w64/files/)
