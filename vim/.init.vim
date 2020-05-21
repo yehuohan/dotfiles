@@ -881,7 +881,7 @@ endif
 if s:gset.use_snip
     " 删除UltiSnips#map_keys#MapKeys中的xnoremap <Tab>（和textmanip的<C-i>冲突）
     let g:UltiSnipsEditSplit = "vertical"
-    let g:UltiSnipsSnippetDirectories = [$DotVimPath . '/vSnippets']
+    let g:UltiSnipsSnippetDirectories = [$DotVimPath . '/snips']
     let g:UltiSnipsExpandTrigger = '<Tab>'
     let g:UltiSnipsListSnippets = '<C-o>'
     let g:UltiSnipsJumpForwardTrigger = '<C-j>'

@@ -14,7 +14,6 @@ let s:env = {
 
 " hp with windows10 {{{
 let s:env.hp.win = [
-    \ $DotVimPath . '/vBin',
     \ 'C:/apps/bin',
     \ 'C:/apps/Python',
     \ 'C:/apps/Julia/bin',
