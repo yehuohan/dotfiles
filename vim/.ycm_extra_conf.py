@@ -98,12 +98,13 @@ def GetCfamilyFlags(gen='all'):
     ]
 
     # local flags from project
-    local_flags = GetDirsRecursive('-isystem' if gen == 'all' else '',
-        [
+    local_paths = [
             os.path.join(LOC_DIR, ''),
-        ], ['.c', '.cpp', '.h', '.hpp' ], ['sample'])
+        ]
     if gen == 'tags':
-        return local_flags
+        return local_paths 
+    local_flags = GetDirsRecursive('-isystem' if gen == 'all' else '',
+            local_paths, ['.c', '.cpp', '.h', '.hpp' ], ['sample', 'test'])
 
     # global flags from host-system, $VPath is from env#env
     if platform.system() == "Linux":
