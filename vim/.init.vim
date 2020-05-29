@@ -2715,9 +2715,8 @@ endif
 
 " Gui {{{
 " Function: GuiAdjustFontSize(inc) {{{
-let s:gui_fontsize = 12
 function! GuiAdjustFontSize(inc)
-    let s:gui_fontsize += a:inc
+    let s:gui_fontsize = exists('s:gui_fontsize') ? s:gui_fontsize + a:inc : 12
     if IsLinux()
         execute 'set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ ' . s:gui_fontsize
         execute 'set guifontwide=WenQuanYi\ Micro\ Hei\ Mono\ ' . s:gui_fontsize
@@ -2764,15 +2763,13 @@ if IsNVimQt()
     GuiLinespace 0
     GuiTabline 0
     GuiPopupmenu 0
-    nnoremap <silent> <RightMouse> :call GuiShowContextMenu()<CR>
-    inoremap <silent> <RightMouse> <Esc>:call GuiShowContextMenu()<CR>
-    vnoremap <silent> <RightMouse> :call GuiShowContextMenu()<CR>gv
+    nnoremap <RightMouse> :call GuiShowContextMenu()<CR>
+    inoremap <RightMouse> <Esc>:call GuiShowContextMenu()<CR>
+    vnoremap <RightMouse> :call GuiShowContextMenu()<CR>gv
     nnoremap <leader>tf :call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
     nnoremap <leader>tm :call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>
     nnoremap <kPlus> :call GuiAdjustFontSize(1)<CR>
     nnoremap <kMinus> :call GuiAdjustFontSize(-1)<CR>
-    " Qt-Gui中使用<S-lt>代替<映射
-    nnoremap <S-Lt> <<
 endif
 endfunction
 " }}}
