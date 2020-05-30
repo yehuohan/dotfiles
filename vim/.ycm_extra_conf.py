@@ -99,7 +99,7 @@ def GetCfamilyFlags(gen='all'):
 
     # local flags from project
     local_paths = [
-            os.path.join(LOC_DIR, ''),
+            # os.path.join(LOC_DIR, ''),
         ]
     if gen == 'tags':
         return local_paths 
