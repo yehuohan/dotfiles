@@ -17,7 +17,7 @@ function! IsGVim()
     return has('gui_running')
 endfunction
 function! IsNVimQt()
-    " 只在VimEnter之后起作用
+    " 只在UIEnter之后起作用
     return exists('g:GuiLoaded')
 endfunction
 " }}}
@@ -49,7 +49,12 @@ set encoding=utf-8                      " 内部使用utf-8编码
 if IsVim()
     set nocompatible                    " 不兼容vi
 endif
-let mapleader="\<Space>"
+set guioptions=M                        " 完全禁用Gui界面元素
+let g:did_install_default_menus = 1
+let g:did_install_syntax_menu = 1
+syntax enable                           " 语法高亮
+filetype plugin indent on               " 打开文件类型检测
+let mapleader="\<Space>"                " Space leader
 nnoremap ; :
 vnoremap ; :
 nnoremap : ;
@@ -60,11 +65,11 @@ set ttimeoutlen=70                      " 键码超时时间为70ms
 if IsVim()
     " 终端Alt键映射处理：如 Alt+x，实际连续发送 <Esc>x 编码
     " 以下三种方法都可以使按下 Alt+x 后，执行 CmdTest 命令，但超时检测有区别
-    "<1> set <M-x>=x  " 设置键码，这里的是一个字符，即<Esc>的编码，不是^和[放在一起
-                        " 在终端的Insert模式，按Ctrl+v再按Alt+x可输入
-    "    nnoremap <M-x> :CmdTest<CR>    " 按键码超时时间检测
+    "<1> set <M-x>=x                  " 设置键码，这里的是一个字符，即<Esc>的编码，不是^和[放在一起
+                                        " 在终端的Insert模式，依次按Ctrl+v, Ctrl-[可输入
+    "    nnoremap <M-x>  :CmdTest<CR>   " 按键码超时时间检测
     "<2> nnoremap <Esc>x :CmdTest<CR>   " 按映射超时时间检测
-    "<3> nnoremap x  :CmdTest<CR>     " 按映射超时时间检测
+    "<3> nnoremap x    :CmdTest<CR>   " 按映射超时时间检测
     for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
         execute 'set <M-'. t . '>=' . t
     endfor
@@ -679,6 +684,7 @@ endif
     let g:Popc_subSeparator = {'left' : '', 'right': ''}
     let g:Popc_useLayerPath = 0
     let g:Popc_useLayerRoots = ['.popc', '.git', '.svn', '.hg', 'tags']
+    let g:Popc_enableLog = 1
     nnoremap <leader><leader>h :PopcBuffer<CR>
     nnoremap <M-i> :PopcBufferSwitchLeft<CR>
     nnoremap <M-o> :PopcBufferSwitchRight<CR>
@@ -2645,8 +2651,6 @@ endfunction
 
 " User Settings {{{
 " Basic {{{
-    syntax enable                       " 语法高亮
-    filetype plugin indent on           " 打开文件类型检测
     set synmaxcol=512                   " 最大高亮列数
     set number                          " 显示行号
     set relativenumber                  " 显示相对行号
@@ -2731,12 +2735,6 @@ endfunction
 
 " Gui-vim {{{
 if IsGVim()
-    set guioptions-=m                   " 隐藏菜单栏
-    set guioptions-=T                   " 隐藏工具栏
-    set guioptions-=L                   " 隐藏左侧滚动条
-    set guioptions-=r                   " 隐藏右侧滚动条
-    set guioptions-=b                   " 隐藏底部滚动条
-    set guioptions-=e                   " 不使用Gui标签
     call GuiAdjustFontSize(0)
     set lines=25
     set columns=90
