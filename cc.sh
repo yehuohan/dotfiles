@@ -24,6 +24,7 @@ if [[ `uname` == "Linux" ]]; then
     cp ../.zprofile                                 ./root/home/
     cp ../.Xmodmap                                  ./root/home/
     cp ../.gitconfig                                ./root/home/
+    cp ../.gdbinit                                  ./root/home/
     # .config
     cp -r ../.config/i3                             ./root/home/.config/
     cp -r ../.config/i3status                       ./root/home/.config/
