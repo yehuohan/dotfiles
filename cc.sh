@@ -33,7 +33,7 @@ if [[ `uname` == "Linux" ]]; then
     cp ../.tmux.conf                                ./root/home/
     cp ../.tmux-status.conf                         ./root/home/
     # misc
-    cp ../my-apps/ToggleTouchPad.py                 ./misc/
+    cp ../uapps/ToggleTouchPad.py                   ./misc/
 
     ## Arch
     #if [[ `uname -r` =~ "lts" ]]; then

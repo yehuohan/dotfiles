@@ -131,8 +131,9 @@ compctl -K _pip_completion pip
 compctl -K _pip_completion pip3
 
 # alias
-alias vin=nvim
-alias qvin=nvim-qt
+alias vim=nvim
+alias vi=nvim
+alias qvim=nvim-qt
 alias -s png=eog
 alias -s jpg=eog
 alias -s jpeg=eog
