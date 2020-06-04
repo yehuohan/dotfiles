@@ -688,6 +688,7 @@ endif
     nnoremap <leader><leader>h :PopcBuffer<CR>
     nnoremap <M-i> :PopcBufferSwitchLeft<CR>
     nnoremap <M-o> :PopcBufferSwitchRight<CR>
+    cnoremap q<CR> :PopcBufferClose<CR>
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
     nnoremap <silent> <leader>ty
@@ -1427,8 +1428,6 @@ endfunction
 " }}}
 
 " Workspace {{{
-" Required: 'yehuohan/popc'
-
 let s:ws = {
     \ 'root' : '',
     \ 'rp': {
@@ -1443,12 +1442,11 @@ let s:ws = {
         \ },
     \ 'execution' : ''
     \ }
-
 augroup UserModulesWorkspace
     autocmd!
     autocmd User PopcLayerWksSavePre call popc#layer#wks#SetSettings(s:ws)
     autocmd User PopcLayerWksLoaded call extend(s:ws, popc#layer#wks#GetSettings(), 'force') |
-                                    \ let s:ws.root = popc#layer#wks#GetCurrentWks()[1] |
+                                    \ let s:ws.root = popc#layer#wks#GetCurrentWks('root') |
                                     \ if empty(s:ws.fw.path) |
                                     \   let s:ws.fw.path = s:ws.root |
                                     \ endif
@@ -2713,6 +2711,31 @@ if IsVim()
         let &t_EI = "\<Esc>[2 q"        " 退出Insert模式
     endif
 endif
+
+" Function: s:onLargeFile() {{{
+function! s:onLargeFile()
+    let l:fsize = getfsize(expand('<afile>'))
+    if l:fsize >= 5 * 1024 * 1024 || l:fsize == -2
+        let b:lightline_check_flg = 0
+        setlocal filetype=log
+        setlocal buftype=nowrite
+        setlocal undolevels=-1
+        setlocal noswapfile
+    endif
+endfunction
+" }}}
+
+augroup UserSettingsCmd
+    autocmd!
+    autocmd BufNewFile *                set fileformat=unix
+    autocmd BufRead,BufNewFile *.tex    set filetype=tex
+    autocmd BufRead,BufNewFile *.log    set filetype=log
+    autocmd Filetype vim                setlocal foldmethod=marker
+    autocmd Filetype c,cpp,javascript   setlocal foldmethod=syntax
+    autocmd Filetype python             setlocal foldmethod=indent
+    autocmd FileType go                 setlocal expandtab
+    autocmd BufReadPre *                call s:onLargeFile()
+augroup END
 " }}}
 
 " Gui {{{
@@ -2770,41 +2793,6 @@ endif
 endfunction
 " }}}
 endif
-" }}}
-" }}}
-
-" Autocmd {{{
-augroup UserSettingsCmd
-    autocmd!
-    autocmd BufNewFile *                set fileformat=unix
-    autocmd BufRead,BufNewFile *.tex    set filetype=tex
-    autocmd BufRead,BufNewFile *.log    set filetype=log
-    autocmd Filetype vim                setlocal foldmethod=marker
-    autocmd Filetype c,cpp,javascript   setlocal foldmethod=syntax
-    autocmd Filetype python             setlocal foldmethod=indent
-    autocmd FileType go                 setlocal expandtab
-    autocmd Filetype vim,help,lua       call s:onBufferMappings()
-    autocmd BufReadPre *                call s:onLargeFile()
-augroup END
-
-" Function: s:onBufferMappings() {{{
-function! s:onBufferMappings()
-    nnoremap <buffer> <S-k> :call execute('help ' . expand('<cword>'))<CR>
-    vnoremap <buffer> <S-k> :call execute('help ' . GetSelected())<CR>
-endfunction
-" }}}
-
-" Function: s:onLargeFile() {{{
-function! s:onLargeFile()
-    let l:fsize = getfsize(expand('<afile>'))
-    if l:fsize >= 5 * 1024 * 1024 || l:fsize == -2
-        let b:lightline_check_flg = 0
-        setlocal filetype=log
-        setlocal buftype=nowrite
-        setlocal undolevels=-1
-        setlocal noswapfile
-    endif
-endfunction
 " }}}
 " }}}
 " }}} End
