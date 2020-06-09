@@ -693,7 +693,7 @@ endif
     nnoremap <leader><leader>w :PopcWorkspace<CR>
     nnoremap <silent> <leader>ty
         \ :let g:Popc_tabline_layout = (get(g:, 'Popc_tabline_layout', 0) + 1) % 3<Bar>
-        \ :call call('popc#ui#TabLineSetLayout',
+        \ :call call('popc#stl#TabLineSetLayout',
         \           [['buffer', 'tab'], ['buffer', ''], ['', 'tab']][g:Popc_tabline_layout])<CR>
 " }}}
 
