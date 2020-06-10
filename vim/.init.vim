@@ -1077,9 +1077,6 @@ endif
 " }}}
 
 " asyncrun {{{ 导步运行程序
-if IsWin()
-    let g:asyncrun_encs = 'cp936'   " 即'gbk'编码
-endif
     let g:asyncrun_open = 8             " 自动打开quickfix window
     let g:asyncrun_save = 1             " 自动保存当前文件
     let g:asyncrun_local = 1            " 使用setlocal的efm
