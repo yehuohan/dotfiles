@@ -109,27 +109,20 @@ def GetCfamilyFlags(gen='all'):
     # global flags from host-system, $VPath is from env#env
     if platform.system() == "Linux":
         UNIX_DIR = '/usr/include'
-        GCC_DIR = os.path.join('/usr/include/c++',
-                    list(filter(lambda dir: re.compile(r'^\d{1,2}\.\d{1,2}\.\d{1,2}$').match(dir),
-                        os.listdir('/usr/include/c++')))[0])
-        QT_DIR = '/usr/include/qt/'
+        GCC_DIR = os.path.join('/usr/include/c++', os.listdir('/usr/include/c++')[0])
     elif platform.system() == "Windows":
         UNIX_DIR = os.getenv('VPathCygwin') + '/usr/include'
         GCC_DIR = os.path.join(os.getenv('VPathCygwin') + '/lib/gcc/x86_64-pc-cygwin',
-                    list(filter(lambda dir: re.compile(r'^\d{1,2}\.\d{1,2}\.\d{1,2}$').match(dir),
-                        os.listdir(os.getenv('VPathCygwin') + '/lib/gcc/x86_64-pc-cygwin')))[0]) + '/include'
+                os.listdir(os.getenv('VPathCygwin') + '/lib/gcc/x86_64-pc-cygwin')[0] + '/include')
         VS_DIR = os.getenv('VPathVs') + '/include/'
-        QT_DIR = os.getenv('VPathQt') + '/include/'
 
     global_flags = [
             # '-isystem', GCC_DIR,
             # '-isystem', UNIX_DIR,
             # '-isystem', VS_DIR,
-            # '-isystem', QT_DIR,
         ] + GetDirsRecursive('-isystem', [
             # GCC_DIR,
             # UNIX_DIR,
-            # QT_DIR,
         ])
 
     # all flags
