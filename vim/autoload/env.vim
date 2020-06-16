@@ -17,7 +17,8 @@ let s:env.hp.win = [
     \ 'C:/apps/bin',
     \ 'C:/apps/Python',
     \ 'C:/apps/Julia/bin',
-    \ 'C:/apps/cygwin64/bin',
+    \ 'C:/apps/msys64/usr/bin',
+    \ 'C:/apps/msys64/mingw64/bin',
     \ 'C:/apps/LLVM/bin',
     \ 'C:/apps/Go/bin',
     \ 'C:/apps/lua',
@@ -51,7 +52,7 @@ function! env#env(dev, os)
             let $PATH .= ';' . join(l:e, ';')
         endif
         let $VPathPython = 'C:/apps/Python'
-        let $VPathCygwin = 'C:/apps/cygwin64'
+        let $VPathMingw64 = 'C:/apps/msys64/mingw64'
         let $VPathVs = 'D:/VS2017/VC/Tools/MSVC/14.13.26128'
         let $VPathLuaLsp = $HOME . '/.vscode/extensions/sumneko.lua-0.16.2'
     else

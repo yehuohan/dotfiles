@@ -111,9 +111,9 @@ def GetCfamilyFlags(gen='all'):
         UNIX_DIR = '/usr/include'
         GCC_DIR = os.path.join('/usr/include/c++', os.listdir('/usr/include/c++')[0])
     elif platform.system() == "Windows":
-        UNIX_DIR = os.getenv('VPathCygwin') + '/usr/include'
-        GCC_DIR = os.path.join(os.getenv('VPathCygwin') + '/lib/gcc/x86_64-pc-cygwin',
-                os.listdir(os.getenv('VPathCygwin') + '/lib/gcc/x86_64-pc-cygwin')[0] + '/include')
+        UNIX_DIR = os.getenv('VPathMingw64') + '/include'
+        GCC_DIR = os.path.join(os.getenv('VPathMingw64') + '/include/c++',
+                os.listdir(os.getenv('VPathMingw64') + '/include/c++')[0])
         VS_DIR = os.getenv('VPathVs') + '/include/'
 
     global_flags = [
