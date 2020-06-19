@@ -1,6 +1,6 @@
 
 #
-# i3-config
+# i3-config with gnome or xfce4
 # yehuohan@gmail.com, yehuohan@qq.com
 #
 
@@ -42,7 +42,6 @@ exec --no-startup-id mate-power-manager
 exec --no-startup-id nm-applet
 # 音量图标
 exec --no-startup-id volumeicon
-
 # }}}
 
 
@@ -86,6 +85,7 @@ for_window [class=$TPadOff] exec ToggleTouchPad off
 # i3-gaps configuration
 gaps inner 2
 gaps outer 2
+smart_gaps on
 
 # color vairable
 # M-main, T-text, D-default
@@ -103,7 +103,6 @@ client.focused_inactive #$CLR_D #$CLR_D #808080 #$CLR_D   #$CLR_D
 client.urgent           #$CLR_D #$CLR_D #$CLR_T #$CLR_D   #$CLR_D
 client.placeholder      #$CLR_D #$CLR_D #$CLR_T #$CLR_D   #$CLR_D
 client.background       #$CLR_D
-
 # }}}
 
 # i3bar设置
@@ -138,7 +137,6 @@ bar {
         binding_mode       #00000055 #$CLR_MB  #$CLR_TB
     }
 }
-
 # }}}
 
 
@@ -229,7 +227,6 @@ mode "resize" {
     bindsym Return mode "default"
     bindsym Escape mode "default"
 }
-
 # }}}
 
 # WorkSpace管理
@@ -275,7 +272,6 @@ bindsym $mod+comma move container to output left
 bindsym $mod+period move container to output right
 # Tggles focus among the outputs
 bindsym $mod+m focus output right
-
 #}}}
 
 # 其它设置
@@ -294,17 +290,15 @@ bindsym $mod+mod1+b border pixel $bp
 
 # Use Mouse+$mod to drag floating windows at any position, not only at border
 floating_modifier $mod
-
 # }}}
 
 
 #===============================================================================
 # key bind for starting program
 #===============================================================================
-#{{{
+# {{{
 # terminal
-#bindsym $mod+Return exec gnome-terminal
-bindsym $mod+Return exec xfce4-terminal
+bindsym $mod+Return exec xfce4-terminal || gnome-terminal
 bindsym $mod+mod1+Return exec xterm || xfce4-terminal || gnome-terminal
 
 # file manager
@@ -343,5 +337,4 @@ set $scrot_dir ~/Picture/scrot
 bindsym Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -e 'mv $f $scrot_dir/'
 bindsym $mod+Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/'
 bindsym $mod+Shift+Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/ && ristretto $scrot_dir/$f'
-
 # }}}
