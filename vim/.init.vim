@@ -215,8 +215,8 @@ if s:gset.use_lightline
 endif
     Plug 'luochen1990/rainbow'
     Plug 'Yggdroot/indentLine'
-    Plug 'yehuohan/popset'
     Plug 'yehuohan/popc'
+    Plug 'yehuohan/popset'
     Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTree']}
     Plug 'mhinz/vim-startify'
 if s:gset.use_fzf
@@ -1589,14 +1589,24 @@ function! s:rp.run(term, wdir, cmd, ...) dict
     if a:0 >= 1 && has_key(self.efm, a:1)
         execute 'setlocal efm=' . self.efm[a:1]
     endif
-    let l:exec = ':AsyncRun '
-    if a:term
-        let l:exec .= '-mode=term -pos=right '
-    endif
-    if !empty(a:wdir)
-        let l:wdir = fnameescape(a:wdir)
-        let l:exec .= '-cwd=' . l:wdir
-        execute 'lcd ' . l:wdir
+
+    if exists(':AsyncRun') == 2
+        let l:exec = ':AsyncRun '
+        if a:term
+            let l:exec .= '-mode=term -pos=right '
+        endif
+        if !empty(a:wdir)
+            let l:wdir = fnameescape(a:wdir)
+            let l:exec .= '-cwd=' . l:wdir
+            execute 'lcd ' . l:wdir
+        endif
+    else
+        let l:exec = ':! '
+        if !empty(a:wdir)
+            let l:wdir = fnameescape(a:wdir)
+            let l:exec .= 'cd ' . l:wdir . ' && '
+            execute 'lcd ' . l:wdir
+        endif
     endif
 
     " create exec string
