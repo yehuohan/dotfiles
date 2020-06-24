@@ -792,6 +792,7 @@ if s:gset.use_powerfont
 else
     let g:Lf_StlSeparator = {'left': '', 'right': ''}
 endif
+    let g:Lf_ShowDevIcons = 0
     let g:Lf_ShortcutF = ''
     let g:Lf_ShortcutB = ''
     let g:Lf_ReverseOrder = 1
