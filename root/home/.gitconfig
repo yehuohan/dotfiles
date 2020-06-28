@@ -7,3 +7,8 @@
 	editor = vim
 [color]
 	ui = auto
+[pull]
+	rebase = true
+[oh-my-zsh]
+	hide-status = 1
+	hide-dirty = 1

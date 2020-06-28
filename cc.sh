@@ -36,33 +36,33 @@ if [[ `uname` == "Linux" ]]; then
     cp ../uapps/ToggleTouchPad.py                   ./misc/
 
     ## Arch
-    #if [[ `uname -r` =~ "lts" ]]; then
-    #    # home/.config
-    #    cp ../.config/xfce4/terminal/terminalrc     ./root/home-arch/.config/xfce4/terminal/
-    #    # X11
-    #    cp ../.Xresources                           ./root/home-arch/
-    #    cp ../.xinitrc                              ./root/home-arch/
-    #    cp ../.nvidia-xinitrc                       ./root/home-arch/
-    #    cp ../.inputrc                              ./root/home-arch/
-    #    cp /etc/X11/xorg.conf                       ./root/etc-arch/X11/
-    #    cp /etc/X11/xorg.conf.d/30-touchpad.conf    ./root/etc-arch/X11/xorg.conf.d
-    #    cp /etc/X11/nvidia-xorg.conf                ./root/etc-arch/X11/
-    #    cp -r /etc/X11/nvidia-xorg.conf.d           ./root/etc-arch/X11/
-    #    # systemd
-    #    cp /etc/systemd/logind.conf                 ./root/etc-arch/systemd/
-    #    # pacman
-    #    cp /etc/pacman.conf                         ./root/etc-arch/
-    #    # modules
-    #    cp -r /etc/modprobe.d                       ./root/etc-arch/
-    #    cp -r /etc/modules-load.d                   ./root/etc-arch/
-    #    echo "Arch: Copy was completed!"
-    #fi
+    if [[ `uname -r` =~ "lts" ]]; then
+        # home/.config
+        cp ../.config/xfce4/terminal/terminalrc     ./root/home/.config/xfce4/terminal/
+        # X11
+        cp ../.Xresources                           ./root/home-arch/
+        cp ../.xinitrc                              ./root/home-arch/
+        cp ../.nvidia-xinitrc                       ./root/home-arch/
+        cp ../.inputrc                              ./root/home-arch/
+        cp /etc/X11/xorg.conf                       ./root/etc-arch/X11/
+        cp /etc/X11/xorg.conf.d/30-touchpad.conf    ./root/etc-arch/X11/xorg.conf.d
+        cp /etc/X11/nvidia-xorg.conf                ./root/etc-arch/X11/
+        cp -r /etc/X11/nvidia-xorg.conf.d           ./root/etc-arch/X11/
+        # systemd
+        cp /etc/systemd/logind.conf                 ./root/etc-arch/systemd/
+        # pacman
+        cp /etc/pacman.conf                         ./root/etc-arch/
+        # modules
+        cp -r /etc/modprobe.d                       ./root/etc-arch/
+        cp -r /etc/modules-load.d                   ./root/etc-arch/
+        echo "Arch: Copy was completed!"
+    fi
 
     # Ubuntu
     if [[ `uname -v` =~ "Ubuntu" ]]; then
         # home/.config
-        cp ../.config/libinput-gestures.conf        ./root/home-ubuntu/.config/
-        cp ../.config/user-dirs.dirs                ./root/home-ubuntu/.config/
+        cp ../.config/libinput-gestures.conf        ./root/home/.config/
+        cp ../.config/user-dirs.dirs                ./root/home/.config/
 
         echo "Ubuntu: Copy was completed!"
     fi
