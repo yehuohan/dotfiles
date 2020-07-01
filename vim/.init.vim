@@ -2807,18 +2807,22 @@ endif
 
 " User Mappings {{{
 " Basic {{{
-    " 重复上次操作命令
+    " 重复命令
     nnoremap <leader>. :call ExecLast(1)<CR>
     nnoremap <leader><leader>. :call ExecLast(0)<CR>
     nnoremap <M-;> @:
     vnoremap <silent> <leader><leader>;
         \ :call feedkeys(':' . GetSelected(), 'n')<CR>
+    " 排序
+    vnoremap <silent> <leader><leader>s
+        \ :call feedkeys(printf(':sort nr /\%%>%dc.*\%%<%dc/', getpos("'<")[2]-1, getpos("'>")[2]+1), 'n')<CR>
+    vnoremap <silent> <leader><leader>S
+        \ :call feedkeys(printf(':sort! nr /\%%>%dc.*\%%<%dc/', getpos("'<")[2]-1, getpos("'>")[2]+1), 'n')<CR>
     " 回退操作
     nnoremap <S-u> <C-r>
     " 大小写转换
     nnoremap <leader>u ~
     vnoremap <leader>u ~
-    nnoremap <leader>gu g~
     " 行移动
     nnoremap > >>
     nnoremap < <<
@@ -2829,25 +2833,24 @@ endif
     vnoremap <leader>ak <C-a>
     vnoremap <leader>agj g<C-x>
     vnoremap <leader>agk g<C-a>
-    " 嵌套映射匹配符(%)
+    " 匹配符跳转
 if IsVim()
     packadd matchit
 endif
     nmap <S-s> %
     vmap <S-s> %
-    " 行首和行尾
-    nnoremap <S-l> $
-    nnoremap <S-h> ^
-    vnoremap <S-l> $
-    vnoremap <S-h> ^
-    " 复制到行首行尾
-    nnoremap yL y$
-    nnoremap yH y^
-    " j, k 移行
+    " 行移动
     nnoremap j gj
     vnoremap j gj
     nnoremap k gk
     vnoremap k gk
+    nnoremap <S-l> $
+    nnoremap <S-h> ^
+    vnoremap <S-l> $
+    vnoremap <S-h> ^
+    " 行复制
+    nnoremap yL y$
+    nnoremap yH y^
     " 折叠
     nnoremap <leader>za zA
     nnoremap <leader>zc zC
