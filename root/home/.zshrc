@@ -67,6 +67,8 @@ source $ZSH/oh-my-zsh.sh
 
 #键绑定, 设置 [DEL]键 为向后删除
 #bindkey "\e[3~" delete-char
+bindkey '^P' up-line-or-search
+bindkey '^N' down-line-or-search
 
 # ctrl+z 返回vim
 fancy-ctrl-z () {
