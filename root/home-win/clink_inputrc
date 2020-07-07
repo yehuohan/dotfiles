@@ -1,0 +1,3 @@
+
+"\e`H": history-search-backward # arrow up
+"\e`P": history-search-forward  # arrow down
