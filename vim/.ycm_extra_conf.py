@@ -103,27 +103,34 @@ def GetCfamilyFlags(gen='all'):
         ]
     if gen == 'tags':
         return local_paths 
-    local_flags = GetDirsRecursive('-isystem' if gen == 'all' else '',
-            local_paths, ['.c', '.cpp', '.h', '.hpp' ], ['sample', 'test'])
+    local_flags = [
+            '-isystem', LOC_DIR,
+        ] + GetDirsRecursive(
+            flag    = '-isystem',
+            paths   = local_paths,
+            suffixs = ['.c', '.cpp', '.h', '.hpp'],
+            exdirs  = ['sample', 'test'])
 
     # global flags from host-system, $VPath is from env#env
     if platform.system() == "Linux":
         UNIX_DIR = '/usr/include'
-        GCC_DIR = os.path.join('/usr/include/c++', os.listdir('/usr/include/c++')[0])
+        GCC_DIR  = os.path.join('/usr/include/c++', os.listdir('/usr/include/c++')[0])
     elif platform.system() == "Windows":
         UNIX_DIR = os.getenv('VPathMingw64') + '/include'
-        GCC_DIR = os.path.join(os.getenv('VPathMingw64') + '/include/c++',
-                os.listdir(os.getenv('VPathMingw64') + '/include/c++')[0])
-        VS_DIR = os.getenv('VPathVs') + '/include/'
-
+        GCC_DIR  = os.path.join(os.getenv('VPathMingw64') + '/include/c++', os.listdir(os.getenv('VPathMingw64') + '/include/c++')[0])
+        VS_DIR   = os.getenv('VPathVs') + '/include/'
     global_flags = [
             # '-isystem', GCC_DIR,
             # '-isystem', UNIX_DIR,
             # '-isystem', VS_DIR,
-        ] + GetDirsRecursive('-isystem', [
-            # GCC_DIR,
-            # UNIX_DIR,
-        ])
+        ] + GetDirsRecursive(
+            flag    = '-isystem',
+            paths   = [
+                # GCC_DIR,
+                # UNIX_DIR,
+            ],
+            suffixs = [],
+            exdirs  = ['sample', 'test'])
 
     # all flags
     flags_cfamily = project_flags + local_flags + global_flags

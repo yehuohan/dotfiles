@@ -261,7 +261,7 @@ endef
 create_obj_target = $(foreach line,$(2),$(eval $(call do_create_obj_target,$(1),$(line),$(3))))
 
 CC         := ${1:g++}
-CTAGS	   := ctags
+CTAGS      := ctags
 TARGET     := ${2:main}
 ifeq (${CC}, g++)
 CC_SUF     := c cc cpp cxx
@@ -312,6 +312,8 @@ cmake_minimum_required(VERSION 3.5)
 
 #set(CMAKE_C_COMPILER "clang")
 #set(CMAKE_CXX_COMPILER "clang++")
+#set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -g")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 project(${1:main} LANGUAGES ${2:CXX})
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
