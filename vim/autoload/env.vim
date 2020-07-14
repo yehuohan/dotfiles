@@ -31,8 +31,8 @@ let s:env.hp.win = [
     \ 'D:/Qt/5.12.5/msvc2017_64/bin',
     \ 'D:/VS2017/MSBuild/15.0/Bin',
     \ 'D:/VS2017/VC/Auxiliary/Build',
-    \ 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx64/x64',
-    \ 'D:/VS2017/VC/Tools/MSVC/14.13.26128/bin/Hostx64/x86',
+    \ 'D:/VS2017/VC/Tools/MSVC/14.16.27023/bin/Hostx64/x64',
+    \ 'D:/VS2017/VC/Tools/MSVC/14.16.27023/bin/Hostx64/x86',
     \ 'D:/Mozilla Firefox',
     \ 'D:/Typora',
     \ 'E:/texlive/bin/win32',
@@ -53,7 +53,7 @@ function! env#env(dev, os)
         endif
         let $VPathPython = 'C:/apps/Python'
         let $VPathMingw64 = 'C:/apps/msys64/mingw64'
-        let $VPathVs = 'D:/VS2017/VC/Tools/MSVC/14.13.26128'
+        let $VPathVs = 'D:/VS2017/VC/Tools/MSVC/14.16.27023'
         let $VPathLuaLsp = $HOME . '/.vscode/extensions/sumneko.lua-0.16.2'
     else
         if !empty(l:e)

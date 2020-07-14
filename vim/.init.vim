@@ -1490,7 +1490,7 @@ let s:rp = {
         \ 'javascript' : ['node %s %s'                         , 'srcf' , 'args'                   ],
         \ 'typescript' : ['node %s %s'                         , 'srcf' , 'args'                   ],
         \ 'dart'       : ['dart %s %s'                         , 'srcf' , 'args'                   ],
-        \ 'tex'        : ['pdfLatex %s && SumatraPDF %s.pdf'   , 'srcf' , 'outf'                   ],
+        \ 'tex'        : ['xelatex %s && SumatraPDF %s.pdf'    , 'srcf' , 'outf'                   ],
         \ 'sh'         : ['./%s %s'                            , 'srcf' , 'args'                   ],
         \ 'dosbatch'   : ['%s %s'                              , 'srcf' , 'args'                   ],
         \ 'markdown'   : ['typora %s'                          , 'srcf'                            ],
