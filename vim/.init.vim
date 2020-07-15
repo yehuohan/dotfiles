@@ -920,7 +920,7 @@ if s:gset.use_coc
     let g:coc_global_extensions = [
         \ 'coc-lists', 'coc-snippets', 'coc-yank', 'coc-explorer',
         \ 'coc-clangd', 'coc-python', 'coc-java', 'coc-tsserver', 'coc-rls',
-        \ 'coc-vimlsp', 'coc-cmake', 'coc-json', 'coc-calc', 'coc-pairs'
+        \ 'coc-vimlsp', 'coc-vimtex', 'coc-cmake', 'coc-json', 'coc-calc', 'coc-pairs',
         \ ]
     let g:coc_status_error_sign = '✘'
     let g:coc_status_warning_sign = '!'
@@ -3046,11 +3046,11 @@ endif
     nnoremap <leader>eb :call RunInsertSpaceB()<CR>
     nnoremap <leader>el :call RunInsertSpaceL()<CR>
     nnoremap <leader>ed :call RunInsertSpaceD()<CR>
-    nnoremap <silent> <leader>ac
+    nnoremap <silent> <leader>ae
         \ :call ExecInput(['Command: ', '', 'command'], {str -> append(line('.'), GetEval(str, 'command'))})<CR>
     nnoremap <silent> <leader>af
         \ :call ExecInput(['Function: ', '', 'function'], {str -> append(line('.'), GetEval(str, 'function'))})<CR>
-    vnoremap <silent> <leader>ac
+    vnoremap <silent> <leader>ae
         \ :call append(line('.'), GetEval(GetSelected(), 'command'))<CR>
     vnoremap <silent> <leader>af
         \ :call append(line('.'), GetEval(GetSelected(), 'function'))<CR>
