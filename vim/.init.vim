@@ -6,23 +6,6 @@
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 " Platforms {{{
-" Vim or NVim, with or without Gui {{{
-function! IsVim()
-    return !(has('nvim'))
-endfunction
-function! IsNVim()
-    return (has('nvim'))
-endfunction
-function! IsGVim()
-    return has('gui_running')
-endfunction
-function! IsNVimQt()
-    " 只在UIEnter之后起作用
-    return exists('g:GuiLoaded')
-endfunction
-" }}}
-
-" Linux or Win {{{
 function! IsLinux()
     return (has('unix') && !has('macunix') && !has('win32unix'))
 endfunction
@@ -30,18 +13,27 @@ function! IsWin()
     return (has('win32') || has('win64'))
 endfunction
 function! IsGw()
-    " GNU for windows
-    return (has('win32unix'))
+    return has('win32unix')
 endfunction
 function! IsMac()
-    return (has('mac'))
+    return has('mac')
 endfunction
-" }}}
+function! IsVim()
+    return !(has('nvim'))
+endfunction
+function! IsNVim()
+    return has('nvim')
+endfunction
+function! IsGVim()
+    return has('gui_running')
+endfunction
+function! IsNVimQt()
+    return exists('g:GuiLoaded')        " 在UIEnter之后才起作用
+endfunction
 " }}} End
 
 " Globals {{{
-let s:home = resolve(expand('<sfile>:p:h'))
-let $DotVimPath=s:home . '/.vim'
+let $DotVimPath=resolve(expand('<sfile>:p:h')) . '/.vim'
 set rtp+=$DotVimPath
 
 " First {{{
@@ -63,10 +55,8 @@ set ttimeout                            " 打开键码超时检测
 set timeoutlen=1000                     " 映射超时时间为1000ms
 set ttimeoutlen=70                      " 键码超时时间为70ms
 if IsVim()
-    " 终端Alt键映射处理：如 Alt+x，实际连续发送 <Esc>x 编码
-    " 以下三种方法都可以使按下 Alt+x 后，执行 CmdTest 命令，但超时检测有区别
-    "<1> set <M-x>=x                  " 设置键码，这里的是一个字符，即<Esc>的编码，不是^和[放在一起
-                                        " 在终端的Insert模式，依次按Ctrl+v, Ctrl-[可输入
+    " 终端Alt键映射处理：如 Alt+x，实际连续发送 <Esc>x 的键码
+    "<1> set <M-x>=x                  " 设置键码，这里的是一个字符，即<Esc>的键码（按i-C-v, i-C-[输入）
     "    nnoremap <M-x>  :CmdTest<CR>   " 按键码超时时间检测
     "<2> nnoremap <Esc>x :CmdTest<CR>   " 按映射超时时间检测
     "<3> nnoremap x    :CmdTest<CR>   " 按映射超时时间检测
@@ -102,8 +92,7 @@ function! s:gsetLoad()
     else
         call s:gsetSave()
     endif
-    if IsVim() && s:gset.use_coc
-        " vim中coc容易卡，补全用ycm
+    if IsVim() && s:gset.use_coc        " vim中coc容易卡，补全用ycm
         let s:gset.use_ycm = '1'
         let s:gset.use_coc = '0'
     endif
@@ -204,8 +193,7 @@ call plug#begin($DotVimPath.'/bundle')  " 设置插件位置
     Plug 'tpope/vim-repeat'
     Plug 'kshenoy/vim-signature'
     Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
-
-    " ui and managers
+    " managers
     Plug 'morhetz/gruvbox'
     Plug 'sainnhe/vim-color-forest-night'
     Plug 'srcery-colors/srcery-vim'
@@ -232,7 +220,6 @@ if IsVim()
     Plug 'yehuohan/grep'
 endif
     Plug 'mhinz/vim-grepper', {'on': ['Grepper', '<plug>(GrepperOperator)']}
-
     " codings
 if s:gset.use_ycm
     function! Plug_ycm_build(info)
@@ -281,7 +268,6 @@ endif
     Plug 'Konfekt/FastFold'
     Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
     Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
-
     " utils
 if s:gset.use_utils
     Plug 'yianwillis/vimcdoc', {'for': 'help'}
@@ -294,6 +280,7 @@ if s:gset.use_utils
     Plug 'tyru/open-browser.vim'
     Plug 'arecarn/vim-crunch'
     Plug 'arecarn/vim-selection'
+    Plug 'voldikss/vim-translator'
 endif
 call plug#end()
 " }}}
@@ -304,17 +291,12 @@ call plug#end()
     let g:EasyMotion_smartcase = 1      " 不区分大小写
     nmap s <Plug>(easymotion-overwin-f)
     nmap <leader>ms <Plug>(easymotion-overwin-f2)
-                                        " 跨分屏快速跳转到字母
     nmap <leader>j <Plug>(easymotion-j)
     nmap <leader>k <Plug>(easymotion-k)
     nmap <leader>mw <Plug>(easymotion-w)
     nmap <leader>mb <Plug>(easymotion-b)
     nmap <leader>me <Plug>(easymotion-e)
     nmap <leader>mg <Plug>(easymotion-ge)
-    nmap <leader>mW <Plug>(easymotion-W)
-    nmap <leader>mB <Plug>(easymotion-B)
-    nmap <leader>mE <Plug>(easymotion-E)
-    nmap <leader>mG <Plug>(easymotion-gE)
 " }}}
 
 " vim-visual-multi {{{ 多光标编辑
@@ -440,23 +422,11 @@ call plug#end()
         \ 'PlaceNextMark'     : "m,",
         \ 'ToggleMarkAtLine'  : "m.",
         \ 'PurgeMarksAtLine'  : "m-",
-        \ 'DeleteMark'        : '',
-        \ 'PurgeMarks'        : '',
-        \ 'PurgeMarkers'      : '',
-        \ 'GotoNextLineAlpha' : '',
-        \ 'GotoPrevLineAlpha' : '',
-        \ 'GotoNextSpotAlpha' : '',
-        \ 'GotoPrevSpotAlpha' : '',
-        \ 'GotoNextLineByPos' : '',
-        \ 'GotoPrevLineByPos' : '',
-        \ 'GotoNextSpotByPos' : '',
-        \ 'GotoPrevSpotByPos' : '',
-        \ 'GotoNextMarker'    : '',
-        \ 'GotoPrevMarker'    : '',
-        \ 'GotoNextMarkerAny' : '',
-        \ 'GotoPrevMarkerAny' : '',
-        \ 'ListBufferMarks'   : '',
-        \ 'ListBufferMarkers' : '',
+        \ 'DeleteMark'        : '', 'PurgeMarks'        : '', 'PurgeMarkers'      : '',
+        \ 'GotoNextLineAlpha' : '', 'GotoPrevLineAlpha' : '', 'GotoNextLineByPos' : '', 'GotoPrevLineByPos' : '',
+        \ 'GotoNextSpotAlpha' : '', 'GotoPrevSpotAlpha' : '', 'GotoNextSpotByPos' : '', 'GotoPrevSpotByPos' : '',
+        \ 'GotoNextMarker'    : '', 'GotoPrevMarker'    : '', 'GotoNextMarkerAny' : '', 'GotoPrevMarkerAny' : '',
+        \ 'ListBufferMarks'   : '', 'ListBufferMarkers' : '',
     \ }
     nnoremap <leader>ts :SignatureToggleSigns<CR>
     nnoremap <leader>ma :SignatureListBufferMarks<CR>
@@ -473,24 +443,19 @@ call plug#end()
 
 " Manager {{{
 " theme {{{ Vim主题(ColorScheme, StatusLine, TabLine)
-    " Unicode字符：
-    "                    
-    " ► ✘ ❖ ▫ ▪ ★ ☆ • ≡ ፨ ♥
-    "❤️ ❌ ⭕️ 🚫 💯 ⚠️  ❗️❓ 🔴 🔺 🔻 🔸 🔶
+    " Unicode:                     ► ✘ ❖ ▫ ▪ ★ ☆ • ≡ ፨ ♥
     let g:gruvbox_contrast_dark='soft'  " 背景选项：dark, medium, soft
     let g:gruvbox_italic = 1
     let g:forest_night_use_italic = 1
     let g:srcery_italic = 1
     let g:one_allow_italics = 1
-if !s:gset.use_lightline
     try
         set background=dark
         colorscheme gruvbox
-    " E185: 找不到主题
-    catch /^Vim\%((\a\+)\)\=:E185/
-        silent! colorscheme desert
+    catch /^Vim\%((\a\+)\)\=:E185/      " E185: 找不到主题
+        silent! colorscheme default
     endtry
-else
+if s:gset.use_lightline
     let g:lightline = {
         \ 'enable' : {'statusline': 1, 'tabline': 0},
         \ 'colorscheme' : 'gruvbox',
@@ -530,6 +495,7 @@ else
                 \ 'chk_indent'  : 'error',
                 \ 'chk_trailing': 'error',
                 \ },
+        \ 'blacklist' : {'tagbar': 0, 'nerdtree': 0, 'Popc': 0, 'coc-explorer': 0},
         \ }
     if s:gset.use_powerfont
         let g:lightline.separator            = {'left': '', 'right': ''}
@@ -537,15 +503,6 @@ else
         let g:lightline.tabline_separator    = {'left': '', 'right': ''}
         let g:lightline.tabline_subseparator = {'left': '', 'right': ''}
     endif
-    try
-        set background=dark
-        colorscheme gruvbox
-    " E185: 找不到主题
-    catch /^Vim\%((\a\+)\)\=:E185/
-        silent! colorscheme desert
-        let g:lightline.colorscheme = 'one'
-    endtry
-    let g:lightline.blacklist = {'tagbar':0, 'nerdtree':0, 'Popc':0, 'coc-explorer':0}
     nnoremap <leader>tl :call lightline#toggle()<CR>
     nnoremap <leader>tk :call Plug_ll_toggleCheck()<CR>
 
@@ -565,8 +522,7 @@ else
             call lightline#init()
             call lightline#colorscheme()
             call lightline#update()
-        " E117: 函数不存在
-        catch /^Vim\%((\a\+)\)\=:E117/
+        catch /^Vim\%((\a\+)\)\=:E117/  " E117: 函数不存在
         endtry
     endfunction
 
@@ -640,13 +596,12 @@ endif
 
 " indentLine {{{ 显示缩进标识
     "let g:indentLine_char = '|'        " 设置标识符样式
-    let g:indentLinet_color_term=200    " 设置标识符颜色
+    let g:indentLinet_color_term = 200  " 设置标识符颜色
     nnoremap <leader>ti :IndentLinesToggle<CR>
 " }}}
 
 " popset {{{ 弹出选项
-    let g:Popset_SelectionData = [
-        \{
+    let g:Popset_SelectionData = [{
             \ 'opt' : ['filetype', 'ft'],
             \ 'dsr' : 'When this option is set, the FileType autocommand event is triggered.',
             \ 'lst' : ['vim', 'make', 'markdown', 'conf',  'json', 'help'],
@@ -737,13 +692,11 @@ if s:gset.use_startify
 if IsLinux() || IsMac()
     let g:startify_bookmarks = [ {'c': '~/.init.vim'},
                                 \{'d': '~/.config/nvim/init.vim'},
-                                \{'o': '$DotVimPath/todo.md'},
-                                \]
+                                \{'o': '$DotVimPath/todo.md'} ]
 elseif IsWin()
     let g:startify_bookmarks = [ {'c': '$DotVimPath/../.init.vim'},
                                 \{'d': '$LOCALAPPDATA/nvim/init.vim'},
-                                \{'o': '$DotVimPath/todo.md'},
-                                \]
+                                \{'o': '$DotVimPath/todo.md'} ]
 endif
     let g:startify_lists = [
             \ {'type': 'bookmarks', 'header': ['   Bookmarks']},
@@ -928,13 +881,10 @@ if s:gset.use_coc
     let g:coc_snippet_next = '<C-j>'
     let g:coc_snippet_prev = '<C-k>'
     "inoremap <silent><expr> <Tab>
-        "\ coc#expandable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-        "\ "\<Tab>"
-    "inoremap <silent><expr> <Tab>
-        "\ pumvisible() ? coc#_select_confirm() :
-        "\ coc#expandable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-        "\ Plug_coc_check_bs() ? "\<Tab>" :
-        "\ coc#refresh()
+    "    \ pumvisible() ? coc#_select_confirm() :
+    "    \ coc#expandable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+    "    \ Plug_coc_check_bs() ? "\<Tab>" :
+    "    \ coc#refresh()
     "function! Plug_coc_check_bs() abort
     "    let col = col('.') - 1
     "    return !col || getline('.')[col - 1]  =~# '\s'
@@ -980,25 +930,18 @@ if IsVim()
 else
     let g:echodoc#type = 'floating'
 endif
-    nnoremap <leader>to :call Plug_ed_toggle()<CR>
-
-    function! Plug_ed_toggle()
-        if echodoc#is_enabled()
-            call echodoc#disable()
-        else
-            call echodoc#enable()
-        endif
-        echo 'Echo doc: ' . string(echodoc#is_enabled())
-    endfunction
+    nnoremap <silent> <leader>to
+        \ :call call(echodoc#is_enabled() ? 'echodoc#disable' : 'echodoc#enable', [])<Bar>
+        \ :echo 'Echo doc: ' . string(echodoc#is_enabled())<CR>
 endif
 " }}}
 
 " auto-pairs {{{ 自动括号
 if !s:gset.use_coc
-    let g:AutoPairsShortcutToggle=''
-    let g:AutoPairsShortcutFastWrap=''
-    let g:AutoPairsShortcutJump=''
-    let g:AutoPairsShortcutFastBackInsert=''
+    let g:AutoPairsShortcutToggle = ''
+    let g:AutoPairsShortcutFastWrap = ''
+    let g:AutoPairsShortcutJump = ''
+    let g:AutoPairsShortcutFastBackInsert = ''
     nnoremap <leader>tp :call AutoPairsToggle()<CR>
 endif
 " }}}
@@ -1056,8 +999,8 @@ endif
 " }}}
 
 " tagbar {{{ 代码结构查看
-    let g:tagbar_width=30
-    let g:tagbar_map_showproto=''       " 取消tagbar对<Space>的占用
+    let g:tagbar_width = 30
+    let g:tagbar_map_showproto = ''     " 取消tagbar对<Space>的占用
     nnoremap <leader>tt :TagbarToggle<CR>
 " }}}
 
@@ -1166,7 +1109,7 @@ endif
 
 " Utils {{{
 if s:gset.use_utils
-" vimcdoc {{{ 中文帮助文档
+" vimcdoc {{{
 " }}}
 
 " MarkDown {{{
@@ -1203,7 +1146,7 @@ else
 endif
 " }}}
 
-" vimtex {{{ Latex支持
+" vimtex {{{ Latex
     let g:vimtex_view_general_viewer = 'SumatraPDF'
     let g:vimtex_complete_enabled = 1   " 使用vimtex#complete#omnifunc补全
     let g:vimtex_complete_close_braces = 1
@@ -1219,12 +1162,8 @@ endif
 " }}}
 
 " open-browser {{{ 在线搜索
-    let g:openbrowser_default_search='bing'
-    let g:openbrowser_search_engines = {
-		\ 'google': 'https://google.com/search?q={query}',
-        \ 'bing'  : 'https://bing.com/search?q={query}',
-		\ 'github': 'https://github.com/search?q={query}'
-        \ }
+    let g:openbrowser_default_search = 'bing'
+    let g:openbrowser_search_engines = {'bing' : 'https://bing.com/search?q={query}'}
     nmap <leader>bs <Plug>(openbrowser-smart-search)
     vmap <leader>bs <Plug>(openbrowser-smart-search)
     nnoremap <leader>big :OpenBrowserSearch -google<Space>
@@ -1246,6 +1185,14 @@ endif
     nnoremap <silent> <leader>ev
         \ :<C-U>execute '.,+' . string(v:count1-1) . 'Crunch'<CR>
     vnoremap <silent> <leader>ev :Crunch<CR>
+" }}}
+
+" translator {{{
+    nmap <leader>tw <Plug>TranslateW
+    vmap <leader>tw <Plug>TranslateWV
+    nnoremap <leader><leader>t :TranslateW<Space>
+    vnoremap <silent> <leader><leader>t
+        \ :call feedkeys(':TranslateW ' . GetSelected(), 'n')<CR>
 " }}}
 endif
 " }}}
@@ -1414,7 +1361,7 @@ function! ExecLast(eager)
     if !empty(s:ws.execution)
         if a:eager
             silent execute s:ws.execution
-            if s:execution_echo != v:null
+            if exists('s:execution_echo') && s:execution_echo != v:null
                 echo s:execution_echo
             endif
         else
@@ -1610,7 +1557,6 @@ function! s:rp.run(term, wdir, cmd, ...) dict
         endif
     endif
 
-    " create exec string
     let l:exec = join([l:exec, a:cmd])
     call SetExecLast(l:exec)
     execute l:exec
@@ -1766,7 +1712,6 @@ function! FnCell(sopt, sel, conf)
     let [l:bin, l:pats, l:pate] = s:rp.cell[l:type]
     let l:range = GetRange(l:pats, l:pate)
 
-    " run exec string
     let l:exec = ':' . join(l:range, ',') . 'AsyncRun '. l:bin
     execute l:exec
     echo l:exec
@@ -1807,10 +1752,8 @@ function! FnCMake(sopt, sel, conf)
         "build
         silent! call mkdir(l:workdir, 'p')
         if a:conf.key ==# 'u'
-            " generate unix makefiles
             let l:cmd = printf('cmake -G "Unix Makefiles" .. && cmake --build . %s', a:conf.args)
         elseif a:conf.key ==# 'n'
-            " generate nmake makefiles
             let l:cmd = printf('vcvars64.bat && cmake -G "NMake Makefiles" .. && cmake --build . %s', a:conf.args)
         endif
         "run
@@ -2502,8 +2445,6 @@ endfunction
 
 " Function: QuickfixGet() {{{ 类型与编号
 function! QuickfixGet()
-    " location-list : 每个窗口对应一个位置列表
-    " quickfix      : 整个vim对应一个quickfix
     let l:type = ''
     let l:line = 0
     if &filetype ==# 'qf'

@@ -33,7 +33,7 @@
 
     /* coc-snippets */
     "snippets.ultisnips.enable": true,
-    "snippets.ultisnips.directories": ["vSnippets", "UltiSnips"],
+    "snippets.ultisnips.directories": ["snips", "UltiSnips"],
     "snippets.snipmate.enable": false,
 
     /* coc-yank */
