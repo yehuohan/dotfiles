@@ -1,0 +1,62 @@
+
+\ProvidesPackage{basesty.sty}[2020/07/19]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 排版设置
+\RequirePackage{
+    geometry, % 页面布局
+    setspace, % 间距调整
+    hyperref, % 目录超链接
+}
+\geometry{
+    top=2cm,
+    bottom=2cm,
+    left=2cm,
+    right=2cm,
+    centering,
+}
+\setstretch{1.5} % 行距设置
+\hypersetup{
+    bookmarks=true, % PDF书签
+    bookmarksnumbered=true, % PDF书签章节编号
+    hidelinks, % 不显示红框
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 字体
+\RequirePackage{ctex}
+\setmainfont{Noto Serif} % 英文衬线字体（默认字体）
+\setsansfont{Noto Sans} % 英文无衬线字体
+\setmonofont{Noto Sans Mono} % 英文等宽字体
+\setCJKmainfont{Noto Serif CJK SC} % 中文衬线字体（默认字体），如 SimSun(宋体) NSimSun(新宋体) FangSong(仿宋) KaiTi(楷体)
+\setCJKsansfont{Noto Sans CJK SC} % 中文无衬线字体，SimHei(黑体) YouYuan(幼圆)
+\setCJKmonofont{Noto Sans Mono CJK SC} % 中文等宽字体，如 Microsoft YaHei(微软雅黑)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 绘图
+\RequirePackage{tikz}
+\usetikzlibrary{
+    arrows,
+    arrows.meta,
+    calc,
+    positioning,
+    scopes,
+    shapes,
+    shadows,
+}
+\pgfdeclarelayer{fg} % 背景图层
+\pgfdeclarelayer{bg} % 前景图层
+\pgfsetlayers{bg, main, fg} % 图层顺序
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 代码块
+\RequirePackage{
+    listings, % 源代码显示
+}
+\lstset{
+    basicstyle=\ttfamily,
+    backgroundcolor=\color[gray]{0.95},
+    breaklines=true,
+    keywordstyle=\color{red},
+    commentstyle=\color[rgb]{0.2, 0.5, 0.2},
+}

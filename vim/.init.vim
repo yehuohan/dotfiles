@@ -2265,7 +2265,7 @@ let s:rs = {
                     \ 'edit ++enc=cp936' : 'reload as cp936',
                     \ 'copyConfig'       : {
                         \ 'opt' : 'select config',
-                        \ 'lst' : ['.ycm_extra_conf.py', 'jsconfig.json', '.vimspector.json'],
+                        \ 'lst' : ['.ycm_extra_conf.py', '.vimspector.json'],
                         \ 'cmd' : {sopt, arg -> execute('edit ' . s:rs.func.copyConfig(arg))},
                         \ },
                     \ },
