@@ -1024,6 +1024,7 @@ endif
     let g:asyncrun_open = 8             " 自动打开quickfix window
     let g:asyncrun_save = 1             " 自动保存当前文件
     let g:asyncrun_local = 1            " 使用setlocal的efm
+    let g:asyncrun_encs = IsWin() ? 'cp936' : 'utf-8'
     nnoremap <leader><leader>r :AsyncRun<Space>
     vnoremap <silent> <leader><leader>r
         \ :call feedkeys(':AsyncRun ' . GetSelected(), 'n')<CR>
@@ -1193,6 +1194,7 @@ endif
     nnoremap <leader><leader>t :TranslateW<Space>
     vnoremap <silent> <leader><leader>t
         \ :call feedkeys(':TranslateW ' . GetSelected(), 'n')<CR>
+    nnoremap <leader>tj :call translator#ui#try_jump_into()<CR>
 " }}}
 endif
 " }}}
@@ -1722,7 +1724,6 @@ endfunction
 function! FnQMake(sopt, sel, conf)
     let l:srcfile = fnamemodify(a:sel, ':t')
     let l:outfile = s:rp.pstr(a:sel, s:rp.pat.target)
-    let l:outfile = empty(l:outfile) ? fnamemodify(a:sel, ':r') : l:outfile
     let l:workdir = fnamemodify(a:sel, ':h')
 
     if IsWin()
@@ -1733,7 +1734,7 @@ function! FnQMake(sopt, sel, conf)
                     \ l:srcfile, a:conf.args, a:conf.clean ? 'distclean' : '')
     endif
     if a:conf.run
-        let l:cmd .= ' && "./' . l:outfile .'"'
+        let l:cmd .= empty(l:outfile) ? ' && echo VIM: No executable file, try add TARGET' : ' && "./' . l:outfile .'"'
     endif
     call s:rp.run(a:conf.term, l:workdir, l:cmd, 'cpp')
 endfunction
@@ -1742,23 +1743,21 @@ endfunction
 " Function: FnCMake(sopt, sel, conf) {{{
 function! FnCMake(sopt, sel, conf)
     let l:outfile = s:rp.pstr(a:sel, s:rp.pat.project)
-    let l:outfile = empty(l:outfile) ? '' : l:outfile
     let l:workdir = fnamemodify(a:sel, ':h') . '/CMakeBuildOut'
 
     if a:conf.clean
         " clean
         call delete(l:workdir, 'rf')
     else
-        "build
+        "build and run
         silent! call mkdir(l:workdir, 'p')
         if a:conf.key ==# 'u'
             let l:cmd = printf('cmake -G "Unix Makefiles" .. && cmake --build . %s', a:conf.args)
         elseif a:conf.key ==# 'n'
             let l:cmd = printf('vcvars64.bat && cmake -G "NMake Makefiles" .. && cmake --build . %s', a:conf.args)
         endif
-        "run
         if a:conf.run
-            let l:cmd .= ' && "./' . l:outfile .'"'
+            let l:cmd .= empty(l:outfile) ? ' && echo VIM: No executable file, try add project()' : ' && "./' . l:outfile .'"'
         endif
         call s:rp.run(a:conf.term, l:workdir, l:cmd)
     endif
@@ -1768,12 +1767,11 @@ endfunction
 " Function: FnMake(sopt, sel, conf) {{{
 function! FnMake(sopt, sel, conf)
     let l:outfile = s:rp.pstr(a:sel, s:rp.pat.target)
-    let l:outfile = empty(l:outfile) ? '' : l:outfile
     let l:workdir = fnamemodify(a:sel, ':h')
 
     let l:cmd = printf('make %s %s', a:conf.clean ? 'clean' : '', a:conf.args)
     if a:conf.run
-        let l:cmd .= ' && "./' . l:outfile .'"'
+        let l:cmd .= empty(l:outfile) ? ' && echo VIM: No executable file, try add TARGET' : ' && "./' . l:outfile .'"'
     endif
     call s:rp.run(a:conf.term, l:workdir, l:cmd)
 endfunction
@@ -1818,7 +1816,7 @@ function! FnSphinx(sopt, sel, conf)
     let l:cmd = printf('make %s %s',
                 \ a:conf.clean ? 'clean' : 'html', a:conf.args)
     if a:conf.run
-        let l:cmd .= join([' && firefox', l:outfile])
+        let l:cmd .= ' && firefox ' . l:outfile
     endif
     call s:rp.run(a:conf.term, l:workdir, l:cmd)
 endfunction

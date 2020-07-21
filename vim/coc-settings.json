@@ -77,7 +77,7 @@
         "u": "gotoParent",
         "cd": "cd",
 
-        "o": ["expandable?", "expandOrCollapse", "open"],
+        "o": ["expandable?", ["expanded?", "collapse", "expand"], "open"],
         "O": "systemExecute",
         "e": false,
         "i": "open:vsplit",
