@@ -177,6 +177,7 @@ endfunction
 call plug#begin($DotVimPath.'/bundle')  " 设置插件位置
     " editing
     Plug 'easymotion/vim-easymotion'
+    Plug 'rhysd/clever-f.vim'
     Plug 'mg979/vim-visual-multi'
     Plug 't9md/vim-textmanip'
     Plug 'markonm/traces.vim'
@@ -241,10 +242,8 @@ endif
 if s:gset.use_coc
     Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
     Plug 'neoclide/jsonc.vim'
-else
-    Plug 'Shougo/echodoc.vim'
-    Plug 'jiangmiao/auto-pairs'
 endif
+    Plug 'jiangmiao/auto-pairs'
     Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
     Plug 'tpope/vim-surround'
     Plug 'majutsushi/tagbar', {'on': 'TagbarToggle'}
@@ -297,6 +296,10 @@ call plug#end()
     nmap <leader>mb <Plug>(easymotion-b)
     nmap <leader>me <Plug>(easymotion-e)
     nmap <leader>mg <Plug>(easymotion-ge)
+" }}}
+
+" clever-f {{{ 行跳转
+    let g:clever_f_show_prompt = 1
 " }}}
 
 " vim-visual-multi {{{ 多光标编辑
@@ -873,7 +876,7 @@ if s:gset.use_coc
     let g:coc_global_extensions = [
         \ 'coc-lists', 'coc-snippets', 'coc-yank', 'coc-explorer',
         \ 'coc-clangd', 'coc-python', 'coc-java', 'coc-tsserver', 'coc-rls',
-        \ 'coc-vimlsp', 'coc-vimtex', 'coc-cmake', 'coc-json', 'coc-calc', 'coc-pairs',
+        \ 'coc-vimlsp', 'coc-vimtex', 'coc-cmake', 'coc-json', 'coc-calc',
         \ ]
     let g:coc_status_error_sign = '✘'
     let g:coc_status_warning_sign = '!'
@@ -922,28 +925,13 @@ if s:gset.use_coc
 endif
 " }}}
 
-" echodoc {{{ 参数文档显示
-if !s:gset.use_coc
-    let g:echodoc_enable_at_startup = 1
-if IsVim()
-    let g:echodoc#type = 'popup'
-else
-    let g:echodoc#type = 'floating'
-endif
-    nnoremap <silent> <leader>to
-        \ :call call(echodoc#is_enabled() ? 'echodoc#disable' : 'echodoc#enable', [])<Bar>
-        \ :echo 'Echo doc: ' . string(echodoc#is_enabled())<CR>
-endif
-" }}}
-
 " auto-pairs {{{ 自动括号
-if !s:gset.use_coc
+    let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`', '<':'>'}
     let g:AutoPairsShortcutToggle = ''
-    let g:AutoPairsShortcutFastWrap = ''
+    let g:AutoPairsShortcutFastWrap = '<M-p>'
     let g:AutoPairsShortcutJump = ''
     let g:AutoPairsShortcutFastBackInsert = ''
     nnoremap <leader>tp :call AutoPairsToggle()<CR>
-endif
 " }}}
 
 " neoformat {{{ 代码格式化
@@ -1473,16 +1461,11 @@ let s:rp = {
     \ 'mappings' : [
         \  'rf', 'rtf', 'Rf' , 'Rtf', 'rj' ,
         \  'rP',
-        \  'rp',  'rq',  'ru',  'rn',  'rm',  'rv',  'ra',  'rh',  'rs',
-        \  'Rp',  'Rq',  'Ru',  'Rn',  'Rm',  'Rv',  'Ra',  'Rh',  'Rs',
-        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rtv', 'rta', 'rth', 'rts',
-        \ 'Rtp', 'Rtq', 'Rtu', 'Rtn', 'Rtm', 'Rtv', 'Rta', 'Rth', 'Rts',
-        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rbv', 'rba', 'rbh', 'rbs',
-        \ 'Rbp', 'Rbq', 'Rbu', 'Rbn', 'Rbm', 'Rbv', 'Rba', 'Rbh', 'Rbs',
-        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rcv', 'rca', 'rch', 'rcs',
-        \ 'Rcp', 'Rcq', 'Rcu', 'Rcn', 'Rcm', 'Rcv', 'Rca', 'Rch', 'Rcs',
-        \ 'rop', 'roq', 'rou', 'ron', 'rom', 'rov', 'roa', 'roh', 'ros',
-        \ 'Rop', 'Roq', 'Rou', 'Ron', 'Rom', 'Rov', 'Roa', 'Roh', 'Ros',
+        \  'rp',  'rq',  'ru',  'rn',  'rm',  'rv',  'ra',  'rh',  'rs',  'Rp',  'Rq',  'Ru',  'Rn',  'Rm',  'Rv',  'Ra',  'Rh',  'Rs',
+        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rtv', 'rta', 'rth', 'rts', 'Rtp', 'Rtq', 'Rtu', 'Rtn', 'Rtm', 'Rtv', 'Rta', 'Rth', 'Rts',
+        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rbv', 'rba', 'rbh', 'rbs', 'Rbp', 'Rbq', 'Rbu', 'Rbn', 'Rbm', 'Rbv', 'Rba', 'Rbh', 'Rbs',
+        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rcv', 'rca', 'rch', 'rcs', 'Rcp', 'Rcq', 'Rcu', 'Rcn', 'Rcm', 'Rcv', 'Rca', 'Rch', 'Rcs',
+        \ 'rlp', 'rlq', 'rlu', 'rln', 'rlm', 'rlv', 'rla', 'rlh', 'rls', 'Rlp', 'Rlq', 'Rlu', 'Rln', 'Rlm', 'Rlv', 'Rla', 'Rlh', 'Rls',
         \ ]
     \ }
 " Function: s:rp.glob(pat, low) {{{
@@ -1493,12 +1476,10 @@ function! s:rp.glob(pat, low) dict
     let l:dir      = expand('%:p:h')
     let l:dir_last = ''
 
-    if IsWin()
-        let l:pat = a:pat               " widows文件不区分大小写
-    else
-        let l:pat = join(map(split(a:pat, '\zs'),
-                    \ {k,c -> (c =~? '[a-z]') ? '[' . toupper(c) . tolower(c) . ']' : c}), '')
-    endif
+    " widows文件不区分大小写，其它需要通过正则式实现
+    let l:pat = IsWin() ? a:pat :
+        \ join(map(split(a:pat, '\zs'),
+        \       {k,c -> (c =~? '[a-z]') ? '[' . toupper(c) . tolower(c) . ']' : c}), '')
 
     let l:res = ''
     while l:dir !=# l:dir_last
@@ -1570,7 +1551,7 @@ endfunction
 function! RunProject(keys, ...)
     " doc
     " {{{
-    " MapKeys: [rR][tbco][pP ...]
+    " MapKeys: [rR][tbcl][pP ...]
     "          [%1][%2  ][%3    ]
     " Run: %1
     "   r : build and run
@@ -1579,7 +1560,7 @@ function! RunProject(keys, ...)
     "   t : run in terminal
     "   b : build without run
     "   c : clean project
-    "   o : search project file to low directory
+    "   l : search project file to low directory
     " Project: %3
     "   p : run project from s:ws.rp
     "   P : set project to s:ws.rp
@@ -1645,7 +1626,7 @@ function! RunProject(keys, ...)
         elseif a:keys =~# s:rp.proj.sets
             " others
             let [l:fn, l:pat] = s:rp.proj[l:conf.key]
-            let l:file = s:rp.glob(l:pat, (a:keys =~# 'o'))
+            let l:file = s:rp.glob(l:pat, (a:keys =~# 'l'))
             if len(l:file) == 1
                 return [l:fn, l:file[0], l:conf]
             elseif len(l:file) > 1
@@ -2708,7 +2689,7 @@ if IsGVim()
     set columns=90
     set linespace=0
     if IsWin()
-        nnoremap <leader>tf <Esc>:call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)<CR>
+        nnoremap <leader>tf :call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)<CR>
     endif
     nnoremap <kPlus> :call GuiAdjustFontSize(1)<CR>
     nnoremap <kMinus> :call GuiAdjustFontSize(-1)<CR>
