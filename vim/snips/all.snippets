@@ -3,12 +3,6 @@
 # qt project
 #===============================================================================
 snippet qpro "qmake pro file"
-#-------------------------------------------------
-#
-# Project created by Vim `!v strftime("%Y-%m-%d %X")`
-#
-#-------------------------------------------------
-
 QT += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -49,12 +43,6 @@ SOURCES    += \
 endsnippet
 
 snippet qproc "qmake pro console file"
-#-------------------------------------------------
-#
-# Project created by Vim `!v strftime("%Y-%m-%d %X")`
-#
-#-------------------------------------------------
-
 QT += core
 QT -= gui
 
@@ -91,12 +79,6 @@ SOURCES    += \
 endsnippet
 
 snippet qcpp "qmake pro only for c/c++"
-#-------------------------------------------------
-#
-# Project created by Vim `!v strftime("%Y-%m-%d %X")`
-#
-#-------------------------------------------------
-
 TEMPLATE = app
 CONFIG  -= qt
 CONFIG  -= app_bundle
@@ -130,13 +112,6 @@ SOURCES    += \
 endsnippet
 
 snippet qcudapp "qmake for cuda application"
-
-#-------------------------------------------------
-#
-# Project created by Vim `!v strftime("%Y-%m-%d %X")`
-#
-#-------------------------------------------------
-
 TEMPLATE = app
 CONFIG  -= qt
 CONFIG  -= app_bundle
@@ -222,13 +197,6 @@ endsnippet
 # makefile
 #===============================================================================
 snippet mkf "makefile template"
-
-#-------------------------------------------------
-#
-# Project created by Vim `!v strftime("%Y-%m-%d %X")`
-#
-#-------------------------------------------------
-
 #===============================================================================
 # dir
 #===============================================================================
@@ -294,20 +262,13 @@ $(call create_obj_target,${DIR_OBJ},${SRC},${CXXFLAGS})
 tags:
 	${CTAGS} -R ${SRC} ${DIR_INC}
 
-.phony: clean
+.PHONY: clean
 clean:
 	-rm -r ${DIR_OBJ}
 	-rm ${BIN}
 endsnippet
 
 snippet cmk "cmake template"
-
-#-------------------------------------------------
-#
-# Project created by Vim `!v strftime("%Y-%m-%d %X")`
-#
-#-------------------------------------------------
-
 cmake_minimum_required(VERSION 3.5)
 
 #set(CMAKE_C_COMPILER "clang")
@@ -346,21 +307,6 @@ endsnippet
 #===============================================================================
 # block comment
 #===============================================================================
-
-snippet cmc "comment block for c/cpp"
-//==============================================================================
-/* ${1:name} */
-${0}
-/* $1 End */
-//==============================================================================
-endsnippet
-
-snippet cmv "comment for vim"
-"===============================================================================
-"${0}
-"===============================================================================
-endsnippet
-
 snippet cmb "commet = with 1 character"
 ${1:type}===============================================================================
 $1 ${0}
@@ -389,6 +335,11 @@ endsnippet
 #===============================================================================
 #  chars
 #===============================================================================
+snippet cunicode "some unicode chars"
+⁰ ¹ ² ³ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹ ± · ÷
+► ✘ ❖ ▫ ▪ ★ ☆ • ≡ ፨ ♥ → …
+                   
+endsnippet
 
 snippet cbox "chars for box"
 ┌─┬─┐

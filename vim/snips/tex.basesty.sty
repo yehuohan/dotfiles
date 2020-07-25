@@ -7,6 +7,8 @@
     geometry, % 页面布局
     setspace, % 间距调整
     hyperref, % 目录超链接
+    tocbibind, % 生成PDF目录页书签
+    xcolor, % 颜色包
 }
 \geometry{
     top=2cm,
@@ -19,7 +21,8 @@
 \hypersetup{
     bookmarks=true, % PDF书签
     bookmarksnumbered=true, % PDF书签章节编号
-    hidelinks, % 不显示红框
+    colorlinks=true, % true:使用颜色链接，false:使用方框链接
+    linkcolor=purple!80!white,
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -33,13 +36,24 @@
 \setCJKmonofont{Noto Sans Mono CJK SC} % 中文等宽字体，如 Microsoft YaHei(微软雅黑)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 绘图
-\RequirePackage{tikz}
+%% 表
+\RequirePackage{
+    makecell, % 单元格
+    multirow, % 多行表格
+    booktabs, % 表格水平线
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 图
+\RequirePackage{
+    tikz, % 绘图
+    graphicx, % 图片包
+}
 \usetikzlibrary{
-    arrows,
-    arrows.meta,
-    calc,
-    positioning,
+    arrows, % 箭头形状
+    arrows.meta, % 箭头形状
+    calc, % 坐标计算
+    positioning, % Node位置
     scopes,
     shapes,
     shadows,
@@ -47,6 +61,12 @@
 \pgfdeclarelayer{fg} % 背景图层
 \pgfdeclarelayer{bg} % 前景图层
 \pgfsetlayers{bg, main, fg} % 图层顺序
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 公式
+\RequirePackage{
+    mathtools, % 数学工具
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 代码块

@@ -60,12 +60,9 @@ if IsVim()
     "    nnoremap <M-x>  :CmdTest<CR>   " 按键码超时时间检测
     "<2> nnoremap <Esc>x :CmdTest<CR>   " 按映射超时时间检测
     "<3> nnoremap x    :CmdTest<CR>   " 按映射超时时间检测
-    for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
+    for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m ; , .', ' ')
         execute 'set <M-'. t . '>=' . t
     endfor
-    set <M-,>=,
-    set <M-.>=.
-    set <M-;>=;
 endif
 " }}}
 
@@ -446,7 +443,6 @@ call plug#end()
 
 " Manager {{{
 " theme {{{ Vim主题(ColorScheme, StatusLine, TabLine)
-    " Unicode:                     ► ✘ ❖ ▫ ▪ ★ ☆ • ≡ ፨ ♥
     let g:gruvbox_contrast_dark='soft'  " 背景选项：dark, medium, soft
     let g:gruvbox_italic = 1
     let g:forest_night_use_italic = 1
@@ -692,13 +688,13 @@ endif
 
 " startify {{{ Vim启动首页
 if s:gset.use_startify
-if IsLinux() || IsMac()
-    let g:startify_bookmarks = [ {'c': '~/.init.vim'},
-                                \{'d': '~/.config/nvim/init.vim'},
-                                \{'o': '$DotVimPath/todo.md'} ]
-elseif IsWin()
+if IsWin()
     let g:startify_bookmarks = [ {'c': '$DotVimPath/../.init.vim'},
                                 \{'d': '$LOCALAPPDATA/nvim/init.vim'},
+                                \{'o': '$DotVimPath/todo.md'} ]
+else
+    let g:startify_bookmarks = [ {'c': '~/.init.vim'},
+                                \{'d': '~/.config/nvim/init.vim'},
                                 \{'o': '$DotVimPath/todo.md'} ]
 endif
     let g:startify_lists = [
@@ -728,7 +724,7 @@ endif
 " fzf {{{ 模糊查找
 if s:gset.use_fzf
     let g:fzf_command_prefix = 'Fzf'
-    nnoremap <leader><leader>f :FzfFiles<Space>
+    nnoremap <leader><leader>f :Fzf
     augroup PluginFzf
         autocmd!
         autocmd Filetype fzf tnoremap <buffer> <Esc> <C-c>
@@ -738,16 +734,12 @@ endif
 
 " LeaderF {{{ 模糊查找
 if s:gset.use_leaderf
-    call s:plug.reg('onVimEnter', 'exec', 'autocmd! LeaderF_Mru')
+    "call s:plug.reg('onVimEnter', 'exec', 'autocmd! LeaderF_Mru')
     let g:Lf_CacheDirectory = $DotVimPath
     "let g:Lf_WindowPosition = 'popup'
     "let g:Lf_PreviewInPopup = 1
     let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0}
-if s:gset.use_powerfont
-    let g:Lf_StlSeparator = {'left': '', 'right': ''}
-else
-    let g:Lf_StlSeparator = {'left': '', 'right': ''}
-endif
+    let g:Lf_StlSeparator = s:gset.use_powerfont ? {'left': '', 'right': ''} : {'left': '', 'right': ''}
     let g:Lf_ShowDevIcons = 0
     let g:Lf_ShortcutF = ''
     let g:Lf_ShortcutB = ''
@@ -760,7 +752,7 @@ endif
         \ 'dir': ['.git', '.svn', '.hg'],
         \ 'file': []
         \ }
-    nnoremap <leader><leader>l :LeaderfFile<Space>
+    nnoremap <leader><leader>l :Leaderf
     nnoremap <leader>lf :LeaderfFile<CR>
     nnoremap <leader>lu :LeaderfFunction<CR>
     nnoremap <leader>lU :LeaderfFunctionAll<CR>
@@ -874,7 +866,7 @@ if s:gset.use_coc
     let g:coc_config_home = $DotVimPath
     let g:coc_data_home = $DotVimPath . '/.coc'
     let g:coc_global_extensions = [
-        \ 'coc-lists', 'coc-snippets', 'coc-yank', 'coc-explorer',
+        \ 'coc-snippets', 'coc-yank', 'coc-explorer',
         \ 'coc-clangd', 'coc-python', 'coc-java', 'coc-tsserver', 'coc-rls',
         \ 'coc-vimlsp', 'coc-vimtex', 'coc-cmake', 'coc-json', 'coc-calc',
         \ ]
@@ -926,7 +918,6 @@ endif
 " }}}
 
 " auto-pairs {{{ 自动括号
-    let g:AutoPairs = {'(':')', '[':']', '{':'}',"'":"'",'"':'"', '`':'`', '<':'>'}
     let g:AutoPairsShortcutToggle = ''
     let g:AutoPairsShortcutFastWrap = '<M-p>'
     let g:AutoPairsShortcutJump = ''
@@ -1434,7 +1425,6 @@ let s:rp = {
         \ 'json'       : ['python -m json.tool %s'             , 'srcf'                            ],
         \ 'matlab'     : ['matlab -nosplash -nodesktop -r %s'  , 'outf'                            ],
         \ 'html'       : ['firefox %s'                         , 'srcf'                            ],
-        \ 'dot'        : ['dotty %s && dot -Tpng %s -o %s.png' , 'srcf' , 'srcf' , 'outf'          ],
         \ },
     \ 'cell' : {
         \ 'python' : ['python', '^#%%' , '^#%%' ],
@@ -1451,12 +1441,12 @@ let s:rp = {
                      \%Wwarning:\ %m,
                      \%Inote:\ %m,
                      \%C\ %#-->\ %f:%l:%c,
-                     \%E\ \ left:%m,%C\ right:%m\ %f:%l:%c,%Z'
+                     \%E\ \ left:%m,%C\ right:%m\ %f:%l:%c,%Z',
         \ },
     \ 'pat' : {
         \ 'target'  : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
-        \ 'name'    : '\mname\s*=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)'
+        \ 'name'    : '\mname\s*=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ },
     \ 'mappings' : [
         \  'rf', 'rtf', 'Rf' , 'Rtf', 'rj' ,
@@ -1977,7 +1967,7 @@ endfunction
 call s:fw.init()
 " }}}
 
-" Function: FindWow(keys, mode) {{{ 超速查找
+" Function: FindWow(keys, mode) {{{ 查找
 function! FindWow(keys, mode)
     " doc
     " {{{
@@ -2138,7 +2128,7 @@ function! FindWow(keys, mode)
 endfunction
 " }}}
 
-" Function: FindWowKill() {{{ 停止超速查找
+" Function: FindWowKill() {{{ 停止查找
 function! FindWowKill()
     execute s:fw.engine.sk
 endfunction
@@ -2169,11 +2159,7 @@ endfunction
 
 " Function: FindWowSetEngine(type) {{{ 设置engine
 function! FindWowSetEngine(type)
-    if a:type ==# 'engine'
-        call PopSelection(s:fw.engine.sel)
-    else
-        call PopSelection(s:fw.engine.sel.dic[a:type])
-    endif
+    call PopSelection(a:type ==# 'engine' ? s:fw.engine.sel : s:fw.engine.sel.dic[a:type])
 endfunction
 " }}}
 
@@ -2487,9 +2473,6 @@ function! QuickfixMakeIconv(sopt, argstr, type)
         call setloclist(0, l:list)
     endif
 endfunction
-" }}}
-
-" Function: QuickfixIconv() {{{ 编码转换
 function! QuickfixIconv()
     let l:type = QuickfixGet()[0]
     if empty(l:type)
@@ -2670,14 +2653,12 @@ augroup END
 " Function: GuiAdjustFontSize(inc) {{{
 function! GuiAdjustFontSize(inc)
     let s:gui_fontsize = exists('s:gui_fontsize') ? s:gui_fontsize + a:inc : 12
-    if IsLinux()
-        execute 'set guifont=DejaVu\ Sans\ Mono\ for\ Powerline\ ' . s:gui_fontsize
-        execute 'set guifontwide=WenQuanYi\ Micro\ Hei\ Mono\ ' . s:gui_fontsize
-    elseif IsWin()
+    if IsWin()
         execute 'set guifont=Consolas\ For\ Powerline:h' . s:gui_fontsize
         execute 'set guifontwide=Microsoft\ YaHei\ Mono:h' . (s:gui_fontsize - 1)
-    elseif IsMac()
+    else
         execute 'set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h' . s:gui_fontsize
+        execute 'set guifontwide=WenQuanYi\ Micro\ Hei\ Mono:h' . s:gui_fontsize
     endif
 endfunction
 " }}}
@@ -2861,30 +2842,26 @@ endif
     nnoremap <leader>bn :bnext<CR>
     nnoremap <leader>bp :bprevious<CR>
     nnoremap <leader>bl <C-^>
-    " 打开/关闭quickfix
+    " quickfix, location-list操作
     nnoremap <leader>qo :call QuickfixBasic('co')<CR>
     nnoremap <leader>qc :call QuickfixBasic('cc')<CR>
     nnoremap <leader>qj :call QuickfixBasic('cj')<CR>
     nnoremap <leader>qJ :call QuickfixBasic('cJ')<CR>
     nnoremap <leader>qk :call QuickfixBasic('ck')<CR>
     nnoremap <leader>qK :call QuickfixBasic('cK')<CR>
-    " 打开/关闭location-list
     nnoremap <leader>lo :call QuickfixBasic('lo')<CR>
     nnoremap <leader>lc :call QuickfixBasic('lc')<CR>
     nnoremap <leader>lj :call QuickfixBasic('lj')<CR>
     nnoremap <leader>lJ :call QuickfixBasic('lJ')<CR>
     nnoremap <leader>lk :call QuickfixBasic('lk')<CR>
     nnoremap <leader>lK :call QuickfixBasic('lK')<CR>
-    " 预览quickfix和location-list
     nnoremap <C-Space> :call QuickfixPreview()<CR>
-    " 在新tab中打开列表项
     nnoremap <leader>qt :call QuickfixTabEdit()<CR>
+    nnoremap <leader>qi :call QuickfixIconv()<CR>
     " 将quickfix中的内容复制location-list
     nnoremap <leader>ql
         \ :call setloclist(0, getqflist())<Bar>
         \ :vertical botright lopen 35<CR>
-    " 编码转换
-    nnoremap <leader>qi :call QuickfixIconv()<CR>
     " 分割窗口
     nnoremap <leader>ws <C-w>s
     nnoremap <leader>wv <C-W>v
