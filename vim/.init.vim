@@ -1003,7 +1003,6 @@ endif
     let g:asyncrun_open = 8             " 自动打开quickfix window
     let g:asyncrun_save = 1             " 自动保存当前文件
     let g:asyncrun_local = 1            " 使用setlocal的efm
-    let g:asyncrun_encs = IsWin() ? 'cp936' : 'utf-8'
     nnoremap <leader><leader>r :AsyncRun<Space>
     vnoremap <silent> <leader><leader>r
         \ :call feedkeys(':AsyncRun ' . GetSelected(), 'n')<CR>
@@ -1948,7 +1947,7 @@ function! s:fw.exec(input, ...) dict
     if a:input
         call PopSelection({
             \ 'opt' : 'select options',
-            \ 'lst' : ['--no-fixed-strings', '--hidden', '--no-ignore'],
+            \ 'lst' : ['--no-fixed-strings', '--hidden', '--no-ignore', '--encoding gbk'],
             \ 'cmd' : {sopt, arg -> s:fw.exec(0, arg)}
             \ })
     else
