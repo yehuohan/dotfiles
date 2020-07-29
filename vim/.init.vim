@@ -214,10 +214,6 @@ endif
 if s:gset.use_leaderf
     Plug 'Yggdroot/LeaderF', {'do': IsWin() ? './install.bat' : './install.sh'}
 endif
-if IsVim()
-    Plug 'yehuohan/grep'
-endif
-    Plug 'mhinz/vim-grepper', {'on': ['Grepper', '<plug>(GrepperOperator)']}
     " codings
 if s:gset.use_ycm
     function! Plug_ycm_build(info)
@@ -770,15 +766,6 @@ if s:gset.use_leaderf
     nnoremap <leader>le :LeaderfHistoryCmd<CR>
 endif
 " }}}
-
-" grep {{{ 大范围查找
-    let g:grepper = {
-        \ 'rg': {
-            \ 'grepprg':    'rg -H --no-heading --vimgrep' . (has('win32') ? ' $*' : ''),
-            \ 'grepformat': '%f:%l:%c:%m',
-            \ 'escape':     '\^$.*+?()[]{}|'}
-        \}
-" }}}
 " }}}
 
 " Codings {{{
@@ -1096,7 +1083,7 @@ if s:gset.use_utils
     let g:markdown_enable_mappings = 0
     let g:markdown_enable_spell_checking = 0
     let g:markdown_enable_folding = 1   " 感觉MarkDown折叠引起卡顿时，关闭此项
-    let g:markdown_enable_conceal = 1   " 在Vim中显示MarkDown预览
+    let g:markdown_enable_conceal = 0   " 在Vim中显示MarkDown预览
     let g:mkdp_auto_start = 0
     let g:mkdp_auto_close = 1
     let g:mkdp_refresh_slow = 0         " 即时预览MarkDown
@@ -1803,7 +1790,7 @@ endfunction
 " }}}
 
 " Find {{{
-" Required: 'skywind3000/asyncrun.vim' or 'yegappan/grep' or 'mhinz/vim-grepper'
+" Required: 'skywind3000/asyncrun.vim'
 "           'Yggdroot/LeaderF', 'junegunn/fzf.vim'
 "           'yehuohan/popc', 'yehuohan/popset'
 
@@ -1834,39 +1821,23 @@ let s:fw = {
             \ 'opt' : 'select the engine',
             \ 'lst' : ['rg', 'fuzzy'],
             \ 'dic' : {
-                \ 'rg' : {
-                    \ 'opt' : 'select rg engine',
-                    \ 'lst' : ['asyncrun', 'grep', 'grepper'],
-                    \ 'cmd' : {sopt, arg -> s:fw.setEngine('rg', arg)},
-                    \ 'get' : {sopt -> s:fw.engine.rg}
-                    \ },
+                \ 'rg' : {},
                 \ 'fuzzy' : {
                     \ 'opt' : 'select fuzzy engine',
                     \ 'lst' : ['fzf', 'leaderf'],
                     \ 'cmd' : {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
                     \ 'get' : {sopt -> s:fw.engine.fuzzy}
                     \ }
-                \ },
+                \ }
             \ }
         \ },
     \ 'rg' : {
         \ 'asyncrun' : {
-            \ 'ch' : '"#%',
+            \ 'maker' : '[rg,[Finished',
+            \ 'chars' : '"#%',
             \ 'sr' : ':botright copen | :AsyncRun! rg --vimgrep -F %s -e "%s" "%s"',
             \ 'sa' : ':botright copen | :AsyncRun! -append rg --vimgrep -F %s -e "%s" "%s"',
             \ 'sk' : ':AsyncStop'
-            \ },
-        \ 'grep' : {
-            \ 'ch' : '#% ',
-            \ 'sr' : ':Rg -F %s %s "%s"',
-            \ 'sa' : ':RgAdd -F %s %s "%s"',
-            \ 'sk' : ':GrepStop'
-            \ },
-        \ 'grepper' : {
-            \ 'ch' : '"',
-            \ 'sr' : ':Grepper -noprompt -tool rg -query -F %s -e "%s" "%s"',
-            \ 'sa' : ':Grepper -noprompt -tool rg -append -query -F %s -e "%s" "%s"',
-            \ 'sk' : ':Grepper -stop'
             \ }
         \ },
     \ 'fuzzy' : {
@@ -1927,7 +1898,13 @@ function! s:fw.init() dict
     " 设置搜索结果高亮
     augroup UserModulesSearch
         autocmd!
-        autocmd User Grepper call FindWowHighlight(s:fw.pat)
+        autocmd User AsyncRunStop
+            \ if &filetype ==# 'qf' |
+            \   setlocal modifiable |
+            \   setlocal foldmethod=marker |
+            \   execute 'setlocal foldmarker=' . s:fw.engine.maker |
+            \   silent! normal! zO |
+            \ endif
     augroup END
     " 设置搜索引擎
     call s:fw.setEngine('rg', 'asyncrun')
@@ -1955,7 +1932,7 @@ function! s:fw.exec(input, ...) dict
             let l:self.opt .= a:1
         endif
         " format: printf('cmd %s %s %s',<opt>,<pat>,<loc>)
-        let l:exec = printf(self.cmd, self.opt, escape(self.pat, self.engine.ch), self.loc)
+        let l:exec = printf(self.cmd, self.opt, escape(self.pat, self.engine.chars), self.loc)
         execute l:exec
         call FindWowHighlight(self.pat)
         call SetExecLast(l:exec)
@@ -2190,9 +2167,7 @@ endfunction
 " Function: FindWowHighlight([string]) {{{ 高亮字符串
 " @param string: 若有字符串，则先添加到s:fw.strings，再高亮
 function! FindWowHighlight(...)
-    if &filetype ==# 'leaderf'
-        " use leaderf's highlight
-    elseif &filetype ==# 'qf'
+    if &filetype ==# 'qf'
         if a:0 >= 1
             call add(s:fw.strings, a:1)
         endif
@@ -2216,6 +2191,7 @@ let s:rs = {
                     \ '%s/\r//ge',
                     \ 'edit ++enc=utf-8',
                     \ 'edit ++enc=cp936',
+                    \ 'syntax match QC /\v^[^|]*\|[^|]*\| / conceal',
                     \ 'call mkdir(fnamemodify(tempname(), ":h"), "p")',
                     \ 'copyConfig',
                     \ 'lineToTop',
@@ -2493,7 +2469,7 @@ let s:opt = {
     \ 'lst' : {
         \ 'conceallevel' : [2, 0],
         \ 'virtualedit'  : ['all', ''],
-        \ 'signcolumn'   : ['no', 'auto'],
+        \ 'signcolumn'   : ['no', 'yes', 'auto'],
         \ },
     \ 'func' : {
         \ 'number' : 'OptFuncNumber',
@@ -2578,7 +2554,7 @@ endfunction
                                         " 不可见字符显示
     set autoindent                      " 使用autoindent缩进
     set nobreakindent                   " 折行时不缩进
-    set conceallevel=0                  " 显示markdown等格式中的隐藏字符
+    set conceallevel=0                  " 显示高样样式中的隐藏字符
     set foldenable                      " 充许折叠
     set foldopen-=search                " 查找时不自动展开折叠
     set foldcolumn=0                    " 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
@@ -2983,8 +2959,6 @@ endif
         execute printf('nnoremap <leader>%s :call FindWowFuzzy("%s")<CR>', key, key)
     endfor
     nnoremap <leader>fk :call FindWowKill()<CR>
-    nnoremap <leader>fee :call FindWowSetEngine('engine')<CR>
-    nnoremap <leader>fes :call FindWowSetEngine('rg')<CR>
     nnoremap <leader>feu :call FindWowSetEngine('fuzzy')<CR>
     nnoremap <leader>fea :call FindWowSetArgs('pfg')<CR>
     nnoremap <leader>fer :call FindWowSetArgs('p')<CR>
