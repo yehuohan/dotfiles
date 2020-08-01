@@ -205,6 +205,7 @@ endif
     Plug 'yehuohan/popset'
     Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTree']}
     Plug 'mhinz/vim-startify'
+    Plug 'itchyny/screensaver.vim'
 if s:gset.use_fzf
 if IsWin()
     Plug 'junegunn/fzf', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
@@ -682,7 +683,7 @@ endif
     nnoremap <leader>tE :execute ':NERDTree ' . expand('%:p:h')<CR>
 " }}}
 
-" startify {{{ Vim启动首页
+" startify {{{ 启动首页
 if s:gset.use_startify
 if IsWin()
     let g:startify_bookmarks = [ {'c': '$DotVimPath/../.init.vim'},
@@ -715,6 +716,10 @@ endif
         endif
     endfunction
 endif
+" }}}
+
+" screensaver {{{ 屏保
+    nnoremap <silent> <leader>ss :ScreenSaver<CR>
 " }}}
 
 " fzf {{{ 模糊查找
@@ -1153,7 +1158,7 @@ endif
     vnoremap <silent> <leader>ev :Crunch<CR>
 " }}}
 
-" translator {{{
+" translator {{{ 翻译
     nmap <leader>tw <Plug>TranslateW
     vmap <leader>tw <Plug>TranslateWV
     nnoremap <leader><leader>t :TranslateW<Space>
@@ -1345,7 +1350,8 @@ let s:ws = {
     \ 'rp': {
         \ 'fn'       : '',
         \ 'file'     : '',
-        \ 'filetype' : ''
+        \ 'filetype' : '',
+        \ 'args'     : ''
         \ },
     \ 'fw': {
         \ 'path'    : '',
@@ -1390,9 +1396,9 @@ let s:rp = {
         \ 'sets' : '[qunmvahs]'
         \ },
     \ 'filetype' : {
-        \ 'c'          : [IsWin() ? 'gcc %s %s -o %s.exe && %s' : 'gcc %s %s -o %s && ./%s',
+        \ 'c'          : [IsWin() ? 'gcc -g %s %s -o %s.exe && %s' : 'gcc -g %s %s -o %s && ./%s',
                                                                \ 'args' , 'srcf' , 'outf' , 'outf' ],
-        \ 'cpp'        : [IsWin() ? 'g++ -std=c++11 %s %s -o %s.exe && %s' : 'g++ -std=c++11 %s %s -o %s && ./%s',
+        \ 'cpp'        : [IsWin() ? 'g++ -g -std=c++11 %s %s -o %s.exe && %s' : 'g++ -g -std=c++11 %s %s -o %s && ./%s',
                                                                \ 'args' , 'srcf' , 'outf' , 'outf' ],
         \ 'rust'       : [IsWin() ? 'rustc %s %s -o %s.exe && %s' : 'rustc %s %s -o %s && ./%s',
                                                                \ 'args' , 'srcf' , 'outf' , 'outf' ],
@@ -1404,9 +1410,10 @@ let s:rp = {
         \ 'javascript' : ['node %s %s'                         , 'srcf' , 'args'                   ],
         \ 'typescript' : ['node %s %s'                         , 'srcf' , 'args'                   ],
         \ 'dart'       : ['dart %s %s'                         , 'srcf' , 'args'                   ],
-        \ 'tex'        : ['xelatex %s && SumatraPDF %s.pdf'    , 'srcf' , 'outf'                   ],
+        \ 'make'       : ['make -f %s %s'                      , 'srcf' , 'args'                   ],
         \ 'sh'         : ['./%s %s'                            , 'srcf' , 'args'                   ],
         \ 'dosbatch'   : ['%s %s'                              , 'srcf' , 'args'                   ],
+        \ 'tex'        : ['xelatex %s && SumatraPDF %s.pdf'    , 'srcf' , 'outf'                   ],
         \ 'markdown'   : ['typora %s'                          , 'srcf'                            ],
         \ 'json'       : ['python -m json.tool %s'             , 'srcf'                            ],
         \ 'matlab'     : ['matlab -nosplash -nodesktop -r %s'  , 'outf'                            ],
@@ -1435,8 +1442,7 @@ let s:rp = {
         \ 'name'    : '\mname\s*=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ },
     \ 'mappings' : [
-        \  'rf', 'rtf', 'Rf' , 'Rtf', 'rj' ,
-        \  'rP',
+        \  'rP',  'rf', 'rtf',  'Rf', 'Rtf',  'rj',
         \  'rp',  'rq',  'ru',  'rn',  'rm',  'rv',  'ra',  'rh',  'rs',  'Rp',  'Rq',  'Ru',  'Rn',  'Rm',  'Rv',  'Ra',  'Rh',  'Rs',
         \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rtv', 'rta', 'rth', 'rts', 'Rtp', 'Rtq', 'Rtu', 'Rtn', 'Rtm', 'Rtv', 'Rta', 'Rth', 'Rts',
         \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rbv', 'rba', 'rbh', 'rbs', 'Rbp', 'Rbq', 'Rbu', 'Rbn', 'Rbm', 'Rbv', 'Rba', 'Rbh', 'Rbs',
@@ -1542,29 +1548,6 @@ function! RunProject(keys, ...)
     "   P : set project to s:ws.rp
     "   ... : supported project from s:rp.proj
     " }}}
-    " Function: s:inputArgs() closure {{{
-    function! s:inputArgs() closure
-        if a:keys =~# '[fj]'
-            call PopSelection({
-                \ 'opt' : 'select args',
-                \ 'lst' : [
-                        \ '-g',
-                        \ '-finput-charset=utf-8 -fexec-charset=gbk',
-                        \ '-static',
-                        \ '-fPIC -shared'
-                        \ ],
-                \ 'cpl' : 'customlist,GetMultiFilesCompletion',
-                \ 'cmd' : {sopt, arg -> call('RunProject', ['r' . a:keys[1:], arg])}
-                \ })
-        elseif a:keys =~# s:rp.proj.sets
-            call PopSelection({
-                \ 'opt' : 'select args',
-                \ 'lst' : ['tags', '--target tags'],
-                \ 'cmd' : {sopt, arg -> call('RunProject', ['r' . a:keys[1:], arg])}
-                \ })
-        endif
-    endfunction
-    " }}}
     " Function: s:parseKeys(args) closure {{{
     function! s:parseKeys(args) closure
         " parse conf
@@ -1584,8 +1567,8 @@ function! RunProject(keys, ...)
             " project
             if a:keys =~# 'P' || empty(s:ws.rp.fn)
                 let l:p = GetInput('rp.fn (f,' . join(split(s:rp.proj.sets[1:-2], '\zs'), ',') . '): ')[0:0]
-                if l:p !~# 'f' && l:p !~# s:rp.proj.sets
-                    return 'Invalid fn'
+                if empty(l:p)
+                    return 'Invalid proj'
                 endif
                 let s:ws.rp.fn = s:rp.proj[l:p][0]
             endif
@@ -1596,6 +1579,12 @@ function! RunProject(keys, ...)
                 endif
                 let s:ws.rp.file = fnamemodify(s:ws.rp.file, ':p')
                 let s:ws.rp.filetype = getbufvar(fnamemodify(s:ws.rp.file, ':t'), '&filetype', &filetype)
+            endif
+            if a:keys =~# 'P'
+                let s:ws.rp.args = GetInput('rp.args: ', '', 'customlist,GetMultiFilesCompletion' )
+            endif
+            if empty(a:args)
+                let l:conf.args = s:ws.rp.args
             endif
             let l:conf.filetype = s:ws.rp.filetype
             return [s:ws.rp.fn, s:ws.rp.file, l:conf]
@@ -1615,7 +1604,17 @@ function! RunProject(keys, ...)
     " }}}
 
     if a:keys =~# 'R'
-        call s:inputArgs()
+        call PopSelection({
+            \ 'opt' : 'select args',
+            \ 'lst' : [
+                    \ '-static',
+                    \ '-fPIC -shared',
+                    \ 'tags',
+                    \ '--target tags'
+                    \ ],
+            \ 'cpl' : 'customlist,GetMultiFilesCompletion',
+            \ 'cmd' : {sopt, arg -> call('RunProject', ['r' . a:keys[1:], arg])}
+            \ })
     else
         let l:ret = s:parseKeys((a:0 > 0) ? a:1 : '')
         if type(l:ret) == v:t_list
@@ -2604,7 +2603,6 @@ function! s:onLargeFile()
     if l:fsize >= 5 * 1024 * 1024 || l:fsize == -2
         let b:lightline_check_flg = 0
         setlocal filetype=log
-        setlocal buftype=nowrite
         setlocal undolevels=-1
         setlocal noswapfile
     endif
