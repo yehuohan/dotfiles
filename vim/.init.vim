@@ -617,7 +617,7 @@ endif
             \ 'lst' : ['forest-night', 'gruvbox', 'srcery', 'one'],
         \}
     \ ]
-    nnoremap <leader><leader>s :PopSet<Space>
+    nnoremap <leader><leader>p :PopSet<Space>
     nnoremap <leader>sp :PopSet popset<CR>
 " }}}
 
@@ -793,9 +793,7 @@ if s:gset.use_ycm
     let g:ycm_autoclose_preview_window_after_insertion = 1      " 自动关闭预览窗口
     let g:ycm_filetype_whitelist = {'*': 1}                     " YCM只在whitelist出现且blacklist未出现的filetype工作
     let g:ycm_language_server = []                              " LSP支持
-    let g:ycm_semantic_triggers = {
-        \ 'tex' : g:vimtex#re#youcompleteme
-        \ }
+    let g:ycm_semantic_triggers = {'tex' : g:vimtex#re#youcompleteme}
     let g:ycm_key_detailed_diagnostics = ''                     " 直接使用:YcmShowDetailedDiagnostic命令
     let g:ycm_key_list_select_completion = ['<C-j>', '<M-j>', '<C-n>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-k>', '<M-k>', '<C-p>', '<Up>']
@@ -2288,10 +2286,6 @@ function! FuncInsertSpace(string, pos) range
     endfor
     call SetExecLast('call FuncInsertSpace(''' . a:string . ''', ''' . a:pos . ''')', v:null)
 endfunction
-let RunInsertSpaceH = function('ExecInput', [['Divide H: '], 'FuncInsertSpace', 'h'])
-let RunInsertSpaceB = function('ExecInput', [['Divide B: '], 'FuncInsertSpace', 'b'])
-let RunInsertSpaceL = function('ExecInput', [['Divide L: '], 'FuncInsertSpace', 'l'])
-let RunInsertSpaceD = function('ExecInput', [['Delete D: '], 'FuncInsertSpace', 'd'])
 " }}}
 
 " Function: FuncSwitchFile(sf) {{{ 切换文件
@@ -2649,6 +2643,8 @@ endif
     vnoremap <silent> <leader><leader>;
         \ :call feedkeys(':' . GetSelected(), 'n')<CR>
     " 排序
+    nnoremap <silent> <leader><leader>s :call feedkeys(':sort nr /', 'n')<CR>
+    nnoremap <silent> <leader><leader>S :call feedkeys(':sort! nr /', 'n')<CR>
     vnoremap <silent> <leader><leader>s
         \ :call feedkeys(printf(':sort nr /\%%>%dc.*\%%<%dc/', getpos("'<")[2]-1, getpos("'>")[2]+1), 'n')<CR>
     vnoremap <silent> <leader><leader>S
@@ -2860,7 +2856,6 @@ endif
 " }}}
 
 " Project {{{
-    " 常用操作
     nnoremap <silent> <leader>ei
         \ :call ExecInput(['Suffix: '], 'FuncEditFile', 0)<CR>
     nnoremap <silent> <leader>eti
@@ -2873,18 +2868,16 @@ endif
     nnoremap <leader>eta :call RunEditFile('ta')<CR>
     nnoremap <leader>etr :call RunEditFile('tr')<CR>
     nnoremap <leader>etp :call RunEditFile('tp')<CR>
-    nnoremap <leader>eh :call RunInsertSpaceH()<CR>
-    nnoremap <leader>eb :call RunInsertSpaceB()<CR>
-    nnoremap <leader>el :call RunInsertSpaceL()<CR>
-    nnoremap <leader>ed :call RunInsertSpaceD()<CR>
+    nnoremap <silent> <leader>eh :call ExecInput(['Divide H: '], 'FuncInsertSpace', 'h')<CR>
+    nnoremap <silent> <leader>eb :call ExecInput(['Divide B: '], 'FuncInsertSpace', 'b')<CR>
+    nnoremap <silent> <leader>el :call ExecInput(['Divide L: '], 'FuncInsertSpace', 'l')<CR>
+    nnoremap <silent> <leader>ed :call ExecInput(['Divide D: '], 'FuncInsertSpace', 'd')<CR>
     nnoremap <silent> <leader>ae
         \ :call ExecInput(['Command: ', '', 'command'], {str -> append(line('.'), GetEval(str, 'command'))})<CR>
     nnoremap <silent> <leader>af
         \ :call ExecInput(['Function: ', '', 'function'], {str -> append(line('.'), GetEval(str, 'function'))})<CR>
-    vnoremap <silent> <leader>ae
-        \ :call append(line('.'), GetEval(GetSelected(), 'command'))<CR>
-    vnoremap <silent> <leader>af
-        \ :call append(line('.'), GetEval(GetSelected(), 'function'))<CR>
+    vnoremap <silent> <leader>ae :call append(line('.'), GetEval(GetSelected(), 'command'))<CR>
+    vnoremap <silent> <leader>af :call append(line('.'), GetEval(GetSelected(), 'function'))<CR>
     nnoremap <leader>sf :call RunSwitchFile()<CR>
     nnoremap <leader>se :call RunScript('exe')<CR>
     nnoremap <leader>sa :call RunScript('async')<CR>
