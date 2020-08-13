@@ -1347,18 +1347,19 @@ endfunction
 " Workspace {{{
 let s:ws = {
     \ 'root' : '',
+    \ 'rp': {'fn': '', 'file': '', 'filetype': '', 'args': ''},
+    \ 'fw': {'path': '', 'filters': '', 'globlst': []},
+    \ 'execution' : '',
+    \ }
+let s:dp = {
     \ 'rp': {
-        \ 'fn'       : '',
-        \ 'file'     : '',
-        \ 'filetype' : '',
-        \ 'args'     : ''
-        \ },
+        \ 'str'   : ['|| [RP]Warning : \.\*\$'],
+        \ 'hl'    : 'WarningMsg',
+        \ 'chars' : ''},
     \ 'fw': {
-        \ 'path'    : '',
-        \ 'filters' : '',
-        \ 'globlst' : []
-        \ },
-    \ 'execution' : ''
+        \ 'str'   : [],
+        \ 'hl'    : 'IncSearch',
+        \ 'chars' : '\/'},
     \ }
 augroup UserModulesWorkspace
     autocmd!
@@ -1368,7 +1369,26 @@ augroup UserModulesWorkspace
                                     \ if empty(s:ws.fw.path) |
                                     \   let s:ws.fw.path = s:ws.root |
                                     \ endif
+    autocmd User AsyncRunStop call DisplaySetting()
+    autocmd Filetype qf call DisplaySetting()
 augroup END
+
+" Function: DisplaySetting() {{{ 设置结果显示窗口
+function! DisplaySetting()
+    if &filetype ==# 'qf'
+        let l:mod = getline('.') =~# '\V\^|| [rg' ? 'fw' : 'rp'
+        if l:mod ==# 'fw'
+            setlocal modifiable
+            setlocal foldmethod=marker
+            setlocal foldmarker=[rg,[Finished
+            silent! normal! zO
+        endif
+        for str in s:dp[l:mod].str
+            execute printf('syntax match %s /\V\c%s/', s:dp[l:mod].hl, escape(str, s:dp[l:mod].chars))
+        endfor
+    endif
+endfunction
+" }}}
 " }}}
 
 " Project {{{
@@ -1503,23 +1523,14 @@ function! s:rp.run(term, wdir, cmd, ...) dict
         execute 'setlocal efm=' . self.efm[a:1]
     endif
 
-    if exists(':AsyncRun') == 2
-        let l:exec = ':AsyncRun '
-        if a:term
-            let l:exec .= '-mode=term -pos=right '
-        endif
-        if !empty(a:wdir)
-            let l:wdir = fnameescape(a:wdir)
-            let l:exec .= '-cwd=' . l:wdir
-            execute 'lcd ' . l:wdir
-        endif
-    else
-        let l:exec = ':! '
-        if !empty(a:wdir)
-            let l:wdir = fnameescape(a:wdir)
-            let l:exec .= 'cd ' . l:wdir . ' && '
-            execute 'lcd ' . l:wdir
-        endif
+    let l:exec = ':AsyncRun '
+    if a:term
+        let l:exec .= '-mode=term -pos=right '
+    endif
+    if !empty(a:wdir)
+        let l:wdir = fnameescape(a:wdir)
+        let l:exec .= '-cwd=' . l:wdir
+        execute 'lcd ' . l:wdir
     endif
 
     let l:exec = join([l:exec, a:cmd])
@@ -1690,7 +1701,7 @@ function! FnQMake(sopt, sel, conf)
                     \ l:srcfile, a:conf.args, a:conf.clean ? 'distclean' : '')
     endif
     if a:conf.run
-        let l:cmd .= empty(l:outfile) ? ' && echo VIM: No executable file, try add TARGET' : ' && "./' . l:outfile .'"'
+        let l:cmd .= empty(l:outfile) ? ' && echo [RP]Warning: No executable file, try add TARGET' : ' && "./' . l:outfile .'"'
     endif
     call s:rp.run(a:conf.term, l:workdir, l:cmd, 'cpp')
 endfunction
@@ -1713,7 +1724,7 @@ function! FnCMake(sopt, sel, conf)
             let l:cmd = printf('vcvars64.bat && cmake -G "NMake Makefiles" .. && cmake --build . %s', a:conf.args)
         endif
         if a:conf.run
-            let l:cmd .= empty(l:outfile) ? ' && echo VIM: No executable file, try add project()' : ' && "./' . l:outfile .'"'
+            let l:cmd .= empty(l:outfile) ? ' && echo [RP]Warning: No executable file, try add project()' : ' && "./' . l:outfile .'"'
         endif
         call s:rp.run(a:conf.term, l:workdir, l:cmd)
     endif
@@ -1727,7 +1738,7 @@ function! FnMake(sopt, sel, conf)
 
     let l:cmd = printf('make %s %s', a:conf.clean ? 'clean' : '', a:conf.args)
     if a:conf.run
-        let l:cmd .= empty(l:outfile) ? ' && echo VIM: No executable file, try add TARGET' : ' && "./' . l:outfile .'"'
+        let l:cmd .= empty(l:outfile) ? ' && echo [RP]Warning: No executable file, try add TARGET' : ' && "./' . l:outfile .'"'
     endif
     call s:rp.run(a:conf.term, l:workdir, l:cmd)
 endfunction
@@ -1805,7 +1816,6 @@ endfunction
 "            fH : fuzzy ctags
 " @attribute rg: 预置的rg搜索命令，用于搜索指定文本
 " @attribute fuzzy: 预置的模糊搜索命令，用于文件和文本等模糊搜索
-" @attribute strings: 高亮搜索字符串
 " @attribute mappings: 映射按键
 let s:fw = {
     \ 'cmd' : '',
@@ -1832,7 +1842,6 @@ let s:fw = {
         \ },
     \ 'rg' : {
         \ 'asyncrun' : {
-            \ 'maker' : '[rg,[Finished',
             \ 'chars' : '"#%',
             \ 'sr' : ':botright copen | :AsyncRun! rg --vimgrep -F %s -e "%s" "%s"',
             \ 'sa' : ':botright copen | :AsyncRun! -append rg --vimgrep -F %s -e "%s" "%s"',
@@ -1857,11 +1866,7 @@ let s:fw = {
             \ 'fH' : ':Leaderf tag --nowrap'
             \ }
         \ },
-    \ 'strings' : [],
-    \ 'mappings' : {
-        \ 'rg' :[],
-        \ 'fuzzy' : []
-        \ }
+    \ 'mappings' : {'rg' :[], 'fuzzy' : []}
     \ }
 " s:fw.mappings {{{
 let s:fw.mappings.rg = [
@@ -1892,25 +1897,6 @@ let s:fw.mappings.fuzzy = [
     \ ]
 " }}}
 
-" Function: s:fw.init() dict {{{
-function! s:fw.init() dict
-    " 设置搜索结果高亮
-    augroup UserModulesSearch
-        autocmd!
-        autocmd User AsyncRunStop
-            \ if &filetype ==# 'qf' |
-            \   setlocal modifiable |
-            \   setlocal foldmethod=marker |
-            \   execute 'setlocal foldmarker=' . s:fw.engine.maker |
-            \   silent! normal! zO |
-            \ endif
-    augroup END
-    " 设置搜索引擎
-    call s:fw.setEngine('rg', 'asyncrun')
-    call s:fw.setEngine('fuzzy', 'leaderf')
-endfunction
-" }}}
-
 " Function: s:fw.setEngine(type, engine) dict {{{
 function! s:fw.setEngine(type, engine) dict
     let self.engine[a:type] = a:engine
@@ -1933,13 +1919,14 @@ function! s:fw.exec(input, ...) dict
         " format: printf('cmd %s %s %s',<opt>,<pat>,<loc>)
         let l:exec = printf(self.cmd, self.opt, escape(self.pat, self.engine.chars), self.loc)
         execute l:exec
-        call FindWowHighlight(self.pat)
+        call add(s:dp.fw.str, self.pat)
         call SetExecLast(l:exec)
     endif
 endfunction
 " }}}
 
-call s:fw.init()
+call s:fw.setEngine('rg', 'asyncrun')
+call s:fw.setEngine('fuzzy', 'leaderf')
 " }}}
 
 " Function: FindWow(keys, mode) {{{ 查找
@@ -2051,7 +2038,7 @@ function! FindWow(keys, mode)
             let l:cmd = s:fw.engine.sa
         else
             let l:cmd = s:fw.engine.sr
-            let s:fw.strings = []
+            let s:dp.fw.str = []
         endif
         return l:cmd
     endfunction
@@ -2083,7 +2070,7 @@ function! FindWow(keys, mode)
             echo 'No match: ' . l:pat
         else
             botright copen
-            call FindWowHighlight(s:fw.pat)
+            let s:dp.fw.str = [s:fw.pat]
         endif
         return 1
     endfunction
@@ -2160,20 +2147,6 @@ function! FindWowSetArgs(type)
         let s:ws.fw.globlst = split(GetInput('fw.globlst: '))
     endif
     return 1
-endfunction
-" }}}
-
-" Function: FindWowHighlight([string]) {{{ 高亮字符串
-" @param string: 若有字符串，则先添加到s:fw.strings，再高亮
-function! FindWowHighlight(...)
-    if &filetype ==# 'qf'
-        if a:0 >= 1
-            call add(s:fw.strings, a:1)
-        endif
-        for str in s:fw.strings
-            execute 'syntax match IncSearch /\V\c' . escape(str, '\/') . '/'
-        endfor
-    endif
 endfunction
 " }}}
 " }}}
@@ -2349,33 +2322,23 @@ let RunSwitchFile = function('FuncSwitchFile', [
 " }}}
 " }}}
 
-" Output {{{
+" Quickfix {{{
 " Function: QuickfixBasic(kyes) {{{ 基本操作
 function! QuickfixBasic(keys)
     let l:type = a:keys[0]
     let l:oprt = a:keys[1]
     if l:oprt ==# 'o'
         execute 'botright ' . l:type . 'open'
-        call FindWowHighlight()
     elseif l:oprt ==# 'c'
-        if &filetype==#'qf'
+        if &filetype ==#'qf'
             wincmd p
         endif
         execute l:type . 'close'
-    elseif l:oprt ==# 'j'
-        execute l:type . 'next'
-        silent! normal! zO
-        normal! zz
-    elseif l:oprt ==# 'J'
-        execute l:type . 'last'
-        silent! normal! zO
-        normal! zz
-    elseif l:oprt ==# 'k'
-        execute l:type . 'previous'
-        silent! normal! zO
-        normal! zz
-    elseif l:oprt ==# 'K'
-        execute l:type . 'first'
+    else
+        let l:tbl = {
+            \ 'l': {'j': 'lnext', 'J': 'llast', 'k': 'lprevious', 'K': 'lfirst'},
+            \ 'c': {'j': 'cnext', 'J': 'clast', 'k': 'cprevious', 'K': 'cfirst'}}
+        execute l:tbl[l:type][l:oprt]
         silent! normal! zO
         normal! zz
     endif
@@ -2426,12 +2389,11 @@ function! QuickfixTabEdit()
     silent! normal! zO
     silent! normal! zz
     execute 'botright ' . l:type . 'open'
-    call FindWowHighlight()
 endfunction
 " }}}
 
-" Function: QuickfixMakeIconv() {{{ 编码转换
-function! QuickfixMakeIconv(sopt, argstr, type)
+" Function: QuickfixDoIconv() {{{ 编码转换
+function! QuickfixDoIconv(sopt, argstr, type)
     let [l:from, l:to] = GetArgs(a:argstr)
     if a:type[0] ==# 'c'
         let l:list = getqflist()
@@ -2455,7 +2417,7 @@ function! QuickfixIconv()
     call PopSelection({
         \ 'opt' : 'select encoding',
         \ 'lst' : ['"cp936", "utf-8"', '"utf-8", "cp936"'],
-        \ 'cmd' : 'QuickfixMakeIconv',
+        \ 'cmd' : 'QuickfixDoIconv',
         \ 'arg' : [l:type,]
         \ })
 endfunction
@@ -2617,7 +2579,7 @@ augroup UserSettingsCmd
     autocmd Filetype vim                setlocal foldmethod=marker
     autocmd Filetype c,cpp,javascript   setlocal foldmethod=syntax
     autocmd Filetype python             setlocal foldmethod=indent
-    autocmd FileType go                 setlocal expandtab
+    autocmd FileType txt,log            setlocal foldmethod=manual
     autocmd BufReadPre *                call s:onLargeFile()
 augroup END
 " }}}
