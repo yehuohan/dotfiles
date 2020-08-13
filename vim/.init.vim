@@ -2258,8 +2258,7 @@ function! RunEditFile(key)
                 \ 'a': 'cpp',
                 \ 'r': 'rs',
                 \ 'p': 'py'}[a:key[-1:]]
-    let l:ntab = a:key[0] ==# 't'
-    call FuncEditFile(l:suffix, l:ntab)
+    call FuncEditFile(l:suffix, a:key[0] ==# 't')
 endfunction
 " }}}
 
