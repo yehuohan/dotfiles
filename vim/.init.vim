@@ -261,6 +261,7 @@ endif
     Plug 'Konfekt/FastFold'
     Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
     Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
+    Plug 'cespare/vim-toml'
     " utils
 if s:gset.use_utils
     Plug 'yianwillis/vimcdoc', {'for': 'help'}
@@ -1066,9 +1067,6 @@ endif
                                         " 允许指定的命令更新folds
 " }}}
 
-" cpp-modern {{{ c++语法高亮
-" }}}
-
 " julia {{{ Julia支持
     let g:default_julia_version = 'devel'
     let g:latex_to_unicode_tab = 1      " 使用<Tab>输入unicode字符
@@ -1078,9 +1076,6 @@ endif
 
 " Utils {{{
 if s:gset.use_utils
-" vimcdoc {{{
-" }}}
-
 " MarkDown {{{
     let g:markdown_include_jekyll_support = 0
     let g:markdown_enable_mappings = 0
@@ -1177,6 +1172,12 @@ call s:plug.init()
 
 " User Modules {{{
 " Libs {{{
+" Function: GetStruct(var) {{{ 获取脚本变量，用于调试
+function! GetStruct(var)
+    return get(s:, a:var)
+endfunction
+" }}}
+
 " Function: GetSelected() {{{ 获取选区内容
 function! GetSelected()
     let l:reg_var = getreg('0', 1)
