@@ -29,3 +29,35 @@ snippet lsty "latex basic style"
 `!v join(readfile($DotVimPath . '/snips/tex.basesty.sty'), "\n")`
 endsnippet
 
+snippet lpic "latex draw picture"
+\documentclass[border=5pt]{standalone}
+\usepackage{
+    tikz, % 绘图
+    xcolor, % 颜色包
+}
+\usetikzlibrary{
+    arrows, % 箭头形状
+    arrows.meta, % 箭头形状
+    calc, % 坐标计算
+    positioning, % Node位置
+    scopes,
+    shapes,
+    shadows,
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\definecolor{FC}{rgb}{0, 0, 0.8}
+
+\begin{document}
+\begin{tikzpicture}[
+    scale=1,
+    base/.style={draw=black, fill=FC, line width=1pt},
+    ]
+
+\coordinate (O) at (0, 0);
+\draw [base, radius=3] (O) circle;
+
+\end{tikzpicture}
+\end{document}
+endsnippet

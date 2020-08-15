@@ -1101,6 +1101,11 @@ if s:gset.use_utils
 " }}}
 
 " ReStructruedText {{{
+    let g:riv_auto_format_table = 0
+    let g:riv_i_tab_pum_next = 0
+    let g:riv_ignored_imaps = '<Tab>,<S-Tab>,<CR>'
+    let g:riv_ignored_nmaps = '<Tab>,<S-Tab>,<CR>'
+    let g:riv_ignored_vmaps = '<Tab>,<S-Tab>,<CR>'
     let g:instant_rst_browser = 'firefox'
 if IsWin()
     " 需要安装 https://github.com/mgedmin/restview
