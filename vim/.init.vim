@@ -1583,14 +1583,14 @@ function! RunProject(keys, ...)
             if a:keys =~# 'P' || empty(s:ws.rp.fn)
                 let l:p = GetInput('rp.fn (f,' . join(split(s:rp.proj.sets[1:-2], '\zs'), ',') . '): ')[0:0]
                 if empty(l:p)
-                    return 'Invalid proj'
+                    throw 'Invalid proj'
                 endif
                 let s:ws.rp.fn = s:rp.proj[l:p][0]
             endif
             if a:keys =~# 'P' || empty(s:ws.rp.file)
                 let s:ws.rp.file = GetInput('rp.file: ', '', 'file')
                 if empty(s:ws.rp.file)
-                    return 'Invalid file'
+                    throw 'Invalid file'
                 endif
                 let s:ws.rp.file = fnamemodify(s:ws.rp.file, ':p')
                 let s:ws.rp.filetype = getbufvar(fnamemodify(s:ws.rp.file, ':t'), '&filetype', &filetype)
@@ -1607,13 +1607,10 @@ function! RunProject(keys, ...)
             " others
             let [l:fn, l:pat] = s:rp.proj[l:conf.key]
             let l:file = s:rp.glob(l:pat, (a:keys =~# 'l'))
-            if len(l:file) == 1
-                return [l:fn, l:file[0], l:conf]
-            elseif len(l:file) > 1
-                return [l:fn, l:file, l:conf]
-            else
-                return 'None of ' . l:pat . ' was found!'
+            if empty(l:file)
+                throw 'None of ' . l:pat . ' was found!'
             endif
+            return [l:fn, (len(l:file) == 1) ? l:file[0] : l:file, l:conf]
         endif
     endfunction
     " }}}
@@ -1622,17 +1619,15 @@ function! RunProject(keys, ...)
         call PopSelection({
             \ 'opt' : 'select args',
             \ 'lst' : [
-                    \ '-static',
-                    \ '-fPIC -shared',
-                    \ 'tags',
-                    \ '--target tags'
+                    \ '-static', '-fPIC -shared',
+                    \ 'tags', '--target tags'
                     \ ],
             \ 'cpl' : 'customlist,GetMultiFilesCompletion',
             \ 'cmd' : {sopt, arg -> call('RunProject', ['r' . a:keys[1:], arg])}
             \ })
     else
-        let l:ret = s:parseKeys((a:0 > 0) ? a:1 : '')
-        if type(l:ret) == v:t_list
+        try
+            let l:ret = s:parseKeys((a:0 > 0) ? a:1 : '')
             let [l:fn, l:file, l:conf] = l:ret
             if type(l:file) == v:t_list
                 call PopSelection({
@@ -1644,9 +1639,9 @@ function! RunProject(keys, ...)
             else
                 call function(l:fn)('', l:file, l:conf)
             endif
-        else
-            echo l:ret
-        endif
+        catch
+            echo v:exception
+        endtry
     endif
 endfunction
 " }}}
@@ -1766,15 +1761,11 @@ endfunction
 " Function: FnCargo(sopt, sel, conf) {{{
 function! FnCargo(sopt, sel, conf)
     let l:workdir = fnamemodify(a:sel, ':h')
-
-    let l:cmd = 'cargo'
-    if a:conf.run
-        let l:cmd .= ' run'
-    elseif a:conf.clean
-        let l:cmd .= ' clean'
-    else
-        let l:cmd .= ' build'
-    endif
+    let l:cmd = printf('cargo %s %s',
+                \ a:conf.run ? 'run' :
+                \ a:conf.clean ? 'clean' :
+                \ 'build',
+                \ a:conf.args)
     call s:rp.run(a:conf.term, l:workdir, l:cmd, 'rust')
 endfunction
 " }}}
