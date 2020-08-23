@@ -65,11 +65,12 @@ focus_follows_mouse no
 # 自动跳转到原来的workspace
 workspace_auto_back_and_forth yes
 
-# 打开软件时自动移至相应工作区
+# 打开软件时自动移至相应工作区，使用xprop查看class
 assign [class="Nautilus"] workspace $WS1
 assign [class="Firefox"] workspace $WS2
 assign [class="Nightly"] workspace $WS2
 assign [class="Google-chrome"] workspace $WS2
+assign [class="chromium"] workspace $WS2
 assign [class="VirtualBox Manager"] workspace $WS3
 
 # 对特定窗口，执行特定命令
@@ -305,8 +306,8 @@ bindsym $mod+mod1+Return exec xterm || xfce4-terminal || gnome-terminal
 bindsym $mod+e exec nautilus
 
 # browser
-bindsym $mod+g exec firefox || google-chrome-stable --force-device-scale-factor=1.15
-bindsym $mod+mod1+g exec google-chrome-stable --force-device-scale-factor=1.15
+bindsym $mod+g exec firefox || chromium --force-device-scale-factor=1.15
+bindsym $mod+mod1+g exec chromium --force-device-scale-factor=1.15
 
 # 快速切换窗口
 bindsym $mod+c exec rofi -show window
