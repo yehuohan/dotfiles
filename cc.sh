@@ -36,7 +36,7 @@ if [[ `uname` == "Linux" ]]; then
     cp ../uapps/ToggleTouchPad.py                   ./misc/
 
     ## Arch
-    if [[ `uname -r` =~ "lts" ]]; then
+    if [[ `uname -r` =~ "arch" ]]; then
         # home/.config
         cp ../.config/xfce4/terminal/terminalrc     ./root/home/.config/xfce4/terminal/
         # X11
