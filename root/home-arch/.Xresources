@@ -21,30 +21,29 @@ Xft.rgba: rgb
 !===============================================================================
 xterm.termName: xterm-256color
 
-! Molokai theme color
-*xterm*background: #303030
-*xterm*foreground: #d0d0d0
-*xterm*cursorColor: #d0d0d0
-*xterm*color0: #101010
-*xterm*color1: #960050
-*xterm*color2: #66aa11
-*xterm*color3: #c47f2c
-*xterm*color4: #30309b
-*xterm*color5: #7e40a5
-*xterm*color6: #3579a8
-*xterm*color7: #9999aa
-*xterm*color8: #303030
-*xterm*color9: #ff0090
-*xterm*color10: #80ff00
-*xterm*color11: #ffba68
-*xterm*color12: #5f5fee
-*xterm*color13: #bb88dd
-*xterm*color14: #4eb4fa
-*xterm*color15: #d0d0d0
+! Dracula
+*.background: #282A36
+*.foreground: #F8F8F2
+*.color0:     #000000
+*.color8:     #4D4D4D
+*.color1:     #FF5555
+*.color9:     #FF6E67
+*.color2:     #50FA7B
+*.color10:    #5AF78E
+*.color3:     #F1FA8C
+*.color11:    #F4F99D
+*.color4:     #BD93F9
+*.color12:    #CAA9FA
+*.color5:     #FF79C6
+*.color13:    #FF92D0
+*.color6:     #8BE9FD
+*.color14:    #9AEDFE
+*.color7:     #BFBFBF
+*.color15:    #E6E6E6
 
 ! font
-xterm*faceName: DejaVu Sans Mono for Powerline:antialias=True:pixelsize=18
-xterm*faceNameDoublesize: WenQuanYi Micro Hei Mono:antialias=True:pixelsize=17
+xterm*faceName: UbuntuMono Nerd Font Mono:antialias=True:pixelsize=20
+xterm*faceNameDoublesize: WenQuanYi Micro Hei Mono:antialias=True:pixelsize=19
 xterm*faceSize: 13
 xterm*scaleHeight: 1.0
 
