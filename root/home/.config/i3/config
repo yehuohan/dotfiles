@@ -113,9 +113,11 @@ bar {
     position top
     height 25
     i3bar_command i3bar -t
-    # 调用i3status
+    # 使用i3status
     #status_command i3status
-    # 调用conky
+    # 使用i3status-rust
+    #status_command i3status-rs ~/.config/i3/status.toml
+    # 使用conky
     status_command ~/.config/i3/conky.sh
 
     # 显示托盘图标的显示器
