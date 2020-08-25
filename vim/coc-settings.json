@@ -23,13 +23,13 @@
     "coc.preferences.rootPatterns": [".popc", ".git", ".svn", ".hg", "tags"],
     "coc.preferences.jumpCommand": "edit",
     "coc.preferences.snippets.enable": true,
-
-    /* coc-lists */
-    "session.saveOnVimLeave" : false,
-    "session.restartOnSessionLoad" : false,
     "list.nextKeymap": "<C-j>",
     "list.previousKeymap": "<C-k>",
-    "list.source.grep.command": "rg",
+
+    /* coc-lists(NOT in use) */
+    //"session.saveOnVimLeave" : false,
+    //"session.restartOnSessionLoad" : false,
+    //"list.source.grep.command": "rg",
 
     /* coc-snippets */
     "snippets.ultisnips.enable": true,

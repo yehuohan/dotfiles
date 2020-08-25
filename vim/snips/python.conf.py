@@ -38,7 +38,10 @@ exclude_patterns = [] # 忽略的文件和目录
 
 
 # -- Options for HTML output -------------------------------------------------
-html_theme = 'sphinxdoc' # 文档主题样式
+html_theme = 'sphinxdoc' # 文档主题样式: sphinxdoc, nature
+html_theme_options = {
+    'sidebarwidth': '25%',
+}
 html_static_path = ['_static'] # HTML静态文件(style sheets ...)
 
 

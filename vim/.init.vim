@@ -411,9 +411,6 @@ call plug#end()
     endfunction
 " }}}
 
-" repeat {{{ 重复命令
-" }}}
-
 " signature {{{ 书签管理
     let g:SignatureMap = {
         \ 'Leader'            : "m",
@@ -564,7 +561,7 @@ if s:gset.use_lightline
 
     function! Plug_ll_msgRight()
         return empty(s:ws.fw.path) ? '' :
-            \ (s:ws.fw.path . '[' . s:ws.fw.filters . '(' . join(s:ws.fw.globlst,',') . ')]')
+            \ printf('%s[%s(%s)]', s:ws.fw.path, join(s:ws.fw.filters, ','), join(s:ws.fw.globlst, ','))
     endfunction
 
     function! Plug_ll_checkMixedIndent()
@@ -895,6 +892,9 @@ if s:gset.use_coc
     nmap <leader>ok <Plug>(coc-diagnostic-prev-error)
     nmap <leader>oJ <Plug>(coc-diagnostic-next)
     nmap <leader>oK <Plug>(coc-diagnostic-prev)
+    nnoremap <silent> <leader>od
+        \ :call coc#config('diagnostic.enable', !coc#util#get_config('diagnostic').enable)<Bar>
+        \ :echo 'diagnostic.enable: ' . coc#util#get_config('diagnostic').enable<CR>
     nmap <leader>or <Plug>(coc-rename)
     vnoremap <silent> <leader>of :call CocAction('formatSelected', 'v')<CR>
     nnoremap <silent> <leader>of :call CocAction('format')<CR>
@@ -1322,26 +1322,23 @@ endfunction
 
 " Function: SetExecLast(string, [execution_echo]) {{{ 设置execution
 function! SetExecLast(string, ...)
-    let s:ws.execution = a:string
-    if a:0 >= 1
-        let s:execution_echo = a:1
-    else
-        let s:execution_echo = a:string
-    endif
+    let s:execution = a:string
+    let s:execution_echo = (a:0 >= 1) ? a:1 : a:string
+    silent! call repeat#set("\<Plug>ExecLast")
 endfunction
 " }}}
 
 " Function: ExecLast() {{{ 执行上一次的execution
-" @param eager: 1:立接执行, 0:用户执行
-function! ExecLast(eager)
-    if !empty(s:ws.execution)
-        if a:eager
-            silent execute s:ws.execution
+" @param exe: 1:运行, 0:显示
+function! ExecLast(exe)
+    if exists('s:execution') && !empty(s:execution)
+        if a:exe
+            silent execute s:execution
             if exists('s:execution_echo') && s:execution_echo != v:null
                 echo s:execution_echo
             endif
         else
-            call feedkeys(s:ws.execution, 'n')
+            call feedkeys(s:execution, 'n')
         endif
     endif
 endfunction
@@ -1350,14 +1347,13 @@ endfunction
 
 " Workspace {{{
 let s:ws = {
-    \ 'root' : '',
+    \ 'root': '',
     \ 'rp': {'fn': '', 'file': '', 'filetype': '', 'args': ''},
-    \ 'fw': {'path': '', 'filters': '', 'globlst': []},
-    \ 'execution' : '',
+    \ 'fw': {'path': '', 'filters': [], 'globlst': []},
     \ }
 let s:dp = {
     \ 'rp': {
-        \ 'str'   : ['|| [RP]Warning : \.\*\$'],
+        \ 'str'   : ['|| [RP]Warning: \.\*\$'],
         \ 'hl'    : 'WarningMsg',
         \ 'chars' : ''},
     \ 'fw': {
@@ -1409,9 +1405,9 @@ let s:rp = {
     \ 'proj' : {
         \ 'f' : ['FnFile'                                     ],
         \ 'j' : ['FnCell'                                     ],
-        \ 'q' : ['FnQMake' , '*.pro'                          ],
-        \ 'u' : ['FnCMake' , 'cmakelists.txt'                 ],
-        \ 'n' : ['FnCMake' , 'cmakelists.txt'                 ],
+        \ 'q' : ['FnGMake' , '*.pro'                          ],
+        \ 'u' : ['FnGMake' , 'cmakelists.txt'                 ],
+        \ 'n' : ['FnGMake' , 'cmakelists.txt'                 ],
         \ 'm' : ['FnMake'  , 'makefile'                       ],
         \ 'v' : ['FnVs'    , '*.sln'                          ],
         \ 'a' : ['FnCargo' , 'Cargo.toml'                     ],
@@ -1548,15 +1544,15 @@ endfunction
 function! RunProject(keys, ...)
     " doc
     " {{{
-    " MapKeys: [rR][tbcl][pP ...]
-    "          [%1][%2  ][%3    ]
+    " MapKeys: [rR][ibctl][pP ...]
+    "          [%1][%2   ][%3    ]
     " Run: %1
     "   r : build and run
-    "   R : input global args
+    "   R : insert or append global args(can use with %2 together)
     " Command: %2
-    "   t : run in terminal
     "   b : build without run
     "   c : clean project
+    "   t : run project in terminal
     "   l : search project file to low directory
     " Project: %3
     "   p : run project from s:ws.rp
@@ -1568,10 +1564,10 @@ function! RunProject(keys, ...)
         " parse conf
         let l:conf = {
             \ 'key'   : a:keys[-1:-1],
-            \ 'run'   : (a:keys =~# 'b' || a:keys =~# 'c') ? 0 : 1,
+            \ 'run'   : (a:keys =~# '[bc]') ? 0 : 1,
             \ 'term'  : (a:keys =~# 't') ? 1 : 0,
             \ 'clean' : (a:keys =~# 'c') ? 1 : 0,
-            \ 'args'  : a:args
+            \ 'args'  : a:args,
             \ }
         " parse fn and file
         if a:keys =~# '[fj]'
@@ -1650,7 +1646,7 @@ endfunction
 function! FnFile(sopt, sel, conf)
     let l:type = a:conf.filetype
     if !has_key(s:rp.filetype, l:type)
-        \ || ('sh' ==? l:type && !(IsLinux() || IsGw() || IsMac()))
+        \ || ('sh' ==? l:type && IsWin())
         \ || ('dosbatch' ==? l:type && !IsWin())
         echo 's:rp.filetype doesn''t support "' . l:type . '"'
         return
@@ -1686,50 +1682,6 @@ function! FnCell(sopt, sel, conf)
 endfunction
 " }}}
 
-" Function: FnQMake(sopt, sel, conf) {{{
-function! FnQMake(sopt, sel, conf)
-    let l:srcfile = fnamemodify(a:sel, ':t')
-    let l:outfile = s:rp.pstr(a:sel, s:rp.pat.target)
-    let l:workdir = fnamemodify(a:sel, ':h')
-
-    if IsWin()
-        let l:cmd = printf('qmake -r "%s" %s && vcvars64.bat && nmake -f Makefile.Debug %s',
-                    \ l:srcfile, a:conf.args, a:conf.clean ? 'distclean' : '')
-    else
-        let l:cmd = printf('qmake "%s" %s && make %s',
-                    \ l:srcfile, a:conf.args, a:conf.clean ? 'distclean' : '')
-    endif
-    if a:conf.run
-        let l:cmd .= empty(l:outfile) ? ' && echo [RP]Warning: No executable file, try add TARGET' : ' && "./' . l:outfile .'"'
-    endif
-    call s:rp.run(a:conf.term, l:workdir, l:cmd, 'cpp')
-endfunction
-" }}}
-
-" Function: FnCMake(sopt, sel, conf) {{{
-function! FnCMake(sopt, sel, conf)
-    let l:outfile = s:rp.pstr(a:sel, s:rp.pat.project)
-    let l:workdir = fnamemodify(a:sel, ':h') . '/CMakeBuildOut'
-
-    if a:conf.clean
-        " clean
-        call delete(l:workdir, 'rf')
-    else
-        "build and run
-        silent! call mkdir(l:workdir, 'p')
-        if a:conf.key ==# 'u'
-            let l:cmd = printf('cmake -G "Unix Makefiles" .. && cmake --build . %s', a:conf.args)
-        elseif a:conf.key ==# 'n'
-            let l:cmd = printf('vcvars64.bat && cmake -G "NMake Makefiles" .. && cmake --build . %s', a:conf.args)
-        endif
-        if a:conf.run
-            let l:cmd .= empty(l:outfile) ? ' && echo [RP]Warning: No executable file, try add project()' : ' && "./' . l:outfile .'"'
-        endif
-        call s:rp.run(a:conf.term, l:workdir, l:cmd)
-    endif
-endfunction
-" }}}
-
 " Function: FnMake(sopt, sel, conf) {{{
 function! FnMake(sopt, sel, conf)
     let l:outfile = s:rp.pstr(a:sel, s:rp.pat.target)
@@ -1740,6 +1692,48 @@ function! FnMake(sopt, sel, conf)
         let l:cmd .= empty(l:outfile) ? ' && echo [RP]Warning: No executable file, try add TARGET' : ' && "./' . l:outfile .'"'
     endif
     call s:rp.run(a:conf.term, l:workdir, l:cmd)
+endfunction
+" }}}
+
+" Function: FnGMake(sopt, sel, conf) {{{
+" generate make from cmake, qmake ...
+function! FnGMake(sopt, sel, conf)
+    let l:srcfile = fnamemodify(a:sel, ':t')
+    let l:outfile = s:rp.pstr(a:sel, a:conf.key ==# 'q' ? s:rp.pat.target : s:rp.pat.project)
+    let l:workdir = fnamemodify(a:sel, ':h') . '/__VBuildOut'
+
+    if a:conf.clean
+        call delete(l:workdir, 'rf')
+    else
+        silent! call mkdir(l:workdir, 'p')
+        if a:conf.key ==# 'u'
+            let l:cmd = printf('cmake -G "Unix Makefiles" .. && cmake --build . %s', a:conf.args)
+        elseif a:conf.key ==# 'n'
+            let l:cmd = printf('vcvars64.bat && cmake -G "NMake Makefiles" .. && cmake --build . %s', a:conf.args)
+        elseif a:conf.key ==# 'q'
+            if IsWin()
+                let l:cmd = printf('vcvars64.bat && qmake ../"%s" && nmake %s', l:srcfile, a:conf.args)
+            else
+                let l:cmd = printf('qmake ../"%s" && make %s', l:srcfile, a:conf.args)
+            endif
+        endif
+        if a:conf.run
+            let l:cmd .= empty(l:outfile) ? ' && echo [RP]Warning: No executable file, try add "project()" or "TARGET"' : ' && "./' . l:outfile .'"'
+        endif
+        call s:rp.run(a:conf.term, l:workdir, l:cmd)
+    endif
+endfunction
+" }}}
+
+" Function: FnCargo(sopt, sel, conf) {{{
+function! FnCargo(sopt, sel, conf)
+    let l:workdir = fnamemodify(a:sel, ':h')
+    let l:cmd = printf('cargo %s %s',
+                \ a:conf.run ? 'run' :
+                \ a:conf.clean ? 'clean' :
+                \ 'build',
+                \ a:conf.args)
+    call s:rp.run(a:conf.term, l:workdir, l:cmd, 'rust')
 endfunction
 " }}}
 
@@ -1755,18 +1749,6 @@ function! FnVs(sopt, sel, conf)
         let l:cmd .= ' && "./' . l:outfile .'"'
     endif
     call s:rp.run(a:conf.term, l:workdir, l:cmd, 'cpp')
-endfunction
-" }}}
-
-" Function: FnCargo(sopt, sel, conf) {{{
-function! FnCargo(sopt, sel, conf)
-    let l:workdir = fnamemodify(a:sel, ':h')
-    let l:cmd = printf('cargo %s %s',
-                \ a:conf.run ? 'run' :
-                \ a:conf.clean ? 'clean' :
-                \ 'build',
-                \ a:conf.args)
-    call s:rp.run(a:conf.term, l:workdir, l:cmd, 'rust')
 endfunction
 " }}}
 
@@ -2018,7 +2000,7 @@ function! FindWow(keys, mode)
         if a:keys =~# '[iws]' | let l:opt .= '-i ' | elseif a:keys =~# '[IWS]' | let l:opt .= '-s ' | endif
         if a:keys !~# '[btop]'
             if !empty(s:ws.fw.filters)
-                let l:opt .= '-g"*.{' . s:ws.fw.filters . '}" '
+                let l:opt .= '-g"*.{' . join(s:ws.fw.filters, ',') . '}" '
             endif
             if !empty(s:ws.fw.globlst)
                 let l:opt .= '-g' . join(s:ws.fw.globlst, ' -g')
@@ -2121,7 +2103,7 @@ endfunction
 " }}}
 
 " Function: FindWowSetArgs(type) {{{ 设置args
-" @param type: p-path, f-filters, g-glob
+" @param type: p-path, f-filters, g-glob，其中f-filters, g-glob均用空格分隔
 " @return 0表示异常结束函数（path无效），1表示正常结束函数
 function! FindWowSetArgs(type)
     if a:type =~# 'p'
@@ -2136,7 +2118,7 @@ function! FindWowSetArgs(type)
         let s:ws.fw.path = l:path
     endif
     if a:type =~# 'f'
-        let s:ws.fw.filters = GetInput('fw.filters: ')
+        let s:ws.fw.filters = split(GetInput('fw.filters: '))
     endif
     if a:type =~# 'g'
         let s:ws.fw.globlst = split(GetInput('fw.globlst: '))
@@ -2232,7 +2214,7 @@ endfunction
 
 " Function: FuncMacro(key) {{{ 执行宏
 function! FuncMacro(key)
-    let l:mstr = 'normal! @' . a:key
+    let l:mstr = ':normal! @' . a:key
     execute l:mstr
     call SetExecLast(l:mstr)
 endfunction
@@ -2281,7 +2263,7 @@ function! FuncInsertSpace(string, pos) range
         endfor
         call setline(k, l:line)
     endfor
-    call SetExecLast('call FuncInsertSpace(''' . a:string . ''', ''' . a:pos . ''')', v:null)
+    call SetExecLast(':call FuncInsertSpace(''' . a:string . ''', ''' . a:pos . ''')', v:null)
 endfunction
 " }}}
 
@@ -2634,6 +2616,7 @@ endif
 " User Mappings {{{
 " Basic {{{
     " 重复命令
+    nnoremap <Plug>ExecLast :call ExecLast(1)<CR>
     nnoremap <leader>. :call ExecLast(1)<CR>
     nnoremap <leader><leader>. :call ExecLast(0)<CR>
     nnoremap <M-;> @:
