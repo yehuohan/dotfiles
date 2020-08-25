@@ -24,7 +24,6 @@ MiscRewrapOnResize=TRUE
 MiscUseShiftArrowsToScroll=FALSE
 MiscSlimTabs=FALSE
 MiscNewTabAdjacent=FALSE
-FontName=DejaVu Sans Mono for Powerline 12
 BackgroundMode=TERMINAL_BACKGROUND_TRANSPARENT
 BackgroundDarkness=1.000000
 MiscSearchDialogOpacity=100
@@ -40,4 +39,5 @@ ColorBoldUseDefault=FALSE
 ShortcutsNoMnemonics=TRUE
 ShortcutsNoHelpkey=TRUE
 ShortcutsNoMenukey=TRUE
+FontName=UbuntuMono Nerd Font Mono 13
 
