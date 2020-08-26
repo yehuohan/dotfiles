@@ -109,6 +109,7 @@ client.background       #$CLR_D
 # i3bar设置
 # {{{
 bar {
+    font pango:Ubuntu Mono 12
     # 显示
     position top
     height 25
