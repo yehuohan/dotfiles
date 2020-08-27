@@ -15,6 +15,7 @@ let s:env = {
 " hp with windows10 {{{
 let s:env.hp.win = [
     \ 'C:/apps/bin',
+    \ 'C:/apps/bin/bin',
     \ 'C:/apps/Python',
     \ 'C:/apps/Julia/bin',
     \ 'C:/apps/msys64/usr/bin',

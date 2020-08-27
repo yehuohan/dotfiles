@@ -632,7 +632,7 @@ endif
     let g:Popc_separator = {'left' : '', 'right': ''}
     let g:Popc_subSeparator = {'left' : '', 'right': ''}
     let g:Popc_useLayerPath = 0
-    let g:Popc_useLayerRoots = ['.popc', '.git', '.svn', '.hg', 'tags']
+    let g:Popc_useLayerRoots = ['.popc', '.git', '.svn', '.hg', 'tags', '.LfGtags']
     let g:Popc_enableLog = 1
     nnoremap <leader><leader>h :PopcBuffer<CR>
     nnoremap <M-i> :PopcBufferSwitchLeft<CR>
@@ -744,9 +744,10 @@ if s:gset.use_leaderf
     let g:Lf_ShortcutB = ''
     let g:Lf_ReverseOrder = 1
     let g:Lf_ShowHidden = 1             " 搜索隐藏文件和目录
-    let g:Lf_GtagsAutoGenerate = 0
+    let g:Lf_GtagsAutoGenerate = 0      " 禁止自动生成gtags
     let g:Lf_Gtagslabel = 'native-pygments'
-                                        " gtags需要安装 pip install Pygments
+                                        " gtags: pip install Pygments
+    let g:Lf_GtagsStoreInRootMarker = 1
     let g:Lf_WildIgnore = {
         \ 'dir': ['.git', '.svn', '.hg'],
         \ 'file': []
@@ -1791,6 +1792,8 @@ endfunction
 "            fL : fuzzy line text
 "            fh : fuzzy ctags with <cword>
 "            fH : fuzzy ctags
+"            fd : fuzzy gtags definitions with <cword>
+"            fg : fuzzy gtags references with <cword>
 " @attribute rg: 预置的rg搜索命令，用于搜索指定文本
 " @attribute fuzzy: 预置的模糊搜索命令，用于文件和文本等模糊搜索
 " @attribute mappings: 映射按键
@@ -1802,7 +1805,7 @@ let s:fw = {
     \ 'engine' : {
         \ 'rg' : '', 'fuzzy' : '',
         \ 'sr' : '', 'sa' : '', 'sk' : '',
-        \ 'ff' : '', 'fF' : '', 'fl' : '', 'fL' : '', 'fh' : '', 'fH' : '',
+        \ 'ff' : '', 'fF' : '', 'fl' : '', 'fL' : '', 'fh' : '', 'fH' : '', 'fd' : '', 'fD' : '',
         \ 'sel': {
             \ 'opt' : 'select the engine',
             \ 'lst' : ['rg', 'fuzzy'],
@@ -1840,7 +1843,9 @@ let s:fw = {
             \ 'fl' : ':Leaderf rg --nowrap --cword',
             \ 'fL' : ':Leaderf rg --nowrap',
             \ 'fh' : ':Leaderf tag --nowrap --cword',
-            \ 'fH' : ':Leaderf tag --nowrap'
+            \ 'fH' : ':Leaderf tag --nowrap',
+            \ 'fd' : ':execute "Leaderf gtags --auto-jump -d " .expand("<cword>")',
+            \ 'fg' : ':execute "Leaderf gtags -r " .expand("<cword>")',
             \ }
         \ },
     \ 'mappings' : {'rg' :[], 'fuzzy' : []}
@@ -1869,8 +1874,8 @@ let s:fw.mappings.rg = [
     \ 'fv=', 'fvp=', 'fv=',  'fvp=',
     \ ]
 let s:fw.mappings.fuzzy = [
-    \  'ff',  'fF',  'fl',  'fL',  'fh',  'fH',
-    \ 'fpf', 'fpF', 'fpl', 'fpL', 'fph', 'fpH',
+    \  'ff',  'fF',  'fl',  'fL',  'fh',  'fH',  'fd',  'fg',
+    \ 'fpf', 'fpF', 'fpl', 'fpL', 'fph', 'fpH', 'fpd', 'fpg',
     \ ]
 " }}}
 
@@ -1895,9 +1900,9 @@ function! s:fw.exec(input, ...) dict
         endif
         " format: printf('cmd %s %s %s',<opt>,<pat>,<loc>)
         let l:exec = printf(self.cmd, self.opt, escape(self.pat, self.engine.chars), self.loc)
-        execute l:exec
         call add(s:dp.fw.str, self.pat)
         call SetExecLast(l:exec)
+        execute l:exec
     endif
 endfunction
 " }}}
@@ -2090,8 +2095,9 @@ function! FindWowFuzzy(keys)
         let l:path = GetInput('Location: ', '', 'dir', expand('%:p:h'))
     endif
     if !empty(l:path)
-        execute 'lcd ' . l:path
-        execute s:fw.engine[a:keys[0] . a:keys[-1:]]
+        let l:exec = printf(":lcd %s | %s", l:path, s:fw.engine[a:keys[0] . a:keys[-1:]])
+        call SetExecLast(l:exec)
+        execute l:exec
     endif
 endfunction
 " }}}
@@ -2142,6 +2148,7 @@ let s:rs = {
                     \ 'edit ++enc=cp936',
                     \ 'syntax match QC /\v^[^|]*\|[^|]*\| / conceal',
                     \ 'call mkdir(fnamemodify(tempname(), ":h"), "p")',
+                    \ 'Leaderf gtags --update',
                     \ 'copyConfig',
                     \ 'lineToTop',
                     \ 'clearUndo',
@@ -2167,8 +2174,8 @@ let s:rs = {
                     \ 'python setup.py build',
                     \ 'objdump -D -S -C %:r > %.asm',
                     \ 'go mod init %:r',
-                    \ 'cflow -T %',
                     \ 'ctags -R',
+                    \ 'cflow -T %',
                     \ ],
             \ 'cmd' : {sopt, arg -> has_key(s:rs.func, arg) ? s:rs.func[arg]() : execute(':AsyncRun ' . arg)},
             \ }
