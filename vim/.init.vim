@@ -74,8 +74,6 @@ let s:gset = {
     \ 'use_powerfont' : 1,
     \ 'use_lightline' : 1,
     \ 'use_startify'  : 1,
-    \ 'use_fzf'       : 1,
-    \ 'use_leaderf'   : 1,
     \ 'use_ycm'       : 1,
     \ 'use_snip'      : 1,
     \ 'use_coc'       : 1,
@@ -119,8 +117,6 @@ function! s:gsetInit()
             \ 'use_powerfont' : {'opt': 'use_powerfont', 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
             \ 'use_lightline' : {'opt': 'use_lightline', 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
             \ 'use_startify'  : {'opt': 'use_startify' , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
-            \ 'use_fzf'       : {'opt': 'use_fzf'      , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
-            \ 'use_leaderf'   : {'opt': 'use_leaderf'  , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
             \ 'use_ycm'       : {'opt': 'use_ycm'      , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
             \ 'use_snip'      : {'opt': 'use_snip'     , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
             \ 'use_coc'       : {'opt': 'use_coc'      , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
@@ -206,15 +202,11 @@ endif
     Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTree']}
     Plug 'mhinz/vim-startify'
     Plug 'itchyny/screensaver.vim'
-if s:gset.use_fzf
 if IsWin()
     Plug 'junegunn/fzf', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
 endif
     Plug 'junegunn/fzf.vim', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
-endif
-if s:gset.use_leaderf
     Plug 'Yggdroot/LeaderF', {'do': IsWin() ? './install.bat' : './install.sh'}
-endif
     " codings
 if s:gset.use_ycm
     function! Plug_ycm_build(info)
@@ -473,8 +465,8 @@ if s:gset.use_lightline
         \ 'component': {
                 \ 'all_filesign': '%{winnr()},%-n%{&ro?",":""}%M',
                 \ 'all_format'  : '%{&ft!=#""?&ft."":""}%{&fenc!=#""?&fenc:&enc}%{&ff}',
-                \ 'all_lineinfo': '0x%02B ≡%3p%%  %04l/%L  %-2v',
-                \ 'lite_info'   : '%p%%≡%L',
+                \ 'all_lineinfo': 'U%B %p%% %l/%L %v',
+                \ 'lite_info'   : '%l/%L %v',
                 \ },
         \ 'component_function': {
                 \ 'mode'        : 'Plug_ll_mode',
@@ -721,18 +713,15 @@ endif
 " }}}
 
 " fzf {{{ 模糊查找
-if s:gset.use_fzf
     let g:fzf_command_prefix = 'Fzf'
     nnoremap <leader><leader>f :Fzf
     augroup PluginFzf
         autocmd!
         autocmd Filetype fzf tnoremap <buffer> <Esc> <C-c>
     augroup END
-endif
 " }}}
 
 " LeaderF {{{ 模糊查找
-if s:gset.use_leaderf
     "call s:plug.reg('onVimEnter', 'exec', 'autocmd! LeaderF_Mru')
     let g:Lf_CacheDirectory = $DotVimPath
     "let g:Lf_WindowPosition = 'popup'
@@ -768,7 +757,6 @@ if s:gset.use_leaderf
     nnoremap <leader>ls :LeaderfSelf<CR>
     nnoremap <leader>lh :LeaderfHistorySearch<CR>
     nnoremap <leader>le :LeaderfHistoryCmd<CR>
-endif
 " }}}
 " }}}
 
@@ -1165,6 +1153,17 @@ endif
         \ :call feedkeys(':TranslateW ' . GetSelected(), 'n')<CR>
     nnoremap <leader>tj :call translator#ui#try_jump_into()<CR>
 " }}}
+endif
+" }}}
+
+" Remote {{{
+if IsNVim()
+    " 中文Motion
+    call s:plug.reg('onDelay', 'exec', 'ZhmInit')
+    nnoremap <silent> w :ZhmCmd w<CR>
+    nnoremap <silent> b :ZhmCmd b<CR>
+    nnoremap <silent> e :ZhmCmd e<CR>
+    nnoremap <silent> ge :ZhmCmd ge<CR>
 endif
 " }}}
 

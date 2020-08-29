@@ -102,7 +102,7 @@ def GetCfamilyFlags(gen='all'):
             # os.path.join(LOC_DIR, ''),
         ]
     if gen == 'tags':
-        return local_paths 
+        return local_paths
     local_flags = [
             '-isystem', LOC_DIR,
         ] + GetDirsRecursive(

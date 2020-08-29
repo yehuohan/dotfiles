@@ -18,6 +18,7 @@ if [[ `uname` == "Linux" ]]; then
     cp ../.vim/coc-settings.json                    ./vim/
     cp -r ../.vim/snips                             ./vim/
     cp -r ../.vim/autoload                          ./vim/
+    cp -r ../.vim/rplugin                           ./vim/
     cp -r ../.config/nvim                           ./vim/
     # zsh
     cp ../.zshrc                                    ./root/home/
@@ -80,6 +81,7 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp ../VConfig/.vim/coc-settings.json            ./vim/
     cp -r ../VConfig/.vim/snips                     ./vim/
     cp -r ../VConfig/.vim/autoload                  ./vim/
+    cp -r ../VConfig/.vim/rplugin                   ./vim/
 
     # cygwin
     cp ~/.minttyrc                                  ./root/home-gw/
