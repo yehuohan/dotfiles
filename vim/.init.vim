@@ -78,6 +78,7 @@ let s:gset = {
     \ 'use_snip'      : 1,
     \ 'use_coc'       : 1,
     \ 'use_spector'   : 1,
+    \ 'use_leaderf'   : 1,
     \ 'use_utils'     : 1,
     \ }
 " Function: s:gsetLoad() {{{
@@ -121,6 +122,7 @@ function! s:gsetInit()
             \ 'use_snip'      : {'opt': 'use_snip'     , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
             \ 'use_coc'       : {'opt': 'use_coc'      , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
             \ 'use_spector'   : {'opt': 'use_spector'  , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
+            \ 'use_leaderf'   : {'opt': 'use_leaderf'  , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
             \ 'use_utils'     : {'opt': 'use_utils'    , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
             \ },
         \ 'cmd' : {sopt, arg -> (arg ==# '[OK]') ? s:gsetSave() : v:null}
@@ -206,16 +208,18 @@ if IsWin()
     Plug 'junegunn/fzf', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
 endif
     Plug 'junegunn/fzf.vim', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
+if s:gset.use_leaderf
     Plug 'Yggdroot/LeaderF', {'do': IsWin() ? './install.bat' : './install.sh'}
+endif
     " codings
 if s:gset.use_ycm
     function! Plug_ycm_build(info)
         " (first installed) or (PlugInstall! or PlugUpdate!)
         if a:info.status == 'installed' || a:info.force
-            if IsLinux()
-                !python install.py --clangd-completer --build-dir ycm_build
-            elseif IsWin()
+            if IsWin()
                 !python install.py --clangd-completer --msvc 15 --build-dir ycm_build
+            else
+                !python install.py --clangd-completer --build-dir ycm_build
             endif
         endif
     endfunction
@@ -245,10 +249,10 @@ if s:gset.use_spector
 endif
     Plug 't9md/vim-quickhl'
     Plug 'RRethy/vim-illuminate'
-if IsNVim()
-    Plug 'norcalli/nvim-colorizer.lua', {'on': 'ColorizerToggle'}
-else
+if IsVim()
     Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
+else
+    Plug 'norcalli/nvim-colorizer.lua', {'on': 'ColorizerToggle'}
 endif
     Plug 'Konfekt/FastFold'
     Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
@@ -722,6 +726,7 @@ endif
 " }}}
 
 " LeaderF {{{ 模糊查找
+if s:gset.use_leaderf
     "call s:plug.reg('onVimEnter', 'exec', 'autocmd! LeaderF_Mru')
     let g:Lf_CacheDirectory = $DotVimPath
     "let g:Lf_WindowPosition = 'popup'
@@ -757,6 +762,7 @@ endif
     nnoremap <leader>ls :LeaderfSelf<CR>
     nnoremap <leader>lh :LeaderfHistorySearch<CR>
     nnoremap <leader>le :LeaderfHistoryCmd<CR>
+endif
 " }}}
 " }}}
 
@@ -1034,17 +1040,13 @@ endif
     nnoremap <leader>tg :IlluminationToggle<CR>
 " }}}
 
-" colorizer.lua {{{ 颜色预览
-if IsNVim()
-    nnoremap <leader>tc :ColorizerToggle<CR>
-endif
-" }}}
-
 " colorizer {{{ 颜色预览
 if IsVim()
     let g:colorizer_nomap = 1
     let g:colorizer_startup = 0
     nnoremap <leader>tc :ColorToggle<CR>
+else
+    nnoremap <leader>tc :ColorizerToggle<CR>
 endif
 " }}}
 
@@ -1431,7 +1433,7 @@ let s:rp = {
         \ 'typescript' : ['node %s %s'                         , 'srcf' , 'args'                   ],
         \ 'dart'       : ['dart %s %s'                         , 'srcf' , 'args'                   ],
         \ 'make'       : ['make -f %s %s'                      , 'srcf' , 'args'                   ],
-        \ 'sh'         : ['./%s %s'                            , 'srcf' , 'args'                   ],
+        \ 'sh'         : ['bash ./%s %s'                       , 'srcf' , 'args'                   ],
         \ 'dosbatch'   : ['%s %s'                              , 'srcf' , 'args'                   ],
         \ 'tex'        : ['xelatex %s && SumatraPDF %s.pdf'    , 'srcf' , 'outf'                   ],
         \ 'markdown'   : ['typora %s'                          , 'srcf'                            ],
@@ -1444,6 +1446,12 @@ let s:rp = {
         \ 'julia'  : ['julia' , '^#%%' , '^#%%' ],
         \ 'lua'    : ['lua'   , '^--%%', '^--%%'],
         \ },
+    \ 'enc' : {
+        \ 'c'    : 'utf-8',
+        \ 'cpp'  : 'utf-8',
+        \ 'make' : 'utf-8',
+        \ 'sh'   : 'utf-8',
+        \ },
     \ 'efm' : {
         \ 'python' : '%*\\sFile\ \"%f\"\\,\ line\ %l\\,\ %m',
         \ 'rust'   : '%-G,
@@ -1455,6 +1463,7 @@ let s:rp = {
                      \%Inote:\ %m,
                      \%C\ %#-->\ %f:%l:%c,
                      \%E\ \ left:%m,%C\ right:%m\ %f:%l:%c,%Z',
+        \ 'lua'    : 'lua:\ %f:%l:\ %m',
         \ },
     \ 'pat' : {
         \ 'target'  : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
@@ -1517,11 +1526,14 @@ endfunction
 " @param term: 在内置terminal中运行
 " @param wdir: 命令运行目录
 " @param cmd: 命令字符串
-" @param type: 用于设置errorformat
+" @param type: 用于设置encoding, errorformat ...
 function! s:rp.run(term, wdir, cmd, ...) dict
-    if a:0 >= 1 && has_key(self.efm, a:1)
-        execute 'setlocal efm=' . self.efm[a:1]
+    let l:type = (a:0 >= 1) ? a:1 : ''
+    if has_key(self.efm, l:type)
+        execute 'setlocal efm=' . self.efm[l:type]
     endif
+    let g:asyncrun_encs = has_key(self.enc, l:type) ? self.enc[l:type] :
+                        \ ((IsWin() || IsGw()) ? 'gbk' : 'utf-8')
 
     let l:exec = ':AsyncRun '
     if a:term
@@ -1646,7 +1658,6 @@ endfunction
 function! FnFile(sopt, sel, conf)
     let l:type = a:conf.filetype
     if !has_key(s:rp.filetype, l:type)
-        \ || ('sh' ==? l:type && IsWin())
         \ || ('dosbatch' ==? l:type && !IsWin())
         echo 's:rp.filetype doesn''t support "' . l:type . '"'
         return
@@ -1822,8 +1833,8 @@ let s:fw = {
     \ 'rg' : {
         \ 'asyncrun' : {
             \ 'chars' : '"#%',
-            \ 'sr' : ':botright copen | :AsyncRun! rg --vimgrep -F %s -e "%s" "%s"',
-            \ 'sa' : ':botright copen | :AsyncRun! -append rg --vimgrep -F %s -e "%s" "%s"',
+            \ 'sr' : ':botright copen | :let g:asyncrun_encs="utf-8" | :AsyncRun! rg --vimgrep -F %s -e "%s" "%s"',
+            \ 'sa' : ':botright copen | :let g:asyncrun_encs="utf-8" | :AsyncRun! -append rg --vimgrep -F %s -e "%s" "%s"',
             \ 'sk' : ':AsyncStop'
             \ }
         \ },
