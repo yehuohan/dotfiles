@@ -6,12 +6,12 @@ Some requirements:
  - Basic:
     - [vim/vim](https://github.com/vim/vim)
     - [neovim/neovim](https://github.com/neovim/neovim)
-    - [Python](https://www.python.org/)
+    - [Python](https://www.python.org/), `pip install pynvim`
+    - [NodeJs](https://nodejs.org), `npm install -g neovim`
     - [LLVM(Clang)](http://llvm.org/)
     - [lua](https://www.lua.org/)
     - Git
       - [Msys2](http://www.msys2.org/)
-      - [MinGW-w64](https://sourceforge.net/projects/mingw-w64/files/)
       - [Cygwin](https://cygwin.com)
 
  - Coding:

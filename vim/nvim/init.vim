@@ -8,7 +8,7 @@
 if (has('unix') && !has('macunix') && !has('win32unix')) || (has('mac'))
     " Path '~/config/nvim/'
     let g:python3_host_prog = '/usr/bin/python3'
-    let g:node_host_prog = '/use/bin/neovim-node-host'
+    let g:node_host_prog = '/usr/bin/neovim-node-host'
     set rtp^=~/.vim
     set rtp+=~/.vim/after
     let &packpath = &rtp

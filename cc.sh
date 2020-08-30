@@ -30,6 +30,7 @@ if [[ `uname` == "Linux" ]]; then
     cp -r ../.config/i3                             ./root/home/.config/
     cp -r ../.config/i3status                       ./root/home/.config/
     cp -r ../.config/rofi                           ./root/home/.config/
+    cp -r ../.config/fontconfig                     ./root/home/.config/
     # tmux
     cp ../.tmux.conf                                ./root/home/
     cp ../.tmux-status.conf                         ./root/home/
