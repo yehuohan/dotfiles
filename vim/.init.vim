@@ -34,6 +34,7 @@ endfunction
 
 " Globals {{{
 let $DotVimPath=resolve(expand('<sfile>:p:h')) . '/.vim'
+let $DotVimCachePath=$DotVimPath . '/.cache'
 set rtp+=$DotVimPath
 
 " First {{{
@@ -67,7 +68,7 @@ endif
 " }}}
 
 " Struct: s:gset {{{
-let s:gset_file = $DotVimPath . '/.gset.json'
+let s:gset_file = $DotVimCachePath . '/.gset.json'
 let s:gset = {
     \ 'set_dev'       : v:null,
     \ 'set_os'        : v:null,
@@ -616,7 +617,7 @@ endif
 " }}}
 
 " popc {{{ buffer管理
-    let g:Popc_jsonPath = $DotVimPath
+    let g:Popc_jsonPath = $DotVimCachePath
     let g:Popc_useFloatingWin = 1
     let g:Popc_highlight = {
         \ 'text'     : 'Pmenu',
@@ -682,11 +683,11 @@ if s:gset.use_startify
 if IsWin()
     let g:startify_bookmarks = [ {'c': '$DotVimPath/../.init.vim'},
                                 \{'d': '$LOCALAPPDATA/nvim/init.vim'},
-                                \{'o': '$DotVimPath/todo.md'} ]
+                                \{'o': '$DotVimCachePath/todo.md'} ]
 else
     let g:startify_bookmarks = [ {'c': '~/.init.vim'},
                                 \{'d': '~/.config/nvim/init.vim'},
-                                \{'o': '$DotVimPath/todo.md'} ]
+                                \{'o': '$DotVimCachePath/todo.md'} ]
 endif
     let g:startify_lists = [
             \ {'type': 'bookmarks', 'header': ['   Bookmarks']},
@@ -701,8 +702,8 @@ endif
     augroup END
 
     function! Plug_stt_todo()
-        if filereadable($DotVimPath.'/todo.md')
-            let l:lines = readfile($DotVimPath.'/todo.md')
+        if filereadable($DotVimCachePath.'/todo.md')
+            let l:lines = readfile($DotVimCachePath.'/todo.md')
             call filter(l:lines, 'v:val !~ "\\m^[ \t]*$"')
             return l:lines
         else
@@ -728,7 +729,7 @@ endif
 " LeaderF {{{ 模糊查找
 if s:gset.use_leaderf
     "call s:plug.reg('onVimEnter', 'exec', 'autocmd! LeaderF_Mru')
-    let g:Lf_CacheDirectory = $DotVimPath
+    let g:Lf_CacheDirectory = $DotVimCachePath
     "let g:Lf_WindowPosition = 'popup'
     "let g:Lf_PreviewInPopup = 1
     let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0}
@@ -770,7 +771,7 @@ endif
 " YouCompleteMe {{{ 自动补全
 if s:gset.use_ycm
     call s:plug.reg('onDelay', 'load', 'YouCompleteMe')
-    let g:ycm_global_ycm_extra_conf = $DotVimPath.'/.ycm_extra_conf.py'
+    let g:ycm_global_ycm_extra_conf = $DotVimPath . '/.ycm_extra_conf.py'
     let g:ycm_enable_diagnostic_signs = 1                       " 开启语法检测
     let g:ycm_max_diagnostics_to_display = 30
     let g:ycm_warning_symbol = '►'                              " Warning符号
@@ -847,7 +848,7 @@ if s:gset.use_coc
     " coc-python: pip install jedi
     " coc-java: download jdt.ls from https://download.eclipse.org/jdtls/snapshots
     let g:coc_config_home = $DotVimPath
-    let g:coc_data_home = $DotVimPath . '/.coc'
+    let g:coc_data_home = $DotVimCachePath . '/.coc'
     let g:coc_global_extensions = [
         \ 'coc-snippets', 'coc-yank', 'coc-explorer',
         \ 'coc-clangd', 'coc-python', 'coc-java', 'coc-tsserver', 'coc-rls',
@@ -1107,6 +1108,7 @@ endif
 " }}}
 
 " vimtex {{{ Latex
+    let g:vimtex_cache_root = $DotVimCachePath . '/.vimtex'
     let g:vimtex_view_general_viewer = 'SumatraPDF'
     let g:vimtex_complete_enabled = 1   " 使用vimtex#complete#omnifunc补全
     let g:vimtex_complete_close_braces = 1

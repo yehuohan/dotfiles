@@ -1,3 +1,13 @@
+%!TEX program = xelatex
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Basic
+% \cmd
+%   \command-name [optional-params]{required-params}
+%   \command-name [arg1, arg2]{}            -> arg1, arg2顺序不可互换
+%   \command-name [arg1][arg2]{}            -> arg1, arg2顺序不可互换
+%   \command-name [arg1=val1, arg2=val2]{}  -> arg1, arg2顺序可互换
 
 \ProvidesPackage{basesty.sty}[2020/07/19]
 
@@ -45,6 +55,19 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 图
+% tikz基本结构：path, node, tree, graph
+%   \path (point) <action> (point) <action> ...
+%   path绘图像一支笔，在一系列point上顺序移动，并画下action
+%       point:
+%           直角坐标(1cm,2pt)
+%           极坐标(30:1cm)
+%           相对坐标+(1,0) ++(50:10)
+%           坐标计算($(...)$)
+%       action:
+%           线：--, .., -|, |-
+%           笔：\path[draw, params] = \draw [params], params使用键值对[key=value]表示
+%           刷：\path[fill, params] = \fill [params], params使用键值对[key=value]表示
+%           形：circle, ellipse, rectangle, arc, grid, parabola, sin, cos, svg, plot ...
 \RequirePackage{
     tikz, % 绘图
     graphicx, % 图片包
