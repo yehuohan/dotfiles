@@ -111,7 +111,7 @@ bar {
     font pango:Ubuntu Mono 12
     # 显示
     position top
-    height 25
+    height 23
     i3bar_command i3bar -t
     # 使用i3status
     #status_command i3status
@@ -125,8 +125,8 @@ bar {
     # bar显示隐藏设置
     mode dock
     # 分隔符
-    #separator_symbol "|"
-    separator_symbol ""
+    #separator_symbol ""
+    separator_symbol ""
 
     colors {
         background #30303000
@@ -152,7 +152,7 @@ bar {
 # i3管理键
 # {{{
 # Power Management
-set $mode_system   Lock(L)  Logout(O)  Reboot(R)  Shutdown(S)  Exit(Esc)
+set $mode_system    Lock(l)  Logout(o)  Reboot(r)  Shutdown(s)  Exit(Esc)
 bindsym $mod+Shift+q mode "$mode_system"
 mode "$mode_system" {
     bindsym l exec --no-startup-id i3lock -c '#202020', mode "default"
@@ -333,11 +333,15 @@ bindsym --release $mod+n exec fcitx-remote -t
 bindsym --release $mod+mod1+n exec fcitx-remote -c
 
 # 截图
-# -u : focused windows
-# -s : selected window
-# -e : execute
 set $scrot_dir ~/Picture/scrot
-bindsym Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -e 'mv $f $scrot_dir/'
-bindsym $mod+Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/'
-bindsym $mod+Shift+Print exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/ && ristretto $scrot_dir/$f'
+set $mode_screenshot    ScreenShot Focus(f,F) Select(s,S)
+bindsym Print mode "$mode_screenshot"
+mode "$mode_screenshot" {
+    bindsym f       mode "default"; exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/'
+    bindsym shift+f mode "default"; exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/ && eog $scrot_dir/$f'
+    bindsym s       mode "default"; exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -s -e 'mv $f $scrot_dir/'
+    bindsym shift+s mode "default"; exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -s -e 'mv $f $scrot_dir/ && eog $scrot_dir/$f'
+    bindsym Escape  mode "default"
+}
+
 # }}}
