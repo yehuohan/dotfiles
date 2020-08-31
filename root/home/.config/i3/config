@@ -333,15 +333,5 @@ bindsym --release $mod+n exec fcitx-remote -t
 bindsym --release $mod+mod1+n exec fcitx-remote -c
 
 # 截图
-set $scrot_dir ~/Picture/scrot
-set $mode_screenshot    ScreenShot Focus(f,F) Select(s,S)
-bindsym Print mode "$mode_screenshot"
-mode "$mode_screenshot" {
-    bindsym f       mode "default"; exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/'
-    bindsym shift+f mode "default"; exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -u -e 'mv $f $scrot_dir/ && eog $scrot_dir/$f'
-    bindsym s       mode "default"; exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -s -e 'mv $f $scrot_dir/'
-    bindsym shift+s mode "default"; exec scrot '%Y-%m-%d_%H:%M:%S_$wx$h_scrot.png' -s -e 'mv $f $scrot_dir/ && eog $scrot_dir/$f'
-    bindsym Escape  mode "default"
-}
-
+bindsym Print exec flameshot gui
 # }}}
