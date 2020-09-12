@@ -1,0 +1,16 @@
+
+global !p
+from snips_utils import load_template
+tp = {
+	'doc': 'basedoc.tex',
+	'pic': 'basepic.tex',
+	'sty': 'basesty.sty',
+}
+endglobal
+
+snippet 'ltl(.*)' "doc,pic,sty template for latex" r
+`!p
+k = match.group(1)
+snip.rv = load_template(tp[k]) if k in tp.keys() else 'lt' + k + ' ' * snip.opt('tabstop', 4)
+`
+endsnippet

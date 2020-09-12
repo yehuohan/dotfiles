@@ -1,0 +1,89 @@
+
+extends c
+
+#===============================================================================
+# qt project
+#===============================================================================
+snippet qmain "qt main function fot gui"
+#include "${1:mainwindow}.h"
+#include <QApplication>
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    ${2:MainWindow} w;
+    w.show();
+
+    return a.exec();
+}
+endsnippet
+
+snippet qmainc "qt main function for console"
+#include <QCoreApplication>
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+
+    return a.exec();
+}
+endsnippet
+
+snippet qwin "qt inherit QMainWindow class"
+#include <QMainWindow>
+
+class ${1:MainWindow} : public QMainWindow
+{
+    Q_OBJECT
+public:
+    explicit $1(QWidget *parent = Q_NULLPTR):QMainWindow(parent) {}
+    ~$1() {}
+
+signals:
+
+public slots:
+};
+endsnippet
+
+snippet qwinui "qt gui with ui file"
+#include <QMainWindow>
+#include "ui_${2:mainwindow}.h"
+
+namespace Ui {
+class $1;
+}
+
+class ${1:MainWindow} : public QMainWindow
+{
+    Q_OBJECT
+public:
+    explicit $1(QWidget *parent = Q_NULLPTR);
+    ~$1();
+
+private:
+    Ui::$1* ui;
+};
+
+$1::$1(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::$1)
+{
+    ui->setupUi(this);
+}
+endsnippet
+
+snippet qobj "qt inherit Obeject class"
+#include <QObject>
+
+class ${1:Object} : public QObject
+{
+    Q_OBJECT
+public:
+    explicit $1(QObject *parent = Q_NULLPTR):QObject(parent) {}
+    ~$1() {}
+
+signals:
+
+public slots:
+};
+endsnippet

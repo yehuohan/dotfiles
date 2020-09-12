@@ -12,14 +12,15 @@ if [[ `uname` == "Linux" ]]; then
     fi
 
     # vim
-    cp ../.init.vim                                 ./vim/
-    cp ../.vim/.ycm_extra_conf.py                   ./vim/
-    cp ../.vim/.vimspector.json                     ./vim/
-    cp ../.vim/coc-settings.json                    ./vim/
-    cp -r ../.vim/snips                             ./vim/
-    cp -r ../.vim/autoload                          ./vim/
-    cp -r ../.vim/rplugin                           ./vim/
-    cp -r ../.config/nvim                           ./vim/
+    cp ../.vim/.init.vim                            ./vim/.vim/
+    cp ../.vim/.ycm_extra_conf.py                   ./vim/.vim/
+    cp ../.vim/.vimspector.json                     ./vim/.vim/
+    cp ../.vim/coc-settings.json                    ./vim/.vim/
+    cp -r ../.vim/snips                             ./vim/.vim/
+    cp -r ../.vim/autoload                          ./vim/.vim/
+    cp -r ../.vim/rplugin                           ./vim/.vim/
+    cp -r ../.vim/pythonx                           ./vim/.vim/
+    cp -r ../.config/nvim                           ./vim/.vim/
     # zsh
     cp ../.zshrc                                    ./root/home/
     cp ../.zprofile                                 ./root/home/
@@ -72,17 +73,18 @@ if [[ `uname` == "Linux" ]]; then
 elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
 
     # vim & neovim
-    if [ ! -d "../VConfig" ]; then
-        echo "../VConfig is not existed."
+    if [ ! -d "../dotvim" ]; then
+        echo "../dotvim is not existed."
         exit
     fi
-    cp ../VConfig/.init.vim                         ./vim/
-    cp ../VConfig/.vim/.ycm_extra_conf.py           ./vim/
-    cp ../VConfig/.vim/.vimspector.json             ./vim/
-    cp ../VConfig/.vim/coc-settings.json            ./vim/
-    cp -r ../VConfig/.vim/snips                     ./vim/
-    cp -r ../VConfig/.vim/autoload                  ./vim/
-    cp -r ../VConfig/.vim/rplugin                   ./vim/
+    cp ../dotvim/.init.vim                          ./vim/.vim/
+    cp ../dotvim/.ycm_extra_conf.py                 ./vim/.vim/
+    cp ../dotvim/.vimspector.json                   ./vim/.vim/
+    cp ../dotvim/coc-settings.json                  ./vim/.vim/
+    cp -r ../dotvim/snips                           ./vim/.vim/
+    cp -r ../dotvim/autoload                        ./vim/.vim/
+    cp -r ../dotvim/rplugin                         ./vim/.vim/
+    cp -r ../dotvim/pythonx                         ./vim/.vim/
 
     # cygwin
     cp ~/.minttyrc                                  ./root/home-gw/

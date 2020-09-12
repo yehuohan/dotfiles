@@ -1,0 +1,53 @@
+
+global !p
+from snips_utils import load_template
+tp = {
+	'mkf': 'Makefile',
+	'cmk': 'CMakeLists.txt',
+	'gui': 'qqui.pro',
+	'con': 'qcon.pro',
+	'cpp': 'qcpp.pro',
+	'cuda': 'qcuda.pro',
+}
+endglobal
+
+#===============================================================================
+# build tools
+#===============================================================================
+snippet 'ltb(.*)' "mkf,cmk template for build tools" r
+`!p
+k = match.group(1)
+snip.rv = load_template(tp[k]) if k in tp.keys() else 'lt' + k + ' ' * snip.opt('tabstop', 4)
+`
+endsnippet
+
+snippet 'ltq(.*)' "gui,con,cpp,cuda template for qmake" r
+`!p
+k = match.group(1)
+snip.rv = load_template(tp[k]) if k in tp.keys() else 'lt' + k + ' ' * snip.opt('tabstop', 4)
+`
+endsnippet
+
+
+#===============================================================================
+# comment block 
+#===============================================================================
+snippet 'cb(.*)' "comment block" r
+${1:type}`!p snip.rv = match.group(1) * (80 - len(t[1]))`
+$1 ${0}
+$1`!p snip.rv = match.group(1) * (80 - len(t[1]))`
+endsnippet
+
+
+#===============================================================================
+# chars
+#===============================================================================
+snippet cunicode "some unicode chars"
+⁰ ¹ ² ³ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹ ± · ÷
+► ✘ ❖ ▫ ▪ ★ ☆ • ≡ ፨ ♥ → …
+                   
+┌─┬─┐
+│ │ │
+├─┼─┤
+└─┴─┘
+endsnippet

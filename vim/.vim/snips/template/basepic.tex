@@ -1,35 +1,3 @@
-
-
-snippet ldoc "latex basic document"
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 文档设置
-\documentclass[10pt,a4paper,UTF8]{article}
-\usepackage{basesty}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{${1:Title}}
-\begin{document}
-
-% 首页
-\maketitle
-
-% 目录页
-\tableofcontents
-
-% 正文页
-\newpage
-
-${0}
-
-\end{document}
-endsnippet
-
-snippet lsty "latex basic style"
-`!v join(readfile($DotVimPath . '/snips/tex.basesty.sty'), "\n")`
-endsnippet
-
-snippet lpic "latex draw picture"
 \documentclass[border=5pt]{standalone}
 \usepackage{
     tikz, % 绘图
@@ -60,4 +28,3 @@ snippet lpic "latex draw picture"
 
 \end{tikzpicture}
 \end{document}
-endsnippet

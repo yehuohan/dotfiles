@@ -1,4 +1,12 @@
 
+global !p
+from snips_utils import load_template
+endglobal
+
+snippet 'ltconf' "sphinx conf" r
+`!p snip.rv = load_template('sphinx-conf.py')`
+endsnippet
+
 #===============================================================================
 # python's code snippets of matplotlib
 #===============================================================================
@@ -74,8 +82,4 @@ snippet pfunc "python function"
 :Returns:
 :Raises:
 """
-endsnippet
-
-snippet conf "sphinx conf.py template"
-`!v join(readfile($DotVimPath . '/snips/python.conf.py'), "\n")`
 endsnippet

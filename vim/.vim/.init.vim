@@ -33,7 +33,7 @@ endfunction
 " }}} End
 
 " Globals {{{
-let $DotVimPath=resolve(expand('<sfile>:p:h')) . '/.vim'
+let $DotVimPath=resolve(expand('<sfile>:p:h'))
 let $DotVimCachePath=$DotVimPath . '/.cache'
 set rtp+=$DotVimPath
 
@@ -256,8 +256,8 @@ else
     Plug 'norcalli/nvim-colorizer.lua', {'on': 'ColorizerToggle'}
 endif
     Plug 'Konfekt/FastFold'
-    Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
     Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
+    Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
     Plug 'cespare/vim-toml'
     " utils
 if s:gset.use_utils
@@ -317,14 +317,10 @@ call plug#end()
 " textmanip {{{ 块编辑
     let g:textmanip_enable_mappings = 0
     " 切换Insert/Replace Mode
-    xnoremap <silent> <M-i>
-        \ :<C-U>let g:textmanip_current_mode = 'insert'<Bar>
-        \ :echo 'textmanip mode: ' . g:textmanip_current_mode<CR>gv
     xnoremap <silent> <M-o>
-        \ :<C-U>let g:textmanip_current_mode = 'replace'<Bar>
+        \ :<C-U>let g:textmanip_current_mode =
+        \   (g:textmanip_current_mode == 'replace') ? 'insert' : 'replace'<Bar>
         \ :echo 'textmanip mode: ' . g:textmanip_current_mode<CR>gv
-    " C-i 与 <Tab>等价
-    xmap <silent> <C-i> <M-i>
     xmap <silent> <C-o> <M-o>
     " 更据Mode使用Move-Insert或Move-Replace
     xmap <C-j> <Plug>(textmanip-move-down)
@@ -645,8 +641,8 @@ endif
 
 " nerdtree {{{ 目录树导航
     let g:NERDTreeShowHidden = 1
-    let NERDTreeDirArrowExpandable = '▸'
-    let NERDTreeDirArrowCollapsible = '▾'
+    let g:NERDTreeDirArrowExpandable = '▸'
+    let g:NERDTreeDirArrowCollapsible = '▾'
     let g:NERDTreeMapActivateNode = 'o'
     let g:NERDTreeMapOpenRecursively = 'O'
     let g:NERDTreeMapPreview = 'go'
@@ -681,11 +677,11 @@ endif
 " startify {{{ 启动首页
 if s:gset.use_startify
 if IsWin()
-    let g:startify_bookmarks = [ {'c': '$DotVimPath/../.init.vim'},
+    let g:startify_bookmarks = [ {'c': '$DotVimPath/.init.vim'},
                                 \{'d': '$LOCALAPPDATA/nvim/init.vim'},
                                 \{'o': '$DotVimCachePath/todo.md'} ]
 else
-    let g:startify_bookmarks = [ {'c': '~/.init.vim'},
+    let g:startify_bookmarks = [ {'c': '~/.vim/.init.vim'},
                                 \{'d': '~/.config/nvim/init.vim'},
                                 \{'o': '$DotVimCachePath/todo.md'} ]
 endif
@@ -817,9 +813,8 @@ endif
 
 " ultisnips {{{ 代码片段
 if s:gset.use_snip
-    " 删除UltiSnips#map_keys#MapKeys中的xnoremap <Tab>（和textmanip的<C-i>冲突）
     let g:UltiSnipsEditSplit = "vertical"
-    let g:UltiSnipsSnippetDirectories = [$DotVimPath . '/snips']
+    let g:UltiSnipsSnippetDirectories = [$DotVimPath . '/snips', "UltiSnips"]
     let g:UltiSnipsExpandTrigger = '<Tab>'
     let g:UltiSnipsListSnippets = '<C-o>'
     let g:UltiSnipsJumpForwardTrigger = '<C-j>'
@@ -1194,38 +1189,25 @@ endfunction
 " }}}
 
 " Function: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{ 多文件自动补全
-" 多个文件或目录时，返回的补全字符串使用'|'分隔，使用时需要将'|'转回空格；
-" 不支含空格的文件或目录；
+" 多个文件或目录时，返回的补全字符串使用'|'分隔
 function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
     let l:arglead_true = ''             " 真正用于补全的arglead
     let l:arglead_head = ''             " arglead_true之前的部分
     let l:arglead_list = []             " arglead_true开头的文件和目录补全列表
-    " arglead   : _true : _head
-    " $$        : ''    : ''     -> strridx('|') == -1 -> empty()
-    " $ $       : ''    : ''     -> strridx('|') == -1 -> count() == strchars()
-    " $xx$      : xx    : ''     -> strridx('|') == -1 -> arglead[-1:] != ' '
-    " $xx yy$   : yy    : xx|    -> strridx('|') == -1 -> arglead[-1:] != ' '
-    " $xx $     : ''    : xx|    -> strridx('|') == -1 -> arglead[-1:] == ' '
-    " $xx yy $  : ''    : xx|yy| -> strridx('|') == -1 -> arglead[-1:] == ' '
-    " $xx|**$   : ''    : xx|    -> strridx('|') != -1 -> strcharpart('|') -> no '|' case
-    " 转换成 no '|' case
-    let l:idx = strridx(a:arglead, '|')
-    if l:idx == -1
-        let l:arglead = a:arglead
+    "arglead        : _true : _head
+    "$xx$           : 'xx'  : text before '|'
+    "$xx $ or $xx|$ : ''    : 'xx|'
+    if a:arglead[-1:-1] ==# ' ' || a:arglead[-1:-1] ==# '|'
+        let l:arglead_true = ''
+        let l:arglead_head = a:arglead[0:-2] . '|'
     else
-        let l:arglead = strcharpart(a:arglead, l:idx + 1)
-        let l:arglead_head = strcharpart(a:arglead, 0, l:idx + 1)
-    endif
-    " 获取_true和_head
-    if !empty(l:arglead) && strchars(l:arglead) > count(l:arglead, ' ')
-        if l:arglead[-1:] !=# ' '
-            let l:arglead = split(l:arglead)
-            let l:arglead_true = l:arglead[-1]
-            if len(l:arglead) > 1
-                let l:arglead_head .= join(l:arglead[0:-2], '|') . '|'
-            endif
+        let l:idx = strridx(a:arglead, '|')
+        if l:idx == -1
+            let l:arglead_true = a:arglead
+            let l:arglead_head = ''
         else
-            let l:arglead_head .= join(split(l:arglead), '|') . '|'
+            let l:arglead_true = a:arglead[l:idx+1 : -1]
+            let l:arglead_head = a:arglead[0 : l:idx]
         endif
     endif
     " 获取_list，包括<.*>隐藏文件，忽略大小写
@@ -1356,14 +1338,8 @@ let s:ws = {
     \ 'fw': {'path': '', 'filters': [], 'globlst': []},
     \ }
 let s:dp = {
-    \ 'rp': {
-        \ 'str'   : ['|| [RP]Warning: \.\*\$'],
-        \ 'hl'    : 'WarningMsg',
-        \ 'chars' : ''},
-    \ 'fw': {
-        \ 'str'   : [],
-        \ 'hl'    : 'IncSearch',
-        \ 'chars' : '\/'},
+    \ 'rp': {'hl': 'WarningMsg', 'str': ['/\V\c|| [RP]Warning: \.\*\$/hs=s+3']},
+    \ 'fw': {'hl': 'IncSearch', 'str': []},
     \ }
 augroup UserModulesWorkspace
     autocmd!
@@ -1388,7 +1364,7 @@ function! DisplaySetting()
             silent! normal! zO
         endif
         for str in s:dp[l:mod].str
-            execute printf('syntax match %s /\V\c%s/', s:dp[l:mod].hl, escape(str, s:dp[l:mod].chars))
+            execute printf('syntax match %s %s', s:dp[l:mod].hl, str)
         endfor
     endif
 endfunction
@@ -1606,7 +1582,7 @@ function! RunProject(keys, ...)
                 let s:ws.rp.filetype = getbufvar(fnamemodify(s:ws.rp.file, ':t'), '&filetype', &filetype)
             endif
             if a:keys =~# 'P'
-                let s:ws.rp.args = GetInput('rp.args: ', '', 'customlist,GetMultiFilesCompletion' )
+                let s:ws.rp.args = GetInput('rp.args: ', '', 'file' )
             endif
             if empty(a:args)
                 let l:conf.args = s:ws.rp.args
@@ -1632,7 +1608,7 @@ function! RunProject(keys, ...)
                     \ '-static', '-fPIC -shared',
                     \ 'tags', '--target tags'
                     \ ],
-            \ 'cpl' : 'customlist,GetMultiFilesCompletion',
+            \ 'cpl' : 'file',
             \ 'cmd' : {sopt, arg -> call('RunProject', ['r' . a:keys[1:], arg])}
             \ })
     else
@@ -1912,7 +1888,6 @@ function! s:fw.exec(input, ...) dict
         endif
         " format: printf('cmd %s %s %s',<opt>,<pat>,<loc>)
         let l:exec = printf(self.cmd, self.opt, escape(self.pat, self.engine.chars), self.loc)
-        call add(s:dp.fw.str, self.pat)
         call SetExecLast(l:exec)
         execute l:exec
     endif
@@ -1957,6 +1932,13 @@ function! FindWow(keys, mode)
     "   UpperCase: [IWS] find in case match
     " }}}
     " parse function
+    " Function: s:getLocations() {{{
+    function! s:getLocations()
+        let l:loc = GetInput('Location: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
+        return empty(l:loc) ? [] :
+            \ map(split(l:loc, '|'), {key, val -> (val =~# '[/\\]$') ? val[0:-2] : val})
+    endfunction
+    " }}}
     " Function: s:parsePattern() closure {{{
     function! s:parsePattern() closure
         let l:pat = ''
@@ -1990,12 +1972,7 @@ function! FindWow(keys, mode)
         elseif a:keys =~# 'o'
             let l:loc = join(popc#layer#buf#GetFiles('alltab'), '" "')
         elseif a:keys =~# 'p'
-            let l:loc = GetInput('Location: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
-            if !empty(l:loc)
-                let l:loc = split(l:loc, '|')
-                call map(l:loc, {key, val -> (val =~# '[/\\]$') ? strcharpart(val, 0, strchars(val) - 1) : val})
-                let l:loc = join(l:loc, '" "') " for \"l:loc\"
-            endif
+            let l:loc = join(s:getLocations(), '" "')
         elseif a:keys =~# 'r'
             let l:loc = FindWowSetArgs('pf') ? s:ws.fw.path : ''
         else
@@ -2039,47 +2016,38 @@ function! FindWow(keys, mode)
     " }}}
     " Function: s:parseVimgrep() closure {{{
     function! s:parseVimgrep() closure
-        if a:keys !~# 'v'
-            return 0
-        endif
-
-        " get pattern and set options
-        let s:fw.pat = s:parsePattern()
-        if empty(s:fw.pat) | return 0 | endif
-        let l:pat = (a:keys =~? 's') ? ('\<' . s:fw.pat . '\>') : (s:fw.pat)
+        " get options
+        let l:pat = (a:keys =~? 's') ? '\<%s\>' : '%s'
         let l:pat .= (a:keys =~# '[iws]') ? '\c' : '\C'
+        let s:fw.opt = ''
 
-        " set loaction
+        " get loaction
         let l:loc = '%'
         if a:keys =~# 'p'
-            let l:loc = GetInput('Location: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
-            let l:loc = tr(l:loc, '|', ' ')
-            if empty(l:loc) | return 0 | endif
+            let l:loc = join(s:getLocations())
+            if empty(l:loc) | return v:false | endif
         endif
+        let s:fw.loc = l:loc
 
-        " execute vimgrep
-        execute 'vimgrep /' . l:pat . '/j ' . l:loc
-        echo 'Finding...'
-        if empty(getqflist())
-            echo 'No match: ' . l:pat
-        else
-            botright copen
-            let s:dp.fw.str = [s:fw.pat]
-        endif
-        return 1
+        " get command
+        let s:dp.fw.str = []
+        cgetexpr '[rg]'
+        let s:fw.cmd = printf(':vimgrepadd %%s /%s/j %%s | :botright copen | caddexpr "[Finished]"', l:pat)
+        return v:true
     endfunction
     " }}}
 
-    " try use vimgrep first
-    if s:parseVimgrep() | return | endif
-
     let s:fw.pat = s:parsePattern()
     if empty(s:fw.pat) | return | endif
-    let s:fw.loc = s:parseLocation()
-    if empty(s:fw.loc) | return | endif
-    let s:fw.opt = s:parseOptions()
-    let s:fw.cmd = s:parseCommand()
-
+    if a:keys =~# 'v'
+        if !s:parseVimgrep() | return | endif
+    else
+        let s:fw.loc = s:parseLocation()
+        if empty(s:fw.loc) | return | endif
+        let s:fw.opt = s:parseOptions()
+        let s:fw.cmd = s:parseCommand()
+    endif
+    call add(s:dp.fw.str, printf('/\V\c%s/', escape(s:fw.pat, '\/')))
     call s:fw.exec(a:keys =~# 'F')
 endfunction
 " }}}
@@ -2121,13 +2089,13 @@ endfunction
 " }}}
 
 " Function: FindWowSetArgs(type) {{{ 设置args
-" @param type: p-path, f-filters, g-glob，其中f-filters, g-glob均用空格分隔
-" @return 0表示异常结束函数（path无效），1表示正常结束函数
+" @param type p-path, f-filters, g-glob，其中f-filters, g-glob均用空格分隔
+" @return v:false 表示异常结束函数（path无效），v:true表示正常结束函数
 function! FindWowSetArgs(type)
     if a:type =~# 'p'
         let l:path = GetInput('fw.path: ', '', 'dir', expand('%:p:h'))
         if empty(l:path)
-            return 0
+            return v:false
         endif
         let l:path = fnamemodify(l:path, ':p')
         if l:path =~# '[/\\]$'
@@ -2141,7 +2109,7 @@ function! FindWowSetArgs(type)
     if a:type =~# 'g'
         let s:ws.fw.globlst = split(GetInput('fw.globlst: '))
     endif
-    return 1
+    return v:true
 endfunction
 " }}}
 " }}}

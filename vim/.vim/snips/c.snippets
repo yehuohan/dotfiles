@@ -1,0 +1,147 @@
+
+global !p
+from snips_utils import load_template
+endglobal
+
+#===============================================================================
+# algorithm for c/c++
+#===============================================================================
+snippet dsa-quick-sort "insertion sort in c/c++"
+`!p snip.rv = load_template('dsa-quick-sort.c')`
+endsnippet
+
+snippet dsa-insert-sort "insertion sort in c/c++"
+`!p snip.rv = load_template('dsa-insert-sort.c')`
+endsnippet
+
+snippet dsa-pre-order "binary tree pre-order"
+`!p snip.rv = load_template('dsa-pre-order.c')`
+endsnippet
+
+snippet dsa-in-order "binary tree in-order"
+`!p snip.rv = load_template('dsa-in-order.c')`
+endsnippet
+
+snippet dsa-post-order "binary tree post-order"
+`!p snip.rv = load_template('dsa-post-order.c')`
+endsnippet
+
+snippet dsa-layer-order "binary tree layer-order"
+`!p snip.rv = load_template('dsa-layer-order.c')`
+endsnippet
+
+snippet dsa-dfs "graph dfs"
+`!p snip.rv = load_template('dsa-dfs.c')`
+endsnippet
+
+snippet dsa-bfs "graph bfs"
+`!p snip.rv = load_template('dsa-bfs.c')`
+endsnippet
+
+snippet dsa-dijkstra "graph dijkstra"
+`!p snip.rv = load_template('dsa-dijkstra.c')`
+endsnippet
+
+snippet dsa-parse "parse protocol"
+`!p snip.rv = load_template('dsa-parse.c')`
+endsnippet
+
+#===============================================================================
+# doxygen style for c/c++
+#===============================================================================
+snippet dmpage "doxygen c/c++ mainpage"
+//==============================================================================
+/*!
+ * @mainpage ${1:title}
+#${0:markdown}
+ */
+//==============================================================================
+endsnippet
+
+snippet dpage "doxygen c/c++ page"
+//==============================================================================
+/*!
+ * @page ${1:name} ${2:title}
+${0:markdown}
+ */
+//==============================================================================
+endsnippet
+
+snippet dspage "doxygen c/c++ subpage"
+ * @subpage ${1:name} "${2:text}"
+endsnippet
+
+snippet dfile "doxygen c/c++ file"
+/*!
+ * @file ${0}
+ * @brief
+ *
+ * @date `!v strftime("%Y-%m-%d")`
+ * @version
+ * @author
+ * @copyright
+ */
+endsnippet
+
+snippet dbrief "doxygen c/c++ brief for class etc."
+/*!
+ * @brief ${0}
+ *
+ */
+endsnippet
+
+snippet dfunc "doxygen c/c++ function"
+/*!
+ * @brief ${0}
+ *
+ * @param None
+ * @return
+ * @retval None
+ */
+endsnippet
+
+snippet dmod "doxygen c/c++ module define"
+/*!
+ * @defgroup ${1:label} ${2:name}
+ *${0}
+ * @{
+ * @}
+ */
+endsnippet
+
+snippet dmod1 "doxygen c/c++ module"
+/*!
+ * @defgroup ${1:label} ${2:name}
+ *${0}
+ * @{
+ */
+
+/*! @} */
+endsnippet
+
+snippet damod "doxygen c/c++ addtomodule"
+/*!
+ * @addtogroup ${1:label}
+ *${0}
+ * @{
+ */
+
+/*! @} */
+endsnippet
+
+snippet dblock "doxygen c/c++ block"
+/*!
+ * @name ${0}
+ * @{
+ */
+
+/*! @} */
+endsnippet
+
+snippet dline "doxygen c/c++ line"
+/** ${0} */
+endsnippet
+
+snippet dlline "doxygen c/c++ last-line"
+/**< ${0} */
+endsnippet

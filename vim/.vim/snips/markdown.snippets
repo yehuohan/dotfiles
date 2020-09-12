@@ -1,0 +1,21 @@
+
+#===============================================================================
+# markdown
+#===============================================================================
+snippet 'mh(.*)' "h1~6 of section" r
+- [${1:name}](#${2:id})
+<h`!p snip.rv = match.group(1)` id="$2">$1</h`!p snip.rv = match.group(1)`>
+endsnippet
+
+snippet mspan "span in markdown"
+<span id = "${1:id}"></span>
+[${2:name}](#$1)
+endsnippet
+
+snippet mimg "image in markdown"
+<img alt="${1:name}" src="${2:jpg}" height="70%" width="70%">
+endsnippet
+
+snippet mhref "href in markdown"
+<a href="${1:url}" target="_blank">${2:name}</a>
+endsnippet
