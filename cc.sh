@@ -20,7 +20,7 @@ if [[ `uname` == "Linux" ]]; then
     cp -r ../.vim/autoload                          ./vim/.vim/
     cp -r ../.vim/rplugin                           ./vim/.vim/
     cp -r ../.vim/pythonx                           ./vim/.vim/
-    cp -r ../.config/nvim                           ./vim/.vim/
+    cp ../.config/nvim/init.vim                     ./vim/nvim/
     # zsh
     cp ../.zshrc                                    ./root/home/
     cp ../.zprofile                                 ./root/home/
