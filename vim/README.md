@@ -5,7 +5,7 @@ Some requirements:
 
  - Basic:
     - [vim/vim](https://github.com/vim/vim)
-    - [neovim/neovim](https://github.com/neovim/neovim)
+    - [neovim/neovim](https://github.com/neovim/neovim) `pacman -S xclip or xsel`
     - [Python](https://www.python.org/), `pip install pynvim`
     - [NodeJs](https://nodejs.org), `npm install -g neovim`
     - [LLVM(Clang)](http://llvm.org/)
