@@ -4,7 +4,7 @@
 [i18n]
 	commitEncoding = utf-8
 [core]
-	editor = vim
+	editor = nvim
 [color]
 	ui = auto
 [pull]
