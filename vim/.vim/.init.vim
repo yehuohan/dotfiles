@@ -1678,7 +1678,7 @@ function! FnMake(sopt, sel, conf)
 
     let l:cmd = printf('make %s %s', a:conf.clean ? 'clean' : '', a:conf.args)
     if a:conf.run
-        let l:cmd .= empty(l:outfile) ? ' && echo [RP]Warning: No executable file, try add TARGET' : ' && "./' . l:outfile .'"'
+        let l:cmd .= empty(l:outfile) ? ' && echo "[RP]Warning: No executable file, try add TARGET"' : ' && "./' . l:outfile .'"'
     endif
     call s:rp.run(a:conf.term, l:workdir, l:cmd)
 endfunction
@@ -1707,7 +1707,7 @@ function! FnGMake(sopt, sel, conf)
             endif
         endif
         if a:conf.run
-            let l:cmd .= empty(l:outfile) ? ' && echo [RP]Warning: No executable file, try add "project()" or "TARGET"' : ' && "./' . l:outfile .'"'
+            let l:cmd .= empty(l:outfile) ? ' && echo "[RP]Warning: No executable file, try add project() or TARGET"' : ' && "./' . l:outfile .'"'
         endif
         call s:rp.run(a:conf.term, l:workdir, l:cmd)
     endif
@@ -1760,7 +1760,7 @@ function! FnTasks(sopt, sel, conf)
     call s:rp.run(
                 \ a:conf.term,
                 \ fnamemodify(a:sel, ':h'),
-                \ printf('echo Not implemented(%s)', a:sel . '/tasks.json'))
+                \ printf('echo "[RP]Warning: Not implemented(%s)"', a:sel . '/tasks.json'))
 endfunction
 " }}}
 " }}}
