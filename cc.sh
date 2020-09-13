@@ -28,6 +28,7 @@ if [[ `uname` == "Linux" ]]; then
     cp ../.gitconfig                                ./root/home/
     cp ../.gdbinit                                  ./root/home/
     # .config
+    cp ../.config/user-dirs.dirs                    ./root/home/.config/
     cp -r ../.config/i3                             ./root/home/.config/
     cp -r ../.config/i3status                       ./root/home/.config/
     cp -r ../.config/rofi                           ./root/home/.config/
@@ -53,6 +54,7 @@ if [[ `uname` == "Linux" ]]; then
         cp -r /etc/X11/nvidia-xorg.conf.d           ./root/etc-arch/X11/
         # systemd
         cp /etc/systemd/logind.conf                 ./root/etc-arch/systemd/
+        cp /etc/systemd/system.conf                 ./root/etc-arch/systemd/
         # pacman
         cp /etc/pacman.conf                         ./root/etc-arch/
         # modules
@@ -65,7 +67,6 @@ if [[ `uname` == "Linux" ]]; then
     if [[ `uname -v` =~ "Ubuntu" ]]; then
         # home/.config
         cp ../.config/libinput-gestures.conf        ./root/home/.config/
-        cp ../.config/user-dirs.dirs                ./root/home/.config/
 
         echo "Ubuntu: Copy was completed!"
     fi
