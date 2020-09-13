@@ -14,16 +14,16 @@
 # period    = .
 set $mod Mod4
 
-set $WS1 "1."
-set $WS2 "2."
-set $WS3 "3."
-set $WS4 "4"
-set $WS5 "5"
-set $WS6 "6"
-set $WS7 "7"
-set $WS8 "8"
-set $WS9 "9"
-set $WS0 "10"
+set $WS1 "1:"
+set $WS2 "2:"
+set $WS3 "3:"
+set $WS4 "4:4"
+set $WS5 "5:5"
+set $WS6 "6:6"
+set $WS7 "7:7"
+set $WS8 "8:8"
+set $WS9 "9:9"
+set $WS0 "10:0"
 
 
 #===============================================================================
@@ -87,13 +87,10 @@ gaps inner 2
 gaps outer 2
 smart_gaps on
 
-# color vairable
 # M-main, T-text, D-default
-set $CLR_M 903080
-set $CLR_T 303030
-set $CLR_D 444444
-set $CLR_MB 903080FF
-set $CLR_TB 303030FF
+set $CLR_M FF7000FF
+set $CLR_T 303030FF
+set $CLR_D 444444FF
 
 # window colors
 # class                 border  backgr. text    indicator child_border
@@ -120,24 +117,29 @@ bar {
     # 使用conky
     status_command ~/.config/i3/conky.sh
 
-    # 显示托盘图标的显示器
+    # 显示tray图标的显示器
     tray_output primary
+    # tray图标填充，可以调整图标大小
+    tray_padding 1
     # bar显示隐藏设置
     mode dock
     # 分隔符
-    #separator_symbol ""
     separator_symbol ""
+    # 显示workspace按钮
+    workspace_buttons yes
+    # 只显示"[n][:][NAME]"格式中的NAME
+    strip_workspace_numbers yes
 
     colors {
         background #30303000
-        statusline #FFFFFF
-        separator  #808080
+        statusline #FFFFFFFF
+        separator  #808080AA
         # 工作区颜色       边框      背景      文字
-        focused_workspace  #00000055 #$CLR_MB  #$CLR_TB
-        active_workspace   #00000055 #FFFFFF55 #$CLR_TB
-        inactive_workspace #22222288 #55555555 #$CLR_TB
-        urgent_workspace   #00000055 #A00000AA #$CLR_TB
-        binding_mode       #00000055 #$CLR_MB  #$CLR_TB
+        focused_workspace  #00000050 #FF7000F0 #$CLR_T
+        active_workspace   #00000050 #FF700050 #$CLR_T
+        inactive_workspace #00000050 #A0A0A050 #$CLR_T
+        urgent_workspace   #00000050 #F5001DF0 #$CLR_T
+        binding_mode       #00000050 #00A287F0 #$CLR_T
     }
 }
 # }}}
