@@ -1338,7 +1338,7 @@ let s:ws = {
     \ 'fw': {'path': '', 'filters': [], 'globlst': []},
     \ }
 let s:dp = {
-    \ 'rp': {'hl': 'WarningMsg', 'str': ['/\V\c|| [RP]Warning: \.\*\$/hs=s+3']},
+    \ 'rp': {'hl': 'WarningMsg', 'str': ['/\V\c|| "\=[RP]Warning: \.\*\$/hs=s+3']},
     \ 'fw': {'hl': 'IncSearch', 'str': []},
     \ }
 augroup UserModulesWorkspace
