@@ -66,6 +66,8 @@
     "explorer.keyMappings" : {
         "j": "nodeNext",
         "k": "nodePrev",
+        "J": "indentNext",
+        "K": "indentPrev",
         "gk": "expandablePrev",
         "gj": "expandableNext",
         "h": false,
@@ -86,8 +88,8 @@
         "p": "preview:labeling",
         ".": "toggleHidden",
 
-        "J": ["toggleSelection", "nodeNext"],
-        "K": ["toggleSelection", "nodePrev"],
+        "<C-n>": ["toggleSelection", "nodeNext"],
+        "<C-p>": ["toggleSelection", "nodePrev"],
         "*": "toggleSelection",
         "<Tab>": "actionMenu",
         "a": "addFile",

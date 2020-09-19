@@ -579,6 +579,10 @@ endif
 " rainbow {{{ 彩色括号
     let g:rainbow_active = 1
     nnoremap <leader>tr :RainbowToggle<CR>
+    augroup PluginRainbow
+        autocmd!
+        autocmd Filetype cmake RainbowToggleOff
+    augroup END
 " }}}
 
 " indentLine {{{ 显示缩进标识
@@ -630,7 +634,7 @@ endif
     nnoremap <leader><leader>h :PopcBuffer<CR>
     nnoremap <M-i> :PopcBufferSwitchLeft<CR>
     nnoremap <M-o> :PopcBufferSwitchRight<CR>
-    cnoremap q<CR> :PopcBufferClose<CR>
+    nnoremap <leader>wq :PopcBufferClose<CR>
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
     nnoremap <silent> <leader>ty
@@ -1397,27 +1401,27 @@ let s:rp = {
         \ },
     \ 'filetype' : {
         \ 'c'          : [IsWin() ? 'gcc -g %s %s -o %s.exe && %s' : 'gcc -g %s %s -o %s && ./%s',
-                                                               \ 'args' , 'srcf' , 'outf' , 'outf' ],
+                                                    \ 'args', 'srcf', 'outf', 'outf'],
         \ 'cpp'        : [IsWin() ? 'g++ -g -std=c++11 %s %s -o %s.exe && %s' : 'g++ -g -std=c++11 %s %s -o %s && ./%s',
-                                                               \ 'args' , 'srcf' , 'outf' , 'outf' ],
+                                                    \ 'args', 'srcf', 'outf', 'outf'],
         \ 'rust'       : [IsWin() ? 'rustc %s %s -o %s.exe && %s' : 'rustc %s %s -o %s && ./%s',
-                                                               \ 'args' , 'srcf' , 'outf' , 'outf' ],
-        \ 'java'       : ['javac %s && java %s %s'             , 'srcf' , 'outf' , 'args'          ],
-        \ 'python'     : ['python %s %s'                       , 'srcf' , 'args'                   ],
-        \ 'julia'      : ['julia %s %s'                        , 'srcf' , 'args'                   ],
-        \ 'lua'        : ['lua %s %s'                          , 'srcf' , 'args'                   ],
-        \ 'go'         : ['go run %s %s'                       , 'srcf' , 'args'                   ],
-        \ 'javascript' : ['node %s %s'                         , 'srcf' , 'args'                   ],
-        \ 'typescript' : ['node %s %s'                         , 'srcf' , 'args'                   ],
-        \ 'dart'       : ['dart %s %s'                         , 'srcf' , 'args'                   ],
-        \ 'make'       : ['make -f %s %s'                      , 'srcf' , 'args'                   ],
-        \ 'sh'         : ['bash ./%s %s'                       , 'srcf' , 'args'                   ],
-        \ 'dosbatch'   : ['%s %s'                              , 'srcf' , 'args'                   ],
-        \ 'tex'        : ['xelatex %s && SumatraPDF %s.pdf'    , 'srcf' , 'outf'                   ],
-        \ 'markdown'   : ['typora %s'                          , 'srcf'                            ],
-        \ 'json'       : ['python -m json.tool %s'             , 'srcf'                            ],
-        \ 'matlab'     : ['matlab -nosplash -nodesktop -r %s'  , 'outf'                            ],
-        \ 'html'       : ['firefox %s'                         , 'srcf'                            ],
+                                                    \ 'args', 'srcf', 'outf', 'outf' ],
+        \ 'java'       : ['javac %s && java %s %s'  , 'srcf', 'outf', 'args'],
+        \ 'python'     : ['python %s %s'            , 'srcf', 'args'        ],
+        \ 'julia'      : ['julia %s %s'             , 'srcf', 'args'        ],
+        \ 'lua'        : ['lua %s %s'               , 'srcf', 'args'        ],
+        \ 'go'         : ['go run %s %s'            , 'srcf', 'args'        ],
+        \ 'javascript' : ['node %s %s'              , 'srcf', 'args'        ],
+        \ 'typescript' : ['node %s %s'              , 'srcf', 'args'        ],
+        \ 'dart'       : ['dart %s %s'              , 'srcf', 'args'        ],
+        \ 'make'       : ['make -f %s %s'           , 'srcf', 'args'        ],
+        \ 'sh'         : ['bash ./%s %s'            , 'srcf', 'args'        ],
+        \ 'dosbatch'   : ['%s %s'                   , 'srcf', 'args'        ],
+        \ 'tex'        : ['xelatex -file-line-error %s && SumatraPDF %s.pdf', 'srcf', 'outf'],
+        \ 'markdown'   : ['typora %s'               , 'srcf'],
+        \ 'json'       : ['python -m json.tool %s'  , 'srcf'],
+        \ 'matlab'     : ['matlab -nosplash -nodesktop -r %s', 'outf'],
+        \ 'html'       : ['firefox %s'              , 'srcf'],
         \ },
     \ 'cell' : {
         \ 'python' : ['python', '^#%%' , '^#%%' ],
@@ -1432,16 +1436,10 @@ let s:rp = {
         \ },
     \ 'efm' : {
         \ 'python' : '%*\\sFile\ \"%f\"\\,\ line\ %l\\,\ %m',
-        \ 'rust'   : '%-G,
-                     \%-Gerror:\ aborting\ %.%#,
-                     \%-Gerror:\ Could\ not\ compile\ %.%#,
-                     \%Eerror:\ %m,
-                     \%Eerror[E%n]:\ %m,
-                     \%Wwarning:\ %m,
-                     \%Inote:\ %m,
-                     \%C\ %#-->\ %f:%l:%c,
-                     \%E\ \ left:%m,%C\ right:%m\ %f:%l:%c,%Z',
+        \ 'rust'   : '\ %#-->\ %f:%l:%c,\%m\ %f:%l:%c',
         \ 'lua'    : 'lua:\ %f:%l:\ %m',
+        \ 'tex'    : '%f:%l:\ %m',
+        \ 'cmake'  : '%ECMake\ Error\ at\ %f:%l\ %#%m:',
         \ },
     \ 'pat' : {
         \ 'target'  : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
@@ -2535,7 +2533,7 @@ augroup UserSettingsCmd
     autocmd BufNewFile *                set fileformat=unix
     autocmd BufRead,BufNewFile *.tex    set filetype=tex
     autocmd BufRead,BufNewFile *.log    set filetype=log
-    autocmd Filetype vim                setlocal foldmethod=marker
+    autocmd Filetype vim,tex            setlocal foldmethod=marker
     autocmd Filetype c,cpp,javascript   setlocal foldmethod=syntax
     autocmd Filetype python             setlocal foldmethod=indent
     autocmd FileType txt,log            setlocal foldmethod=manual
