@@ -258,7 +258,7 @@ endif
     Plug 'Konfekt/FastFold'
     Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
     Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
-    Plug 'cespare/vim-toml'
+    Plug 'rust-lang/rust.vim'
     " utils
 if s:gset.use_utils
     Plug 'yianwillis/vimcdoc', {'for': 'help'}
@@ -1431,6 +1431,7 @@ let s:rp = {
     \ 'enc' : {
         \ 'c'    : 'utf-8',
         \ 'cpp'  : 'utf-8',
+        \ 'rust' : 'utf-8',
         \ 'make' : 'utf-8',
         \ 'sh'   : 'utf-8',
         \ },
@@ -1885,7 +1886,7 @@ function! s:fw.exec(input, ...) dict
             let l:self.opt .= a:1
         endif
         " format: printf('cmd %s %s %s',<opt>,<pat>,<loc>)
-        let l:exec = printf(self.cmd, self.opt, escape(self.pat, self.engine.chars), self.loc)
+        let l:exec = printf(self.cmd, self.opt, self.pat, self.loc)
         call SetExecLast(l:exec)
         execute l:exec
     endif
@@ -2014,9 +2015,9 @@ function! FindWow(keys, mode)
     " }}}
     " Function: s:parseVimgrep() closure {{{
     function! s:parseVimgrep() closure
-        " get options
-        let l:pat = (a:keys =~? 's') ? '\<%s\>' : '%s'
-        let l:pat .= (a:keys =~# '[iws]') ? '\c' : '\C'
+        " get options in which %s is the pattern
+        let l:opt = (a:keys =~? 's') ? '\<%s\>' : '%s'
+        let l:opt .= (a:keys =~# '[iws]') ? '\c' : '\C'
         let s:fw.opt = ''
 
         " get loaction
@@ -2029,23 +2030,25 @@ function! FindWow(keys, mode)
 
         " get command
         let s:dp.fw.str = []
-        cgetexpr '[rg]'
-        let s:fw.cmd = printf(':vimgrepadd %%s /%s/j %%s | :botright copen | caddexpr "[Finished]"', l:pat)
+        cgetexpr '[rg by vimgrep]'
+        let s:fw.cmd = printf(':vimgrepadd %%s /%s/j %%s | :botright copen | caddexpr "[Finished]"', l:opt)
         return v:true
     endfunction
     " }}}
 
-    let s:fw.pat = s:parsePattern()
-    if empty(s:fw.pat) | return | endif
+    let l:pat = s:parsePattern()
+    if empty(l:pat) | return | endif
     if a:keys =~# 'v'
         if !s:parseVimgrep() | return | endif
+        let s:fw.pat = l:pat
     else
         let s:fw.loc = s:parseLocation()
         if empty(s:fw.loc) | return | endif
         let s:fw.opt = s:parseOptions()
         let s:fw.cmd = s:parseCommand()
+        let s:fw.pat = escape(l:pat, s:fw.engine.chars)
     endif
-    call add(s:dp.fw.str, printf('/\V\c%s/', escape(s:fw.pat, '\/')))
+    call add(s:dp.fw.str, printf('/\V\c%s/', escape(l:pat, '\/')))
     call s:fw.exec(a:keys =~# 'F')
 endfunction
 " }}}
@@ -2151,7 +2154,6 @@ let s:rs = {
                     \ 'python -m json.tool %',
                     \ 'python setup.py build',
                     \ 'objdump -D -S -C %:r > %.asm',
-                    \ 'go mod init %:r',
                     \ 'ctags -R',
                     \ 'cflow -T %',
                     \ ],
