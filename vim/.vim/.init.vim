@@ -240,6 +240,7 @@ endif
     Plug 'majutsushi/tagbar', {'on': 'TagbarToggle'}
     Plug 'scrooloose/nerdcommenter'
     Plug 'skywind3000/asyncrun.vim'
+    Plug 'voldikss/vim-floaterm'
 if s:gset.use_spector
     function! Plug_spector_build(info)
         if a:info.status == 'installed' || a:info.force
@@ -634,7 +635,7 @@ endif
     nnoremap <leader><leader>h :PopcBuffer<CR>
     nnoremap <M-i> :PopcBufferSwitchLeft<CR>
     nnoremap <M-o> :PopcBufferSwitchRight<CR>
-    nnoremap <leader>wq :PopcBufferClose<CR>
+    nnoremap <leader>wq :PopcBufferClose!<CR>
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
     nnoremap <silent> <leader>ty
@@ -850,7 +851,7 @@ if s:gset.use_coc
     let g:coc_data_home = $DotVimCachePath . '/.coc'
     let g:coc_global_extensions = [
         \ 'coc-snippets', 'coc-yank', 'coc-explorer',
-        \ 'coc-clangd', 'coc-python', 'coc-java', 'coc-tsserver', 'coc-rls',
+        \ 'coc-clangd', 'coc-python', 'coc-java', 'coc-tsserver', 'coc-rust-analyzer',
         \ 'coc-vimlsp', 'coc-vimtex', 'coc-cmake', 'coc-json', 'coc-calc',
         \ ]
     let g:coc_status_error_sign = '✘'
@@ -993,6 +994,10 @@ endif
     vnoremap <silent> <leader><leader>r
         \ :call feedkeys(':AsyncRun ' . GetSelected(), 'n')<CR>
     nnoremap <leader>rk :AsyncStop<CR>
+" }}}
+
+" floaterm {{{ 终端浮窗
+    nnoremap <leader>tz :FloatermToggle<CR>
 " }}}
 
 " vimspector {{{ C, C++, Python, Go调试
@@ -1156,17 +1161,6 @@ endif
         \ :call feedkeys(':TranslateW ' . GetSelected(), 'n')<CR>
     nnoremap <leader>tj :call translator#ui#try_jump_into()<CR>
 " }}}
-endif
-" }}}
-
-" Remote {{{
-if IsNVim()
-    " 中文Motion
-    call s:plug.reg('onDelay', 'exec', 'ZhmInit')
-    nnoremap <silent> w :ZhmCmd w<CR>
-    nnoremap <silent> b :ZhmCmd b<CR>
-    nnoremap <silent> e :ZhmCmd e<CR>
-    nnoremap <silent> ge :ZhmCmd ge<CR>
 endif
 " }}}
 
@@ -1512,17 +1506,20 @@ function! s:rp.run(term, wdir, cmd, ...) dict
     let g:asyncrun_encs = has_key(self.enc, l:type) ? self.enc[l:type] :
                         \ ((IsWin() || IsGw()) ? 'gbk' : 'utf-8')
 
-    let l:exec = ':AsyncRun '
+    let l:wdir = fnameescape(a:wdir)
+    let l:cmd = a:cmd
+    let l:arg = ''
     if a:term
-        let l:exec .= '-mode=term -pos=right '
+        let l:arg .= '-mode=term -pos=right '
     endif
-    if !empty(a:wdir)
-        let l:wdir = fnameescape(a:wdir)
-        let l:exec .= '-cwd=' . l:wdir
+    if !empty(l:wdir)
+        if a:term
+            let l:cmd = printf('cd %s && %s', l:wdir, l:cmd)
+        endif
+        let l:arg .= '-cwd=' . l:wdir
         execute 'lcd ' . l:wdir
     endif
-
-    let l:exec = join([l:exec, a:cmd])
+    let l:exec = printf(':AsyncRun %s %s', l:arg, l:cmd)
     call SetExecLast(l:exec)
     execute l:exec
 endfunction
@@ -2502,7 +2499,7 @@ endfunction
     set notildeop                       " 使切换大小写的~，类似于c,y,d等操作符
     set nrformats=bin,octal,hex,alpha   " CTRL-A-X支持数字和字母
     set mouse=a                         " 使能鼠标
-    set noimdisable                     " 切换Normal模式时，自动换成英文输入法
+    set noimdisable                     " 不禁用输入法
     set visualbell                      " 使用可视响铃代替鸣声
     set noerrorbells                    " 关闭错误信息响铃
     set belloff=all                     " 关闭所有事件的响铃
@@ -2808,9 +2805,9 @@ endif
 
 " Terminal {{{
 if IsWin()
-    nnoremap <leader>tz :terminal<CR>
+    nnoremap <leader>tZ :terminal<CR>
 else
-    nnoremap <leader>tz :terminal zsh<CR>
+    nnoremap <leader>tZ :terminal zsh<CR>
 endif
     nnoremap <leader><leader>z :terminal<Space>
 if IsVim()
@@ -2855,10 +2852,8 @@ endif
 " }}}
 
 " Find {{{
-    " /?
     nnoremap <leader><Esc> :nohlsearch<CR>
     nnoremap i :nohlsearch<CR>i
-    " *,#使用\< \>，而g*,g# 不使用\< \>
     nnoremap <leader>8  *
     nnoremap <leader>3  #
     nnoremap <leader>g8 g*

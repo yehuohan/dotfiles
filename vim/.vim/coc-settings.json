@@ -115,9 +115,13 @@
     "python.autoComplete.extraPaths": [],
 
     /* coc-rls */
-    "rust-client.channel": "nightly",
-    "rust.unstable_features": true,
-    "rust.all_features": true,
+    //"rust-client.channel": "nightly",
+    //"rust.unstable_features": true,
+    //"rust.all_features": true,
+
+    /* coc-rust-analyzer */
+    "rust-analyzer.updates.channel": "nightly",
+    "rust-analyzer.cargo.allFeatures": true,
 
     /* lsp */
     "languageserver": {
