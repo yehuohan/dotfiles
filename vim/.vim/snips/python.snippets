@@ -3,12 +3,12 @@ global !p
 from snips_utils import load_template
 endglobal
 
-snippet 'ltconf' "sphinx conf" r
+snippet 'ltconf' "sphinx conf"
 `!p snip.rv = load_template('sphinx-conf.py')`
 endsnippet
 
 #===============================================================================
-# python's code snippets of matplotlib
+# python's code snippets of python modules
 #===============================================================================
 snippet mpl "matplotlib for python"
 import matplotlib as ${1:mpl}
@@ -61,7 +61,7 @@ import mpl_toolkits.mplot3d as plt3d
 #ax.plot_surface(x, y, z, shade=True, cmap='jet')
 endsnippet
 
-snippet mpy "pymovie make gif"
+snippet mgif "pymovie make gif"
 import moviepy.editor as mpy
 from moviepy.video.io.bindings import mplfig_to_npimage
 
@@ -71,6 +71,17 @@ def make_frame(t):
 anim = mpy.VideoClip(make_frame, duration=1)
 anim.write_videofile("m.mp4", fps=24)
 anim.write_gif("m.gif", fps=24)
+endsnippet
+
+snippet mplay "pyaudio play pcm"
+import pyaudio
+pa = pyaudio.PyAudio()
+stream=pa.open(format=pa.get_format_from_width(2), # 2bytes => 16bits
+		channels=1, rate=16000, output=True)
+chunk = 1024
+while (len(data) > 0):
+	stream.write(data[:chunk])
+	data = data[chunk:]
 endsnippet
 
 #===============================================================================

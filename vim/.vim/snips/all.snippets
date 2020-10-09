@@ -32,7 +32,7 @@ endsnippet
 #===============================================================================
 # comment block 
 #===============================================================================
-snippet 'cb(.*)' "comment block" r
+snippet 'cb([~#*-_=])' "comment block" r
 ${1:type}`!p snip.rv = match.group(1) * (80 - len(t[1]))`
 $1 ${0}
 $1`!p snip.rv = match.group(1) * (80 - len(t[1]))`

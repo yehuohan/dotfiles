@@ -14,3 +14,36 @@ k = match.group(1)
 snip.rv = load_template(tp[k]) if k in tp.keys() else 'lt' + k + ' ' * snip.opt('tabstop', 4)
 `
 endsnippet
+
+
+snippet 'tikz-calc0' "coordinate with factor: sin(30)*(2,2)+(1,1)"
+(\$${1:factor}*(${2:coordinate})+(${3:coordinate})\$)
+endsnippet
+
+snippet 'tikz-calc1' "coordinate with partway: (1,0)!0.5!30:(2,0)"
+(\$(${1:coordinate})!${2:number}!${3:angle}:(${4:coordinate})\$)
+endsnippet
+
+snippet 'tikz-calc2' "coordinate with distance: (1,0)!1cm!30:(2,0)"
+(\$(${1:coordinate})!${2:distance}!${3:angle}:(${4:coordinate})\$)
+endsnippet
+
+snippet 'tikz-calc3' "coordinate with projection: (1,0)!(1,1)!30:(2,0)"
+(\$(${1:coordinate})!(${2:projection})!${3:angle}:(${4:coordinate})\$)
+endsnippet
+
+snippet 'tikz-controls'
+\draw (${1:coordinate}) .. controls (${2:coordinate}) .. (${3:coordinate});
+endsnippet
+
+snippet 'tikz-rectangle'
+\draw (${1:coordinate}) rectangle (${2:coordinate});
+endsnippet
+
+snippet 'tikz-circle'
+\draw (${1:coordinate}) circle [x radius=${2:1}, y radius=${3:1}, rotate=${4:0}];
+endsnippet
+
+snippet 'tikz-node'
+\path node[${1:options}] (${2:name}) at (${3:coordinate}) {${4:contents}};
+endsnippet

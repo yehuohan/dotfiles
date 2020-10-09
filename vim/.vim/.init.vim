@@ -1875,7 +1875,7 @@ function! s:fw.exec(input, ...) dict
     if a:input
         call PopSelection({
             \ 'opt' : 'select options',
-            \ 'lst' : ['--no-fixed-strings', '--hidden', '--no-ignore', '--encoding gbk'],
+            \ 'lst' : ['--no-fixed-strings', '--word-regexp', '--hidden', '--no-ignore', '--encoding gbk'],
             \ 'cmd' : {sopt, arg -> s:fw.exec(0, arg)}
             \ })
     else
