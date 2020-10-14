@@ -1,0 +1,5 @@
+
+map <c-j> page-down
+map <c-k> page-up
+map <a-j> half-down
+map <a-k> half-up

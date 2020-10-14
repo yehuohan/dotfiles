@@ -25,19 +25,19 @@ if [[ `uname` == "Linux" ]]; then
     cp ../.zshrc                                    ./root/home/
     cp ../.zprofile                                 ./root/home/
     cp ../.Xmodmap                                  ./root/home/
+    cp ../.tmux.conf                                ./root/home/
+    cp ../.tmux-status.conf                         ./root/home/
     cp ../.gitconfig                                ./root/home/
     cp ../.gdbinit                                  ./root/home/
-    # .config
+    # config
     cp ../.config/user-dirs.dirs                    ./root/home/.config/
     cp -r ../.config/i3                             ./root/home/.config/
     cp -r ../.config/i3status                       ./root/home/.config/
     cp -r ../.config/rofi                           ./root/home/.config/
     cp -r ../.config/fontconfig                     ./root/home/.config/
-    # tmux
-    cp ../.tmux.conf                                ./root/home/
-    cp ../.tmux-status.conf                         ./root/home/
-    # misc
-    cp ../uapps/ToggleTouchPad.py                   ./misc/
+    cp -r ../.config/lf                             ./root/home/.config/
+    cp -r ../.cargo                                 ./root/home/
+    cp -r ../.pip                                   ./root/home/
 
     ## Arch
     if [[ `uname -r` =~ "arch" ]]; then
@@ -86,13 +86,20 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp -r ../dotvim/autoload                        ./vim/.vim/
     cp -r ../dotvim/rplugin                         ./vim/.vim/
     cp -r ../dotvim/pythonx                         ./vim/.vim/
+    cp $LOCALAPPDATA/nvim/init.vim                  ./vim/nvim/
 
-    # cygwin
+    # gw
     cp ~/.minttyrc                                  ./root/home-gw/
     cp ~/.gitconfig                                 ./root/home-gw/
     cp ~/.zshrc                                     ./root/home-gw/
     cp ~/.tmux.conf                                 ./root/home-gw/
     cp ~/.tmux-status.conf                          ./root/home-gw/
+
+    # win
+    cp $USERPROFILE/clink_inputrc                   ./root/home-win/
+    cp -r $USERPROFILE/pip                          ./root/home-win/
+    cp -r $USERPROFILE/.cargo                       ./root/home-win/
+    cp -r $LOCALAPPDATA/lf                          ./root/home-win/AppData/Local/
 
     echo "Gw: Copy was completed!"
 fi
