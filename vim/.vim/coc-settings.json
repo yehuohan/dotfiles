@@ -20,7 +20,7 @@
     "coc.source.file.ignoreHidden": false,
     "coc.preferences.extensionUpdateCheck": "weekly",
     "coc.preferences.enableFloatHighlight": true,
-    "coc.preferences.rootPatterns": [".popc", ".git", ".svn", ".hg", "tags"],
+    "coc.preferences.rootPatterns": [".popc", ".git", ".svn", ".hg"],
     "coc.preferences.jumpCommand": "edit",
     "coc.preferences.snippets.enable": true,
     "list.nextKeymap": "<C-j>",
@@ -125,6 +125,12 @@
 
     /* lsp */
     "languageserver": {
+        "clangd": {
+            // download llvm from https://releases.llvm.org
+            "command": "clangd",
+            "rootPatterns": ["compile_flags.txt", "compile_commands.json", "tags"],
+            "filetypes": ["c", "cc", "cpp", "c++", "objc", "objcpp"]
+        },
         "julia": {
             "command": "julia",
             "args": [

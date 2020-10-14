@@ -844,14 +844,13 @@ if s:gset.use_coc
                 \ }
             \ })
     endfunction
-    " coc-clangd: download llvm from https://releases.llvm.org
     " coc-python: pip install jedi
     " coc-java: download jdt.ls from https://download.eclipse.org/jdtls/snapshots
     let g:coc_config_home = $DotVimPath
     let g:coc_data_home = $DotVimCachePath . '/.coc'
     let g:coc_global_extensions = [
         \ 'coc-snippets', 'coc-yank', 'coc-explorer',
-        \ 'coc-clangd', 'coc-python', 'coc-java', 'coc-tsserver', 'coc-rust-analyzer',
+        \ 'coc-python', 'coc-java', 'coc-tsserver', 'coc-rust-analyzer',
         \ 'coc-vimlsp', 'coc-vimtex', 'coc-cmake', 'coc-json', 'coc-calc',
         \ ]
     let g:coc_status_error_sign = '✘'
@@ -881,8 +880,6 @@ if s:gset.use_coc
     nmap <leader>gr <Plug>(coc-references)
     nmap <leader>gy <Plug>(coc-type-definition)
     nmap <leader>gf <Plug>(coc-fix-current)
-    nnoremap <silent> <leader>gs :CocCommand clangd.switchSourceHeader<CR>
-    nnoremap <silent> <leader>gb :CocCommand clangd.symbolInfo<CR>
     nmap <leader>oi <Plug>(coc-diagnostic-info)
     nmap <leader>oj <Plug>(coc-diagnostic-next-error)
     nmap <leader>ok <Plug>(coc-diagnostic-prev-error)
@@ -998,6 +995,7 @@ endif
 
 " floaterm {{{ 终端浮窗
     nnoremap <leader>tz :FloatermToggle<CR>
+    nnoremap <leader>mf :FloatermNew lf<CR>
 " }}}
 
 " vimspector {{{ C, C++, Python, Go调试
@@ -2855,9 +2853,11 @@ endif
     nnoremap <leader><Esc> :nohlsearch<CR>
     nnoremap i :nohlsearch<CR>i
     nnoremap <leader>8  *
+    vnoremap <silent> <leader>8
+        \ "9y<Bar>:execute '/\V\c\<' . escape(@9, '\/') . '\>'<CR>
     nnoremap <leader>3  #
-    nnoremap <leader>g8 g*
-    nnoremap <leader>g3 g#
+    vnoremap <silent> <leader>3
+        \ "9y<Bar>:execute '?\V\c\<' . escape(@9, '\/') . '\>'<CR>
     nnoremap <silent> <leader>/
         \ :execute '/\V\c' . escape(expand('<cword>'), '\/')<CR>
     vnoremap <silent> <leader>/
