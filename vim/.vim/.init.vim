@@ -241,6 +241,7 @@ endif
     Plug 'scrooloose/nerdcommenter'
     Plug 'skywind3000/asyncrun.vim'
     Plug 'voldikss/vim-floaterm'
+    Plug 'yehuohan/popc-floaterm'
 if s:gset.use_spector
     function! Plug_spector_build(info)
         if a:info.status == 'installed' || a:info.force
@@ -994,7 +995,15 @@ endif
 " }}}
 
 " floaterm {{{ 终端浮窗
+    nnoremap <leader><leader>m :Popc Floaterm<CR>
+    nnoremap <leader><leader>z :FloatermNew<Space>
     nnoremap <leader>tz :FloatermToggle<CR>
+    tnoremap <A-u> <C-\><C-n>:FloatermFirst<CR>
+    tnoremap <A-i> <C-\><C-n>:FloatermPrev<CR>
+    tnoremap <A-o> <C-\><C-n>:FloatermNext<CR>
+    tnoremap <A-p> <C-\><C-n>:FloatermLast<CR>
+    tnoremap <A-q> <C-\><C-n>:FloatermKill<CR>
+    tnoremap <A-h> <C-\><C-n>:FloatermHide<CR>
     nnoremap <leader>mf :FloatermNew lf<CR>
 " }}}
 
@@ -2807,7 +2816,6 @@ if IsWin()
 else
     nnoremap <leader>tZ :terminal zsh<CR>
 endif
-    nnoremap <leader><leader>z :terminal<Space>
 if IsVim()
     set termwinkey=<C-l>
     tnoremap <Esc> <C-l>N
