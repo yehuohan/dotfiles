@@ -1,5 +1,5 @@
 
-map <c-j> page-down
-map <c-k> page-up
-map <a-j> half-down
-map <a-k> half-up
+map <a-j> page-down
+map <a-k> page-up
+map <a-n> half-down
+map <a-m> half-up
