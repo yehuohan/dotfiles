@@ -35,9 +35,9 @@ if [[ `uname` == "Linux" ]]; then
     cp -r ../.config/i3status                       ./root/home/.config/
     cp -r ../.config/rofi                           ./root/home/.config/
     cp -r ../.config/fontconfig                     ./root/home/.config/
-    cp -r ../.config/lf                             ./root/home/.config/
-    cp -r ../.cargo                                 ./root/home/
-    cp -r ../.pip                                   ./root/home/
+    cp ../.config/lf/lfrc                           ./root/home/.config/lf/
+    cp ../.cargo/config                             ./root/home/.cargo/
+    cp ../.pip/pip.conf                             ./root/home/.pip/
 
     ## Arch
     if [[ `uname -r` =~ "arch" ]]; then
@@ -97,9 +97,9 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
 
     # win
     cp $USERPROFILE/clink_inputrc                   ./root/home-win/
-    cp -r $USERPROFILE/pip                          ./root/home-win/
-    cp -r $USERPROFILE/.cargo                       ./root/home-win/
-    cp -r $LOCALAPPDATA/lf                          ./root/home-win/AppData/Local/
+    cp $USERPROFILE/pip/pip.ini                     ./root/home-win/pip/
+    cp $USERPROFILE/.cargo/config                   ./root/home-win/.cargo/
+    cp $LOCALAPPDATA/lf/lfrc                        ./root/home-win/AppData/Local/lf/
 
     echo "Gw: Copy was completed!"
 fi
