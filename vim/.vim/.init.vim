@@ -179,7 +179,7 @@ call plug#begin($DotVimPath.'/bundle')  " 设置插件位置
     Plug 'markonm/traces.vim'
     Plug 'godlygeek/tabular', {'on': 'Tabularize'}
     Plug 'junegunn/vim-easy-align'
-    Plug 'terryma/vim-smooth-scroll'
+    Plug 'psliwka/vim-smoothie'
     Plug 'terryma/vim-expand-region'
     Plug 'kana/vim-textobj-user'
     Plug 'kana/vim-textobj-indent'
@@ -362,11 +362,14 @@ call plug#end()
     vnoremap <leader><leader>g :EasyAlign
 " }}}
 
-" smooth-scroll {{{ 平滑滚动
-    nnoremap <silent> <M-n> :call smooth_scroll#down(&scroll, 0, 2)<CR>
-    nnoremap <silent> <M-m> :call smooth_scroll#up(&scroll, 0, 2)<CR>
-    nnoremap <silent> <M-j> :call smooth_scroll#down(&scroll*2, 0, 4)<CR>
-    nnoremap <silent> <M-k> :call smooth_scroll#up(&scroll*2, 0, 4)<CR>
+" smoothie {{{ 平滑滚动
+    let g:smoothie_no_default_mappings = v:true
+    let g:smoothie_update_interval = 30
+    let g:smoothie_base_speed = 20
+    nmap <silent> <M-n> <Plug>(SmoothieDownwards)
+    nmap <silent> <M-m> <Plug>(SmoothieUpwards)
+    nmap <silent> <M-j> <Plug>(SmoothieForwards)
+    nmap <silent> <M-k> <Plug>(SmoothieBackwards)
 " }}}
 
 " expand-region {{{ 快速块选择
@@ -995,9 +998,17 @@ endif
 " }}}
 
 " floaterm {{{ 终端浮窗
+if IsVim()
+    set termwinkey=<C-l>
+    tnoremap <Esc> <C-l>N
+else
+    tnoremap <C-l> <C-\><C-n><C-w>
+    tnoremap <Esc> <C-\><C-n>
+endif
+    nnoremap <leader>tZ :terminal<CR>
+    nnoremap <leader>tz :FloatermToggle<CR>
     nnoremap <leader><leader>m :Popc Floaterm<CR>
     nnoremap <leader><leader>z :FloatermNew<Space>
-    nnoremap <leader>tz :FloatermToggle<CR>
     tnoremap <A-u> <C-\><C-n>:FloatermFirst<CR>
     tnoremap <A-i> <C-\><C-n>:FloatermPrev<CR>
     tnoremap <A-o> <C-\><C-n>:FloatermNext<CR>
@@ -1403,7 +1414,7 @@ let s:rp = {
     \ 'filetype' : {
         \ 'c'          : [IsWin() ? 'gcc -g %s %s -o %s.exe && %s' : 'gcc -g %s %s -o %s && ./%s',
                                                     \ 'args', 'srcf', 'outf', 'outf'],
-        \ 'cpp'        : [IsWin() ? 'g++ -g -std=c++11 %s %s -o %s.exe && %s' : 'g++ -g -std=c++11 %s %s -o %s && ./%s',
+        \ 'cpp'        : [IsWin() ? 'g++ -g -std=c++17 %s %s -o %s.exe && %s' : 'g++ -g -std=c++17 %s %s -o %s && ./%s',
                                                     \ 'args', 'srcf', 'outf', 'outf'],
         \ 'rust'       : [IsWin() ? 'rustc %s %s -o %s.exe && %s' : 'rustc %s %s -o %s && ./%s',
                                                     \ 'args', 'srcf', 'outf', 'outf' ],
@@ -2808,21 +2819,6 @@ endif
         \ :<C-U>execute '.,+' . string(v:count1-1) . 'diffget'<CR>
     nnoremap <leader>dj ]c
     nnoremap <leader>dk [c
-" }}}
-
-" Terminal {{{
-if IsWin()
-    nnoremap <leader>tZ :terminal<CR>
-else
-    nnoremap <leader>tZ :terminal zsh<CR>
-endif
-if IsVim()
-    set termwinkey=<C-l>
-    tnoremap <Esc> <C-l>N
-else
-    tnoremap <C-l> <C-\><C-n><C-w>
-    tnoremap <Esc> <C-\><C-n>
-endif
 " }}}
 
 " Project {{{
