@@ -2190,7 +2190,7 @@ endfunction
 " Function: s:rs.func.clearUndo() dict {{{ 清除undo数据
 function! s:rs.func.clearUndo() dict
     let l:ulbak = &undolevels
-    set undolevels=-1
+    setlocal undolevels=-1
     execute "normal! a\<Bar>\<BS>\<Esc>"
     let &undolevels = l:ulbak
 endfunction

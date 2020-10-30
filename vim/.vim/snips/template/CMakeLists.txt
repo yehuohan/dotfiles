@@ -31,11 +31,21 @@ add_library(${PROJECT_NAME} <SHARED,STATIC,MODULE>
 #target_link_directories
 target_link_libraries(${PROJECT_NAME} lib)
 add_dependencies(${PROJECT_NAME} lib)
+#add_custom_command(TARGET ${PROJECT_NAME} # add_executable或add_library时执行的命令
+#    PRE_BUILD or PRE_LINK or POST_BUILD
+#    COMMAND xxx
+#    VERBATIM
+#    )
+#add_custom_command(OUTPUT dep # 生成add_custom_target的依赖
+#    COMMAND xxx
+#    VERBATIM
+#    )
+
 
 
 # tags
 set_source_files_properties(tags PROPERTIES GENERATED TRUE)
-add_custom_target(tags
+add_custom_target(tags # 定义目标（类似于Makefile中的target）
     COMMAND ctags -R ${CMAKE_CURRENT_SOURCE_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
