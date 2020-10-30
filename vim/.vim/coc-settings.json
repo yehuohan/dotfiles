@@ -63,24 +63,22 @@
     "explorer.file.column.indent.chars": " ",
     "explorer.file.column.indent.indentLine": false,
     "explorer.file.tabCD": false,
-    "explorer.keyMappings" : {
+    "explorer.keyMappingMode": "none",
+    "explorer.keyMappings.global" : {
         "j": "nodeNext",
         "k": "nodePrev",
         "J": "indentNext",
         "K": "indentPrev",
         "gk": "expandablePrev",
         "gj": "expandableNext",
-        "h": false,
-        "l": false,
-        "gl": "expandRecursive",
-        "gh": "collapseRecursive",
+        "gl": "expand:recursive",
+        "gh": "collapse:recursive",
         "gd": "listDrive",
         "u": "gotoParent",
         "cd": "cd",
 
         "o": ["expandable?", ["expanded?", "collapse", "expand"], "open"],
         "O": "systemExecute",
-        "e": false,
         "i": "open:vsplit",
         "s": "open:split",
         "t": "open:tab",
@@ -101,7 +99,6 @@
         "X": "cutFile",
         "P": "pasteFile",
         "D": "delete",
-        "y": false, "c": false, "x": false, "d": false,
 
         "q": "quit",
         "?": "help"
