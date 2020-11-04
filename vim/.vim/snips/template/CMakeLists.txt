@@ -2,8 +2,11 @@
 cmake_minimum_required(VERSION 3.5)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+
+set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_ROOT})
+set(LIBRARY_OUTPUT_PATH ${PROJECT_ROOT})
+
 
 #set(CMAKE_C_COMPILER "clang")
 #set(CMAKE_CXX_COMPILER "clang++")
@@ -40,7 +43,7 @@ add_dependencies(${PROJECT_NAME} lib)
 #    COMMAND xxx
 #    VERBATIM
 #    )
-
+#add_subdirectory(${PROJECT_ROOT}/third) # set的变量，在子目录中也生效
 
 
 # tags

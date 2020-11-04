@@ -14,10 +14,6 @@ snippet mpl "matplotlib for python"
 import matplotlib as ${1:mpl}
 import matplotlib.pyplot as plt
 
-# mpl.rcParams['font.family'] = 'Consolas'
-# mpl.rcParams['font.family'] = 'DejaVu Sans'
-# mpl.rcParams['font.size'] = 9
-
 def on_key(event:$1.backend_bases.KeyEvent):
     if event.key == 'escape':
         plt.close()
@@ -34,10 +30,6 @@ endsnippet
 snippet mplt "matplotlib.pyplot for python"
 import matplotlib as ${1:mpl}
 import matplotlib.pyplot as plt
-
-# mpl.rcParams['font.family'] = 'Consolas'
-# mpl.rcParams['font.family'] = 'DejaVu Sans'
-# mpl.rcParams['font.size'] = 9
 
 def on_key(event:$1.backend_bases.KeyEvent):
     if event.key == 'escape':
@@ -59,6 +51,27 @@ import mpl_toolkits.mplot3d as plt3d
 #ax.plot_wireframe(x, y, z)
 #x, y = np.meshgrid(np.linespace(), np.arange())
 #ax.plot_surface(x, y, z, shade=True, cmap='jet')
+endsnippet
+
+snippet mplmouse "matplotlib for mouse click event"
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+def on_click(event:mpl.backend_bases.MouseEvent):
+    if event.button == 1:
+        if event.xdata == None:
+            return
+
+fig.canvas.mpl_connect('button_press_event', on_click)
+plt.connect('button_press_event', on_click)
+endsnippet
+
+snippet mplparam "matplotlib param settings"
+import matplotlib as mpl
+
+mpl.rcParams['font.family'] = 'Consolas'
+mpl.rcParams['font.family'] = 'DejaVu Sans'
+mpl.rcParams['font.size'] = 9
 endsnippet
 
 snippet mgif "pymovie make gif"
