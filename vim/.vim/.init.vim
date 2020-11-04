@@ -274,6 +274,7 @@ if s:gset.use_utils
     Plug 'arecarn/vim-crunch'
     Plug 'arecarn/vim-selection'
     Plug 'voldikss/vim-translator'
+    Plug 'brglng/vim-im-select'
 endif
 call plug#end()
 " }}}
@@ -297,17 +298,19 @@ call plug#end()
 " }}}
 
 " vim-visual-multi {{{ 多光标编辑
-    let g:VM_mouse_mappings = 0         " 禁用鼠标
-    " C-n: 进入cursor模式
-    " C-Up/Down: 进入extend模式
+    " Usage: https://github.com/mg979/vim-visual-multi/wiki
     " Tab: 切换cursor/extend模式
+    " C-n: 添加word或selected region作为cursor
+    " C-Up/Down: 移动当前position并添加cursor
+    " <VM_leader>A: 查找当前word作为cursor
+    " <VM_leader>/: 查找regex作为cursor（n/N用于查找下/上一个）
+    " <VM_leader>\: 添加当前position作为cursor（使用/或arrows跳转位置）
+    " s: 文件对象（类似于viw等）
+    let g:VM_mouse_mappings = 0         " 禁用鼠标
     let g:VM_leader = '\'
     let g:VM_maps = {
         \ 'Find Under'         : '<C-n>',
         \ 'Find Subword Under' : '<C-n>',
-        \ 'Select Cursor Down' : '<C-Down>',
-        \ 'Select Cursor Up'   : '<C-Up>',
-        \ 'Switch Mode'        : '<Tab>',
         \ }
     let g:VM_custom_remaps = {
         \ '<C-p>': '[',
@@ -1178,6 +1181,14 @@ endif
     vnoremap <silent> <leader><leader>t
         \ :call feedkeys(':TranslateW ' . GetSelected(), 'n')<CR>
     nnoremap <leader>tj :call translator#ui#try_jump_into()<CR>
+" }}}
+
+" im-select {{{ 输入法
+    let g:im_select_get_im_cmd = 'im-select'
+if IsWin() || IsGw()
+    let g:im_select_default = '1033'    " 输入法代码：切换到期望的默认输入法，运行im-select
+endif
+    let g:ImSelectSetImCmd = {key -> ['im-select', key]}
 " }}}
 endif
 " }}}
@@ -2134,46 +2145,33 @@ endfunction
 " Struct: s:rs {{{
 let s:rs = {
     \ 'sel' : {
-        \ 'exe' : {
-            \ 'opt' : 'select scripts to run',
-            \ 'lst' : [
-                    \ 'retab',
-                    \ '%s/\s\+$//ge',
-                    \ '%s/\r//ge',
-                    \ 'edit ++enc=utf-8',
-                    \ 'edit ++enc=cp936',
-                    \ 'syntax match QC /\v^[^|]*\|[^|]*\| / conceal',
-                    \ 'call mkdir(fnamemodify(tempname(), ":h"), "p")',
-                    \ 'Leaderf gtags --update',
-                    \ 'copyConfig',
-                    \ 'lineToTop',
-                    \ 'clearUndo',
-                    \ ],
-            \ 'dic' : {
-                    \ 'retab'            : 'retab with expandtab',
-                    \ '%s/\s\+$//ge'     : 'remove trailing space',
-                    \ '%s/\r//ge'        : 'remove ^M',
-                    \ 'edit ++enc=utf-8' : 'reload as utf-8',
-                    \ 'edit ++enc=cp936' : 'reload as cp936',
-                    \ 'copyConfig'       : {
-                        \ 'opt' : 'select config',
-                        \ 'lst' : ['.ycm_extra_conf.py', '.vimspector.json'],
-                        \ 'cmd' : {sopt, arg -> execute('edit ' . s:rs.func.copyConfig(arg))},
-                        \ },
+        \ 'opt' : 'select scripts to run',
+        \ 'lst' : [
+                \ 'retab',
+                \ '%s/\s\+$//ge',
+                \ '%s/\r//ge',
+                \ 'edit ++enc=utf-8',
+                \ 'edit ++enc=cp936',
+                \ 'syntax match QC /\v^[^|]*\|[^|]*\| / conceal',
+                \ 'call mkdir(fnamemodify(tempname(), ":h"), "p")',
+                \ 'Leaderf gtags --update',
+                \ 'copyConfig',
+                \ 'lineToTop',
+                \ 'clearUndo',
+                \ ],
+        \ 'dic' : {
+                \ 'retab'            : 'retab with expandtab',
+                \ '%s/\s\+$//ge'     : 'remove trailing space',
+                \ '%s/\r//ge'        : 'remove ^M',
+                \ 'edit ++enc=utf-8' : 'reload as utf-8',
+                \ 'edit ++enc=cp936' : 'reload as cp936',
+                \ 'copyConfig'       : {
+                    \ 'opt' : 'select config',
+                    \ 'lst' : ['.ycm_extra_conf.py', '.vimspector.json'],
+                    \ 'cmd' : {sopt, arg -> execute('edit ' . s:rs.func.copyConfig(arg))},
                     \ },
-            \ 'cmd' : {sopt, arg -> has_key(s:rs.func, arg) ? s:rs.func[arg]() : execute(arg)},
-            \ },
-        \ 'async' : {
-            \ 'opt' : 'select scripts to run async',
-            \ 'lst' : [
-                    \ 'python -m json.tool %',
-                    \ 'python setup.py build',
-                    \ 'objdump -D -S -C %:r > %.asm',
-                    \ 'ctags -R',
-                    \ 'cflow -T %',
-                    \ ],
-            \ 'cmd' : {sopt, arg -> has_key(s:rs.func, arg) ? s:rs.func[arg]() : execute(':AsyncRun ' . arg)},
-            \ }
+                \ },
+        \ 'cmd' : {sopt, arg -> has_key(s:rs.func, arg) ? s:rs.func[arg]() : execute(arg)},
         \ },
     \ 'func' : {}
     \ }
@@ -2208,9 +2206,9 @@ endfunction
 " }}}
 " }}}
 
-" Function: RunScript(type) " {{{
-function! RunScript(type)
-    call PopSelection(s:rs.sel[a:type])
+" Function: RunScript() " {{{
+function! RunScript()
+    call PopSelection(s:rs.sel)
 endfunction
 " }}}
 
@@ -2845,8 +2843,7 @@ endif
     vnoremap <silent> <leader>ae :call append(line('.'), GetEval(GetSelected(), 'command'))<CR>
     vnoremap <silent> <leader>af :call append(line('.'), GetEval(GetSelected(), 'function'))<CR>
     nnoremap <leader>sf :call RunSwitchFile()<CR>
-    nnoremap <leader>se :call RunScript('exe')<CR>
-    nnoremap <leader>sa :call RunScript('async')<CR>
+    nnoremap <leader>se :call RunScript()<CR>
     " RunProject
     for key in s:rp.mappings
         execute printf('nnoremap <leader>%s :call RunProject("%s")<CR>', key, key)
