@@ -1184,8 +1184,8 @@ endif
 " }}}
 
 " im-select {{{ 输入法
-    let g:im_select_get_im_cmd = 'im-select'
 if IsWin() || IsGw()
+    let g:im_select_get_im_cmd = 'im-select'
     let g:im_select_default = '1033'    " 输入法代码：切换到期望的默认输入法，运行im-select
 endif
     let g:ImSelectSetImCmd = {key -> ['im-select', key]}
