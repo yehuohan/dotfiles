@@ -104,14 +104,18 @@
         "?": "help"
     },
 
-    /* coc-clangd */
-    "clangd.enabled": true,
-    "clangd.path": "clangd",
 
-    /* coc-python */
+
+    /* coc-clangd(NOT in use) */
+    //"clangd.enabled": true,
+    //"clangd.path": "clangd",
+
+    /* coc-python
+     * required: pip install jedi
+     */
     "python.autoComplete.extraPaths": [],
 
-    /* coc-rls */
+    /* coc-rls(NOT in use) */
     //"rust-client.channel": "nightly",
     //"rust.unstable_features": true,
     //"rust.all_features": true,
@@ -119,6 +123,11 @@
     /* coc-rust-analyzer */
     "rust-analyzer.updates.channel": "nightly",
     "rust-analyzer.cargo.allFeatures": true,
+
+    /* coc-java
+     * required: download jdt.ls from https://download.eclipse.org/jdtls/snapshots
+     */
+    "java.enabled": true,
 
     /* lsp */
     "languageserver": {

@@ -240,6 +240,7 @@ endif
     Plug 'majutsushi/tagbar', {'on': 'TagbarToggle'}
     Plug 'scrooloose/nerdcommenter'
     Plug 'skywind3000/asyncrun.vim'
+    Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
     Plug 'voldikss/vim-floaterm'
     Plug 'yehuohan/popc-floaterm'
 if s:gset.use_spector
@@ -305,7 +306,7 @@ call plug#end()
     " <VM_leader>A: 查找当前word作为cursor
     " <VM_leader>/: 查找regex作为cursor（n/N用于查找下/上一个）
     " <VM_leader>\: 添加当前position作为cursor（使用/或arrows跳转位置）
-    " s: 文件对象（类似于viw等）
+    " s: 文本对象（类似于viw等）
     let g:VM_mouse_mappings = 0         " 禁用鼠标
     let g:VM_leader = '\'
     let g:VM_maps = {
@@ -851,8 +852,6 @@ if s:gset.use_coc
                 \ }
             \ })
     endfunction
-    " coc-python: pip install jedi
-    " coc-java: download jdt.ls from https://download.eclipse.org/jdtls/snapshots
     let g:coc_config_home = $DotVimPath
     let g:coc_data_home = $DotVimCachePath . '/.coc'
     let g:coc_global_extensions = [
@@ -1079,7 +1078,7 @@ endif
 " FastFold {{{ 更新折叠
     nmap <leader>zu <Plug>(FastFoldUpdate)
     let g:fastfold_savehook = 0         " 只允许手动更新folds
-    let g:fastfold_fold_command_suffixes =  ['x','X','a','A','o','O','c','C']
+    let g:fastfold_fold_command_suffixes = ['x','X','a','A','o','O','c','C']
     let g:fastfold_fold_movement_commands = ['z[', 'z]', 'zj', 'zk']
                                         " 允许指定的命令更新folds
 " }}}
@@ -1399,7 +1398,7 @@ endfunction
 " }}}
 
 " Project {{{
-" Required: 'skywind3000/asyncrun.vim'
+" Required: 'skywind3000/asyncrun.vim', 'voldikss/floaterm'
 "           'yehuohan/popc', 'yehuohan/popset'
 
 " Struct: s:rp {{{
@@ -1416,11 +1415,11 @@ let s:rp = {
         \ 'u' : ['FnGMake' , 'cmakelists.txt'                 ],
         \ 'n' : ['FnGMake' , 'cmakelists.txt'                 ],
         \ 'm' : ['FnMake'  , 'makefile'                       ],
-        \ 'v' : ['FnVs'    , '*.sln'                          ],
         \ 'a' : ['FnCargo' , 'Cargo.toml'                     ],
         \ 'h' : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
+        \ 'v' : ['FnVs'    , '*.sln'                          ],
         \ 's' : ['FnTasks' , '.vscode'                        ],
-        \ 'sets' : '[qunmvahs]'
+        \ 'sets' : '[qunmahvs]'
         \ },
     \ 'filetype' : {
         \ 'c'          : [IsWin() ? 'gcc -g %s %s -o %s.exe && %s' : 'gcc -g %s %s -o %s && ./%s',
@@ -1471,12 +1470,13 @@ let s:rp = {
         \ 'name'    : '\mname\s*=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ },
     \ 'mappings' : [
-        \  'rP',  'rf', 'rtf',  'Rf', 'Rtf',  'rj',
+        \  'rP',  'rf', 'rlf', 'rtf',  'Rf', 'Rlf', 'Rtf',  'rj',
         \  'rp',  'rq',  'ru',  'rn',  'rm',  'rv',  'ra',  'rh',  'rs',  'Rp',  'Rq',  'Ru',  'Rn',  'Rm',  'Rv',  'Ra',  'Rh',  'Rs',
-        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rtv', 'rta', 'rth', 'rts', 'Rtp', 'Rtq', 'Rtu', 'Rtn', 'Rtm', 'Rtv', 'Rta', 'Rth', 'Rts',
-        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rbv', 'rba', 'rbh', 'rbs', 'Rbp', 'Rbq', 'Rbu', 'Rbn', 'Rbm', 'Rbv', 'Rba', 'Rbh', 'Rbs',
         \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rcv', 'rca', 'rch', 'rcs', 'Rcp', 'Rcq', 'Rcu', 'Rcn', 'Rcm', 'Rcv', 'Rca', 'Rch', 'Rcs',
+        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rbv', 'rba', 'rbh', 'rbs', 'Rbp', 'Rbq', 'Rbu', 'Rbn', 'Rbm', 'Rbv', 'Rba', 'Rbh', 'Rbs',
         \ 'rlp', 'rlq', 'rlu', 'rln', 'rlm', 'rlv', 'rla', 'rlh', 'rls', 'Rlp', 'Rlq', 'Rlu', 'Rln', 'Rlm', 'Rlv', 'Rla', 'Rlh', 'Rls',
+        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rtv', 'rta', 'rth', 'rts', 'Rtp', 'Rtq', 'Rtu', 'Rtn', 'Rtm', 'Rtv', 'Rta', 'Rth', 'Rts',
+        \ 'rop', 'roq', 'rou', 'ron', 'rom', 'rov', 'roa', 'roh', 'ros', 'Rop', 'Roq', 'Rou', 'Ron', 'Rom', 'Rov', 'Roa', 'Roh', 'Ros',
         \ ]
     \ }
 " Function: s:rp.glob(pat, low) {{{
@@ -1535,20 +1535,17 @@ function! s:rp.run(term, wdir, cmd, ...) dict
     let g:asyncrun_encs = has_key(self.enc, l:type) ? self.enc[l:type] :
                         \ ((IsWin() || IsGw()) ? 'gbk' : 'utf-8')
 
-    let l:wdir = fnameescape(a:wdir)
-    let l:cmd = a:cmd
+    let l:dir = fnameescape(a:wdir)
+    let l:bin = (a:term == 1) ? ':FloatermNew' : ':AsyncRun'
+    let l:cmd = (a:term == 0) ? a:cmd : printf('cd %s && %s', l:dir, a:cmd)
     let l:arg = ''
-    if a:term
-        let l:arg .= '-mode=term -pos=right '
+    if a:term == 1
+        let l:arg = '--name=RunProject'
+    elseif a:term == 2
+        let l:arg = '-mode=term -pos=right -cwd=' . l:dir
     endif
-    if !empty(l:wdir)
-        if a:term
-            let l:cmd = printf('cd %s && %s', l:wdir, l:cmd)
-        endif
-        let l:arg .= '-cwd=' . l:wdir
-        execute 'lcd ' . l:wdir
-    endif
-    let l:exec = printf(':AsyncRun %s %s', l:arg, l:cmd)
+    execute 'lcd ' . l:dir
+    let l:exec = printf('%s %s %s', l:bin, l:arg, l:cmd)
     call SetExecLast(l:exec)
     execute l:exec
 endfunction
@@ -1559,16 +1556,17 @@ endfunction
 function! RunProject(keys, ...)
     " doc
     " {{{
-    " MapKeys: [rR][ibctl][pP ...]
+    " MapKeys: [rR][cblto][pP ...]
     "          [%1][%2   ][%3    ]
     " Run: %1
     "   r : build and run
     "   R : insert or append global args(can use with %2 together)
     " Command: %2
-    "   b : build without run
     "   c : clean project
+    "   b : build without run
+    "   l : run project in floaterm
     "   t : run project in terminal
-    "   l : search project file to low directory
+    "   o : use project with the lowest directory
     " Project: %3
     "   p : run project from s:ws.rp
     "   P : set project to s:ws.rp
@@ -1580,7 +1578,7 @@ function! RunProject(keys, ...)
         let l:conf = {
             \ 'key'   : a:keys[-1:-1],
             \ 'run'   : (a:keys =~# '[bc]') ? 0 : 1,
-            \ 'term'  : (a:keys =~# 't') ? 1 : 0,
+            \ 'term'  : (a:keys =~# 'l') ? 1 : ((a:keys =~# 't') ? 2 : 0),
             \ 'clean' : (a:keys =~# 'c') ? 1 : 0,
             \ 'args'  : a:args,
             \ }
@@ -1617,7 +1615,7 @@ function! RunProject(keys, ...)
         elseif a:keys =~# s:rp.proj.sets
             " others
             let [l:fn, l:pat] = s:rp.proj[l:conf.key]
-            let l:file = s:rp.glob(l:pat, (a:keys =~# 'l'))
+            let l:file = s:rp.glob(l:pat, (a:keys =~# 'o'))
             if empty(l:file)
                 throw 'None of ' . l:pat . ' was found!'
             endif
@@ -1782,9 +1780,7 @@ endfunction
 
 " Function: FnTasks(sopt, sel, conf) {{{
 function! FnTasks(sopt, sel, conf)
-    call s:rp.run(
-                \ a:conf.term,
-                \ fnamemodify(a:sel, ':h'),
+    call s:rp.run(a:conf.term, fnamemodify(a:sel, ':h'),
                 \ printf('echo "[RP]Warning: Not implemented(%s)"', a:sel . '/tasks.json'))
 endfunction
 " }}}
