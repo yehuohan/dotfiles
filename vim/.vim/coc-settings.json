@@ -45,9 +45,10 @@
     "explorer.width": 30,
     "explorer.sources": [{"name": "file", "expand": true}],
     "explorer.previewAction.onHover": false,
+    "explorer.diagnostic.displayMax": 0,
+    "explorer.git.enable": false,
     "explorer.icon.expanded": "▾",
     "explorer.icon.collapsed": "▸",
-    "explorer.file.diagnosticCountMax": 0,
     "explorer.file.autoReveal": true,
     "explorer.file.showHiddenFiles": true,
     "explorer.file.hiddenRules": {
@@ -78,6 +79,7 @@
         "cd": "cd",
 
         "o": ["expandable?", ["expanded?", "collapse", "expand"], "open"],
+        "<CR>": ["expandable?", ["expanded?", "collapse", "expand"], "open"],
         "O": "systemExecute",
         "i": "open:vsplit",
         "s": "open:split",
@@ -123,6 +125,8 @@
     /* coc-rust-analyzer */
     "rust-analyzer.updates.channel": "nightly",
     "rust-analyzer.cargo.allFeatures": true,
+    "rust-analyzer.notifications.cargoTomlNotFound": false,
+    "rust-analyzer.diagnostics.disabled": ["inactive-code"],
 
     /* coc-java
      * required: download jdt.ls from https://download.eclipse.org/jdtls/snapshots

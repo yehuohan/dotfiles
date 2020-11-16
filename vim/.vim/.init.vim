@@ -1540,9 +1540,12 @@ function! s:rp.run(term, wdir, cmd, ...) dict
     let l:cmd = (a:term == 0) ? a:cmd : printf('cd %s && %s', l:dir, a:cmd)
     let l:arg = ''
     if a:term == 1
-        let l:arg = '--name=RunProject'
-    elseif a:term == 2
-        let l:arg = '-mode=term -pos=right -cwd=' . l:dir
+        let l:arg .= '--name=RunProject'
+    else
+        let l:arg .= '-cwd=' . l:dir
+        if a:term == 2
+            let l:arg .= ' -mode=term -pos=right'
+        endif
     endif
     execute 'lcd ' . l:dir
     let l:exec = printf('%s %s %s', l:bin, l:arg, l:cmd)
@@ -2479,7 +2482,7 @@ endfunction
     set shiftwidth=4                    " 设置>和<命令移动宽度为4
     set nowrap                          " 默认关闭折行
     set textwidth=0                     " 关闭自动换行
-    set listchars=eol:$,tab:»·,trail:~,space:.
+    set listchars=tab:⤜⤚→,eol:↲,space:·,nbsp:␣,extends:…,precedes:<,extends:>,trail:~
                                         " 不可见字符显示
     set autoindent                      " 使用autoindent缩进
     set nobreakindent                   " 折行时不缩进
