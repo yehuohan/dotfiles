@@ -1,4 +1,3 @@
-
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " .init.vim: configuration for vim and neovim.
 " Github: https://github.com/yehuohan/dotconfigs
@@ -172,7 +171,7 @@ endfunction
 " Plug {{{
 call plug#begin($DotVimPath.'/bundle')  " 设置插件位置
     " editing
-    Plug 'easymotion/vim-easymotion'
+    Plug 'yehuohan/vim-easymotion'
     Plug 'rhysd/clever-f.vim'
     Plug 'mg979/vim-visual-multi'
     Plug 't9md/vim-textmanip'
@@ -192,8 +191,6 @@ call plug#begin($DotVimPath.'/bundle')  " 设置插件位置
     Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
     " managers
     Plug 'morhetz/gruvbox'
-    Plug 'sainnhe/vim-color-forest-night'
-    Plug 'srcery-colors/srcery-vim'
     Plug 'rakr/vim-one'
 if s:gset.use_lightline
     Plug 'yehuohan/lightline.vim'
@@ -282,6 +279,7 @@ call plug#end()
 
 " Editing {{{
 " easy-motion {{{ 快速跳转
+    let g:EasyMotion_dict = 'zh-cn'     " 支持简体中文拼音
     let g:EasyMotion_do_mapping = 0     " 禁止默认map
     let g:EasyMotion_smartcase = 1      " 不区分大小写
     nmap s <Plug>(easymotion-overwin-f)
@@ -306,6 +304,7 @@ call plug#end()
     " <VM_leader>A: 查找当前word作为cursor
     " <VM_leader>/: 查找regex作为cursor（n/N用于查找下/上一个）
     " <VM_leader>\: 添加当前position作为cursor（使用/或arrows跳转位置）
+    " <VM_leader>a <VM_leader>c: 添加visual区域作为cursor
     " s: 文本对象（类似于viw等）
     let g:VM_mouse_mappings = 0         " 禁用鼠标
     let g:VM_leader = '\'
@@ -442,8 +441,6 @@ call plug#end()
 " theme {{{ Vim主题(ColorScheme, StatusLine, TabLine)
     let g:gruvbox_contrast_dark='soft'  " 背景选项：dark, medium, soft
     let g:gruvbox_italic = 1
-    let g:forest_night_use_italic = 1
-    let g:srcery_italic = 1
     let g:one_allow_italics = 1
     try
         set background=dark
@@ -615,10 +612,9 @@ endif
                     \},
             \ 'cmd' : 'popset#data#SetEqual',
             \ 'get' : 'popset#data#GetOptValue'
-        \},
-        \{
+        \}, {
             \ 'opt' : ['colorscheme', 'colo'],
-            \ 'lst' : ['forest-night', 'gruvbox', 'srcery', 'one'],
+            \ 'lst' : ['gruvbox', 'one'],
         \}
     \ ]
     nnoremap <leader><leader>p :PopSet<Space>
@@ -643,6 +639,10 @@ endif
     nnoremap <leader><leader>h :PopcBuffer<CR>
     nnoremap <M-i> :PopcBufferSwitchLeft<CR>
     nnoremap <M-o> :PopcBufferSwitchRight<CR>
+    nnoremap <C-i> :PopcBufferJumpPrev<CR>
+    nnoremap <C-o> :PopcBufferJumpNext<CR>
+    nnoremap <C-,> <C-o>
+    nnoremap <C-.> <C-i>
     nnoremap <leader>wq :PopcBufferClose!<CR>
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
