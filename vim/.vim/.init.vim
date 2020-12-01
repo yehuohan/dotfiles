@@ -488,7 +488,7 @@ if s:gset.use_lightline
                 \ 'chk_indent'  : 'error',
                 \ 'chk_trailing': 'error',
                 \ },
-        \ 'blacklist' : {'tagbar': 0, 'nerdtree': 0, 'Popc': 0, 'coc-explorer': 0},
+        \ 'fallback' : {'tagbar': 0, 'nerdtree': 0, 'Popc': 0, 'coc-explorer': '%{getcwd()}'},
         \ }
     if s:gset.use_powerfont
         let g:lightline.separator            = {'left': '', 'right': ''}
@@ -712,9 +712,7 @@ endif
 
     function! Plug_stt_todo()
         if filereadable($DotVimCachePath.'/todo.md')
-            let l:lines = readfile($DotVimCachePath.'/todo.md')
-            call filter(l:lines, 'v:val !~ "\\m^[ \t]*$"')
-            return l:lines
+            return filter(readfile($DotVimCachePath.'/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
         else
             return ''
         endif
