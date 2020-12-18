@@ -241,12 +241,7 @@ endif
     Plug 'voldikss/vim-floaterm'
     Plug 'yehuohan/popc-floaterm'
 if s:gset.use_spector
-    function! Plug_spector_build(info)
-        if a:info.status == 'installed' || a:info.force
-            !python install_gadget.py --enable-c --enable-python
-        endif
-    endfunction
-    Plug 'puremourning/vimspector', {'do': function('Plug_spector_build'), 'for': ['c', 'cpp', 'python']}
+    Plug 'puremourning/vimspector'
 endif
     Plug 't9md/vim-quickhl'
     Plug 'RRethy/vim-illuminate'
@@ -259,6 +254,7 @@ endif
     Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
     Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
     Plug 'rust-lang/rust.vim'
+    Plug 'tikhomirov/vim-glsl'
     " utils
 if s:gset.use_utils
     Plug 'yianwillis/vimcdoc', {'for': 'help'}
@@ -1018,15 +1014,14 @@ endif
     nnoremap <leader>mf :FloatermNew lf<CR>
 " }}}
 
-" vimspector {{{ C, C++, Python, Go调试
+" vimspector {{{ 调试
 if s:gset.use_spector
-    sign define vimspectorBP text=🔴 texthl=WarningMsg
-    sign define vimspectorBPDisabled text=🔴 texthl=MoreMsg
-    sign define vimspectorPC text=🔶 texthl=Question
+    let g:vimspector_install_gadgets = ['debugpy', 'vscode-cpptools', 'CodeLLDB']
     nmap <F3>   <Plug>VimspectorStop
     nmap <F4>   <Plug>VimspectorRestart
     nmap <F5>   <Plug>VimspectorContinue
     nmap <F6>   <Plug>VimspectorPause
+    nmap <F7>   <Plug>VimspectorToggleConditionalBreakpoint
     nmap <F8>   <Plug>VimspectorAddFunctionBreakpoint
     nmap <F9>   <Plug>VimspectorToggleBreakpoint
     nmap <F10>  <Plug>VimspectorStepOver
@@ -2152,6 +2147,10 @@ let s:rs = {
                 \ 'syntax match QC /\v^[^|]*\|[^|]*\| / conceal',
                 \ 'call mkdir(fnamemodify(tempname(), ":h"), "p")',
                 \ 'Leaderf gtags --update',
+                \ '!rustc --emit asm=%.asm %',
+                \ '!rustc --emit asm=%.asm -C "llvm-args=-x86-asm-syntax=intel" %',
+                \ '!gcc -S -masm=att %',
+                \ '!gcc -S -masm=intel %',
                 \ 'copyConfig',
                 \ 'lineToTop',
                 \ 'clearUndo',

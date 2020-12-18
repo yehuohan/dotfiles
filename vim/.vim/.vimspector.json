@@ -1,41 +1,32 @@
 {
     "configurations": {
-        "cpp-launch": {
-            "adapter": "vscode-cpptools",
+        "Launch cxx/rust with CodeLLDB": {
+            "adapter": "CodeLLDB",
             "configuration": {
-                "name": "cpp-launch",
-                "type": "cppdbg",
                 "request": "launch",
                 "program": "${workspaceRoot}/main",
-                "args": [],
-                "cwd": "${workspaceRoot}",
-                "environment": [],
-                "externalConsole": true,
-                "MIMode": "gdb"
+                "stopAtEntry": true
             }
         },
-        "cpp-attach": {
+        "Launch cxx with cpptools": {
             "adapter": "vscode-cpptools",
             "configuration": {
-                "name": "cpp-attach",
-                "type": "cppdbg",
-                "request": "attach",
+                "request": "launch",
                 "program": "${workspaceRoot}/main",
-                "MIMode": "gdb"
+                "stopAtEntry": true
             }
         },
-        "python-launch": {
+        "Launch python with debugpy": {
             "adapter": "debugpy",
             "configuration": {
-                "name": "python-launch",
-                "type": "python",
                 "request": "launch",
-                "program": "${workspaceRoot}/test.py",
+                "type": "python",
                 "cwd": "${workspaceRoot}",
+                "program": "${workspaceRoot}/test.py",
                 "stopOnEntry": true,
-                "console": "externalTerminal",
-                "debugOptions": []
+                "console": "integratedTerminal"
             }
         }
+
     }
 }
