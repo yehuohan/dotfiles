@@ -1697,7 +1697,7 @@ function! FnMake(sopt, sel, conf)
 
     let l:cmd = printf('make %s %s', a:conf.clean ? 'clean' : '', a:conf.args)
     if a:conf.run
-        let l:cmd .= empty(l:outfile) ? ' && echo "[RP]Warning: No executable file, try add TARGET"' : ' && "./' . l:outfile .'"'
+        let l:cmd .= empty(l:outfile) ? ' && echo "[RP]Warning: No executable file, try add TARGET"' : ' && "./__VBuildOut/' . l:outfile .'"'
     endif
     call s:rp.run(a:conf.term, l:workdir, l:cmd)
 endfunction
@@ -1708,12 +1708,13 @@ endfunction
 function! FnGMake(sopt, sel, conf)
     let l:srcfile = fnamemodify(a:sel, ':t')
     let l:outfile = s:rp.pstr(a:sel, a:conf.key ==# 'q' ? s:rp.pat.target : s:rp.pat.project)
-    let l:workdir = fnamemodify(a:sel, ':h') . '/__VBuildOut'
+    let l:workdir = fnamemodify(a:sel, ':h')
+    let l:outdir = l:workdir . '/__VBuildOut'
 
     if a:conf.clean
-        call delete(l:workdir, 'rf')
+        call delete(l:outdir, 'rf')
     else
-        silent! call mkdir(l:workdir, 'p')
+        silent! call mkdir(l:outdir, 'p')
         if a:conf.key ==# 'u'
             let l:cmd = printf('cmake -G "Unix Makefiles" .. && cmake --build . %s', a:conf.args)
         elseif a:conf.key ==# 'n'
@@ -1725,8 +1726,9 @@ function! FnGMake(sopt, sel, conf)
                 let l:cmd = printf('qmake ../"%s" && make %s', l:srcfile, a:conf.args)
             endif
         endif
+        let l:cmd = printf('cd __VBuildOut && %s && cd ..', l:cmd)
         if a:conf.run
-            let l:cmd .= empty(l:outfile) ? ' && echo "[RP]Warning: No executable file, try add project() or TARGET"' : ' && "./' . l:outfile .'"'
+            let l:cmd .= empty(l:outfile) ? ' && echo "[RP]Warning: No executable file, try add project() or TARGET"' : ' && "./__VBuildOut/' . l:outfile .'"'
         endif
         call s:rp.run(a:conf.term, l:workdir, l:cmd)
     endif
@@ -1765,8 +1767,7 @@ function! FnSphinx(sopt, sel, conf)
     let l:outfile = 'build/html/index.html'
     let l:workdir = fnamemodify(a:sel, ':h')
 
-    let l:cmd = printf('make %s %s',
-                \ a:conf.clean ? 'clean' : 'html', a:conf.args)
+    let l:cmd = printf('make %s %s', a:conf.clean ? 'clean' : 'html', a:conf.args)
     if a:conf.run
         let l:cmd .= ' && firefox ' . l:outfile
     endif

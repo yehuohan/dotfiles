@@ -1,10 +1,10 @@
 #===============================================================================
 # dir
 #===============================================================================
+DIR_OUT := ./__VBuildOut
+DIR_OBJ := ${DIR_OUT}/obj
 DIR_INC := ./inc
 DIR_SRC := ./src
-DIR_OBJ := ./obj
-DIR_BIN := .
 
 #===============================================================================
 # settings
@@ -37,7 +37,7 @@ CC_SUF     := c cc cpp cxx
 else
 CC_SUF     := c cc
 endif
-BIN        := ${DIR_BIN}/${TARGET}
+BIN        := ${DIR_OUT}/${TARGET}
 SRC        := $(call get_src,${DIR_SRC},${CC_SUF})
 OBJ        := $(call get_suf,${DIR_OBJ},o,${SRC})
 DEP        := $(call get_suf,${DIR_OBJ},d,${SRC})
@@ -60,10 +60,10 @@ $(call create_obj_target,${DIR_OBJ},${SRC},${CXXFLAGS})
 
 -include ${DEP}
 
-tags:
-	${CTAGS} -R ${SRC} ${DIR_INC}
-
 .PHONY: clean
 clean:
-	-rm -r ${DIR_OBJ}
-	-rm ${BIN}
+	-rm -r ${DIR_OUT}
+
+.PHONY: tags
+tags:
+	${CTAGS} -R ${DIR_INC} ${DIR_SRC}
