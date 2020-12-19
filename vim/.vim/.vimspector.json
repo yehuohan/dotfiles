@@ -1,19 +1,19 @@
 {
     "configurations": {
-        "Launch cxx/rust with CodeLLDB": {
+        "Launch rust,cxx with CodeLLDB": {
             "adapter": "CodeLLDB",
             "configuration": {
                 "request": "launch",
-                "program": "${workspaceRoot}/main",
-                "stopAtEntry": true
+                "cwd": "${workspaceRoot}",
+                "program": "${workspaceRoot}/target/debug/main"
             }
         },
         "Launch cxx with cpptools": {
             "adapter": "vscode-cpptools",
             "configuration": {
                 "request": "launch",
-                "program": "${workspaceRoot}/main",
-                "stopAtEntry": true
+                "cwd": "${workspaceRoot}",
+                "program": "${workspaceRoot}/main"
             }
         },
         "Launch python with debugpy": {
@@ -22,7 +22,7 @@
                 "request": "launch",
                 "type": "python",
                 "cwd": "${workspaceRoot}",
-                "program": "${workspaceRoot}/test.py",
+                "program": "${workspaceRoot}/main.py",
                 "stopOnEntry": true,
                 "console": "integratedTerminal"
             }
