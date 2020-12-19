@@ -1,5 +1,5 @@
+# vi: fdm=marker
 
-#
 # i3-config with gnome or xfce4
 # yehuohan@gmail.com, yehuohan@qq.com
 #
@@ -56,7 +56,6 @@ font pango:Microsoft YaHei, WenQuanYi Micro Hei 10
 
 # 窗口设置
 # {{{
-# window operations
 default_border normal
 default_floating_border normal
 popup_during_fullscreen leave_fullscreen
@@ -64,29 +63,27 @@ focus_follows_mouse no
 # 自动跳转到原来的workspace
 workspace_auto_back_and_forth yes
 
-# 打开软件时自动移至相应工作区，使用xprop查看class
+# 特定窗口设置，使用xprop查看class
+set $bp 3
+set $Terminal "(XTerm)|(Gnome-terminal)|(Xfce4-terminal)|(Alacritty)"
+set $NonTerminal "^(?!((XTerm)|(Gnome-terminal)|(Xfce4-terminal)|(Alacritty)))"
 assign [class="Nautilus"] workspace $WS1
 assign [class="Firefox"] workspace $WS2
 assign [class="Nightly"] workspace $WS2
 assign [class="Google-chrome"] workspace $WS2
 assign [class="Chromium"] workspace $WS2
 assign [class="VirtualBox Manager"] workspace $WS3
-
-# 对特定窗口，执行特定命令
-set $bp 3
 for_window [window_role="pop-up"] floating enable
 for_window [class="^.*" tiling] border pixel $bp
-# Touchpad Off|On
-set $TPadOff "XTerm|Gnome-terminal|Xfce4-terminal|Gvim"
-set $TPadOn  "^(?!((XTerm)|(Gnome-terminal)|(Xfce4-terminal)|(Gvim)))"
-for_window [class=$TPadOff] exec ToggleTouchPad off
-#for_window [class=$TPadOn] exec ToggleTouchPad on
+for_window [class=$Terminal] exec ToggleTouchPad off
+#for_window [class=$NonTerminal] exec ToggleTouchPad on
 
-# i3-gaps configuration
+# i3-gaps设置
 gaps inner 2
 gaps outer 2
-smart_gaps on
+#smart_gaps on
 
+# 配色设置
 # M-main, T-text, D-default
 set $CLR_M FF7000FF
 set $CLR_T 303030FF
@@ -186,7 +183,10 @@ bindsym $mod+f fullscreen toggle
 # 把当前窗口放到scratchpad
 bindsym $mod+mod1+p move scratchpad
 # 从scratchpad呼出第一个窗口，将呼出的窗口设置成平铺才能继续呼出窗口
-bindsym $mod+p scratchpad show; [floating] border normal; [tiling] border pixel $bp
+bindsym $mod+p \
+    scratchpad show; \
+    [floating] border normal; \
+    [tiling] border pixel $bp
 
 # change focus
 bindsym $mod+h focus left
@@ -200,7 +200,13 @@ bindsym $mod+mod1+v focus parent
 bindsym $mod+v focus child
 
 # toggle tiling / floating
-bindsym $mod+mod1+space floating toggle; [floating] border normal; [tiling] border pixel $bp
+#bindsym $mod+mod1+space floating toggle; [floating] border normal; [tiling] border pixel $bp
+bindsym $mod+mod1+space \
+    floating toggle; \
+    [floating] border normal; \
+    [floating class=$Terminal] resize set 855 600; \
+    [tiling] border pixel $bp
+
 # change focus between tiling / floating windows
 bindsym $mod+space focus mode_toggle
 
@@ -305,6 +311,7 @@ floating_modifier $mod
 # terminal
 bindsym $mod+Return exec xfce4-terminal || gnome-terminal
 bindsym $mod+mod1+Return exec xterm || xfce4-terminal || gnome-terminal
+bindsym $mod+Shift+Return exec alacritty || xfce4-terminal || gnome-terminal
 
 # file manager
 bindsym $mod+e exec nautilus
