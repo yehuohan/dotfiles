@@ -850,7 +850,7 @@ if s:gset.use_coc
     let g:coc_data_home = $DotVimCachePath . '/.coc'
     let g:coc_global_extensions = [
         \ 'coc-snippets', 'coc-yank', 'coc-explorer',
-        \ 'coc-python', 'coc-java', 'coc-tsserver', 'coc-rust-analyzer',
+        \ 'coc-pyright', 'coc-java', 'coc-tsserver', 'coc-rust-analyzer',
         \ 'coc-vimlsp', 'coc-vimtex', 'coc-cmake', 'coc-json', 'coc-calc',
         \ ]
     let g:coc_status_error_sign = '✘'

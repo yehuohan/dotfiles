@@ -107,15 +107,13 @@
     },
 
 
-
     /* coc-clangd(NOT in use) */
     //"clangd.enabled": true,
     //"clangd.path": "clangd",
 
-    /* coc-python
-     * required: pip install jedi
+    /* coc-pyright
      */
-    "python.autoComplete.extraPaths": [],
+    "python.analysis.stubPath": "typings",
 
     /* coc-rls(NOT in use) */
     //"rust-client.channel": "nightly",
