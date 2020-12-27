@@ -1410,9 +1410,8 @@ let s:rp = {
         \ 'm' : ['FnMake'  , 'makefile'                       ],
         \ 'a' : ['FnCargo' , 'Cargo.toml'                     ],
         \ 'h' : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
-        \ 'v' : ['FnVs'    , '*.sln'                          ],
-        \ 's' : ['FnTasks' , '.vscode'                        ],
-        \ 'sets' : '[qunmahvs]'
+        \ 'v' : ['FnTasks' , '.vscode'                        ],
+        \ 'sets' : '[qunmahv]'
         \ },
     \ 'filetype' : {
         \ 'c'          : [IsWin() ? 'gcc -g %s %s -o %s.exe && %s' : 'gcc -g %s %s -o %s && ./%s',
@@ -1464,12 +1463,12 @@ let s:rp = {
         \ },
     \ 'mappings' : [
         \  'rP',  'rf', 'rlf', 'rtf',  'Rf', 'Rlf', 'Rtf',  'rj',
-        \  'rp',  'rq',  'ru',  'rn',  'rm',  'rv',  'ra',  'rh',  'rs',  'Rp',  'Rq',  'Ru',  'Rn',  'Rm',  'Rv',  'Ra',  'Rh',  'Rs',
-        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rcv', 'rca', 'rch', 'rcs', 'Rcp', 'Rcq', 'Rcu', 'Rcn', 'Rcm', 'Rcv', 'Rca', 'Rch', 'Rcs',
-        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rbv', 'rba', 'rbh', 'rbs', 'Rbp', 'Rbq', 'Rbu', 'Rbn', 'Rbm', 'Rbv', 'Rba', 'Rbh', 'Rbs',
-        \ 'rlp', 'rlq', 'rlu', 'rln', 'rlm', 'rlv', 'rla', 'rlh', 'rls', 'Rlp', 'Rlq', 'Rlu', 'Rln', 'Rlm', 'Rlv', 'Rla', 'Rlh', 'Rls',
-        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rtv', 'rta', 'rth', 'rts', 'Rtp', 'Rtq', 'Rtu', 'Rtn', 'Rtm', 'Rtv', 'Rta', 'Rth', 'Rts',
-        \ 'rop', 'roq', 'rou', 'ron', 'rom', 'rov', 'roa', 'roh', 'ros', 'Rop', 'Roq', 'Rou', 'Ron', 'Rom', 'Rov', 'Roa', 'Roh', 'Ros',
+        \  'rp',  'rq',  'ru',  'rn',  'rm',  'ra',  'rh',  'rv',  'Rp',  'Rq',  'Ru',  'Rn',  'Rm',  'Ra',  'Rh',  'Rv',
+        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rca', 'rch', 'rcv', 'Rcp', 'Rcq', 'Rcu', 'Rcn', 'Rcm', 'Rca', 'Rch', 'Rcv',
+        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rba', 'rbh', 'rbv', 'Rbp', 'Rbq', 'Rbu', 'Rbn', 'Rbm', 'Rba', 'Rbh', 'Rbv',
+        \ 'rlp', 'rlq', 'rlu', 'rln', 'rlm', 'rla', 'rlh', 'rlv', 'Rlp', 'Rlq', 'Rlu', 'Rln', 'Rlm', 'Rla', 'Rlh', 'Rlv',
+        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rta', 'rth', 'rtv', 'Rtp', 'Rtq', 'Rtu', 'Rtn', 'Rtm', 'Rta', 'Rth', 'Rtv',
+        \ 'rop', 'roq', 'rou', 'ron', 'rom', 'roa', 'roh', 'rov', 'Rop', 'Roq', 'Rou', 'Ron', 'Rom', 'Roa', 'Roh', 'Rov',
         \ ]
     \ }
 " Function: s:rp.glob(pat, low) {{{
@@ -1529,14 +1528,14 @@ function! s:rp.run(term, wdir, cmd, ...) dict
                         \ ((IsWin() || IsGw()) ? 'gbk' : 'utf-8')
 
     let l:dir = fnameescape(a:wdir)
-    let l:bin = (a:term == 1) ? ':FloatermNew' : ':AsyncRun'
+    let l:bin = (a:term == 2) ? ':FloatermNew' : ':AsyncRun'
     let l:cmd = (a:term == 0) ? a:cmd : printf('cd %s && %s', l:dir, a:cmd)
     let l:arg = ''
-    if a:term == 1
+    if a:term == 2
         let l:arg .= '--name=RunProject'
     else
         let l:arg .= '-cwd=' . l:dir
-        if a:term == 2
+        if a:term == 1
             let l:arg .= ' -mode=term -pos=right'
         endif
     endif
@@ -1574,7 +1573,7 @@ function! RunProject(keys, ...)
         let l:conf = {
             \ 'key'   : a:keys[-1:-1],
             \ 'run'   : (a:keys =~# '[bc]') ? 0 : 1,
-            \ 'term'  : (a:keys =~# 'l') ? 1 : ((a:keys =~# 't') ? 2 : 0),
+            \ 'term'  : (a:keys =~# 'l') ? 2 : ((a:keys =~# 't') ? 1 : 0),
             \ 'clean' : (a:keys =~# 'c') ? 1 : 0,
             \ 'args'  : a:args,
             \ }
@@ -1623,10 +1622,7 @@ function! RunProject(keys, ...)
     if a:keys =~# 'R'
         call PopSelection({
             \ 'opt' : 'select args',
-            \ 'lst' : [
-                    \ '-static', '-fPIC -shared',
-                    \ 'tags', '--target tags'
-                    \ ],
+            \ 'lst' : ['-static', 'tags', '--target tags'],
             \ 'cpl' : 'file',
             \ 'cmd' : {sopt, arg -> call('RunProject', ['r' . a:keys[1:], arg])}
             \ })
@@ -1744,21 +1740,6 @@ function! FnCargo(sopt, sel, conf)
                 \ 'build',
                 \ a:conf.args)
     call s:rp.run(a:conf.term, l:workdir, l:cmd, 'rust')
-endfunction
-" }}}
-
-" Function: FnVs(sopt, sel, conf) {{{
-function! FnVs(sopt, sel, conf)
-    let l:srcfile = fnamemodify(a:sel, ':t')
-    let l:outfile = fnamemodify(a:sel, ':t:r')
-    let l:workdir = fnamemodify(a:sel, ':h')
-
-    let l:cmd = printf('vcvars64.bat && devenv "%s" /%s %s',
-                    \ l:srcfile, a:conf.clean ? 'Clean' : 'Build', a:conf.args)
-    if a:conf.run
-        let l:cmd .= ' && "./' . l:outfile .'"'
-    endif
-    call s:rp.run(a:conf.term, l:workdir, l:cmd, 'cpp')
 endfunction
 " }}}
 
