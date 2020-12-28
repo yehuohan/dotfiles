@@ -2391,7 +2391,7 @@ let s:opt = {
 
 " Function: OptionInv(opt) {{{ 切换参数值（bool取反）
 function! OptionInv(opt)
-    execute printf('set inv%s', a:opt)
+    execute printf('setlocal inv%s', a:opt)
     execute printf('echo "%s = " . &%s', a:opt, a:opt)
 endfunction
 " }}}
