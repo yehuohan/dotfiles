@@ -260,7 +260,7 @@ if s:gset.use_utils
     Plug 'yianwillis/vimcdoc', {'for': 'help'}
     Plug 'gabrielelana/vim-markdown', {'for': 'markdown'}
     Plug 'iamcco/markdown-preview.nvim', {'for': 'markdown', 'do': { -> mkdp#util#install()}}
-    Plug 'joker1007/vim-markdown-quote-syntax'
+    Plug 'joker1007/vim-markdown-quote-syntax', {'for': 'markdown'}
     Plug 'Rykka/riv.vim', {'for': 'rst'}
     Plug 'Rykka/InstantRst', {'for': 'rst'}
     Plug 'lervag/vimtex', {'for': 'tex'}
@@ -1089,7 +1089,7 @@ if s:gset.use_utils
     let g:markdown_include_jekyll_support = 0
     let g:markdown_enable_mappings = 0
     let g:markdown_enable_spell_checking = 0
-    let g:markdown_enable_folding = 1   " 感觉MarkDown折叠引起卡顿时，关闭此项
+    let g:markdown_enable_folding = 0   " 感觉MarkDown折叠引起卡顿时，关闭此项
     let g:markdown_enable_conceal = 0   " 在Vim中显示MarkDown预览
     let g:mkdp_auto_start = 0
     let g:mkdp_auto_close = 1
@@ -1431,10 +1431,11 @@ let s:rp = {
         \ 'make'       : ['make -f %s %s'           , 'srcf', 'args'        ],
         \ 'sh'         : ['bash ./%s %s'            , 'srcf', 'args'        ],
         \ 'dosbatch'   : ['%s %s'                   , 'srcf', 'args'        ],
+        \ 'glsl'       : ['glslangValidator %s %s'  , 'args', 'srcf'        ],
         \ 'tex'        : ['xelatex -file-line-error %s && SumatraPDF %s.pdf', 'srcf', 'outf'],
-        \ 'markdown'   : ['typora %s'               , 'srcf'],
-        \ 'json'       : ['python -m json.tool %s'  , 'srcf'],
         \ 'matlab'     : ['matlab -nosplash -nodesktop -r %s', 'outf'],
+        \ 'json'       : ['python -m json.tool %s'  , 'srcf'],
+        \ 'markdown'   : ['typora %s'               , 'srcf'],
         \ 'html'       : ['firefox %s'              , 'srcf'],
         \ },
     \ 'cell' : {

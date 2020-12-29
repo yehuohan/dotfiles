@@ -12,6 +12,8 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_ROOT}/__VBuildOut)
 #set(CMAKE_CXX_COMPILER "clang++")
 #set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -g")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+#set(CMAKE_BUILD_TYPE "Debug")
+#set(CMAKE_BUILD_TYPE "Release")
 project(main LANGUAGES CXX)
 
 include_directories(
