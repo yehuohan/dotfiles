@@ -637,8 +637,8 @@ endif
     nnoremap <M-o> :PopcBufferSwitchRight<CR>
     nnoremap <C-i> :PopcBufferJumpPrev<CR>
     nnoremap <C-o> :PopcBufferJumpNext<CR>
-    nnoremap <C-,> <C-o>
-    nnoremap <C-.> <C-i>
+    nnoremap <C-h> <C-o>
+    nnoremap <C-l> <C-i>
     nnoremap <leader>wq :PopcBufferClose!<CR>
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
@@ -2472,6 +2472,7 @@ endfunction
     set foldcolumn=0                    " 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
     set foldmethod=indent               " 设置折叠，默认为缩进折叠
     set scrolloff=3                     " 光标上下保留的行数
+    set nostartofline                   " 执行滚屏等命令时，不改变光标列位置
     set laststatus=2                    " 一直显示状态栏
     set noshowmode                      " 命令行栏不显示VISUAL等字样
     set completeopt=menuone,preview     " 补全显示设置
@@ -2658,8 +2659,6 @@ endif
     nnoremap <C-k> <C-y>
     nnoremap zh zt
     nnoremap zl zb
-    nnoremap <C-h> 2zh
-    nnoremap <C-l> 2zl
     nnoremap <M-h> 16zh
     nnoremap <M-l> 16zl
     " 命令行

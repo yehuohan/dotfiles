@@ -20,6 +20,7 @@ def on_key(event:$1.backend_bases.KeyEvent):
 
 fig = plt.figure('Plot')
 fig.canvas.mpl_connect('key_press_event', on_key)
+# fig.subplots_adjust(0.1, 0.1, 1.0, 1.0, 0.1, 0.05)
 # ax = fig.add_subplot(1, 1, 1)
 # ax = fig.add_axes((0.1, 0.1, 0.8, 0.8))
 # ax.plot()
@@ -37,6 +38,7 @@ def on_key(event:$1.backend_bases.KeyEvent):
 
 plt.figure('Plot')
 plt.connect('key_press_event', on_key)
+# plt.subplots_adjust(0.1, 0.1, 1.0, 1.0, 0.1, 0.05)
 # plt.subplot(1, 1, 1)
 # plt.axes((0.1, 0.1, 0.8, 0.8))
 # plt.plot()

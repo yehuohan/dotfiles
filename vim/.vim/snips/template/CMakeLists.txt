@@ -29,6 +29,7 @@ add_executable(${PROJECT_NAME} ${SRC})
 add_library(${PROJECT_NAME} <SHARED,STATIC,MODULE>
     ${SRC}
     )
+#target_sources
 #target_include_directories # target_xxx命令：其它Target链接此Target需要的include_directories
 #target_compile_options
 #target_compile_definitions
