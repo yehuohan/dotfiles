@@ -14,16 +14,16 @@
 # period    = .
 set $mod Mod4
 
-set $WS1 "1:"
-set $WS2 "2:"
-set $WS3 "3:"
+set $WS1 "1:"
+set $WS2 "2:"
+set $WS3 "3:"
 set $WS4 "4:4"
 set $WS5 "5:5"
 set $WS6 "6:6"
 set $WS7 "7:7"
 set $WS8 "8:8"
 set $WS9 "9:9"
-set $WS0 "10:0"
+set $WS0 "10:"
 
 
 #===============================================================================
@@ -67,16 +67,17 @@ workspace_auto_back_and_forth yes
 set $bp 3
 set $Terminal "(XTerm)|(Gnome-terminal)|(Xfce4-terminal)|(Alacritty)"
 set $NonTerminal "^(?!((XTerm)|(Gnome-terminal)|(Xfce4-terminal)|(Alacritty)))"
-assign [class="Nautilus"] workspace $WS1
-assign [class="Firefox"] workspace $WS2
-assign [class="Nightly"] workspace $WS2
-assign [class="Google-chrome"] workspace $WS2
-assign [class="Chromium"] workspace $WS2
-assign [class="VirtualBox Manager"] workspace $WS3
-for_window [window_role="pop-up"] floating enable
+set $Desktop "(VirtualBox Manager)|(netease-cloud-music)"
+assign [class="(Firefox)|(Nightly)"] workspace $WS1
+assign [class="(Google-chrome)|(Chromium)"] workspace $WS1
+assign [class="Nautilus"] workspace $WS2
+assign [class=$Desktop] workspace $WS3
 for_window [class="^.*" tiling] border pixel $bp
+for_window [class="^.*" floating] border normal
+for_window [class=$Desktop] floating enable
 for_window [class=$Terminal] exec ToggleTouchPad off
 #for_window [class=$NonTerminal] exec ToggleTouchPad on
+for_window [window_role="pop-up"] floating enable
 
 # i3-gaps设置
 gaps inner 2
@@ -200,7 +201,6 @@ bindsym $mod+mod1+v focus parent
 bindsym $mod+v focus child
 
 # toggle tiling / floating
-#bindsym $mod+mod1+space floating toggle; [floating] border normal; [tiling] border pixel $bp
 bindsym $mod+mod1+space \
     floating toggle; \
     [floating] border normal; \
