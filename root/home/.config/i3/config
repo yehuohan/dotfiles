@@ -33,7 +33,7 @@ set $WS0 "10:"
 # 输入法
 exec --no-startup-id fcitx
 # 透明效果
-exec --no-startup-id compton
+exec --no-startup-id picom --config ~/.config/i3/picom.conf
 # 背景
 exec_always --no-startup-id feh --bg-fill ~/Picture/wall-paper/wp.jpg
 # 电池管理，包括亮度调节(可以使用Fn+亮度调节键)
