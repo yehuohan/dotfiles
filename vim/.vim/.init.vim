@@ -38,12 +38,10 @@ set rtp+=$DotVimPath
 
 " First {{{
 set encoding=utf-8                      " 内部使用utf-8编码
-if IsVim()
-    set nocompatible                    " 不兼容vi
-endif
+set nocompatible                        " 不兼容vi
 set guioptions=M                        " 完全禁用Gui界面元素
-let g:did_install_default_menus = 1
-let g:did_install_syntax_menu = 1
+let g:did_install_default_menus = 1     " 禁止加载缺省菜单
+let g:did_install_syntax_menu = 1       " 禁止加载Syntax菜单
 syntax enable                           " 语法高亮
 filetype plugin indent on               " 打开文件类型检测
 let mapleader="\<Space>"                " Space leader
