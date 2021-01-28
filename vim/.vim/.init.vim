@@ -42,7 +42,7 @@ set nocompatible                        " 不兼容vi
 set guioptions=M                        " 完全禁用Gui界面元素
 let g:did_install_default_menus = 1     " 禁止加载缺省菜单
 let g:did_install_syntax_menu = 1       " 禁止加载Syntax菜单
-syntax enable                           " 语法高亮
+syntax enable                           " 打开语法高亮
 filetype plugin indent on               " 打开文件类型检测
 let mapleader="\<Space>"                " Space leader
 nnoremap ; :
@@ -79,12 +79,12 @@ let s:gset = {
     \ 'use_leaderf'   : 1,
     \ 'use_utils'     : 1,
     \ }
-" Function: s:gsetLoad() {{{
-function! s:gsetLoad()
+" Function: s:gsLoad() {{{
+function! s:gsLoad()
     if filereadable(s:gset_file)
         call extend(s:gset, json_decode(join(readfile(s:gset_file))), 'force')
     else
-        call s:gsetSave()
+        call s:gsSave()
     endif
     if IsVim() && s:gset.use_coc        " vim中coc容易卡，补全用ycm
         let s:gset.use_ycm = '1'
@@ -93,42 +93,34 @@ function! s:gsetLoad()
     call env#env(s:gset.set_dev, s:gset.set_os)
 endfunction
 " }}}
-" Function: s:gsetSave() {{{
-function! s:gsetSave()
+" Function: s:gsSave(...) {{{
+function! s:gsSave(...)
     call writefile([json_encode(s:gset)], s:gset_file)
     echo 's:gset save successful!'
 endfunction
 " }}}
-" Function: s:gsetInit() {{{
-function! s:gsetInit()
-    function! InitSet(sopt, arg)
-        let s:gset[a:sopt] = a:arg
-    endfunction
-    function! InitGet(sopt)
-        return s:gset[a:sopt]
-    endfunction
+" Function: s:gsInit() {{{
+function! s:gsInit()
     call PopSelection({
         \ 'opt' : 'select settings',
-        \ 'lst' : add(sort(keys(s:gset)), '[OK]') ,
+        \ 'lst' : sort(keys(s:gset)),
         \ 'dic' : {
-            \ 'set_dev'       : {'opt': 'set_dev'      , 'lst': ['hp']         , 'cmd': 'InitSet', 'get': 'InitGet'},
-            \ 'set_os'        : {'opt': 'set_os'       , 'lst': ['win', 'arch'], 'cmd': 'InitSet', 'get': 'InitGet'},
-            \ 'use_powerfont' : {'opt': 'use_powerfont', 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
-            \ 'use_lightline' : {'opt': 'use_lightline', 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
-            \ 'use_startify'  : {'opt': 'use_startify' , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
-            \ 'use_ycm'       : {'opt': 'use_ycm'      , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
-            \ 'use_snip'      : {'opt': 'use_snip'     , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
-            \ 'use_coc'       : {'opt': 'use_coc'      , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
-            \ 'use_spector'   : {'opt': 'use_spector'  , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
-            \ 'use_leaderf'   : {'opt': 'use_leaderf'  , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
-            \ 'use_utils'     : {'opt': 'use_utils'    , 'lst': ['0', '1']     , 'cmd': 'InitSet', 'get': 'InitGet'},
+            \ 'set_dev': {'lst': ['hp']         },
+            \ 'set_os' : {'lst': ['win', 'arch']},
+            \ 'use_powerfont': {}, 'use_lightline': {}, 'use_startify': {}, 'use_utils': {},
+            \ 'use_ycm': {}, 'use_snip': {}, 'use_coc': {}, 'use_spector': {}, 'use_leaderf': {},
             \ },
-        \ 'cmd' : {sopt, arg -> (arg ==# '[OK]') ? s:gsetSave() : v:null}
+        \ 'sub' : {
+            \ 'lst': ['0', '1'],
+            \ 'cmd': {sopt, sel -> extend(s:gset, {sopt : sel})},
+            \ 'get': {sopt -> s:gset[sopt]},
+            \ },
+        \ 'onCR': function('s:gsSave'),
         \ })
 endfunction
 " }}}
-command! -nargs=0 GSInit :call s:gsetInit()
-call s:gsetLoad()
+command! -nargs=0 GSInit :call s:gsInit()
+call s:gsLoad()
 " }}}
 " }}} End
 
@@ -235,6 +227,7 @@ endif
     Plug 'majutsushi/tagbar', {'on': 'TagbarToggle'}
     Plug 'scrooloose/nerdcommenter'
     Plug 'skywind3000/asyncrun.vim'
+    Plug 'skywind3000/asyncrun.extra'
     Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
     Plug 'voldikss/vim-floaterm'
     Plug 'yehuohan/popc-floaterm'
@@ -401,7 +394,7 @@ call plug#end()
         call PopSelection({
             \ 'opt' : 'select text object motion',
             \ 'lst' : split('w W s p ( b [ < t { B " '' ` i f c m u', ' '),
-            \ 'cmd' : {sopt, arg -> execute('normal! ' . tolower(a:motion) . (a:motion =~# '\l' ? 'i' : 'a' ) . arg)}
+            \ 'cmd' : {sopt, sel -> execute('normal! ' . tolower(a:motion) . (a:motion =~# '\l' ? 'i' : 'a' ) . sel)}
             \ })
     endfunction
 " }}}
@@ -1010,6 +1003,7 @@ endif
     tnoremap <A-q> <C-\><C-n>:FloatermKill<CR>
     tnoremap <A-h> <C-\><C-n>:FloatermHide<CR>
     nnoremap <leader>mf :FloatermNew lf<CR>
+    highlight default link FloatermBorder Normal
 " }}}
 
 " vimspector {{{ 调试
@@ -1033,7 +1027,7 @@ if s:gset.use_spector
         \ :call PopSelection({
             \ 'opt' : 'select debug configuration',
             \ 'lst' : keys(json_decode(join(readfile('.vimspector.json'))).configurations),
-            \ 'cmd' : {sopt, arg -> vimspector#LaunchWithSettings({'configuration': arg})}
+            \ 'cmd' : {sopt, sel -> vimspector#LaunchWithSettings({'configuration': sel})}
             \})<CR>
 endif
 " }}}
@@ -1351,7 +1345,7 @@ endfunction
 " Workspace {{{
 let s:ws = {
     \ 'root': '',
-    \ 'rp': {'fn': '', 'file': '', 'filetype': '', 'args': ''},
+    \ 'rp': {},
     \ 'fw': {'path': '', 'filters': [], 'globlst': []},
     \ }
 let s:dp = {
@@ -1394,14 +1388,11 @@ endfunction
 
 " Struct: s:rp {{{
 " @attribute proj: project类型
-" @attribute filetype: 文件类型
-" @attribute cell: 用于filetype的cell类型
-" @attribute efm: 用于filetype的errorformat类型
-" @attribute pat: 匹配模式字符串
+" @attribute type: filetype类型
 let s:rp = {
     \ 'proj' : {
-        \ 'f' : ['FnFile'                                     ],
-        \ 'j' : ['FnCell'                                     ],
+        \ 'f' : ['FnFile'  , v:null                           ],
+        \ 'j' : ['FnCell'  , v:null                           ],
         \ 'q' : ['FnGMake' , '*.pro'                          ],
         \ 'u' : ['FnGMake' , 'cmakelists.txt'                 ],
         \ 'n' : ['FnGMake' , 'cmakelists.txt'                 ],
@@ -1409,27 +1400,26 @@ let s:rp = {
         \ 'a' : ['FnCargo' , 'Cargo.toml'                     ],
         \ 'h' : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
         \ 'v' : ['FnTasks' , '.vscode'                        ],
-        \ 'sets' : '[qunmahv]'
         \ },
-    \ 'filetype' : {
-        \ 'c'          : [IsWin() ? 'gcc -g %s %s -o %s.exe && %s' : 'gcc -g %s %s -o %s && ./%s',
-                                                    \ 'args', 'srcf', 'outf', 'outf'],
-        \ 'cpp'        : [IsWin() ? 'g++ -g -std=c++17 %s %s -o %s.exe && %s' : 'g++ -g -std=c++17 %s %s -o %s && ./%s',
-                                                    \ 'args', 'srcf', 'outf', 'outf'],
-        \ 'rust'       : [IsWin() ? 'rustc %s %s -o %s.exe && %s' : 'rustc %s %s -o %s && ./%s',
-                                                    \ 'args', 'srcf', 'outf', 'outf' ],
-        \ 'java'       : ['javac %s && java %s %s'  , 'srcf', 'outf', 'args'],
-        \ 'python'     : ['python %s %s'            , 'srcf', 'args'        ],
-        \ 'julia'      : ['julia %s %s'             , 'srcf', 'args'        ],
-        \ 'lua'        : ['lua %s %s'               , 'srcf', 'args'        ],
-        \ 'go'         : ['go run %s %s'            , 'srcf', 'args'        ],
-        \ 'javascript' : ['node %s %s'              , 'srcf', 'args'        ],
-        \ 'typescript' : ['node %s %s'              , 'srcf', 'args'        ],
-        \ 'dart'       : ['dart %s %s'              , 'srcf', 'args'        ],
-        \ 'make'       : ['make -f %s %s'           , 'srcf', 'args'        ],
-        \ 'sh'         : ['bash ./%s %s'            , 'srcf', 'args'        ],
-        \ 'dosbatch'   : ['%s %s'                   , 'srcf', 'args'        ],
-        \ 'glsl'       : ['glslangValidator %s %s'  , 'args', 'srcf'        ],
+    \ 'type' : {
+        \ 'c'          : [IsWin() ? 'gcc -g %s %s -o %s.exe && %s %s' : 'gcc -g %s %s -o %s && ./%s %s',
+                                                    \ 'abld', 'srcf', 'outf', 'outf', 'arun'],
+        \ 'cpp'        : [IsWin() ? 'g++ -g -std=c++17 %s %s -o %s.exe && %s %s' : 'g++ -g -std=c++17 %s %s -o %s && ./%s %s',
+                                                    \ 'abld', 'srcf', 'outf', 'outf', 'arun'],
+        \ 'rust'       : [IsWin() ? 'rustc %s %s -o %s.exe && %s %s' : 'rustc %s %s -o %s && ./%s %s',
+                                                    \ 'abld', 'srcf', 'outf', 'outf', 'arun'],
+        \ 'java'       : ['javac %s && java %s %s'  , 'srcf', 'outf', 'arun'],
+        \ 'python'     : ['python %s %s'            , 'srcf', 'arun'        ],
+        \ 'julia'      : ['julia %s %s'             , 'srcf', 'arun'        ],
+        \ 'lua'        : ['lua %s %s'               , 'srcf', 'arun'        ],
+        \ 'go'         : ['go run %s %s'            , 'srcf', 'arun'        ],
+        \ 'javascript' : ['node %s %s'              , 'srcf', 'arun'        ],
+        \ 'typescript' : ['node %s %s'              , 'srcf', 'arun'        ],
+        \ 'dart'       : ['dart %s %s'              , 'srcf', 'arun'        ],
+        \ 'make'       : ['make -f %s %s'           , 'srcf', 'arun'        ],
+        \ 'sh'         : ['bash ./%s %s'            , 'srcf', 'arun'        ],
+        \ 'dosbatch'   : ['%s %s'                   , 'srcf', 'arun'        ],
+        \ 'glsl'       : ['glslangValidator %s %s'  , 'abld', 'srcf'        ],
         \ 'tex'        : ['xelatex -file-line-error %s && SumatraPDF %s.pdf', 'srcf', 'outf'],
         \ 'matlab'     : ['matlab -nosplash -nodesktop -r %s', 'outf'],
         \ 'json'       : ['python -m json.tool %s'  , 'srcf'],
@@ -1461,13 +1451,13 @@ let s:rp = {
         \ 'name'    : '\mname\s*=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ },
     \ 'mappings' : [
-        \  'rP',  'rf', 'rlf', 'rtf',  'Rf', 'Rlf', 'Rtf',  'rj',
-        \  'rp',  'rq',  'ru',  'rn',  'rm',  'ra',  'rh',  'rv',  'Rp',  'Rq',  'Ru',  'Rn',  'Rm',  'Ra',  'Rh',  'Rv',
-        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rca', 'rch', 'rcv', 'Rcp', 'Rcq', 'Rcu', 'Rcn', 'Rcm', 'Rca', 'Rch', 'Rcv',
-        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rba', 'rbh', 'rbv', 'Rbp', 'Rbq', 'Rbu', 'Rbn', 'Rbm', 'Rba', 'Rbh', 'Rbv',
-        \ 'rlp', 'rlq', 'rlu', 'rln', 'rlm', 'rla', 'rlh', 'rlv', 'Rlp', 'Rlq', 'Rlu', 'Rln', 'Rlm', 'Rla', 'Rlh', 'Rlv',
-        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rta', 'rth', 'rtv', 'Rtp', 'Rtq', 'Rtu', 'Rtn', 'Rtm', 'Rta', 'Rth', 'Rtv',
-        \ 'rop', 'roq', 'rou', 'ron', 'rom', 'roa', 'roh', 'rov', 'Rop', 'Roq', 'Rou', 'Ron', 'Rom', 'Roa', 'Roh', 'Rov',
+        \  'Rp',  'Rq',  'Ru',  'Rn',  'Rm',  'Ra',  'Rh',  'Rv',  'Rf',
+        \  'rp',  'rq',  'ru',  'rn',  'rm',  'ra',  'rh',  'rv',  'rf', 'rj',
+        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rca', 'rch', 'rcv',
+        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rba', 'rbh', 'rbv',
+        \ 'rlp', 'rlq', 'rlu', 'rln', 'rlm', 'rla', 'rlh', 'rlv', 'rlf',
+        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rta', 'rth', 'rtv', 'rtf',
+        \ 'rop', 'roq', 'rou', 'ron', 'rom', 'roa', 'roh', 'rov',
         \ ]
     \ }
 " Function: s:rp.glob(pat, low) {{{
@@ -1513,45 +1503,54 @@ function! s:rp.pstr(file, pat)
 endfunction
 " }}}
 
-" Function: s:rp.run(term, wdir, cmd, [type]) dict {{{
-" @param term: 在内置terminal中运行
-" @param wdir: 命令运行目录
-" @param cmd: 命令字符串
-" @param type: 用于设置encoding, errorformat ...
-function! s:rp.run(term, wdir, cmd, ...) dict
-    let l:type = (a:0 >= 1) ? a:1 : ''
+" Function: s:rp.run(cfg) dict {{{
+" @param cfg = {
+"   key: proj的类型
+"   term: 运行的终端类型
+"   type: 用于设置encoding, errorformat ...
+" }
+function! s:rp.run(cfg) dict
+    " get file and wdir
+    let [l:Fn, l:pat] = self.proj[a:cfg.key]
+    if !has_key(a:cfg, 'file')
+        if l:pat == v:null
+            let a:cfg.file = expand('%:p')
+        else
+            let a:cfg.file = self.glob(l:pat, a:cfg.lowest)
+            if empty(a:cfg.file)
+                throw 'None of ' . l:pat . ' was found!'
+            endif
+            let a:cfg.file = a:cfg.file[0]
+        endif
+    endif
+    let a:cfg.wdir = fnamemodify(a:cfg.file, ':h')
+
+    " set efm and enc
+    let l:type = get(a:cfg, 'type', '')
     if has_key(self.efm, l:type)
         execute 'setlocal efm=' . self.efm[l:type]
     endif
-    let g:asyncrun_encs = has_key(self.enc, l:type) ? self.enc[l:type] :
-                        \ ((IsWin() || IsGw()) ? 'gbk' : 'utf-8')
+    let g:asyncrun_encs = get(self.enc, l:type, (IsWin() || IsGw()) ? 'gbk' : 'utf-8')
 
-    let l:dir = fnameescape(a:wdir)
-    let l:bin = (a:term == 2) ? ':FloatermNew' : ':AsyncRun'
-    let l:cmd = (a:term == 0) ? a:cmd : printf('cd %s && %s', l:dir, a:cmd)
-    let l:arg = ''
-    if a:term == 2
-        let l:arg .= '--name=RunProject'
-    else
-        let l:arg .= '-cwd=' . l:dir
-        if a:term == 1
-            let l:arg .= ' -mode=term -pos=right'
-        endif
+    " execute
+    let l:dir = fnameescape(a:cfg.wdir)
+    let l:exec = printf(':AsyncRun -cwd=%s ', l:dir)
+    if !empty(a:cfg.term)
+        let l:exec .= printf('-mode=term -pos=%s ', a:cfg.term)
     endif
+    let l:exec .= function(l:Fn)(a:cfg)
     execute 'lcd ' . l:dir
-    let l:exec = printf('%s %s %s', l:bin, l:arg, l:cmd)
     call SetExecLast(l:exec)
     execute l:exec
 endfunction
 " }}}
 " }}}
 
-" Function: RunProject(keys, [args]) {{{
+" Function: RunProject(keys, [cfg]) {{{
 function! RunProject(keys, ...)
-    " doc
     " {{{
-    " MapKeys: [rR][cblto][pP ...]
-    "          [%1][%2   ][%3    ]
+    " MapKeys: [rR][cblto][p...]
+    "          [%1][%2   ][%3  ]
     " Run: %1
     "   r : build and run
     "   R : insert or append global args(can use with %2 together)
@@ -1563,82 +1562,62 @@ function! RunProject(keys, ...)
     "   o : use project with the lowest directory
     " Project: %3
     "   p : run project from s:ws.rp
-    "   P : set project to s:ws.rp
     "   ... : supported project from s:rp.proj
     " }}}
-    " Function: s:parseKeys(args) closure {{{
-    function! s:parseKeys(args) closure
-        " parse conf
-        let l:conf = {
-            \ 'key'   : a:keys[-1:-1],
-            \ 'run'   : (a:keys =~# '[bc]') ? 0 : 1,
-            \ 'term'  : (a:keys =~# 'l') ? 2 : ((a:keys =~# 't') ? 1 : 0),
-            \ 'clean' : (a:keys =~# 'c') ? 1 : 0,
-            \ 'args'  : a:args,
-            \ }
-        " parse fn and file
-        if a:keys =~# '[fj]'
-            " filetype, cell
-            let l:conf.filetype = &filetype
-            return [s:rp.proj[l:conf.key][0], expand('%:p'), l:conf]
-        elseif a:keys =~? 'p'
-            " project
-            if a:keys =~# 'P' || empty(s:ws.rp.fn)
-                let l:p = GetInput('rp.fn (f,' . join(split(s:rp.proj.sets[1:-2], '\zs'), ',') . '): ')[0:0]
-                if empty(l:p)
-                    throw 'Invalid proj'
-                endif
-                let s:ws.rp.fn = s:rp.proj[l:p][0]
-            endif
-            if a:keys =~# 'P' || empty(s:ws.rp.file)
-                let s:ws.rp.file = GetInput('rp.file: ', '', 'file')
-                if empty(s:ws.rp.file)
-                    throw 'Invalid file'
-                endif
-                let s:ws.rp.file = fnamemodify(s:ws.rp.file, ':p')
-                let s:ws.rp.filetype = getbufvar(fnamemodify(s:ws.rp.file, ':t'), '&filetype', &filetype)
-            endif
-            if a:keys =~# 'P'
-                let s:ws.rp.args = GetInput('rp.args: ', '', 'file' )
-            endif
-            if empty(a:args)
-                let l:conf.args = s:ws.rp.args
-            endif
-            let l:conf.filetype = s:ws.rp.filetype
-            return [s:ws.rp.fn, s:ws.rp.file, l:conf]
-        elseif a:keys =~# s:rp.proj.sets
-            " others
-            let [l:fn, l:pat] = s:rp.proj[l:conf.key]
-            let l:file = s:rp.glob(l:pat, (a:keys =~# 'o'))
-            if empty(l:file)
-                throw 'None of ' . l:pat . ' was found!'
-            endif
-            return [l:fn, (len(l:file) == 1) ? l:file[0] : l:file, l:conf]
-        endif
-    endfunction
-    " }}}
-
     if a:keys =~# 'R'
-        call PopSelection({
-            \ 'opt' : 'select args',
-            \ 'lst' : ['-static', 'tags', '--target tags'],
-            \ 'cpl' : 'file',
-            \ 'cmd' : {sopt, arg -> call('RunProject', ['r' . a:keys[1:], arg])}
-            \ })
+        let s:cfg = {
+            \ 'term': '', 'agen': '', 'abld': '', 'arun': '',
+            \ 'deploy': 'run',
+            \ 'lowest': 0,
+            \ }
+        let l:sel = {
+            \ 'opt' : 'change configs',
+            \ 'lst' : ['term', 'agen', 'abld', 'arun', 'deploy', 'lowest'],
+            \ 'dic' : {
+                \ 'term': {'lst': ['right', 'bottom', 'floaterm']},
+                \ 'agen': {'lst': ['-DTEST=']},
+                \ 'abld': {'lst': ['-static', 'tags', '--target tags']},
+                \ 'arun': {'lst': ['--nocapture']},
+                \ 'deploy': {'lst': ['build', 'run', 'clean', 'test']},
+                \ 'lowest': {},
+                \ },
+            \ 'sub' : {
+                \ 'cmd': {sopt, sel -> extend(s:cfg, {sopt : sel})},
+                \ 'get': {sopt -> s:cfg[sopt]},
+                \ },
+            \ 'onCR': {sopt -> call('RunProject', [tolower(a:keys), s:cfg])}
+            \ }
+        if a:keys =~# 'p'
+            call extend(s:cfg, {'key': '', 'file': '', 'type': ''})
+            call extend(s:cfg, s:ws.rp)
+            let l:sel.lst = ['key', 'file', 'type'] + l:sel.lst
+            let l:sel.dic['key'] = {'lst': keys(s:rp.proj)}
+            let l:sel.dic['file'] = {'cpl': 'file'}
+            let l:sel.dic['type'] = {'cpl': 'filetype'}
+        endif
+        call PopSelection(l:sel)
+    elseif a:keys =~# 'p'
+        if a:0 > 0
+            let s:ws.rp = a:1
+            let s:ws.rp.file = fnamemodify(s:ws.rp.file, ':p')
+            if empty(s:ws.rp.type)
+                let s:ws.rp.type = getbufvar(fnamemodify(s:ws.rp.file, ':t'), '&filetype', &filetype)
+            endif
+        endif
+        call RunProject(has_key(s:ws.rp, 'key') ? a:keys[0:-2] : ('R' . a:keys[1:-1]), s:ws.rp)
     else
         try
-            let l:ret = s:parseKeys((a:0 > 0) ? a:1 : '')
-            let [l:fn, l:file, l:conf] = l:ret
-            if type(l:file) == v:t_list
-                call PopSelection({
-                    \ 'opt' : 'select project file',
-                    \ 'lst' : l:file,
-                    \ 'cmd' : l:fn,
-                    \ 'arg' : l:conf
-                    \ })
-            else
-                call function(l:fn)('', l:file, l:conf)
+            let l:cfg = {
+                \ 'key'   : a:keys[-1:-1],
+                \ 'term'  : (a:keys =~# 'l') ? 'floaterm' : ((a:keys =~# 't') ? 'right' : ''),
+                \ 'deploy': (a:keys =~# 'b') ? 'build' : ((a:keys =~# 'c') ? 'clean' : 'run'),
+                \ 'lowest': (a:keys =~# 'o') ? 1 : 0,
+                \ 'agen': '', 'abld': '', 'arun': '',
+                \ }
+            if a:0 > 0
+                call extend(l:cfg, a:1)
             endif
+            call s:rp.run(l:cfg)
         catch
             echo v:exception
         endtry
@@ -1646,119 +1625,119 @@ function! RunProject(keys, ...)
 endfunction
 " }}}
 
-" Function: FnFile(sopt, sel, conf) {{{
-function! FnFile(sopt, sel, conf)
-    let l:type = a:conf.filetype
-    if !has_key(s:rp.filetype, l:type)
-        \ || ('dosbatch' ==? l:type && !IsWin())
-        echo 's:rp.filetype doesn''t support "' . l:type . '"'
-        return
+" Function: FnFile(cfg) {{{
+function! FnFile(cfg)
+    let l:type = get(a:cfg, 'type', &filetype)
+    if !has_key(s:rp.type, l:type) || ('dosbatch' ==? l:type && !IsWin())
+        throw 's:rp.type doesn''t support "' . l:type . '"'
+    else
+        let a:cfg.type = l:type
+        let a:cfg.srcf = '"' . fnamemodify(a:cfg.file, ':t') . '"'
+        let a:cfg.outf = '"' . fnamemodify(a:cfg.file, ':t:r') . '"'
+        let l:pstr = map(copy(s:rp.type[l:type]), {key, val -> (key == 0) ? val : get(a:cfg, val, '')})
+        return call('printf', l:pstr)
     endif
-
-    let l:dict = {
-        \ 'args' : a:conf.args,
-        \ 'srcf' : '"' . fnamemodify(a:sel, ':t') . '"',
-        \ 'outf' : '"' . fnamemodify(a:sel, ':t:r') . '"'
-        \ }
-    let l:pstr = map(copy(s:rp.filetype[l:type]), {key, val -> (key == 0) ? val : get(l:dict, val, '')})
-
-    call s:rp.run(a:conf.term, fnamemodify(a:sel, ':h'), call('printf', l:pstr), l:type)
 endfunction
 " }}}
 
-" Function: FnCell(sopt, sel, conf) {{{
-function! FnCell(sopt, sel, conf)
-    let l:type = a:conf.filetype
+" Function: FnCell(cfg) {{{
+function! FnCell(cfg)
+    let l:type = &filetype
     if !has_key(s:rp.cell, l:type)
-        echo 's:rp.cell doesn''t support "' . l:type . '"'
-        return
+        throw 's:rp.cell doesn''t support "' . l:type . '"'
+    else
+        let [l:bin, l:pats, l:pate] = s:rp.cell[l:type]
+        let l:exec = ':' . join(GetRange(l:pats, l:pate), ',') . 'AsyncRun '. l:bin
+        execute l:exec
+        throw l:exec
     endif
-    if has_key(s:rp.efm, l:type)
-        execute 'setlocal efm=' . s:rp.efm[l:type]
-    endif
-    let [l:bin, l:pats, l:pate] = s:rp.cell[l:type]
-    let l:range = GetRange(l:pats, l:pate)
-
-    let l:exec = ':' . join(l:range, ',') . 'AsyncRun '. l:bin
-    execute l:exec
-    echo l:exec
 endfunction
 " }}}
 
-" Function: FnMake(sopt, sel, conf) {{{
-function! FnMake(sopt, sel, conf)
-    let l:outfile = s:rp.pstr(a:sel, s:rp.pat.target)
-    let l:workdir = fnamemodify(a:sel, ':h')
-
-    let l:cmd = printf('make %s %s', a:conf.clean ? 'clean' : '', a:conf.args)
-    if a:conf.run
-        let l:cmd .= empty(l:outfile) ? ' && echo "[RP]Warning: No executable file, try add TARGET"' : ' && "./__VBuildOut/' . l:outfile .'"'
+" Function: FnMake(cfg) {{{
+function! FnMake(cfg)
+    if a:cfg.deploy ==# 'clean'
+        let l:cmd = 'make clean'
+    else
+        let l:cmd = 'make ' . a:cfg.abld
+        if a:cfg.deploy ==# 'run'
+            let l:outfile = s:rp.pstr(a:cfg.file, s:rp.pat.target)
+            if empty(l:outfile)
+                let l:cmd .= ' && echo "[RP]Warning: No executable file, try add TARGET"'
+            else
+                let l:cmd .= printf(' && "./__VBuildOut/%s" %s', l:outfile, a:cfg.arun)
+            endif
+        endif
     endif
-    call s:rp.run(a:conf.term, l:workdir, l:cmd)
+    return l:cmd
 endfunction
 " }}}
 
-" Function: FnGMake(sopt, sel, conf) {{{
+" Function: FnGMake(cfg) {{{
 " generate make from cmake, qmake ...
-function! FnGMake(sopt, sel, conf)
-    let l:srcfile = fnamemodify(a:sel, ':t')
-    let l:outfile = s:rp.pstr(a:sel, a:conf.key ==# 'q' ? s:rp.pat.target : s:rp.pat.project)
-    let l:workdir = fnamemodify(a:sel, ':h')
-    let l:outdir = l:workdir . '/__VBuildOut'
-
-    if a:conf.clean
+function! FnGMake(cfg)
+    let l:outdir = a:cfg.wdir . '/__VBuildOut'
+    if a:cfg.deploy ==# 'clean'
         call delete(l:outdir, 'rf')
+        throw '__VBuildOut was removed'
     else
         silent! call mkdir(l:outdir, 'p')
-        if a:conf.key ==# 'u'
-            let l:cmd = printf('cmake -G "Unix Makefiles" .. && cmake --build . %s', a:conf.args)
-        elseif a:conf.key ==# 'n'
-            let l:cmd = printf('vcvars64.bat && cmake -G "NMake Makefiles" .. && cmake --build . %s', a:conf.args)
-        elseif a:conf.key ==# 'q'
+        if a:cfg.key ==# 'u'
+            let l:cmd = printf('cmake %s -G "Unix Makefiles" .. && cmake --build . %s', a:cfg.agen, a:cfg.abld)
+        elseif a:cfg.key ==# 'n'
+            let l:cmd = printf('vcvars64.bat && cmake %s -G "NMake Makefiles" .. && cmake --build . %s',  a:cfg.agen, a:cfg.abld)
+        elseif a:cfg.key ==# 'q'
+            let l:srcfile = fnamemodify(a:cfg.file, ':t')
             if IsWin()
-                let l:cmd = printf('vcvars64.bat && qmake ../"%s" && nmake %s', l:srcfile, a:conf.args)
+                let l:cmd = printf('vcvars64.bat && qmake %s ../"%s" && nmake %s', a:cfg.agen, l:srcfile, a:cfg.abld)
             else
-                let l:cmd = printf('qmake ../"%s" && make %s', l:srcfile, a:conf.args)
+                let l:cmd = printf('qmake %s ../"%s" && make %s', a:cfg.agen, l:srcfile, a:cfg.abld)
             endif
         endif
         let l:cmd = printf('cd __VBuildOut && %s && cd ..', l:cmd)
-        if a:conf.run
-            let l:cmd .= empty(l:outfile) ? ' && echo "[RP]Warning: No executable file, try add project() or TARGET"' : ' && "./__VBuildOut/' . l:outfile .'"'
+
+        if a:cfg.deploy ==# 'run'
+            let l:outfile = s:rp.pstr(a:cfg.file, a:cfg.key ==# 'q' ? s:rp.pat.target : s:rp.pat.project)
+            if empty(l:outfile)
+                let l:cmd .= ' && echo "[RP]Warning: No executable file, try add TARGET"'
+                let l:cmd .= ' && echo "[RP]Warning: No executable file, try add project() or TARGET"'
+            else
+                let l:cmd .= printf(' && "./__VBuildOut/%s" %s', l:outfile, a:cfg.arun)
+            endif
         endif
-        call s:rp.run(a:conf.term, l:workdir, l:cmd)
+        return l:cmd
     endif
 endfunction
 " }}}
 
-" Function: FnCargo(sopt, sel, conf) {{{
-function! FnCargo(sopt, sel, conf)
-    let l:workdir = fnamemodify(a:sel, ':h')
-    let l:cmd = printf('cargo %s %s',
-                \ a:conf.run ? 'run' :
-                \ a:conf.clean ? 'clean' :
-                \ 'build',
-                \ a:conf.args)
-    call s:rp.run(a:conf.term, l:workdir, l:cmd, 'rust')
-endfunction
-" }}}
-
-" Function: FnSphinx(sopt, sel, conf) {{{
-function! FnSphinx(sopt, sel, conf)
-    let l:outfile = 'build/html/index.html'
-    let l:workdir = fnamemodify(a:sel, ':h')
-
-    let l:cmd = printf('make %s %s', a:conf.clean ? 'clean' : 'html', a:conf.args)
-    if a:conf.run
-        let l:cmd .= ' && firefox ' . l:outfile
+" Function: FnCargo(cfg) {{{
+function! FnCargo(cfg)
+    let l:cmd = printf('cargo %s %s', a:cfg.deploy, a:cfg.abld)
+    if a:cfg.deploy ==# 'run' || a:cfg.deploy ==# 'test'
+        let l:cmd .= ' -- ' . a:cfg.arun
     endif
-    call s:rp.run(a:conf.term, l:workdir, l:cmd)
+    let a:cfg.type = 'rust'
+    return l:cmd
 endfunction
 " }}}
 
-" Function: FnTasks(sopt, sel, conf) {{{
-function! FnTasks(sopt, sel, conf)
-    call s:rp.run(a:conf.term, fnamemodify(a:sel, ':h'),
-                \ printf('echo "[RP]Warning: Not implemented(%s)"', a:sel . '/tasks.json'))
+" Function: FnSphinx(cfg) {{{
+function! FnSphinx(cfg)
+    if a:cfg.deploy ==# 'clean'
+        let l:cmd = 'make clean'
+    else
+        let l:cmd = 'make html ' . a:cfg.abld
+        if a:cfg.deploy ==# 'run'
+            let l:cmd .= ' && firefox build/html/index.html'
+        endif
+    endif
+    return l:cmd
+endfunction
+" }}}
+
+" Function: FnTasks(cfg) {{{
+function! FnTasks(cfg)
+    throw printf('echo "[RP]Warning: Not implemented(%s/tasks.json)"', a:cfg.file)
 endfunction
 " }}}
 " }}}
@@ -1878,7 +1857,7 @@ function! s:fw.exec(input, ...) dict
         call PopSelection({
             \ 'opt' : 'select options',
             \ 'lst' : ['--no-fixed-strings', '--word-regexp', '--hidden', '--no-ignore', '--encoding gbk'],
-            \ 'cmd' : {sopt, arg -> s:fw.exec(0, arg)}
+            \ 'cmd' : {sopt, sel -> s:fw.exec(0, sel)}
             \ })
     else
         if a:0
@@ -1898,7 +1877,6 @@ call s:fw.setEngine('fuzzy', 'leaderf')
 
 " Function: FindWow(keys, mode) {{{ 查找
 function! FindWow(keys, mode)
-    " doc
     " {{{
     " MapKeys: [fF][av][btopr][IiWwSs=]
     "          [%1][%2][%3   ][4%     ]
@@ -1929,7 +1907,6 @@ function! FindWow(keys, mode)
     "   LowerCase: [iws] find in ignorecase
     "   UpperCase: [IWS] find in case match
     " }}}
-    " parse function
     " Function: s:getLocations() {{{
     function! s:getLocations()
         let l:loc = GetInput('Location: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
