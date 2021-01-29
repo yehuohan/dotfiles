@@ -539,15 +539,12 @@ if s:gset.use_lightline
         if &ft ==# 'qf'
             return 'cwd = ' . getcwd()
         else
-            let l:fp = expand('%:p')
-            return empty(s:ws.fw.path) ? l:fp :
-                \ substitute(l:fp, escape(s:ws.fw.path, '\'), '', '')
+            return substitute(expand('%:p'), '^' . escape(get(s:ws.fw, 'path', ''), '\'), '', '')
         endif
     endfunction
 
     function! Plug_ll_msgRight()
-        return empty(s:ws.fw.path) ? '' :
-            \ printf('%s[%s(%s)]', s:ws.fw.path, join(s:ws.fw.filters, ','), join(s:ws.fw.globlst, ','))
+        return get(s:ws.fw, 'path', '')
     endfunction
 
     function! Plug_ll_checkMixedIndent()
@@ -1343,11 +1340,7 @@ endfunction
 " }}}
 
 " Workspace {{{
-let s:ws = {
-    \ 'root': '',
-    \ 'rp': {},
-    \ 'fw': {'path': '', 'filters': [], 'globlst': []},
-    \ }
+let s:ws = {'root': '', 'rp': {}, 'fw': {}}
 let s:dp = {
     \ 'rp': {'hl': 'WarningMsg', 'str': ['/\V\c|| "\=[RP]Warning: \.\*\$/hs=s+3']},
     \ 'fw': {'hl': 'IncSearch', 'str': []},
@@ -1385,7 +1378,6 @@ endfunction
 " Project {{{
 " Required: 'skywind3000/asyncrun.vim', 'voldikss/floaterm'
 "           'yehuohan/popc', 'yehuohan/popset'
-
 " Struct: s:rp {{{
 " @attribute proj: project类型
 " @attribute type: filetype类型
@@ -1547,31 +1539,33 @@ endfunction
 " }}}
 
 " Function: RunProject(keys, [cfg]) {{{
+" {{{
+" @param keys: [rR][cblto][p...]
+"              [%1][%2   ][%3  ]
+" Run: %1
+"   r : build and run
+"   R : insert or append global args(can use with %2 together)
+" Command: %2
+"   c : clean project
+"   b : build without run
+"   l : run project in floaterm
+"   t : run project in terminal
+"   o : use project with the lowest directory
+" Project: %3
+"   p : run project from s:ws.rp
+"   ... : supported project from s:rp.proj
+" @param cfg: first priority of config
+" }}}
 function! RunProject(keys, ...)
-    " {{{
-    " MapKeys: [rR][cblto][p...]
-    "          [%1][%2   ][%3  ]
-    " Run: %1
-    "   r : build and run
-    "   R : insert or append global args(can use with %2 together)
-    " Command: %2
-    "   c : clean project
-    "   b : build without run
-    "   l : run project in floaterm
-    "   t : run project in terminal
-    "   o : use project with the lowest directory
-    " Project: %3
-    "   p : run project from s:ws.rp
-    "   ... : supported project from s:rp.proj
-    " }}}
     if a:keys =~# 'R'
-        let s:cfg = {
+        " config project
+        let l:cfg = {
             \ 'term': '', 'agen': '', 'abld': '', 'arun': '',
             \ 'deploy': 'run',
             \ 'lowest': 0,
             \ }
         let l:sel = {
-            \ 'opt' : 'change configs',
+            \ 'opt' : 'config project',
             \ 'lst' : ['term', 'agen', 'abld', 'arun', 'deploy', 'lowest'],
             \ 'dic' : {
                 \ 'term': {'lst': ['right', 'bottom', 'floaterm']},
@@ -1579,17 +1573,17 @@ function! RunProject(keys, ...)
                 \ 'abld': {'lst': ['-static', 'tags', '--target tags']},
                 \ 'arun': {'lst': ['--nocapture']},
                 \ 'deploy': {'lst': ['build', 'run', 'clean', 'test']},
-                \ 'lowest': {},
+                \ 'lowest': {'lst': [0, 1]},
                 \ },
             \ 'sub' : {
-                \ 'cmd': {sopt, sel -> extend(s:cfg, {sopt : sel})},
-                \ 'get': {sopt -> s:cfg[sopt]},
+                \ 'cmd' : {sopt, sel -> extend(l:cfg, {sopt : sel})},
+                \ 'get' : {sopt -> l:cfg[sopt]},
                 \ },
-            \ 'onCR': {sopt -> call('RunProject', [tolower(a:keys), s:cfg])}
+            \ 'onCR': {sopt -> call('RunProject', ['r' . a:keys[1:-1], l:cfg])}
             \ }
         if a:keys =~# 'p'
-            call extend(s:cfg, {'key': '', 'file': '', 'type': ''})
-            call extend(s:cfg, s:ws.rp)
+            call extend(l:cfg, {'key': '', 'file': '', 'type': ''})
+            call extend(l:cfg, s:ws.rp)
             let l:sel.lst = ['key', 'file', 'type'] + l:sel.lst
             let l:sel.dic['key'] = {'lst': keys(s:rp.proj)}
             let l:sel.dic['file'] = {'cpl': 'file'}
@@ -1597,6 +1591,7 @@ function! RunProject(keys, ...)
         endif
         call PopSelection(l:sel)
     elseif a:keys =~# 'p'
+        " save config of project
         if a:0 > 0
             let s:ws.rp = a:1
             let s:ws.rp.file = fnamemodify(s:ws.rp.file, ':p')
@@ -1606,6 +1601,7 @@ function! RunProject(keys, ...)
         endif
         call RunProject(has_key(s:ws.rp, 'key') ? a:keys[0:-2] : ('R' . a:keys[1:-1]), s:ws.rp)
     else
+        " run project with config
         try
             let l:cfg = {
                 \ 'key'   : a:keys[-1:-1],
@@ -1647,7 +1643,7 @@ function! FnCell(cfg)
         throw 's:rp.cell doesn''t support "' . l:type . '"'
     else
         let [l:bin, l:pats, l:pate] = s:rp.cell[l:type]
-        let l:exec = ':' . join(GetRange(l:pats, l:pate), ',') . 'AsyncRun '. l:bin
+        let l:exec = printf(':%sAsyncRun %s', join(GetRange(l:pats, l:pate), ','), l:bin)
         execute l:exec
         throw l:exec
     endif
@@ -1743,25 +1739,12 @@ endfunction
 " }}}
 
 " Find {{{
-" Required: 'skywind3000/asyncrun.vim'
-"           'Yggdroot/LeaderF', 'junegunn/fzf.vim'
+" Required: 'skywind3000/asyncrun.vim', 'Yggdroot/LeaderF', 'junegunn/fzf.vim'
 "           'yehuohan/popc', 'yehuohan/popset'
-
 " Struct: s:fw {{{
-" @attribute engine: 搜索程序
-"            sr : search
-"            sa : search append
-"            sk : search kill
-"            ff : fuzzy files
-"            fl : fuzzy line text with <cword>
-"            fL : fuzzy line text
-"            fh : fuzzy ctags with <cword>
-"            fH : fuzzy ctags
-"            fd : fuzzy gtags definitions with <cword>
-"            fg : fuzzy gtags references with <cword>
+" @attribute engine: see FindW, FindWFuzzy, FindWKill
 " @attribute rg: 预置的rg搜索命令，用于搜索指定文本
 " @attribute fuzzy: 预置的模糊搜索命令，用于文件和文本等模糊搜索
-" @attribute mappings: 映射按键
 let s:fw = {
     \ 'cmd' : '',
     \ 'opt' : '',
@@ -1769,21 +1752,12 @@ let s:fw = {
     \ 'loc' : '',
     \ 'engine' : {
         \ 'rg' : '', 'fuzzy' : '',
-        \ 'sr' : '', 'sa' : '', 'sk' : '',
-        \ 'ff' : '', 'fF' : '', 'fl' : '', 'fL' : '', 'fh' : '', 'fH' : '', 'fd' : '', 'fD' : '',
-        \ 'sel': {
-            \ 'opt' : 'select the engine',
-            \ 'lst' : ['rg', 'fuzzy'],
-            \ 'dic' : {
-                \ 'rg' : {},
-                \ 'fuzzy' : {
-                    \ 'opt' : 'select fuzzy engine',
-                    \ 'lst' : ['fzf', 'leaderf'],
-                    \ 'cmd' : {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
-                    \ 'get' : {sopt -> s:fw.engine.fuzzy}
-                    \ }
-                \ }
-            \ }
+        \ 'sel-fuzzy': {
+            \ 'opt' : 'select fuzzy engine',
+            \ 'lst' : ['fzf', 'leaderf'],
+            \ 'cmd' : {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
+            \ 'get' : {sopt -> s:fw.engine.fuzzy},
+            \ },
         \ },
     \ 'rg' : {
         \ 'asyncrun' : {
@@ -1817,31 +1791,34 @@ let s:fw = {
     \ }
 " s:fw.mappings {{{
 let s:fw.mappings.rg = [
-    \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fri',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'frI',
-    \  'fw',  'fbw',  'ftw',  'fow',  'fpw',  'frw',  'fW',  'fbW',  'ftW',  'foW',  'fpW',  'frW',
-    \  'fs',  'fbs',  'fts',  'fos',  'fps',  'frs',  'fS',  'fbS',  'ftS',  'foS',  'fpS',  'frS',
-    \  'f=',  'fb=',  'ft=',  'fo=',  'fp=',  'fr=',  'f=',  'fb=',  'ft=',  'fo=',  'fp=',  'fr=',
-    \  'Fi',  'Fbi',  'Fti',  'Foi',  'Fpi',  'Fri',  'FI',  'FbI',  'FtI',  'FoI',  'FpI',  'FrI',
-    \  'Fw',  'Fbw',  'Ftw',  'Fow',  'Fpw',  'Frw',  'FW',  'FbW',  'FtW',  'FoW',  'FpW',  'FrW',
-    \  'Fs',  'Fbs',  'Fts',  'Fos',  'Fps',  'Frs',  'FS',  'FbS',  'FtS',  'FoS',  'FpS',  'FrS',
-    \  'F=',  'Fb=',  'Ft=',  'Fo=',  'Fp=',  'Fr=',  'F=',  'Fb=',  'Ft=',  'Fo=',  'Fp=',  'Fr=',
-    \ 'fai', 'fabi', 'fati', 'faoi', 'fapi', 'fari', 'faI', 'fabI', 'fatI', 'faoI', 'fapI', 'farI',
-    \ 'faw', 'fabw', 'fatw', 'faow', 'fapw', 'farw', 'faW', 'fabW', 'fatW', 'faoW', 'fapW', 'farW',
-    \ 'fas', 'fabs', 'fats', 'faos', 'faps', 'fars', 'faS', 'fabS', 'fatS', 'faoS', 'fapS', 'farS',
-    \ 'fa=', 'fab=', 'fat=', 'fao=', 'fap=', 'far=', 'fa=', 'fab=', 'fat=', 'fao=', 'fap=', 'far=',
-    \ 'Fai', 'Fabi', 'Fati', 'Faoi', 'Fapi', 'Fari', 'FaI', 'FabI', 'FatI', 'FaoI', 'FapI', 'FarI',
-    \ 'Faw', 'Fabw', 'Fatw', 'Faow', 'Fapw', 'Farw', 'FaW', 'FabW', 'FatW', 'FaoW', 'FapW', 'FarW',
-    \ 'Fas', 'Fabs', 'Fats', 'Faos', 'Faps', 'Fars', 'FaS', 'FabS', 'FatS', 'FaoS', 'FapS', 'FarS',
-    \ 'Fa=', 'Fab=', 'Fat=', 'Fao=', 'Fap=', 'Far=', 'Fa=', 'Fab=', 'Fat=', 'Fao=', 'Fap=', 'Far=',
+    \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'Fi',  'FI',
+    \  'fw',  'fbw',  'ftw',  'fow',  'fpw',  'fW',  'fbW',  'ftW',  'foW',  'fpW',  'Fw',  'FW',
+    \  'fs',  'fbs',  'fts',  'fos',  'fps',  'fS',  'fbS',  'ftS',  'foS',  'fpS',  'Fs',  'FS',
+    \  'f=',  'fb=',  'ft=',  'fo=',  'fp=',  'f=',  'fb=',  'ft=',  'fo=',  'fp=',  'F=',  'F=',
+    \ 'fai', 'fabi', 'fati', 'faoi', 'fapi', 'faI', 'fabI', 'fatI', 'faoI', 'fapI', 'Fai', 'FaI',
+    \ 'faw', 'fabw', 'fatw', 'faow', 'fapw', 'faW', 'fabW', 'fatW', 'faoW', 'fapW', 'Faw', 'FaW',
+    \ 'fas', 'fabs', 'fats', 'faos', 'faps', 'faS', 'fabS', 'fatS', 'faoS', 'fapS', 'Fas', 'FaS',
+    \ 'fa=', 'fab=', 'fat=', 'fao=', 'fap=', 'fa=', 'fab=', 'fat=', 'fao=', 'fap=', 'Fa=', 'Fa=',
     \ 'fvi', 'fvpi', 'fvI',  'fvpI',
     \ 'fvw', 'fvpw', 'fvW',  'fvpW',
     \ 'fvs', 'fvps', 'fvS',  'fvpS',
     \ 'fv=', 'fvp=', 'fv=',  'fvp=',
     \ ]
 let s:fw.mappings.fuzzy = [
+    \  'Ff',  'FF',  'Fl',  'FL',  'Fh',  'FH',
     \  'ff',  'fF',  'fl',  'fL',  'fh',  'fH',  'fd',  'fg',
     \ 'fpf', 'fpF', 'fpl', 'fpL', 'fph', 'fpH', 'fpd', 'fpg',
     \ ]
+" }}}
+
+" Function: s:fw.unifyPath(path) dict {{{
+function! s:fw.unifyPath(path) dict
+    let l:path = fnamemodify(a:path, ':p')
+    if l:path =~# '[/\\]$'
+        let l:path = strcharpart(l:path, 0, strchars(l:path) - 1)
+    endif
+    return l:path
+endfunction
 " }}}
 
 " Function: s:fw.setEngine(type, engine) dict {{{
@@ -1851,23 +1828,12 @@ function! s:fw.setEngine(type, engine) dict
 endfunction
 " }}}
 
-" Function: s:fw.exec(input, ['opt']) dict {{{
-function! s:fw.exec(input, ...) dict
-    if a:input
-        call PopSelection({
-            \ 'opt' : 'select options',
-            \ 'lst' : ['--no-fixed-strings', '--word-regexp', '--hidden', '--no-ignore', '--encoding gbk'],
-            \ 'cmd' : {sopt, sel -> s:fw.exec(0, sel)}
-            \ })
-    else
-        if a:0
-            let l:self.opt .= a:1
-        endif
-        " format: printf('cmd %s %s %s',<opt>,<pat>,<loc>)
-        let l:exec = printf(self.cmd, self.opt, self.pat, self.loc)
-        call SetExecLast(l:exec)
-        execute l:exec
-    endif
+" Function: s:fw.exec() dict {{{
+function! s:fw.exec() dict
+    " format: printf('cmd %s %s %s',<opt>,<pat>,<loc>)
+    let l:exec = printf(self.cmd, self.opt, self.pat, self.loc)
+    call SetExecLast(l:exec)
+    execute l:exec
 endfunction
 " }}}
 
@@ -1875,38 +1841,38 @@ call s:fw.setEngine('rg', 'asyncrun')
 call s:fw.setEngine('fuzzy', 'leaderf')
 " }}}
 
-" Function: FindWow(keys, mode) {{{ 查找
-function! FindWow(keys, mode)
-    " {{{
-    " MapKeys: [fF][av][btopr][IiWwSs=]
-    "          [%1][%2][%3   ][4%     ]
-    " Find: %1
-    "   f : find working
-    "   F : find working with inputing args
-    " Command: %2
-    "   '': find with rg by default
-    "   a : find with rg append
-    "   v : find with vimgrep
-    " Location: %3
-    "   b : find in current buffer(%)
-    "   t : find in buffers of tab via popc
-    "   o : find in buffers of all tabs via popc
-    "   p : find with inputing path
-    "   r : find with inputing working path and filter
-    "  '' : find with s:ws.fw
-    " Pattern: %4
-    "   = : find text from clipboard
-    "   Normal Mode: mode='n'
-    "   i : find input
-    "   w : find word
-    "   s : find word with boundaries
-    "   Visual Mode: mode='v'
-    "   i : find input    with selected
-    "   w : find visual   with selected
-    "   s : find selected with boundaries
-    "   LowerCase: [iws] find in ignorecase
-    "   UpperCase: [IWS] find in case match
-    " }}}
+" Function: FindW(keys, mode, [cfg]) {{{ 查找
+" {{{
+" @param keys: [fF][av][btop][IiWwSs=]
+"              [%1][%2][%3  ][4%     ]
+" Find: %1
+"   F : find with inputing args
+" Command: %2
+"   '': find with rg by default, see s:fw.engine.sr
+"   a : find with rg append, see s:fw.engine.sa
+"   v : find with vimgrep
+" Location: %3
+"   b : find in current buffer(%)
+"   t : find in buffers of tab via popc
+"   o : find in buffers of all tabs via popc
+"   p : find with inputing path
+"  '' : find with s:ws.fw
+" Pattern: %4
+"   = : find text from clipboard
+"   Normal Mode: mode='n'
+"   i : find input
+"   w : find word
+"   s : find word with boundaries
+"   Visual Mode: mode='v'
+"   i : find input    with selected
+"   w : find visual   with selected
+"   s : find selected with boundaries
+"   LowerCase: [iws] find in ignorecase
+"   UpperCase: [IWS] find in case match
+" @param mode: mapping mode of keys
+" @param cfg: first priority of config
+" }}}
+function! FindW(keys, mode, ...)
     " Function: s:getLocations() {{{
     function! s:getLocations()
         let l:loc = GetInput('Location: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
@@ -1948,16 +1914,11 @@ function! FindWow(keys, mode)
             let l:loc = join(popc#layer#buf#GetFiles('alltab'), '" "')
         elseif a:keys =~# 'p'
             let l:loc = join(s:getLocations(), '" "')
-        elseif a:keys =~# 'r'
-            let l:loc = FindWowSetArgs('pf') ? s:ws.fw.path : ''
         else
             if empty(s:ws.fw.path)
                 let s:ws.fw.path = popc#utils#FindRoot()
             endif
-            if empty(s:ws.fw.path)
-                call FindWowSetArgs('p')
-            endif
-            let l:loc = s:ws.fw.path
+            let l:loc = empty(s:ws.fw.path) ? '.' : s:ws.fw.path
         endif
         return l:loc
     endfunction
@@ -1969,10 +1930,13 @@ function! FindWow(keys, mode)
         if a:keys =~# '[iws]' | let l:opt .= '-i ' | elseif a:keys =~# '[IWS]' | let l:opt .= '-s ' | endif
         if a:keys !~# '[btop]'
             if !empty(s:ws.fw.filters)
-                let l:opt .= '-g"*.{' . join(s:ws.fw.filters, ',') . '}" '
+                let l:opt .= '-g"*.{' . s:ws.fw.filters . '}" '
             endif
             if !empty(s:ws.fw.globlst)
-                let l:opt .= '-g' . join(s:ws.fw.globlst, ' -g')
+                let l:opt .= '-g' . join(split(s:ws.fw.globlst), ' -g') . ' '
+            endif
+            if !empty(s:ws.fw.exargs)
+                let l:opt .= s:ws.fw.exargs
             endif
         endif
         return l:opt
@@ -2012,83 +1976,99 @@ function! FindWow(keys, mode)
     endfunction
     " }}}
 
-    let l:pat = s:parsePattern()
-    if empty(l:pat) | return | endif
-    if a:keys =~# 'v'
-        if !s:parseVimgrep() | return | endif
-        let s:fw.pat = l:pat
+    if a:keys =~# 'F'
+        " config find
+        let l:cfg = extend({'path': '', 'filters': '', 'globlst': '', 'exargs': ''}, s:ws.fw)
+        let l:sel = {
+            \ 'opt' : 'config find',
+            \ 'lst' : ['path', 'filters', 'globlst', 'exargs'],
+            \ 'dic' : {
+                \ 'path': {'cpl': 'file'},
+                \ 'filters': {'dsr': {sopt -> '-g*.{' . l:cfg.filters . '}'}},
+                \ 'globlst': {'dsr': {sopt -> '-g' . join(split(l:cfg.globlst), ' -g')}, 'cpl': 'file'},
+                \ 'exargs': {'lst' : ['--no-fixed-strings', '--word-regexp', '--hidden', '--no-ignore', '--encoding gbk']},
+                \ },
+            \ 'sub' : {
+                \ 'cmd' : {sopt, sel -> extend(l:cfg, {sopt : sel})},
+                \ 'get' : {sopt -> l:cfg[sopt]},
+                \ },
+            \ 'onCR': {sopt -> call('FindW', ['f' . a:keys[1:-1], a:mode, l:cfg])}
+            \ }
+        call PopSelection(l:sel)
     else
-        let s:fw.loc = s:parseLocation()
-        if empty(s:fw.loc) | return | endif
-        let s:fw.opt = s:parseOptions()
-        let s:fw.cmd = s:parseCommand()
-        let s:fw.pat = escape(l:pat, s:fw.engine.chars)
+        " save config
+        if a:0 > 0
+            let s:ws.fw = a:1
+            let s:ws.fw.path = s:fw.unifyPath(s:ws.fw.path)
+        else
+            call extend(s:ws.fw, {'path': '', 'filters': '', 'globlst': '', 'exargs': ''}, 'keep')
+        endif
+        " find with config
+        let l:pat = s:parsePattern()
+        if empty(l:pat) | return | endif
+        if a:keys =~# 'v'
+            if !s:parseVimgrep() | return | endif
+            let s:fw.pat = l:pat
+        else
+            let s:fw.loc = s:parseLocation()
+            if empty(s:fw.loc) | return | endif
+            let s:fw.opt = s:parseOptions()
+            let s:fw.cmd = s:parseCommand()
+            let s:fw.pat = escape(l:pat, s:fw.engine.chars)
+        endif
+        call add(s:dp.fw.str, printf('/\V\c%s/', escape(l:pat, '\/')))
+        call s:fw.exec()
     endif
-    call add(s:dp.fw.str, printf('/\V\c%s/', escape(l:pat, '\/')))
-    call s:fw.exec(a:keys =~# 'F')
 endfunction
 " }}}
 
-" Function: FindWowKill() {{{ 停止查找
-function! FindWowKill()
-    execute s:fw.engine.sk
-endfunction
+" Function: FindWFuzzy(keys) {{{ 模糊搜索
+" {{{
+" @param keys: [fF][p ][fFlLhHdg]
+"              [%1][%2][%3      ]
+" Find: %1
+"   F : find with inputing path
+" Location: %2
+"   p : find with inputing temp path
+" Action: %3
+"   f : fuzzy files
+"   F : fuzzy files with <cword>
+"   l : fuzzy line text with <cword>
+"   L : fuzzy line text
+"   h : fuzzy ctags with <cword>
+"   H : fuzzy ctags
+"   d : fuzzy gtags definitions with <cword>
+"   g : fuzzy gtags references with <cword>
 " }}}
-
-" Function: FindWowFuzzy(keys) {{{ 模糊搜索
-function! FindWowFuzzy(keys)
+function! FindWFuzzy(keys)
+    let l:f = (a:keys[0] ==# 'F') ? 1 : 0
     let l:p = (a:keys[1] ==# 'p') ? 1 : 0
-    let l:path = s:ws.fw.path
-    if !l:p && empty(l:path)
-        " 使用fw.path
-        let s:ws.fw.path = popc#utils#FindRoot()
-        if empty(s:ws.fw.path) && !FindWowSetArgs('p')
+    let l:path = get(s:ws.fw, 'path', '')
+
+    if !l:f && !l:p && empty(l:path)
+        let l:path = popc#utils#FindRoot()
+        let s:ws.fw.path = l:path
+    endif
+    if l:f || l:p || empty(l:path)
+        let l:path = GetInput('fuzzy path: ', '', 'dir', expand('%:p:h'))
+        if empty(l:path)
             return
         endif
-        let l:path = s:ws.fw.path
     endif
-    if l:p || empty(l:path)
-        " 使用临时目录
-        let l:path = GetInput('Location: ', '', 'dir', expand('%:p:h'))
+    if l:f
+        let s:ws.fw.path = s:fw.unifyPath(l:path)
     endif
+
     if !empty(l:path)
-        let l:exec = printf(":lcd %s | %s", l:path, s:fw.engine[a:keys[0] . a:keys[-1:]])
+        let l:exec = printf(":lcd %s | %s", l:path, s:fw.engine[tolower(a:keys[0]) . a:keys[-1:]])
         call SetExecLast(l:exec)
         execute l:exec
     endif
 endfunction
 " }}}
 
-" Function: FindWowSetEngine(type) {{{ 设置engine
-function! FindWowSetEngine(type)
-    call PopSelection(a:type ==# 'engine' ? s:fw.engine.sel : s:fw.engine.sel.dic[a:type])
-endfunction
-" }}}
-
-" Function: FindWowSetArgs(type) {{{ 设置args
-" @param type p-path, f-filters, g-glob，其中f-filters, g-glob均用空格分隔
-" @return v:false 表示异常结束函数（path无效），v:true表示正常结束函数
-function! FindWowSetArgs(type)
-    if a:type =~# 'p'
-        let l:path = GetInput('fw.path: ', '', 'dir', expand('%:p:h'))
-        if empty(l:path)
-            return v:false
-        endif
-        let l:path = fnamemodify(l:path, ':p')
-        if l:path =~# '[/\\]$'
-            let l:path = strcharpart(l:path, 0, strchars(l:path) - 1)
-        endif
-        let s:ws.fw.path = l:path
-    endif
-    if a:type =~# 'f'
-        let s:ws.fw.filters = split(GetInput('fw.filters: '))
-    endif
-    if a:type =~# 'g'
-        let s:ws.fw.globlst = split(GetInput('fw.globlst: '))
-    endif
-    return v:true
-endfunction
-" }}}
+let FindWKill = function('execute', [s:fw.engine.sk])
+let FindWSetFuzzy = function('popset#set#PopSelection', [s:fw.engine['sel-fuzzy']])
 " }}}
 
 " Scripts {{{
@@ -2158,12 +2138,8 @@ function! s:rs.func.copyConfig(filename) dict
     return l:dstfile
 endfunction
 " }}}
-" }}}
 
-" Function: RunScript() " {{{
-function! RunScript()
-    call PopSelection(s:rs.sel)
-endfunction
+let RunScript = function('popset#set#PopSelection', [s:rs.sel])
 " }}}
 
 " Function: FuncMacro(key) {{{ 执行宏
@@ -2807,30 +2783,23 @@ endif
     nnoremap <leader><Esc> :nohlsearch<CR>
     nnoremap i :nohlsearch<CR>i
     nnoremap <leader>8  *
-    vnoremap <silent> <leader>8
-        \ "9y<Bar>:execute '/\V\c\<' . escape(@9, '\/') . '\>'<CR>
     nnoremap <leader>3  #
-    vnoremap <silent> <leader>3
-        \ "9y<Bar>:execute '?\V\c\<' . escape(@9, '\/') . '\>'<CR>
+    vnoremap <silent> <leader>8 "9y<Bar>:execute '/\V\c\<' . escape(@9, '\/') . '\>'<CR>
+    vnoremap <silent> <leader>3 "9y<Bar>:execute '?\V\c\<' . escape(@9, '\/') . '\>'<CR>
+    vnoremap <silent> <leader>/ "9y<Bar>:execute '/\V\c' . escape(@9, '\/')<CR>
     nnoremap <silent> <leader>/
         \ :execute '/\V\c' . escape(expand('<cword>'), '\/')<CR>
-    vnoremap <silent> <leader>/
-        \ "9y<Bar>:execute '/\V\c' . escape(@9, '\/')<CR>
     vnoremap <silent> <leader><leader>/
         \ :call feedkeys('/' . GetSelected(), 'n')<CR>
-    " FindWow
+    " FindW
     for key in s:fw.mappings.rg
-        execute printf('nnoremap <leader>%s :call FindWow("%s", "n")<CR>', key, key)
-        execute printf('vnoremap <leader>%s :call FindWow("%s", "v")<CR>', key, key)
+        execute printf('nnoremap <leader>%s :call FindW("%s", "n")<CR>', key, key)
+        execute printf('vnoremap <leader>%s :call FindW("%s", "v")<CR>', key, key)
     endfor
     for key in s:fw.mappings.fuzzy
-        execute printf('nnoremap <leader>%s :call FindWowFuzzy("%s")<CR>', key, key)
+        execute printf('nnoremap <leader>%s :call FindWFuzzy("%s")<CR>', key, key)
     endfor
-    nnoremap <leader>fk :call FindWowKill()<CR>
-    nnoremap <leader>feu :call FindWowSetEngine('fuzzy')<CR>
-    nnoremap <leader>fea :call FindWowSetArgs('pfg')<CR>
-    nnoremap <leader>fer :call FindWowSetArgs('p')<CR>
-    nnoremap <leader>fef :call FindWowSetArgs('f')<CR>
-    nnoremap <leader>feg :call FindWowSetArgs('g')<CR>
+    nnoremap <leader>fk :call FindWKill()<CR>
+    nnoremap <leader>fu :call FindWSetFuzzy()<CR>
 " }}}
 " }}} End
