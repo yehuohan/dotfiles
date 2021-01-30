@@ -1350,7 +1350,7 @@ augroup UserModulesWorkspace
     autocmd User PopcLayerWksSavePre call popc#layer#wks#SetSettings(s:ws)
     autocmd User PopcLayerWksLoaded call extend(s:ws, popc#layer#wks#GetSettings(), 'force') |
                                     \ let s:ws.root = popc#layer#wks#GetCurrentWks('root') |
-                                    \ if empty(s:ws.fw.path) |
+                                    \ if empty(get(s:ws.fw, 'path', '')) |
                                     \   let s:ws.fw.path = s:ws.root |
                                     \ endif
     autocmd User AsyncRunStop call DisplaySetting()
@@ -1585,7 +1585,7 @@ function! RunProject(keys, ...)
             call extend(l:cfg, {'key': '', 'file': '', 'type': ''})
             call extend(l:cfg, s:ws.rp)
             let l:sel.lst = ['key', 'file', 'type'] + l:sel.lst
-            let l:sel.dic['key'] = {'lst': keys(s:rp.proj)}
+            let l:sel.dic['key'] = {'lst': keys(s:rp.proj), 'dic': map(deepcopy(s:rp.proj), {key, val -> val[0]})}
             let l:sel.dic['file'] = {'cpl': 'file'}
             let l:sel.dic['type'] = {'cpl': 'filetype'}
         endif
@@ -1709,7 +1709,7 @@ endfunction
 " Function: FnCargo(cfg) {{{
 function! FnCargo(cfg)
     let l:cmd = printf('cargo %s %s', a:cfg.deploy, a:cfg.abld)
-    if a:cfg.deploy ==# 'run' || a:cfg.deploy ==# 'test'
+    if (a:cfg.deploy ==# 'run' || a:cfg.deploy ==# 'test') && !empty(a:cfg.arun)
         let l:cmd .= ' -- ' . a:cfg.arun
     endif
     let a:cfg.type = 'rust'
@@ -1762,8 +1762,8 @@ let s:fw = {
     \ 'rg' : {
         \ 'asyncrun' : {
             \ 'chars' : '"#%',
-            \ 'sr' : ':botright copen | :let g:asyncrun_encs="utf-8" | :AsyncRun! rg --vimgrep -F %s -e "%s" "%s"',
-            \ 'sa' : ':botright copen | :let g:asyncrun_encs="utf-8" | :AsyncRun! -append rg --vimgrep -F %s -e "%s" "%s"',
+            \ 'sr' : ':botright copen | :AsyncRun! rg --vimgrep -F %s -e "%s" "%s"',
+            \ 'sa' : ':botright copen | :AsyncRun! -append rg --vimgrep -F %s -e "%s" "%s"',
             \ 'sk' : ':AsyncStop'
             \ }
         \ },
@@ -1832,6 +1832,7 @@ endfunction
 function! s:fw.exec() dict
     " format: printf('cmd %s %s %s',<opt>,<pat>,<loc>)
     let l:exec = printf(self.cmd, self.opt, self.pat, self.loc)
+    let g:asyncrun_encs="utf-8"
     call SetExecLast(l:exec)
     execute l:exec
 endfunction
@@ -1986,7 +1987,7 @@ function! FindW(keys, mode, ...)
                 \ 'path': {'cpl': 'file'},
                 \ 'filters': {'dsr': {sopt -> '-g*.{' . l:cfg.filters . '}'}},
                 \ 'globlst': {'dsr': {sopt -> '-g' . join(split(l:cfg.globlst), ' -g')}, 'cpl': 'file'},
-                \ 'exargs': {'lst' : ['--no-fixed-strings', '--word-regexp', '--hidden', '--no-ignore', '--encoding gbk']},
+                \ 'exargs': {'lst' : ['--no-fixed-strings', '--hidden', '--no-ignore', '--encoding gbk']},
                 \ },
             \ 'sub' : {
                 \ 'cmd' : {sopt, sel -> extend(l:cfg, {sopt : sel})},
@@ -2077,34 +2078,34 @@ let s:rs = {
     \ 'sel' : {
         \ 'opt' : 'select scripts to run',
         \ 'lst' : [
-                \ 'retab',
-                \ '%s/\s\+$//ge',
-                \ '%s/\r//ge',
-                \ 'edit ++enc=utf-8',
-                \ 'edit ++enc=cp936',
-                \ 'syntax match QC /\v^[^|]*\|[^|]*\| / conceal',
-                \ 'call mkdir(fnamemodify(tempname(), ":h"), "p")',
-                \ 'Leaderf gtags --update',
-                \ '!rustc --emit asm=%.asm %',
-                \ '!rustc --emit asm=%.asm -C "llvm-args=-x86-asm-syntax=intel" %',
-                \ '!gcc -S -masm=att %',
-                \ '!gcc -S -masm=intel %',
-                \ 'copyConfig',
-                \ 'lineToTop',
-                \ 'clearUndo',
-                \ ],
+            \ 'retab',
+            \ '%s/\s\+$//ge',
+            \ '%s/\r//ge',
+            \ 'edit ++enc=utf-8',
+            \ 'edit ++enc=cp936',
+            \ 'syntax match QC /\v^[^|]*\|[^|]*\| / conceal',
+            \ 'call mkdir(fnamemodify(tempname(), ":h"), "p")',
+            \ 'Leaderf gtags --update',
+            \ '!rustc --emit asm=%.asm %',
+            \ '!rustc --emit asm=%.asm -C "llvm-args=-x86-asm-syntax=intel" %',
+            \ '!gcc -S -masm=att %',
+            \ '!gcc -S -masm=intel %',
+            \ 'copyConfig',
+            \ 'lineToTop',
+            \ 'clearUndo',
+            \ ],
         \ 'dic' : {
-                \ 'retab'            : 'retab with expandtab',
-                \ '%s/\s\+$//ge'     : 'remove trailing space',
-                \ '%s/\r//ge'        : 'remove ^M',
-                \ 'edit ++enc=utf-8' : 'reload as utf-8',
-                \ 'edit ++enc=cp936' : 'reload as cp936',
-                \ 'copyConfig'       : {
-                    \ 'opt' : 'select config',
-                    \ 'lst' : ['.ycm_extra_conf.py', '.vimspector.json'],
-                    \ 'cmd' : {sopt, arg -> execute('edit ' . s:rs.func.copyConfig(arg))},
-                    \ },
+            \ 'retab'            : 'retab with expandtab',
+            \ '%s/\s\+$//ge'     : 'remove trailing space',
+            \ '%s/\r//ge'        : 'remove ^M',
+            \ 'edit ++enc=utf-8' : 'reload as utf-8',
+            \ 'edit ++enc=cp936' : 'reload as cp936',
+            \ 'copyConfig'       : {
+                \ 'opt' : 'select config',
+                \ 'lst' : ['.ycm_extra_conf.py', '.vimspector.json'],
+                \ 'cmd' : {sopt, arg -> execute('edit ' . s:rs.func.copyConfig(arg))},
                 \ },
+            \ },
         \ 'cmd' : {sopt, arg -> has_key(s:rs.func, arg) ? s:rs.func[arg]() : execute(arg)},
         \ },
     \ 'func' : {}
