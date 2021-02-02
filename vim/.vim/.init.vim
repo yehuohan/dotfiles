@@ -1502,7 +1502,7 @@ endfunction
 "   type: 用于设置encoding, errorformat ...
 " }
 function! s:rp.run(cfg) dict
-    " get file and wdir
+    " get file and wdir for l:Fn
     let [l:Fn, l:pat] = self.proj[a:cfg.key]
     if !has_key(a:cfg, 'file')
         if l:pat == v:null
@@ -1516,6 +1516,7 @@ function! s:rp.run(cfg) dict
         endif
     endif
     let a:cfg.wdir = fnamemodify(a:cfg.file, ':h')
+    let l:cmd = function(l:Fn)(a:cfg)
 
     " set efm and enc
     let l:type = get(a:cfg, 'type', '')
@@ -1530,7 +1531,7 @@ function! s:rp.run(cfg) dict
     if !empty(a:cfg.term)
         let l:exec .= printf('-mode=term -pos=%s ', a:cfg.term)
     endif
-    let l:exec .= function(l:Fn)(a:cfg)
+    let l:exec .= l:cmd
     execute 'lcd ' . l:dir
     call SetExecLast(l:exec)
     execute l:exec
