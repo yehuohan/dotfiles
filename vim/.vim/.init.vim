@@ -1502,7 +1502,7 @@ endfunction
 "   type: 用于设置encoding, errorformat ...
 " }
 function! s:rp.run(cfg) dict
-    " get file and wdir for l:Fn
+    " get file and wdir for l:Fn, which may set filetype
     let [l:Fn, l:pat] = self.proj[a:cfg.key]
     if !has_key(a:cfg, 'file')
         if l:pat == v:null
@@ -2490,18 +2490,18 @@ augroup END
 " }}}
 
 " Gui {{{
-" Function: GuiAdjustFontSize(inc) {{{
-function! GuiAdjustFontSize(inc)
-    let s:gui_fontsize = exists('s:gui_fontsize') ? s:gui_fontsize + a:inc : 12
-    if IsWin()
-        execute 'set guifont=Consolas\ For\ Powerline:h' . s:gui_fontsize
-        execute 'set guifontwide=Microsoft\ YaHei\ Mono:h' . (s:gui_fontsize - 1)
-    else
-        execute 'set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h' . s:gui_fontsize
-        execute 'set guifontwide=WenQuanYi\ Micro\ Hei\ Mono:h' . s:gui_fontsize
-    endif
-endfunction
-" }}}
+    nnoremap <kPlus> :call GuiAdjustFontSize(1)<CR>
+    nnoremap <kMinus> :call GuiAdjustFontSize(-1)<CR>
+    function! GuiAdjustFontSize(inc)
+        let s:gui_fontsize = (exists('s:gui_fontsize') ? s:gui_fontsize : 12) + a:inc
+        if IsWin()
+            execute 'set guifont=Consolas\ For\ Powerline:h' . s:gui_fontsize
+            execute 'set guifontwide=Microsoft\ YaHei\ Mono:h' . (s:gui_fontsize - 1)
+        else
+            execute 'set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h' . s:gui_fontsize
+            execute 'set guifontwide=WenQuanYi\ Micro\ Hei\ Mono:h' . s:gui_fontsize
+        endif
+    endfunction
 
 " Gui-vim {{{
 if IsGVim()
@@ -2512,8 +2512,6 @@ if IsGVim()
     if IsWin()
         nnoremap <leader>tf :call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)<CR>
     endif
-    nnoremap <kPlus> :call GuiAdjustFontSize(1)<CR>
-    nnoremap <kMinus> :call GuiAdjustFontSize(-1)<CR>
 endif
 " }}}
 
@@ -2536,11 +2534,18 @@ if IsNVimQt()
     vnoremap <RightMouse> :call GuiShowContextMenu()<CR>gv
     nnoremap <leader>tf :call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
     nnoremap <leader>tm :call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>
-    nnoremap <kPlus> :call GuiAdjustFontSize(1)<CR>
-    nnoremap <kMinus> :call GuiAdjustFontSize(-1)<CR>
 endif
 endfunction
 " }}}
+endif
+" }}}
+
+" Gui-neovide {{{
+if exists('g:neovide')
+    set guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20
+    let g:neovide_cursor_antialiasing = v:false
+    let g:neovide_cursor_vfx_mode = "railgun"
+    call GuiAdjustFontSize(4)
 endif
 " }}}
 " }}}
