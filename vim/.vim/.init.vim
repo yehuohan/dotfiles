@@ -2403,9 +2403,6 @@ endfunction
     set relativenumber                  " 显示相对行号
     set cursorline                      " 高亮当前行
     set cursorcolumn                    " 高亮当前列
-    set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
-        \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
-        \,sm:block-blinkwait175-blinkoff150-blinkon175
     set hlsearch                        " 设置高亮显示查找到的文本
     set incsearch                       " 预览当前的搜索内容
     set termguicolors                   " 在终端中使用24位彩色
@@ -2505,10 +2502,10 @@ augroup END
 
 " Gui-vim {{{
 if IsGVim()
-    call GuiAdjustFontSize(0)
     set lines=25
     set columns=90
     set linespace=0
+    call GuiAdjustFontSize(0)
     if IsWin()
         nnoremap <leader>tf :call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)<CR>
     endif
@@ -2517,6 +2514,9 @@ endif
 
 " Gui-neovim {{{
 if IsNVim()
+    set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
+        \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
+        \,sm:block-blinkwait175-blinkoff150-blinkon175
 augroup UserSettingsGui
     autocmd!
     autocmd UIEnter * call s:NVimQt_setGui()
@@ -2525,10 +2525,10 @@ augroup END
 " Function: s:NVimQt_setGui() {{{
 function! s:NVimQt_setGui()
 if IsNVimQt()
-    call GuiAdjustFontSize(0)
     GuiLinespace 0
     GuiTabline 0
     GuiPopupmenu 0
+    call GuiAdjustFontSize(0)
     nnoremap <RightMouse> :call GuiShowContextMenu()<CR>
     inoremap <RightMouse> <Esc>:call GuiShowContextMenu()<CR>
     vnoremap <RightMouse> :call GuiShowContextMenu()<CR>gv
