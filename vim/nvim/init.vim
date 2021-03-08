@@ -1,4 +1,3 @@
-
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " init.vim: init.vim for neovim.
 " Github: https://github.com/yehuohan/dotconfigs
@@ -17,8 +16,8 @@ elseif (has('win32') || has('win64'))
     " Path 'C:\Users\<user>\AppData\Local\nvim\'
     let g:python3_host_prog = 'C:/apps/Python/python.exe'
     let g:node_host_prog = 'D:/nodejs/node_modules/neovim-node-host.cmd'
-    set rtp^=C:/apps/VConfig/.vim
-    set rtp+=C:/apps/VConfig/.vim/after
+    set rtp^=C:/apps/dotvim
+    set rtp+=C:/apps/dotvim/after
     let &packpath = &rtp
     source C:/apps/dotvim/.init.vim
 endif
