@@ -326,7 +326,6 @@ bindsym $mod+mod1+c exec rofi -show ssh
 
 # 程序启动器
 bindsym $mod+d exec rofi -show run
-bindsym $mod+mod1+d exec dmenu_run
 
 # 切换Touchpad
 bindsym $mod+x exec ToggleTouchPad
