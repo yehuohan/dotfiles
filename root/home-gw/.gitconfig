@@ -12,3 +12,5 @@
 [oh-my-zsh]
 	hide-status = 1
 	hide-dirty = 1
+[http]
+	postBuffer = 524288000
