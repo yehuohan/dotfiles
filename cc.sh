@@ -96,6 +96,8 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp ~/.tmux-status.conf                          ./root/home-gw/
 
     # win
+    cp $APPDATA/Code/User/settings.json             ./root/home-win/AppData/Roaming/Code/User/
+    cp $USERPROFILE/.ideavimrc                      ./root/home-win/
     cp $USERPROFILE/clink_inputrc                   ./root/home-win/
     cp $USERPROFILE/pip/pip.ini                     ./root/home-win/pip/
     cp $USERPROFILE/.cargo/config                   ./root/home-win/.cargo/

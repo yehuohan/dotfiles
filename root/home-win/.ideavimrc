@@ -1,10 +1,4 @@
 
-"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-" Ideavimrc: configuration for android studio with IdeaVim.
-" Github: https://github.com/yehuohan/dotconfigs
-" Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
-"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 " Settings {{{
 set surround
 set multiple-cursors
@@ -29,14 +23,19 @@ vnoremap ; :
     nnoremap <leader>u ~
     vnoremap <leader>u ~
     nnoremap <leader>gu g~
+    " 行移动
+    nnoremap > >>
+    nnoremap < <<
     " 矩形选择
     nnoremap vv <C-v>
     vnoremap vv <C-v>
     " 加减序号
-    nnoremap <C-h> <C-x>
-    vnoremap <leader><C-h> g<C-x>
-    nnoremap <C-l> <C-a>
-    vnoremap <leader><C-l> g<C-a>
+    nnoremap <leader>aj <C-x>
+    nnoremap <leader>ak <C-a>
+    vnoremap <leader>aj <C-x>
+    vnoremap <leader>ak <C-a>
+    vnoremap <leader>agj g<C-x>
+    vnoremap <leader>agk g<C-a>
     " 全屏
     nnoremap <leader>tf :action ToggleFullScreen<CR>
     " Surround
@@ -52,44 +51,6 @@ vnoremap ; :
     vmap <C-x> <A-x>
     nmap <C-p> <A-p>
     vmap <C-p> <A-p>
-    " 嵌套映射匹配符(%)
-    nmap <S-s> %
-    " 行首和行尾
-    nnoremap <S-l> $
-    nnoremap <S-h> ^
-    vnoremap <S-l> $
-    vnoremap <S-h> ^
-    " 复制到行首行尾
-    nnoremap yL y$
-    nnoremap yH y^
-    " j, k 移行
-    nnoremap j gj
-    vnoremap j gj
-    nnoremap k gk
-    vnoremap k gk
-    " 折叠
-    nnoremap <leader>za zA
-    nnoremap <leader>zc zC
-    nnoremap <leader>zo zO
-    nnoremap <leader>zm zM
-    nnoremap <leader>zn zN
-    nnoremap <leader>zr zR
-    nnoremap <leader>zx zX
-    " 滚屏
-    nnoremap <C-j> <C-e>
-    nnoremap <C-k> <C-y>
-    nnoremap <A-j> <C-f>
-    nnoremap <A-k> <C-b>
-    nnoremap zh zt
-    nnoremap zl zb
-    nnoremap <A-h> 16zh
-    nnoremap <A-l> 16zl
-    " Tab切换
-    nnoremap <A-i> gT
-    nnoremap <A-o> gt
-    " 位置跳转
-    nnoremap <C-o> :action Back<CR>
-    nnoremap <C-i> :action Forward<CR>
 " }}}
 
 " Copy and paste{{{
@@ -262,6 +223,47 @@ vnoremap ; :
     nnoremap <leader>2X @X
     nnoremap <leader>2Y @Y
     nnoremap <leader>2Z @Z
+" }}}
+
+" Move and goto{{{
+    " 嵌套映射匹配符(%)
+    nmap <S-s> %
+    " 行首和行尾
+    nnoremap <S-l> $
+    nnoremap <S-h> ^
+    vnoremap <S-l> $
+    vnoremap <S-h> ^
+    " 复制到行首行尾
+    nnoremap yL y$
+    nnoremap yH y^
+    " j, k 移行
+    nnoremap j gj
+    vnoremap j gj
+    nnoremap k gk
+    vnoremap k gk
+    " 折叠
+    nnoremap <leader>za zA
+    nnoremap <leader>zc zC
+    nnoremap <leader>zo zO
+    nnoremap <leader>zm zM
+    nnoremap <leader>zn zN
+    nnoremap <leader>zr zR
+    nnoremap <leader>zx zX
+    " 滚屏
+    nnoremap <C-j> <C-e>
+    nnoremap <C-k> <C-y>
+    nnoremap <A-j> <C-f>
+    nnoremap <A-k> <C-b>
+    nnoremap zh zt
+    nnoremap zl zb
+    nnoremap <A-h> 16zh
+    nnoremap <A-l> 16zl
+    " Tab切换
+    nnoremap <A-i> gT
+    nnoremap <A-o> gt
+    " 位置跳转
+    nnoremap <C-o> :action Back<CR>
+    nnoremap <C-i> :action Forward<CR>
 " }}}
 
 " Window manager{{{

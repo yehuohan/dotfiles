@@ -1,9 +1,5 @@
 {
-    "workbench.colorTheme": "Quiet Light",
-    "latex-workshop.view.pdf.viewer": "tab",
-    "editor.fontLigatures": true,
-    "editor.fontFamily": "'Cascadia Code', Consolas, 'Courier New', monospace",
-    // Vim 设置
+    // Extensions
     "vim.leader": "<Space>",
     "vim.easymotion": true,
     "vim.easymotionMarkerYOffset": 4,
@@ -146,5 +142,34 @@
             "before": ["v", "v"],
             "after": ["<C-v>"]
         }
-    ]
+    ],
+    "vscode-neovim.neovimExecutablePaths.win32": "C:\\apps\\Neovim\\bin\\nvim.exe",
+    "markdown-preview-enhanced.enableScriptExecution": true,
+    "latex-workshop.view.pdf.viewer": "tab",
+    "python.autoComplete.extraPaths": [
+        "C:/apps/Python/Lib/site-packages",
+        "C:/apps/Python/Scripts"
+    ],
+
+    // Vscode
+    "editor.fontLigatures": true,
+    "editor.fontFamily": "'Cascadia Code', Consolas",
+    "workbench.colorTheme": "Gruvbox Dark Soft",
+    "workbench.sideBar.location": "left",
+    "update.mode": "manual",
+    "update.enableWindowsBackgroundUpdates": false,
+    "extensions.ignoreRecommendations": true,
+    "extensions.autoCheckUpdates": false,
+    "extensions.autoUpdate": false,
+    "remote.SSH.showLoginTerminal": true,
+    "git.ignoreLegacyWarning": true,
+    "editor.renderWhitespace": "none",
+    "editor.renderControlCharacters": false,
+    "editor.columnSelection": false,
+    "editor.multiCursorModifier": "ctrlCmd",
+    "editor.minimap.enabled": false,
+    "files.exclude": {
+        "**/.cache": true,
+        "**/.clangd": true
+    }
 }
