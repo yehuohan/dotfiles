@@ -1156,6 +1156,7 @@ endif
 " }}}
 
 " translator {{{ 翻译
+    let g:translator_default_engines = ['haici', 'youdao']
     nmap <leader>tw <Plug>TranslateW
     vmap <leader>tw <Plug>TranslateWV
     nnoremap <leader><leader>t :TranslateW<Space>
