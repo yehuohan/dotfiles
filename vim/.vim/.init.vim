@@ -69,15 +69,15 @@ let s:gset_file = $DotVimCachePath . '/.gset.json'
 let s:gset = {
     \ 'set_dev'       : v:null,
     \ 'set_os'        : v:null,
-    \ 'use_powerfont' : 1,
-    \ 'use_lightline' : 1,
-    \ 'use_startify'  : 1,
-    \ 'use_ycm'       : 1,
-    \ 'use_snip'      : 1,
-    \ 'use_coc'       : 1,
-    \ 'use_spector'   : 1,
-    \ 'use_leaderf'   : 1,
-    \ 'use_utils'     : 1,
+    \ 'use_powerfont' : 0,
+    \ 'use_lightline' : 0,
+    \ 'use_startify'  : 0,
+    \ 'use_ycm'       : 0,
+    \ 'use_snip'      : 0,
+    \ 'use_coc'       : 0,
+    \ 'use_spector'   : 0,
+    \ 'use_leaderf'   : 0,
+    \ 'use_utils'     : 0,
     \ }
 " Function: s:gsLoad() {{{
 function! s:gsLoad()
@@ -457,10 +457,10 @@ if s:gset.use_lightline
                 \ 'right': [['close']],
                 \ },
         \ 'component': {
-                \ 'all_filesign': '%{winnr()},%-n%{&ro?",":""}%M',
-                \ 'all_format'  : '%{&ft!=#""?&ft."":""}%{&fenc!=#""?&fenc:&enc}%{&ff}',
-                \ 'all_lineinfo': 'U%B %p%% %l/%L %v',
-                \ 'lite_info'   : '%l/%L %v',
+                \ 'all_filesign': '%{winnr()},%-n%{&ro?",$":""}%M',
+                \ 'all_format'  : '%{&ft!=#""?&ft."/":""}%{&fenc!=#""?&fenc:&enc}/%{&ff}',
+                \ 'all_lineinfo': 'U%B %p%% %l/%L # %v',
+                \ 'lite_info'   : '%l/%L # %v',
                 \ },
         \ 'component_function': {
                 \ 'mode'        : 'Plug_ll_mode',
@@ -482,6 +482,12 @@ if s:gset.use_lightline
         let g:lightline.subseparator         = {'left': '', 'right': ''}
         let g:lightline.tabline_separator    = {'left': '', 'right': ''}
         let g:lightline.tabline_subseparator = {'left': '', 'right': ''}
+        let g:lightline.component = {
+                \ 'all_filesign': '%{winnr()},%-n%{&ro?",":""}%M',
+                \ 'all_format'  : '%{&ft!=#""?&ft."":""}%{&fenc!=#""?&fenc:&enc}%{&ff}',
+                \ 'all_lineinfo': 'U%B %p%% %l/%L %v',
+                \ 'lite_info'   : '%l/%L %v',
+                \ }
     endif
     nnoremap <leader>tl :call lightline#toggle()<CR>
     nnoremap <leader>tk :call Plug_ll_toggleCheck()<CR>
@@ -2490,15 +2496,18 @@ augroup END
 " Gui {{{
     nnoremap <kPlus> :call GuiAdjustFontSize(1)<CR>
     nnoremap <kMinus> :call GuiAdjustFontSize(-1)<CR>
+    let s:gui_fontsize = 12
+    if IsWin()
+        let s:gui_font = s:gset.use_powerfont ? 'Consolas\ For\ Powerline' : 'Consolas'
+        let s:gui_fontwide = 'Microsoft\ YaHei\ Mono'
+    else
+        let s:gui_font = s:gset.use_powerfont ? 'DejaVu\ Sans\ Mono\ for\ Powerline' : 'DejaVu\ Sans'
+        let s:gui_fontwide = 'WenQuanYi\ Micro\ Hei\ Mono'
+    endif
     function! GuiAdjustFontSize(inc)
-        let s:gui_fontsize = (exists('s:gui_fontsize') ? s:gui_fontsize : 12) + a:inc
-        if IsWin()
-            execute 'set guifont=Consolas\ For\ Powerline:h' . s:gui_fontsize
-            execute 'set guifontwide=Microsoft\ YaHei\ Mono:h' . (s:gui_fontsize - 1)
-        else
-            execute 'set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h' . s:gui_fontsize
-            execute 'set guifontwide=WenQuanYi\ Micro\ Hei\ Mono:h' . s:gui_fontsize
-        endif
+        let s:gui_fontsize += a:inc
+        execute printf('set guifont=%s:h%d', s:gui_font, s:gui_fontsize)
+        execute printf('set guifontwide=%s:h%d', s:gui_fontwide, s:gui_fontsize - 1)
     endfunction
 
 " Gui-vim {{{

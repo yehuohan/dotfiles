@@ -9,7 +9,7 @@ Some requirements:
     - [Python](https://www.python.org/), `pip install pynvim`
     - [NodeJs](https://nodejs.org), `npm install -g neovim`
     - [lua](https://www.lua.org/)
-    - Git
+    - Git, `git config --global http.proxy addr:port` for vpn
       - [Msys2](http://www.msys2.org/)
       - [Cygwin](https://cygwin.com)
 
