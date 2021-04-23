@@ -16,6 +16,11 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_ROOT}/__VBuildOut)
 #set(CMAKE_BUILD_TYPE "Release")
 project(main LANGUAGES CXX)
 
+#set(OpenCV_DIR <path-to-opencv-cmake>) # 设置package的cmake文件查找路径
+#find_package(OpenCV REQUIRED)
+#include_directories(${OpenCV_INCLUDE_DIRS})
+#target_link_libraries(${PROJECT_NAME}, ${OpenCV_LIBS})
+
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/inc
     )
@@ -26,11 +31,12 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 add_compile_options(-g -Wall -DMYVAR=1)
 add_compile_definitions(MYVAR=1)
 add_executable(${PROJECT_NAME} ${SRC})
-add_library(${PROJECT_NAME} <SHARED,STATIC,MODULE>
+add_library(${PROJECT_NAME} <SHARED,STATIC,MODULE,INTERFACE,IMPORTED>
     ${SRC}
     )
-#target_sources
+#set_target_properties # 类似于各种target_xxx命令
 #target_include_directories # target_xxx命令：其它Target链接此Target需要的include_directories
+#target_sources
 #target_compile_options
 #target_compile_definitions
 #target_link_options
