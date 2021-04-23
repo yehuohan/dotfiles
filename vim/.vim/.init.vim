@@ -999,12 +999,16 @@ endif
     nnoremap <leader>tz :FloatermToggle<CR>
     nnoremap <leader><leader>m :Popc Floaterm<CR>
     nnoremap <leader><leader>z :FloatermNew<Space>
-    tnoremap <A-u> <C-\><C-n>:FloatermFirst<CR>
-    tnoremap <A-i> <C-\><C-n>:FloatermPrev<CR>
-    tnoremap <A-o> <C-\><C-n>:FloatermNext<CR>
-    tnoremap <A-p> <C-\><C-n>:FloatermLast<CR>
-    tnoremap <A-q> <C-\><C-n>:FloatermKill<CR>
-    tnoremap <A-h> <C-\><C-n>:FloatermHide<CR>
+    tnoremap <M-u> <C-\><C-n>:FloatermFirst<CR>
+    tnoremap <M-i> <C-\><C-n>:FloatermPrev<CR>
+    tnoremap <M-o> <C-\><C-n>:FloatermNext<CR>
+    tnoremap <M-p> <C-\><C-n>:FloatermLast<CR>
+    tnoremap <M-q> <C-\><C-n>:FloatermKill<CR>
+    tnoremap <M-h> <C-\><C-n>:FloatermHide<CR>
+    tnoremap <M-n> <C-\><C-n>:FloatermUpdate --height=0.6 --width=0.6<CR>
+    tnoremap <M-m> <C-\><C-n>:FloatermUpdate --height=0.9 --width=0.9<CR>
+    tnoremap <M-l> <C-\><C-n>:FloatermUpdate --position=topright<CR>
+    tnoremap <M-c> <C-\><C-n>:FloatermUpdate --position=center<CR>
     nnoremap <leader>mf :FloatermNew lf<CR>
     highlight default link FloatermBorder Normal
 " }}}
