@@ -63,7 +63,6 @@
     "explorer.file.child.labelingTemplate": "[fullpath][link][size][timeAccessed][timeModified][timeCreated][readonly][modified]",
     "explorer.file.column.indent.chars": " ",
     "explorer.file.column.indent.indentLine": false,
-    "explorer.file.tabCD": false,
     "explorer.keyMappingMode": "none",
     "explorer.keyMappings.global" : {
         "j": "nodeNext",

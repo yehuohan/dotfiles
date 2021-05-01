@@ -33,6 +33,7 @@ endfunction
 
 " Globals {{{
 let $DotVimPath=resolve(expand('<sfile>:p:h'))
+let $DotVimMiscPath=$DotVimPath . '/misc'
 let $DotVimCachePath=$DotVimPath . '/.cache'
 set rtp+=$DotVimPath
 
@@ -768,7 +769,7 @@ endif
 " YouCompleteMe {{{ 自动补全
 if s:gset.use_ycm
     call s:plug.reg('onDelay', 'load', 'YouCompleteMe')
-    let g:ycm_global_ycm_extra_conf = $DotVimPath . '/.ycm_extra_conf.py'
+    let g:ycm_global_ycm_extra_conf = $DotVimMiscPath . '/.ycm_extra_conf.py'
     let g:ycm_enable_diagnostic_signs = 1                       " 开启语法检测
     let g:ycm_max_diagnostics_to_display = 30
     let g:ycm_warning_symbol = '►'                              " Warning符号
@@ -840,7 +841,7 @@ if s:gset.use_coc
                 \ }
             \ })
     endfunction
-    let g:coc_config_home = $DotVimPath
+    let g:coc_config_home = $DotVimMiscPath
     let g:coc_data_home = $DotVimCachePath . '/.coc'
     let g:coc_global_extensions = [
         \ 'coc-snippets', 'coc-yank', 'coc-explorer',
@@ -1707,7 +1708,6 @@ function! FnGMake(cfg)
         if a:cfg.deploy ==# 'run'
             let l:outfile = s:rp.pstr(a:cfg.file, a:cfg.key ==# 'q' ? s:rp.pat.target : s:rp.pat.project)
             if empty(l:outfile)
-                let l:cmd .= ' && echo "[RP]Warning: No executable file, try add TARGET"'
                 let l:cmd .= ' && echo "[RP]Warning: No executable file, try add project() or TARGET"'
             else
                 let l:cmd .= printf(' && "./__VBuildOut/%s" %s', l:outfile, a:cfg.arun)
@@ -2098,23 +2098,28 @@ let s:rs = {
             \ 'syntax match QC /\v^[^|]*\|[^|]*\| / conceal',
             \ 'call mkdir(fnamemodify(tempname(), ":h"), "p")',
             \ 'Leaderf gtags --update',
-            \ '!rustc --emit asm=%.asm %',
-            \ '!rustc --emit asm=%.asm -C "llvm-args=-x86-asm-syntax=intel" %',
-            \ '!gcc -S -masm=att %',
-            \ '!gcc -S -masm=intel %',
+            \ 'execAssembly',
             \ 'copyConfig',
             \ 'lineToTop',
             \ 'clearUndo',
             \ ],
         \ 'dic' : {
-            \ 'retab'            : 'retab with expandtab',
-            \ '%s/\s\+$//ge'     : 'remove trailing space',
-            \ '%s/\r//ge'        : 'remove ^M',
-            \ 'edit ++enc=utf-8' : 'reload as utf-8',
-            \ 'edit ++enc=cp936' : 'reload as cp936',
-            \ 'copyConfig'       : {
-                \ 'opt' : 'select config',
-                \ 'lst' : ['.ycm_extra_conf.py', '.vimspector.json'],
+            \ 'retab' : 'retab with expandtab',
+            \ '%s/\s\+$//ge' : 'remove trailing space',
+            \ '%s/\r//ge' : 'remove ^M',
+            \ 'execAssembly' : {
+                \ 'dsr' : 'execute assembly command',
+                \ 'lst' : [
+                    \ 'rustc --emit asm=%.asm %',
+                    \ 'rustc --emit asm=%.asm -C "llvm-args=-x86-asm-syntax=intel" %',
+                    \ 'gcc -S -masm=att %',
+                    \ 'gcc -S -masm=intel %',
+                    \ ],
+                \ 'cmd' : {sopt, arg -> execute('AsyncRun ' . arg)}
+                \ },
+            \ 'copyConfig' : {
+                \ 'dsr' : 'copy config file',
+                \ 'lst' : ['.ycm_extra_conf.py', 'pyrightconfig.json', '.vimspector.json'],
                 \ 'cmd' : {sopt, arg -> execute('edit ' . s:rs.func.copyConfig(arg))},
                 \ },
             \ },
@@ -2143,7 +2148,7 @@ endfunction
 
 " Function: s:rs.func.copyConfig(filename) dict {{{ 复制配置文件到当前目录
 function! s:rs.func.copyConfig(filename) dict
-    let l:srcfile = $DotVimPath . '/' . a:filename
+    let l:srcfile = $DotVimMiscPath . '/' . a:filename
     let l:dstfile = expand('%:p:h') . '/' . a:filename
     if !filereadable(l:dstfile)
         call writefile(readfile(l:srcfile), l:dstfile)

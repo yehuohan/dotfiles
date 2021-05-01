@@ -13,9 +13,7 @@ if [[ `uname` == "Linux" ]]; then
 
     # vim
     cp ../.vim/.init.vim                            ./vim/.vim/
-    cp ../.vim/.ycm_extra_conf.py                   ./vim/.vim/
-    cp ../.vim/.vimspector.json                     ./vim/.vim/
-    cp ../.vim/coc-settings.json                    ./vim/.vim/
+    cp -r ../.vim/misc                              ./vim/.vim/
     cp -r ../.vim/snips                             ./vim/.vim/
     cp -r ../.vim/autoload                          ./vim/.vim/
     cp -r ../.vim/rplugin                           ./vim/.vim/
@@ -79,9 +77,7 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
         exit
     fi
     cp ../dotvim/.init.vim                          ./vim/.vim/
-    cp ../dotvim/.ycm_extra_conf.py                 ./vim/.vim/
-    cp ../dotvim/.vimspector.json                   ./vim/.vim/
-    cp ../dotvim/coc-settings.json                  ./vim/.vim/
+    cp -r ../dotvim/misc                            ./vim/.vim/
     cp -r ../dotvim/snips                           ./vim/.vim/
     cp -r ../dotvim/autoload                        ./vim/.vim/
     cp -r ../dotvim/rplugin                         ./vim/.vim/

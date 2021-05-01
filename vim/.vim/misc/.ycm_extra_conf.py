@@ -10,7 +10,6 @@
 
 import os
 import platform
-import re
 
 LOC_DIR = os.path.dirname(os.path.abspath(__file__))  # Local working path
 
