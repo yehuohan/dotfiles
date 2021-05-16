@@ -2230,10 +2230,6 @@ function! FuncSwitchFile(sf)
             execute 'edit ' . l:file . '.' . e
             break
         endif
-        if filereadable(l:file . '.' . toupper(e))
-            execute 'edit ' . l:file . '.' . e
-            break
-        endif
     endfor
 endfunction
 let RunSwitchFile = function('FuncSwitchFile', [
