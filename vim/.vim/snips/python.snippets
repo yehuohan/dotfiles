@@ -11,10 +11,10 @@ endsnippet
 # python's code snippets of python modules
 #===============================================================================
 snippet mpl "matplotlib for python"
-import matplotlib as ${1:mpl}
+from matplotlib.backend_bases import KeyEvent
 import matplotlib.pyplot as plt
 
-def on_key(event:$1.backend_bases.KeyEvent):
+def on_key(event:KeyEvent):
     if event.key == 'escape':
         plt.close()
 
@@ -29,10 +29,10 @@ ${0}
 endsnippet
 
 snippet mplt "matplotlib.pyplot for python"
-import matplotlib as ${1:mpl}
+from matplotlib.backend_bases import KeyEvent
 import matplotlib.pyplot as plt
 
-def on_key(event:$1.backend_bases.KeyEvent):
+def on_key(event:KeyEvent):
     if event.key == 'escape':
         plt.close()
 
@@ -56,10 +56,10 @@ import mpl_toolkits.mplot3d as plt3d
 endsnippet
 
 snippet mplmouse "matplotlib for mouse click event"
-import matplotlib as mpl
+from matplotlib.backend_bases import KeyEvent
 import matplotlib.pyplot as plt
 
-def on_click(event:mpl.backend_bases.MouseEvent):
+def on_key(event:KeyEvent):
     if event.button == 1:
         if event.xdata == None:
             return

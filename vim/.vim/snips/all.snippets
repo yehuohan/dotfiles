@@ -4,10 +4,8 @@ from snips_utils import load_template
 tp = {
 	'mkf': 'Makefile',
 	'cmk': 'CMakeLists.txt',
-	'gui': 'qqui.pro',
+	'gui': 'qgui.pro',
 	'con': 'qcon.pro',
-	'cpp': 'qcpp.pro',
-	'cuda': 'qcuda.pro',
 }
 endglobal
 
@@ -30,7 +28,7 @@ endsnippet
 
 
 #===============================================================================
-# comment block 
+# comment block
 #===============================================================================
 snippet 'cb([~#*-_=])' "comment block" r
 ${1:type}`!p snip.rv = match.group(1) * (80 - len(t[1]))`

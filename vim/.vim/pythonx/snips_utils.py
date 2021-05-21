@@ -10,7 +10,5 @@ DotVimPath = os.getenv("DotVimPath")
 
 def load_template(filename):
     """从文件中加载模版"""
-    f = DotVimPath + '/snips/template/' + filename
-    with open(f, 'r', encoding='utf-8') as fp:
+    with open(DotVimPath + '/snips/template/' + filename, 'r', encoding='utf-8') as fp:
         return ''.join(fp.readlines())
-    return 'Failed to load template: ' + f
