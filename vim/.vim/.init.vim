@@ -590,24 +590,9 @@ endif
 
 " popset {{{ 弹出选项
     let g:Popset_SelectionData = [{
-            \ 'opt' : ['filetype', 'ft'],
-            \ 'dsr' : 'When this option is set, the FileType autocommand event is triggered.',
-            \ 'lst' : ['vim', 'make', 'markdown', 'conf',  'json', 'help'],
-            \ 'dic' : {
-                    \ 'vim'      : 'Vim script file',
-                    \ 'make'     : 'Makefile of .mak file',
-                    \ 'markdown' : 'MarkDown file',
-                    \ 'conf'     : 'Config file',
-                    \ 'json'     : 'Json file',
-                    \ 'help'     : 'Vim help doc',
-                    \},
-            \ 'cmd' : 'popset#data#SetEqual',
-            \ 'get' : 'popset#data#GetOptValue'
-        \}, {
             \ 'opt' : ['colorscheme', 'colo'],
             \ 'lst' : ['gruvbox', 'one'],
-        \}
-    \ ]
+        \}]
     nnoremap <leader><leader>p :PopSet<Space>
     nnoremap <leader>sp :PopSet popset<CR>
 " }}}
@@ -790,8 +775,7 @@ if s:gset.use_ycm
     let g:ycm_key_list_select_completion = ['<C-j>', '<M-j>', '<C-n>', '<Down>']
     let g:ycm_key_list_previous_completion = ['<C-k>', '<M-k>', '<C-p>', '<Up>']
     let g:ycm_key_list_stop_completion = ['<C-y>']              " 关闭补全menu
-    let g:ycm_key_invoke_completion = '<C-l>'                   " 显示补全内容，YCM使用completefunc（C-X C-U）
-                                                                " YCM不支持的补全，通过omnifunc(C-X C-O)集成到YCM上
+    let g:ycm_key_invoke_completion = '<C-l>'                   " 显示补全内容，YCM使用completefunc，使用omnifunc集成其它补全
     imap <M-l> <C-l>
     imap <M-y> <C-y>
     nnoremap <leader>gg :YcmCompleter<CR>
@@ -829,17 +813,9 @@ if s:gset.use_coc
     call s:plug.reg('onDelay', 'load', 'coc.nvim')
     call s:plug.reg('onDelay', 'exec', 'call s:Plug_coc_settings()')
     function! s:Plug_coc_settings()
-        call coc#config("python", {
-            \ "pythonPath": $VPathPython . "/python"
-            \ })
-        call coc#config('languageserver', {
-            \ 'lua-language-server': {
-                \ 'cwd': $VPathLuaLsp,
-                \ 'command': $VPathLuaLsp . (IsWin() ? '/server/bin/Windows/lua-language-server.exe' : '/server/bin/Linux/lua-language-server'),
-                \ 'args': ['-E', '-e', 'LANG="zh-cn"', $VPathLuaLsp . '/server/main.lua'],
-                \ 'filetypes': ['lua'],
-                \ }
-            \ })
+        for [sec, val] in items(env#coc_settings())
+            call coc#config(sec, val)
+        endfor
     endfunction
     let g:coc_config_home = $DotVimMiscPath
     let g:coc_data_home = $DotVimCachePath . '/.coc'

@@ -1,9 +1,6 @@
 
-"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " Env: environment variable for vim and neovim.
-" Github: https://github.com/yehuohan/dotconfigs
-" Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
-"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 " environment variable {{{
 " Format: s:env.dev.os
@@ -51,16 +48,35 @@ function! env#env(dev, os)
         if !empty(l:e)
             let $PATH .= ';' . join(l:e, ';')
         endif
-        let $VPathPython = 'C:/apps/Python'
+        " For .ycm_extra_conf.py
         let $VPathMingw64 = 'C:/apps/msys64/mingw64'
         let $VPathVs = 'D:/VS2017/VC/Tools/MSVC/14.16.27023'
-        let $VPathLuaLsp = $HOME . '/.vscode/extensions/sumneko.lua-0.16.2'
+        let $VPathPython = 'C:/apps/Python'
     else
         if !empty(l:e)
             let $PATH .= ':' . join(l:e, ':')
         endif
         let $VPathPython = '/usr/bin'
-        let $VPathLuaLsp = '~/.vscode/extensions/sumneko.lua-0.16.2'
     endif
+endfunction
+" }}}
+
+" FUNCTION: env#coc_settings() {{{
+function! env#coc_settings()
+    let l:lualsp_cwd = (IsWin() ? $USERPROFILE : '~') . '/.vscode/extensions/sumneko.lua-0.16.2'
+    let l:lualsp_cmd = l:lualsp_cwd . (IsWin() ? '/server/bin/Windows/lua-language-server.exe' : '/server/bin/Linux/lua-language-server')
+    return {
+        \ "python": {
+            \ "pythonPath": $VPathPython . "/python"
+            \ },
+        \ 'languageserver': {
+                \ 'lua-language-server': {
+                    \ 'cwd': l:lualsp_cwd,
+                    \ 'command': l:lualsp_cmd,
+                    \ 'args': ['-E', '-e', 'LANG="zh-cn"', l:lualsp_cwd . '/server/main.lua'],
+                    \ 'filetypes': ['lua'],
+                    \ }
+            \ }
+        \ }
 endfunction
 " }}}
