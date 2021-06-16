@@ -191,7 +191,9 @@ endif
     Plug 'yehuohan/popc'
     Plug 'yehuohan/popset'
     Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTree']}
+if s:gset.use_startify
     Plug 'mhinz/vim-startify'
+endif
     Plug 'itchyny/screensaver.vim'
 if IsWin()
     Plug 'junegunn/fzf', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
