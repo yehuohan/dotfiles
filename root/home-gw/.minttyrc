@@ -15,3 +15,5 @@ FontSmoothing=full
 BellType=0
 ThemeFile=dracula
 RightClickAction=paste
+WindowShortcuts=no
+AltFnShortcuts=no
