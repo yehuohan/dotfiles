@@ -26,10 +26,7 @@ endfunction
 function! IsGVim()
     return has('gui_running')
 endfunction
-function! IsNVimQt()
-    return exists('g:GuiLoaded')        " 在UIEnter之后才起作用
-endfunction
-" }}} End
+" }}}
 
 " Globals {{{
 let $DotVimPath=resolve(expand('<sfile>:p:h'))
@@ -123,7 +120,7 @@ endfunction
 command! -nargs=0 GSInit :call s:gsInit()
 call s:gsLoad()
 " }}}
-" }}} End
+" }}}
 
 " Plugins {{{
 " Struct: s:plug {{{
@@ -273,13 +270,11 @@ call plug#end()
     let g:EasyMotion_do_mapping = 0     " 禁止默认map
     let g:EasyMotion_smartcase = 1      " 不区分大小写
     nmap s <Plug>(easymotion-overwin-f)
-    nmap <leader>ms <Plug>(easymotion-overwin-f2)
-    nmap <leader>j <Plug>(easymotion-j)
-    nmap <leader>k <Plug>(easymotion-k)
-    nmap <leader>mw <Plug>(easymotion-w)
-    nmap <leader>mb <Plug>(easymotion-b)
-    nmap <leader>me <Plug>(easymotion-e)
-    nmap <leader>mg <Plug>(easymotion-ge)
+    nmap <leader>ms <Plug>(easymotion-sn)
+    nmap <leader>j <Plug>(easymotion-bd-jk)
+    nmap <leader>k <Plug>(easymotion-overwin-line)
+    nmap <leader>mw <Plug>(easymotion-bd-w)
+    nmap <leader>me <Plug>(easymotion-bd-e)
 " }}}
 
 " clever-f {{{ 行跳转
@@ -548,12 +543,14 @@ if s:gset.use_lightline
         if &ft ==# 'qf'
             return 'cwd = ' . getcwd()
         else
-            return substitute(expand('%:p'), '^' . escape(get(s:ws.fw, 'path', ''), '\'), '', '')
+            return exists('s:ws') ?
+                \ substitute(expand('%:p'), '^' . escape(expand(s:ws.fw.path), '\'), '', '') :
+                \ expand('%:p')
         endif
     endfunction
 
     function! Plug_ll_msgRight()
-        return get(s:ws.fw, 'path', '')
+        return exists('s:ws') ? s:ws.fw.path : ''
     endfunction
 
     function! Plug_ll_checkMixedIndent()
@@ -1165,7 +1162,7 @@ endif
 " }}}
 
 call s:plug.init()
-" }}} End
+" }}}
 
 " User Modules {{{
 " Libs {{{
@@ -1269,9 +1266,9 @@ function! GetArgs(str)
 endfunction
 " }}}
 
-" Function: GetInput(prompt, [text, completion, workdir]) {{{ 输入字符串
+" Function: Input2Str(prompt, [text, completion, workdir]) {{{ 输入字符串
 " @param workdir: 设置工作目录，用于文件和目录补全
-function! GetInput(prompt, ...)
+function! Input2Str(prompt, ...)
     if a:0 == 0
         return input(a:prompt)
     elseif a:0 == 1
@@ -1285,12 +1282,12 @@ function! GetInput(prompt, ...)
 endfunction
 " }}}
 
-" Function: ExecInput(iargs, fn, [fargs...]) range {{{
-" @param iargs: 用于GetInput的参数列表
-" @param fn: 要运行的函数，第一个参数必须为GetInput的输入
+" Function: Input2Fn(iargs, fn, [fargs...]) range {{{ 输入字符串作为函数参数
+" @param iargs: 用于Input2Str的参数列表
+" @param fn: 要运行的函数，第一个参数必须为Input2Str的输入
 " @param fargs: fn的附加参数
-function! ExecInput(iargs, fn, ...) range
-    let l:inpt = call('GetInput', a:iargs)
+function! Input2Fn(iargs, fn, ...) range
+    let l:inpt = call('Input2Str', a:iargs)
     if empty(l:inpt)
         return
     endif
@@ -1327,10 +1324,34 @@ function! ExecLast(exe)
     endif
 endfunction
 " }}}
+
+" Function: ExecMacro(key) {{{ 执行宏
+function! ExecMacro(key)
+    let l:mstr = ':normal! @' . a:key
+    execute l:mstr
+    call SetExecLast(l:mstr)
+endfunction
+" }}}
+
+nnoremap <Plug>ExecLast :call ExecLast(1)<CR>
+nnoremap <leader>. :call ExecLast(1)<CR>
+nnoremap <leader><leader>. :call ExecLast(0)<CR>
+nnoremap <M-;> @:
+vnoremap <silent> <leader><leader>;
+    \ :call feedkeys(':' . GetSelected(), 'n')<CR>
+nnoremap <silent> <leader>ae
+    \ :call Input2Fn(['Command: ', '', 'command'], {str -> append(line('.'), GetEval(str, 'command'))})<CR>
+nnoremap <silent> <leader>af
+    \ :call Input2Fn(['Function: ', '', 'function'], {str -> append(line('.'), GetEval(str, 'function'))})<CR>
+vnoremap <silent> <leader>ae :call append(line('.'), GetEval(GetSelected(), 'command'))<CR>
+vnoremap <silent> <leader>af :call append(line('.'), GetEval(GetSelected(), 'function'))<CR>
 " }}}
 
 " Workspace {{{
-let s:ws = {'root': '', 'rp': {}, 'fw': {}}
+" Required: 'yehuohan/popc', 'yehuohan/popset'
+"           'skywind3000/asyncrun.vim', 'voldikss/floaterm', 'Yggdroot/LeaderF', 'junegunn/fzf.vim'
+
+let s:ws = {'root': '', 'rp': {}, 'fw': {'path': ''}}
 let s:dp = {
     \ 'rp': {'hl': 'WarningMsg', 'str': ['/\V\c|| "\=[RP]Warning: \.\*\$/hs=s+3']},
     \ 'fw': {'hl': 'IncSearch', 'str': []},
@@ -1340,15 +1361,15 @@ augroup UserModulesWorkspace
     autocmd User PopcLayerWksSavePre call popc#layer#wks#SetSettings(s:ws)
     autocmd User PopcLayerWksLoaded call extend(s:ws, popc#layer#wks#GetSettings(), 'force') |
                                     \ let s:ws.root = popc#layer#wks#GetCurrentWks('root') |
-                                    \ if empty(get(s:ws.fw, 'path', '')) |
+                                    \ if empty(s:ws.fw.path) |
                                     \   let s:ws.fw.path = s:ws.root |
                                     \ endif
-    autocmd User AsyncRunStop call DisplaySetting()
-    autocmd Filetype qf call DisplaySetting()
+    autocmd User AsyncRunStop call WsDisplay()
+    autocmd Filetype qf call WsDisplay()
 augroup END
 
-" Function: DisplaySetting() {{{ 设置结果显示窗口
-function! DisplaySetting()
+" Function: WsDisplay() {{{ 设置结果显示窗口
+function! WsDisplay()
     if &filetype ==# 'qf'
         let l:mod = getline('.') =~# '\V\^|| [rg' ? 'fw' : 'rp'
         if l:mod ==# 'fw'
@@ -1363,11 +1384,8 @@ function! DisplaySetting()
     endif
 endfunction
 " }}}
-" }}}
 
 " Project {{{
-" Required: 'skywind3000/asyncrun.vim', 'voldikss/floaterm'
-"           'yehuohan/popc', 'yehuohan/popset'
 " Struct: s:rp {{{
 " @attribute proj: project类型
 " @attribute type: filetype类型
@@ -1381,7 +1399,6 @@ let s:rp = {
         \ 'm' : ['FnMake'  , 'makefile'                       ],
         \ 'a' : ['FnCargo' , 'Cargo.toml'                     ],
         \ 'h' : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
-        \ 'v' : ['FnTasks' , '.vscode'                        ],
         \ },
     \ 'type' : {
         \ 'c'          : [IsWin() ? 'gcc -g %s %s -o %s.exe && %s %s' : 'gcc -g %s %s -o %s && ./%s %s',
@@ -1433,13 +1450,13 @@ let s:rp = {
         \ 'name'    : '\mname\s*=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ },
     \ 'mappings' : [
-        \  'Rp',  'Rq',  'Ru',  'Rn',  'Rm',  'Ra',  'Rh',  'Rv',  'Rf',
-        \  'rp',  'rq',  'ru',  'rn',  'rm',  'ra',  'rh',  'rv',  'rf', 'rj',
-        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rca', 'rch', 'rcv',
-        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rba', 'rbh', 'rbv',
-        \ 'rlp', 'rlq', 'rlu', 'rln', 'rlm', 'rla', 'rlh', 'rlv', 'rlf',
-        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rta', 'rth', 'rtv', 'rtf',
-        \ 'rop', 'roq', 'rou', 'ron', 'rom', 'roa', 'roh', 'rov',
+        \  'Rp',  'Rq',  'Ru',  'Rn',  'Rm',  'Ra',  'Rh',  'Rf',
+        \  'rp',  'rq',  'ru',  'rn',  'rm',  'ra',  'rh',  'rf', 'rj',
+        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rca', 'rch',
+        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rba', 'rbh',
+        \ 'rlp', 'rlq', 'rlu', 'rln', 'rlm', 'rla', 'rlh', 'rlf',
+        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rta', 'rth', 'rtf',
+        \ 'rop', 'roq', 'rou', 'ron', 'rom', 'roa', 'roh',
         \ ]
     \ }
 " Function: s:rp.glob(pat, low) {{{
@@ -1721,16 +1738,12 @@ function! FnSphinx(cfg)
 endfunction
 " }}}
 
-" Function: FnTasks(cfg) {{{
-function! FnTasks(cfg)
-    throw printf('echo "[RP]Warning: Not implemented(%s/tasks.json)"', a:cfg.file)
-endfunction
-" }}}
+for key in s:rp.mappings
+    execute printf('nnoremap <leader>%s :call RunProject("%s")<CR>', key, key)
+endfor
 " }}}
 
 " Find {{{
-" Required: 'skywind3000/asyncrun.vim', 'Yggdroot/LeaderF', 'junegunn/fzf.vim'
-"           'yehuohan/popc', 'yehuohan/popset'
 " Struct: s:fw {{{
 " @attribute engine: see FindW, FindWFuzzy, FindWKill
 " @attribute rg: 预置的rg搜索命令，用于搜索指定文本
@@ -1866,7 +1879,7 @@ call s:fw.setEngine('fuzzy', 'leaderf')
 function! FindW(keys, mode, ...)
     " Function: s:getLocations() {{{
     function! s:getLocations()
-        let l:loc = GetInput('Location: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
+        let l:loc = Input2Str('Location: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
         return empty(l:loc) ? [] :
             \ map(split(l:loc, '|'), {key, val -> (val =~# '[/\\]$') ? val[0:-2] : val})
     endfunction
@@ -1876,14 +1889,14 @@ function! FindW(keys, mode, ...)
         let l:pat = ''
         if a:mode ==# 'n'
             if a:keys =~? 'i'
-                let l:pat = GetInput('Pattern: ')
+                let l:pat = Input2Str('Pattern: ')
             elseif a:keys =~? '[ws]'
                 let l:pat = expand('<cword>')
             endif
         elseif a:mode ==# 'v'
             let l:selected = GetSelected()
             if a:keys =~? 'i'
-                let l:pat = GetInput('Pattern: ', l:selected)
+                let l:pat = Input2Str('Pattern: ', l:selected)
             elseif a:keys =~? '[ws]'
                 let l:pat = l:selected
             endif
@@ -2034,14 +2047,14 @@ endfunction
 function! FindWFuzzy(keys)
     let l:f = (a:keys[0] ==# 'F') ? 1 : 0
     let l:p = (a:keys[1] ==# 'p') ? 1 : 0
-    let l:path = get(s:ws.fw, 'path', '')
+    let l:path = s:ws.fw.path
 
     if !l:f && !l:p && empty(l:path)
         let l:path = popc#utils#FindRoot()
         let s:ws.fw.path = l:path
     endif
     if l:f || l:p || empty(l:path)
-        let l:path = GetInput('fuzzy path: ', '', 'dir', expand('%:p:h'))
+        let l:path = Input2Str('fuzzy path: ', '', 'dir', expand('%:p:h'))
         if empty(l:path)
             return
         endif
@@ -2060,6 +2073,16 @@ endfunction
 
 let FindWKill = function('execute', [s:fw.engine.sk])
 let FindWSetFuzzy = function('popset#set#PopSelection', [s:fw.engine['sel-fuzzy']])
+for key in s:fw.mappings.rg
+    execute printf('nnoremap <leader>%s :call FindW("%s", "n")<CR>', key, key)
+    execute printf('vnoremap <leader>%s :call FindW("%s", "v")<CR>', key, key)
+endfor
+for key in s:fw.mappings.fuzzy
+    execute printf('nnoremap <leader>%s :call FindWFuzzy("%s")<CR>', key, key)
+endfor
+nnoremap <leader>fk :call FindWKill()<CR>
+nnoremap <leader>fu :call FindWSetFuzzy()<CR>
+" }}}
 " }}}
 
 " Scripts {{{
@@ -2098,15 +2121,15 @@ let s:rs = {
             \ 'copyConfig' : {
                 \ 'dsr' : 'copy config file',
                 \ 'lst' : ['.ycm_extra_conf.py', 'pyrightconfig.json', '.vimspector.json'],
-                \ 'cmd' : {sopt, arg -> execute('edit ' . s:rs.func.copyConfig(arg))},
+                \ 'cmd' : {sopt, arg -> execute('edit ' . s:rs.fns.copyConfig(arg))},
                 \ },
             \ },
-        \ 'cmd' : {sopt, arg -> has_key(s:rs.func, arg) ? s:rs.func[arg]() : execute(arg)},
+        \ 'cmd' : {sopt, arg -> has_key(s:rs.fns, arg) ? s:rs.fns[arg]() : execute(arg)},
         \ },
-    \ 'func' : {}
+    \ 'fns' : {}
     \ }
-" Function: s:rs.func.lineToTop() dict {{{ 冻结顶行
-function! s:rs.func.lineToTop() dict
+" Function: s:rs.fns.lineToTop() dict {{{ 冻结顶行
+function! s:rs.fns.lineToTop() dict
     let l:line = line('.')
     split %
     resize 1
@@ -2115,8 +2138,8 @@ function! s:rs.func.lineToTop() dict
 endfunction
 " }}}
 
-" Function: s:rs.func.clearUndo() dict {{{ 清除undo数据
-function! s:rs.func.clearUndo() dict
+" Function: s:rs.fns.clearUndo() dict {{{ 清除undo数据
+function! s:rs.fns.clearUndo() dict
     let l:ulbak = &undolevels
     setlocal undolevels=-1
     execute "normal! a\<Bar>\<BS>\<Esc>"
@@ -2124,8 +2147,8 @@ function! s:rs.func.clearUndo() dict
 endfunction
 " }}}
 
-" Function: s:rs.func.copyConfig(filename) dict {{{ 复制配置文件到当前目录
-function! s:rs.func.copyConfig(filename) dict
+" Function: s:rs.fns.copyConfig(filename) dict {{{ 复制配置文件到当前目录
+function! s:rs.fns.copyConfig(filename) dict
     let l:srcfile = $DotVimMiscPath . '/' . a:filename
     let l:dstfile = expand('%:p:h') . '/' . a:filename
     if !filereadable(l:dstfile)
@@ -2138,37 +2161,21 @@ endfunction
 let RunScript = function('popset#set#PopSelection', [s:rs.sel])
 " }}}
 
-" Function: FuncMacro(key) {{{ 执行宏
-function! FuncMacro(key)
-    let l:mstr = ':normal! @' . a:key
-    execute l:mstr
-    call SetExecLast(l:mstr)
-endfunction
-" }}}
-
-" Function: FuncEditFile(suffix, ntab) {{{ 编辑临时文件
+" Function: FnEditFile(suffix, ntab) {{{ 编辑临时文件
 " @param suffix: 临时文件附加后缀
 " @param ntab: 在新tab中打开
-function! FuncEditFile(suffix, ntab)
+function! FnEditFile(suffix, ntab)
     execute printf('%s %s.%s',
                 \ a:ntab ? 'tabedit' : 'edit',
                 \ fnamemodify(tempname(), ':r'),
                 \ empty(a:suffix) ? 'tmp' : a:suffix)
 endfunction
-function! RunEditFile(key)
-    let l:suffix = {
-                \ 'c': 'c',
-                \ 'a': 'cpp',
-                \ 'r': 'rs',
-                \ 'p': 'py'}[a:key[-1:]]
-    call FuncEditFile(l:suffix, a:key[0] ==# 't')
-endfunction
 " }}}
 
-" Function: FuncInsertSpace(string, pos) range {{{ 插入分隔符
+" Function: FnInsertSpace(string, pos) range {{{ 插入分隔符
 " @param string: 分割字符，以空格分隔
 " @param pos: 分割的位置
-function! FuncInsertSpace(string, pos) range
+function! FnInsertSpace(string, pos) range
     let l:chars = split(a:string)
 
     for k in range(a:firstline, a:lastline)
@@ -2189,12 +2196,12 @@ function! FuncInsertSpace(string, pos) range
         endfor
         call setline(k, l:line)
     endfor
-    call SetExecLast(':call FuncInsertSpace(''' . a:string . ''', ''' . a:pos . ''')', v:null)
+    call SetExecLast(':call FnInsertSpace(''' . a:string . ''', ''' . a:pos . ''')', v:null)
 endfunction
 " }}}
 
-" Function: FuncSwitchFile(sf) {{{ 切换文件
-function! FuncSwitchFile(sf)
+" Function: FnSwitchFile(sf) {{{ 切换文件
+function! FnSwitchFile(sf)
     let l:ext = expand('%:e')
     let l:file = expand('%:p:r')
     let l:try = []
@@ -2210,15 +2217,32 @@ function! FuncSwitchFile(sf)
         endif
     endfor
 endfunction
-let RunSwitchFile = function('FuncSwitchFile', [
-            \ {'lhs': ['c', 'cc', 'cpp', 'cxx'],
-            \  'rhs': ['h', 'hh', 'hpp', 'hxx']}])
 " }}}
+
+nnoremap <leader>se :call RunScript()<CR>
+nnoremap <silent> <leader>ei
+    \ :call Input2Fn(['Suffix: '], 'FnEditFile', 0)<CR>
+nnoremap <silent> <leader>eti
+    \ :call Input2Fn(['Suffix: '], 'FnEditFile', 1)<CR>
+nnoremap <leader>ec  :call FnEditFile('c', 0)<CR>
+nnoremap <leader>etc :call FnEditFile('c', 1)<CR>
+nnoremap <leader>ea  :call FnEditFile('cpp', 0)<CR>
+nnoremap <leader>eta :call FnEditFile('cpp', 1)<CR>
+nnoremap <leader>er  :call FnEditFile('rs', 0)<CR>
+nnoremap <leader>etr :call FnEditFile('rs', 1)<CR>
+nnoremap <leader>ep  :call FnEditFile('py', 0)<CR>
+nnoremap <leader>etp :call FnEditFile('py', 1)<CR>
+nnoremap <silent> <leader>eh :call Input2Fn(['Divide H: '], 'FnInsertSpace', 'h')<CR>
+nnoremap <silent> <leader>eb :call Input2Fn(['Divide B: '], 'FnInsertSpace', 'b')<CR>
+nnoremap <silent> <leader>el :call Input2Fn(['Divide L: '], 'FnInsertSpace', 'l')<CR>
+nnoremap <silent> <leader>ed :call Input2Fn(['Divide D: '], 'FnInsertSpace', 'd')<CR>
+nnoremap <silent> <leader>sf
+    \ :call FnSwitchFile({'lhs': ['c', 'cc', 'cpp', 'cxx'], 'rhs': ['h', 'hh', 'hpp', 'hxx']})<CR>
 " }}}
 
 " Quickfix {{{
-" Function: QuickfixBasic(kyes) {{{ 基本操作
-function! QuickfixBasic(keys)
+" Function: QuickfixOps(kyes) {{{ 基本操作
+function! QuickfixOps(keys)
     let l:type = a:keys[0]
     let l:oprt = a:keys[1]
     if l:oprt ==# 'o'
@@ -2316,9 +2340,29 @@ function! QuickfixIconv()
         \ })
 endfunction
 " }}}
+
+nnoremap <leader>qo :call QuickfixOps('co')<CR>
+nnoremap <leader>qc :call QuickfixOps('cc')<CR>
+nnoremap <leader>qj :call QuickfixOps('cj')<CR>
+nnoremap <leader>qJ :call QuickfixOps('cJ')<CR>
+nnoremap <leader>qk :call QuickfixOps('ck')<CR>
+nnoremap <leader>qK :call QuickfixOps('cK')<CR>
+nnoremap <leader>lo :call QuickfixOps('lo')<CR>
+nnoremap <leader>lc :call QuickfixOps('lc')<CR>
+nnoremap <leader>lj :call QuickfixOps('lj')<CR>
+nnoremap <leader>lJ :call QuickfixOps('lJ')<CR>
+nnoremap <leader>lk :call QuickfixOps('lk')<CR>
+nnoremap <leader>lK :call QuickfixOps('lK')<CR>
+nnoremap <C-Space>  :call QuickfixPreview()<CR>
+nnoremap <leader>qt :call QuickfixTabEdit()<CR>
+nnoremap <leader>qi :call QuickfixIconv()<CR>
+" 将quickfix中的内容复制location-list
+nnoremap <leader>ql
+    \ :call setloclist(0, getqflist())<Bar>
+    \ :vertical botright lopen 35<CR>
 " }}}
 
-" Option {{{
+" Options {{{
 " Struct: s:opt {{{
 let s:opt = {
     \ 'lst' : {
@@ -2326,9 +2370,9 @@ let s:opt = {
         \ 'virtualedit'  : ['all', ''],
         \ 'signcolumn'   : ['no', 'yes', 'auto'],
         \ },
-    \ 'func' : {
-        \ 'number' : 'OptFuncNumber',
-        \ 'syntax' : 'OptFuncSyntax',
+    \ 'fns' : {
+        \ 'number' : 'FnNumber',
+        \ 'syntax' : 'FnSyntax',
         \ },
     \ }
 " }}}
@@ -2350,15 +2394,15 @@ function! OptionLst(opt)
 endfunction
 " }}}
 
-" Function: OptionFunc(opt) {{{ 切换参数值（函数取值）
-function! OptionFunc(opt)
-    let Fn = function(s:opt.func[a:opt])
+" Function: OptionFns(opt) {{{ 切换参数值（函数取值）
+function! OptionFns(opt)
+    let Fn = function(s:opt.fns[a:opt])
     call Fn()
 endfunction
 " }}}
 
-" Function: OptFuncNumber() {{{ 切换显示行号
-function! OptFuncNumber()
+" Function: FnNumber() {{{ 切换显示行号
+function! FnNumber()
     if (&number) && (&relativenumber)
         set nonumber
         set norelativenumber
@@ -2372,8 +2416,8 @@ function! OptFuncNumber()
 endfunction
 " }}}
 
-" Function: OptFuncSyntax() {{{ 切换高亮
-function! OptFuncSyntax()
+" Function: FnSyntax() {{{ 切换高亮
+function! FnSyntax()
     if exists('g:syntax_on')
         syntax off
         echo 'syntax off'
@@ -2383,11 +2427,22 @@ function! OptFuncSyntax()
     endif
 endfunction
 " }}}
+
+nnoremap <leader>iw :call OptionInv('wrap')<CR>
+nnoremap <leader>il :call OptionInv('list')<CR>
+nnoremap <leader>ii :call OptionInv('ignorecase')<CR>
+nnoremap <leader>ie :call OptionInv('expandtab')<CR>
+nnoremap <leader>ib :call OptionInv('scrollbind')<CR>
+nnoremap <leader>iv :call OptionLst('virtualedit')<CR>
+nnoremap <leader>ic :call OptionLst('conceallevel')<CR>
+nnoremap <leader>is :call OptionLst('signcolumn')<CR>
+nnoremap <leader>in :call OptionFns('number')<CR>
+nnoremap <leader>ih :call OptionFns('syntax')<CR>
 " }}}
-" }}} End
+" }}}
 
 " User Settings {{{
-" Basic {{{
+" Style {{{
     set synmaxcol=512                   " 最大高亮列数
     set number                          " 显示行号
     set relativenumber                  " 显示相对行号
@@ -2444,10 +2499,9 @@ if IsVim()
     set renderoptions=                  " 设置正常显示unicode字符
     if &term == 'xterm' || &term == 'xterm-256color'
         set t_vb=                       " 关闭终端可视闪铃，即normal模式时按esc会有响铃
-        " 5,6: 竖线，  3,4: 横线，  1,2: 方块
-        let &t_SI = "\<Esc>[6 q"        " 进入Insert模式
-        let &t_SR = "\<Esc>[3 q"        " 进入Replace模式
-        let &t_EI = "\<Esc>[2 q"        " 退出Insert模式
+        let &t_SI = "\<Esc>[6 q"        " 进入Insert模式，5,6:竖线
+        let &t_SR = "\<Esc>[3 q"        " 进入Replace模式，3,4:横线
+        let &t_EI = "\<Esc>[2 q"        " 退出Insert模式，1,2:方块
     endif
 endif
 
@@ -2517,17 +2571,17 @@ augroup END
 
 " Function: s:NVimQt_setGui() {{{
 function! s:NVimQt_setGui()
-if IsNVimQt()
-    GuiLinespace 0
-    GuiTabline 0
-    GuiPopupmenu 0
-    call GuiAdjustFontSize(0)
-    nnoremap <RightMouse> :call GuiShowContextMenu()<CR>
-    inoremap <RightMouse> <Esc>:call GuiShowContextMenu()<CR>
-    vnoremap <RightMouse> :call GuiShowContextMenu()<CR>gv
-    nnoremap <leader>tf :call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
-    nnoremap <leader>tm :call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>
-endif
+    if exists('g:GuiLoaded') " 在UIEnter之后才起作用
+        GuiLinespace 0
+        GuiTabline 0
+        GuiPopupmenu 0
+        call GuiAdjustFontSize(0)
+        nnoremap <RightMouse> :call GuiShowContextMenu()<CR>
+        inoremap <RightMouse> <Esc>:call GuiShowContextMenu()<CR>
+        vnoremap <RightMouse> :call GuiShowContextMenu()<CR>gv
+        nnoremap <leader>tf :call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
+        nnoremap <leader>tm :call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>
+    endif
 endfunction
 " }}}
 endif
@@ -2542,29 +2596,11 @@ if exists('g:neovide')
 endif
 " }}}
 " }}}
-" }}} End
 
-" User Mappings {{{
+" Mappings {{{
 " Basic {{{
-    " 重复命令
-    nnoremap <Plug>ExecLast :call ExecLast(1)<CR>
-    nnoremap <leader>. :call ExecLast(1)<CR>
-    nnoremap <leader><leader>. :call ExecLast(0)<CR>
-    nnoremap <M-;> @:
-    vnoremap <silent> <leader><leader>;
-        \ :call feedkeys(':' . GetSelected(), 'n')<CR>
-    " 排序
-    nnoremap <silent> <leader><leader>s :call feedkeys(':sort nr /', 'n')<CR>
-    nnoremap <silent> <leader><leader>S :call feedkeys(':sort! nr /', 'n')<CR>
-    vnoremap <silent> <leader><leader>s
-        \ :call feedkeys(printf(':sort nr /\%%>%dc.*\%%<%dc/', getpos("'<")[2]-1, getpos("'>")[2]+1), 'n')<CR>
-    vnoremap <silent> <leader><leader>S
-        \ :call feedkeys(printf(':sort! nr /\%%>%dc.*\%%<%dc/', getpos("'<")[2]-1, getpos("'>")[2]+1), 'n')<CR>
     " 回退操作
     nnoremap <S-u> <C-r>
-    " 大小写转换
-    nnoremap <leader>u ~
-    vnoremap <leader>u ~
     " 行移动
     nnoremap > >>
     nnoremap < <<
@@ -2623,20 +2659,16 @@ endif
     cnoremap <M-j> <C-Left>
     cnoremap <M-i> <C-b>
     cnoremap <M-o> <C-e>
+    " 排序
+    nnoremap <silent> <leader><leader>s :call feedkeys(':sort nr /', 'n')<CR>
+    nnoremap <silent> <leader><leader>S :call feedkeys(':sort! nr /', 'n')<CR>
+    vnoremap <silent> <leader><leader>s
+        \ :call feedkeys(printf(':sort nr /\%%>%dc.*\%%<%dc/', getpos("'<")[2]-1, getpos("'>")[2]+1), 'n')<CR>
+    vnoremap <silent> <leader><leader>S
+        \ :call feedkeys(printf(':sort! nr /\%%>%dc.*\%%<%dc/', getpos("'<")[2]-1, getpos("'>")[2]+1), 'n')<CR>
     " HEX编辑
     nnoremap <leader>xx :%!xxd<CR>
     nnoremap <leader>xr :%!xxd -r<CR>
-    " 参数设置
-    nnoremap <leader>iw :call OptionInv('wrap')<CR>
-    nnoremap <leader>il :call OptionInv('list')<CR>
-    nnoremap <leader>ii :call OptionInv('ignorecase')<CR>
-    nnoremap <leader>ie :call OptionInv('expandtab')<CR>
-    nnoremap <leader>ib :call OptionInv('scrollbind')<CR>
-    nnoremap <leader>iv :call OptionLst('virtualedit')<CR>
-    nnoremap <leader>ic :call OptionLst('conceallevel')<CR>
-    nnoremap <leader>is :call OptionLst('signcolumn')<CR>
-    nnoremap <leader>in :call OptionFunc('number')<CR>
-    nnoremap <leader>ih :call OptionFunc('syntax')<CR>
 " }}}
 
 " Copy & Paste {{{
@@ -2669,11 +2701,11 @@ endif
         execute printf('nnoremap <leader>''%s "%sp', t, t)
         execute printf('nnoremap <leader>''%s "%sP', toupper(t), t)
         " 快速执行宏
-        execute printf('nnoremap <leader>2%s :call FuncMacro("%s")<CR>', t, t)
+        execute printf('nnoremap <leader>2%s :call ExecMacro("%s")<CR>', t, t)
     endfor
 " }}}
 
-" Tab, Buffer, Quickfix, Window {{{
+" Tab, Buffer, Window {{{
     " tab切换
     nnoremap <M-u> gT
     nnoremap <M-p> gt
@@ -2681,26 +2713,6 @@ endif
     nnoremap <leader>bn :bnext<CR>
     nnoremap <leader>bp :bprevious<CR>
     nnoremap <leader>bl <C-^>
-    " quickfix, location-list操作
-    nnoremap <leader>qo :call QuickfixBasic('co')<CR>
-    nnoremap <leader>qc :call QuickfixBasic('cc')<CR>
-    nnoremap <leader>qj :call QuickfixBasic('cj')<CR>
-    nnoremap <leader>qJ :call QuickfixBasic('cJ')<CR>
-    nnoremap <leader>qk :call QuickfixBasic('ck')<CR>
-    nnoremap <leader>qK :call QuickfixBasic('cK')<CR>
-    nnoremap <leader>lo :call QuickfixBasic('lo')<CR>
-    nnoremap <leader>lc :call QuickfixBasic('lc')<CR>
-    nnoremap <leader>lj :call QuickfixBasic('lj')<CR>
-    nnoremap <leader>lJ :call QuickfixBasic('lJ')<CR>
-    nnoremap <leader>lk :call QuickfixBasic('lk')<CR>
-    nnoremap <leader>lK :call QuickfixBasic('lK')<CR>
-    nnoremap <C-Space> :call QuickfixPreview()<CR>
-    nnoremap <leader>qt :call QuickfixTabEdit()<CR>
-    nnoremap <leader>qi :call QuickfixIconv()<CR>
-    " 将quickfix中的内容复制location-list
-    nnoremap <leader>ql
-        \ :call setloclist(0, getqflist())<Bar>
-        \ :vertical botright lopen 35<CR>
     " 分割窗口
     nnoremap <leader>ws <C-w>s
     nnoremap <leader>wv <C-W>v
@@ -2733,9 +2745,9 @@ endif
 
 " Diff {{{
     nnoremap <silent> <leader>ds
-        \ :call ExecInput(['File: ', '', 'file', expand('%:p:h')], {filename -> execute('diffsplit ' . filename)})<CR>
+        \ :call Input2Fn(['File: ', '', 'file', expand('%:p:h')], {filename -> execute('diffsplit ' . filename)})<CR>
     nnoremap <silent> <leader>dv
-        \ :call ExecInput(['File: ', '', 'file', expand('%:p:h')], {filename -> execute('vertical diffsplit ' . filename)})<CR>
+        \ :call Input2Fn(['File: ', '', 'file', expand('%:p:h')], {filename -> execute('vertical diffsplit ' . filename)})<CR>
     " 比较当前文件（已经分屏）
     nnoremap <leader>dt :diffthis<CR>
     nnoremap <leader>do :diffoff<CR>
@@ -2748,38 +2760,7 @@ endif
     nnoremap <leader>dk [c
 " }}}
 
-" Project {{{
-    nnoremap <silent> <leader>ei
-        \ :call ExecInput(['Suffix: '], 'FuncEditFile', 0)<CR>
-    nnoremap <silent> <leader>eti
-        \ :call ExecInput(['Suffix: '], 'FuncEditFile', 1)<CR>
-    nnoremap <leader>ec :call RunEditFile('c')<CR>
-    nnoremap <leader>ea :call RunEditFile('a')<CR>
-    nnoremap <leader>er :call RunEditFile('r')<CR>
-    nnoremap <leader>ep :call RunEditFile('p')<CR>
-    nnoremap <leader>etc :call RunEditFile('tc')<CR>
-    nnoremap <leader>eta :call RunEditFile('ta')<CR>
-    nnoremap <leader>etr :call RunEditFile('tr')<CR>
-    nnoremap <leader>etp :call RunEditFile('tp')<CR>
-    nnoremap <silent> <leader>eh :call ExecInput(['Divide H: '], 'FuncInsertSpace', 'h')<CR>
-    nnoremap <silent> <leader>eb :call ExecInput(['Divide B: '], 'FuncInsertSpace', 'b')<CR>
-    nnoremap <silent> <leader>el :call ExecInput(['Divide L: '], 'FuncInsertSpace', 'l')<CR>
-    nnoremap <silent> <leader>ed :call ExecInput(['Divide D: '], 'FuncInsertSpace', 'd')<CR>
-    nnoremap <silent> <leader>ae
-        \ :call ExecInput(['Command: ', '', 'command'], {str -> append(line('.'), GetEval(str, 'command'))})<CR>
-    nnoremap <silent> <leader>af
-        \ :call ExecInput(['Function: ', '', 'function'], {str -> append(line('.'), GetEval(str, 'function'))})<CR>
-    vnoremap <silent> <leader>ae :call append(line('.'), GetEval(GetSelected(), 'command'))<CR>
-    vnoremap <silent> <leader>af :call append(line('.'), GetEval(GetSelected(), 'function'))<CR>
-    nnoremap <leader>sf :call RunSwitchFile()<CR>
-    nnoremap <leader>se :call RunScript()<CR>
-    " RunProject
-    for key in s:rp.mappings
-        execute printf('nnoremap <leader>%s :call RunProject("%s")<CR>', key, key)
-    endfor
-" }}}
-
-" Find {{{
+" Search {{{
     nnoremap <leader><Esc> :nohlsearch<CR>
     nnoremap i :nohlsearch<CR>i
     nnoremap <leader>8  *
@@ -2791,15 +2772,6 @@ endif
         \ :execute '/\V\c' . escape(expand('<cword>'), '\/')<CR>
     vnoremap <silent> <leader><leader>/
         \ :call feedkeys('/' . GetSelected(), 'n')<CR>
-    " FindW
-    for key in s:fw.mappings.rg
-        execute printf('nnoremap <leader>%s :call FindW("%s", "n")<CR>', key, key)
-        execute printf('vnoremap <leader>%s :call FindW("%s", "v")<CR>', key, key)
-    endfor
-    for key in s:fw.mappings.fuzzy
-        execute printf('nnoremap <leader>%s :call FindWFuzzy("%s")<CR>', key, key)
-    endfor
-    nnoremap <leader>fk :call FindWKill()<CR>
-    nnoremap <leader>fu :call FindWSetFuzzy()<CR>
 " }}}
-" }}} End
+" }}}
+" }}}
