@@ -543,14 +543,14 @@ if s:gset.use_lightline
         if &ft ==# 'qf'
             return 'cwd = ' . getcwd()
         else
-            return exists('s:ws') ?
+            return exists('s:ws.fw.path') ?
                 \ substitute(expand('%:p'), '^' . escape(expand(s:ws.fw.path), '\'), '', '') :
                 \ expand('%:p')
         endif
     endfunction
 
     function! Plug_ll_msgRight()
-        return exists('s:ws') ? s:ws.fw.path : ''
+        return exists('s:ws.fw.path') ? s:ws.fw.path : ''
     endfunction
 
     function! Plug_ll_checkMixedIndent()
@@ -1351,7 +1351,7 @@ vnoremap <silent> <leader>af :call append(line('.'), GetEval(GetSelected(), 'fun
 " Required: 'yehuohan/popc', 'yehuohan/popset'
 "           'skywind3000/asyncrun.vim', 'voldikss/floaterm', 'Yggdroot/LeaderF', 'junegunn/fzf.vim'
 
-let s:ws = {'root': '', 'rp': {}, 'fw': {'path': ''}}
+let s:ws = {'root': '', 'rp': {}, 'fw': {}}
 let s:dp = {
     \ 'rp': {'hl': 'WarningMsg', 'str': ['/\V\c|| "\=[RP]Warning: \.\*\$/hs=s+3']},
     \ 'fw': {'hl': 'IncSearch', 'str': []},
@@ -1361,7 +1361,7 @@ augroup UserModulesWorkspace
     autocmd User PopcLayerWksSavePre call popc#layer#wks#SetSettings(s:ws)
     autocmd User PopcLayerWksLoaded call extend(s:ws, popc#layer#wks#GetSettings(), 'force') |
                                     \ let s:ws.root = popc#layer#wks#GetCurrentWks('root') |
-                                    \ if empty(s:ws.fw.path) |
+                                    \ if empty(get(s:ws.fw, 'path', '')) |
                                     \   let s:ws.fw.path = s:ws.root |
                                     \ endif
     autocmd User AsyncRunStop call WsDisplay()
@@ -1919,7 +1919,7 @@ function! FindW(keys, mode, ...)
         elseif a:keys =~# 'p'
             let l:loc = join(s:getLocations(), '" "')
         else
-            if empty(s:ws.fw.path)
+            if empty(get(s:ws.fw, 'path', ''))
                 let s:ws.fw.path = popc#utils#FindRoot()
             endif
             let l:loc = empty(s:ws.fw.path) ? '.' : s:ws.fw.path
@@ -2047,7 +2047,7 @@ endfunction
 function! FindWFuzzy(keys)
     let l:f = (a:keys[0] ==# 'F') ? 1 : 0
     let l:p = (a:keys[1] ==# 'p') ? 1 : 0
-    let l:path = s:ws.fw.path
+    let l:path = get(s:ws.fw, 'path', '')
 
     if !l:f && !l:p && empty(l:path)
         let l:path = popc#utils#FindRoot()
