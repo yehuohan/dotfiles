@@ -1,61 +1,40 @@
-
 " Env: environment variable for vim and neovim.
 
-
-" environment variable {{{
-" Format: s:env.dev.os
+" Environment variables {{{
 let s:env = {
-    \ 'hp': {}
-    \ }
+    \ 'local': [
+        \ $DotVimPath . '/local',
+        \ $DotVimPath . '/local/bin',
+    \ ],
+    \ 'unix': [
+        \ '~/ubin',
+        \ '~/uapps',
+    \ ],
+    \ 'win': [
+        \ 'D:/apps/lua',
+        \ 'D:/VS2017/VC/Auxiliary/Build',
+        \ 'C:/Program Files (x86)/Google/Chrome/Application',
+        \ 'D:/Mozilla Firefox',
+        \ 'D:/Typora',
+        \ 'E:/texlive/bin/win32',
+        \ 'E:/SumatraPDF',
+        \ 'E:/MATLAB/R2015b/bin',
+    \ ],
+\ }
 " }}}
 
-" hp with windows10 {{{
-let s:env.hp.win = [
-    \ 'C:/apps/bin',
-    \ 'C:/apps/bin/bin',
-    \ 'C:/apps/Python',
-    \ 'C:/apps/msys64/usr/bin',
-    \ 'C:/apps/msys64/mingw64/bin',
-    \ 'D:/apps/rust/toolchain/toolchains/nightly-x86_64-pc-windows-msvc/bin',
-    \ 'D:/apps/rust/cargo/bin',
-    \ 'D:/apps/LLVM/bin',
-    \ 'D:/apps/lua',
-    \ 'D:/apps/Julia/bin',
-    \ 'D:/apps/Go/bin',
-    \ 'D:/apps/cmake/bin',
-    \ 'D:/nodejs',
-    \ 'D:/Java/jdk1.8.0_201/bin',
-    \ 'D:/Qt/5.12.5/msvc2017_64/bin',
-    \ 'D:/VS2017/VC/Auxiliary/Build',
-    \ 'D:/VS2017/VC/Tools/MSVC/14.16.27023/bin/Hostx64/x64',
-    \ 'D:/VS2017/VC/Tools/MSVC/14.16.27023/bin/Hostx64/x86',
-    \ 'C:/Program Files (x86)/Google/Chrome/Application',
-    \ 'D:/Mozilla Firefox',
-    \ 'D:/Typora',
-    \ 'E:/texlive/bin/win32',
-    \ 'E:/SumatraPDF',
-    \ 'E:/MATLAB/R2015b/bin',
-    \ ]
-" }}}
-
-" FUNCTION: env#env(dev, os) {{{
-" @param dev: device name
-" @param os: os name
-function! env#env(dev, os)
-    let l:e = get(get(s:env, a:dev, {}), a:os, [])
-    " IsWin() is from vimrc
+" FUNCTION: env#env() {{{
+function! env#env()
     if IsWin()
-        if !empty(l:e)
-            let $PATH .= ';' . join(l:e, ';')
-        endif
+        let $PATH .= ';' . join(s:env.local, ';')
+        let $PATH .= ';' . join(s:env.win, ';')
         " For .ycm_extra_conf.py
+        let $VPathPython = 'C:/apps/Python'
         let $VPathMingw64 = 'C:/apps/msys64/mingw64'
         let $VPathVs = 'D:/VS2017/VC/Tools/MSVC/14.16.27023'
-        let $VPathPython = 'C:/apps/Python'
     else
-        if !empty(l:e)
-            let $PATH .= ':' . join(l:e, ':')
-        endif
+        let $PATH .= ':' . join(s:env.local, ':')
+        let $PATH .= ':' . join(s:env.unix, ':')
         let $VPathPython = '/usr/bin'
     endif
 endfunction

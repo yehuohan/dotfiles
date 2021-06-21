@@ -33,40 +33,22 @@ let $DotVimPath=resolve(expand('<sfile>:p:h'))
 let $DotVimMiscPath=$DotVimPath . '/misc'
 let $DotVimCachePath=$DotVimPath . '/.cache'
 set rtp+=$DotVimPath
+call env#env()
 
 " First {{{
 set encoding=utf-8                      " 内部使用utf-8编码
 set nocompatible                        " 不兼容vi
-set guioptions=M                        " 完全禁用Gui界面元素
-let g:did_install_default_menus = 1     " 禁止加载缺省菜单
-let g:did_install_syntax_menu = 1       " 禁止加载Syntax菜单
 syntax enable                           " 打开语法高亮
 filetype plugin indent on               " 打开文件类型检测
 let mapleader="\<Space>"                " Space leader
 nnoremap ; :
 vnoremap ; :
 nnoremap : ;
-set timeout                             " 打开映射超时检测
-set ttimeout                            " 打开键码超时检测
-set timeoutlen=1000                     " 映射超时时间为1000ms
-set ttimeoutlen=70                      " 键码超时时间为70ms
-if IsVim()
-    " 终端Alt键映射处理：如 Alt+x，实际连续发送 <Esc>x 的键码
-    "<1> set <M-x>=x                  " 设置键码，这里的是一个字符，即<Esc>的键码（按i-C-v, i-C-[输入）
-    "    nnoremap <M-x>  :CmdTest<CR>   " 按键码超时时间检测
-    "<2> nnoremap <Esc>x :CmdTest<CR>   " 按映射超时时间检测
-    "<3> nnoremap x    :CmdTest<CR>   " 按映射超时时间检测
-    for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m ; , .', ' ')
-        execute 'set <M-'. t . '>=' . t
-    endfor
-endif
 " }}}
 
 " Struct: s:gset {{{
 let s:gset_file = $DotVimCachePath . '/.gset.json'
 let s:gset = {
-    \ 'set_dev'       : v:null,
-    \ 'set_os'        : v:null,
     \ 'use_powerfont' : 0,
     \ 'use_lightline' : 0,
     \ 'use_startify'  : 0,
@@ -88,7 +70,6 @@ function! s:gsLoad()
         let s:gset.use_ycm = '1'
         let s:gset.use_coc = '0'
     endif
-    call env#env(s:gset.set_dev, s:gset.set_os)
 endfunction
 " }}}
 " Function: s:gsSave(...) {{{
@@ -103,8 +84,6 @@ function! s:gsInit()
         \ 'opt' : 'select settings',
         \ 'lst' : sort(keys(s:gset)),
         \ 'dic' : {
-            \ 'set_dev': {'lst': ['hp']         },
-            \ 'set_os' : {'lst': ['win', 'arch']},
             \ 'use_powerfont': {}, 'use_lightline': {}, 'use_startify': {}, 'use_utils': {},
             \ 'use_ycm': {}, 'use_snip': {}, 'use_coc': {}, 'use_spector': {}, 'use_leaderf': {},
             \ },
@@ -2495,7 +2474,19 @@ nnoremap <leader>ih :call OptionFns('syntax')<CR>
     set noerrorbells                    " 关闭错误信息响铃
     set belloff=all                     " 关闭所有事件的响铃
     set helplang=en,cn                  " help-doc顺序
+    set timeout                         " 打开映射超时检测
+    set ttimeout                        " 打开键码超时检测
+    set timeoutlen=1000                 " 映射超时时间为1000ms
+    set ttimeoutlen=70                  " 键码超时时间为70ms
 if IsVim()
+    " 终端Alt键映射处理：如 Alt+x，实际连续发送 <Esc>x 的键码
+    "<1> set <M-x>=x                  " 设置键码，这里的是一个字符，即<Esc>的键码（按i-C-v, i-C-[输入）
+    "    nnoremap <M-x>  :CmdTest<CR>   " 按键码超时时间检测
+    "<2> nnoremap <Esc>x :CmdTest<CR>   " 按映射超时时间检测
+    "<3> nnoremap x    :CmdTest<CR>   " 按映射超时时间检测
+    for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m ; , .', ' ')
+        execute 'set <M-'. t . '>=' . t
+    endfor
     set renderoptions=                  " 设置正常显示unicode字符
     if &term == 'xterm' || &term == 'xterm-256color'
         set t_vb=                       " 关闭终端可视闪铃，即normal模式时按esc会有响铃
@@ -2531,6 +2522,9 @@ augroup END
 " }}}
 
 " Gui {{{
+    set guioptions=M                    " 完全禁用Gui界面元素
+    let g:did_install_default_menus = 1 " 禁止加载缺省菜单
+    let g:did_install_syntax_menu = 1   " 禁止加载Syntax菜单
     nnoremap <kPlus> :call GuiAdjustFontSize(1)<CR>
     nnoremap <kMinus> :call GuiAdjustFontSize(-1)<CR>
     let s:gui_fontsize = 12
