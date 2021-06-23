@@ -666,7 +666,8 @@ endif
 
     function! Plug_stt_todo()
         if filereadable($DotVimCachePath.'/todo.md')
-            return filter(readfile($DotVimCachePath.'/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
+            let l:todo = filter(readfile($DotVimCachePath.'/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
+            return empty(l:todo) ? '' : l:todo
         else
             return ''
         endif
