@@ -7,9 +7,9 @@ typedef struct node_s {
 
 void traverse_postorder(node_t* root, void (*visit)(node_t*)) {
     node_t* d = root;
-    node_t* last = nullptr;
+    node_t* last = NULL;
     std::stack<node_t*> s;
-    while (true) {
+    while (1) {
         while (d) {
             s.push(d);
             d = d->left;

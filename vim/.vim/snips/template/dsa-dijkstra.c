@@ -1,3 +1,6 @@
+#include <stdint.h>
+#include <stdlib.h>
+
 typedef struct Vertex {
     int     data;
     uint8_t status;
