@@ -23,9 +23,6 @@ endfunction
 function! IsNVim()
     return has('nvim')
 endfunction
-function! IsGVim()
-    return has('gui_running')
-endfunction
 " }}}
 
 " Globals {{{
@@ -139,6 +136,8 @@ endfunction
 call plug#begin($DotVimPath.'/bundle')  " 设置插件位置
     " editing
     Plug 'yehuohan/vim-easymotion'
+    Plug 'haya14busa/incsearch.vim'
+    Plug 'haya14busa/incsearch-fuzzy.vim'
     Plug 'rhysd/clever-f.vim'
     Plug 'mg979/vim-visual-multi'
     Plug 't9md/vim-textmanip'
@@ -171,9 +170,7 @@ if s:gset.use_startify
     Plug 'mhinz/vim-startify'
 endif
     Plug 'itchyny/screensaver.vim'
-if IsWin()
     Plug 'junegunn/fzf', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
-endif
     Plug 'junegunn/fzf.vim', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
 if s:gset.use_leaderf
     Plug 'Yggdroot/LeaderF', {'do': IsWin() ? './install.bat' : './install.sh'}
@@ -254,6 +251,8 @@ call plug#end()
     nmap <leader>k <Plug>(easymotion-overwin-line)
     nmap <leader>mw <Plug>(easymotion-bd-w)
     nmap <leader>me <Plug>(easymotion-bd-e)
+    nnoremap <silent><expr>  z/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/'}))
+    nnoremap <silent><expr> zg/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/', 'is_stay': 1}))
 " }}}
 
 " clever-f {{{ 行跳转
@@ -681,6 +680,8 @@ endif
 
 " fzf {{{ 模糊查找
     let g:fzf_command_prefix = 'Fzf'
+    let g:fzf_layout = { 'down': '40%' }
+    let g:fzf_preview_window = ['right:40%,border-sharp']
     nnoremap <leader><leader>f :Fzf
     augroup PluginFzf
         autocmd!
@@ -1489,7 +1490,7 @@ endfunction
 "   type: 用于设置encoding, errorformat ...
 " }
 function! s:rp.run(cfg) dict
-    " get file and wdir for l:Fn, which may set filetype
+    " get file and wdir for calling l:Fn before use type because l:Fn may change filetype
     let [l:Fn, l:pat] = self.proj[a:cfg.key]
     if !has_key(a:cfg, 'file')
         if l:pat == v:null
@@ -2531,7 +2532,7 @@ augroup END
     let s:gui_fontsize = 12
     if IsWin()
         let s:gui_font = s:gset.use_powerfont ? 'Consolas\ For\ Powerline' : 'Consolas'
-        let s:gui_fontwide = 'Microsoft\ YaHei\ Mono'
+        let s:gui_fontwide = IsVim() ? 'Microsoft\ YaHei\ Mono' : 'Microsoft\ YaHei\ UI'
     else
         let s:gui_font = s:gset.use_powerfont ? 'DejaVu\ Sans\ Mono\ for\ Powerline' : 'DejaVu\ Sans'
         let s:gui_fontwide = 'WenQuanYi\ Micro\ Hei\ Mono'
@@ -2543,7 +2544,7 @@ augroup END
     endfunction
 
 " Gui-vim {{{
-if IsGVim()
+if IsVim() && has('gui_running')
     set lines=25
     set columns=90
     set linespace=0
@@ -2554,8 +2555,8 @@ if IsGVim()
 endif
 " }}}
 
-" Gui-neovim {{{
 if IsNVim()
+" Gui-neovim {{{
     set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
         \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
         \,sm:block-blinkwait175-blinkoff150-blinkon175
@@ -2579,7 +2580,6 @@ function! s:NVimQt_setGui()
     endif
 endfunction
 " }}}
-endif
 " }}}
 
 " Gui-neovide {{{
@@ -2590,6 +2590,7 @@ if exists('g:neovide')
     call GuiAdjustFontSize(4)
 endif
 " }}}
+endif
 " }}}
 
 " Mappings {{{
