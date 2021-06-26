@@ -35,8 +35,6 @@ call env#env()
 " First {{{
 set encoding=utf-8                      " 内部使用utf-8编码
 set nocompatible                        " 不兼容vi
-syntax enable                           " 打开语法高亮
-filetype plugin indent on               " 打开文件类型检测
 let mapleader="\<Space>"                " Space leader
 nnoremap ; :
 vnoremap ; :
@@ -133,7 +131,7 @@ endfunction
 " }}}
 
 " Plug {{{
-call plug#begin($DotVimPath.'/bundle')  " 设置插件位置
+call plug#begin($DotVimPath.'/bundle')  " 设置插件位置，且自动设置了syntax enable和filetype plugin indent on
     " editing
     Plug 'yehuohan/vim-easymotion'
     Plug 'haya14busa/incsearch.vim'

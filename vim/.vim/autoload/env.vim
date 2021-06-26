@@ -11,10 +11,9 @@ let s:env = {
         \ '~/uapps',
     \ ],
     \ 'win': [
-        \ 'D:/apps/lua',
-        \ 'D:/VS2017/VC/Auxiliary/Build',
         \ 'C:/Program Files (x86)/Google/Chrome/Application',
         \ 'D:/Mozilla Firefox',
+        \ 'D:/VS2017/VC/Auxiliary/Build',
         \ 'D:/Typora',
         \ 'E:/texlive/bin/win32',
         \ 'E:/SumatraPDF',

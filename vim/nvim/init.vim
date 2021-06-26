@@ -18,14 +18,14 @@ if (has('unix') && !has('macunix') && !has('win32unix')) || (has('mac'))
     source ~/.vim/.init.vim
 elseif (has('win32') || has('win64'))
     " Path 'C:\Users\<user>\AppData\Local\nvim\'
-    let g:python3_host_prog = 'C:/apps/Python/python.exe'
-    if filereadable('C:/apps/dotvim/local/node_modules/.bin/neovim-node-host.cmd')
-        let g:node_host_prog = 'C:/apps/dotvim/local/node_modules/.bin/neovim-node-host.cmd'
+    let g:python3_host_prog = $APPS_HOME . '/Python/python.exe'
+    if filereadable($APPS_HOME . '/dotvim/local/node_modules/.bin/neovim-node-host.cmd')
+        let g:node_host_prog = $APPS_HOME . '/dotvim/local/node_modules/.bin/neovim-node-host.cmd'
     else
-        let g:node_host_prog = 'D:/nodejs/node_modules/neovim-node-host.cmd'
+        let g:node_host_prog = $APPS_HOME . '/nodejs/node_modules/neovim-node-host.cmd'
     endif
-    set rtp^=C:/apps/dotvim
-    set rtp+=C:/apps/dotvim/after
+    set rtp^=$APPS_HOME/dotvim
+    set rtp+=$APPS_HOME/dotvim/after
     let &packpath = &rtp
-    source C:/apps/dotvim/.init.vim
+    source $APPS_HOME/dotvim/.init.vim
 endif
