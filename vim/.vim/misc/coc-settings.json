@@ -22,7 +22,6 @@
     "coc.preferences.enableFloatHighlight": true,
     "coc.preferences.rootPatterns": [".popc", ".git", ".svn", ".hg"],
     "coc.preferences.jumpCommand": "edit",
-    "coc.preferences.snippets.enable": true,
     "list.nextKeymap": "<C-j>",
     "list.previousKeymap": "<C-k>",
 
@@ -105,14 +104,19 @@
         "?": "help"
     },
 
+    /* coc-lua */
+    "lua.enable": true,
+    "Lua.color.mode": "Semantic",
+    "Lua.completion.enable": true,
+    "Lua.runtime.version": "Lua 5.1",
+    "Lua.diagnostics.globals": ["vim"],
+
+    /* coc-pyright */
+    "python.analysis.stubPath": "typings",
 
     /* coc-clangd(NOT in use) */
     //"clangd.enabled": true,
     //"clangd.path": "clangd",
-
-    /* coc-pyright
-     */
-    "python.analysis.stubPath": "typings",
 
     /* coc-rls(NOT in use) */
     //"rust-client.channel": "nightly",

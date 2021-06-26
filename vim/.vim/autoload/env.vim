@@ -41,20 +41,20 @@ endfunction
 
 " FUNCTION: env#coc_settings() {{{
 function! env#coc_settings()
-    let l:lualsp_cwd = (IsWin() ? $USERPROFILE : '~') . '/.vscode/extensions/sumneko.lua-0.16.2'
-    let l:lualsp_cmd = l:lualsp_cwd . (IsWin() ? '/server/bin/Windows/lua-language-server.exe' : '/server/bin/Linux/lua-language-server')
     return {
+        \ "Lua": {
+            \ "workspace": {
+                \ "library": {
+                    \ $VIMRUNTIME."/lua": v:true,
+                    \ $VIMRUNTIME."/lua/vim": v:true,
+                    \ $VIMRUNTIME."/lua/vim/lsp": v:true,
+                    \ $VIMRUNTIME."/lua/vim/treesitter": v:true
+                \}
+            \ }
+        \ },
         \ "python": {
             \ "pythonPath": $VPathPython . "/python"
-            \ },
-        \ 'languageserver': {
-                \ 'lua-language-server': {
-                    \ 'cwd': l:lualsp_cwd,
-                    \ 'command': l:lualsp_cmd,
-                    \ 'args': ['-E', '-e', 'LANG="zh-cn"', l:lualsp_cwd . '/server/main.lua'],
-                    \ 'filetypes': ['lua'],
-                    \ }
-            \ }
         \ }
+    \ }
 endfunction
 " }}}
