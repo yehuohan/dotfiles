@@ -13,11 +13,12 @@ if [[ `uname` == "Linux" ]]; then
 
     # vim
     cp ../.vim/.init.vim                            ./vim/.vim/
-    cp -r ../.vim/misc                              ./vim/.vim/
-    cp -r ../.vim/snips                             ./vim/.vim/
     cp -r ../.vim/autoload                          ./vim/.vim/
+    cp -r ../.vim/viml                              ./vim/.vim/
     cp -r ../.vim/rplugin                           ./vim/.vim/
     cp -r ../.vim/pythonx                           ./vim/.vim/
+    cp -r ../.vim/snips                             ./vim/.vim/
+    cp -r ../.vim/misc                              ./vim/.vim/
     cp ../.config/nvim/init.vim                     ./vim/nvim/
     # zsh
     cp ../.zshrc                                    ./root/home/
@@ -77,11 +78,12 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
         exit
     fi
     cp ../dotvim/.init.vim                          ./vim/.vim/
-    cp -r ../dotvim/misc                            ./vim/.vim/
-    cp -r ../dotvim/snips                           ./vim/.vim/
     cp -r ../dotvim/autoload                        ./vim/.vim/
+    cp -r ../dotvim/viml                            ./vim/.vim/
     cp -r ../dotvim/rplugin                         ./vim/.vim/
     cp -r ../dotvim/pythonx                         ./vim/.vim/
+    cp -r ../dotvim/snips                           ./vim/.vim/
+    cp -r ../dotvim/misc                            ./vim/.vim/
     cp $LOCALAPPDATA/nvim/init.vim                  ./vim/nvim/
 
     # gw
