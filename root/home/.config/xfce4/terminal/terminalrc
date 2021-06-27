@@ -40,4 +40,5 @@ ShortcutsNoMnemonics=TRUE
 ShortcutsNoHelpkey=TRUE
 ShortcutsNoMenukey=TRUE
 FontName=UbuntuMono Nerd Font Mono 13
+CellHeightScale=1.050000
 
