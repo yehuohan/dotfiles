@@ -72,17 +72,19 @@ if [[ `uname` == "Linux" ]]; then
 elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
 
     # vim & neovim
-    if [ ! -d "../dotvim" ]; then
-        echo "../dotvim is not existed."
+    if [ ! -d "$APPS_HOME/dotvim" ]; then
+        echo "$APPS_HOME/dotvim is not existed."
         exit
     fi
-    cp ../dotvim/.init.vim                          ./vim/.vim/
-    cp -r ../dotvim/autoload                        ./vim/.vim/
-    cp -r ../dotvim/viml                            ./vim/.vim/
-    cp -r ../dotvim/rplugin                         ./vim/.vim/
-    cp -r ../dotvim/pythonx                         ./vim/.vim/
-    cp -r ../dotvim/snips                           ./vim/.vim/
-    cp -r ../dotvim/misc                            ./vim/.vim/
+
+    # vim
+    cp $APPS_HOME/dotvim/.init.vim                  ./vim/.vim/
+    cp -r $APPS_HOME/dotvim/autoload                ./vim/.vim/
+    cp -r $APPS_HOME/dotvim/viml                    ./vim/.vim/
+    cp -r $APPS_HOME/dotvim/rplugin                 ./vim/.vim/
+    cp -r $APPS_HOME/dotvim/pythonx                 ./vim/.vim/
+    cp -r $APPS_HOME/dotvim/snips                   ./vim/.vim/
+    cp -r $APPS_HOME/dotvim/misc                    ./vim/.vim/
     cp $LOCALAPPDATA/nvim/init.vim                  ./vim/nvim/
 
     # gw

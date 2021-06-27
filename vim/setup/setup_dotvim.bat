@@ -6,14 +6,13 @@ if not exist %APPS_HOME%\dotvim (
 )
 
 :: .vim
-copy  %APPS_HOME%\dotconfigs\vim\.vim\.init.vim     %APPS_HOME%\dotvim\
-xcopy %APPS_HOME%\dotconfigs\vim\.vim               %APPS_HOME%\dotvim\ /E /R /Y
+xcopy %APPS_HOME%\dotconfigs\vim\.vim           %APPS_HOME%\dotvim\ /E /R /Y
 
 :: nvim
 if not exist %LOCALAPPDATA%\nvim (
     md %LOCALAPPDATA%\nvim
 )
-copy %APPS_HOME%\dotconfigs\vim\nvim\init.vim %LOCALAPPDATA%\nvim\
+copy %APPS_HOME%\dotconfigs\vim\nvim\init.vim   %LOCALAPPDATA%\nvim\
 
 echo Dotvim setup was completed!
 pause
