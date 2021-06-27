@@ -1,5 +1,6 @@
 [source.crates-io]
-registry = "https://github.com/rust-lang/crates.io-index"
+# Bug: Windows would use crates-io from github still, so go away registry below
+#registry = "https://github.com/rust-lang/crates.io-index"
 
 replace-with = 'tuna'
 [source.tuna]
