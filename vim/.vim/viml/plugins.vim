@@ -119,10 +119,11 @@ else
     Plug 'norcalli/nvim-colorizer.lua', {'on': 'ColorizerToggle'}
 endif
     Plug 'Konfekt/FastFold'
-    Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
+    Plug 'euclidianAce/BetterLua.vim', {'for': 'lua'}
     Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
     Plug 'rust-lang/rust.vim'
     Plug 'tikhomirov/vim-glsl'
+    Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
     " utils
 if s:gset.use_utils
     Plug 'yianwillis/vimcdoc', {'for': 'help'}
