@@ -1,4 +1,22 @@
 
+## Setup
+
+- Linux
+
+```sh
+cd dotconfigs/vim/setup
+./setup_dotvim.sh
+```
+
+- Windows
+
+```sh
+cd dotconfigs/vim/setup
+# 首先运行add_env_path.reg，添加APPS_HOME等环境变量
+setup_dotvim.bat
+setup_link_msys64.bat
+```
+
 ## Vim && Neovim
 
 - [vim/vim](https://github.com/vim/vim)

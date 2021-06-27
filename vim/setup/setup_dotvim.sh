@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 if [[ $(cd `dirname "$0"`;pwd) != ~/dotconfigs/vim/setup ]]; then
-    echo 'Is Not in ~/dotconfigs/vim/setup'
+    echo 'Is NOT in ~/dotconfigs/vim/setup'
     exit
 fi
 
