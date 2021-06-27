@@ -133,7 +133,7 @@ bar {
         statusline #FFFFFFFF
         separator  #808080AA
         # 工作区颜色       边框      背景      文字
-        focused_workspace  #00000050 #FF7000F0 #$CLR_T
+        focused_workspace  #00000050 #00000000 #FF0000FF
         active_workspace   #00000050 #FF700050 #$CLR_T
         inactive_workspace #00000050 #A0A0A050 #$CLR_T
         urgent_workspace   #00000050 #F5001DF0 #$CLR_T
