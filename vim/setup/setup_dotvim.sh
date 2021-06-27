@@ -6,18 +6,13 @@ if [[ $(cd `dirname "$0"`;pwd) != ~/dotconfigs/vim/setup ]]; then
 fi
 
 # .vim
-cp ../.vim/.init.vim            ~/.vim/
-cp -r ../.vim/autoload          ~/.vim/
-cp -r ../.vim/viml              ~/.vim/
-cp -r ../.vim/rplugin           ~/.vim/
-cp -r ../.vim/pythonx           ~/.vim/
-cp -r ../.vim/snips             ~/.vim/
-cp -r ../.vim/misc              ~/.vim/
+cp    ~/dotconfigs/vim/.vim/.init.vim   ~/.vim/
+cp -r ~/dotconfigs/vim/.vim/*           ~/.vim/
 
 # nvim
 if type nvim >/dev/null 2>&1; then 
     mkdir -p ~/.config/nvim
-    cp ../nvim/init.vim ~/.config/nvim/
+    cp ~/dotconfigs/vim/nvim/init.vim   ~/.config/nvim/
 fi
 
 echo "Dotvim setup was completed!"
