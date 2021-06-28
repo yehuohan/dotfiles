@@ -1,4 +1,4 @@
-let s:gset = Sv_gset()
+let s:use = Sv_use()
 
 " Style {{{
     set synmaxcol=512                   " 最大高亮列数
@@ -108,10 +108,10 @@ augroup END
     nnoremap <kMinus> :call GuiAdjustFontSize(-1)<CR>
     let s:gui_fontsize = 12
     if IsWin()
-        let s:gui_font = s:gset.use_powerfont ? 'Consolas\ For\ Powerline' : 'Consolas'
+        let s:gui_font = s:use.powerfont ? 'Consolas\ For\ Powerline' : 'Consolas'
         let s:gui_fontwide = IsVim() ? 'Microsoft\ YaHei\ Mono' : 'Microsoft\ YaHei\ UI'
     else
-        let s:gui_font = s:gset.use_powerfont ? 'DejaVu\ Sans\ Mono\ for\ Powerline' : 'DejaVu\ Sans'
+        let s:gui_font = s:use.powerfont ? 'DejaVu\ Sans\ Mono\ for\ Powerline' : 'DejaVu\ Sans'
         let s:gui_fontwide = 'WenQuanYi\ Micro\ Hei\ Mono'
     endif
     function! GuiAdjustFontSize(inc)

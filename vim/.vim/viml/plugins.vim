@@ -1,4 +1,4 @@
-let s:gset = Sv_gset()
+let s:use = Sv_use()
 
 " Struct: s:plug {{{
 let s:plug = {
@@ -59,7 +59,7 @@ call plug#begin($DotVimPath.'/bundle')  " 设置插件位置，且自动设置�
     " managers
     Plug 'morhetz/gruvbox'
     Plug 'rakr/vim-one'
-if s:gset.use_lightline
+if s:use.lightline
     Plug 'yehuohan/lightline.vim'
 endif
     Plug 'luochen1990/rainbow'
@@ -67,17 +67,17 @@ endif
     Plug 'yehuohan/popc'
     Plug 'yehuohan/popset'
     Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTree']}
-if s:gset.use_startify
+if s:use.startify
     Plug 'mhinz/vim-startify'
 endif
     Plug 'itchyny/screensaver.vim'
     Plug 'junegunn/fzf', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
     Plug 'junegunn/fzf.vim', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
-if s:gset.use_leaderf
+if s:use.leaderf
     Plug 'Yggdroot/LeaderF', {'do': IsWin() ? './install.bat' : './install.sh'}
 endif
     " codings
-if s:gset.use_ycm
+if s:use.ycm
     function! Plug_ycm_build(info)
         " (first installed) or (PlugInstall! or PlugUpdate!)
         if a:info.status == 'installed' || a:info.force
@@ -90,11 +90,11 @@ if s:gset.use_ycm
     endfunction
     Plug 'ycm-core/YouCompleteMe', {'do': function('Plug_ycm_build'), 'on': []}
 endif
-if s:gset.use_snip
+if s:use.snip
     Plug 'SirVer/ultisnips'
     Plug 'honza/vim-snippets'
 endif
-if s:gset.use_coc
+if s:use.coc
     Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
     Plug 'neoclide/jsonc.vim'
 endif
@@ -108,7 +108,7 @@ endif
     Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
     Plug 'voldikss/vim-floaterm'
     Plug 'yehuohan/popc-floaterm'
-if s:gset.use_spector
+if s:use.spector
     Plug 'puremourning/vimspector'
 endif
     Plug 't9md/vim-quickhl'
@@ -125,8 +125,10 @@ endif
     Plug 'tikhomirov/vim-glsl'
     Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
     " utils
-if s:gset.use_utils
+if s:use.utils
+if IsVim()
     Plug 'yianwillis/vimcdoc', {'for': 'help'}
+endif
     Plug 'gabrielelana/vim-markdown', {'for': 'markdown'}
     Plug 'iamcco/markdown-preview.nvim', {'for': 'markdown', 'do': { -> mkdp#util#install()}}
     Plug 'joker1007/vim-markdown-quote-syntax', {'for': 'markdown'}
@@ -313,7 +315,7 @@ call plug#end()
     catch /^Vim\%((\a\+)\)\=:E185/      " E185: 找不到主题
         silent! colorscheme default
     endtry
-if s:gset.use_lightline
+if s:use.lightline
     let g:lightline = {
         \ 'enable' : {'statusline': 1, 'tabline': 0},
         \ 'colorscheme' : 'gruvbox',
@@ -355,7 +357,7 @@ if s:gset.use_lightline
                 \ },
         \ 'fallback' : {'tagbar': 0, 'nerdtree': 0, 'Popc': 0, 'coc-explorer': '%{getcwd()}'},
         \ }
-    if s:gset.use_powerfont
+    if s:use.powerfont
         let g:lightline.separator            = {'left': '', 'right': ''}
         let g:lightline.subseparator         = {'left': '', 'right': ''}
         let g:lightline.tabline_separator    = {'left': '', 'right': ''}
@@ -487,7 +489,7 @@ endif
         \ }
     let g:Popc_useTabline = 1
     let g:Popc_useStatusline = 1
-    let g:Popc_usePowerFont = s:gset.use_powerfont
+    let g:Popc_usePowerFont = s:use.powerfont
     let g:Popc_separator = {'left' : '', 'right': ''}
     let g:Popc_subSeparator = {'left' : '', 'right': ''}
     let g:Popc_useLayerPath = 0
@@ -545,7 +547,7 @@ endif
 " }}}
 
 " startify {{{ 启动首页
-if s:gset.use_startify
+if s:use.startify
 if IsWin()
     let g:startify_bookmarks = [ {'c': '$DotVimPath/.init.vim'},
                                 \{'d': '$LOCALAPPDATA/nvim/init.vim'},
@@ -594,13 +596,13 @@ endif
 " }}}
 
 " LeaderF {{{ 模糊查找
-if s:gset.use_leaderf
+if s:use.leaderf
     "call s:plug.reg('onVimEnter', 'exec', 'autocmd! LeaderF_Mru')
     let g:Lf_CacheDirectory = $DotVimCachePath
     "let g:Lf_WindowPosition = 'popup'
     "let g:Lf_PreviewInPopup = 1
     let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0}
-    let g:Lf_StlSeparator = s:gset.use_powerfont ? {'left': '', 'right': ''} : {'left': '', 'right': ''}
+    let g:Lf_StlSeparator = s:use.powerfont ? {'left': '', 'right': ''} : {'left': '', 'right': ''}
     let g:Lf_ShowDevIcons = 0
     let g:Lf_ShortcutF = ''
     let g:Lf_ShortcutB = ''
@@ -636,7 +638,7 @@ endif
 
 " Codings {{{
 " YouCompleteMe {{{ 自动补全
-if s:gset.use_ycm
+if s:use.ycm
     call s:plug.reg('onDelay', 'load', 'YouCompleteMe')
     let g:ycm_global_ycm_extra_conf = $DotVimMiscPath . '/.ycm_extra_conf.py'
     let g:ycm_enable_diagnostic_signs = 1                       " 开启语法检测
@@ -682,7 +684,7 @@ endif
 " }}}
 
 " ultisnips {{{ 代码片段
-if s:gset.use_snip
+if s:use.snip
     let g:UltiSnipsEditSplit = "vertical"
     let g:UltiSnipsSnippetDirectories = [$DotVimPath . '/snips', "UltiSnips"]
     let g:UltiSnipsExpandTrigger = '<Tab>'
@@ -693,11 +695,11 @@ endif
 " }}}
 
 " coc {{{ 自动补全
-if s:gset.use_coc
+if s:use.coc
     call s:plug.reg('onDelay', 'load', 'coc.nvim')
     call s:plug.reg('onDelay', 'exec', 'call s:Plug_coc_settings()')
     function! s:Plug_coc_settings()
-        for [sec, val] in items(env#coc_settings())
+        for [sec, val] in items(Env_coc_settings())
             call coc#config(sec, val)
         endfor
     endfunction
@@ -875,7 +877,7 @@ endif
 " }}}
 
 " vimspector {{{ 调试
-if s:gset.use_spector
+if s:use.spector
     let g:vimspector_install_gadgets = ['debugpy', 'vscode-cpptools', 'CodeLLDB']
     nmap <F3>   <Plug>VimspectorStop
     nmap <F4>   <Plug>VimspectorRestart
@@ -944,7 +946,7 @@ endif
 " }}}
 
 " Utils {{{
-if s:gset.use_utils
+if s:use.utils
 " MarkDown {{{
     let g:markdown_include_jekyll_support = 0
     let g:markdown_enable_mappings = 0

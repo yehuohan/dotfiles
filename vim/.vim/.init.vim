@@ -4,6 +4,21 @@
 " Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+" Globals {{{
+let $DotVimPath=resolve(expand('<sfile>:p:h'))
+let $DotVimVimLPath=$DotVimPath . '/viml'
+let $DotVimMiscPath=$DotVimPath . '/misc'
+let $DotVimCachePath=$DotVimPath . '/.cache'
+set rtp+=$DotVimPath
+
+set encoding=utf-8                      " 内部使用utf-8编码
+set nocompatible                        " 不兼容vi
+let mapleader="\<Space>"                " Space leader
+nnoremap ; :
+vnoremap ; :
+nnoremap : ;
+" }}}
+
 " Platforms {{{
 function! IsLinux()
     return (has('unix') && !has('macunix') && !has('win32unix'))
@@ -25,23 +40,8 @@ function! IsNVim()
 endfunction
 " }}}
 
-" Globals {{{
-let $DotVimPath=resolve(expand('<sfile>:p:h'))
-let $DotVimVimLPath=$DotVimPath . '/viml'
-let $DotVimMiscPath=$DotVimPath . '/misc'
-let $DotVimCachePath=$DotVimPath . '/.cache'
-set rtp+=$DotVimPath
-call env#env()
-
-set encoding=utf-8                      " 内部使用utf-8编码
-set nocompatible                        " 不兼容vi
-let mapleader="\<Space>"                " Space leader
-nnoremap ; :
-vnoremap ; :
-nnoremap : ;
-" }}}
-
-source $DotVimVimLPath/gset.vim
+source $DotVimVimLPath/env.vim
+source $DotVimVimLPath/use.vim
 source $DotVimVimLPath/plugins.vim
 source $DotVimVimLPath/modules.vim
 source $DotVimVimLPath/settings.vim
