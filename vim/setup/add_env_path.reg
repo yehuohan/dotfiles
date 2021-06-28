@@ -6,5 +6,5 @@ Windows Registry Editor Version 5.00
 "LLVM_HOME"="D:\\apps\\LLVM"
 "RUSTUP_DIST_SERVER"="https://mirrors.tuna.tsinghua.edu.cn/rustup"
 "RUSTUP_UPDATE_ROOT"="https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup"
-"RUSTUP_HOME"="D:\\apps\\rust\\toolchain"
+"RUSTUP_HOME"="D:\\apps\\rust\\rustup"
 "CARGO_HOME"="D:\\apps\\rust\\cargo"
