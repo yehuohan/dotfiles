@@ -1,0 +1,5 @@
+:: Use zsh
+set "LOGINSHELL=zsh"
+
+:: Export windows' PATH
+set MSYS2_PATH_TYPE=inherit
