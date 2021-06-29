@@ -4,15 +4,30 @@ endfunction
 
 let s:use_file = $DotVimCachePath . '/.use.json'
 let s:use = {
-    \ 'powerfont' : 0,
-    \ 'lightline' : 0,
-    \ 'startify'  : 0,
-    \ 'ycm'       : 0,
-    \ 'snip'      : 0,
-    \ 'coc'       : 0,
-    \ 'spector'   : 0,
-    \ 'leaderf'   : 0,
-    \ 'utils'     : 0,
+    \ 'powerfont' : v:false,
+    \ 'lightline' : v:false,
+    \ 'startify'  : v:false,
+    \ 'ycm'       : v:false,
+    \ 'snip'      : v:false,
+    \ 'coc'       : v:false,
+    \ 'coc_exts'  : {
+        \ 'coc-snippets'      : v:false,
+        \ 'coc-yank'          : v:false,
+        \ 'coc-explorer'      : v:false,
+        \ 'coc-json'          : v:false,
+        \ 'coc-pyright'       : v:false,
+        \ 'coc-java'          : v:false,
+        \ 'coc-tsserver'      : v:false,
+        \ 'coc-rust-analyzer' : v:false,
+        \ 'coc-vimlsp'        : v:false,
+        \ 'coc-lua'           : v:false,
+        \ 'coc-vimtex'        : v:false,
+        \ 'coc-cmake'         : v:false,
+        \ 'coc-calc'          : v:false,
+        \ },
+    \ 'spector'   : v:false,
+    \ 'leaderf'   : v:false,
+    \ 'utils'     : v:false,
     \ }
 
 " Function: s:useLoad() {{{
@@ -23,8 +38,8 @@ function! s:useLoad()
         call s:useSave()
     endif
     if IsVim() && s:use.coc        " vim中coc容易卡，补全用ycm
-        let s:use.ycm = '1'
-        let s:use.coc = '0'
+        let s:use.ycm = v:true
+        let s:use.coc = v:false
     endif
 endfunction
 " }}}
@@ -38,16 +53,30 @@ endfunction
 
 " Function: s:useInit() {{{
 function! s:useInit()
+    " Set coc-extension selections
+    let l:dic = map(copy(s:use), '{}')
+    let l:dic.coc_exts = {
+        \ 'dsr' : 'coc extensions',
+        \ 'lst' : sort(keys(s:use.coc_exts)),
+        \ 'dic' : map(copy(s:use.coc_exts), '{}'),
+        \ 'sub' : {
+            \ 'lst': [v:true, v:false],
+            \ 'cmd': {sopt, sel -> extend(s:use.coc_exts, {sopt : sel})},
+            \ 'get': {sopt -> s:use.coc_exts[sopt]},
+            \ },
+        \ 'onCR': funcref('s:useSave'),
+        \ }
+
     call PopSelection({
         \ 'opt' : 'select use settings',
         \ 'lst' : sort(keys(s:use)),
-        \ 'dic' : map(copy(s:use), '{}'),
+        \ 'dic' : l:dic,
         \ 'sub' : {
-            \ 'lst': ['0', '1'],
-            \ 'cmd': {sopt, sel -> extend(s:use, {sopt : sel})},
-            \ 'get': {sopt -> s:use[sopt]},
+            \ 'lst' : [v:true, v:false],
+            \ 'cmd' : {sopt, sel -> extend(s:use, {sopt : sel})},
+            \ 'get' : {sopt -> s:use[sopt]},
             \ },
-        \ 'onCR': function('s:useSave'),
+        \ 'onCR': funcref('s:useSave'),
         \ })
 endfunction
 " }}}

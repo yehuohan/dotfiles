@@ -228,8 +228,8 @@ call plug#end()
     ":EasyAlign[!] [N-th]DELIMITER_KEY[OPTIONS]
     ":EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
     nnoremap <silent> <leader><leader>g
-        \ :call feedkeys(':' . join(GetRange('^[ \t]*$', '^[ \t]*$'), ',') . 'EasyAlign', 'n')<CR>
-    vnoremap <leader><leader>g :EasyAlign
+        \ :call feedkeys(':' . join(GetRange('^[ \t]*$', '^[ \t]*$'), ',') . 'EasyAlign ', 'n')<CR>
+    vnoremap <leader><leader>g :EasyAlign<Space>
 " }}}
 
 " smoothie {{{ 平滑滚动
@@ -705,11 +705,7 @@ if s:use.coc
     endfunction
     let g:coc_config_home = $DotVimMiscPath
     let g:coc_data_home = $DotVimCachePath . '/.coc'
-    let g:coc_global_extensions = [
-        \ 'coc-snippets', 'coc-yank', 'coc-explorer', 'coc-json',
-        \ 'coc-pyright', 'coc-java', 'coc-tsserver', 'coc-rust-analyzer',
-        \ 'coc-vimlsp', 'coc-lua', 'coc-vimtex', 'coc-cmake', 'coc-calc',
-        \ ]
+    let g:coc_global_extensions = keys(filter(copy(s:use.coc_exts), 'v:val'))
     let g:coc_status_error_sign = '✘'
     let g:coc_status_warning_sign = '!'
     let g:coc_filetype_map = {}

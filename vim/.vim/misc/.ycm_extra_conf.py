@@ -88,7 +88,7 @@ def GetCfamilyFlags(gen='all'):
         '-Wno-variadic-macros',
         '-fexceptions',
         '-DNDEBUG',
-        # '-Werror',                # Take all errors as warnings
+        # '-Werror',                # Take all warnings as errors
         # '-Wno-unused-variable',   # Show warning of unused variable
         # '-Wno-unused-parameter',  # Show warning of unused parameter
         # '-DXX=XX'                 # define macro to elimate some errors

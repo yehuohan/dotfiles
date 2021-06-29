@@ -1,11 +1,14 @@
 @echo off
 
-if not exist %APPS_HOME%\dotvim (
+if not %APPS_HOME%\dotconfigs\vim\setup == %cd% (
     echo Is NOT in %APPS_HOME%\dotconfigs\vim\setup
     exit
 )
 
 :: .vim
+if not exist %APPS_HOME%\dotvim (
+    md %APPS_HOME%\dotvim
+)
 xcopy %APPS_HOME%\dotconfigs\vim\.vim           %APPS_HOME%\dotvim\ /E /R /Y
 
 :: nvim
