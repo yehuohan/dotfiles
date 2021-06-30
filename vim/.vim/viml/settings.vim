@@ -184,6 +184,9 @@ endif
     vnoremap <leader>ak <C-a>
     vnoremap <leader>agj g<C-x>
     vnoremap <leader>agk g<C-a>
+    " 大小写切换
+    nnoremap <leader>u ~
+    vnoremap <leader>u ~
     " 匹配符跳转
 if IsVim()
     packadd matchit
@@ -199,9 +202,6 @@ endif
     nnoremap <S-h> ^
     vnoremap <S-l> $
     vnoremap <S-h> ^
-    " 行复制
-    nnoremap yL y$
-    nnoremap yH y^
     " 折叠
     nnoremap <leader>za zA
     nnoremap <leader>zc zC
@@ -242,9 +242,17 @@ endif
     " HEX编辑
     nnoremap <leader>xx :%!xxd<CR>
     nnoremap <leader>xr :%!xxd -r<CR>
+    " 查看help文档
+    nnoremap <silent> <leader><leader>k
+        \ :call feedkeys(':h ' . expand('<cword>'), 'n')<CR>
+    vnoremap <silent> <leader><leader>k
+        \ :call feedkeys(':h ' . GetSelected(), 'n')<CR>
 " }}}
 
 " Copy & Paste {{{
+    " 行复制
+    nnoremap yL y$
+    nnoremap yH y^
     " yank & put
     vnoremap <leader>y ygv
     nnoremap <silent> ya

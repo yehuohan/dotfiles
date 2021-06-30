@@ -466,7 +466,7 @@ endif
 " }}}
 
 " indentLine {{{ 显示缩进标识
-    "let g:indentLine_char = '|'        " 设置标识符样式
+    let g:indentLine_char = '⁞'         " 设置标识符样式
     let g:indentLinet_color_term = 200  " 设置标识符颜色
     nnoremap <leader>ti :IndentLinesToggle<CR>
 " }}}
@@ -489,9 +489,16 @@ endif
         \ }
     let g:Popc_useTabline = 1
     let g:Popc_useStatusline = 1
-    let g:Popc_usePowerFont = s:use.powerfont
+    let g:Popc_usePowerFont = 1
+if s:use.powerfont
+    let g:Popc_selectPointer = ''
     let g:Popc_separator = {'left' : '', 'right': ''}
     let g:Popc_subSeparator = {'left' : '', 'right': ''}
+else
+    let g:Popc_selectPointer = '►'
+    let g:Popc_separator = {'left' : '', 'right': ''}
+    let g:Popc_subSeparator = {'left' : '│', 'right': '│'}
+endif
     let g:Popc_useLayerPath = 0
     let g:Popc_useLayerRoots = ['.popc', '.git', '.svn', '.hg', 'tags', '.LfGtags']
     let g:Popc_enableLog = 1
@@ -644,7 +651,7 @@ if s:use.ycm
     let g:ycm_enable_diagnostic_signs = 1                       " 开启语法检测
     let g:ycm_max_diagnostics_to_display = 30
     let g:ycm_warning_symbol = '►'                              " Warning符号
-    let g:ycm_error_symbol = '✘'                                " Error符号
+    let g:ycm_error_symbol = 'x'                                " Error符号
     let g:ycm_auto_start_csharp_server = 0                      " 禁止C#补全
     let g:ycm_cache_omnifunc = 0                                " 禁止缓存匹配项，每次都重新生成匹配项
     let g:ycm_complete_in_strings = 1                           " 开启对字符串补全
@@ -706,7 +713,7 @@ if s:use.coc
     let g:coc_config_home = $DotVimMiscPath
     let g:coc_data_home = $DotVimCachePath . '/.coc'
     let g:coc_global_extensions = keys(filter(copy(s:use.coc_exts), 'v:val'))
-    let g:coc_status_error_sign = '✘'
+    let g:coc_status_error_sign = 'x'
     let g:coc_status_warning_sign = '!'
     let g:coc_filetype_map = {}
     let g:coc_snippet_next = '<C-j>'
