@@ -2,15 +2,30 @@ local fn = vim.fn
 
 local use_file = vim.env.DotVimCachePath .. '/.use.json'
 local use = {
-    powerfont = 0,
-    lightline = 0,
-    startify  = 0,
-    ycm       = 0,
-    snip      = 0,
-    coc       = 0,
-    spector   = 0,
-    leaderf   = 0,
-    utils     = 0,
+    powerfont = false,
+    lightline = false,
+    startify  = false,
+    ycm       = false,
+    snip      = false,
+    coc       = false,
+    coc_exts  = {
+        ['coc-snippets']      = false,
+        ['coc-yank']          = false,
+        ['coc-explorer']      = false,
+        ['coc-json']          = false,
+        ['coc-pyright']       = false,
+        ['coc-java']          = false,
+        ['coc-tsserver']      = false,
+        ['coc-rust-analyzer'] = false,
+        ['coc-vimlsp']        = false,
+        ['coc-lua']           = false,
+        ['coc-vimtex']        = false,
+        ['coc-cmake']         = false,
+        ['coc-calc']          = false,
+    },
+    spector   = false,
+    leaderf   = false,
+    utils     = false,
 }
 
 local function use_save(...)
@@ -31,15 +46,29 @@ local function use_load()
 end
 
 local function use_init()
+    -- Set coc-extension selections
+    local cocdic = vim.tbl_map(function() return vim.empty_dict() end, use)
+    cocdic.coc_exts = {
+        dsr = 'coc extensions',
+        lst = fn.sort(vim.tbl_keys(use.coc_exts)),
+        dic = vim.tbl_map(function() return vim.empty_dict() end, use.coc_exts),
+        sub = {
+            lst = {true, false},
+            cmd = function(sopt, sel) use.coc_exts[sopt] = sel end,
+            get = function(sopt) return use.coc_exts[sopt] end,
+        },
+        onCR = use_save,
+    }
+
     fn.PopSelection({
         opt = 'select use settings',
         lst = fn.sort(vim.tbl_keys(use)),
-        dic = vim.tbl_map(function() return vim.empty_dict() end, use),
+        dic = cocdic,
         sub = {
-            lst = {'0', '1'},
-            cmd = function(sopt, sel) use = vim.tbl_extend('force', use, {[sopt] = sel}) end,
+            lst = {true, false},
+            cmd = function(sopt, sel) use[sopt] = sel end,
             get = function(sopt) return use[sopt] end,
-            },
+        },
         onCR = use_save,
     })
 end

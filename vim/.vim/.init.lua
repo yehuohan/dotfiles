@@ -4,9 +4,7 @@
 -- Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-local fn = vim.fn
-
-vim.env.DotVimPath      = fn.resolve(fn.expand('<sfile>:p:h'))
+vim.env.DotVimPath      = vim.fn.resolve(vim.fn.expand('<sfile>:p:h'))
 vim.env.DotVimMiscPath  = vim.env.DotVimPath .. '/misc'
 vim.env.DotVimCachePath = vim.env.DotVimPath .. '/.cache'
 vim.opt.rtp:append(vim.env.DotVimPath)
@@ -19,7 +17,7 @@ vim.api.nvim_set_keymap('n' , ':' , ';' , { noremap = true })
 
 require('env')
 require('use')
-require('plugs')
+require('plugins')
 require('users.style')
 require('users.gui')
 require('users.mappings')
