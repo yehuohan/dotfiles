@@ -28,7 +28,7 @@ local use = {
     utils     = false,
 }
 
-local function use_save(...)
+local function use_save(_)
     fn.writefile({ fn.json_encode(use) }, use_file)
     print('s:use save successful!')
 end

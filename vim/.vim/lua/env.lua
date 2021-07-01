@@ -1,13 +1,15 @@
 local fn = vim.fn
 local ostype = require('ostype')
 
-local env_local = {
-    vim.env.DotVimPath .. '/local',
-    vim.env.DotVimPath .. '/local/bin',
-}
-local env_unix = {
-    '~/ubin',
-    '~/uapps',
+local env = {
+    ['local'] = {
+        vim.env.DotVimPath .. '/local',
+        vim.env.DotVimPath .. '/local/bin',
+    },
+    ['unix'] = {
+        '~/ubin',
+        '~/uapps',
+    }
 }
 
 local function env_init()
@@ -19,12 +21,12 @@ local function env_init()
         vim.env.VPathMingw64 = vim.env.APPS_HOME .. '/msys64/mingw64'
     else
         sep = ':'
-        vim.env.PATH = vim.env.PATH .. sep .. fn.join(env_unix, sep)
+        vim.env.PATH = vim.env.PATH .. sep .. fn.join(env['unix'], sep)
         vim.env.VPathPython = '/usr/bin'
     end
 
     -- Local path has first priority to vim
-    vim.env.PATH = fn.join(env_local, sep) .. sep .. vim.env.PATH
+    vim.env.PATH = fn.join(env['local'], sep) .. sep .. vim.env.PATH
 
     -- Append {'path':[], 'vars':{}} from .env.json
     local ex_file = vim.env.DotVimCachePath .. '/.env.json'
