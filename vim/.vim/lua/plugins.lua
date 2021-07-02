@@ -127,7 +127,7 @@ map('x', '<leader>ga', [[<Plug>(EasyAlign)]],   {})
 -- :EasyAlign[!] [N-th]DELIMITER_KEY[OPTIONS]
 -- :EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
 map('n', '<leader><leader>g',
-    [[:let g:easy_align_range = luaeval('require("users.libs").get_range(_A[1], _A[2])', ['^[ \t]*$', '^[ \t]*$'])<Bar>]] ..
+    [[:let g:easy_align_range = v:lua.require'users.libs'.get_range('^[ \t]*$', '^[ \t]*$')<Bar>]] ..
     [[:call feedkeys(':' . join(g:easy_align_range, ',') . 'EasyAlign ', 'n')<CR>]],
     { noremap = true, silent = true })
 map('v', '<leader><leader>g', [[:EasyAlign<Space>]], {})
@@ -178,11 +178,9 @@ function PlugToMotion(motion)
         lst = vim.split([[w W s p ( b [ < t { B " ' ` i f c m u]], ' '),
         cmd = function(_, sel)
             local c = ''
-            if textobj_motion:match_str(motion) then
-                c = 'i'
-            else
-                c = 'a'
-            end
+            if textobj_motion:match_str(motion)
+            then c = 'i'
+            else c = 'a' end
             vim.cmd(string.format('normal! %s%s%s', string.lower(motion), c, sel))
         end
     })

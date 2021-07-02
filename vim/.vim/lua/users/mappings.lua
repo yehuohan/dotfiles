@@ -20,6 +20,6 @@ map('n', '<leader>/',
     [[:execute '/\V\c' . escape(expand('<cword>'), '\/')<CR>]],
     { noremap = true, silent = true })
 map('v', '<leader><leader>/',
-    [[:call feedkeys('/' . luaeval('require("users.libs").get_selected()'), 'n')<CR>]],
+    [[:call feedkeys('/' . v:lua.require'users.libs'.get_selected(), 'n')<CR>]],
     { noremap = true, silent = true })
 -- }}}
