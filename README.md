@@ -1,10 +1,7 @@
 
 ## Dotconfigs
 
-```text
-.
-├── root  : Linux config
-├── vim   : Vim config
-├── fonts : Powerline font
-└── misc  : Others
-```
+- [root](./root/README.md) : Linux config
+- [vim](./vim/README.md) : Vim config
+- [fonts](./fonts/README.md) : Powerline font
+- misc

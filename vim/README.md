@@ -17,7 +17,7 @@ setup_dotvim.bat
 setup_link_msys64.bat
 ```
 
-## Vim && Neovim
+## Links
 
 - [vim/vim](https://github.com/vim/vim)
 - [neovim/neovim](https://github.com/neovim/neovim)
