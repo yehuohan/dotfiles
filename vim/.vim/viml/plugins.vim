@@ -208,6 +208,7 @@ call plug#end()
 
 " traces {{{ 预览增强
     " 支持:s, :g, :v, :sort, :range预览
+    let g:traces_num_range_preview = 1  " 支持:N,M预览
 " }}}
 
 " tabular {{{ 字符对齐

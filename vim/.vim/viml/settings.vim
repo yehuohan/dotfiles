@@ -15,7 +15,7 @@ let s:use = Sv_use()
     set shiftwidth=4                    " 设置>和<命令移动宽度为4
     set nowrap                          " 默认关闭折行
     set textwidth=0                     " 关闭自动换行
-    set listchars=tab:⤜⤚→,eol:↲,space:·,nbsp:␣,extends:…,precedes:<,extends:>,trail:~
+    set listchars=tab:⤜⤚→,eol:↲,space:·,nbsp:␣,precedes:<,extends:>,trail:~
                                         " 不可见字符显示
     set autoindent                      " 使用autoindent缩进
     set nobreakindent                   " 折行时不缩进
@@ -242,6 +242,9 @@ endif
     " HEX编辑
     nnoremap <leader>xx :%!xxd<CR>
     nnoremap <leader>xr :%!xxd -r<CR>
+    " lua的echo测试代码
+    nnoremap <leader><leader>u :lua print(
+    nnoremap <leader><leader>U :lua print(vim.inspect(
     " 查看help文档
     nnoremap <silent> <leader><leader>k
         \ :call feedkeys(':h ' . expand('<cword>'), 'n')<CR>
