@@ -180,7 +180,8 @@ vnoremap <silent> <leader>af :call append(line('.'), GetEval(GetSelected(), 'fun
 
 " Workspace {{{
 " Required: 'yehuohan/popc', 'yehuohan/popset'
-"           'skywind3000/asyncrun.vim', 'voldikss/floaterm', 'Yggdroot/LeaderF', 'junegunn/fzf.vim'
+"           'skywind3000/asyncrun.vim', 'voldikss/floaterm'
+"           'Yggdroot/LeaderF', 'junegunn/fzf.vim'
 
 let s:ws = {'root': '', 'rp': {}, 'fw': {}}
 let s:dp = {

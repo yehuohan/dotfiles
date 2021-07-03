@@ -1,7 +1,7 @@
 
 ## Dotconfigs
 
-- [root](./root/README.md) : Linux config
-- [vim](./vim/README.md) : Vim config
-- [fonts](./fonts/README.md) : Powerline font
+- [root](./root) : Linux config
+- [vim](./vim) : Vim config
+- [fonts](./fonts) : Powerline font
 - misc

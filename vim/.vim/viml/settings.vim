@@ -79,7 +79,7 @@ endif
 function! s:onLargeFile()
     let l:fsize = getfsize(expand('<afile>'))
     if l:fsize >= 5 * 1024 * 1024 || l:fsize == -2
-        let b:lightline_check_flg = 0
+        let b:lightline_check_flg = 0   " 禁止MixedIndent和Trailing检测
         setlocal filetype=log
         setlocal undolevels=-1
         setlocal noswapfile

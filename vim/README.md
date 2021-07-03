@@ -17,9 +17,34 @@ setup_dotvim.bat
 setup_link_msys64.bat
 ```
 
+## `.vim`
+
+- `.vim/viml/env.vim`: 设置vim用的环境变量
+- `.vim/viml/use.vim`: 设置全局`使能`变量
+- `.vim/viml/plugins.vim`: 插件加载和配置
+- `.vim/viml/modules.vim`: Workspace等模块功能配置
+
+> *Workspace run project:*
+
+<div align="center">
+<img alt="workspace run project" src="README/ws-rp.gif"  width=75% height=75% />
+</div>
+
+> *Workspace find:*
+
+<div align="center">
+<img alt="workspace find" src="README/ws-fw.gif"  width=75% height=75% />
+</div>
+
+- `.vim/viml/settings.vim`: 设置vim各种参数
+
+
+---
+
 ## Links
 
 - [vim/vim](https://github.com/vim/vim)
+  - [GvimFullscreen](./gvimfullscreen)
 - [neovim/neovim](https://github.com/neovim/neovim)
   - `pacman -S xclip or xsel`
   - [nvim.appimage](https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage)
@@ -32,26 +57,15 @@ setup_link_msys64.bat
   - `HTTPS_PROXY=addr:port npm install -g neovim`
   - `cd $DotVimPath/local && HTTPS_PROXY=addr:port npm install neovim`
 - [lua](https://www.lua.org/)
-- Git
+- Git: [Msys2](http://www.msys2.org/) or [Cygwin](https://cygwin.com)
   - `git config --global http.proxy addr:port`
-  - [Msys2](http://www.msys2.org/)
-  - [Cygwin](https://cygwin.com)
-
----
-
-- [LLVM](http://llvm.org/)
-  - [Clangd](https://github.com/clangd/clangd)
+- [LLVM](http://llvm.org/) or [Clangd](https://github.com/clangd/clangd)
+- [Ripgrep](https://github.com/BurntSushi/ripgrep) or [Ag](https://github.com/k-takata/the_silver_searcher-win32)
 - [Fzf](https://github.com/junegunn/fzf)
-- [Ripgrep](https://github.com/BurntSushi/ripgrep)
-- [Ag](https://github.com/k-takata/the_silver_searcher-win32)
 - [Bat](https://github.com/sharkdp/bat)
 - [Astyle](http://astyle.sourceforge.net)
 - [Ctags](https://github.com/universal-ctags/ctags)
 - [Lf](https://github.com/gokcehan/lf)
-
----
-
-- [GvimFullscreen](./gvimfullscreen)
 - [Typora](https://typora.io/)
 - [MuPDF](https://www.mupdf.com)
 - [SumatraPDF](https://www.sumatrapdfreader.org)

@@ -2,7 +2,7 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CURRENT_USER\Environment]
 "APPS_HOME"="C:\\apps"
-"APPS_PATH need_change_type"="%APPS_HOME%\\bin;%APPS_HOME%\\Python;%APPS_HOME%\\Python\\Scripts;%APPS_HOME%\\msys64\\usr\\bin;%APPS_HOME%\\msys64\\mingw64\\bin;%APPS_HOME%\\lua;%APPS_HOME%\\nodejs;%APPS_HOME%\\nodejs\\node_modules;%APPS_HOME%\\cmake\\bin;%LLVM_HOME%\\bin;%RUSTUP_HOME%\\toolchains\\nightly-x86_64-pc-windows-msvc\\bin;%CARGO_HOME%\\bin"
+"APPS_PATH need_change_type"="%APPS_HOME%\\Neovim\\bin;%APPS_HOME%\\bin;%APPS_HOME%\\Python;%APPS_HOME%\\Python\\Scripts;%APPS_HOME%\\msys64\\usr\\bin;%APPS_HOME%\\msys64\\mingw64\\bin;%APPS_HOME%\\lua;%APPS_HOME%\\nodejs;%APPS_HOME%\\nodejs\\node_modules;%APPS_HOME%\\cmake\\bin;%LLVM_HOME%\\bin;%RUSTUP_HOME%\\toolchains\\nightly-x86_64-pc-windows-msvc\\bin;%CARGO_HOME%\\bin"
 "LLVM_HOME"="D:\\apps\\LLVM"
 "RUSTUP_DIST_SERVER"="https://mirrors.tuna.tsinghua.edu.cn/rustup"
 "RUSTUP_UPDATE_ROOT"="https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup"
