@@ -127,7 +127,7 @@ map('x', '<leader>ga', [[<Plug>(EasyAlign)]],   {})
 -- :EasyAlign[!] [N-th]DELIMITER_KEY[OPTIONS]
 -- :EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
 map('n', '<leader><leader>g',
-    [[:let g:easy_align_range = v:lua.require'users.libs'.get_range('^[ \t]*$', '^[ \t]*$')<Bar>]] ..
+    [[:let g:easy_align_range = v:lua.require'user.libs'.get_range('^[ \t]*$', '^[ \t]*$')<Bar>]] ..
     [[:call feedkeys(':' . join(g:easy_align_range, ',') . 'EasyAlign ', 'n')<CR>]],
     { noremap = true, silent = true })
 map('v', '<leader><leader>g', [[:EasyAlign<Space>]], {})

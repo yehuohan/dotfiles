@@ -28,4 +28,20 @@ function M.get_range(pats, pate)
     return {rstart, rend}
 end
 
+-- 获取计算结果
+function M.get_eval(str, ty)
+    local result = ''
+    if ty == 'command' then
+        result = fn.execute(str)
+    elseif ty == 'function' then
+        result = fn.eval(str)
+    elseif ty == 'registers' then
+        result = fn.eval('@' .. str)
+    end
+    if fn.type(result) ~= vim.v.t_string then
+        result = fn.string(result)
+    end
+    return fn.split(result, "\n")
+end
+
 return M

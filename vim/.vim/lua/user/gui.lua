@@ -34,7 +34,7 @@ end
 vim.cmd[[
 augroup UserSettingsGui
     autocmd!
-    autocmd UIEnter * :lua require('users.gui').set_gui_neovimqt()
+    autocmd UIEnter * :lua require('user.gui').set_gui_neovimqt()
 augroup END
 ]]
 
