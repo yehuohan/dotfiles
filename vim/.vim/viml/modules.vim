@@ -14,43 +14,6 @@ function! GetSelected()
 endfunction
 " }}}
 
-" Function: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{ 多文件自动补全
-" 多个文件或目录时，返回的补全字符串使用'|'分隔
-function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
-    let l:arglead_true = ''             " 真正用于补全的arglead
-    let l:arglead_head = ''             " arglead_true之前的部分
-    let l:arglead_list = []             " arglead_true开头的文件和目录补全列表
-    "arglead        : _true : _head
-    "$xx$           : 'xx'  : text before '|'
-    "$xx $ or $xx|$ : ''    : 'xx|'
-    if a:arglead[-1:-1] ==# ' ' || a:arglead[-1:-1] ==# '|'
-        let l:arglead_true = ''
-        let l:arglead_head = a:arglead[0:-2] . '|'
-    else
-        let l:idx = strridx(a:arglead, '|')
-        if l:idx == -1
-            let l:arglead_true = a:arglead
-            let l:arglead_head = ''
-        else
-            let l:arglead_true = a:arglead[l:idx+1 : -1]
-            let l:arglead_head = a:arglead[0 : l:idx]
-        endif
-    endif
-    " 获取_list，包括<.*>隐藏文件，忽略大小写
-    let l:wicSave = &wildignorecase
-    set wildignorecase
-    set wildignore+=.,..
-    let l:arglead_list = split(glob(l:arglead_true . "*") . "\n" . glob(l:arglead_true . "\.[^.]*"), "\n")
-    let &wildignorecase = l:wicSave
-    set wildignore-=.,..
-    "  返回补全列表
-    if !empty(l:arglead_head)
-        call map(l:arglead_list, 'l:arglead_head . v:val')
-    endif
-    return l:arglead_list
-endfunction
-" }}}
-
 " Function: GetRange(pats, pate) {{{ 获取特定的内容的范围
 " @param pats: 起始行匹配模式，start为pats所在行
 " @param pate: 结束行匹配模式，end为pate所在行
@@ -94,6 +57,43 @@ function! GetArgs(str)
     endfunction
     execute 'call s:parseArgs(' . a:str . ')'
     return l:args
+endfunction
+" }}}
+
+" Function: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{ 多文件自动补全
+" 多个文件或目录时，返回的补全字符串使用'|'分隔
+function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
+    let l:arglead_true = ''             " 真正用于补全的arglead
+    let l:arglead_head = ''             " arglead_true之前的部分
+    let l:arglead_list = []             " arglead_true开头的文件和目录补全列表
+    "arglead        : _true : _head
+    "$xx$           : 'xx'  : text before '|'
+    "$xx $ or $xx|$ : ''    : 'xx|'
+    if a:arglead[-1:-1] ==# ' ' || a:arglead[-1:-1] ==# '|'
+        let l:arglead_true = ''
+        let l:arglead_head = a:arglead[0:-2] . '|'
+    else
+        let l:idx = strridx(a:arglead, '|')
+        if l:idx == -1
+            let l:arglead_true = a:arglead
+            let l:arglead_head = ''
+        else
+            let l:arglead_true = a:arglead[l:idx+1 : -1]
+            let l:arglead_head = a:arglead[0 : l:idx]
+        endif
+    endif
+    " 获取_list，包括<.*>隐藏文件，忽略大小写
+    let l:wicSave = &wildignorecase
+    set wildignorecase
+    set wildignore+=.,..
+    let l:arglead_list = split(glob(l:arglead_true . "*") . "\n" . glob(l:arglead_true . "\.[^.]*"), "\n")
+    let &wildignorecase = l:wicSave
+    set wildignore-=.,..
+    "  返回补全列表
+    if !empty(l:arglead_head)
+        call map(l:arglead_list, 'l:arglead_head . v:val')
+    endif
+    return l:arglead_list
 endfunction
 " }}}
 
@@ -184,10 +184,11 @@ vnoremap <silent> <leader>af :call append(line('.'), GetEval(GetSelected(), 'fun
 "           'Yggdroot/LeaderF', 'junegunn/fzf.vim'
 
 let s:ws = {'root': '', 'rp': {}, 'fw': {}}
-let s:dp = {
+let s:wsd = {
     \ 'rp': {'hl': 'WarningMsg', 'str': ['/\V\c|| "\=[RP]Warning: \.\*\$/hs=s+3']},
     \ 'fw': {'hl': 'IncSearch', 'str': []},
     \ }
+
 augroup UserModulesWorkspace
     autocmd!
     autocmd User PopcLayerWksSavePre call popc#layer#wks#SetSettings(s:ws)
@@ -196,12 +197,12 @@ augroup UserModulesWorkspace
                                     \ if empty(get(s:ws.fw, 'path', '')) |
                                     \   let s:ws.fw.path = s:ws.root |
                                     \ endif
-    autocmd User AsyncRunStop call WsDisplay()
-    autocmd Filetype qf call WsDisplay()
+    autocmd User AsyncRunStop call s:wsd.display()
+    autocmd Filetype qf call s:wsd.display()
 augroup END
 
-" Function: WsDisplay() {{{ 设置结果显示窗口
-function! WsDisplay()
+" FUNCTION: s:wsd.display() dict {{{ 设置结果显示
+function! s:wsd.display() dict
     if &filetype ==# 'qf'
         let l:mod = getline('.') =~# '\V\^|| [rg' ? 'fw' : 'rp'
         if l:mod ==# 'fw'
@@ -210,8 +211,8 @@ function! WsDisplay()
             setlocal foldmarker=[rg,[Finished
             silent! normal! zO
         endif
-        for str in s:dp[l:mod].str
-            execute printf('syntax match %s %s', s:dp[l:mod].hl, str)
+        for str in self[l:mod].str
+            execute printf('syntax match %s %s', self[l:mod].hl, str)
         endfor
     endif
 endfunction
@@ -223,14 +224,14 @@ endfunction
 " @attribute type: filetype类型
 let s:rp = {
     \ 'proj' : {
-        \ 'f' : ['FnFile'  , v:null                           ],
-        \ 'j' : ['FnCell'  , v:null                           ],
-        \ 'q' : ['FnGMake' , '*.pro'                          ],
-        \ 'u' : ['FnGMake' , 'cmakelists.txt'                 ],
-        \ 'n' : ['FnGMake' , 'cmakelists.txt'                 ],
-        \ 'm' : ['FnMake'  , 'makefile'                       ],
-        \ 'a' : ['FnCargo' , 'Cargo.toml'                     ],
-        \ 'h' : ['FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
+        \ 'f' : ['s:FnFile'  , v:null                           ],
+        \ 'j' : ['s:FnCell'  , v:null                           ],
+        \ 'q' : ['s:FnGMake' , '*.pro'                          ],
+        \ 'u' : ['s:FnGMake' , 'cmakelists.txt'                 ],
+        \ 'n' : ['s:FnGMake' , 'cmakelists.txt'                 ],
+        \ 'm' : ['s:FnMake'  , 'makefile'                       ],
+        \ 'a' : ['s:FnCargo' , 'Cargo.toml'                     ],
+        \ 'h' : ['s:FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
         \ },
     \ 'type' : {
         \ 'c'          : [IsWin() ? 'gcc -g %s %s -o %s.exe && %s %s' : 'gcc -g %s %s -o %s && ./%s %s',
@@ -461,8 +462,8 @@ function! RunProject(keys, ...)
 endfunction
 " }}}
 
-" Function: FnFile(cfg) {{{
-function! FnFile(cfg)
+" Function: s:FnFile(cfg) {{{
+function! s:FnFile(cfg)
     let l:type = get(a:cfg, 'type', &filetype)
     if !has_key(s:rp.type, l:type) || ('dosbatch' ==? l:type && !IsWin())
         throw 's:rp.type doesn''t support "' . l:type . '"'
@@ -476,8 +477,8 @@ function! FnFile(cfg)
 endfunction
 " }}}
 
-" Function: FnCell(cfg) {{{
-function! FnCell(cfg)
+" Function: s:FnCell(cfg) {{{
+function! s:FnCell(cfg)
     let l:type = &filetype
     if !has_key(s:rp.cell, l:type)
         throw 's:rp.cell doesn''t support "' . l:type . '"'
@@ -490,8 +491,8 @@ function! FnCell(cfg)
 endfunction
 " }}}
 
-" Function: FnMake(cfg) {{{
-function! FnMake(cfg)
+" Function: s:FnMake(cfg) {{{
+function! s:FnMake(cfg)
     if a:cfg.deploy ==# 'clean'
         let l:cmd = 'make clean'
     else
@@ -509,9 +510,9 @@ function! FnMake(cfg)
 endfunction
 " }}}
 
-" Function: FnGMake(cfg) {{{
+" Function: s:FnGMake(cfg) {{{
 " generate make from cmake, qmake ...
-function! FnGMake(cfg)
+function! s:FnGMake(cfg)
     let l:outdir = a:cfg.wdir . '/__VBuildOut'
     if a:cfg.deploy ==# 'clean'
         call delete(l:outdir, 'rf')
@@ -545,8 +546,8 @@ function! FnGMake(cfg)
 endfunction
 " }}}
 
-" Function: FnCargo(cfg) {{{
-function! FnCargo(cfg)
+" Function: s:FnCargo(cfg) {{{
+function! s:FnCargo(cfg)
     let l:cmd = printf('cargo %s %s', a:cfg.deploy, a:cfg.abld)
     if (a:cfg.deploy ==# 'run' || a:cfg.deploy ==# 'test') && !empty(a:cfg.arun)
         let l:cmd .= ' -- ' . a:cfg.arun
@@ -556,8 +557,8 @@ function! FnCargo(cfg)
 endfunction
 " }}}
 
-" Function: FnSphinx(cfg) {{{
-function! FnSphinx(cfg)
+" Function: s:FnSphinx(cfg) {{{
+function! s:FnSphinx(cfg)
     if a:cfg.deploy ==# 'clean'
         let l:cmd = 'make clean'
     else
@@ -677,6 +678,114 @@ call s:fw.setEngine('rg', 'asyncrun')
 call s:fw.setEngine('fuzzy', 'leaderf')
 " }}}
 
+" Function: s:getMultiDirs() {{{
+function! s:getMultiDirs()
+    let l:loc = Input2Str('Location: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
+    return empty(l:loc) ? [] :
+        \ map(split(l:loc, '|'), {key, val -> (val =~# '[/\\]$') ? val[0:-2] : val})
+endfunction
+" }}}
+
+" Function: s:parsePattern(keys, mode) {{{
+function! s:parsePattern(keys, mode)
+    let l:pat = ''
+    if a:mode ==# 'n'
+        if a:keys =~? 'i'
+            let l:pat = Input2Str('Pattern: ')
+        elseif a:keys =~? '[ws]'
+            let l:pat = expand('<cword>')
+        endif
+    elseif a:mode ==# 'v'
+        let l:selected = GetSelected()
+        if a:keys =~? 'i'
+            let l:pat = Input2Str('Pattern: ', l:selected)
+        elseif a:keys =~? '[ws]'
+            let l:pat = l:selected
+        endif
+    endif
+    if a:keys =~ '='
+        let l:pat = getreg('+')
+    endif
+    return l:pat
+endfunction
+" }}}
+
+" Function: s:parseLocation(keys) {{{
+function! s:parseLocation(keys)
+    let l:loc = ''
+    if a:keys =~# 'b'
+        let l:loc = expand('%:p')
+    elseif a:keys =~# 't'
+        let l:loc = join(popc#layer#buf#GetFiles('sigtab'), '" "')
+    elseif a:keys =~# 'o'
+        let l:loc = join(popc#layer#buf#GetFiles('alltab'), '" "')
+    elseif a:keys =~# 'p'
+        let l:loc = join(s:getMultiDirs(), '" "')
+    else
+        if empty(get(s:ws.fw, 'path', ''))
+            let s:ws.fw.path = popc#utils#FindRoot()
+        endif
+        let l:loc = empty(s:ws.fw.path) ? '.' : s:ws.fw.path
+    endif
+    return l:loc
+endfunction
+" }}}
+
+" Function: s:parseOptions(keys) {{{
+function! s:parseOptions(keys)
+    let l:opt = ''
+    if a:keys =~? 's'     | let l:opt .= '-w ' | endif
+    if a:keys =~# '[iws]' | let l:opt .= '-i ' | elseif a:keys =~# '[IWS]' | let l:opt .= '-s ' | endif
+    if a:keys !~# '[btop]'
+        if !empty(s:ws.fw.filters)
+            let l:opt .= '-g"*.{' . s:ws.fw.filters . '}" '
+        endif
+        if !empty(s:ws.fw.globlst)
+            let l:opt .= '-g' . join(split(s:ws.fw.globlst), ' -g') . ' '
+        endif
+        if !empty(s:ws.fw.exargs)
+            let l:opt .= s:ws.fw.exargs
+        endif
+    endif
+    return l:opt
+endfunction
+" }}}
+
+" Function: s:parseCommand(keys) {{{
+function! s:parseCommand(keys)
+    if a:keys =~# 'a'
+        let l:cmd = s:fw.engine.sa
+    else
+        let l:cmd = s:fw.engine.sr
+        let s:wsd.fw.str = []
+    endif
+    return l:cmd
+endfunction
+" }}}
+
+" Function: s:parseVimgrep(keys) {{{
+function! s:parseVimgrep(keys)
+    " get options in which %s is the pattern
+    let l:opt = (a:keys =~? 's') ? '\<%s\>' : '%s'
+    let l:opt .= (a:keys =~# '[iws]') ? '\c' : '\C'
+    let s:fw.opt = ''
+
+    " get loaction
+    let l:loc = '%'
+    if a:keys =~# 'p'
+        let l:loc = join(s:getMultiDirs())
+        if empty(l:loc) | return v:false | endif
+    endif
+    let s:fw.loc = l:loc
+
+    " get command
+    let s:wsd.fw.str = []
+    cgetexpr '[rg by vimgrep]'
+    let s:fw.cmd = printf(':vimgrepadd %%s /%s/j %%s | :botright copen | caddexpr "[Finished]"', l:opt)
+    return v:true
+endfunction
+" }}}
+
 " Function: FindW(keys, mode, [cfg]) {{{ 查找
 " {{{
 " @param keys: [fF][av][btop][IiWwSs=]
@@ -709,111 +818,8 @@ call s:fw.setEngine('fuzzy', 'leaderf')
 " @param cfg: first priority of config
 " }}}
 function! FindW(keys, mode, ...)
-    " Function: s:getLocations() {{{
-    function! s:getLocations()
-        let l:loc = Input2Str('Location: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
-        return empty(l:loc) ? [] :
-            \ map(split(l:loc, '|'), {key, val -> (val =~# '[/\\]$') ? val[0:-2] : val})
-    endfunction
-    " }}}
-    " Function: s:parsePattern() closure {{{
-    function! s:parsePattern() closure
-        let l:pat = ''
-        if a:mode ==# 'n'
-            if a:keys =~? 'i'
-                let l:pat = Input2Str('Pattern: ')
-            elseif a:keys =~? '[ws]'
-                let l:pat = expand('<cword>')
-            endif
-        elseif a:mode ==# 'v'
-            let l:selected = GetSelected()
-            if a:keys =~? 'i'
-                let l:pat = Input2Str('Pattern: ', l:selected)
-            elseif a:keys =~? '[ws]'
-                let l:pat = l:selected
-            endif
-        endif
-        if a:keys =~ '='
-            let l:pat = getreg('+')
-        endif
-        return l:pat
-    endfunction
-    " }}}
-    " Function: s:parseLocation() closure {{{
-    function! s:parseLocation() closure
-        let l:loc = ''
-        if a:keys =~# 'b'
-            let l:loc = expand('%:p')
-        elseif a:keys =~# 't'
-            let l:loc = join(popc#layer#buf#GetFiles('sigtab'), '" "')
-        elseif a:keys =~# 'o'
-            let l:loc = join(popc#layer#buf#GetFiles('alltab'), '" "')
-        elseif a:keys =~# 'p'
-            let l:loc = join(s:getLocations(), '" "')
-        else
-            if empty(get(s:ws.fw, 'path', ''))
-                let s:ws.fw.path = popc#utils#FindRoot()
-            endif
-            let l:loc = empty(s:ws.fw.path) ? '.' : s:ws.fw.path
-        endif
-        return l:loc
-    endfunction
-    " }}}
-    " Function: s:parseOptions() closure {{{
-    function! s:parseOptions() closure
-        let l:opt = ''
-        if a:keys =~? 's'     | let l:opt .= '-w ' | endif
-        if a:keys =~# '[iws]' | let l:opt .= '-i ' | elseif a:keys =~# '[IWS]' | let l:opt .= '-s ' | endif
-        if a:keys !~# '[btop]'
-            if !empty(s:ws.fw.filters)
-                let l:opt .= '-g"*.{' . s:ws.fw.filters . '}" '
-            endif
-            if !empty(s:ws.fw.globlst)
-                let l:opt .= '-g' . join(split(s:ws.fw.globlst), ' -g') . ' '
-            endif
-            if !empty(s:ws.fw.exargs)
-                let l:opt .= s:ws.fw.exargs
-            endif
-        endif
-        return l:opt
-    endfunction
-    " }}}
-    " Function: s:parseCommand() closure {{{
-    function! s:parseCommand() closure
-        if a:keys =~# 'a'
-            let l:cmd = s:fw.engine.sa
-        else
-            let l:cmd = s:fw.engine.sr
-            let s:dp.fw.str = []
-        endif
-        return l:cmd
-    endfunction
-    " }}}
-    " Function: s:parseVimgrep() closure {{{
-    function! s:parseVimgrep() closure
-        " get options in which %s is the pattern
-        let l:opt = (a:keys =~? 's') ? '\<%s\>' : '%s'
-        let l:opt .= (a:keys =~# '[iws]') ? '\c' : '\C'
-        let s:fw.opt = ''
-
-        " get loaction
-        let l:loc = '%'
-        if a:keys =~# 'p'
-            let l:loc = join(s:getLocations())
-            if empty(l:loc) | return v:false | endif
-        endif
-        let s:fw.loc = l:loc
-
-        " get command
-        let s:dp.fw.str = []
-        cgetexpr '[rg by vimgrep]'
-        let s:fw.cmd = printf(':vimgrepadd %%s /%s/j %%s | :botright copen | caddexpr "[Finished]"', l:opt)
-        return v:true
-    endfunction
-    " }}}
-
     if a:keys =~# 'F'
-        " config find
+        " input config
         let l:cfg = extend({'path': '', 'filters': '', 'globlst': '', 'exargs': ''}, s:ws.fw)
         let l:sel = {
             \ 'opt' : 'config find',
@@ -840,19 +846,19 @@ function! FindW(keys, mode, ...)
             call extend(s:ws.fw, {'path': '', 'filters': '', 'globlst': '', 'exargs': ''}, 'keep')
         endif
         " find with config
-        let l:pat = s:parsePattern()
+        let l:pat = s:parsePattern(a:keys, a:mode)
         if empty(l:pat) | return | endif
         if a:keys =~# 'v'
-            if !s:parseVimgrep() | return | endif
+            if !s:parseVimgrep(a:keys) | return | endif
             let s:fw.pat = l:pat
         else
-            let s:fw.loc = s:parseLocation()
+            let s:fw.loc = s:parseLocation(a:keys)
             if empty(s:fw.loc) | return | endif
-            let s:fw.opt = s:parseOptions()
-            let s:fw.cmd = s:parseCommand()
+            let s:fw.opt = s:parseOptions(a:keys)
+            let s:fw.cmd = s:parseCommand(a:keys)
             let s:fw.pat = escape(l:pat, s:fw.engine.chars)
         endif
-        call add(s:dp.fw.str, printf('/\V\c%s/', escape(l:pat, '\/')))
+        call add(s:wsd.fw.str, printf('/\V\c%s/', escape(l:pat, '\/')))
         call s:fw.exec()
     endif
 endfunction
@@ -989,8 +995,6 @@ function! s:rs.fns.copyConfig(filename) dict
     return l:dstfile
 endfunction
 " }}}
-
-let RunScript = function('popset#set#PopSelection', [s:rs.sel])
 " }}}
 
 " Function: FnEditFile(suffix, ntab) {{{ 编辑临时文件
@@ -1051,6 +1055,7 @@ function! FnSwitchFile(sf)
 endfunction
 " }}}
 
+let RunScript = function('popset#set#PopSelection', [s:rs.sel])
 nnoremap <leader>se :call RunScript()<CR>
 nnoremap <silent> <leader>ei
     \ :call Input2Fn(['Suffix: '], 'FnEditFile', 0)<CR>
@@ -1202,11 +1207,34 @@ let s:opt = {
         \ 'virtualedit'  : ['all', ''],
         \ 'signcolumn'   : ['no', 'yes', 'auto'],
         \ },
-    \ 'fns' : {
-        \ 'number' : 'FnNumber',
-        \ 'syntax' : 'FnSyntax',
-        \ },
+    \ 'fns' : {},
     \ }
+" Function: s:opt.fns.number() dict {{{ 切换显示行号
+function! s:opt.fns.number() dict
+    if (&number) && (&relativenumber)
+        set nonumber
+        set norelativenumber
+    elseif !(&number) && !(&relativenumber)
+        set number
+        set norelativenumber
+    elseif (&number) && !(&relativenumber)
+        set number
+        set relativenumber
+    endif
+endfunction
+" }}}
+
+" Function: s:opt.fns.syntax() {{{ 切换高亮
+function! s:opt.fns.syntax()
+    if exists('g:syntax_on')
+        syntax off
+        echo 'syntax off'
+    else
+        syntax on
+        echo 'syntax on'
+    endif
+endfunction
+" }}}
 " }}}
 
 " Function: OptionInv(opt) {{{ 切换参数值（bool取反）
@@ -1228,35 +1256,7 @@ endfunction
 
 " Function: OptionFns(opt) {{{ 切换参数值（函数取值）
 function! OptionFns(opt)
-    let Fn = function(s:opt.fns[a:opt])
-    call Fn()
-endfunction
-" }}}
-
-" Function: FnNumber() {{{ 切换显示行号
-function! FnNumber()
-    if (&number) && (&relativenumber)
-        set nonumber
-        set norelativenumber
-    elseif !(&number) && !(&relativenumber)
-        set number
-        set norelativenumber
-    elseif (&number) && !(&relativenumber)
-        set number
-        set relativenumber
-    endif
-endfunction
-" }}}
-
-" Function: FnSyntax() {{{ 切换高亮
-function! FnSyntax()
-    if exists('g:syntax_on')
-        syntax off
-        echo 'syntax off'
-    else
-        syntax on
-        echo 'syntax on'
-    endif
+    call s:opt.fns[a:opt]()
 endfunction
 " }}}
 
