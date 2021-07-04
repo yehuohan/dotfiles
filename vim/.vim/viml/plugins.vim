@@ -43,7 +43,6 @@ call plug#begin($DotVimPath.'/bundle')  " 设置插件位置，且自动设置�
     Plug 'mg979/vim-visual-multi'
     Plug 't9md/vim-textmanip'
     Plug 'markonm/traces.vim'
-    Plug 'godlygeek/tabular', {'on': 'Tabularize'}
     Plug 'junegunn/vim-easy-align'
     Plug 'psliwka/vim-smoothie'
     Plug 'terryma/vim-expand-region'
@@ -216,26 +215,19 @@ call plug#end()
     let g:traces_num_range_preview = 1  " 支持:N,M预览
 " }}}
 
-" tabular {{{ 字符对齐
-    " /,/r2l0   -   第1个field使用第1个对齐符（右对齐），再插入2个空格
-    "               第2个field使用第2个对齐符（左对齐），再插入0个空格
-    "               第3个field又重新从第1个对齐符开始（对齐符可以有多个，循环使用）
-    "               这样就相当于：需对齐的field使用第1个对齐符，分割符(,)field使用第2个对齐符
-    " /,\zs     -   将分割符(,)作为对齐内容field里的字符
-    nnoremap <leader><leader>a :Tabularize /
-    vnoremap <leader><leader>a :Tabularize /
-" }}}
-
 " easy-align {{{ 字符对齐
+    let g:easy_align_bypass_fold = 1
+    let g:easy_align_delimiters = {
+        \ 'd': { 'pattern': ' \(\S\+\s*[;=]\)\@=' },
+        \ }
     " 默认对齐内含段落（Text Object: vip）
-    nmap <leader>ga <Plug>(EasyAlign)ip
-    xmap <leader>ga <Plug>(EasyAlign)
-    " 命令格式
-    ":EasyAlign[!] [N-th]DELIMITER_KEY[OPTIONS]
+    nmap <leader>al <Plug>(LiveEasyAlign)ip
+    xmap <leader>al <Plug>(LiveEasyAlign)
+    ":EasyAlign[!] [N-th] DELIMITER_KEY [OPTIONS]
     ":EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
-    nnoremap <silent> <leader><leader>g
-        \ :call feedkeys(':' . join(GetRange('^[ \t]*$', '^[ \t]*$'), ',') . 'EasyAlign ', 'n')<CR>
-    vnoremap <leader><leader>g :EasyAlign<Space>
+    nnoremap <leader><leader>a
+        \ :normal! vip<CR>:EasyAlign<Space>
+    vnoremap <leader><leader>a :EasyAlign<Space>
 " }}}
 
 " smoothie {{{ 平滑滚动
@@ -1007,12 +999,12 @@ endif
     let g:vimtex_compiler_method = 'latexmk'
                                         " TexLive中包含了latexmk
     nmap <leader>at <Plug>(vimtex-toc-toggle)
-    nmap <leader>al <Plug>(vimtex-compile)
-    nmap <leader>aL <Plug>(vimtex-compile-ss)
-    nmap <leader>ac <Plug>(vimtex-clean)
+    nmap <leader>ap <Plug>(vimtex-compile-ss)
+    nmap <leader>aP <Plug>(vimtex-compile)
     nmap <leader>as <Plug>(vimtex-stop)
-    nmap <leader>av <Plug>(vimtex-view)
+    nmap <leader>ac <Plug>(vimtex-clean)
     nmap <leader>am <Plug>(vimtex-toggle-main)
+    nmap <leader>av <Plug>(vimtex-view)
 " }}}
 
 " open-browser {{{ 在线搜索

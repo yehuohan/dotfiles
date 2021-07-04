@@ -19,10 +19,10 @@ end
 function M.get_range(pats, pate)
     local rstart = fn.search(pats, 'bcnW')
     local rend = fn.search(pate, 'cnW')
-    if (rstart == 0) then
+    if rstart == 0 then
         rstart = 1
     end
-    if (rend == 0) then
+    if rend == 0 then
         rend = fn.line('$')
     end
     return {rstart, rend}
@@ -31,12 +31,9 @@ end
 -- 获取计算结果
 function M.get_eval(str, ty)
     local result = ''
-    if ty == 'command' then
-        result = fn.execute(str)
-    elseif ty == 'function' then
-        result = fn.eval(str)
-    elseif ty == 'registers' then
-        result = fn.eval('@' .. str)
+    if ty == 'command'       then result = fn.execute(str)
+    elseif ty == 'function'  then result = fn.eval(str)
+    elseif ty == 'registers' then result = fn.eval('@' .. str)
     end
     if fn.type(result) ~= vim.v.t_string then
         result = fn.string(result)

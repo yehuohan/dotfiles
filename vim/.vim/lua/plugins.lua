@@ -17,7 +17,6 @@ vim.cmd([[
     Plug 'mg979/vim-visual-multi'
     Plug 't9md/vim-textmanip'
     Plug 'markonm/traces.vim'
-    Plug 'godlygeek/tabular', {'on': 'Tabularize'}
     Plug 'junegunn/vim-easy-align'
     Plug 'psliwka/vim-smoothie'
     Plug 'terryma/vim-expand-region'
@@ -109,28 +108,14 @@ map('x', '<M-l>', [[<Plug>(textmanip-duplicate-right)]], {})
 -- 支持:s, :g, :v, :sort, :range预览
 -- }}}
 
--- tabular {{{ 字符对齐
--- /,/r2l0   -   第1个field使用第1个对齐符（右对齐），再插入2个空格
---               第2个field使用第2个对齐符（左对齐），再插入0个空格
---               第3个field又重新从第1个对齐符开始（对齐符可以有多个，循环使用）
---               这样就相当于：需对齐的field使用第1个对齐符，分割符(,)field使用第2个对齐符
--- /,\zs     -   将分割符(,)作为对齐内容field里的字符
-map('n', '<leader><leader>a', [[:Tabularize /]], { noremap = true })
-map('v', '<leader><leader>a', [[:Tabularize /]], { noremap = true })
--- }}}
-
 -- easy-align {{{ 字符对齐
 -- 默认对齐内含段落（Text Object: vip）
-map('n', '<leader>ga', [[<Plug>(EasyAlign)ip]], {})
-map('x', '<leader>ga', [[<Plug>(EasyAlign)]],   {})
--- 命令格式
--- :EasyAlign[!] [N-th]DELIMITER_KEY[OPTIONS]
+map('n', '<leader>al', [[<Plug>(EasyAlign)ip]], {})
+map('x', '<leader>al', [[<Plug>(EasyAlign)]],   {})
+-- :EasyAlign[!] [N-th] DELIMITER_KEY [OPTIONS]
 -- :EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
-map('n', '<leader><leader>g',
-    [[:let g:easy_align_range = v:lua.require'user.libs'.get_range('^[ \t]*$', '^[ \t]*$')<Bar>]] ..
-    [[:call feedkeys(':' . join(g:easy_align_range, ',') . 'EasyAlign ', 'n')<CR>]],
-    { noremap = true, silent = true })
-map('v', '<leader><leader>g', [[:EasyAlign<Space>]], {})
+map('n', '<leader><leader>a', [[:normal! vip<CR>:EasyAlign<Space>]], { noremap = true })
+map('v', '<leader><leader>a', [[:EasyAlign<Space>]], { noremap = true })
 -- }}}
 
 -- smoothie {{{ 平滑滚动

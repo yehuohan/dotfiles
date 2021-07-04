@@ -9,17 +9,15 @@ local gui_fontsize = 12
 local gui_font = ''
 local gui_fontwide = ''
 if ostype.is_win() then
-    if use.powerfont then
-        gui_font = 'Consolas For Powerline'
-    else
-        gui_font = 'Consolas'
+    if use.powerfont
+    then gui_font = 'Consolas For Powerline'
+    else gui_font = 'Consolas'
     end
     gui_fontwide = 'Microsoft YaHei UI'
 else
-    if use.powerfont then
-        gui_font = 'DejaVu Sans Mono for Powerline'
-    else
-        gui_font = 'DejaVu Sans'
+    if use.powerfont
+    then gui_font = 'DejaVu Sans Mono for Powerline'
+    else gui_font = 'DejaVu Sans'
     end
     gui_fontwide = 'WenQuanYi Micro Hei Mono'
 end
