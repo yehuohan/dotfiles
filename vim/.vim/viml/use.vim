@@ -8,7 +8,6 @@ let s:use = {
     \ 'lightline' : v:false,
     \ 'startify'  : v:false,
     \ 'ycm'       : v:false,
-    \ 'snip'      : v:false,
     \ 'coc'       : v:false,
     \ 'coc_exts'  : {
         \ 'coc-snippets'      : v:false,
@@ -21,10 +20,13 @@ let s:use = {
         \ 'coc-rust-analyzer' : v:false,
         \ 'coc-vimlsp'        : v:false,
         \ 'coc-lua'           : v:false,
+        \ 'coc-toml'          : v:false,
         \ 'coc-vimtex'        : v:false,
         \ 'coc-cmake'         : v:false,
         \ 'coc-calc'          : v:false,
         \ },
+    \ 'nlsp'      : v:false,
+    \ 'snip'      : v:false,
     \ 'spector'   : v:false,
     \ 'leaderf'   : v:false,
     \ 'utils'     : v:false,
@@ -33,7 +35,12 @@ let s:use = {
 " Function: s:useLoad() {{{
 function! s:useLoad()
     if filereadable(s:use_file)
-        call extend(s:use, json_decode(join(readfile(s:use_file))), 'force')
+        let l:dic = json_decode(join(readfile(s:use_file)))
+        if has_key(l:dic, 'coc_exts')
+            call extend(s:use.coc_exts, l:dic.coc_exts)
+            unlet l:dic.coc_exts
+        endif
+        call extend(s:use, l:dic)
     else
         call s:useSave()
     endif

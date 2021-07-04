@@ -55,6 +55,7 @@ call plug#begin($DotVimPath.'/bundle')  " 设置插件位置，且自动设置�
     Plug 'lucapette/vim-textobj-underscore'
     Plug 'tpope/vim-repeat'
     Plug 'kshenoy/vim-signature'
+    Plug 'Konfekt/FastFold'
     Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
     " managers
     Plug 'morhetz/gruvbox'
@@ -90,19 +91,31 @@ if s:use.ycm
     endfunction
     Plug 'ycm-core/YouCompleteMe', {'do': function('Plug_ycm_build'), 'on': []}
 endif
-if s:use.snip
-    Plug 'SirVer/ultisnips'
-    Plug 'honza/vim-snippets'
-endif
 if s:use.coc
     Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
     Plug 'neoclide/jsonc.vim'
 endif
-    Plug 'jiangmiao/auto-pairs'
+if s:use.nlsp
+    Plug 'neovim/nvim-lspconfig'
+    Plug 'kabouzeid/nvim-lspinstall'
+    Plug 'hrsh7th/nvim-compe'
+endif
+if s:use.snip
+    Plug 'SirVer/ultisnips'
+    Plug 'honza/vim-snippets'
+endif
     Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
+    Plug 'jiangmiao/auto-pairs'
     Plug 'tpope/vim-surround'
     Plug 'majutsushi/tagbar', {'on': 'TagbarToggle'}
     Plug 'scrooloose/nerdcommenter'
+    Plug 't9md/vim-quickhl'
+    Plug 'RRethy/vim-illuminate'
+if IsVim()
+    Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
+else
+    Plug 'norcalli/nvim-colorizer.lua', {'on': 'ColorizerToggle'}
+endif
     Plug 'skywind3000/asyncrun.vim'
     Plug 'skywind3000/asyncrun.extra'
     Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
@@ -111,14 +124,6 @@ endif
 if s:use.spector
     Plug 'puremourning/vimspector'
 endif
-    Plug 't9md/vim-quickhl'
-    Plug 'RRethy/vim-illuminate'
-if IsVim()
-    Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
-else
-    Plug 'norcalli/nvim-colorizer.lua', {'on': 'ColorizerToggle'}
-endif
-    Plug 'Konfekt/FastFold'
     Plug 'euclidianAce/BetterLua.vim', {'for': 'lua'}
     Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
     Plug 'rust-lang/rust.vim'
@@ -298,6 +303,14 @@ call plug#end()
     nnoremap <leader>ml :call signature#mark#Purge('line')<CR>
     nnoremap <M-,>      :call signature#mark#Goto('prev', 'line', 'pos')<CR>
     nnoremap <M-.>      :call signature#mark#Goto('next', 'line', 'pos')<CR>
+" }}}
+
+" FastFold {{{ 更新折叠
+    nmap <leader>zu <Plug>(FastFoldUpdate)
+    let g:fastfold_savehook = 0         " 只允许手动更新folds
+    let g:fastfold_fold_command_suffixes = ['x','X','a','A','o','O','c','C']
+    let g:fastfold_fold_movement_commands = ['z[', 'z]', 'zj', 'zk']
+                                        " 允许指定的命令更新folds
 " }}}
 
 " undotree {{{ 撤消历史
@@ -652,7 +665,7 @@ if s:use.ycm
     let g:ycm_enable_diagnostic_signs = 1                       " 开启语法检测
     let g:ycm_max_diagnostics_to_display = 30
     let g:ycm_warning_symbol = '►'                              " Warning符号
-    let g:ycm_error_symbol = 'x'                                " Error符号
+    let g:ycm_error_symbol = '✘'                                " Error符号
     let g:ycm_auto_start_csharp_server = 0                      " 禁止C#补全
     let g:ycm_cache_omnifunc = 0                                " 禁止缓存匹配项，每次都重新生成匹配项
     let g:ycm_complete_in_strings = 1                           " 开启对字符串补全
@@ -675,6 +688,8 @@ if s:use.ycm
     nnoremap <leader>gg :YcmCompleter<CR>
     nnoremap <leader>gt :YcmCompleter GoTo<CR>
     nnoremap <leader>gI :YcmCompleter GoToInclude<CR>
+    nnoremap         gd :YcmCompleter GoToDefinition<CR>
+    nnoremap         gD :YcmCompleter GoToDeclaration<CR>
     nnoremap <leader>gd :YcmCompleter GoToDefinition<CR>
     nnoremap <leader>gD :YcmCompleter GoToDeclaration<CR>
     nnoremap <leader>gi :YcmCompleter GoToImplementation<CR>
@@ -691,17 +706,6 @@ if s:use.ycm
 endif
 " }}}
 
-" ultisnips {{{ 代码片段
-if s:use.snip
-    let g:UltiSnipsEditSplit = "vertical"
-    let g:UltiSnipsSnippetDirectories = [$DotVimPath . '/snips', "UltiSnips"]
-    let g:UltiSnipsExpandTrigger = '<Tab>'
-    let g:UltiSnipsListSnippets = '<C-o>'
-    let g:UltiSnipsJumpForwardTrigger = '<C-j>'
-    let g:UltiSnipsJumpBackwardTrigger = '<C-k>'
-endif
-" }}}
-
 " coc {{{ 自动补全
 if s:use.coc
     call s:plug.reg('onDelay', 'load', 'coc.nvim')
@@ -714,7 +718,7 @@ if s:use.coc
     let g:coc_config_home = $DotVimMiscPath
     let g:coc_data_home = $DotVimCachePath . '/.coc'
     let g:coc_global_extensions = keys(filter(copy(s:use.coc_exts), 'v:val'))
-    let g:coc_status_error_sign = 'x'
+    let g:coc_status_error_sign = '✘'
     let g:coc_status_warning_sign = '!'
     let g:coc_filetype_map = {}
     let g:coc_snippet_next = '<C-j>'
@@ -735,6 +739,8 @@ if s:use.coc
     inoremap <silent><expr> <C-l>
         \ pumvisible() ? "\<C-g>u" : coc#refresh()
     imap <M-l> <C-l>
+    nmap         gd <Plug>(coc-definition)
+    nmap         gD <Plug>(coc-declaration)
     nmap <leader>gd <Plug>(coc-definition)
     nmap <leader>gD <Plug>(coc-declaration)
     nmap <leader>gi <Plug>(coc-implementation)
@@ -762,12 +768,15 @@ if s:use.coc
 endif
 " }}}
 
-" auto-pairs {{{ 自动括号
-    let g:AutoPairsShortcutToggle = ''
-    let g:AutoPairsShortcutFastWrap = '<M-p>'
-    let g:AutoPairsShortcutJump = ''
-    let g:AutoPairsShortcutFastBackInsert = ''
-    nnoremap <leader>tp :call AutoPairsToggle()<CR>
+" ultisnips {{{ 代码片段
+if s:use.snip
+    let g:UltiSnipsEditSplit = "vertical"
+    let g:UltiSnipsSnippetDirectories = [$DotVimPath . '/snips', "UltiSnips"]
+    let g:UltiSnipsExpandTrigger = '<Tab>'
+    let g:UltiSnipsListSnippets = '<C-o>'
+    let g:UltiSnipsJumpForwardTrigger = '<C-j>'
+    let g:UltiSnipsJumpBackwardTrigger = '<C-k>'
+endif
 " }}}
 
 " neoformat {{{ 代码格式化
@@ -800,6 +809,14 @@ endif
     let g:neoformat_enabled_python = ['autopep8']
     nnoremap <leader>fc :Neoformat<CR>
     vnoremap <leader>fc :Neoformat<CR>
+" }}}
+
+" auto-pairs {{{ 自动括号
+    let g:AutoPairsShortcutToggle = ''
+    let g:AutoPairsShortcutFastWrap = '<M-p>'
+    let g:AutoPairsShortcutJump = ''
+    let g:AutoPairsShortcutFastBackInsert = ''
+    nnoremap <leader>tp :call AutoPairsToggle()<CR>
 " }}}
 
 " surround {{{ 添加包围符
@@ -842,6 +859,34 @@ endif
     nmap <leader>ca <Plug>NERDCommenterAppend
     nmap <leader>ct <Plug>NERDCommenterAltDelims
     nmap <leader>cu <Plug>NERDCommenterUncomment
+" }}}
+
+" quickhl {{{ 单词高亮
+    nmap <leader>hw <Plug>(quickhl-manual-this)
+    xmap <leader>hw <Plug>(quickhl-manual-this)
+    nmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
+    xmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
+    nmap <leader>hc <Plug>(quickhl-manual-clear)
+    xmap <leader>hc <Plug>(quickhl-manual-clear)
+    nmap <leader>hr <Plug>(quickhl-manual-reset)
+    nmap <leader>th <Plug>(quickhl-manual-toggle)
+" }}}
+
+" illuminate {{{ 自动高亮
+    let g:Illuminate_delay = 250
+    let g:Illuminate_ftblacklist = ['nerdtree', 'tagbar', 'coc-explorer']
+    highlight link illuminatedWord MatchParen
+    nnoremap <leader>tg :IlluminationToggle<CR>
+" }}}
+
+" colorizer {{{ 颜色预览
+if IsVim()
+    let g:colorizer_nomap = 1
+    let g:colorizer_startup = 0
+    nnoremap <leader>tc :ColorToggle<CR>
+else
+    nnoremap <leader>tc :ColorizerToggle<CR>
+endif
 " }}}
 
 " asyncrun {{{ 导步运行程序
@@ -904,42 +949,6 @@ if s:use.spector
             \ 'cmd' : {sopt, sel -> vimspector#LaunchWithSettings({'configuration': sel})}
             \})<CR>
 endif
-" }}}
-
-" quickhl {{{ 单词高亮
-    nmap <leader>hw <Plug>(quickhl-manual-this)
-    xmap <leader>hw <Plug>(quickhl-manual-this)
-    nmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
-    xmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
-    nmap <leader>hc <Plug>(quickhl-manual-clear)
-    xmap <leader>hc <Plug>(quickhl-manual-clear)
-    nmap <leader>hr <Plug>(quickhl-manual-reset)
-    nmap <leader>th <Plug>(quickhl-manual-toggle)
-" }}}
-
-" illuminate {{{ 自动高亮
-    let g:Illuminate_delay = 250
-    let g:Illuminate_ftblacklist = ['nerdtree', 'tagbar', 'coc-explorer']
-    highlight link illuminatedWord MatchParen
-    nnoremap <leader>tg :IlluminationToggle<CR>
-" }}}
-
-" colorizer {{{ 颜色预览
-if IsVim()
-    let g:colorizer_nomap = 1
-    let g:colorizer_startup = 0
-    nnoremap <leader>tc :ColorToggle<CR>
-else
-    nnoremap <leader>tc :ColorizerToggle<CR>
-endif
-" }}}
-
-" FastFold {{{ 更新折叠
-    nmap <leader>zu <Plug>(FastFoldUpdate)
-    let g:fastfold_savehook = 0         " 只允许手动更新folds
-    let g:fastfold_fold_command_suffixes = ['x','X','a','A','o','O','c','C']
-    let g:fastfold_fold_movement_commands = ['z[', 'z]', 'zj', 'zk']
-                                        " 允许指定的命令更新folds
 " }}}
 
 " julia {{{ Julia支持

@@ -19,6 +19,7 @@ local use = {
         ['coc-rust-analyzer'] = false,
         ['coc-vimlsp']        = false,
         ['coc-lua']           = false,
+        ['coc-toml']          = false,
         ['coc-vimtex']        = false,
         ['coc-cmake']         = false,
         ['coc-calc']          = false,
@@ -35,7 +36,7 @@ end
 
 local function use_load()
     if fn.filereadable(use_file) == 1 then
-        use = vim.tbl_extend(
+        use = vim.tbl_deep_extend(
             'force',
             use,
             fn.json_decode(fn.join(fn.readfile(use_file)))
