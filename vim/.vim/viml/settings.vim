@@ -349,11 +349,14 @@ endif
     nnoremap i :nohlsearch<CR>i
     nnoremap <leader>8  *
     nnoremap <leader>3  #
-    vnoremap <silent> <leader>8 "9y<Bar>:execute '/\V\c\<' . escape(@9, '\/') . '\>'<CR>
-    vnoremap <silent> <leader>3 "9y<Bar>:execute '?\V\c\<' . escape(@9, '\/') . '\>'<CR>
-    vnoremap <silent> <leader>/ "9y<Bar>:execute '/\V\c' . escape(@9, '\/')<CR>
+    vnoremap <silent> <leader>8
+        \ :call execute('/\V\c\<' . escape(GetSelected(), '\/') . '\>')<CR>
+    vnoremap <silent> <leader>3
+        \ :call execute('?\V\c\<' . escape(GetSelected(), '\/') . '\>')<CR>
     nnoremap <silent> <leader>/
         \ :execute '/\V\c' . escape(expand('<cword>'), '\/')<CR>
+    vnoremap <silent> <leader>/
+        \ :call execute('/\V\c' . escape(GetSelected(), '\/'))<CR>
     vnoremap <silent> <leader><leader>/
         \ :call feedkeys('/' . GetSelected(), 'n')<CR>
 " }}}

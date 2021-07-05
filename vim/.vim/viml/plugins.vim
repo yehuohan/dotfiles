@@ -217,9 +217,6 @@ call plug#end()
 
 " easy-align {{{ 字符对齐
     let g:easy_align_bypass_fold = 1
-    let g:easy_align_delimiters = {
-        \ 'd': { 'pattern': ' \(\S\+\s*[;=]\)\@=' },
-        \ }
     " 默认对齐内含段落（Text Object: vip）
     nmap <leader>al <Plug>(LiveEasyAlign)ip
     xmap <leader>al <Plug>(LiveEasyAlign)

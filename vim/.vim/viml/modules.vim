@@ -61,7 +61,7 @@ endfunction
 " }}}
 
 " Function: GetMultiFilesCompletion(arglead, cmdline, cursorpos) {{{ 多文件自动补全
-" 多个文件或目录时，返回的补全字符串使用'|'分隔
+" 支持带空格的命名，当有多个文件或目录时，返回的补全字符串使用'|'分隔
 function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
     let l:arglead_true = ''             " 真正用于补全的arglead
     let l:arglead_head = ''             " arglead_true之前的部分
@@ -83,12 +83,13 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
         endif
     endif
     " 获取_list，包括<.*>隐藏文件，忽略大小写
+    let l:wigSave = &wildignore
     let l:wicSave = &wildignorecase
+    set wildignore=.,..
     set wildignorecase
-    set wildignore+=.,..
     let l:arglead_list = split(glob(l:arglead_true . "*") . "\n" . glob(l:arglead_true . "\.[^.]*"), "\n")
+    let &wildignore = l:wigSave
     let &wildignorecase = l:wicSave
-    set wildignore-=.,..
     "  返回补全列表
     if !empty(l:arglead_head)
         call map(l:arglead_list, 'l:arglead_head . v:val')
