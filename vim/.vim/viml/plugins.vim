@@ -684,7 +684,7 @@ if s:use.ycm
     nnoremap <leader>gi :YcmCompleter GoToImplementation<CR>
     nnoremap <leader>gr :YcmCompleter GoToReferences<CR>
     nnoremap <leader>gp :YcmCompleter GetParent<CR>
-    nnoremap <leader>gk :YcmCompleter GetDoc<CR>
+    nnoremap <leader>gh :YcmCompleter GetDoc<CR>
     nnoremap <leader>gy :YcmCompleter GetType<CR>
     nnoremap <leader>gf :YcmCompleter FixIt<CR>
     nnoremap <leader>gc :YcmCompleter ClearCompilationFlagCache<CR>
@@ -728,28 +728,39 @@ if s:use.coc
     inoremap <silent><expr> <C-l>
         \ pumvisible() ? "\<C-g>u" : coc#refresh()
     imap <M-l> <C-l>
+    inoremap <silent> <C-u> <Esc>:call CocActionAsync('showSignatureHelp')<CR>a
+    imap <M-u> <C-u>
     nmap         gd <Plug>(coc-definition)
     nmap         gD <Plug>(coc-declaration)
     nmap <leader>gd <Plug>(coc-definition)
     nmap <leader>gD <Plug>(coc-declaration)
     nmap <leader>gi <Plug>(coc-implementation)
     nmap <leader>gr <Plug>(coc-references)
-    nmap <leader>gy <Plug>(coc-type-definition)
+    nmap <leader>gt <Plug>(coc-type-definition)
     nmap <leader>gf <Plug>(coc-fix-current)
+    nmap <leader>gn <Plug>(coc-rename)
+    nmap <leader>gj <Plug>(coc-float-jump)
+    nnoremap <silent> <leader>gh :call CocActionAsync('doHover')<CR>
+    nnoremap <silent> <leader>gs :CocCommand clangd.switchSourceHeader<CR>
+    nnoremap <silent> <leader>gm :CocCommand clangd.symbolInfo<CR>
     nmap <leader>oi <Plug>(coc-diagnostic-info)
     nmap <leader>oj <Plug>(coc-diagnostic-next-error)
     nmap <leader>ok <Plug>(coc-diagnostic-prev-error)
     nmap <leader>oJ <Plug>(coc-diagnostic-next)
     nmap <leader>oK <Plug>(coc-diagnostic-prev)
+    nnoremap <silent> <leader>oD :call CocAction('diagnosticToggle')<CR>
     nnoremap <silent> <leader>od
         \ :call coc#config('diagnostic.enable', !coc#util#get_config('diagnostic').enable)<Bar>
         \ :echo 'diagnostic.enable: ' . coc#util#get_config('diagnostic').enable<CR>
-    nmap <leader>or <Plug>(coc-rename)
-    vnoremap <silent> <leader>of :call CocAction('formatSelected', 'v')<CR>
-    nnoremap <silent> <leader>of :call CocAction('format')<CR>
+    nnoremap <silent> <leader>or :call CocActionAsync('diagnosticRefresh')<CR>
+    vnoremap <silent> <leader>of :call CocActionAsync('formatSelected', 'v')<CR>
+    nnoremap <silent> <leader>of :call CocActionAsync('format')<CR>
     nnoremap <leader>oR :CocRestart<CR>
     nnoremap <leader>on :CocConfig<CR>
     nnoremap <leader>oN :CocLocalConfig<CR>
+    nnoremap <silent> <leader>ol :CocList lists<CR>
+    nnoremap <silent> <leader>os :CocList --normal sources<CR>
+    nnoremap <silent> <leader>ox :CocList --normal extensions<CR>
     " coc-extensions
     nnoremap <silent> <leader>oy :<C-u>CocList --normal yank<CR>
     nnoremap <silent> <leader>oe :CocCommand explorer<CR>
@@ -762,9 +773,10 @@ if s:use.snip
     let g:UltiSnipsEditSplit = "vertical"
     let g:UltiSnipsSnippetDirectories = [$DotVimPath . '/snips', "UltiSnips"]
     let g:UltiSnipsExpandTrigger = '<Tab>'
-    let g:UltiSnipsListSnippets = '<C-o>'
     let g:UltiSnipsJumpForwardTrigger = '<C-j>'
     let g:UltiSnipsJumpBackwardTrigger = '<C-k>'
+    let g:UltiSnipsListSnippets = '<C-o>'
+    imap <M-o> <C-o>
 endif
 " }}}
 

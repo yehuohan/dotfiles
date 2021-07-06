@@ -2,7 +2,6 @@
     /* coc */
     "suggest.autoTrigger": "always",
     "suggest.enablePreview": true,
-    "suggest.snippetIndicator": " ★",
     "suggest.echodocSupport": false,
     "diagnostic.enable": true,
     "diagnostic.level": "hint",
@@ -15,6 +14,7 @@
     "diagnostic.virtualText": false,
     "diagnostic.virtualTextCurrentLineOnly": true,
     "diagnostic.virtualTextPrefix": "   ",
+    "diagnostic.autoRefresh": true,
     "signature.enable": true,
     "coc.source.file.enable": true,
     "coc.source.file.ignoreHidden": false,
@@ -114,9 +114,13 @@
     /* coc-pyright */
     "python.analysis.stubPath": "typings",
 
-    /* coc-clangd(NOT in use) */
-    //"clangd.enabled": true,
-    //"clangd.path": "clangd",
+    /* coc-clangd */
+    "clangd.enabled": true,
+    "clangd.arguments": [], // arguments for clangd server
+    "clangd.compilationDatabasePath": "", // specifies the directory containing the compilation database
+    "clangd.fallbackFlags": [], // extra clang flags used to parse files when no compilation database is found
+    "clangd.path": "clangd",
+
 
     /* coc-rls(NOT in use) */
     //"rust-client.channel": "nightly",
@@ -136,12 +140,13 @@
 
     /* lsp */
     "languageserver": {
+        /* install llvm or clangd and less memory used (Not in use)
         "clangd": {
-            // download llvm from https://releases.llvm.org
             "command": "clangd",
             "rootPatterns": ["compile_flags.txt", "compile_commands.json", "tags"],
             "filetypes": ["c", "cc", "cpp", "c++", "objc", "objcpp"]
         },
+        */
         "julia": {
             "command": "julia",
             "args": [
