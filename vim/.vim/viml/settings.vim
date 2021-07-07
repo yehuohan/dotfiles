@@ -318,9 +318,11 @@ endif
     " 改变窗口大小
     nnoremap <leader>w= <C-w>=
     nnoremap <M-e> :resize+5<CR>
-    nnoremap <M-d> :resize-5<CR>
     nnoremap <M-s> :vertical resize-5<CR>
+if !s:use.coc
+    nnoremap <M-d> :resize-5<CR>
     nnoremap <M-f> :vertical resize+5<CR>
+endif
     nnoremap <M-Up> :resize+1<CR>
     nnoremap <M-Down> :resize-1<CR>
     nnoremap <M-Left> :vertical resize-1<CR>

@@ -15,9 +15,13 @@
     "diagnostic.virtualTextCurrentLineOnly": true,
     "diagnostic.virtualTextPrefix": "   ",
     "diagnostic.autoRefresh": true,
+    "dialog.floatHighlight": "Normal",
+    "dialog.floatBorderHighlight": "Normal",
     "signature.enable": true,
     "coc.source.file.enable": true,
     "coc.source.file.ignoreHidden": false,
+    "coc.preferences.enableMessageDialog": true,
+    "coc.preferences.promptInput": true,
     "coc.preferences.extensionUpdateCheck": "weekly",
     "coc.preferences.enableFloatHighlight": true,
     "coc.preferences.rootPatterns": [".popc", ".git", ".svn", ".hg"],
@@ -147,6 +151,7 @@
             "filetypes": ["c", "cc", "cpp", "c++", "objc", "objcpp"]
         },
         */
+        /* Not in use
         "julia": {
             "command": "julia",
             "args": [
@@ -157,5 +162,6 @@
             ],
             "filetypes": ["julia"]
         }
+        */
     }
 }

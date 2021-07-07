@@ -721,15 +721,21 @@ if s:use.coc
     "    let col = col('.') - 1
     "    return !col || getline('.')[col - 1]  =~# '\s'
     "endfunction
-    inoremap <expr> <M-j> pumvisible() ? "\<C-n>" : "\<C-j>"
-    inoremap <expr> <M-k> pumvisible() ? "\<C-p>" : "\<C-k>"
-    imap <C-j> <M-j>
-    imap <C-k> <M-k>
+    inoremap <expr> <C-j> pumvisible() ? "\<C-n>" : "\<C-j>"
+    inoremap <expr> <C-k> pumvisible() ? "\<C-p>" : "\<C-k>"
+    imap <M-j> <C-j>
+    imap <M-k> <C-k>
     inoremap <silent><expr> <C-l>
         \ pumvisible() ? "\<C-g>u" : coc#refresh()
     imap <M-l> <C-l>
     inoremap <silent> <C-u> <Esc>:call CocActionAsync('showSignatureHelp')<CR>a
     imap <M-u> <C-u>
+    nnoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? coc#float#scroll(1) : ":vertical resize+5\<CR>"
+    nnoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? coc#float#scroll(0) : ":resize-5\<CR>"
+    inoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(1)\<CR>" : "\<Right>"
+    inoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(0)\<CR>" : "\<Left>"
+    vnoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<M-f>"
+    vnoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? coc#float#scroll(0) : "\<M-d>"
     nmap         gd <Plug>(coc-definition)
     nmap         gD <Plug>(coc-declaration)
     nmap <leader>gd <Plug>(coc-definition)
@@ -765,13 +771,14 @@ if s:use.coc
     nnoremap <silent> <leader>oy :<C-u>CocList --normal yank<CR>
     nnoremap <silent> <leader>oe :CocCommand explorer<CR>
     nmap <leader>oc <Plug>(coc-calc-result-append)
+    hi default link CocMenuSel CursorLineNr
 endif
 " }}}
 
 " ultisnips {{{ 代码片段
 if s:use.snip
-    let g:UltiSnipsEditSplit = "vertical"
-    let g:UltiSnipsSnippetDirectories = [$DotVimPath . '/snips', "UltiSnips"]
+    let g:UltiSnipsEditSplit = 'vertical'
+    let g:UltiSnipsSnippetDirectories = [$DotVimPath . '/snips', 'UltiSnips']
     let g:UltiSnipsExpandTrigger = '<Tab>'
     let g:UltiSnipsJumpForwardTrigger = '<C-j>'
     let g:UltiSnipsJumpBackwardTrigger = '<C-k>'
