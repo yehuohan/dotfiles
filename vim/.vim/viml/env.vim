@@ -1,4 +1,4 @@
-let s:env = {
+const s:env = {
     \ 'local': [
         \ $DotVimPath . '/local',
         \ $DotVimPath . '/local/bin',

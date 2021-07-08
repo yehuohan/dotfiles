@@ -184,24 +184,12 @@ vnoremap <silent> <leader>af :call append(line('.'), GetEval(GetSelected(), 'fun
 "           'skywind3000/asyncrun.vim', 'voldikss/floaterm'
 "           'Yggdroot/LeaderF', 'junegunn/fzf.vim'
 
+" Struct s:ws {{{
 let s:ws = {'root': '', 'rp': {}, 'fw': {}}
 let s:wsd = {
     \ 'rp': {'hl': 'WarningMsg', 'str': ['/\V\c|| "\=[RP]Warning: \.\*\$/hs=s+3']},
     \ 'fw': {'hl': 'IncSearch', 'str': []},
     \ }
-
-augroup UserModulesWorkspace
-    autocmd!
-    autocmd User PopcLayerWksSavePre call popc#layer#wks#SetSettings(s:ws)
-    autocmd User PopcLayerWksLoaded call extend(s:ws, popc#layer#wks#GetSettings(), 'force') |
-                                    \ let s:ws.root = popc#layer#wks#GetCurrentWks('root') |
-                                    \ if empty(get(s:ws.fw, 'path', '')) |
-                                    \   let s:ws.fw.path = s:ws.root |
-                                    \ endif
-    autocmd User AsyncRunStop call s:wsd.display()
-    autocmd Filetype qf call s:wsd.display()
-augroup END
-
 " FUNCTION: s:wsd.display() dict {{{ 设置结果显示
 function! s:wsd.display() dict
     if &filetype ==# 'qf'
@@ -217,6 +205,19 @@ function! s:wsd.display() dict
         endfor
     endif
 endfunction
+" }}}
+
+augroup UserModulesWorkspace
+    autocmd!
+    autocmd User PopcLayerWksSavePre call popc#layer#wks#SetSettings(s:ws)
+    autocmd User PopcLayerWksLoaded call extend(s:ws, popc#layer#wks#GetSettings(), 'force') |
+                                    \ let s:ws.root = popc#layer#wks#GetCurrentWks('root') |
+                                    \ if empty(get(s:ws.fw, 'path', '')) |
+                                    \   let s:ws.fw.path = s:ws.root |
+                                    \ endif
+    autocmd User AsyncRunStop call s:wsd.display()
+    autocmd Filetype qf call s:wsd.display()
+augroup END
 " }}}
 
 " Project {{{
@@ -283,7 +284,9 @@ let s:rp = {
         \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ 'name'    : '\mname\s*=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
         \ },
-    \ 'mappings' : [
+    \ }
+" s:rp_mappings {{{
+const s:rp_mappings = [
         \  'Rp',  'Rq',  'Ru',  'Rn',  'Rm',  'Ra',  'Rh',  'Rf',
         \  'rp',  'rq',  'ru',  'rn',  'rm',  'ra',  'rh',  'rf', 'rj',
         \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rca', 'rch',
@@ -292,48 +295,6 @@ let s:rp = {
         \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rta', 'rth', 'rtf',
         \ 'rop', 'roq', 'rou', 'ron', 'rom', 'roa', 'roh',
         \ ]
-    \ }
-" Function: s:rp.glob(pat, low) {{{
-" @param pat: 文件匹配模式，如*.pro
-" @param low: true:查找到存在pat的最低层目录 false:查找到存在pat的最高层目录
-" @return 返回找到的文件列表
-function! s:rp.glob(pat, low) dict
-    let l:dir      = expand('%:p:h')
-    let l:dir_last = ''
-
-    " widows文件不区分大小写，其它需要通过正则式实现
-    let l:pat = IsWin() ? a:pat :
-        \ join(map(split(a:pat, '\zs'),
-        \       {k,c -> (c =~? '[a-z]') ? '[' . toupper(c) . tolower(c) . ']' : c}), '')
-
-    let l:res = ''
-    while l:dir !=# l:dir_last
-        let l:files = glob(l:dir . '/' . l:pat)
-        if !empty(l:files)
-            let l:res = l:files
-            if a:low
-                break
-            endif
-        endif
-        let l:dir_last = l:dir
-        let l:dir = fnamemodify(l:dir, ':p:h:h')
-    endwhile
-    return split(l:res, "\n")
-endfunction
-" }}}
-
-" Function: s:rp.pstr(file, pat) {{{
-" @param pat: 匹配模式，必须使用 \(\) 来提取字符串
-" @return 返回匹配的字符串结果
-function! s:rp.pstr(file, pat)
-    for l:line in readfile(a:file)
-        let l:res = matchlist(l:line, a:pat)
-        if !empty(l:res)
-            return l:res[1]
-        endif
-    endfor
-    return ''
-endfunction
 " }}}
 
 " Function: s:rp.run(cfg) dict {{{
@@ -349,7 +310,7 @@ function! s:rp.run(cfg) dict
         if l:pat == v:null
             let a:cfg.file = expand('%:p')
         else
-            let a:cfg.file = self.glob(l:pat, a:cfg.lowest)
+            let a:cfg.file = s:glob(l:pat, a:cfg.lowest)
             if empty(a:cfg.file)
                 throw 'None of ' . l:pat . ' was found!'
             endif
@@ -380,26 +341,74 @@ endfunction
 " }}}
 " }}}
 
+" Function: s:glob(pat, low) {{{
+" @param pat: 文件匹配模式，如*.pro
+" @param low: true:查找到存在pat的最低层目录 false:查找到存在pat的最高层目录
+" @return 返回找到的文件列表
+function! s:glob(pat, low)
+    let l:dir      = expand('%:p:h')
+    let l:dir_last = ''
+
+    " widows文件不区分大小写，其它需要通过正则式实现
+    let l:pat = IsWin() ? a:pat :
+        \ join(map(split(a:pat, '\zs'),
+        \       {k,c -> (c =~? '[a-z]') ? '[' . toupper(c) . tolower(c) . ']' : c}), '')
+
+    let l:res = ''
+    while l:dir !=# l:dir_last
+        let l:files = glob(l:dir . '/' . l:pat)
+        if !empty(l:files)
+            let l:res = l:files
+            if a:low
+                break
+            endif
+        endif
+        let l:dir_last = l:dir
+        let l:dir = fnamemodify(l:dir, ':p:h:h')
+    endwhile
+    return split(l:res, "\n")
+endfunction
+" }}}
+
+" Function: s:pstr(file, pat) {{{
+" @param pat: 匹配模式，必须使用 \(\) 来提取字符串
+" @return 返回匹配的字符串结果
+function! s:pstr(file, pat)
+    for l:line in readfile(a:file)
+        let l:res = matchlist(l:line, a:pat)
+        if !empty(l:res)
+            return l:res[1]
+        endif
+    endfor
+    return ''
+endfunction
+" }}}
+
 " Function: RunProject(keys, [cfg]) {{{
 " {{{
 " @param keys: [rR][cblto][p...]
 "              [%1][%2   ][%3  ]
-" Run: %1
+" Run: %1 = km.S
 "   r : build and run
 "   R : insert or append global args(can use with %2 together)
-" Command: %2
+" Command: %2 = km.A
 "   c : clean project
 "   b : build without run
 "   l : run project in floaterm
 "   t : run project in terminal
 "   o : use project with the lowest directory
-" Project: %3
+" Project: %3 = km.E
 "   p : run project from s:ws.rp
 "   ... : supported project from s:rp.proj
 " @param cfg: first priority of config
 " }}}
 function! RunProject(keys, ...)
-    if a:keys =~# 'R'
+    let km = {
+        \ 'S': a:keys[0],
+        \ 'A': a:keys[1:-2],
+        \ 'E': a:keys[-1:-1],
+        \ }
+    if km.S ==# 'R'
         " config project
         let l:cfg = {
             \ 'term': '', 'agen': '', 'abld': '', 'arun': '',
@@ -421,9 +430,9 @@ function! RunProject(keys, ...)
                 \ 'cmd' : {sopt, sel -> extend(l:cfg, {sopt : sel})},
                 \ 'get' : {sopt -> l:cfg[sopt]},
                 \ },
-            \ 'onCR': {sopt -> call('RunProject', ['r' . a:keys[1:-1], l:cfg])}
+            \ 'onCR': {sopt -> call('RunProject', ['r' . km.A . km.E, l:cfg])}
             \ }
-        if a:keys =~# 'p'
+        if km.E ==# 'p'
             call extend(l:cfg, {'key': '', 'file': '', 'type': ''})
             call extend(l:cfg, s:ws.rp)
             let l:sel.lst = ['key', 'file', 'type'] + l:sel.lst
@@ -432,7 +441,7 @@ function! RunProject(keys, ...)
             let l:sel.dic['type'] = {'cpl': 'filetype'}
         endif
         call PopSelection(l:sel)
-    elseif a:keys =~# 'p'
+    elseif km.E ==# 'p'
         " save config of project
         if a:0 > 0
             let s:ws.rp = a:1
@@ -441,15 +450,17 @@ function! RunProject(keys, ...)
                 let s:ws.rp.type = getbufvar(fnamemodify(s:ws.rp.file, ':t'), '&filetype', &filetype)
             endif
         endif
-        call RunProject(has_key(s:ws.rp, 'key') ? a:keys[0:-2] : ('R' . a:keys[1:-1]), s:ws.rp)
+        call RunProject(
+            \ has_key(s:ws.rp, 'key') ? (km.S . km.A . s:ws.rp.key) : ('R' . km.A . km.E),
+            \ s:ws.rp)
     else
         " run project with config
         try
             let l:cfg = {
-                \ 'key'   : a:keys[-1:-1],
-                \ 'term'  : (a:keys =~# 'l') ? 'floaterm' : ((a:keys =~# 't') ? 'right' : ''),
-                \ 'deploy': (a:keys =~# 'b') ? 'build' : ((a:keys =~# 'c') ? 'clean' : 'run'),
-                \ 'lowest': (a:keys =~# 'o') ? 1 : 0,
+                \ 'key'   : km.E,
+                \ 'term'  : (km.A ==# 'l') ? 'floaterm' : ((km.A ==# 't') ? 'right' : ''),
+                \ 'deploy': (km.A ==# 'b') ? 'build' : ((km.A ==# 'c') ? 'clean' : 'run'),
+                \ 'lowest': (km.A ==# 'o') ? 1 : 0,
                 \ 'agen': '', 'abld': '', 'arun': '',
                 \ }
             if a:0 > 0
@@ -499,7 +510,7 @@ function! s:FnMake(cfg)
     else
         let l:cmd = 'make ' . a:cfg.abld
         if a:cfg.deploy ==# 'run'
-            let l:outfile = s:rp.pstr(a:cfg.file, s:rp.pat.target)
+            let l:outfile = s:pstr(a:cfg.file, s:rp.pat.target)
             if empty(l:outfile)
                 let l:cmd .= ' && echo "[RP]Warning: No executable file, try add TARGET"'
             else
@@ -535,7 +546,7 @@ function! s:FnGMake(cfg)
         let l:cmd = printf('cd __VBuildOut && %s && cd ..', l:cmd)
 
         if a:cfg.deploy ==# 'run'
-            let l:outfile = s:rp.pstr(a:cfg.file, a:cfg.key ==# 'q' ? s:rp.pat.target : s:rp.pat.project)
+            let l:outfile = s:pstr(a:cfg.file, a:cfg.key ==# 'q' ? s:rp.pat.target : s:rp.pat.project)
             if empty(l:outfile)
                 let l:cmd .= ' && echo "[RP]Warning: No executable file, try add project() or TARGET"'
             else
@@ -572,30 +583,18 @@ function! s:FnSphinx(cfg)
 endfunction
 " }}}
 
-for key in s:rp.mappings
+for key in s:rp_mappings
     execute printf('nnoremap <leader>%s :call RunProject("%s")<CR>', key, key)
 endfor
 " }}}
 
 " Find {{{
 " Struct: s:fw {{{
-" @attribute engine: see FindW, FindWFuzzy, FindWKill
+" @attribute engine: see FindW, FindWFuzzy
 " @attribute rg: 预置的rg搜索命令，用于搜索指定文本
 " @attribute fuzzy: 预置的模糊搜索命令，用于文件和文本等模糊搜索
 let s:fw = {
-    \ 'cmd' : '',
-    \ 'opt' : '',
-    \ 'pat' : '',
-    \ 'loc' : '',
-    \ 'engine' : {
-        \ 'rg' : '', 'fuzzy' : '',
-        \ 'sel-fuzzy': {
-            \ 'opt' : 'select fuzzy engine',
-            \ 'lst' : ['fzf', 'leaderf'],
-            \ 'cmd' : {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
-            \ 'get' : {sopt -> s:fw.engine.fuzzy},
-            \ },
-        \ },
+    \ 'engine' : { 'rg' : '', 'fuzzy' : '' },
     \ 'rg' : {
         \ 'asyncrun' : {
             \ 'chars' : '"#%',
@@ -624,10 +623,9 @@ let s:fw = {
             \ 'fg' : ':execute "Leaderf gtags -r " .expand("<cword>")',
             \ }
         \ },
-    \ 'mappings' : {'rg' :[], 'fuzzy' : []}
     \ }
-" s:fw.mappings {{{
-let s:fw.mappings.rg = [
+" s:fw_mappings {{{
+const s:fw_mappings_rg = [
     \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'Fi',  'FI',
     \  'fw',  'fbw',  'ftw',  'fow',  'fpw',  'fW',  'fbW',  'ftW',  'foW',  'fpW',  'Fw',  'FW',
     \  'fs',  'fbs',  'fts',  'fos',  'fps',  'fS',  'fbS',  'ftS',  'foS',  'fpS',  'Fs',  'FS',
@@ -641,21 +639,11 @@ let s:fw.mappings.rg = [
     \ 'fvs', 'fvps', 'fvS',  'fvpS',
     \ 'fv=', 'fvp=', 'fv=',  'fvp=',
     \ ]
-let s:fw.mappings.fuzzy = [
+const s:fw_mappings_fuzzy = [
     \  'Ff',  'FF',  'Fl',  'FL',  'Fh',  'FH',
     \  'ff',  'fF',  'fl',  'fL',  'fh',  'fH',  'fd',  'fg',
     \ 'fpf', 'fpF', 'fpl', 'fpL', 'fph', 'fpH', 'fpd', 'fpg',
     \ ]
-" }}}
-
-" Function: s:fw.unifyPath(path) dict {{{
-function! s:fw.unifyPath(path) dict
-    let l:path = fnamemodify(a:path, ':p')
-    if l:path =~# '[/\\]$'
-        let l:path = strcharpart(l:path, 0, strchars(l:path) - 1)
-    endif
-    return l:path
-endfunction
 " }}}
 
 " Function: s:fw.setEngine(type, engine) dict {{{
@@ -665,10 +653,10 @@ function! s:fw.setEngine(type, engine) dict
 endfunction
 " }}}
 
-" Function: s:fw.exec() dict {{{
-function! s:fw.exec() dict
-    " format: printf('cmd %s %s %s',<opt>,<pat>,<loc>)
-    let l:exec = printf(self.cmd, self.opt, self.pat, self.loc)
+" Function: s:fw.exec(fmt) dict {{{
+function! s:fw.exec(fmt) dict
+    " format: printf('<cmd> %s %s %s',<opt>,<pat>,<loc>)
+    let l:exec = printf(a:fmt.cmd, a:fmt.opt, a:fmt.pat, a:fmt.loc)
     let g:asyncrun_encs="utf-8"
     call SetExecLast(l:exec)
     execute l:exec
@@ -679,6 +667,16 @@ call s:fw.setEngine('rg', 'asyncrun')
 call s:fw.setEngine('fuzzy', 'leaderf')
 " }}}
 
+" Function: s:unifyPath(path) {{{
+function! s:unifyPath(path)
+    let l:path = fnamemodify(a:path, ':p')
+    if l:path =~# '[/\\]$'
+        let l:path = strcharpart(l:path, 0, strchars(l:path) - 1)
+    endif
+    return l:path
+endfunction
+" }}}
+
 " Function: s:getMultiDirs() {{{
 function! s:getMultiDirs()
     let l:loc = Input2Str('Location: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
@@ -687,40 +685,40 @@ function! s:getMultiDirs()
 endfunction
 " }}}
 
-" Function: s:parsePattern(keys, mode) {{{
-function! s:parsePattern(keys, mode)
+" Function: s:parsePattern(km, mode) {{{
+function! s:parsePattern(km, mode)
     let l:pat = ''
     if a:mode ==# 'n'
-        if a:keys =~? 'i'
+        if a:km.E ==? 'i'
             let l:pat = Input2Str('Pattern: ')
-        elseif a:keys =~? '[ws]'
+        elseif a:km.E =~? '[ws]'
             let l:pat = expand('<cword>')
         endif
     elseif a:mode ==# 'v'
         let l:selected = GetSelected()
-        if a:keys =~? 'i'
+        if a:km.E ==? 'i'
             let l:pat = Input2Str('Pattern: ', l:selected)
-        elseif a:keys =~? '[ws]'
+        elseif a:km.E =~? '[ws]'
             let l:pat = l:selected
         endif
     endif
-    if a:keys =~ '='
+    if a:km.E ==# '='
         let l:pat = getreg('+')
     endif
     return l:pat
 endfunction
 " }}}
 
-" Function: s:parseLocation(keys) {{{
-function! s:parseLocation(keys)
+" Function: s:parseLocation(km) {{{
+function! s:parseLocation(km)
     let l:loc = ''
-    if a:keys =~# 'b'
+    if a:km.A0 ==# 'b'
         let l:loc = expand('%:p')
-    elseif a:keys =~# 't'
+    elseif a:km.A0 ==# 't'
         let l:loc = join(popc#layer#buf#GetFiles('sigtab'), '" "')
-    elseif a:keys =~# 'o'
+    elseif a:km.A0 ==# 'o'
         let l:loc = join(popc#layer#buf#GetFiles('alltab'), '" "')
-    elseif a:keys =~# 'p'
+    elseif a:km.A0 ==# 'p'
         let l:loc = join(s:getMultiDirs(), '" "')
     else
         if empty(get(s:ws.fw, 'path', ''))
@@ -732,12 +730,12 @@ function! s:parseLocation(keys)
 endfunction
 " }}}
 
-" Function: s:parseOptions(keys) {{{
-function! s:parseOptions(keys)
+" Function: s:parseOptions(km) {{{
+function! s:parseOptions(km)
     let l:opt = ''
-    if a:keys =~? 's'     | let l:opt .= '-w ' | endif
-    if a:keys =~# '[iws]' | let l:opt .= '-i ' | elseif a:keys =~# '[IWS]' | let l:opt .= '-s ' | endif
-    if a:keys !~# '[btop]'
+    if a:km.E ==? 's'     | let l:opt .= '-w ' | endif
+    if a:km.E =~# '[iws]' | let l:opt .= '-i ' | elseif a:km.E =~# '[IWS]' | let l:opt .= '-s ' | endif
+    if a:km.A1 !~# '[btop]'
         if !empty(s:ws.fw.filters)
             let l:opt .= '-g"*.{' . s:ws.fw.filters . '}" '
         endif
@@ -752,9 +750,9 @@ function! s:parseOptions(keys)
 endfunction
 " }}}
 
-" Function: s:parseCommand(keys) {{{
-function! s:parseCommand(keys)
-    if a:keys =~# 'a'
+" Function: s:parseCommand(km) {{{
+function! s:parseCommand(km)
+    if a:km.A0 ==# 'a'
         let l:cmd = s:fw.engine.sa
     else
         let l:cmd = s:fw.engine.sr
@@ -764,46 +762,48 @@ function! s:parseCommand(keys)
 endfunction
 " }}}
 
-" Function: s:parseVimgrep(keys) {{{
-function! s:parseVimgrep(keys)
+" Function: s:parseVimgrep(km, fmt) {{{
+function! s:parseVimgrep(km, fmt)
     " get options in which %s is the pattern
-    let l:opt = (a:keys =~? 's') ? '\<%s\>' : '%s'
-    let l:opt .= (a:keys =~# '[iws]') ? '\c' : '\C'
-    let s:fw.opt = ''
+    let l:opt = (a:km.E ==? 's') ? '\<%s\>' : '%s'
+    let l:opt .= (a:km.E =~# '[iws]') ? '\c' : '\C'
+    let a:fmt.opt = ''
 
     " get loaction
     let l:loc = '%'
-    if a:keys =~# 'p'
+    if a:km.A1 ==# 'p'
         let l:loc = join(s:getMultiDirs())
-        if empty(l:loc) | return v:false | endif
+        if empty(l:loc)
+            return v:false
+        endif
     endif
-    let s:fw.loc = l:loc
+    let a:fmt.loc = l:loc
 
     " get command
     let s:wsd.fw.str = []
     cgetexpr '[rg by vimgrep]'
-    let s:fw.cmd = printf(':vimgrepadd %%s /%s/j %%s | :botright copen | caddexpr "[Finished]"', l:opt)
+    let a:fmt.cmd = printf(':vimgrepadd %%s /%s/j %%s | :botright copen | caddexpr "[Finished]"', l:opt)
     return v:true
 endfunction
 " }}}
 
-" Function: FindW(keys, mode, [cfg]) {{{ 查找
+" Function: FindW(mode, keys, [cfg]) {{{ 查找
 " {{{
 " @param keys: [fF][av][btop][IiWwSs=]
 "              [%1][%2][%3  ][4%     ]
-" Find: %1
+" Find: %1 = km.S
 "   F : find with inputing args
-" Command: %2
+" Command: %2 = km.A0
 "   '': find with rg by default, see s:fw.engine.sr
 "   a : find with rg append, see s:fw.engine.sa
 "   v : find with vimgrep
-" Location: %3
+" Location: %3 = km.A1
 "   b : find in current buffer(%)
 "   t : find in buffers of tab via popc
 "   o : find in buffers of all tabs via popc
 "   p : find with inputing path
 "  '' : find with s:ws.fw
-" Pattern: %4
+" Pattern: %4 = km.E
 "   = : find text from clipboard
 "   Normal Mode: mode='n'
 "   i : find input
@@ -818,8 +818,14 @@ endfunction
 " @param mode: mapping mode of keys
 " @param cfg: first priority of config
 " }}}
-function! FindW(keys, mode, ...)
-    if a:keys =~# 'F'
+function! FindW(mode, keys, ...)
+    let km = {
+        \ 'S': a:keys[0],
+        \ 'A0': a:keys[1:-2][0],
+        \ 'A1': a:keys[1:-2][-1:-1],
+        \ 'E': a:keys[-1:-1],
+        \ }
+    if km.S ==# 'F'
         " input config
         let l:cfg = extend({'path': '', 'filters': '', 'globlst': '', 'exargs': ''}, s:ws.fw)
         let l:sel = {
@@ -835,32 +841,34 @@ function! FindW(keys, mode, ...)
                 \ 'cmd' : {sopt, sel -> extend(l:cfg, {sopt : sel})},
                 \ 'get' : {sopt -> l:cfg[sopt]},
                 \ },
-            \ 'onCR': {sopt -> call('FindW', ['f' . a:keys[1:-1], a:mode, l:cfg])}
+            \ 'onCR': {sopt -> call('FindW', ['f' . km.A0 . km.A1 . km.E, a:mode, l:cfg])}
             \ }
         call PopSelection(l:sel)
     else
         " save config
         if a:0 > 0
             let s:ws.fw = a:1
-            let s:ws.fw.path = s:fw.unifyPath(s:ws.fw.path)
+            let s:ws.fw.path = s:unifyPath(s:ws.fw.path)
         else
             call extend(s:ws.fw, {'path': '', 'filters': '', 'globlst': '', 'exargs': ''}, 'keep')
         endif
         " find with config
-        let l:pat = s:parsePattern(a:keys, a:mode)
-        if empty(l:pat) | return | endif
-        if a:keys =~# 'v'
-            if !s:parseVimgrep(a:keys) | return | endif
-            let s:fw.pat = l:pat
-        else
-            let s:fw.loc = s:parseLocation(a:keys)
-            if empty(s:fw.loc) | return | endif
-            let s:fw.opt = s:parseOptions(a:keys)
-            let s:fw.cmd = s:parseCommand(a:keys)
-            let s:fw.pat = escape(l:pat, s:fw.engine.chars)
+        let l:pat = s:parsePattern(km, a:mode)
+        if !empty(l:pat)
+            let l:fmt = { 'cmd': '', 'opt': '', 'pat': '', 'loc': '' }
+            if km.A0 ==# 'v'
+                if !s:parseVimgrep(km, l:fmt) | return | endif
+                let l:fmt.pat = l:pat
+            else
+                let l:fmt.loc = s:parseLocation(km)
+                if empty(l:fmt.loc) | return | endif
+                let l:fmt.opt = s:parseOptions(km)
+                let l:fmt.cmd = s:parseCommand(km)
+                let l:fmt.pat = escape(l:pat, s:fw.engine.chars)
+            endif
+            call add(s:wsd.fw.str, printf('/\V\c%s/', escape(l:pat, '\/')))
+            call s:fw.exec(l:fmt)
         endif
-        call add(s:wsd.fw.str, printf('/\V\c%s/', escape(l:pat, '\/')))
-        call s:fw.exec()
     endif
 endfunction
 " }}}
@@ -869,11 +877,11 @@ endfunction
 " {{{
 " @param keys: [fF][p ][fFlLhHdg]
 "              [%1][%2][%3      ]
-" Find: %1
+" Find: %1 = km.S
 "   F : find with inputing path
-" Location: %2
+" Location: %2 = km.A
 "   p : find with inputing temp path
-" Action: %3
+" Action: %3 = km.E
 "   f : fuzzy files
 "   F : fuzzy files with <cword>
 "   l : fuzzy line text with <cword>
@@ -884,8 +892,13 @@ endfunction
 "   g : fuzzy gtags references with <cword>
 " }}}
 function! FindWFuzzy(keys)
-    let l:f = (a:keys[0] ==# 'F') ? 1 : 0
-    let l:p = (a:keys[1] ==# 'p') ? 1 : 0
+    let km = {
+        \ 'S': a:keys[0],
+        \ 'A': a:keys[1:-2],
+        \ 'E': a:keys[-1:-1],
+        \ }
+    let l:f = (km.S ==# 'F') ? 1 : 0
+    let l:p = (km.A ==# 'p') ? 1 : 0
     let l:path = get(s:ws.fw, 'path', '')
 
     if !l:f && !l:p && empty(l:path)
@@ -899,11 +912,11 @@ function! FindWFuzzy(keys)
         endif
     endif
     if l:f
-        let s:ws.fw.path = s:fw.unifyPath(l:path)
+        let s:ws.fw.path = s:unifyPath(l:path)
     endif
 
     if !empty(l:path)
-        let l:exec = printf(":lcd %s | %s", l:path, s:fw.engine[tolower(a:keys[0]) . a:keys[-1:]])
+        let l:exec = printf(":lcd %s | %s", l:path, s:fw.engine['f' . km.E])
         call SetExecLast(l:exec)
         execute l:exec
     endif
@@ -911,12 +924,18 @@ endfunction
 " }}}
 
 let FindWKill = function('execute', [s:fw.engine.sk])
-let FindWSetFuzzy = function('popset#set#PopSelection', [s:fw.engine['sel-fuzzy']])
-for key in s:fw.mappings.rg
-    execute printf('nnoremap <leader>%s :call FindW("%s", "n")<CR>', key, key)
-    execute printf('vnoremap <leader>%s :call FindW("%s", "v")<CR>', key, key)
+let FindWSetFuzzy = function('popset#set#PopSelection',
+    \ [{
+        \ 'opt' : 'select fuzzy engine',
+        \ 'lst' : ['fzf', 'leaderf'],
+        \ 'cmd' : {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
+        \ 'get' : {sopt -> s:fw.engine.fuzzy},
+    \ }])
+for key in s:fw_mappings_rg
+    execute printf('nnoremap <leader>%s :call FindW("n", "%s")<CR>', key, key)
+    execute printf('vnoremap <leader>%s :call FindW("v", "%s")<CR>', key, key)
 endfor
-for key in s:fw.mappings.fuzzy
+for key in s:fw_mappings_fuzzy
     execute printf('nnoremap <leader>%s :call FindWFuzzy("%s")<CR>', key, key)
 endfor
 nnoremap <leader>fk :call FindWKill()<CR>
