@@ -1,14 +1,4 @@
 
-## Consolas For Powerline
-
-### **Introduction:**
-For windows, `Consolas For Powerline` work nice with `Microsoft YaHei Mono` in vim.
-(`Consolas For Powerline` is based on [consolas v5.33](https://en.wikipedia.org/wiki/Consolas))
-
-![example](./example.png)
-
-For unix/linux, [DejaVu Sans Mono For Powerline](https://github.com/powerline/fonts/tree/master/DejaVuSansMono) is recommended.
-
 ### **Characters:**
 
 | Codepoint  | Character                |
