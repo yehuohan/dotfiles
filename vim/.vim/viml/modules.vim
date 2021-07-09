@@ -595,6 +595,12 @@ endfor
 " @attribute fuzzy: 预置的模糊搜索命令，用于文件和文本等模糊搜索
 let s:fw = {
     \ 'engine' : { 'rg' : '', 'fuzzy' : '' },
+    \ 'selfuzzy' : {
+        \ 'opt' : 'select fuzzy engine',
+        \ 'lst' : ['fzf', 'leaderf'],
+        \ 'cmd' : {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
+        \ 'get' : {sopt -> s:fw.engine.fuzzy},
+    \ },
     \ 'rg' : {
         \ 'asyncrun' : {
             \ 'chars' : '"#%',
@@ -924,13 +930,7 @@ endfunction
 " }}}
 
 let FindWKill = function('execute', [s:fw.engine.sk])
-let FindWSetFuzzy = function('popset#set#PopSelection',
-    \ [{
-        \ 'opt' : 'select fuzzy engine',
-        \ 'lst' : ['fzf', 'leaderf'],
-        \ 'cmd' : {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
-        \ 'get' : {sopt -> s:fw.engine.fuzzy},
-    \ }])
+let FindWSetFuzzy = function('popset#set#PopSelection', [s:fw.selfuzzy])
 for key in s:fw_mappings_rg
     execute printf('nnoremap <leader>%s :call FindW("n", "%s")<CR>', key, key)
     execute printf('vnoremap <leader>%s :call FindW("v", "%s")<CR>', key, key)
@@ -978,7 +978,7 @@ let s:rs = {
                 \ },
             \ 'copyConfig' : {
                 \ 'dsr' : 'copy config file',
-                \ 'lst' : ['.ycm_extra_conf.py', 'pyrightconfig.json', '.vimspector.json'],
+                \ 'lst' : ['.ycm_extra_conf.py', '.clang-format', 'pyrightconfig.json', '.vimspector.json'],
                 \ 'cmd' : {sopt, arg -> execute('edit ' . s:rs.fns.copyConfig(arg))},
                 \ },
             \ },
