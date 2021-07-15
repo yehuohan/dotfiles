@@ -1002,7 +1002,7 @@ if IsWin()
 else
     " 需要安装 https://github.com/Rykka/instant-rst.py
     nnoremap <silent> <leader>vr
-        \ :echo g:_instant_rst_daemon_started ? 'CLose rst' : 'Open rst'<Bar>
+        \ :echo g:_instant_rst_daemon_started ? 'Close rst' : 'Open rst'<Bar>
         \ :execute g:_instant_rst_daemon_started ? 'StopInstantRst' : 'InstantRst'<CR>
 endif
 " }}}
