@@ -1,6 +1,5 @@
 local fn = vim.fn
 local map = vim.api.nvim_set_keymap
-local ostype = require('ostype')
 local use = require('use').use
 
 
@@ -8,7 +7,7 @@ local use = require('use').use
 local gui_fontsize = 12
 local gui_font = ''
 local gui_fontwide = ''
-if ostype.is_win() then
+if IsWin() then
     if use.powerfont
     then gui_font = 'Consolas For Powerline'
     else gui_font = 'Consolas'

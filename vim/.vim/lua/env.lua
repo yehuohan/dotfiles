@@ -1,5 +1,4 @@
 local fn = vim.fn
-local ostype = require('ostype')
 
 local env = {
     ['local'] = {
@@ -14,7 +13,7 @@ local env = {
 
 local function env_init()
     local sep = ''
-    if ostype.is_win() then
+    if IsWin() then
         sep = ';'
         -- For .ycm_extra_conf.py
         vim.env.VPathPython = vim.env.APPS_HOME .. '/Python'

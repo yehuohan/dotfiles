@@ -154,7 +154,7 @@ call plug#end()
     let g:EasyMotion_do_mapping = 0     " 禁止默认map
     let g:EasyMotion_smartcase = 1      " 不区分大小写
     nmap s <Plug>(easymotion-overwin-f)
-    nmap <leader>ms <Plug>(easymotion-sn)
+    nmap <leader>ms <Plug>(easymotion-overwin-f2)
     nmap <leader>j <Plug>(easymotion-bd-jk)
     nmap <leader>k <Plug>(easymotion-overwin-line)
     nmap <leader>mw <Plug>(easymotion-bd-w)
