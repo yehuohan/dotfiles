@@ -7,6 +7,7 @@ fi
 
 # .vim
 cp    ~/dotconfigs/vim/.vim/.init.vim   ~/.vim/
+cp    ~/dotconfigs/vim/.vim/.init.lua   ~/.vim/
 cp -r ~/dotconfigs/vim/.vim/*           ~/.vim/
 
 # nvim
