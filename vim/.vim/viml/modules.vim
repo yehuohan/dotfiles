@@ -1102,8 +1102,9 @@ nnoremap <silent> <leader>sf
 function! QuickfixOps(keys)
     let l:type = a:keys[0]
     let l:oprt = a:keys[1]
-    if l:oprt ==# 'o'
-        execute 'botright ' . l:type . 'open'
+    if l:oprt ==? 'o'
+        let l:pos = (l:oprt ==# 'O') ? 'vertical ' : ''
+        execute l:pos . 'botright ' . l:type . 'open'
     elseif l:oprt ==# 'c'
         if &filetype ==#'qf'
             wincmd p
@@ -1199,12 +1200,14 @@ endfunction
 " }}}
 
 nnoremap <leader>qo :call QuickfixOps('co')<CR>
+nnoremap <leader>qO :call QuickfixOps('cO')<CR>
 nnoremap <leader>qc :call QuickfixOps('cc')<CR>
 nnoremap <leader>qj :call QuickfixOps('cj')<CR>
 nnoremap <leader>qJ :call QuickfixOps('cJ')<CR>
 nnoremap <leader>qk :call QuickfixOps('ck')<CR>
 nnoremap <leader>qK :call QuickfixOps('cK')<CR>
 nnoremap <leader>lo :call QuickfixOps('lo')<CR>
+nnoremap <leader>lO :call QuickfixOps('lO')<CR>
 nnoremap <leader>lc :call QuickfixOps('lc')<CR>
 nnoremap <leader>lj :call QuickfixOps('lj')<CR>
 nnoremap <leader>lJ :call QuickfixOps('lJ')<CR>
