@@ -847,7 +847,7 @@ function! FindW(mode, keys, ...)
                 \ 'cmd' : {sopt, sel -> extend(l:cfg, {sopt : sel})},
                 \ 'get' : {sopt -> l:cfg[sopt]},
                 \ },
-            \ 'onCR': {sopt -> call('FindW', ['f' . km.A0 . km.A1 . km.E, a:mode, l:cfg])}
+            \ 'onCR': {sopt -> call('FindW', [a:mode, 'f' . km.A0 . km.A1 . km.E, l:cfg])}
             \ }
         call PopSelection(l:sel)
     else
