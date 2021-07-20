@@ -771,7 +771,7 @@ if s:use.coc
     nnoremap <silent> <leader>oy :<C-u>CocList --normal yank<CR>
     nnoremap <silent> <leader>oe :CocCommand explorer<CR>
     nmap <leader>oc <Plug>(coc-calc-result-append)
-    hi default link CocMenuSel CursorLineNr
+    highlight default link CocMenuSel CursorLineNr
 endif
 " }}}
 
@@ -883,8 +883,8 @@ endif
 " illuminate {{{ 自动高亮
     let g:Illuminate_delay = 250
     let g:Illuminate_ftblacklist = ['nerdtree', 'tagbar', 'coc-explorer']
-    highlight link illuminatedWord MatchParen
     nnoremap <leader>tg :IlluminationToggle<CR>
+    highlight link illuminatedWord MatchParen
 " }}}
 
 " colorizer {{{ 颜色预览
@@ -930,7 +930,7 @@ endif
     tnoremap <M-l> <C-\><C-n>:FloatermUpdate --position=topright<CR>
     tnoremap <M-c> <C-\><C-n>:FloatermUpdate --position=center<CR>
     nnoremap <leader>mf :FloatermNew lf<CR>
-    highlight default link FloatermBorder Normal
+    highlight default link FloatermBorder Constant
 " }}}
 
 " vimspector {{{ 调试
@@ -1057,6 +1057,7 @@ endif
     vnoremap <silent> <leader><leader>t
         \ :call feedkeys(':TranslateW ' . GetSelected(), 'n')<CR>
     nnoremap <leader>tj :call translator#ui#try_jump_into()<CR>
+	highlight default link TranslatorBorder Constant
 " }}}
 
 " im-select {{{ 输入法
