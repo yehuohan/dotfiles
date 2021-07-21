@@ -127,6 +127,7 @@ endif
     Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
     Plug 'rust-lang/rust.vim'
     Plug 'tikhomirov/vim-glsl'
+    Plug 'beyondmarc/hlsl.vim', {'for': 'hlsl'}
     Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
     " utils
 if s:use.utils
@@ -492,22 +493,20 @@ endif
         \ }
     let g:Popc_useTabline = 1
     let g:Popc_useStatusline = 1
-    let g:Popc_usePowerFont = 1
+    let g:Popc_usePowerFont = s:use.powerfont
 if s:use.powerfont
     let g:Popc_selectPointer = ''
     let g:Popc_separator = {'left' : '', 'right': ''}
     let g:Popc_subSeparator = {'left' : '', 'right': ''}
-else
-    let g:Popc_selectPointer = '►'
-    let g:Popc_separator = {'left' : '', 'right': ''}
-    let g:Popc_subSeparator = {'left' : '│', 'right': '│'}
 endif
     let g:Popc_useLayerPath = 0
     let g:Popc_useLayerRoots = ['.popc', '.git', '.svn', '.hg', 'tags', '.LfGtags']
     let g:Popc_enableLog = 1
     nnoremap <leader><leader>h :PopcBuffer<CR>
-    nnoremap <M-i> :PopcBufferSwitchLeft<CR>
-    nnoremap <M-o> :PopcBufferSwitchRight<CR>
+    nnoremap <M-u> :PopcBufferSwitchTabLeft!<CR>
+    nnoremap <M-p> :PopcBufferSwitchTabRight!<CR>
+    nnoremap <M-i> :PopcBufferSwitchLeft!<CR>
+    nnoremap <M-o> :PopcBufferSwitchRight!<CR>
     nnoremap <C-i> :PopcBufferJumpPrev<CR>
     nnoremap <C-o> :PopcBufferJumpNext<CR>
     nnoremap <C-h> <C-o>

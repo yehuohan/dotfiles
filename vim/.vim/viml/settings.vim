@@ -91,14 +91,15 @@ endfunction
 
 augroup UserSettingsCmd
     autocmd!
-    autocmd BufNewFile *                set fileformat=unix
-    autocmd BufRead,BufNewFile *.tex    set filetype=tex
-    autocmd BufRead,BufNewFile *.log    set filetype=log
-    autocmd Filetype vim,tex            setlocal foldmethod=marker
-    autocmd Filetype c,cpp,javascript   setlocal foldmethod=syntax
-    autocmd Filetype python             setlocal foldmethod=indent
-    autocmd FileType txt,log            setlocal foldmethod=manual
-    autocmd BufReadPre *                call s:onLargeFile()
+    autocmd BufNewFile *                    set fileformat=unix
+    autocmd BufRead,BufNewFile *.tex        set filetype=tex
+    autocmd BufRead,BufNewFile *.log        set filetype=log
+    autocmd BufRead,BufNewFile *.usf,*ush   set filetype=hlsl
+    autocmd Filetype vim,tex                setlocal foldmethod=marker
+    autocmd Filetype c,cpp,javascript       setlocal foldmethod=syntax
+    autocmd Filetype python                 setlocal foldmethod=indent
+    autocmd FileType txt,log                setlocal foldmethod=manual
+    autocmd BufReadPre * call s:onLargeFile()
 augroup END
 " }}}
 
@@ -290,9 +291,9 @@ endif
 " }}}
 
 " Tab, Buffer, Window {{{
-    " tab切换
-    nnoremap <M-u> gT
-    nnoremap <M-p> gt
+    " tab切换(使用Popc的tab切换)
+    "nnoremap <M-u> gT
+    "nnoremap <M-p> gt
     " buffer切换
     nnoremap <leader>bn :bnext<CR>
     nnoremap <leader>bp :bprevious<CR>
