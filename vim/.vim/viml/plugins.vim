@@ -36,7 +36,11 @@ endfunction
 " Plug {{{
 call plug#begin($DotVimPath.'/bundle')  " 设置插件位置，且自动设置了syntax enable和filetype plugin indent on
     " editing
+if IsVim()
     Plug 'yehuohan/vim-easymotion'
+else
+    Plug 'phaazon/hop.nvim'
+endif
     Plug 'haya14busa/incsearch.vim'
     Plug 'haya14busa/incsearch-fuzzy.vim'
     Plug 'rhysd/clever-f.vim'
@@ -150,7 +154,8 @@ call plug#end()
 " }}}
 
 " Editing {{{
-" easy-motion {{{ 快速跳转
+" hop, easy-motion {{{ 快速跳转
+if IsVim()
     let g:EasyMotion_dict = 'zh-cn'     " 支持简体中文拼音
     let g:EasyMotion_do_mapping = 0     " 禁止默认map
     let g:EasyMotion_smartcase = 1      " 不区分大小写
@@ -160,6 +165,14 @@ call plug#end()
     nmap <leader>k <Plug>(easymotion-overwin-line)
     nmap <leader>mw <Plug>(easymotion-bd-w)
     nmap <leader>me <Plug>(easymotion-bd-e)
+else
+    nnoremap <silent> s :HopChar1<CR>
+    nnoremap <silent> <leader>ms :HopPattern<CR>
+    nnoremap <silent> <leader>j :HopLineStart<CR>
+    nnoremap <silent> <leader>k :HopLine<CR>
+    nnoremap <silent> <leader>mw :HopWord<CR>
+    lua require'hop'.setup({ dict_list = { 'zh_sc' }, create_hl_autocmd = true })
+endif
     nnoremap <silent><expr>  z/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/'}))
     nnoremap <silent><expr> zg/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/', 'is_stay': 1}))
 " }}}
