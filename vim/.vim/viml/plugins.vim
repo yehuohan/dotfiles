@@ -160,18 +160,18 @@ if IsVim()
     let g:EasyMotion_do_mapping = 0     " 禁止默认map
     let g:EasyMotion_smartcase = 1      " 不区分大小写
     nmap s <Plug>(easymotion-overwin-f)
-    nmap <leader>ms <Plug>(easymotion-overwin-f2)
+    nmap S <Plug>(easymotion-overwin-f2)
     nmap <leader>j <Plug>(easymotion-bd-jk)
     nmap <leader>k <Plug>(easymotion-overwin-line)
     nmap <leader>mw <Plug>(easymotion-bd-w)
     nmap <leader>me <Plug>(easymotion-bd-e)
 else
     lua require'hop'.setup({ dict_list = { 'zh_sc' }, create_hl_autocmd = true })
-    nnoremap <silent> s :HopChar1<CR>
-    nnoremap <silent> <leader>ms :HopPattern<CR>
-    nnoremap <silent> <leader>j :HopLineStart<CR>
-    nnoremap <silent> <leader>k :HopLine<CR>
-    nnoremap <silent> <leader>mw :HopWord<CR>
+    noremap s <Cmd>HopChar1<CR>
+    noremap S <Cmd>HopPattern<CR>
+    noremap <leader>j <Cmd>HopLineStart<CR>
+    noremap <leader>k <Cmd>HopLine<CR>
+    noremap <leader>mw <Cmd>HopWord<CR>
 endif
     nnoremap <silent><expr>  z/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/'}))
     nnoremap <silent><expr> zg/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/', 'is_stay': 1}))
@@ -249,17 +249,15 @@ endif
     let g:smoothie_no_default_mappings = v:true
     let g:smoothie_update_interval = 30
     let g:smoothie_base_speed = 20
-    nmap <silent> <M-n> <Plug>(SmoothieDownwards)
-    nmap <silent> <M-m> <Plug>(SmoothieUpwards)
-    nmap <silent> <M-j> <Plug>(SmoothieForwards)
-    nmap <silent> <M-k> <Plug>(SmoothieBackwards)
+    nmap <M-n> <Plug>(SmoothieDownwards)
+    nmap <M-m> <Plug>(SmoothieUpwards)
+    nmap <M-j> <Plug>(SmoothieForwards)
+    nmap <M-k> <Plug>(SmoothieBackwards)
 " }}}
 
 " expand-region {{{ 快速块选择
-    nmap <C-p> <Plug>(expand_region_expand)
-    vmap <C-p> <Plug>(expand_region_expand)
-    nmap <C-u> <Plug>(expand_region_shrink)
-    vmap <C-u> <Plug>(expand_region_shrink)
+    map <C-p> <Plug>(expand_region_expand)
+    map <C-u> <Plug>(expand_region_shrink)
 " }}}
 
 " textobj-user {{{ 文本对象
@@ -270,14 +268,14 @@ endif
     omap iI <Plug>(textobj-indent-i)
     omap ai <Plug>(textobj-indent-same-a)
     omap ii <Plug>(textobj-indent-same-i)
-    vmap aI <Plug>(textobj-indent-a)
-    vmap iI <Plug>(textobj-indent-i)
-    vmap ai <Plug>(textobj-indent-same-a)
-    vmap ii <Plug>(textobj-indent-same-i)
+    xmap aI <Plug>(textobj-indent-a)
+    xmap iI <Plug>(textobj-indent-i)
+    xmap ai <Plug>(textobj-indent-same-a)
+    xmap ii <Plug>(textobj-indent-same-i)
     omap au <Plug>(textobj-underscore-a)
     omap iu <Plug>(textobj-underscore-i)
-    vmap au <Plug>(textobj-underscore-a)
-    vmap iu <Plug>(textobj-underscore-i)
+    xmap au <Plug>(textobj-underscore-a)
+    xmap iu <Plug>(textobj-underscore-i)
     nnoremap <leader>tv :call Plug_to_motion('v')<CR>
     nnoremap <leader>tV :call Plug_to_motion('V')<CR>
     nnoremap <leader>td :call Plug_to_motion('d')<CR>
@@ -830,8 +828,7 @@ endif
     let g:neoformat_enabled_cpp = ['astyle']
     let g:neoformat_enabled_java = ['astyle']
     let g:neoformat_enabled_python = ['autopep8']
-    nnoremap <leader>fc :Neoformat<CR>
-    vnoremap <leader>fc :Neoformat<CR>
+    noremap <leader>fc :Neoformat<CR>
 " }}}
 
 " auto-pairs {{{ 自动括号
@@ -885,12 +882,9 @@ endif
 " }}}
 
 " quickhl {{{ 单词高亮
-    nmap <leader>hw <Plug>(quickhl-manual-this)
-    xmap <leader>hw <Plug>(quickhl-manual-this)
-    nmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
-    xmap <leader>hs <Plug>(quickhl-manual-this-whole-word)
-    nmap <leader>hc <Plug>(quickhl-manual-clear)
-    xmap <leader>hc <Plug>(quickhl-manual-clear)
+    map <leader>hw <Plug>(quickhl-manual-this)
+    map <leader>hs <Plug>(quickhl-manual-this-whole-word)
+    map <leader>hc <Plug>(quickhl-manual-clear)
     nmap <leader>hr <Plug>(quickhl-manual-reset)
     nmap <leader>th <Plug>(quickhl-manual-toggle)
 " }}}
@@ -1045,8 +1039,7 @@ endif
 " open-browser {{{ 在线搜索
     let g:openbrowser_default_search = 'bing'
     let g:openbrowser_search_engines = {'bing' : 'https://bing.com/search?q={query}'}
-    nmap <leader>bs <Plug>(openbrowser-smart-search)
-    vmap <leader>bs <Plug>(openbrowser-smart-search)
+    map <leader>bs <Plug>(openbrowser-smart-search)
     nnoremap <leader>big :OpenBrowserSearch -google<Space>
     nnoremap <leader>bib :OpenBrowserSearch -bing<Space>
     nnoremap <leader>bih :OpenBrowserSearch -github<Space>
@@ -1071,8 +1064,8 @@ endif
 
 " translator {{{ 翻译
     let g:translator_default_engines = ['haici', 'youdao']
-    nmap <leader>tw <Plug>TranslateW
-    vmap <leader>tw <Plug>TranslateWV
+    nmap <Leader>tw <Plug>TranslateW
+    vmap <Leader>tw <Plug>TranslateWV
     nnoremap <leader><leader>t :TranslateW<Space>
     vnoremap <leader><leader>t
         \ <Cmd>call feedkeys(':TranslateW ' . GetSelected(' '), 'n')<CR>

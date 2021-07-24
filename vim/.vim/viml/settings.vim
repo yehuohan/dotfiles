@@ -235,9 +235,8 @@ function! s:NVimQt_setGui()
         GuiTabline 0
         GuiPopupmenu 0
         call GuiAdjustFontSize(0)
-        nnoremap <RightMouse> <Cmd>call GuiShowContextMenu()<CR>
+        noremap <RightMouse> <Cmd>call GuiShowContextMenu()<CR>
         inoremap <RightMouse> <Cmd>call GuiShowContextMenu()<CR>
-        vnoremap <RightMouse> <Cmd>call GuiShowContextMenu()<CR>
         nnoremap <leader>tf <Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
         nnoremap <leader>tm <Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>
     endif
@@ -264,28 +263,20 @@ nnoremap <S-u> <C-r>
 nnoremap > >>
 nnoremap < <<
 " 加减序号
-nnoremap <leader>aj <C-x>
-nnoremap <leader>ak <C-a>
-vnoremap <leader>aj <C-x>
-vnoremap <leader>ak <C-a>
+noremap <leader>aj <C-x>
+noremap <leader>ak <C-a>
 vnoremap <leader>agj g<C-x>
 vnoremap <leader>agk g<C-a>
 " 大小写切换
-nnoremap <leader>u ~
-vnoremap <leader>u ~
+noremap <leader>u ~
 " 匹配符跳转
 packadd matchit
-nmap <S-s> %
-vmap <S-s> %
+map <S-m> %
 " 行移动
-nnoremap j gj
-vnoremap j gj
-nnoremap k gk
-vnoremap k gk
-nnoremap <S-l> $
-nnoremap <S-h> ^
-vnoremap <S-l> $
-vnoremap <S-h> ^
+noremap j gj
+noremap k gk
+noremap <S-l> $
+noremap <S-h> ^
 " 折叠
 nnoremap <leader>za zA
 nnoremap <leader>zc zC
@@ -364,8 +355,9 @@ inoremap <C-v> <Esc>"+pi
 " 使用i-C-a代替i-C-v
 inoremap <C-a> <C-v>
 " 矩形选择
-nnoremap vv <C-v>
-vnoremap vv <C-v>
+noremap vv <C-v>
+xnoremap <C-g> <C-g><Cmd>echo 'mode: ' . string(mode(1))<CR>
+snoremap <C-g> <C-g><Cmd>echo 'mode: ' . string(mode(1))<CR>
 
 for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
     " 寄存器快速复制与粘贴
