@@ -7,7 +7,11 @@ endfunction
 function! GetSelected()
     let l:reg_var = getreg('0', 1)
     let l:reg_mode = getregtype('0')
-    normal! gv"0y
+    if mode() ==# 'n'
+        normal! gv"0y
+    else
+        normal! "0y
+    endif
     let l:word = getreg('0')
     call setreg('0', l:reg_var, l:reg_mode)
     return l:word
@@ -165,18 +169,20 @@ function! ExecMacro(key)
 endfunction
 " }}}
 
-nnoremap <Plug>ExecLast :call ExecLast(1)<CR>
-nnoremap <leader>. :call ExecLast(1)<CR>
+nnoremap <Plug>ExecLast    :call ExecLast(1)<CR>
+nnoremap <leader>.         :call ExecLast(1)<CR>
 nnoremap <leader><leader>. :call ExecLast(0)<CR>
 nnoremap <M-;> @:
-vnoremap <silent> <leader><leader>;
-    \ :call feedkeys(':' . GetSelected(), 'n')<CR>
-nnoremap <silent> <leader>ae
-    \ :call Input2Fn(['Command: ', '', 'command'], {str -> append(line('.'), GetEval(str, 'command'))})<CR>
-nnoremap <silent> <leader>af
-    \ :call Input2Fn(['Function: ', '', 'function'], {str -> append(line('.'), GetEval(str, 'function'))})<CR>
-vnoremap <silent> <leader>ae :call append(line('.'), GetEval(GetSelected(), 'command'))<CR>
-vnoremap <silent> <leader>af :call append(line('.'), GetEval(GetSelected(), 'function'))<CR>
+vnoremap <leader><leader>;
+    \ <Cmd>call feedkeys(':' . GetSelected(), 'n')<CR>
+nnoremap <leader>ae
+    \ <Cmd>call Input2Fn(['Command: ', '', 'command'], {str -> append(line('.'), GetEval(str, 'command'))})<CR>
+nnoremap <leader>af
+    \ <Cmd>call Input2Fn(['Function: ', '', 'function'], {str -> append(line('.'), GetEval(str, 'function'))})<CR>
+vnoremap <leader>ae
+    \ <Cmd>call append(line('.'), GetEval(GetSelected(), 'command'))<CR>
+vnoremap <leader>af
+    \ <Cmd>call append(line('.'), GetEval(GetSelected(), 'function'))<CR>
 " }}}
 
 " Workspace {{{
@@ -1077,10 +1083,10 @@ endfunction
 
 let RunScript = function('popset#set#PopSelection', [s:rs.sel])
 nnoremap <leader>se :call RunScript()<CR>
-nnoremap <silent> <leader>ei
-    \ :call Input2Fn(['Suffix: '], 'FnEditFile', 0)<CR>
-nnoremap <silent> <leader>eti
-    \ :call Input2Fn(['Suffix: '], 'FnEditFile', 1)<CR>
+nnoremap <leader>ei
+    \ <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 0)<CR>
+nnoremap <leader>eti
+    \ <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 1)<CR>
 nnoremap <leader>ec  :call FnEditFile('c', 0)<CR>
 nnoremap <leader>etc :call FnEditFile('c', 1)<CR>
 nnoremap <leader>ea  :call FnEditFile('cpp', 0)<CR>
@@ -1089,12 +1095,12 @@ nnoremap <leader>er  :call FnEditFile('rs', 0)<CR>
 nnoremap <leader>etr :call FnEditFile('rs', 1)<CR>
 nnoremap <leader>ep  :call FnEditFile('py', 0)<CR>
 nnoremap <leader>etp :call FnEditFile('py', 1)<CR>
-nnoremap <silent> <leader>eh :call Input2Fn(['Divide H: '], 'FnInsertSpace', 'h')<CR>
-nnoremap <silent> <leader>eb :call Input2Fn(['Divide B: '], 'FnInsertSpace', 'b')<CR>
-nnoremap <silent> <leader>el :call Input2Fn(['Divide L: '], 'FnInsertSpace', 'l')<CR>
-nnoremap <silent> <leader>ed :call Input2Fn(['Divide D: '], 'FnInsertSpace', 'd')<CR>
-nnoremap <silent> <leader>sf
-    \ :call FnSwitchFile({'lhs': ['c', 'cc', 'cpp', 'cxx'], 'rhs': ['h', 'hh', 'hpp', 'hxx']})<CR>
+nnoremap <leader>eh <Cmd>call Input2Fn(['Divide H: '], 'FnInsertSpace', 'h')<CR>
+nnoremap <leader>eb <Cmd>call Input2Fn(['Divide B: '], 'FnInsertSpace', 'b')<CR>
+nnoremap <leader>el <Cmd>call Input2Fn(['Divide L: '], 'FnInsertSpace', 'l')<CR>
+nnoremap <leader>ed <Cmd>call Input2Fn(['Divide D: '], 'FnInsertSpace', 'd')<CR>
+nnoremap <leader>sf
+    \ <Cmd>call FnSwitchFile({'lhs': ['c', 'cc', 'cpp', 'cxx'], 'rhs': ['h', 'hh', 'hpp', 'hxx']})<CR>
 " }}}
 
 " Quickfix {{{
@@ -1218,8 +1224,9 @@ nnoremap <leader>qt :call QuickfixTabEdit()<CR>
 nnoremap <leader>qi :call QuickfixIconv()<CR>
 " 将quickfix中的内容复制location-list
 nnoremap <leader>ql
-    \ :call setloclist(0, getqflist())<Bar>
-    \ :vertical botright lopen 35<CR>
+    \ <Cmd>
+    \ call setloclist(0, getqflist())<Bar>
+    \ vertical botright lopen 35<CR>
 " }}}
 
 " Options {{{

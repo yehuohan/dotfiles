@@ -130,7 +130,8 @@ if IsVim() && has('gui_running')
     set linespace=0
     call GuiAdjustFontSize(0)
     if IsWin()
-        nnoremap <leader>tf :call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)<CR>
+        nnoremap <leader>tf
+            \ <Cmd>call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)<CR>
     endif
 endif
 " }}}
@@ -152,11 +153,11 @@ function! s:NVimQt_setGui()
         GuiTabline 0
         GuiPopupmenu 0
         call GuiAdjustFontSize(0)
-        nnoremap <RightMouse> :call GuiShowContextMenu()<CR>
-        inoremap <RightMouse> <Esc>:call GuiShowContextMenu()<CR>
-        vnoremap <RightMouse> :call GuiShowContextMenu()<CR>gv
-        nnoremap <leader>tf :call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
-        nnoremap <leader>tm :call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>
+        nnoremap <RightMouse> <Cmd>call GuiShowContextMenu()<CR>
+        inoremap <RightMouse> <Cmd>call GuiShowContextMenu()<CR>
+        vnoremap <RightMouse> <Cmd>call GuiShowContextMenu()<CR>
+        nnoremap <leader>tf <Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
+        nnoremap <leader>tm <Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>
     endif
 endfunction
 " }}}
@@ -234,12 +235,12 @@ endif
     cnoremap <M-i> <C-b>
     cnoremap <M-o> <C-e>
     " 排序
-    nnoremap <silent> <leader><leader>s :call feedkeys(':sort nr /', 'n')<CR>
-    nnoremap <silent> <leader><leader>S :call feedkeys(':sort! nr /', 'n')<CR>
-    vnoremap <silent> <leader><leader>s
-        \ :call feedkeys(printf(':sort nr /\%%>%dc.*\%%<%dc/', getpos("'<")[2]-1, getpos("'>")[2]+1), 'n')<CR>
-    vnoremap <silent> <leader><leader>S
-        \ :call feedkeys(printf(':sort! nr /\%%>%dc.*\%%<%dc/', getpos("'<")[2]-1, getpos("'>")[2]+1), 'n')<CR>
+    nnoremap <leader><leader>s <Cmd>call feedkeys(':sort nr /', 'n')<CR>
+    nnoremap <leader><leader>S <Cmd>call feedkeys(':sort! nr /', 'n')<CR>
+    vnoremap <leader><leader>s
+        \ <Cmd>call feedkeys(printf(':sort nr /\%%>%dc.*\%%<%dc/', getpos("'<")[2]-1, getpos("'>")[2]+1), 'n')<CR>
+    vnoremap <leader><leader>S
+        \ <Cmd>call feedkeys(printf(':sort! nr /\%%>%dc.*\%%<%dc/', getpos("'<")[2]-1, getpos("'>")[2]+1), 'n')<CR>
     " HEX编辑
     nnoremap <leader>xx :%!xxd<CR>
     nnoremap <leader>xr :%!xxd -r<CR>
@@ -247,10 +248,9 @@ endif
     nnoremap <leader><leader>u :lua print(
     nnoremap <leader><leader>U :lua print(vim.inspect(
     " 查看help文档
-    nnoremap <silent> <leader><leader>k
-        \ :call feedkeys(':h ' . expand('<cword>'), 'n')<CR>
-    vnoremap <silent> <leader><leader>k
-        \ :call feedkeys(':h ' . GetSelected(), 'n')<CR>
+    nnoremap <leader><leader>k :h <C-r><C-w>
+    vnoremap <leader><leader>k
+        \ <Cmd>call feedkeys(':h ' . GetSelected(), 'n')<CR>
 " }}}
 
 " Copy & Paste {{{
@@ -259,12 +259,14 @@ endif
     nnoremap yH y^
     " yank & put
     vnoremap <leader>y ygv
-    nnoremap <silent> ya
-        \ :<C-U>execute 'let @0 .= join(getline(line("."), line(".") + v:count), "\n") . "\n"'<Bar>
-        \ :echo v:count1 . ' lines append'<CR>
-    nnoremap <silent> yd
-        \ dd<Bar>:execute 'let @0 .= @"'<Bar>
-        \ :echo 'deleted lines append'<CR>
+    nnoremap ya
+        \ <Cmd>
+        \ execute 'let @0 .= join(getline(line("."), line(".") + v:count), "\n") . "\n"'<Bar>
+        \ echo v:count1 . ' lines append'<CR>
+    nnoremap yd
+        \ dd<Cmd>
+        \ execute 'let @0 .= @"'<Bar>
+        \ echo 'deleted lines append'<CR>
     nnoremap <leader>p "0p
     nnoremap <leader>P "0P
     " ctrl-c & ctrl-v
@@ -331,36 +333,36 @@ endif
 " }}}
 
 " Diff {{{
-    nnoremap <silent> <leader>ds
-        \ :call Input2Fn(['File: ', '', 'file', expand('%:p:h')], {filename -> execute('diffsplit ' . filename)})<CR>
-    nnoremap <silent> <leader>dv
-        \ :call Input2Fn(['File: ', '', 'file', expand('%:p:h')], {filename -> execute('vertical diffsplit ' . filename)})<CR>
+    nnoremap <leader>ds
+        \ <Cmd>call Input2Fn(['File: ', '', 'file', expand('%:p:h')], {filename -> execute('diffsplit ' . filename)})<CR>
+    nnoremap <leader>dv
+        \ <Cmd>call Input2Fn(['File: ', '', 'file', expand('%:p:h')], {filename -> execute('vertical diffsplit ' . filename)})<CR>
     " 比较当前文件（已经分屏）
     nnoremap <leader>dt :diffthis<CR>
     nnoremap <leader>do :diffoff<CR>
     nnoremap <leader>du :diffupdate<CR>
     nnoremap <leader>dp
-        \ :<C-U>execute '.,+' . string(v:count1-1) . 'diffput'<CR>
+        \ <Cmd>execute '.,+' . string(v:count1-1) . 'diffput'<CR>
     nnoremap <leader>dg
-        \ :<C-U>execute '.,+' . string(v:count1-1) . 'diffget'<CR>
+        \ <Cmd>execute '.,+' . string(v:count1-1) . 'diffget'<CR>
     nnoremap <leader>dj ]c
     nnoremap <leader>dk [c
 " }}}
 
 " Search {{{
     nnoremap <leader><Esc> :nohlsearch<CR>
-    nnoremap i :nohlsearch<CR>i
-    nnoremap <leader>8  *
-    nnoremap <leader>3  #
-    vnoremap <silent> <leader>8
-        \ :call execute('/\V\c\<' . escape(GetSelected(), '\/') . '\>')<CR>
-    vnoremap <silent> <leader>3
-        \ :call execute('?\V\c\<' . escape(GetSelected(), '\/') . '\>')<CR>
-    nnoremap <silent> <leader>/
-        \ :execute '/\V\c' . escape(expand('<cword>'), '\/')<CR>
-    vnoremap <silent> <leader>/
-        \ :call execute('/\V\c' . escape(GetSelected(), '\/'))<CR>
-    vnoremap <silent> <leader><leader>/
-        \ :call feedkeys('/' . GetSelected(), 'n')<CR>
+    nnoremap i <Cmd>nohlsearch<CR>i
+    nnoremap <leader>8 *
+    nnoremap <leader>3 #
+    vnoremap <leader>8
+        \ <Cmd>call execute('/\V\c\<' . escape(GetSelected(), '\/') . '\>')<CR>
+    vnoremap <leader>3
+        \ <Cmd>call execute('?\V\c\<' . escape(GetSelected(), '\/') . '\>')<CR>
+    nnoremap <leader>/ /\V\c<C-r><C-w><CR>
+    nnoremap <leader><leader>/ /<C-r><C-w>
+    vnoremap <leader>/
+        \ <Cmd>call execute('/\V\c' . escape(GetSelected(), '\/'))<CR>
+    vnoremap <leader><leader>/
+        \ <Cmd>call feedkeys('/' . GetSelected(), 'n')<CR>
 " }}}
 " }}}

@@ -166,12 +166,12 @@ if IsVim()
     nmap <leader>mw <Plug>(easymotion-bd-w)
     nmap <leader>me <Plug>(easymotion-bd-e)
 else
+    lua require'hop'.setup({ dict_list = { 'zh_sc' }, create_hl_autocmd = true })
     nnoremap <silent> s :HopChar1<CR>
     nnoremap <silent> <leader>ms :HopPattern<CR>
     nnoremap <silent> <leader>j :HopLineStart<CR>
     nnoremap <silent> <leader>k :HopLine<CR>
     nnoremap <silent> <leader>mw :HopWord<CR>
-    lua require'hop'.setup({ dict_list = { 'zh_sc' }, create_hl_autocmd = true })
 endif
     nnoremap <silent><expr>  z/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/'}))
     nnoremap <silent><expr> zg/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/', 'is_stay': 1}))
@@ -207,11 +207,11 @@ endif
 " textmanip {{{ 块编辑
     let g:textmanip_enable_mappings = 0
     " 切换Insert/Replace Mode
-    xnoremap <silent> <M-o>
-        \ :<C-U>let g:textmanip_current_mode =
-        \   (g:textmanip_current_mode == 'replace') ? 'insert' : 'replace'<Bar>
-        \ :echo 'textmanip mode: ' . g:textmanip_current_mode<CR>gv
-    xmap <silent> <C-o> <M-o>
+    xnoremap <M-o>
+        \ <Cmd>
+        \ let g:textmanip_current_mode = (g:textmanip_current_mode == 'replace') ? 'insert' : 'replace'<Bar>
+        \ echo 'textmanip mode: ' . g:textmanip_current_mode<CR>
+    xmap <C-o> <M-o>
     " 更据Mode使用Move-Insert或Move-Replace
     xmap <C-j> <Plug>(textmanip-move-down)
     xmap <C-k> <Plug>(textmanip-move-up)
@@ -231,14 +231,18 @@ endif
 
 " easy-align {{{ 字符对齐
     let g:easy_align_bypass_fold = 1
+    let g:easy_align_ignore_groups = [] " 默认任何group都进行对齐
     " 默认对齐内含段落（Text Object: vip）
     nmap <leader>al <Plug>(LiveEasyAlign)ip
     xmap <leader>al <Plug>(LiveEasyAlign)
     ":EasyAlign[!] [N-th] DELIMITER_KEY [OPTIONS]
     ":EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
     nnoremap <leader><leader>a
+        \ :normal! vip<CR>:EasyAlign<Space>*//<Left>
+    vnoremap <leader><leader>a :EasyAlign<Space>*//<Left>
+    nnoremap <leader><leader>A
         \ :normal! vip<CR>:EasyAlign<Space>
-    vnoremap <leader><leader>a :EasyAlign<Space>
+    vnoremap <leader><leader>A :EasyAlign<Space>
 " }}}
 
 " smoothie {{{ 平滑滚动
@@ -527,10 +531,11 @@ endif
     nnoremap <leader>wq :PopcBufferClose!<CR>
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
-    nnoremap <silent> <leader>ty
-        \ :let g:Popc_tabline_layout = (get(g:, 'Popc_tabline_layout', 0) + 1) % 3<Bar>
-        \ :call call('popc#stl#TabLineSetLayout',
-        \           [['buffer', 'tab'], ['buffer', ''], ['', 'tab']][g:Popc_tabline_layout])<CR>
+    nnoremap <leader>ty
+        \ <Cmd>
+        \ let g:Popc_tablineLayout = (get(g:, 'Popc_tablineLayout', 0) + 1) % 3<Bar>
+        \ call call('popc#stl#TabLineSetLayout',
+        \           [['buffer', 'tab'], ['buffer', ''], ['', 'tab']][g:Popc_tablineLayout])<CR>
 " }}}
 
 " nerdtree {{{ 目录树导航
@@ -565,7 +570,8 @@ endif
     let g:NERDTreeMapToggleFiles = 'F'
     let g:NERDTreeMapMenu = 'M'
     nnoremap <leader>te :NERDTreeToggle<CR>
-    nnoremap <leader>tE :execute ':NERDTree ' . expand('%:p:h')<CR>
+    nnoremap <leader>tE
+        \ <Cmd>execute ':NERDTree ' . expand('%:p:h')<CR>
 " }}}
 
 " startify {{{ 启动首页
@@ -603,7 +609,7 @@ endif
 " }}}
 
 " screensaver {{{ 屏保
-    nnoremap <silent> <leader>ss :ScreenSaver<CR>
+    nnoremap <leader>ss :ScreenSaver<CR>
 " }}}
 
 " fzf {{{ 模糊查找
@@ -740,7 +746,7 @@ if s:use.coc
     inoremap <silent><expr> <C-l>
         \ pumvisible() ? "\<C-g>u" : coc#refresh()
     imap <M-l> <C-l>
-    inoremap <silent> <C-u> <Esc>:call CocActionAsync('showSignatureHelp')<CR>a
+    inoremap <C-u> <Cmd>call CocActionAsync('showSignatureHelp')<CR>
     imap <M-u> <C-u>
     nnoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? coc#float#scroll(1) : ":vertical resize+5\<CR>"
     nnoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? coc#float#scroll(0) : ":resize-5\<CR>"
@@ -758,30 +764,31 @@ if s:use.coc
     nmap <leader>gf <Plug>(coc-fix-current)
     nmap <leader>gn <Plug>(coc-rename)
     nmap <leader>gj <Plug>(coc-float-jump)
-    nnoremap <silent> <leader>gh :call CocActionAsync('doHover')<CR>
-    nnoremap <silent> <leader>gs :CocCommand clangd.switchSourceHeader<CR>
-    nnoremap <silent> <leader>gm :CocCommand clangd.symbolInfo<CR>
+    nnoremap <leader>gh <Cmd>call CocActionAsync('doHover')<CR>
+    nnoremap <leader>gs <Cmd>CocCommand clangd.switchSourceHeader<CR>
+    nnoremap <leader>gm <Cmd>CocCommand clangd.symbolInfo<CR>
     nmap <leader>oi <Plug>(coc-diagnostic-info)
     nmap <leader>oj <Plug>(coc-diagnostic-next-error)
     nmap <leader>ok <Plug>(coc-diagnostic-prev-error)
     nmap <leader>oJ <Plug>(coc-diagnostic-next)
     nmap <leader>oK <Plug>(coc-diagnostic-prev)
-    nnoremap <silent> <leader>oD :call CocAction('diagnosticToggle')<CR>
-    nnoremap <silent> <leader>od
-        \ :call coc#config('diagnostic.enable', !coc#util#get_config('diagnostic').enable)<Bar>
-        \ :echo 'diagnostic.enable: ' . coc#util#get_config('diagnostic').enable<CR>
-    nnoremap <silent> <leader>or :call CocActionAsync('diagnosticRefresh')<CR>
-    vnoremap <silent> <leader>of :call CocActionAsync('formatSelected', 'v')<CR>
-    nnoremap <silent> <leader>of :call CocActionAsync('format')<CR>
+    nnoremap <leader>oD <Cmd>call CocAction('diagnosticToggle')<CR>
+    nnoremap <leader>od
+        \ <Cmd>
+        \ call coc#config('diagnostic.enable', !coc#util#get_config('diagnostic').enable)<Bar>
+        \ echo 'diagnostic.enable: ' . coc#util#get_config('diagnostic').enable<CR>
+    nnoremap <leader>or <Cmd>call CocActionAsync('diagnosticRefresh')<CR>
+    vnoremap <leader>of <Cmd>call CocActionAsync('formatSelected', 'v')<CR>
+    nnoremap <leader>of <Cmd>call CocActionAsync('format')<CR>
     nnoremap <leader>oR :CocRestart<CR>
     nnoremap <leader>on :CocConfig<CR>
     nnoremap <leader>oN :CocLocalConfig<CR>
-    nnoremap <silent> <leader>ol :CocList lists<CR>
-    nnoremap <silent> <leader>os :CocList --normal sources<CR>
-    nnoremap <silent> <leader>ox :CocList --normal extensions<CR>
+    nnoremap <leader>ol <Cmd>CocList lists<CR>
+    nnoremap <leader>os <Cmd>CocList --normal sources<CR>
+    nnoremap <leader>ox <Cmd>CocList --normal extensions<CR>
     " coc-extensions
-    nnoremap <silent> <leader>oy :<C-u>CocList --normal yank<CR>
-    nnoremap <silent> <leader>oe :CocCommand explorer<CR>
+    nnoremap <leader>oy <Cmd>CocList --normal yank<CR>
+    nnoremap <leader>oe <Cmd>CocCommand explorer<CR>
     nmap <leader>oc <Plug>(coc-calc-result-append)
     highlight default link CocMenuSel CursorLineNr
 endif
@@ -914,8 +921,8 @@ endif
     let g:asyncrun_save = 1             " 自动保存当前文件
     let g:asyncrun_local = 1            " 使用setlocal的efm
     nnoremap <leader><leader>r :AsyncRun<Space>
-    vnoremap <silent> <leader><leader>r
-        \ :call feedkeys(':AsyncRun ' . GetSelected(), 'n')<CR>
+    vnoremap <leader><leader>r
+        \ <Cmd>call feedkeys(':AsyncRun ' . GetSelected(), 'n')<CR>
     nnoremap <leader>rk :AsyncStop<CR>
 " }}}
 
@@ -962,8 +969,8 @@ if s:use.spector
     nnoremap <leader>de :VimspectorEval<Space>
     nnoremap <leader>dw :VimspectorWatch<Space>
     nnoremap <leader>dh :VimspectorShowOutput<Space>
-    nnoremap <silent><leader>db
-        \ :call PopSelection({
+    nnoremap <leader>db
+        \ <Cmd>call PopSelection({
             \ 'opt' : 'select debug configuration',
             \ 'lst' : keys(json_decode(join(readfile('.vimspector.json'))).configurations),
             \ 'cmd' : {sopt, sel -> vimspector#LaunchWithSettings({'configuration': sel})}
@@ -991,12 +998,14 @@ if s:use.utils
     let g:mkdp_refresh_slow = 0         " 即时预览MarkDown
     let g:mkdp_command_for_global = 0   " 只有markdown文件可以预览
     let g:mkdp_browser = 'firefox'
-    nnoremap <silent> <leader>vm
-        \ :echo get(b:, 'MarkdownPreviewToggleBool') ? 'Close markdown preview' : 'Open markdown preview'<Bar>
-        \ :call mkdp#util#toggle_preview()<CR>
-    nnoremap <silent> <leader>tb
-        \ :let g:mkdp_browser = (g:mkdp_browser ==# 'firefox') ? 'chrome' : 'firefox'<Bar>
-        \ :echo 'Browser: ' . g:mkdp_browser<CR>
+    nnoremap <leader>vm
+        \ <Cmd>
+        \ echo get(b:, 'MarkdownPreviewToggleBool') ? 'Close markdown preview' : 'Open markdown preview'<Bar>
+        \ call mkdp#util#toggle_preview()<CR>
+    nnoremap <leader>tb
+        \ <Cmd>
+        \ let g:mkdp_browser = (g:mkdp_browser ==# 'firefox') ? 'chrome' : 'firefox'<Bar>
+        \ echo 'Browser: ' . g:mkdp_browser<CR>
 " }}}
 
 " ReStructruedText {{{
@@ -1008,14 +1017,16 @@ if s:use.utils
     let g:instant_rst_browser = 'firefox'
 if IsWin()
     " 需要安装 https://github.com/mgedmin/restview
-    nnoremap <silent> <leader>vr
-        \ :execute ':AsyncRun restview ' . expand('%:p:t')<Bar>
-        \ :cclose<CR>
+    nnoremap <leader>vr
+        \ <Cmd>
+        \ execute ':AsyncRun restview ' . expand('%:p:t')<Bar>
+        \ cclose<CR>
 else
     " 需要安装 https://github.com/Rykka/instant-rst.py
-    nnoremap <silent> <leader>vr
-        \ :echo g:_instant_rst_daemon_started ? 'Close rst' : 'Open rst'<Bar>
-        \ :execute g:_instant_rst_daemon_started ? 'StopInstantRst' : 'InstantRst'<CR>
+    nnoremap <leader>vr
+        \ <Cmd>
+        \ echo g:_instant_rst_daemon_started ? 'Close rst' : 'Open rst'<Bar>
+        \ execute g:_instant_rst_daemon_started ? 'StopInstantRst' : 'InstantRst'<CR>
 endif
 " }}}
 
@@ -1043,12 +1054,12 @@ endif
     nnoremap <leader>big :OpenBrowserSearch -google<Space>
     nnoremap <leader>bib :OpenBrowserSearch -bing<Space>
     nnoremap <leader>bih :OpenBrowserSearch -github<Space>
-    nnoremap <silent> <leader>bb  :call openbrowser#search(expand('<cword>'), 'bing')<CR>
-    nnoremap <silent> <leader>bg  :call openbrowser#search(expand('<cword>'), 'google')<CR>
-    nnoremap <silent> <leader>bh  :call openbrowser#search(expand('<cword>'), 'github')<CR>
-    vnoremap <silent> <leader>bb  :call openbrowser#search(GetSelected(), 'bing')<CR>
-    vnoremap <silent> <leader>bg  :call openbrowser#search(GetSelected(), 'google')<CR>
-    vnoremap <silent> <leader>bh  :call openbrowser#search(GetSelected(), 'github')<CR>
+    nnoremap <leader>bb  <Cmd>call openbrowser#search(expand('<cword>'), 'bing')<CR>
+    nnoremap <leader>bg  <Cmd>call openbrowser#search(expand('<cword>'), 'google')<CR>
+    nnoremap <leader>bh  <Cmd>call openbrowser#search(expand('<cword>'), 'github')<CR>
+    vnoremap <leader>bb  <Cmd>call openbrowser#search(GetSelected(), 'bing')<CR>
+    vnoremap <leader>bg  <Cmd>call openbrowser#search(GetSelected(), 'google')<CR>
+    vnoremap <leader>bh  <Cmd>call openbrowser#search(GetSelected(), 'github')<CR>
 " }}}
 
 " crunch {{{ 计算器
@@ -1056,9 +1067,9 @@ endif
         \ 'e': '2.718281828459045',
         \ 'pi': '3.141592653589793'
         \ }
-    nnoremap <silent> <leader>ev
-        \ :<C-U>execute '.,+' . string(v:count1-1) . 'Crunch'<CR>
-    vnoremap <silent> <leader>ev :Crunch<CR>
+    nnoremap <leader>ev
+        \ <Cmd>execute '.,+' . string(v:count1-1) . 'Crunch'<CR>
+    vnoremap <leader>ev :Crunch<CR>
 " }}}
 
 " translator {{{ 翻译
@@ -1066,9 +1077,8 @@ endif
     nmap <leader>tw <Plug>TranslateW
     vmap <leader>tw <Plug>TranslateWV
     nnoremap <leader><leader>t :TranslateW<Space>
-    vnoremap <silent> <leader><leader>t
-        \ :call feedkeys(':TranslateW ' . GetSelected(), 'n')<CR>
-    nnoremap <leader>tj :call translator#ui#try_jump_into()<CR>
+    vnoremap <leader><leader>t
+        \ <Cmd>call feedkeys(':TranslateW ' . GetSelected(), 'n')<CR>
 	highlight default link TranslatorBorder Constant
 " }}}
 
