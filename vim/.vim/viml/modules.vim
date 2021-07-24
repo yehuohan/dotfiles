@@ -9,9 +9,9 @@ function! GetSelected(...)
     let l:reg_var = getreg('9', 1)
     let l:reg_mode = getregtype('9')
     if mode() ==# 'n'
-        normal! gv"9y
+        silent normal! gv"9y
     else
-        normal! "9y
+        silent normal! "9y
     endif
     let l:selected = getreg('9')
     call setreg('9', l:reg_var, l:reg_mode)
@@ -703,16 +703,16 @@ function! s:getMultiDirs()
 endfunction
 " }}}
 
-" Function: s:parsePattern(km, mode) {{{
-function! s:parsePattern(km, mode)
+" Function: s:parsePattern(km) {{{
+function! s:parsePattern(km)
     let l:pat = ''
-    if a:mode ==# 'n'
+    if mode() ==# 'n'
         if a:km.E ==? 'i'
             let l:pat = Input2Str('Pattern: ')
         elseif a:km.E =~? '[ws]'
             let l:pat = expand('<cword>')
         endif
-    elseif a:mode ==# 'v'
+    else
         let l:selected = GetSelected('')
         if a:km.E ==? 'i'
             let l:pat = Input2Str('Pattern: ', l:selected)
@@ -805,7 +805,7 @@ function! s:parseVimgrep(km, fmt)
 endfunction
 " }}}
 
-" Function: FindW(mode, keys, [cfg]) {{{ 查找
+" Function: FindW(keys, [cfg]) {{{ 查找
 " {{{
 " @param keys: [fF][av][btop][IiWwSs=]
 "              [%1][%2][%3  ][4%     ]
@@ -823,20 +823,19 @@ endfunction
 "  '' : find with s:ws.fw
 " Pattern: %4 = km.E
 "   = : find text from clipboard
-"   Normal Mode: mode='n'
+"   Normal Mode:
 "   i : find input
 "   w : find word
 "   s : find word with boundaries
-"   Visual Mode: mode='v'
+"   Visual Mode:
 "   i : find input    with selected
 "   w : find visual   with selected
 "   s : find selected with boundaries
 "   LowerCase: [iws] find in ignorecase
 "   UpperCase: [IWS] find in case match
-" @param mode: mapping mode of keys
 " @param cfg: first priority of config
 " }}}
-function! FindW(mode, keys, ...)
+function! FindW(keys, ...)
     let km = {
         \ 'S': a:keys[0],
         \ 'A0': a:keys[1:-2][0],
@@ -859,7 +858,7 @@ function! FindW(mode, keys, ...)
                 \ 'cmd' : {sopt, sel -> extend(l:cfg, {sopt : sel})},
                 \ 'get' : {sopt -> l:cfg[sopt]},
                 \ },
-            \ 'onCR': {sopt -> call('FindW', [a:mode, 'f' . km.A0 . km.A1 . km.E, l:cfg])}
+            \ 'onCR': {sopt -> call('FindW', ['f' . km.A0 . km.A1 . km.E, l:cfg])}
             \ }
         call PopSelection(l:sel)
     else
@@ -871,7 +870,7 @@ function! FindW(mode, keys, ...)
             call extend(s:ws.fw, {'path': '', 'filters': '', 'globlst': '', 'exargs': ''}, 'keep')
         endif
         " find with config
-        let l:pat = s:parsePattern(km, a:mode)
+        let l:pat = s:parsePattern(km)
         if !empty(l:pat)
             let l:fmt = { 'cmd': '', 'opt': '', 'pat': '', 'loc': '' }
             if km.A0 ==# 'v'
@@ -944,8 +943,7 @@ endfunction
 let FindWKill = function('execute', [s:fw.engine.sk])
 let FindWSetFuzzy = function('popset#set#PopSelection', [s:fw.selfuzzy])
 for key in s:fw_mappings_rg
-    execute printf('nnoremap <leader>%s <Cmd>call FindW("n", "%s")<CR>', key, key)
-    execute printf('vnoremap <leader>%s <Cmd>call FindW("v", "%s")<CR>', key, key)
+    execute printf('noremap <leader>%s <Cmd>call FindW("%s")<CR>', key, key)
 endfor
 for key in s:fw_mappings_fuzzy
     execute printf('nnoremap <leader>%s <Cmd>call FindWFuzzy("%s")<CR>', key, key)
