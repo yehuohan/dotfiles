@@ -209,7 +209,7 @@ endif
     " 切换Insert/Replace Mode
     xnoremap <M-o>
         \ <Cmd>
-        \ let g:textmanip_current_mode = (g:textmanip_current_mode == 'replace') ? 'insert' : 'replace'<Bar>
+        \ let g:textmanip_current_mode = (g:textmanip_current_mode == 'replace') ? 'insert' : 'replace' <Bar>
         \ echo 'textmanip mode: ' . g:textmanip_current_mode<CR>
     xmap <C-o> <M-o>
     " 更据Mode使用Move-Insert或Move-Replace
@@ -391,7 +391,11 @@ if s:use.lightline
                 \ }
     endif
     nnoremap <leader>tl :call lightline#toggle()<CR>
-    nnoremap <leader>tk :call Plug_ll_toggleCheck()<CR>
+    nnoremap <leader>tk
+        \ <Cmd>
+        \ let b:lightline_check_flg = !get(b:, 'lightline_check_flg', 1) <Bar>
+        \ call lightline#update() <Bar>
+        \ echo 'b:lightline_check_flg = ' . b:lightline_check_flg<CR>
 
     " Augroup: PluginLightline {{{
     augroup PluginLightline
@@ -423,19 +427,11 @@ if s:use.lightline
     endfunction
     " }}}
 
-    " Function: Plug_ll_toggleCheck() {{{
-    function! Plug_ll_toggleCheck()
-        let b:lightline_check_flg = !get(b:, 'lightline_check_flg', 1)
-        call lightline#update()
-        echo 'b:lightline_check_flg = ' . b:lightline_check_flg
-    endfunction
-    " }}}
-
     " Function: lightline components {{{
     function! Plug_ll_mode()
         return &ft ==# 'tagbar' ? 'Tagbar' :
             \ &ft ==# 'nerdtree' ? 'NERDTree' :
-            \ &ft ==# 'qf' ? (QuickfixGet()[0] ==# 'c' ? 'Quickfix' : 'Location') :
+            \ &ft ==# 'qf' ? (QuickfixType() ==# 'c' ? 'Quickfix' : 'Location') :
             \ &ft ==# 'help' ? 'Help' :
             \ &ft ==# 'Popc' ? 'Popc' :
             \ &ft ==# 'startify' ? 'Startify' :
@@ -533,7 +529,7 @@ endif
     nnoremap <leader><leader>w :PopcWorkspace<CR>
     nnoremap <leader>ty
         \ <Cmd>
-        \ let g:Popc_tablineLayout = (get(g:, 'Popc_tablineLayout', 0) + 1) % 3<Bar>
+        \ let g:Popc_tablineLayout = (get(g:, 'Popc_tablineLayout', 0) + 1) % 3 <Bar>
         \ call call('popc#stl#TabLineSetLayout',
         \           [['buffer', 'tab'], ['buffer', ''], ['', 'tab']][g:Popc_tablineLayout])<CR>
 " }}}
@@ -775,7 +771,7 @@ if s:use.coc
     nnoremap <leader>oD <Cmd>call CocAction('diagnosticToggle')<CR>
     nnoremap <leader>od
         \ <Cmd>
-        \ call coc#config('diagnostic.enable', !coc#util#get_config('diagnostic').enable)<Bar>
+        \ call coc#config('diagnostic.enable', !coc#util#get_config('diagnostic').enable) <Bar>
         \ echo 'diagnostic.enable: ' . coc#util#get_config('diagnostic').enable<CR>
     nnoremap <leader>or <Cmd>call CocActionAsync('diagnosticRefresh')<CR>
     vnoremap <leader>of <Cmd>call CocActionAsync('formatSelected', 'v')<CR>
@@ -1000,11 +996,11 @@ if s:use.utils
     let g:mkdp_browser = 'firefox'
     nnoremap <leader>vm
         \ <Cmd>
-        \ echo get(b:, 'MarkdownPreviewToggleBool') ? 'Close markdown preview' : 'Open markdown preview'<Bar>
+        \ echo get(b:, 'MarkdownPreviewToggleBool') ? 'Close markdown preview' : 'Open markdown preview' <Bar>
         \ call mkdp#util#toggle_preview()<CR>
     nnoremap <leader>tb
         \ <Cmd>
-        \ let g:mkdp_browser = (g:mkdp_browser ==# 'firefox') ? 'chrome' : 'firefox'<Bar>
+        \ let g:mkdp_browser = (g:mkdp_browser ==# 'firefox') ? 'chrome' : 'firefox' <Bar>
         \ echo 'Browser: ' . g:mkdp_browser<CR>
 " }}}
 
@@ -1019,13 +1015,13 @@ if IsWin()
     " 需要安装 https://github.com/mgedmin/restview
     nnoremap <leader>vr
         \ <Cmd>
-        \ execute ':AsyncRun restview ' . expand('%:p:t')<Bar>
+        \ execute ':AsyncRun restview ' . expand('%:p:t') <Bar>
         \ cclose<CR>
 else
     " 需要安装 https://github.com/Rykka/instant-rst.py
     nnoremap <leader>vr
         \ <Cmd>
-        \ echo g:_instant_rst_daemon_started ? 'Close rst' : 'Open rst'<Bar>
+        \ echo g:_instant_rst_daemon_started ? 'Close rst' : 'Open rst' <Bar>
         \ execute g:_instant_rst_daemon_started ? 'StopInstantRst' : 'InstantRst'<CR>
 endif
 " }}}
@@ -1067,8 +1063,9 @@ endif
         \ 'e': '2.718281828459045',
         \ 'pi': '3.141592653589793'
         \ }
+    nnoremap <leader><leader>e :Crunch<Space>
     nnoremap <leader>ev
-        \ <Cmd>execute '.,+' . string(v:count1-1) . 'Crunch'<CR>
+        \ <Cmd>execute 'silent .,+' . string(v:count1-1) . 'Crunch'<CR>
     vnoremap <leader>ev :Crunch<CR>
 " }}}
 

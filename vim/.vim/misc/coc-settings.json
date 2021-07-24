@@ -52,7 +52,7 @@
     "explorer.git.enable": false,
     "explorer.icon.expanded": "▾",
     "explorer.icon.collapsed": "▸",
-    "explorer.file.autoReveal": false,
+    "explorer.file.reveal.auto": false,
     "explorer.file.showHiddenFiles": true,
     "explorer.file.hiddenRules": {
         "extensions": ["o", "a", "obj", "pyc"],
@@ -125,7 +125,6 @@
     "clangd.fallbackFlags": [], // extra clang flags used to parse files when no compilation database is found
     "clangd.path": "clangd",
 
-
     /* coc-rls(NOT in use) */
     //"rust-client.channel": "nightly",
     //"rust.unstable_features": true,
@@ -144,7 +143,7 @@
 
     /* lsp */
     "languageserver": {
-        /* install llvm or clangd and less memory used (Not in use)
+        /* install llvm or clangd(Not in use)
         "clangd": {
             "command": "clangd",
             "rootPatterns": ["compile_flags.txt", "compile_commands.json", "tags"],
