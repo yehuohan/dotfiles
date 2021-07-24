@@ -918,7 +918,7 @@ endif
     let g:asyncrun_local = 1            " 使用setlocal的efm
     nnoremap <leader><leader>r :AsyncRun<Space>
     vnoremap <leader><leader>r
-        \ <Cmd>call feedkeys(':AsyncRun ' . GetSelected(), 'n')<CR>
+        \ <Cmd>call feedkeys(':AsyncRun ' . GetSelected(''), 'n')<CR>
     nnoremap <leader>rk :AsyncStop<CR>
 " }}}
 
@@ -1053,9 +1053,9 @@ endif
     nnoremap <leader>bb  <Cmd>call openbrowser#search(expand('<cword>'), 'bing')<CR>
     nnoremap <leader>bg  <Cmd>call openbrowser#search(expand('<cword>'), 'google')<CR>
     nnoremap <leader>bh  <Cmd>call openbrowser#search(expand('<cword>'), 'github')<CR>
-    vnoremap <leader>bb  <Cmd>call openbrowser#search(GetSelected(), 'bing')<CR>
-    vnoremap <leader>bg  <Cmd>call openbrowser#search(GetSelected(), 'google')<CR>
-    vnoremap <leader>bh  <Cmd>call openbrowser#search(GetSelected(), 'github')<CR>
+    vnoremap <leader>bb  <Cmd>call openbrowser#search(GetSelected(' '), 'bing')<CR>
+    vnoremap <leader>bg  <Cmd>call openbrowser#search(GetSelected(' '), 'google')<CR>
+    vnoremap <leader>bh  <Cmd>call openbrowser#search(GetSelected(' '), 'github')<CR>
 " }}}
 
 " crunch {{{ 计算器
@@ -1075,7 +1075,7 @@ endif
     vmap <leader>tw <Plug>TranslateWV
     nnoremap <leader><leader>t :TranslateW<Space>
     vnoremap <leader><leader>t
-        \ <Cmd>call feedkeys(':TranslateW ' . GetSelected(), 'n')<CR>
+        \ <Cmd>call feedkeys(':TranslateW ' . GetSelected(' '), 'n')<CR>
 	highlight default link TranslatorBorder Constant
 " }}}
 

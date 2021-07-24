@@ -334,7 +334,7 @@ nnoremap <leader><leader>U :lua print(vim.inspect(
 " 查看help文档
 nnoremap <leader><leader>k :h <C-r><C-w>
 vnoremap <leader><leader>k
-    \ <Cmd>call feedkeys(':h ' . GetSelected(), 'n')<CR>
+    \ <Cmd>call feedkeys(':h ' . GetSelected(''), 'n')<CR>
 " }}}
 
 " Copy & Paste {{{
@@ -560,14 +560,14 @@ nnoremap i <Cmd>nohlsearch<CR>i
 nnoremap <leader>8 *
 nnoremap <leader>3 #
 vnoremap <leader>8
-    \ <Cmd>call execute('/\V\c\<' . escape(GetSelected(), '\/') . '\>')<CR>
+    \ <Cmd>call execute('/\V\c\<' . escape(GetSelected(''), '\/') . '\>')<CR>
 vnoremap <leader>3
-    \ <Cmd>call execute('?\V\c\<' . escape(GetSelected(), '\/') . '\>')<CR>
+    \ <Cmd>call execute('?\V\c\<' . escape(GetSelected(''), '\/') . '\>')<CR>
 nnoremap <leader>/ /\V\c<C-r><C-w><CR>
 nnoremap <leader><leader>/ /<C-r><C-w>
 vnoremap <leader>/
-    \ <Cmd>call execute('/\V\c' . escape(GetSelected(), '\/'))<CR>
+    \ <Cmd>call execute('/\V\c' . escape(GetSelected(''), '\/'))<CR>
 vnoremap <leader><leader>/
-    \ <Cmd>call feedkeys('/' . GetSelected(), 'n')<CR>
+    \ <Cmd>call feedkeys('/' . GetSelected(''), 'n')<CR>
 " }}}
 " }}}

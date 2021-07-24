@@ -3,18 +3,24 @@ function! Sv_ws()
 endfunction
 
 " Libs {{{
-" Function: GetSelected() {{{ 获取选区内容
-function! GetSelected()
-    let l:reg_var = getreg('0', 1)
-    let l:reg_mode = getregtype('0')
+" Function: GetSelected(...) {{{ 获取选区内容
+" @param sep: 提供sep，且选区是多行时，使用sep连接成一行
+function! GetSelected(...)
+    let l:reg_var = getreg('9', 1)
+    let l:reg_mode = getregtype('9')
     if mode() ==# 'n'
-        normal! gv"0y
+        normal! gv"9y
     else
-        normal! "0y
+        normal! "9y
     endif
-    let l:word = getreg('0')
-    call setreg('0', l:reg_var, l:reg_mode)
-    return l:word
+    let l:selected = getreg('9')
+    call setreg('9', l:reg_var, l:reg_mode)
+
+    if a:0 > 0
+        return join(split(l:selected, "\n"), a:1)
+    else
+        return l:selected
+    endif
 endfunction
 " }}}
 
@@ -174,15 +180,15 @@ nnoremap <leader>.         :call ExecLast(1)<CR>
 nnoremap <leader><leader>. :call ExecLast(0)<CR>
 nnoremap <M-;> @:
 vnoremap <leader><leader>;
-    \ <Cmd>call feedkeys(':' . GetSelected(), 'n')<CR>
+    \ <Cmd>call feedkeys(':' . GetSelected(''), 'n')<CR>
 nnoremap <leader>ae
     \ <Cmd>call Input2Fn(['Command: ', '', 'command'], {str -> append(line('.'), GetEval(str, 'command'))})<CR>
 nnoremap <leader>af
     \ <Cmd>call Input2Fn(['Function: ', '', 'function'], {str -> append(line('.'), GetEval(str, 'function'))})<CR>
 vnoremap <leader>ae
-    \ <Cmd>call append(line('.'), GetEval(GetSelected(), 'command'))<CR>
+    \ <Cmd>call append(line('.'), GetEval(GetSelected(''), 'command'))<CR>
 vnoremap <leader>af
-    \ <Cmd>call append(line('.'), GetEval(GetSelected(), 'function'))<CR>
+    \ <Cmd>call append(line('.'), GetEval(GetSelected(''), 'function'))<CR>
 " }}}
 
 " Workspace {{{
@@ -707,7 +713,7 @@ function! s:parsePattern(km, mode)
             let l:pat = expand('<cword>')
         endif
     elseif a:mode ==# 'v'
-        let l:selected = GetSelected()
+        let l:selected = GetSelected('')
         if a:km.E ==? 'i'
             let l:pat = Input2Str('Pattern: ', l:selected)
         elseif a:km.E =~? '[ws]'
@@ -938,11 +944,11 @@ endfunction
 let FindWKill = function('execute', [s:fw.engine.sk])
 let FindWSetFuzzy = function('popset#set#PopSelection', [s:fw.selfuzzy])
 for key in s:fw_mappings_rg
-    execute printf('nnoremap <leader>%s :call FindW("n", "%s")<CR>', key, key)
-    execute printf('vnoremap <leader>%s :call FindW("v", "%s")<CR>', key, key)
+    execute printf('nnoremap <leader>%s <Cmd>call FindW("n", "%s")<CR>', key, key)
+    execute printf('vnoremap <leader>%s <Cmd>call FindW("v", "%s")<CR>', key, key)
 endfor
 for key in s:fw_mappings_fuzzy
-    execute printf('nnoremap <leader>%s :call FindWFuzzy("%s")<CR>', key, key)
+    execute printf('nnoremap <leader>%s <Cmd>call FindWFuzzy("%s")<CR>', key, key)
 endfor
 nnoremap <leader>fk :call FindWKill()<CR>
 nnoremap <leader>fu :call FindWSetFuzzy()<CR>
