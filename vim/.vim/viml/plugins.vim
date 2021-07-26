@@ -36,10 +36,10 @@ endfunction
 " Plug {{{
 call plug#begin($DotVimPath.'/bundle')  " 设置插件位置，且自动设置了syntax enable和filetype plugin indent on
     " editing
-if IsVim()
-    Plug 'yehuohan/vim-easymotion'
-else
+if IsNVim()
     Plug 'phaazon/hop.nvim'
+else
+    Plug 'yehuohan/vim-easymotion'
 endif
     Plug 'haya14busa/incsearch.vim'
     Plug 'haya14busa/incsearch-fuzzy.vim'
@@ -114,16 +114,16 @@ endif
     Plug 'scrooloose/nerdcommenter'
     Plug 't9md/vim-quickhl'
     Plug 'RRethy/vim-illuminate'
-if IsVim()
-    Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
-else
+if IsNVim()
     Plug 'norcalli/nvim-colorizer.lua', {'on': 'ColorizerToggle'}
+else
+    Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
 endif
     Plug 'skywind3000/asyncrun.vim'
     Plug 'skywind3000/asyncrun.extra'
-    Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
     Plug 'voldikss/vim-floaterm'
     Plug 'yehuohan/popc-floaterm'
+    Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
 if s:use.spector
     Plug 'puremourning/vimspector'
 endif
@@ -155,7 +155,14 @@ call plug#end()
 
 " Editing {{{
 " hop, easy-motion {{{ 快速跳转
-if IsVim()
+if IsNVim()
+    lua require'hop'.setup({ dict_list = { 'zh_sc' }, create_hl_autocmd = true })
+    noremap s <Cmd>HopChar1<CR>
+    noremap S <Cmd>HopPattern<CR>
+    noremap <leader>j <Cmd>HopLineStart<CR>
+    noremap <leader>k <Cmd>HopLine<CR>
+    noremap <leader>mw <Cmd>HopWord<CR>
+else
     let g:EasyMotion_dict = 'zh-cn'     " 支持简体中文拼音
     let g:EasyMotion_do_mapping = 0     " 禁止默认map
     let g:EasyMotion_smartcase = 1      " 不区分大小写
@@ -165,13 +172,6 @@ if IsVim()
     nmap <leader>k <Plug>(easymotion-overwin-line)
     nmap <leader>mw <Plug>(easymotion-bd-w)
     nmap <leader>me <Plug>(easymotion-bd-e)
-else
-    lua require'hop'.setup({ dict_list = { 'zh_sc' }, create_hl_autocmd = true })
-    noremap s <Cmd>HopChar1<CR>
-    noremap S <Cmd>HopPattern<CR>
-    noremap <leader>j <Cmd>HopLineStart<CR>
-    noremap <leader>k <Cmd>HopLine<CR>
-    noremap <leader>mw <Cmd>HopWord<CR>
 endif
     nnoremap <silent><expr>  z/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/'}))
     nnoremap <silent><expr> zg/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/', 'is_stay': 1}))
@@ -897,12 +897,12 @@ endif
 " }}}
 
 " colorizer {{{ 颜色预览
-if IsVim()
+if IsNVim()
+    nnoremap <leader>tc :ColorizerToggle<CR>
+else
     let g:colorizer_nomap = 1
     let g:colorizer_startup = 0
     nnoremap <leader>tc :ColorToggle<CR>
-else
-    nnoremap <leader>tc :ColorizerToggle<CR>
 endif
 " }}}
 
@@ -917,12 +917,12 @@ endif
 " }}}
 
 " floaterm {{{ 终端浮窗
-if IsVim()
-    set termwinkey=<C-l>
-    tnoremap <Esc> <C-l>N
-else
+if IsNVim()
     tnoremap <C-l> <C-\><C-n><C-w>
     tnoremap <Esc> <C-\><C-n>
+else
+    set termwinkey=<C-l>
+    tnoremap <Esc> <C-l>N
 endif
     nnoremap <leader>tZ :terminal<CR>
     nnoremap <leader>tz :FloatermToggle<CR>

@@ -188,7 +188,7 @@ let g:did_install_syntax_menu = 1       " 禁止加载Syntax菜单
 let s:gui_fontsize = 12
 if IsWin()
     let s:gui_font = s:use.powerfont ? 'Consolas\ For\ Powerline' : 'Consolas'
-    let s:gui_fontwide = IsVim() ? 'Microsoft\ YaHei\ Mono' : 'Microsoft\ YaHei\ UI'
+    let s:gui_fontwide = IsNVim() ? 'Microsoft\ YaHei\ UI' : 'Microsoft\ YaHei\ Mono'
 else
     let s:gui_font = s:use.powerfont ? 'DejaVu\ Sans\ Mono\ for\ Powerline' : 'DejaVu\ Sans'
     let s:gui_fontwide = 'WenQuanYi\ Micro\ Hei\ Mono'
