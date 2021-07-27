@@ -141,6 +141,7 @@ endfunction
 nnoremap <leader>iw :call OptionInv('wrap')<CR>
 nnoremap <leader>il :call OptionInv('list')<CR>
 nnoremap <leader>ii :call OptionInv('ignorecase')<CR>
+nnoremap <leader>if :call OptionInv('foldenable')<CR>
 nnoremap <leader>ie :call OptionInv('expandtab')<CR>
 nnoremap <leader>ib :call OptionInv('scrollbind')<CR>
 nnoremap <leader>iv :call OptionLst('virtualedit')<CR>
@@ -287,15 +288,15 @@ nnoremap <leader>zr zR
 nnoremap <leader>zx zX
 nnoremap <leader>zf zF
 nnoremap <leader>zd zD
-nnoremap z[ [z
-nnoremap z] ]z
 " 滚屏
 nnoremap <C-j> <C-e>
 nnoremap <C-k> <C-y>
-nnoremap zh zt
-nnoremap zl zb
+nnoremap <C-h> zh
+nnoremap <C-l> zl
 nnoremap <M-h> 16zh
 nnoremap <M-l> 16zl
+nnoremap zh zt
+nnoremap zl zb
 " 命令行
 cnoremap <C-j> <Down>
 cnoremap <C-k> <Up>

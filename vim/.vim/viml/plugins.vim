@@ -160,7 +160,7 @@ if IsNVim()
     noremap s <Cmd>HopChar1<CR>
     noremap S <Cmd>HopPattern<CR>
     noremap <leader>j <Cmd>HopLineStart<CR>
-    noremap <leader>k <Cmd>HopLine<CR>
+    noremap <leader><leader>j <Cmd>HopLine<CR>
     noremap <leader>mw <Cmd>HopWord<CR>
 else
     let g:EasyMotion_dict = 'zh-cn'     " 支持简体中文拼音
@@ -169,7 +169,7 @@ else
     nmap s <Plug>(easymotion-overwin-f)
     nmap S <Plug>(easymotion-overwin-f2)
     nmap <leader>j <Plug>(easymotion-bd-jk)
-    nmap <leader>k <Plug>(easymotion-overwin-line)
+    nmap <leader><leader>j <Plug>(easymotion-overwin-line)
     nmap <leader>mw <Plug>(easymotion-bd-w)
     nmap <leader>me <Plug>(easymotion-bd-e)
 endif
@@ -256,8 +256,8 @@ endif
 " }}}
 
 " expand-region {{{ 快速块选择
-    map <C-p> <Plug>(expand_region_expand)
-    map <C-u> <Plug>(expand_region_shrink)
+    map <M-r> <Plug>(expand_region_expand)
+    map <M-w> <Plug>(expand_region_shrink)
 " }}}
 
 " textobj-user {{{ 文本对象
@@ -520,8 +520,8 @@ endif
     nnoremap <M-o> :PopcBufferSwitchRight!<CR>
     nnoremap <C-i> :PopcBufferJumpPrev<CR>
     nnoremap <C-o> :PopcBufferJumpNext<CR>
-    nnoremap <C-h> <C-o>
-    nnoremap <C-l> <C-i>
+    nnoremap <C-u> <C-o>
+    nnoremap <C-p> <C-i>
     nnoremap <leader>wq :PopcBufferClose!<CR>
     nnoremap <leader><leader>b :PopcBookmark<CR>
     nnoremap <leader><leader>w :PopcWorkspace<CR>
