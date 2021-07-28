@@ -179,6 +179,7 @@ endif
 
 " clever-f {{{ 行跳转
     let g:clever_f_show_prompt = 1
+    let g:clever_f_across_no_line = 1
 " }}}
 
 " vim-visual-multi {{{ 多光标编辑
