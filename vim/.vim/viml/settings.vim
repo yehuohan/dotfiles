@@ -372,8 +372,8 @@ endfor
 
 " Tab, Buffer, Window {{{
 if IsNVim()
-" FUNCTION: GotoNextFloatingWindow() {{{ 跳转到下一个floating窗口
-function! GotoNextFloatingWindow()
+" FUNCTION: WinGotoNextFloating() {{{ 跳转到下一个floating窗口
+function! WinGotoNextFloating()
     for l:wid in nvim_list_wins()
         if l:wid != nvim_get_current_win()
             let l:cfg = nvim_win_get_config(wid)
@@ -385,6 +385,28 @@ function! GotoNextFloatingWindow()
 endfunction
 " }}}
 endif
+
+" FUNCTION: WinMoveSpliter(dir, inc) {{{ 移动窗口的分界，改变窗口大小
+" 只有最bottom-right的窗口是移动其top-left的分界，其余窗口移动其bottom-right分界
+function! WinMoveSpliter(dir, inc)
+    let l:wnr = winnr()
+    let l:pos = win_screenpos(l:wnr)
+    let l:hei = winheight(l:wnr) + l:pos[0] + &cmdheight
+    let l:wid = winwidth(l:wnr) - 1 + l:pos[1]
+    let l:all_hei = &lines
+    let l:all_wid = &columns
+
+    if a:dir ==# 'e'
+        execute printf('resize%s%d', (l:hei >= l:all_hei && l:pos[0] >= 3) ? '+' : '-', a:inc)
+    elseif a:dir ==# 'd'
+        execute printf('resize%s%d', (l:hei >= l:all_hei && l:pos[0] >= 3) ? '-' : '+', a:inc)
+    elseif a:dir ==# 's'
+        execute printf('vertical resize%s%d', l:wid >= l:all_wid ? '+' : '-', a:inc)
+    elseif a:dir ==# 'f'
+        execute printf('vertical resize%s%d', l:wid >= l:all_wid ? '-' : '+', a:inc)
+    endif
+endfunction
+" }}}
 
 " tab切换(使用Popc的tab切换)
 "nnoremap <M-u> gT
@@ -406,7 +428,7 @@ nnoremap <leader>wp <C-w>p
 nnoremap <leader>wP <C-w>P
 nnoremap <leader>ww <C-w>w
 if IsNVim()
-nnoremap <leader>wf :call GotoNextFloatingWindow()<CR>
+nnoremap <leader>wf :call WinGotoNextFloating()<CR>
 endif
 " 移动窗口
 nnoremap <leader>wH <C-w>H
@@ -416,16 +438,16 @@ nnoremap <leader>wL <C-w>L
 nnoremap <leader>wT <C-w>T
 " 改变窗口大小
 nnoremap <leader>w= <C-w>=
-nnoremap <M-e> :resize+5<CR>
-nnoremap <M-s> :vertical resize-5<CR>
+nnoremap <M-e> :call WinMoveSpliter('e', 5)<CR>
+nnoremap <M-s> :call WinMoveSpliter('s', 5)<CR>
 if !s:use.coc
-nnoremap <M-d> :resize-5<CR>
-nnoremap <M-f> :vertical resize+5<CR>
+nnoremap <M-d> :call WinMoveSpliter('d', 5)<CR>
+nnoremap <M-f> :call WinMoveSpliter('f', 5)<CR>
 endif
-nnoremap <M-Up> :resize+1<CR>
-nnoremap <M-Down> :resize-1<CR>
-nnoremap <M-Left> :vertical resize-1<CR>
-nnoremap <M-Right> :vertical resize+1<CR>
+nnoremap <M-Up> :call WinMoveSpliter('e', 1)<CR>
+nnoremap <M-Down> :call WinMoveSpliter('d', 1)<CR>
+nnoremap <M-Left> :call WinMoveSpliter('s', 1)<CR>
+nnoremap <M-Right> :call WinMoveSpliter('f', 1)<CR>
 " }}}
 
 " Quickfix {{{

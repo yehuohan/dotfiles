@@ -743,8 +743,8 @@ if s:use.coc
     imap <M-l> <C-l>
     inoremap <C-o> <Cmd>call CocActionAsync('showSignatureHelp')<CR>
     imap <M-o> <C-o>
-    nnoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? coc#float#scroll(1) : ":vertical resize+5\<CR>"
-    nnoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? coc#float#scroll(0) : ":resize-5\<CR>"
+    nnoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? coc#float#scroll(1) : ":call WinMoveSpliter('f', 5)\<CR>"
+    nnoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? coc#float#scroll(0) : ":call WinMoveSpliter('d', 5)\<CR>"
     inoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(1)\<CR>" : "\<Right>"
     inoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(0)\<CR>" : "\<Left>"
     vnoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<M-f>"
