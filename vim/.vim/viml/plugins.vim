@@ -178,8 +178,9 @@ endif
 " }}}
 
 " clever-f {{{ 行跳转
-    let g:clever_f_show_prompt = 1
     let g:clever_f_across_no_line = 1
+    let g:clever_f_show_prompt = 1
+    let g:clever_f_smart_case = 1
 " }}}
 
 " vim-visual-multi {{{ 多光标编辑
@@ -187,21 +188,24 @@ endif
     " Tab: 切换cursor/extend模式
     " C-n: 添加word或selected region作为cursor
     " C-Up/Down: 移动当前position并添加cursor
-    " <VM_leader>A: 查找当前word作为cursor
+    " <VM_leader>a: 查找当前word作为cursor
     " <VM_leader>/: 查找regex作为cursor（n/N用于查找下/上一个）
-    " <VM_leader>\: 添加当前position作为cursor（使用/或arrows跳转位置）
+    " <VM_leader>,: 添加当前position作为cursor（使用/或arrows或Hop跳转位置）
     " <VM_leader>a <VM_leader>c: 添加visual区域作为cursor
     " s: 文本对象（类似于viw等）
     let g:VM_mouse_mappings = 0         " 禁用鼠标
-    let g:VM_leader = '\'
+    let g:VM_leader = ','
     let g:VM_maps = {
         \ 'Find Under'         : '<C-n>',
         \ 'Find Subword Under' : '<C-n>',
+        \ 'Select All'         : ',a',
+        \ 'Add Cursor At Pos'  : ',,',
         \ }
     let g:VM_custom_remaps = {
-        \ '<C-p>': '[',
-        \ '<C-s>': 'q',
-        \ '<C-c>': 'Q',
+        \ '<C-p>' : '[',
+        \ '<C-s>' : 'q',
+        \ '<C-c>' : 'Q',
+        \ ',s'    : '<Cmd>HopChar1<CR>',
         \ }
 " }}}
 
@@ -340,10 +344,9 @@ if s:use.lightline
         \ 'enable' : {'statusline': 1, 'tabline': 0},
         \ 'colorscheme' : 'gruvbox',
         \ 'active': {
-                \ 'left' : [['mode'],
-                \           ['all_filesign'],
+                \ 'left' : [['mode'], [],
                 \           ['msg_left']],
-                \ 'right': [['chk_trailing', 'chk_indent', 'all_lineinfo'],
+                \ 'right': [['chk_trailing', 'chk_indent', 'all_info'],
                 \           ['all_format'],
                 \           ['msg_right']],
                 \ },
@@ -357,15 +360,14 @@ if s:use.lightline
                 \ 'right': [['close']],
                 \ },
         \ 'component': {
-                \ 'all_filesign': '%{winnr()},%-n%{&ro?",$":""}%M',
-                \ 'all_format'  : '%{&ft!=#""?&ft."/":""}%{&fenc!=#""?&fenc:&enc}/%{&ff}',
-                \ 'all_lineinfo': 'U%B %p%% %l/%L # %v',
-                \ 'lite_info'   : '%l/%L # %v',
+                \ 'all_format': '%{&ft!=#""?&ft."/":""}%{&fenc!=#""?&fenc:&enc}/%{&ff}',
+                \ 'all_info'  : 'U%B %p%% %l/%L # %v @%{winnr()}·%n%{&mod?"+":""}',
+                \ 'lite_info' : '%l/%L # %v @%{winnr()}·%n%{&mod?"+":""}',
                 \ },
         \ 'component_function': {
-                \ 'mode'        : 'Plug_ll_mode',
-                \ 'msg_left'    : 'Plug_ll_msgLeft',
-                \ 'msg_right'   : 'Plug_ll_msgRight',
+                \ 'mode'      : 'Plug_ll_mode',
+                \ 'msg_left'  : 'Plug_ll_msgLeft',
+                \ 'msg_right' : 'Plug_ll_msgRight',
                 \ },
         \ 'component_expand': {
                 \ 'chk_indent'  : 'Plug_ll_checkMixedIndent',
@@ -383,10 +385,9 @@ if s:use.lightline
         let g:lightline.tabline_separator    = {'left': '', 'right': ''}
         let g:lightline.tabline_subseparator = {'left': '', 'right': ''}
         let g:lightline.component = {
-                \ 'all_filesign': '%{winnr()},%-n%{&ro?",":""}%M',
-                \ 'all_format'  : '%{&ft!=#""?&ft."":""}%{&fenc!=#""?&fenc:&enc}%{&ff}',
-                \ 'all_lineinfo': 'U%B %p%% %l/%L %v',
-                \ 'lite_info'   : '%l/%L %v',
+                \ 'all_format': '%{&ft!=#""?&ft."":""}%{&fenc!=#""?&fenc:&enc}%{&ff}',
+                \ 'all_info'  : 'U%B %p%% %l/%L %v ≡%{winnr()}·%n%{&mod?"+":""}',
+                \ 'lite_info' : '%l/%L %v ≡%{winnr()}·%n%{&mod?"+":""}',
                 \ }
     endif
     nnoremap <leader>tl :call lightline#toggle()<CR>
@@ -741,8 +742,8 @@ if s:use.coc
     inoremap <silent><expr> <C-l>
         \ pumvisible() ? "\<C-g>u" : coc#refresh()
     imap <M-l> <C-l>
-    inoremap <C-u> <Cmd>call CocActionAsync('showSignatureHelp')<CR>
-    imap <M-u> <C-u>
+    inoremap <C-o> <Cmd>call CocActionAsync('showSignatureHelp')<CR>
+    imap <M-o> <C-o>
     nnoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? coc#float#scroll(1) : ":vertical resize+5\<CR>"
     nnoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? coc#float#scroll(0) : ":resize-5\<CR>"
     inoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(1)\<CR>" : "\<Right>"
@@ -796,8 +797,8 @@ if s:use.snip
     let g:UltiSnipsExpandTrigger = '<Tab>'
     let g:UltiSnipsJumpForwardTrigger = '<C-j>'
     let g:UltiSnipsJumpBackwardTrigger = '<C-k>'
-    let g:UltiSnipsListSnippets = '<C-o>'
-    imap <M-o> <C-o>
+    let g:UltiSnipsListSnippets = '<C-u>'
+    imap <M-u> <C-u>
 endif
 " }}}
 
