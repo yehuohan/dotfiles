@@ -75,8 +75,8 @@ if s:use.startify
     Plug 'mhinz/vim-startify'
 endif
     Plug 'itchyny/screensaver.vim'
-    Plug 'junegunn/fzf', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
-    Plug 'junegunn/fzf.vim', {'on': ['FzfFiles', 'FzfRg', 'FzfTags']}
+    Plug 'junegunn/fzf'
+    Plug 'junegunn/fzf.vim'
 if s:use.leaderf
     Plug 'Yggdroot/LeaderF', {'do': IsWin() ? './install.bat' : './install.sh'}
 endif
@@ -157,11 +157,11 @@ call plug#end()
 " hop, easy-motion {{{ 快速跳转
 if IsNVim()
     lua require'hop'.setup({ dict_list = { 'zh_sc' }, create_hl_autocmd = true })
-    noremap s <Cmd>HopChar1<CR>
-    noremap S <Cmd>HopPattern<CR>
-    noremap <leader>j <Cmd>HopLineStart<CR>
-    noremap <leader><leader>j <Cmd>HopLine<CR>
-    noremap <leader>mw <Cmd>HopWord<CR>
+    noremap s <Cmd>HopChar1MW<CR>
+    noremap S <Cmd>HopPatternMW<CR>
+    noremap <leader>j <Cmd>HopLineStartMW<CR>
+    noremap <leader><leader>j <Cmd>HopLineMW<CR>
+    noremap <leader>mw <Cmd>HopWordMW<CR>
 else
     let g:EasyMotion_dict = 'zh-cn'     " 支持简体中文拼音
     let g:EasyMotion_do_mapping = 0     " 禁止默认map
@@ -171,7 +171,6 @@ else
     nmap <leader>j <Plug>(easymotion-bd-jk)
     nmap <leader><leader>j <Plug>(easymotion-overwin-line)
     nmap <leader>mw <Plug>(easymotion-bd-w)
-    nmap <leader>me <Plug>(easymotion-bd-e)
 endif
     nnoremap <silent><expr>  z/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/'}))
     nnoremap <silent><expr> zg/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/', 'is_stay': 1}))
