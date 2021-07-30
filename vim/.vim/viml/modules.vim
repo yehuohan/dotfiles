@@ -239,7 +239,6 @@ augroup END
 let s:rp = {
     \ 'proj' : {
         \ 'f' : ['s:FnFile'  , v:null                           ],
-        \ 'j' : ['s:FnCell'  , v:null                           ],
         \ 'q' : ['s:FnGMake' , '*.pro'                          ],
         \ 'u' : ['s:FnGMake' , 'cmakelists.txt'                 ],
         \ 'n' : ['s:FnGMake' , 'cmakelists.txt'                 ],
@@ -272,11 +271,6 @@ let s:rp = {
         \ 'markdown'   : ['typora %s'               , 'srcf'],
         \ 'html'       : ['firefox %s'              , 'srcf'],
         \ },
-    \ 'cell' : {
-        \ 'python' : ['python', '^#%%' , '^#%%' ],
-        \ 'julia'  : ['julia' , '^#%%' , '^#%%' ],
-        \ 'lua'    : ['lua'   , '^--%%', '^--%%'],
-        \ },
     \ 'enc' : {
         \ 'c'    : 'utf-8',
         \ 'cpp'  : 'utf-8',
@@ -300,7 +294,7 @@ let s:rp = {
 " s:rp_mappings {{{
 const s:rp_mappings = [
         \  'Rp',  'Rq',  'Ru',  'Rn',  'Rm',  'Ra',  'Rh',  'Rf',
-        \  'rp',  'rq',  'ru',  'rn',  'rm',  'ra',  'rh',  'rf', 'rj',
+        \  'rp',  'rq',  'ru',  'rn',  'rm',  'ra',  'rh',  'rf',
         \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rca', 'rch',
         \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rba', 'rbh',
         \ 'rlp', 'rlq', 'rlu', 'rln', 'rlm', 'rla', 'rlh', 'rlf',
@@ -497,20 +491,6 @@ function! s:FnFile(cfg)
         let a:cfg.outf = '"' . fnamemodify(a:cfg.file, ':t:r') . '"'
         let l:pstr = map(copy(s:rp.type[l:type]), {key, val -> (key == 0) ? val : get(a:cfg, val, '')})
         return call('printf', l:pstr)
-    endif
-endfunction
-" }}}
-
-" Function: s:FnCell(cfg) {{{
-function! s:FnCell(cfg)
-    let l:type = &filetype
-    if !has_key(s:rp.cell, l:type)
-        throw 's:rp.cell doesn''t support "' . l:type . '"'
-    else
-        let [l:bin, l:pats, l:pate] = s:rp.cell[l:type]
-        let l:exec = printf(':%sAsyncRun %s', join(GetRange(l:pats, l:pate), ','), l:bin)
-        execute l:exec
-        throw l:exec
     endif
 endfunction
 " }}}
