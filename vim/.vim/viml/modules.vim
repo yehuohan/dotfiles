@@ -578,6 +578,13 @@ endfunction
 for key in s:rp_mappings
     execute printf('nnoremap <leader>%s :call RunProject("%s")<CR>', key, key)
 endfor
+nnoremap <leader>rv
+    \ :w<CR><Cmd>
+    \ if &filetype==?'vim' <Bar>
+    \   execute ':source %' <Bar>
+    \ elseif &filetype==?'lua' <Bar>
+    \   execute ':luafile %' <Bar>
+    \ endif<CR>
 " }}}
 
 " Find {{{
@@ -1065,8 +1072,8 @@ function! FnSwitchFile(sf)
 endfunction
 " }}}
 
-let RunScript = function('popset#set#PopSelection', [s:rs.sel])
-nnoremap <leader>se :call RunScript()<CR>
+let ScriptEval = function('popset#set#PopSelection', [s:rs.sel])
+nnoremap <leader>se :call ScriptEval()<CR>
 nnoremap <leader>ei
     \ <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 0)<CR>
 nnoremap <leader>eti
