@@ -272,6 +272,7 @@ vnoremap <leader>agk g<C-a>
 noremap <leader>u ~
 " 匹配符跳转
 packadd matchit
+map <S-s> %
 map <S-m> %
 " 行移动
 noremap j gj
@@ -309,14 +310,12 @@ cnoremap <M-j> <C-Left>
 cnoremap <M-i> <C-b>
 cnoremap <M-o> <C-e>
 " 排序
-nnoremap <leader><leader>s
-    \ <Cmd>call feedkeys(':sort nr /', 'n')<CR>
-nnoremap <leader><leader>S
-    \ <Cmd>call feedkeys(':sort! nr /', 'n')<CR>
-vnoremap <leader><leader>s
-    \ <Cmd>call feedkeys(printf(':sort nr /\%%>%dc.*\%%<%dc/', getpos("'<")[2]-1, getpos("'>")[2]+1), 'n')<CR>
-vnoremap <leader><leader>S
-    \ <Cmd>call feedkeys(printf(':sort! nr /\%%>%dc.*\%%<%dc/', getpos("'<")[2]-1, getpos("'>")[2]+1), 'n')<CR>
+nnoremap <leader><leader>o :sort nr //<Left>
+nnoremap <leader><leader>O :sort! nr //<Left>
+vnoremap <leader><leader>o
+    \ :<C-u>sort nr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
+vnoremap <leader><leader>O
+    \ :<C-u>sort! nr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
 " HEX编辑
 nnoremap <leader>xx :%!xxd<CR>
 nnoremap <leader>xr :%!xxd -r<CR>
@@ -386,9 +385,9 @@ endfunction
 " }}}
 endif
 
-" FUNCTION: WinMoveSpliter(dir, inc) {{{ 移动窗口的分界，改变窗口大小
+" FUNCTION: WinMoveSpliter(dir, inc) range {{{ 移动窗口的分界，改变窗口大小
 " 只有最bottom-right的窗口是移动其top-left的分界，其余窗口移动其bottom-right分界
-function! WinMoveSpliter(dir, inc)
+function! WinMoveSpliter(dir, inc) range
     let l:wnr = winnr()
     let l:pos = win_screenpos(l:wnr)
     let l:hei = winheight(l:wnr) + l:pos[0] + &cmdheight
@@ -396,14 +395,15 @@ function! WinMoveSpliter(dir, inc)
     let l:all_hei = &lines
     let l:all_wid = &columns
 
+    let l:inc = a:inc * v:count1
     if a:dir ==# 'e'
-        execute printf('resize%s%d', (l:hei >= l:all_hei && l:pos[0] >= 3) ? '+' : '-', a:inc)
+        execute printf('resize%s%d', (l:hei >= l:all_hei && l:pos[0] >= 3) ? '+' : '-', l:inc)
     elseif a:dir ==# 'd'
-        execute printf('resize%s%d', (l:hei >= l:all_hei && l:pos[0] >= 3) ? '-' : '+', a:inc)
+        execute printf('resize%s%d', (l:hei >= l:all_hei && l:pos[0] >= 3) ? '-' : '+', l:inc)
     elseif a:dir ==# 's'
-        execute printf('vertical resize%s%d', l:wid >= l:all_wid ? '+' : '-', a:inc)
+        execute printf('vertical resize%s%d', l:wid >= l:all_wid ? '+' : '-', l:inc)
     elseif a:dir ==# 'f'
-        execute printf('vertical resize%s%d', l:wid >= l:all_wid ? '-' : '+', a:inc)
+        execute printf('vertical resize%s%d', l:wid >= l:all_wid ? '-' : '+', l:inc)
     endif
 endfunction
 " }}}
@@ -574,15 +574,11 @@ nnoremap <leader><Esc> :nohlsearch<CR>
 nnoremap i <Cmd>nohlsearch<CR>i
 nnoremap <leader>8 *
 nnoremap <leader>3 #
-vnoremap <leader>8
-    \ <Cmd>call execute('/\V\c\<' . escape(GetSelected(''), '\/') . '\>')<CR>
-vnoremap <leader>3
-    \ <Cmd>call execute('?\V\c\<' . escape(GetSelected(''), '\/') . '\>')<CR>
+vnoremap <leader>8 /\V\c\<<C-r>=escape(GetSelected(''), '\/')<CR>\><CR>
+vnoremap <leader>3 ?\V\c\<<C-r>=escape(GetSelected(''), '\/')<CR>\><CR>
 nnoremap <leader>/ /\V\c<C-r><C-w><CR>
+vnoremap <leader>/ /\V\c<C-r>=escape(GetSelected(''), '\/')<CR><CR>
 nnoremap <leader><leader>/ /<C-r><C-w>
-vnoremap <leader>/
-    \ <Cmd>call execute('/\V\c' . escape(GetSelected(''), '\/'))<CR>
-vnoremap <leader><leader>/
-    \ <Cmd>call feedkeys('/' . GetSelected(''), 'n')<CR>
+vnoremap <leader><leader>/ /<C-r>=GetSelected('')<CR>
 " }}}
 " }}}

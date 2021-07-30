@@ -158,16 +158,16 @@ call plug#end()
 if IsNVim()
     lua require'hop'.setup({ dict_list = { 'zh_sc' }, create_hl_autocmd = true })
     noremap s <Cmd>HopChar1MW<CR>
-    noremap S <Cmd>HopPatternMW<CR>
+    noremap <leader><leader>s <Cmd>HopPatternMW<CR>
     noremap <leader>j <Cmd>HopLineStartMW<CR>
     noremap <leader><leader>j <Cmd>HopLineMW<CR>
-    noremap <leader>mw <Cmd>HopWordMW<CR>
+    noremap <leader>mw <Cmd>HopWord<CR>
 else
     let g:EasyMotion_dict = 'zh-cn'     " 支持简体中文拼音
     let g:EasyMotion_do_mapping = 0     " 禁止默认map
     let g:EasyMotion_smartcase = 1      " 不区分大小写
     nmap s <Plug>(easymotion-overwin-f)
-    nmap S <Plug>(easymotion-overwin-f2)
+    nmap <leader><leader>s <Plug>(easymotion-overwin-f2)
     nmap <leader>j <Plug>(easymotion-bd-jk)
     nmap <leader><leader>j <Plug>(easymotion-overwin-line)
     nmap <leader>mw <Plug>(easymotion-bd-w)
@@ -199,12 +199,13 @@ endif
         \ 'Find Subword Under' : '<C-n>',
         \ 'Select All'         : ',a',
         \ 'Add Cursor At Pos'  : ',,',
+        \ 'Select Operator'    : 'v',
         \ }
     let g:VM_custom_remaps = {
         \ '<C-p>' : '[',
         \ '<C-s>' : 'q',
         \ '<C-c>' : 'Q',
-        \ ',s'    : '<Cmd>HopChar1<CR>',
+        \ 's'    : '<Cmd>HopChar1<CR>',
         \ }
 " }}}
 
@@ -241,11 +242,9 @@ endif
     xmap <leader>al <Plug>(LiveEasyAlign)
     ":EasyAlign[!] [N-th] DELIMITER_KEY [OPTIONS]
     ":EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
-    nnoremap <leader><leader>a
-        \ :normal! vip<CR>:EasyAlign<Space>*//<Left>
+    nnoremap <leader><leader>a vip:EasyAlign<Space>*//<Left>
     vnoremap <leader><leader>a :EasyAlign<Space>*//<Left>
-    nnoremap <leader><leader>A
-        \ :normal! vip<CR>:EasyAlign<Space>
+    nnoremap <leader><leader>A vip:EasyAlign<Space>
     vnoremap <leader><leader>A :EasyAlign<Space>
 " }}}
 
