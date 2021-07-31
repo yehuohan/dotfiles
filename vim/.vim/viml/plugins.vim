@@ -158,6 +158,7 @@ call plug#end()
 if IsNVim()
     lua require'hop'.setup({ dict_list = { 'zh_sc' }, create_hl_autocmd = true })
     noremap s <Cmd>HopChar1MW<CR>
+    noremap <leader>ms <Cmd>HopChar2MW<CR>
     noremap <leader><leader>s <Cmd>HopPatternMW<CR>
     noremap <leader>j <Cmd>HopLineStartMW<CR>
     noremap <leader><leader>j <Cmd>HopLineMW<CR>
@@ -167,7 +168,8 @@ else
     let g:EasyMotion_do_mapping = 0     " 禁止默认map
     let g:EasyMotion_smartcase = 1      " 不区分大小写
     nmap s <Plug>(easymotion-overwin-f)
-    nmap <leader><leader>s <Plug>(easymotion-overwin-f2)
+    nmap <leader>ms <Plug>(easymotion-overwin-f2)
+    nmap <leader><leader>s <Plug>(easymotion-sn)
     nmap <leader>j <Plug>(easymotion-bd-jk)
     nmap <leader><leader>j <Plug>(easymotion-overwin-line)
     nmap <leader>mw <Plug>(easymotion-bd-w)

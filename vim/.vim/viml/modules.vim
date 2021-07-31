@@ -579,7 +579,7 @@ for key in s:rp_mappings
     execute printf('nnoremap <leader>%s :call RunProject("%s")<CR>', key, key)
 endfor
 nnoremap <leader>rv
-    \ :w<CR><Cmd>
+    \ <Cmd>silent w <Bar>
     \ if &filetype==?'vim' <Bar>
     \   execute ':source %' <Bar>
     \ elseif &filetype==?'lua' <Bar>
