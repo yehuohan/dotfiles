@@ -6,7 +6,6 @@ local use = {
     lightline = false,
     startify  = false,
     ycm       = false,
-    snip      = false,
     coc       = false,
     coc_exts  = {
         ['coc-snippets']      = false,
@@ -25,6 +24,8 @@ local use = {
         ['coc-cmake']         = false,
         ['coc-calc']          = false,
     },
+    nlsp      = false,
+    snip      = false,
     spector   = false,
     leaderf   = false,
     utils     = false,

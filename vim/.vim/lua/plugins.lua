@@ -10,7 +10,7 @@ local use = require('use').use
 fn['plug#begin'](vim.env.DotVimPath .. '/bundle')
 vim.cmd([[
     " editing
-    Plug 'yehuohan/vim-easymotion'
+    Plug 'phaazon/hop.nvim'
     Plug 'haya14busa/incsearch.vim'
     Plug 'haya14busa/incsearch-fuzzy.vim'
     Plug 'rhysd/clever-f.vim'
@@ -28,6 +28,7 @@ vim.cmd([[
     Plug 'lucapette/vim-textobj-underscore'
     Plug 'tpope/vim-repeat'
     Plug 'kshenoy/vim-signature'
+    Plug 'Konfekt/FastFold'
     Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
 
     " managers
@@ -39,17 +40,15 @@ fn['plug#end']()
 -- }}}
 
 -- Editing {{{
--- easy-motion {{{ 快速跳转
-g.EasyMotion_dict = 'zh-cn'             -- 支持简体中文拼音
-g.EasyMotion_do_mapping = 0             -- 禁止默认map
-g.EasyMotion_smartcase = 1              -- 不区分大小写
-map('n', 's'         , [[<Plug>(easymotion-overwin-f)]]   , {})
-map('n', '<leader>ms', [[<Plug>(easymotion-sn)]]          , {})
-map('n', '<leader>j' , [[<Plug>(easymotion-bd-jk)]]       , {})
-map('n', '<leader>k' , [[<Plug>(easymotion-overwin-line)]], {})
-map('n', '<leader>mw', [[<Plug>(easymotion-bd-w)]]        , {})
-map('n', '<leader>me', [[<Plug>(easymotion-bd-e)]]        , {})
-map('n', 'z/',
+-- hop {{{ 快速跳转
+require'hop'.setup({ dict_list = { 'ascii', 'zh_sc' }, create_hl_autocmd = true })
+map('', 's'                , [[<Cmd>HopChar1MW<CR>]]    , { noremap = true })
+map('', '<leader>ms'       , [[<Cmd>HopChar2MW<CR>]]    , { noremap = true })
+map('', '<leader><leader>s', [[<Cmd>HopPatternMW<CR>]]  , { noremap = true })
+map('', '<leader>j'        , [[<Cmd>HopLineStartMW<CR>]], { noremap = true })
+map('', '<leader><leader>j', [[<Cmd>HopLineMW<CR>]]     , { noremap = true })
+map('', '<leader>mw'       , [[<Cmd>HopWord<CR>]]       , { noremap = true })
+map('', 'z/',
     [[incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/'}))]],
     { noremap = true, silent = true, expr = true })
 map('n', 'zg/',
@@ -58,7 +57,9 @@ map('n', 'zg/',
 -- }}}
 
 -- clever-f {{{ 行跳转
+g.clever_f_across_no_line = 1
 g.clever_f_show_prompt = 1
+g.clever_f_smart_case = 1
 -- }}}
 
 -- vim-visual-multi {{{ 多光标编辑
@@ -66,21 +67,25 @@ g.clever_f_show_prompt = 1
 -- Tab: 切换cursor/extend模式
 -- C-n: 添加word或selected region作为cursor
 -- C-Up/Down: 移动当前position并添加cursor
--- <VM_leader>A: 查找当前word作为cursor
+-- <VM_leader>a: 查找当前word作为cursor
 -- <VM_leader>/: 查找regex作为cursor（n/N用于查找下/上一个）
--- <VM_leader>\: 添加当前position作为cursor（使用/或arrows跳转位置）
+-- <VM_leader>\: 添加当前position作为cursor（使用/或arrows或Hop跳转位置）
 -- <VM_leader>a <VM_leader>c: 添加visual区域作为cursor
--- s: 文本对象（类似于viw等）
+-- v: 文本对象（类似于viw等）
 g.VM_mouse_mappings = 0         -- 禁用鼠标
-g.VM_leader = '\\'
+g.VM_leader = ','
 g.VM_maps = {
     ['Find Under']         = '<C-n>',
     ['Find Subword Under'] = '<C-n>',
+    ['Select All']         = ',a',
+    ['Add Cursor At Pos']  = ',,',
+    ['Select Operator']    = 'v',
 }
 g.VM_custom_remaps = {
     ['<C-p>'] = '[',
     ['<C-s>'] = 'q',
     ['<C-c>'] = 'Q',
+    ['s']     = '<Cmd>HopChar1<CR>',
 }
 -- }}}
 
@@ -88,10 +93,10 @@ g.VM_custom_remaps = {
 g.textmanip_enable_mappings = 0
 -- 切换Insert/Replace Mode
 map('x', '<M-o>',
-    [[:<C-U>let g:textmanip_current_mode = (g:textmanip_current_mode == 'replace') ? 'insert' : 'replace'<Bar>]] ..
-    [[:echo 'textmanip mode: ' . g:textmanip_current_mode<CR>gv]],
-    { silent = true })
-map('x', '<C-o>', '<M-o>', { silent = true })
+    [[<Cmd>]] ..
+    [[let g:textmanip_current_mode = (g:textmanip_current_mode == 'replace') ? 'insert' : 'replace'<Bar>]] ..
+    [[echo 'textmanip mode: ' . g:textmanip_current_mode<CR>]], {})
+map('x', '<C-o>', '<M-o>', {})
 -- 更据Mode使用Move-Insert或Move-Replace
 map('x', '<C-j>', [[<Plug>(textmanip-move-down)]] , {})
 map('x', '<C-k>', [[<Plug>(textmanip-move-up)]]   , {})
@@ -106,33 +111,36 @@ map('x', '<M-l>', [[<Plug>(textmanip-duplicate-right)]], {})
 
 -- traces {{{ 预览增强
 -- 支持:s, :g, :v, :sort, :range预览
+g.traces_num_range_preview = 1          -- 支持:N,M预览
 -- }}}
 
 -- easy-align {{{ 字符对齐
+g.easy_align_bypass_fold = 1
+g.easy_align_ignore_groups = {}         -- 默认任何group都进行对齐
 -- 默认对齐内含段落（Text Object: vip）
 map('n', '<leader>al', [[<Plug>(EasyAlign)ip]], {})
 map('x', '<leader>al', [[<Plug>(EasyAlign)]],   {})
 -- :EasyAlign[!] [N-th] DELIMITER_KEY [OPTIONS]
 -- :EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
-map('n', '<leader><leader>a', [[:normal! vip<CR>:EasyAlign<Space>]], { noremap = true })
-map('v', '<leader><leader>a', [[:EasyAlign<Space>]], { noremap = true })
+map('n', '<leader><leader>a', [[vip:EasyAlign<Space>*//<Left>]], { noremap = true })
+map('v', '<leader><leader>a', [[:EasyAlign<Space>*//<Left>]]   , { noremap = true })
+map('n', '<leader><leader>A', [[vip:EasyAlign<Space>]]         , { noremap = true })
+map('v', '<leader><leader>A', [[:EasyAlign<Space>]]            , { noremap = true })
 -- }}}
 
 -- smoothie {{{ 平滑滚动
 g.smoothie_no_default_mappings = true
 g.smoothie_update_interval = 30
 g.smoothie_base_speed = 20
-map('n', '<M-n>', [[<Plug>(SmoothieDownwards)]], { silent = true })
-map('n', '<M-m>', [[<Plug>(SmoothieUpwards)]]  , { silent = true })
-map('n', '<M-j>', [[<Plug>(SmoothieForwards)]] , { silent = true })
-map('n', '<M-k>', [[<Plug>(SmoothieBackwards)]], { silent = true })
+map('n', '<M-n>', [[<Plug>(SmoothieDownwards)]], {})
+map('n', '<M-m>', [[<Plug>(SmoothieUpwards)]]  , {})
+map('n', '<M-j>', [[<Plug>(SmoothieForwards)]] , {})
+map('n', '<M-k>', [[<Plug>(SmoothieBackwards)]], {})
 -- }}}
 
 -- expand-region {{{ 快速块选择
-map('n', '<C-p>', [[<Plug>(expand_region_expand)]], {})
-map('v', '<C-p>', [[<Plug>(expand_region_expand)]], {})
-map('n', '<C-u>', [[<Plug>(expand_region_shrink)]], {})
-map('v', '<C-u>', [[<Plug>(expand_region_shrink)]], {})
+map('', '<M-r>', [[<Plug>(expand_region_expand)]], {})
+map('', '<M-w>', [[<Plug>(expand_region_shrink)]], {})
 -- }}}
 
 -- textobj-user {{{ 文本对象
@@ -192,6 +200,14 @@ map('n', '<M-,>',      [[:call signature#mark#Goto('prev', 'line', 'pos')<CR>]],
 map('n', '<M-.>',      [[:call signature#mark#Goto('next', 'line', 'pos')<CR>]], { noremap = true })
 -- }}}
 
+-- FastFold {{{ 更新折叠
+g.fastfold_savehook = 0                 -- 只允许手动更新folds
+g.fastfold_fold_command_suffixes = {'x','X','a','A','o','O','c','C'}
+g.fastfold_fold_movement_commands = {'z[', 'z]', 'zj', 'zk'}
+                                        -- 允许指定的命令更新folds
+map('n', '<leader>zu', [[<Plug>(FastFoldUpdate)]], {})
+-- }}}
+
 -- undotree {{{ 撤消历史
 map('n', '<leader>tu', [[:UndotreeToggle<CR>]], { noremap = true })
 -- }}}
@@ -201,7 +217,6 @@ map('n', '<leader>tu', [[:UndotreeToggle<CR>]], { noremap = true })
 -- theme {{{ Vim主题(ColorScheme, StatusLine, TabLine)
 g.gruvbox_contrast_dark = 'soft'        -- 背景选项：dark, medium, soft
 g.gruvbox_italic = 1
-g.one_allow_italics = 1
 vim.o.background = 'dark'
 if not pcall(vim.cmd, [[colorscheme gruvbox]]) then
     vim.cmd[[colorscheme default]]
@@ -227,32 +242,31 @@ g.Popc_highlight = {
 g.Popc_usePowerFont = 1
 g.Popc_useTabline = 1
 g.Popc_useStatusline = 1
-g.Popc_usePowerFont = 1
+g.Popc_usePowerFont = use.powerfont
 if use.powerfont then
     g.Popc_selectPointer = ''
     g.Popc_separator = {left = '', right = ''}
     g.Popc_subSeparator = {left = '', right = ''}
-else
-    g.Popc_selectPointer = '►'
-    g.Popc_separator = {left = '', right = ''}
-    g.Popc_subSeparator = {left = '│', right = '│'}
 end
 g.Popc_useLayerPath = 0
 g.Popc_useLayerRoots = {'.popc', '.git', '.svn', '.hg', 'tags', '.LfGtags'}
 g.Popc_enableLog = 1
-map('n', '<leader><leader>h', [[:PopcBuffer<CR>]]           , { noremap = true })
-map('n', '<M-i>'            , [[:PopcBufferSwitchLeft<CR>]] , { noremap = true })
-map('n', '<M-o>'            , [[:PopcBufferSwitchRight<CR>]], { noremap = true })
-map('n', '<C-i>'            , [[:PopcBufferJumpPrev<CR>]]   , { noremap = true })
-map('n', '<C-o>'            , [[:PopcBufferJumpNext<CR>]]   , { noremap = true })
-map('n', '<C-h>'            , [[<C-o>]]                     , { noremap = true })
-map('n', '<C-l>'            , [[<C-i>]]                     , { noremap = true })
-map('n', '<leader>wq'       , [[:PopcBufferClose!<CR>]]     , { noremap = true })
-map('n', '<leader><leader>b', [[:PopcBookmark<CR>]]         , { noremap = true })
-map('n', '<leader><leader>w', [[:PopcWorkspace<CR>]]        , { noremap = true })
+map('n', '<leader><leader>h', [[:PopcBuffer<CR>]]               , { noremap = true })
+map('n', '<M-u>'            , [[:PopcBufferSwitchTabLeft!<CR>]] , { noremap = true })
+map('n', '<M-p>'            , [[:PopcBufferSwitchTabRight!<CR>]], { noremap = true })
+map('n', '<M-i>'            , [[:PopcBufferSwitchLeft!<CR>]]    , { noremap = true })
+map('n', '<M-o>'            , [[:PopcBufferSwitchRight!<CR>]]   , { noremap = true })
+map('n', '<C-i>'            , [[:PopcBufferJumpPrev<CR>]]       , { noremap = true })
+map('n', '<C-o>'            , [[:PopcBufferJumpNext<CR>]]       , { noremap = true })
+map('n', '<C-u>'            , [[<C-o>]]                         , { noremap = true })
+map('n', '<C-p>'            , [[<C-i>]]                         , { noremap = true })
+map('n', '<leader>wq'       , [[:PopcBufferClose!<CR>]]         , { noremap = true })
+map('n', '<leader><leader>b', [[:PopcBookmark<CR>]]             , { noremap = true })
+map('n', '<leader><leader>w', [[:PopcWorkspace<CR>]]            , { noremap = true })
 map('n', '<leader>ty',
-    [=[:let g:Popc_tabline_layout = (get(g:, 'Popc_tabline_layout', 0) + 1) % 3<Bar>]=] ..
-    [=[:call call('popc#stl#TabLineSetLayout', [['buffer', 'tab'], ['buffer', ''], ['', 'tab']][g:Popc_tabline_layout])<CR>]=],
-    { noremap = true, silent = true })
+    [=[<Cmd>]=] ..
+    [=[let g:Popc_tabline_layout = (get(g:, 'Popc_tabline_layout', 0) + 1) % 3<Bar>]=] ..
+    [=[call call('popc#stl#TabLineSetLayout', [['buffer', 'tab'], ['buffer', ''], ['', 'tab']][g:Popc_tabline_layout])<CR>]=],
+    { noremap = true })
 -- }}}
 -- }}}

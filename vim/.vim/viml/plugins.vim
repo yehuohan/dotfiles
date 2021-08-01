@@ -156,7 +156,7 @@ call plug#end()
 " Editing {{{
 " hop, easy-motion {{{ 快速跳转
 if IsNVim()
-    lua require'hop'.setup({ dict_list = { 'zh_sc' }, create_hl_autocmd = true })
+    lua require'hop'.setup({ dict_list = { 'ascii', 'zh_sc' }, create_hl_autocmd = true })
     noremap s <Cmd>HopChar1MW<CR>
     noremap <leader>ms <Cmd>HopChar2MW<CR>
     noremap <leader><leader>s <Cmd>HopPatternMW<CR>
@@ -193,7 +193,7 @@ endif
     " <VM_leader>/: 查找regex作为cursor（n/N用于查找下/上一个）
     " <VM_leader>,: 添加当前position作为cursor（使用/或arrows或Hop跳转位置）
     " <VM_leader>a <VM_leader>c: 添加visual区域作为cursor
-    " s: 文本对象（类似于viw等）
+    " v: 文本对象（类似于viw等）
     let g:VM_mouse_mappings = 0         " 禁用鼠标
     let g:VM_leader = ','
     let g:VM_maps = {
@@ -207,7 +207,7 @@ endif
         \ '<C-p>' : '[',
         \ '<C-s>' : 'q',
         \ '<C-c>' : 'Q',
-        \ 's'    : '<Cmd>HopChar1<CR>',
+        \ 's'     : '<Cmd>HopChar1<CR>',
         \ }
 " }}}
 
@@ -316,11 +316,11 @@ endif
 " }}}
 
 " FastFold {{{ 更新折叠
-    nmap <leader>zu <Plug>(FastFoldUpdate)
     let g:fastfold_savehook = 0         " 只允许手动更新folds
     let g:fastfold_fold_command_suffixes = ['x','X','a','A','o','O','c','C']
     let g:fastfold_fold_movement_commands = ['z[', 'z]', 'zj', 'zk']
                                         " 允许指定的命令更新folds
+    nmap <leader>zu <Plug>(FastFoldUpdate)
 " }}}
 
 " undotree {{{ 撤消历史

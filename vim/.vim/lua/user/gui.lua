@@ -44,11 +44,10 @@ local function set_gui_neovimqt()
             GuiTabline 0
             GuiPopupmenu 0
         ]]
-        map('n', '<RightMouse>', [[:call GuiShowContextMenu()<CR>]]                       , { noremap = true })
-        map('i', '<RightMouse>', [[<Esc>:call GuiShowContextMenu()<CR>]]                  , { noremap = true })
-        map('v', '<RightMouse>', [[:call GuiShowContextMenu()<CR>gv]]                     , { noremap = true })
-        map('n', '<leader>tf'  , [[:call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>]], { noremap = true })
-        map('n', '<leader>tm'  , [[:call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>]]  , { noremap = true })
+        map('' , '<RightMouse>', [[<Cmd>call GuiShowContextMenu()<CR>]]                       , { noremap = true })
+        map('i', '<RightMouse>', [[<Cmd>call GuiShowContextMenu()<CR>]]                       , { noremap = true })
+        map('n', '<leader>tf'  , [[<Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>]], { noremap = true })
+        map('n', '<leader>tm'  , [[<Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>]]  , { noremap = true })
     end
 end
 

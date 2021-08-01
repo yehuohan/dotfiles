@@ -3,13 +3,22 @@ local M = {}
 
 
 -- 获取选区内容
-function M.get_selected()
-    local reg_var = fn.getreg('0', 1)
-    local reg_mode = fn.getregtype('0')
-    vim.cmd[[normal! gv"0y]]
-    local word = fn.getreg('0')
-    fn.setreg('0', reg_var, reg_mode)
-    return word
+function M.get_selected(sep)
+    local reg_var = fn.getreg('9', 1)
+    local reg_mode = fn.getregtype('9')
+    if fn.mode() ==# 'n' then
+        vim.cmd[[silent normal! gv"9y]]
+    else
+        vim.cmd[[silent normal! "9y]]
+    end
+    local selected = fn.getreg('9')
+    fn.setreg('9', reg_var, reg_mode)
+
+    if sep then
+        return fn.join(fn.split(selected, "\n"), sep)
+    else
+        return selected
+    end
 end
 
 -- 获取特定的内容的范围
