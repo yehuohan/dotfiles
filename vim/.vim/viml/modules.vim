@@ -238,38 +238,35 @@ augroup END
 " @attribute type: filetype类型
 let s:rp = {
     \ 'proj' : {
-        \ 'f' : ['s:FnFile'  , v:null                           ],
-        \ 'q' : ['s:FnGMake' , '*.pro'                          ],
-        \ 'u' : ['s:FnGMake' , 'cmakelists.txt'                 ],
-        \ 'n' : ['s:FnGMake' , 'cmakelists.txt'                 ],
-        \ 'm' : ['s:FnMake'  , 'makefile'                       ],
-        \ 'a' : ['s:FnCargo' , 'Cargo.toml'                     ],
+        \ 'f' : ['s:FnFile'  , v:null],
+        \ 'm' : ['s:FnMake'  , 'makefile'],
+        \ 'u' : ['s:FnGMake' , 'cmakelists.txt'],
+        \ 'n' : ['s:FnGMake' , 'cmakelists.txt'],
+        \ 'j' : ['s:FnGMake' , 'cmakelists.txt'],
+        \ 'q' : ['s:FnGMake' , '*.pro'],
+        \ 'a' : ['s:FnCargo' , 'Cargo.toml'],
         \ 'h' : ['s:FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
         \ },
     \ 'type' : {
-        \ 'c'          : [IsWin() ? 'gcc -g %s %s -o %s.exe && %s %s' : 'gcc -g %s %s -o %s && ./%s %s',
-                                                    \ 'abld', 'srcf', 'outf', 'outf', 'arun'],
-        \ 'cpp'        : [IsWin() ? 'g++ -g -std=c++17 %s %s -o %s.exe && %s %s' : 'g++ -g -std=c++17 %s %s -o %s && ./%s %s',
-                                                    \ 'abld', 'srcf', 'outf', 'outf', 'arun'],
-        \ 'rust'       : [IsWin() ? 'rustc %s %s -o %s.exe && %s %s' : 'rustc %s %s -o %s && ./%s %s',
-                                                    \ 'abld', 'srcf', 'outf', 'outf', 'arun'],
-        \ 'java'       : ['javac %s && java %s %s'  , 'srcf', 'outf', 'arun'],
-        \ 'python'     : ['python %s %s'            , 'srcf', 'arun'        ],
-        \ 'julia'      : ['julia %s %s'             , 'srcf', 'arun'        ],
-        \ 'lua'        : ['lua %s %s'               , 'srcf', 'arun'        ],
-        \ 'go'         : ['go run %s %s'            , 'srcf', 'arun'        ],
-        \ 'javascript' : ['node %s %s'              , 'srcf', 'arun'        ],
-        \ 'typescript' : ['node %s %s'              , 'srcf', 'arun'        ],
-        \ 'dart'       : ['dart %s %s'              , 'srcf', 'arun'        ],
-        \ 'make'       : ['make -f %s %s'           , 'srcf', 'arun'        ],
-        \ 'sh'         : ['bash ./%s %s'            , 'srcf', 'arun'        ],
-        \ 'dosbatch'   : ['%s %s'                   , 'srcf', 'arun'        ],
-        \ 'glsl'       : ['glslangValidator %s %s'  , 'abld', 'srcf'        ],
-        \ 'tex'        : ['xelatex -file-line-error %s && SumatraPDF %s.pdf', 'srcf', 'outf'],
-        \ 'matlab'     : ['matlab -nosplash -nodesktop -r %s', 'outf'],
+        \ 'c'          : ['gcc -g %s %s -o "%s" && "./%s" %s',            'abld', 'srcf', 'outf', 'outf', 'arun'],
+        \ 'cpp'        : ['g++ -g -std=c++17 %s %s -o "%s" && "./%s" %s', 'abld', 'srcf', 'outf', 'outf', 'arun'],
+        \ 'rust'       : ['rustc %s %s -o "%s" && "./%s" %s',             'abld', 'srcf', 'outf', 'outf', 'arun'],
+        \ 'java'       : ['javac %s && java "%s" %s', 'srcf', 'outf', 'arun'],
+        \ 'python'     : ['python %s %s'            , 'srcf', 'arun'],
+        \ 'julia'      : ['julia %s %s'             , 'srcf', 'arun'],
+        \ 'lua'        : ['lua %s %s'               , 'srcf', 'arun'],
+        \ 'go'         : ['go run %s %s'            , 'srcf', 'arun'],
+        \ 'javascript' : ['node %s %s'              , 'srcf', 'arun'],
+        \ 'typescript' : ['node %s %s'              , 'srcf', 'arun'],
+        \ 'dart'       : ['dart %s %s'              , 'srcf', 'arun'],
+        \ 'make'       : ['make -f %s %s'           , 'srcf', 'arun'],
+        \ 'sh'         : ['bash ./%s %s'            , 'srcf', 'arun'],
+        \ 'dosbatch'   : ['%s %s'                   , 'srcf', 'arun'],
+        \ 'glsl'       : ['glslangValidator %s %s'  , 'abld', 'srcf'],
         \ 'json'       : ['python -m json.tool %s'  , 'srcf'],
         \ 'markdown'   : ['typora %s'               , 'srcf'],
         \ 'html'       : ['firefox %s'              , 'srcf'],
+        \ 'tex'        : ['xelatex -file-line-error %s && SumatraPDF "%s.pdf"', 'srcf', 'outf'],
         \ },
     \ 'enc' : {
         \ 'c'    : 'utf-8',
@@ -285,21 +282,16 @@ let s:rp = {
         \ 'tex'    : '%f:%l:\ %m',
         \ 'cmake'  : '%ECMake\ Error\ at\ %f:%l\ %#%m:',
         \ },
-    \ 'pat' : {
-        \ 'target'  : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
-        \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
-        \ 'name'    : '\mname\s*=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
-        \ },
     \ }
 " s:rp_mappings {{{
 const s:rp_mappings = [
-        \  'Rp',  'Rq',  'Ru',  'Rn',  'Rm',  'Ra',  'Rh',  'Rf',
-        \  'rp',  'rq',  'ru',  'rn',  'rm',  'ra',  'rh',  'rf',
-        \ 'rcp', 'rcq', 'rcu', 'rcn', 'rcm', 'rca', 'rch',
-        \ 'rbp', 'rbq', 'rbu', 'rbn', 'rbm', 'rba', 'rbh',
-        \ 'rlp', 'rlq', 'rlu', 'rln', 'rlm', 'rla', 'rlh', 'rlf',
-        \ 'rtp', 'rtq', 'rtu', 'rtn', 'rtm', 'rta', 'rth', 'rtf',
-        \ 'rop', 'roq', 'rou', 'ron', 'rom', 'roa', 'roh',
+        \  'Rp',  'Rm',  'Ru',  'Rn',  'Rj',  'Rq',  'Ra',  'Rh',  'Rf',
+        \  'rp',  'rm',  'ru',  'rn',  'rj',  'rq',  'ra',  'rh',  'rf',
+        \ 'rcp', 'rcm', 'rcu', 'rcn', 'rcj', 'rcq', 'rca', 'rch',
+        \ 'rbp', 'rbm', 'rbu', 'rbn', 'rbj', 'rbq', 'rba', 'rbh',
+        \ 'rlp', 'rlm', 'rlu', 'rln', 'rlj', 'rlq', 'rla', 'rlh', 'rlf',
+        \ 'rtp', 'rtm', 'rtu', 'rtn', 'rtj', 'rtq', 'rta', 'rth', 'rtf',
+        \ 'rop', 'rom', 'rou', 'ron', 'roj', 'roq', 'roa', 'roh',
         \ ]
 " }}}
 
@@ -316,11 +308,11 @@ function! s:rp.run(cfg) dict
         if l:pat == v:null
             let a:cfg.file = expand('%:p')
         else
-            let a:cfg.file = s:glob(l:pat, a:cfg.lowest)
-            if empty(a:cfg.file)
+            let l:files = s:glob(l:pat, a:cfg.lowest)
+            if empty(l:files)
                 throw 'None of ' . l:pat . ' was found!'
             endif
-            let a:cfg.file = a:cfg.file[0]
+            let a:cfg.file = l:files[0]
         endif
     endif
     let a:cfg.wdir = fnamemodify(a:cfg.file, ':h')
@@ -376,17 +368,38 @@ function! s:glob(pat, low)
 endfunction
 " }}}
 
-" Function: s:pstr(file, pat) {{{
-" @param pat: 匹配模式，必须使用 \(\) 来提取字符串
-" @return 返回匹配的字符串结果
-function! s:pstr(file, pat)
-    for l:line in readfile(a:file)
-        let l:res = matchlist(l:line, a:pat)
-        if !empty(l:res)
-            return l:res[1]
+" Function: s:vout(cfg) {{{
+" 设置__VBuildOut输出和运行（用于FnMake和FnGMake）
+function! s:vout(cfg)
+    let l:dir = '__VBuildOut'
+    if a:cfg.key !=# 'm'
+        let l:outdir = a:cfg.wdir . '/' . l:dir
+        if a:cfg.deploy ==# 'clean'
+            call delete(l:outdir, 'rf')
+            throw l:dir . ' was removed'
         endif
-    endfor
-    return ''
+        silent! call mkdir(l:outdir, 'p')
+    endif
+
+    let l:out = ''
+    if a:cfg.deploy ==# 'run'
+        const l:pats = {
+            \ 'target'  : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
+            \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
+            \ }
+        let l:pat = (a:cfg.key =~# '[mq]') ? l:pats.target : l:pats.project
+
+        let l:out = '&& echo "[RP]Warning: No executable file found"'
+        for l:line in readfile(a:cfg.file)
+            let l:res = matchlist(l:line, l:pat)
+            if !empty(l:res)
+                let l:out = printf('&& "./%s/%s" %s', l:dir, l:res[1], a:cfg.arun)
+                break
+            endif
+        endfor
+    end
+
+    return [l:dir, l:out]
 endfunction
 " }}}
 
@@ -417,34 +430,40 @@ function! RunProject(keys, ...)
     if km.S ==# 'R'
         " config project
         let l:cfg = {
-            \ 'term': '', 'agen': '', 'abld': '', 'arun': '',
+            \ 'key': '',
+            \ 'file': '',
+            \ 'type': '',
+            \ 'term': '',
+            \ 'agen': '',
+            \ 'abld': '',
+            \ 'arun': '',
             \ 'deploy': 'run',
             \ 'lowest': 0,
             \ }
         let l:sel = {
-            \ 'opt' : 'config project',
-            \ 'lst' : ['term', 'agen', 'abld', 'arun', 'deploy', 'lowest'],
-            \ 'dic' : {
-                \ 'term': {'lst': ['right', 'bottom', 'floaterm']},
-                \ 'agen': {'lst': ['-DTEST=']},
-                \ 'abld': {'lst': ['-static', 'tags', '--target tags']},
-                \ 'arun': {'lst': ['--nocapture']},
+            \ 'opt': 'config project',
+            \ 'lst': ['term', 'agen', 'abld', 'arun', 'deploy', 'lowest'],
+            \ 'dic': {
+                \ 'key'   : {'lst': keys(s:rp.proj),
+                \            'dic': map(deepcopy(s:rp.proj), {key, val -> val[0]})},
+                \ 'file'  : {'cpl': 'file'},
+                \ 'type'  : {'cpl': 'filetype'},
+                \ 'term'  : {'lst': ['right', 'bottom', 'floaterm']},
+                \ 'agen'  : {'lst': ['-DTEST=']},
+                \ 'abld'  : {'lst': ['-static', 'tags', '--target tags', '-j32']},
+                \ 'arun'  : {'lst': ['--nocapture']},
                 \ 'deploy': {'lst': ['build', 'run', 'clean', 'test']},
                 \ 'lowest': {'lst': [0, 1]},
                 \ },
-            \ 'sub' : {
-                \ 'cmd' : {sopt, sel -> extend(l:cfg, {sopt : sel})},
-                \ 'get' : {sopt -> l:cfg[sopt]},
+            \ 'sub': {
+                \ 'cmd': {sopt, sel -> extend(l:cfg, {sopt : sel})},
+                \ 'get': {sopt -> l:cfg[sopt]},
                 \ },
             \ 'onCR': {sopt -> call('RunProject', ['r' . km.A . km.E, l:cfg])}
             \ }
         if km.E ==# 'p'
-            call extend(l:cfg, {'key': '', 'file': '', 'type': ''})
             call extend(l:cfg, s:ws.rp)
             let l:sel.lst = ['key', 'file', 'type'] + l:sel.lst
-            let l:sel.dic['key'] = {'lst': keys(s:rp.proj), 'dic': map(deepcopy(s:rp.proj), {key, val -> val[0]})}
-            let l:sel.dic['file'] = {'cpl': 'file'}
-            let l:sel.dic['type'] = {'cpl': 'filetype'}
         endif
         call PopSelection(l:sel)
     elseif km.E ==# 'p'
@@ -460,14 +479,16 @@ function! RunProject(keys, ...)
             \ has_key(s:ws.rp, 'key') ? (km.S . km.A . s:ws.rp.key) : ('R' . km.A . km.E),
             \ s:ws.rp)
     else
-        " run project with config
+        " run project with config or echo message from exception
         try
             let l:cfg = {
-                \ 'key'   : km.E,
-                \ 'term'  : (km.A ==# 'l') ? 'floaterm' : ((km.A ==# 't') ? 'right' : ''),
+                \ 'key': km.E,
+                \ 'term': (km.A ==# 'l') ? 'floaterm' : ((km.A ==# 't') ? 'right' : ''),
+                \ 'agen': '',
+                \ 'abld': '',
+                \ 'arun': '',
                 \ 'deploy': (km.A ==# 'b') ? 'build' : ((km.A ==# 'c') ? 'clean' : 'run'),
                 \ 'lowest': (km.A ==# 'o') ? 1 : 0,
-                \ 'agen': '', 'abld': '', 'arun': '',
                 \ }
             if a:0 > 0
                 call extend(l:cfg, a:1)
@@ -488,7 +509,7 @@ function! s:FnFile(cfg)
     else
         let a:cfg.type = l:type
         let a:cfg.srcf = '"' . fnamemodify(a:cfg.file, ':t') . '"'
-        let a:cfg.outf = '"' . fnamemodify(a:cfg.file, ':t:r') . '"'
+        let a:cfg.outf = fnamemodify(a:cfg.file, ':t:r')
         let l:pstr = map(copy(s:rp.type[l:type]), {key, val -> (key == 0) ? val : get(a:cfg, val, '')})
         return call('printf', l:pstr)
     endif
@@ -500,52 +521,38 @@ function! s:FnMake(cfg)
     if a:cfg.deploy ==# 'clean'
         let l:cmd = 'make clean'
     else
-        let l:cmd = 'make ' . a:cfg.abld
-        if a:cfg.deploy ==# 'run'
-            let l:outfile = s:pstr(a:cfg.file, s:rp.pat.target)
-            if empty(l:outfile)
-                let l:cmd .= ' && echo "[RP]Warning: No executable file, try add TARGET"'
-            else
-                let l:cmd .= printf(' && "./__VBuildOut/%s" %s', l:outfile, a:cfg.arun)
-            endif
-        endif
+        let [_, l:out] = s:vout(a:cfg)
+        let l:cmd = printf('make %s %s', a:cfg.abld, l:out)
     endif
     return l:cmd
 endfunction
 " }}}
 
 " Function: s:FnGMake(cfg) {{{
-" generate make from cmake, qmake ...
+" u: cmake for unix makefiles
+" n: cmake for nmake makefiles
+" j: cmake for ninja
+" q: qmake
 function! s:FnGMake(cfg)
-    let l:outdir = a:cfg.wdir . '/__VBuildOut'
-    if a:cfg.deploy ==# 'clean'
-        call delete(l:outdir, 'rf')
-        throw '__VBuildOut was removed'
-    else
-        silent! call mkdir(l:outdir, 'p')
-        if a:cfg.key ==# 'u'
-            let l:cmd = printf('cmake %s -G "Unix Makefiles" .. && cmake --build . %s', a:cfg.agen, a:cfg.abld)
-        elseif a:cfg.key ==# 'n'
-            let l:cmd = printf('vcvars64.bat && cmake %s -G "NMake Makefiles" .. && cmake --build . %s',  a:cfg.agen, a:cfg.abld)
-        elseif a:cfg.key ==# 'q'
-            let l:srcfile = fnamemodify(a:cfg.file, ':t')
-            if IsWin()
-                let l:cmd = printf('vcvars64.bat && qmake %s ../"%s" && nmake %s', a:cfg.agen, l:srcfile, a:cfg.abld)
-            else
-                let l:cmd = printf('qmake %s ../"%s" && make %s', a:cfg.agen, l:srcfile, a:cfg.abld)
-            endif
-        endif
-        let l:cmd = printf('cd __VBuildOut && %s && cd ..', l:cmd)
+    let [l:dir, l:out] = s:vout(a:cfg)
+    if a:cfg.deploy !=# 'clean'
+        const l:fmts = {
+            \ 'u': 'cmake %s -G "Unix Makefiles" .. && cmake --build . %s',
+            \ 'n': 'vcvars64.bat && cmake %s -G "NMake Makefiles" .. && cmake --build . %s',
+            \ 'j': 'cmake %s -G Ninja .. && cmake --build . %s',
+            \ 'q': IsWin() ?
+            \      'vcvars64.bat && qmake %s ../"%s" && nmake %s' :
+            \      'qmake %s ../"%s" && make %s',
+            \ }
+        let l:fmt = l:fmts[a:cfg.key]
 
-        if a:cfg.deploy ==# 'run'
-            let l:outfile = s:pstr(a:cfg.file, a:cfg.key ==# 'q' ? s:rp.pat.target : s:rp.pat.project)
-            if empty(l:outfile)
-                let l:cmd .= ' && echo "[RP]Warning: No executable file, try add project() or TARGET"'
-            else
-                let l:cmd .= printf(' && "./__VBuildOut/%s" %s', l:outfile, a:cfg.arun)
-            endif
+        if a:cfg.key ==# 'q'
+            let l:srcfile = fnamemodify(a:cfg.file, ':t')
+            let l:cmd = printf(l:fmt, a:cfg.agen, l:srcfile, a:cfg.abld)
+        else
+            let l:cmd = printf(l:fmt, a:cfg.agen, a:cfg.abld)
         endif
-        return l:cmd
+        return printf('cd %s && %s && cd .. %s', l:dir, l:cmd, l:out)
     endif
 endfunction
 " }}}

@@ -156,7 +156,7 @@ call plug#end()
 " Editing {{{
 " hop, easy-motion {{{ 快速跳转
 if IsNVim()
-    lua require'hop'.setup({ dict_list = { 'ascii', 'zh_sc' }, create_hl_autocmd = true })
+    silent! lua require'hop'.setup({ dict_list = { 'ascii', 'zh_sc' }, create_hl_autocmd = true })
     noremap s <Cmd>HopChar1MW<CR>
     noremap <leader>ms <Cmd>HopChar2MW<CR>
     noremap <leader><leader>s <Cmd>HopPatternMW<CR>
@@ -361,8 +361,8 @@ if s:use.lightline
                 \ },
         \ 'component': {
                 \ 'all_format': '%{&ft!=#""?&ft."/":""}%{&fenc!=#""?&fenc:&enc}/%{&ff}',
-                \ 'all_info'  : 'U%B %p%% %l/%L # %v @%{winnr()}·%n%{&mod?"+":""}',
-                \ 'lite_info' : '%l/%L # %v @%{winnr()}·%n%{&mod?"+":""}',
+                \ 'all_info'  : 'U%B %p%% %l/%L $%v %{winnr()}.%n%{&mod?"+":""}',
+                \ 'lite_info' : '%l/%L $%v %{winnr()}.%n%{&mod?"+":""}',
                 \ },
         \ 'component_function': {
                 \ 'mode'      : 'Plug_ll_mode',
@@ -386,8 +386,8 @@ if s:use.lightline
         let g:lightline.tabline_subseparator = {'left': '', 'right': ''}
         let g:lightline.component = {
                 \ 'all_format': '%{&ft!=#""?&ft."":""}%{&fenc!=#""?&fenc:&enc}%{&ff}',
-                \ 'all_info'  : 'U%B %p%% %l/%L %v ≡%{winnr()}·%n%{&mod?"+":""}',
-                \ 'lite_info' : '%l/%L %v ≡%{winnr()}·%n%{&mod?"+":""}',
+                \ 'all_info'  : 'U%B %p%% %l/%L %v %{winnr()}.%n%{&mod?"+":""}',
+                \ 'lite_info' : '%l/%L %v %{winnr()}.%n%{&mod?"+":""}',
                 \ }
     endif
     nnoremap <leader>tl :call lightline#toggle()<CR>
