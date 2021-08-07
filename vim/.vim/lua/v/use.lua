@@ -77,7 +77,7 @@ local function use_init()
 end
 
 
-vim.cmd[[command! -nargs=0 Use :lua require('use').init()]]
+vim.cmd[[command! -nargs=0 Use :lua require('v.use').init()]]
 
 use_load()
 

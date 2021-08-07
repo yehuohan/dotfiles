@@ -2,7 +2,7 @@
 local fn = vim.fn
 local map = vim.api.nvim_set_keymap
 local g = vim.g
-local use = require('use').use
+local use = require('v.use').use
 
 
 -- Plug {{{

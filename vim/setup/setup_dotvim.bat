@@ -16,6 +16,7 @@ if not exist %LOCALAPPDATA%\nvim (
     md %LOCALAPPDATA%\nvim
 )
 copy %APPS_HOME%\dotconfigs\vim\nvim\init.vim   %LOCALAPPDATA%\nvim\
+REM copy %APPS_HOME%\dotconfigs\vim\nvim\init.lua   %LOCALAPPDATA%\nvim\
 
 echo Dotvim setup was completed!
 pause

@@ -1,6 +1,6 @@
 local fn = vim.fn
 local map = vim.api.nvim_set_keymap
-local use = require('use').use
+local use = require('v.use').use
 
 
 -- Init font and font size
@@ -31,7 +31,7 @@ end
 vim.cmd[[
 augroup UserSettingsGui
     autocmd!
-    autocmd UIEnter * :lua require('user.gui').set_gui_neovimqt()
+    autocmd UIEnter * :lua require('v.gui').set_gui_neovimqt()
 augroup END
 ]]
 

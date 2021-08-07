@@ -14,6 +14,7 @@ cp -r ~/dotconfigs/vim/.vim/*           ~/.vim/
 if type nvim >/dev/null 2>&1; then 
     mkdir -p ~/.config/nvim
     cp ~/dotconfigs/vim/nvim/init.vim   ~/.config/nvim/
+    #cp ~/dotconfigs/vim/nvim/init.lua   ~/.config/nvim/
 fi
 
 echo "Dotvim setup was completed!"
