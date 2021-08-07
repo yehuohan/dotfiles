@@ -50,7 +50,7 @@ local function setup(dotvim)
 
     require('v.env')
     require('v.use')
-    require('v.exts')
+    require('v.pkgs')
     require('v.opts')
     require('v.gui')
     require('v.maps')

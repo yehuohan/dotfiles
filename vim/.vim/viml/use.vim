@@ -4,6 +4,7 @@ endfunction
 
 let s:use_file = $DotVimCachePath . '/.use.json'
 let s:use = {
+    \ 'fastgit'   : v:false,
     \ 'powerfont' : v:false,
     \ 'lightline' : v:false,
     \ 'startify'  : v:false,

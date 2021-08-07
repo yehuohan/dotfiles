@@ -5,43 +5,65 @@ local g = vim.g
 local use = require('v.use').use
 
 
--- Plug {{{
--- 设置插件位置，且自动设置了syntax enable和filetype plugin indent on
-fn['plug#begin'](vim.env.DotVimPath .. '/bundle')
-vim.cmd([[
-    " editing
-    Plug 'phaazon/hop.nvim'
-    Plug 'haya14busa/incsearch.vim'
-    Plug 'haya14busa/incsearch-fuzzy.vim'
-    Plug 'rhysd/clever-f.vim'
-    Plug 'mg979/vim-visual-multi'
-    Plug 't9md/vim-textmanip'
-    Plug 'markonm/traces.vim'
-    Plug 'junegunn/vim-easy-align'
-    Plug 'psliwka/vim-smoothie'
-    Plug 'terryma/vim-expand-region'
-    Plug 'kana/vim-textobj-user'
-    Plug 'kana/vim-textobj-indent'
-    Plug 'kana/vim-textobj-function'
-    Plug 'glts/vim-textobj-comment'
-    Plug 'adriaanzon/vim-textobj-matchit'
-    Plug 'lucapette/vim-textobj-underscore'
-    Plug 'tpope/vim-repeat'
-    Plug 'kshenoy/vim-signature'
-    Plug 'Konfekt/FastFold'
-    Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
+-- Packs {{{
+local packer_config = {
+    package_root = vim.env.DotVimPath .. '/pack',
+    compile_path = vim.env.DotVimPath .. '/pack/packer_compiled.lua',
+    plugin_package = 'packer',
+    git = {
+        default_url_format = 'https://github.com/%s',
+    },
+}
+if use.fastgit then
+    packer_config.git.default_url_format = 'https://hub.fastgit.org/%s'
+end
 
-    " managers
-    Plug 'morhetz/gruvbox'
-    Plug 'yehuohan/popc'
-    Plug 'yehuohan/popset'
-]])
-fn['plug#end']()
+require('packer').startup({
+function()
+    local add = require('packer').use
+    add 'wbthomason/packer.nvim'
+    -- editing
+    add {
+        'yehuohan/hop.nvim',
+        config = function()
+            require'hop'.setup({
+                dict_list = { 'ascii', 'zh_sc' },
+                create_hl_autocmd = true
+            })
+        end,
+    }
+    add 'haya14busa/incsearch.vim'
+    add 'haya14busa/incsearch-fuzzy.vim'
+    add 'rhysd/clever-f.vim'
+    add 'mg979/vim-visual-multi'
+    add 't9md/vim-textmanip'
+    add 'markonm/traces.vim'
+    add 'junegunn/vim-easy-align'
+    add 'psliwka/vim-smoothie'
+    add 'terryma/vim-expand-region'
+    add 'kana/vim-textobj-user'
+    add 'kana/vim-textobj-indent'
+    add 'kana/vim-textobj-function'
+    add 'glts/vim-textobj-comment'
+    add 'adriaanzon/vim-textobj-matchit'
+    add 'lucapette/vim-textobj-underscore'
+    add 'tpope/vim-repeat'
+    add 'kshenoy/vim-signature'
+    add 'Konfekt/FastFold'
+    add {
+        'mbbill/undotree',
+        cmd = { 'UndotreeToggle' },
+    }
+
+    -- managers
+    add 'morhetz/gruvbox'
+    add 'yehuohan/popc'
+    add 'yehuohan/popset'
+end, config = packer_config})
 -- }}}
 
 -- Editing {{{
 -- hop {{{ 快速跳转
-require'hop'.setup({ dict_list = { 'ascii', 'zh_sc' }, create_hl_autocmd = true })
 map('', 's'                , [[<Cmd>HopChar1MW<CR>]]    , { noremap = true })
 map('', '<leader>ms'       , [[<Cmd>HopChar2MW<CR>]]    , { noremap = true })
 map('', '<leader><leader>s', [[<Cmd>HopPatternMW<CR>]]  , { noremap = true })

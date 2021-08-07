@@ -5,4 +5,5 @@ else
     dotvim = '~/.vim'
 end
 vim.opt.rtp:prepend(dotvim)
+vim.opt.packpath:prepend(dotvim)
 require('v').setup(dotvim)

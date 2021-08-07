@@ -2,6 +2,7 @@ local fn = vim.fn
 
 local use_file = vim.env.DotVimCachePath .. '/.use.json'
 local use = {
+    fastgit   = false,
     powerfont = false,
     lightline = false,
     startify  = false,

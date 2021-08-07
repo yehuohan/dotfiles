@@ -34,10 +34,13 @@ endfunction
 " }}}
 
 " Plug {{{
+if s:use.fastgit
+    let g:plug_url_format = 'https://hub.fastgit.org/%s.git'
+endif
 call plug#begin($DotVimPath.'/bundle')  " 设置插件位置，且自动设置了syntax enable和filetype plugin indent on
     " editing
 if IsNVim()
-    Plug 'phaazon/hop.nvim'
+    Plug 'yehuohan/hop.nvim'
 else
     Plug 'yehuohan/vim-easymotion'
 endif
