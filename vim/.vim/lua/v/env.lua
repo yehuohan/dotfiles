@@ -29,7 +29,7 @@ local function env_init()
 
     -- Append {'path':[], 'vars':{}} from .env.json
     local ex_file = vim.env.DotVimCachePath .. '/.env.json'
-    if fn.filereadable(ex_file) then
+    if fn.filereadable(ex_file) == 1 then
         local ex = fn.json_decode(fn.join(fn.readfile(ex_file)))
         vim.env.PATH = vim.env.PATH .. sep .. fn.join(ex.path, sep)
         for name, val in pairs(ex.vars) do
