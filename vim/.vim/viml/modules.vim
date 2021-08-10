@@ -24,23 +24,6 @@ function! GetSelected(...)
 endfunction
 " }}}
 
-" Function: GetRange(pats, pate) {{{ 获取特定的内容的范围
-" @param pats: 起始行匹配模式，start为pats所在行
-" @param pate: 结束行匹配模式，end为pate所在行
-" @return 返回列表[start, end]
-function! GetRange(pats, pate)
-    let l:start = search(a:pats, 'bcnW')
-    let l:end = search(a:pate, 'cnW')
-    if l:start == 0
-        let l:start = 1
-    endif
-    if l:end == 0
-        let l:end = line('$')
-    endif
-    return [l:start, l:end]
-endfunction
-" }}}
-
 " Function: GetEval(str, type) {{{ 获取计算结果
 function! GetEval(str, type)
     if a:type ==# 'command'

@@ -21,22 +21,6 @@ function M.get_selected(sep)
     end
 end
 
--- 获取特定的内容的范围
--- @param pats: 起始行匹配模式，rstart为pats所在行
--- @param pate: 结束行匹配模式，rend为pate所在行
--- @return 返回列表[rstart, rend]
-function M.get_range(pats, pate)
-    local rstart = fn.search(pats, 'bcnW')
-    local rend = fn.search(pate, 'cnW')
-    if rstart == 0 then
-        rstart = 1
-    end
-    if rend == 0 then
-        rend = fn.line('$')
-    end
-    return {rstart, rend}
-end
-
 -- 获取计算结果
 function M.get_eval(str, ty)
     local result = ''
