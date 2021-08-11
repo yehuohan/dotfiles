@@ -4,7 +4,7 @@ endfunction
 
 " Libs {{{
 " Function: GetSelected(...) {{{ 获取选区内容
-" @param sep: 提供sep，且选区是多行时，使用sep连接成一行
+" @param sep: 提供sep，当选区是多行时，使用sep连接成一行
 function! GetSelected(...)
     let l:reg_var = getreg('9', 1)
     let l:reg_mode = getregtype('9')
@@ -413,13 +413,10 @@ function! RunProject(keys, ...)
     if km.S ==# 'R'
         " config project
         let l:cfg = {
-            \ 'key': '',
-            \ 'file': '',
-            \ 'type': '',
-            \ 'term': '',
-            \ 'agen': '',
-            \ 'abld': '',
-            \ 'arun': '',
+            \ 'term'  : '',
+            \ 'agen'  : '',
+            \ 'abld'  : '',
+            \ 'arun'  : '',
             \ 'deploy': 'run',
             \ 'lowest': 0,
             \ }
@@ -445,6 +442,7 @@ function! RunProject(keys, ...)
             \ 'onCR': {sopt -> call('RunProject', ['r' . km.A . km.E, l:cfg])}
             \ }
         if km.E ==# 'p'
+            call extend(l:cfg, {'key': '', 'file': '', 'type': ''})
             call extend(l:cfg, s:ws.rp)
             let l:sel.lst = ['key', 'file', 'type'] + l:sel.lst
         endif
@@ -465,11 +463,11 @@ function! RunProject(keys, ...)
         " run project with config or echo message from exception
         try
             let l:cfg = {
-                \ 'key': km.E,
-                \ 'term': (km.A ==# 'l') ? 'floaterm' : ((km.A ==# 't') ? 'right' : ''),
-                \ 'agen': '',
-                \ 'abld': '',
-                \ 'arun': '',
+                \ 'key'   : km.E,
+                \ 'term'  : (km.A ==# 'l') ? 'floaterm' : ((km.A ==# 't') ? 'right' : ''),
+                \ 'agen'  : '',
+                \ 'abld'  : '',
+                \ 'arun'  : '',
                 \ 'deploy': (km.A ==# 'b') ? 'build' : ((km.A ==# 'c') ? 'clean' : 'run'),
                 \ 'lowest': (km.A ==# 'o') ? 1 : 0,
                 \ }
@@ -718,6 +716,8 @@ function! s:parseLocation(km)
     else
         if empty(get(s:ws.fw, 'path', ''))
             let s:ws.fw.path = popc#utils#FindRoot()
+            call add(s:ws.fw.pathlst, s:ws.fw.path)
+            call uniq(sort(s:ws.fw.pathlst))
         endif
         let l:loc = empty(s:ws.fw.path) ? '.' : s:ws.fw.path
     endif
@@ -814,37 +814,50 @@ endfunction
 " }}}
 function! FindW(keys, ...)
     let km = {
-        \ 'S': a:keys[0],
+        \ 'S' : a:keys[0],
         \ 'A0': a:keys[1:-2][0],
         \ 'A1': a:keys[1:-2][-1:-1],
-        \ 'E': a:keys[-1:-1],
+        \ 'E' : a:keys[-1:-1],
+        \ }
+    let l:default = {
+        \ 'path'   : '',
+        \ 'pathlst': [],
+        \ 'filters': '',
+        \ 'globlst': '',
+        \ 'exargs' : ''
         \ }
     if km.S ==# 'F'
         " input config
-        let l:cfg = extend({'path': '', 'filters': '', 'globlst': '', 'exargs': ''}, s:ws.fw)
+        let l:cfg = extend(l:default, s:ws.fw)
         let l:sel = {
-            \ 'opt' : 'config find',
-            \ 'lst' : ['path', 'filters', 'globlst', 'exargs'],
-            \ 'dic' : {
-                \ 'path': {'cpl': 'file'},
+            \ 'opt': 'config find',
+            \ 'lst': ['path', 'filters', 'globlst', 'exargs'],
+            \ 'dic': {
+                \ 'path'   : {'dsr': 'cached find path list',
+                \             'lst': get(s:ws.fw, 'pathlst', []),
+                \             'cpl': 'file'},
                 \ 'filters': {'dsr': {sopt -> '-g*.{' . l:cfg.filters . '}'}},
-                \ 'globlst': {'dsr': {sopt -> '-g' . join(split(l:cfg.globlst), ' -g')}, 'cpl': 'file'},
-                \ 'exargs': {'lst' : ['--no-fixed-strings', '--hidden', '--no-ignore', '--encoding gbk']},
+                \ 'globlst': {'dsr': {sopt -> '-g' . join(split(l:cfg.globlst), ' -g')},
+                \             'cpl': 'file'},
+                \ 'exargs' : {'lst': ['--word-regexp', '--no-fixed-strings', '--hidden', '--no-ignore', '--encoding gbk']},
                 \ },
             \ 'sub' : {
-                \ 'cmd' : {sopt, sel -> extend(l:cfg, {sopt : sel})},
-                \ 'get' : {sopt -> l:cfg[sopt]},
+                \ 'cmd': {sopt, sel -> extend(l:cfg, {sopt : sel})},
+                \ 'get': {sopt -> l:cfg[sopt]},
                 \ },
             \ 'onCR': {sopt -> call('FindW', ['f' . km.A0 . km.A1 . km.E, l:cfg])}
             \ }
         call PopSelection(l:sel)
     else
-        " save config
         if a:0 > 0
+            " save config
             let s:ws.fw = a:1
             let s:ws.fw.path = s:unifyPath(s:ws.fw.path)
+            call add(s:ws.fw.pathlst, s:ws.fw.path)
+            call uniq(sort(s:ws.fw.pathlst))
         else
-            call extend(s:ws.fw, {'path': '', 'filters': '', 'globlst': '', 'exargs': ''}, 'keep')
+            " extend default as config
+            call extend(s:ws.fw, l:default, 'keep')
         endif
         " find with config
         let l:pat = s:parsePattern(km)
