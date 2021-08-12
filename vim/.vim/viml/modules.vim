@@ -274,6 +274,7 @@ const s:rp_mappings = [
         \ 'rbp', 'rbm', 'rbu', 'rbn', 'rbj', 'rbq', 'rba', 'rbh',
         \ 'rlp', 'rlm', 'rlu', 'rln', 'rlj', 'rlq', 'rla', 'rlh', 'rlf',
         \ 'rtp', 'rtm', 'rtu', 'rtn', 'rtj', 'rtq', 'rta', 'rth', 'rtf',
+        \ 'rep', 'rem', 'reu', 'ren', 'rej', 'req', 'rea', 'reh', 'ref',
         \ 'rop', 'rom', 'rou', 'ron', 'roj', 'roq', 'roa', 'roh',
         \ ]
 " }}}
@@ -388,8 +389,8 @@ endfunction
 
 " Function: RunProject(keys, [cfg]) {{{
 " {{{
-" @param keys: [rR][cblto][p...]
-"              [%1][%2   ][%3  ]
+" @param keys: [rR][cblteo][p...]
+"              [%1][%2    ][%3  ]
 " Run: %1 = km.S
 "   r : build and run
 "   R : insert or append global args(can use with %2 together)
@@ -398,6 +399,7 @@ endfunction
 "   b : build without run
 "   l : run project in floaterm
 "   t : run project in terminal
+"   e : run project in external
 "   o : use project with the lowest directory
 " Project: %3 = km.E
 "   p : run project from s:ws.rp
@@ -428,7 +430,7 @@ function! RunProject(keys, ...)
                 \            'dic': map(deepcopy(s:rp.proj), {key, val -> val[0]})},
                 \ 'file'  : {'cpl': 'file'},
                 \ 'type'  : {'cpl': 'filetype'},
-                \ 'term'  : {'lst': ['right', 'bottom', 'floaterm']},
+                \ 'term'  : {'lst': ['right', 'bottom', 'floaterm', 'external']},
                 \ 'agen'  : {'lst': ['-DTEST=']},
                 \ 'abld'  : {'lst': ['-static', 'tags', '--target tags', '-j32']},
                 \ 'arun'  : {'lst': ['--nocapture']},
@@ -464,11 +466,11 @@ function! RunProject(keys, ...)
         try
             let l:cfg = {
                 \ 'key'   : km.E,
-                \ 'term'  : (km.A ==# 'l') ? 'floaterm' : ((km.A ==# 't') ? 'right' : ''),
+                \ 'term'  : get({'l': 'floaterm', 't': 'right', 'e': 'external'}, km.A, ''),
                 \ 'agen'  : '',
                 \ 'abld'  : '',
                 \ 'arun'  : '',
-                \ 'deploy': (km.A ==# 'b') ? 'build' : ((km.A ==# 'c') ? 'clean' : 'run'),
+                \ 'deploy': get({'b': 'build', 'c': 'clean'}, km.A, 'run'),
                 \ 'lowest': (km.A ==# 'o') ? 1 : 0,
                 \ }
             if a:0 > 0
@@ -662,6 +664,9 @@ call s:fw.setEngine('fuzzy', 'leaderf')
 
 " Function: s:unifyPath(path) {{{
 function! s:unifyPath(path)
+    if empty(a:path)
+        return a:path
+    endif
     let l:path = fnamemodify(a:path, ':p')
     if l:path =~# '[/\\]$'
         let l:path = strcharpart(l:path, 0, strchars(l:path) - 1)
@@ -714,12 +719,16 @@ function! s:parseLocation(km)
     elseif a:km.A0 ==# 'p'
         let l:loc = join(s:getMultiDirs(), '" "')
     else
-        if empty(get(s:ws.fw, 'path', ''))
-            let s:ws.fw.path = popc#utils#FindRoot()
-            call add(s:ws.fw.pathlst, s:ws.fw.path)
-            call uniq(sort(s:ws.fw.pathlst))
+        let l:loc = s:ws.fw.path
+        if empty(l:loc)
+            let l:loc = popc#utils#FindRoot()
+            if empty(l:loc)
+                let l:loc = '.'
+            else
+                let s:ws.fw.path = l:loc
+                call add(s:ws.fw.pathlst, s:ws.fw.path)
+            endif
         endif
-        let l:loc = empty(s:ws.fw.path) ? '.' : s:ws.fw.path
     endif
     return l:loc
 endfunction
@@ -853,8 +862,10 @@ function! FindW(keys, ...)
             " save config
             let s:ws.fw = a:1
             let s:ws.fw.path = s:unifyPath(s:ws.fw.path)
-            call add(s:ws.fw.pathlst, s:ws.fw.path)
-            call uniq(sort(s:ws.fw.pathlst))
+            if !empty(s:ws.fw.path)
+                call add(s:ws.fw.pathlst, s:ws.fw.path)
+                call uniq(sort(s:ws.fw.pathlst))
+            endif
         else
             " extend default as config
             call extend(s:ws.fw, l:default, 'keep')
@@ -880,7 +891,7 @@ function! FindW(keys, ...)
 endfunction
 " }}}
 
-" Function: FindWFuzzy(keys) {{{ 模糊搜索
+" Function: FindWFuzzy(keys, [cfg]) {{{ 模糊搜索
 " {{{
 " @param keys: [fF][p ][fFlLhHdg]
 "              [%1][%2][%3      ]
@@ -898,40 +909,67 @@ endfunction
 "   d : fuzzy gtags definitions with <cword>
 "   g : fuzzy gtags references with <cword>
 " }}}
-function! FindWFuzzy(keys)
+function! FindWFuzzy(keys, ...)
     let km = {
         \ 'S': a:keys[0],
         \ 'A': a:keys[1:-2],
         \ 'E': a:keys[-1:-1],
         \ }
-    let l:f = (km.S ==# 'F') ? 1 : 0
-    let l:p = (km.A ==# 'p') ? 1 : 0
-    let l:path = get(s:ws.fw, 'path', '')
-
-    if !l:f && !l:p && empty(l:path)
-        let l:path = popc#utils#FindRoot()
-        let s:ws.fw.path = l:path
-    endif
-    if l:f || l:p || empty(l:path)
-        let l:path = Input2Str('fuzzy path: ', '', 'dir', expand('%:p:h'))
-        if empty(l:path)
-            return
+    let l:default = {
+        \ 'path'   : '',
+        \ 'pathlst': [],
+        \ }
+    if km.S ==# 'F'
+        let l:cfg = extend(l:default, s:ws.fw)
+        let l:sel = {
+            \ 'opt': 'config fuzzy find',
+            \ 'lst': ['path', 'fuzzy'],
+            \ 'dic': {
+                \ 'path'  : {'dsr': 'cached find path list',
+                \            'lst': get(s:ws.fw, 'pathlst', []),
+                \            'cmd': {sopt, sel -> extend(l:cfg, {sopt : sel})},
+                \            'get': {sopt -> l:cfg[sopt]},
+                \            'cpl': 'file'},
+                \ 'fuzzy' : {'lst': ['fzf', 'leaderf'],
+                \            'cmd': {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
+                \            'get': {sopt -> s:fw.engine.fuzzy}},
+                \ },
+            \ 'onCR': {sopt -> call('FindWFuzzy', ['f' . km.A . km.E, l:cfg])}
+            \ }
+        call PopSelection(l:sel)
+    else
+        if a:0 > 0
+            let s:ws.fw = a:1
+            let s:ws.fw.path = s:unifyPath(s:ws.fw.path)
+            if !empty(s:ws.fw.path)
+                call add(s:ws.fw.pathlst, s:ws.fw.path)
+                call uniq(sort(s:ws.fw.pathlst))
+            endif
+        else
+            call extend(s:ws.fw, l:default, 'keep')
         endif
-    endif
-    if l:f
-        let s:ws.fw.path = s:unifyPath(l:path)
-    endif
-
-    if !empty(l:path)
-        let l:exec = printf(":lcd %s | %s", l:path, s:fw.engine['f' . km.E])
-        call SetExecLast(l:exec)
-        execute l:exec
+        " fuzzy find with config
+        let l:path = s:ws.fw.path
+        if (km.A !=# 'p') && empty(l:path)
+            let l:path = popc#utils#FindRoot()
+            if !empty(l:path)
+                let s:ws.fw.path = l:path
+                call add(s:ws.fw.pathlst, s:ws.fw.path)
+            endif
+        endif
+        if (km.A ==# 'p') || empty(l:path)
+            let l:path = Input2Str('fuzzy path: ', '', 'dir', expand('%:p:h'))
+        endif
+        if !empty(l:path)
+            let l:exec = printf(":lcd %s | %s", l:path, s:fw.engine['f' . km.E])
+            call SetExecLast(l:exec)
+            execute l:exec
+        endif
     endif
 endfunction
 " }}}
 
 let FindWKill = function('execute', [s:fw.engine.sk])
-let FindWSetFuzzy = function('popset#set#PopSelection', [s:fw.selfuzzy])
 for key in s:fw_mappings_rg
     execute printf('noremap <leader>%s <Cmd>call FindW("%s")<CR>', key, key)
 endfor
@@ -939,7 +977,6 @@ for key in s:fw_mappings_fuzzy
     execute printf('nnoremap <leader>%s <Cmd>call FindWFuzzy("%s")<CR>', key, key)
 endfor
 nnoremap <leader>fk :call FindWKill()<CR>
-nnoremap <leader>fu :call FindWSetFuzzy()<CR>
 " }}}
 " }}}
 
