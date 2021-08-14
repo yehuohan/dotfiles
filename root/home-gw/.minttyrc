@@ -1,7 +1,7 @@
 BoldAsFont=yes
 Locale=C
 Charset=UTF-8
-Font=Consolas For Powerline
+Font=Consolas Nerd Font Mono
 FontHeight=12
 FontChoice=CJK:5
 Font5=Microsoft YaHei Mono
