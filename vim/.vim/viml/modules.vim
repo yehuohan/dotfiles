@@ -45,10 +45,10 @@ endfunction
 " @return 返回参数列表，如 ["Test", 10, g:a]
 function! GetArgs(str)
     let l:args = []
-    function! s:parseArgs(...) closure
+    function! s:getArgs(...) closure
         let l:args = a:000
     endfunction
-    execute 'call s:parseArgs(' . a:str . ')'
+    execute 'call s:getArgs(' . a:str . ')'
     return l:args
 endfunction
 " }}}
@@ -367,7 +367,7 @@ function! s:vout(cfg)
 
     let l:out = ''
     if a:cfg.deploy ==# 'run'
-        const l:pats = {
+        let l:pats = {
             \ 'target'  : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
             \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
             \ }
@@ -384,6 +384,56 @@ function! s:vout(cfg)
     end
 
     return [l:dir, l:out]
+endfunction
+" }}}
+
+" FUNCTION: s:parseProps(km) {{{
+function! s:parseProps(km)
+    return {
+        \ 'term'  : get({'l': 'floaterm', 't': 'right', 'e': 'external'}, a:km.A, ''),
+        \ 'deploy': get({'b': 'build', 'c': 'clean'}, a:km.A, 'run'),
+        \ 'lowest': (a:km.A ==# 'o') ? 1 : 0,
+        \ }
+endfunction
+" }}}
+
+" FUNCTION: s:popR(km) {{{
+function! s:popR(km)
+    let l:cfg = {
+        \ 'term'  : '',
+        \ 'agen'  : '',
+        \ 'abld'  : '',
+        \ 'arun'  : '',
+        \ 'deploy': 'run',
+        \ 'lowest': 0,
+        \ }
+    let l:sel = {
+        \ 'opt': 'config project',
+        \ 'lst': ['term', 'agen', 'abld', 'arun', 'deploy', 'lowest'],
+        \ 'dic': {
+            \ 'key'   : {'lst': keys(s:rp.proj),
+            \            'dic': map(deepcopy(s:rp.proj), {key, val -> val[0]})},
+            \ 'file'  : {'cpl': 'file'},
+            \ 'type'  : {'cpl': 'filetype'},
+            \ 'term'  : {'lst': ['right', 'bottom', 'floaterm', 'external']},
+            \ 'agen'  : {'lst': ['-DTEST=']},
+            \ 'abld'  : {'lst': ['-static', 'tags', '--target tags', '-j32']},
+            \ 'arun'  : {'lst': ['--nocapture']},
+            \ 'deploy': {'lst': ['build', 'run', 'clean', 'test']},
+            \ 'lowest': {'lst': [0, 1]},
+            \ },
+        \ 'sub': {
+            \ 'cmd': {sopt, sel -> extend(l:cfg, {sopt : sel})},
+            \ 'get': {sopt -> l:cfg[sopt]},
+            \ },
+        \ 'onCR': {sopt -> RunProject('r' . a:km.A . a:km.E, l:cfg)}
+        \ }
+    if a:km.E ==# 'p'
+        call extend(l:cfg, {'key': '', 'file': '', 'type': ''})
+        call extend(l:cfg, s:ws.rp)
+        let l:sel.lst = ['key', 'file', 'type'] + l:sel.lst
+    endif
+    call PopSelection(l:sel)
 endfunction
 " }}}
 
@@ -413,69 +463,28 @@ function! RunProject(keys, ...)
         \ 'E': a:keys[-1:-1],
         \ }
     if km.S ==# 'R'
-        " config project
-        let l:cfg = {
-            \ 'term'  : '',
-            \ 'agen'  : '',
-            \ 'abld'  : '',
-            \ 'arun'  : '',
-            \ 'deploy': 'run',
-            \ 'lowest': 0,
-            \ }
-        let l:sel = {
-            \ 'opt': 'config project',
-            \ 'lst': ['term', 'agen', 'abld', 'arun', 'deploy', 'lowest'],
-            \ 'dic': {
-                \ 'key'   : {'lst': keys(s:rp.proj),
-                \            'dic': map(deepcopy(s:rp.proj), {key, val -> val[0]})},
-                \ 'file'  : {'cpl': 'file'},
-                \ 'type'  : {'cpl': 'filetype'},
-                \ 'term'  : {'lst': ['right', 'bottom', 'floaterm', 'external']},
-                \ 'agen'  : {'lst': ['-DTEST=']},
-                \ 'abld'  : {'lst': ['-static', 'tags', '--target tags', '-j32']},
-                \ 'arun'  : {'lst': ['--nocapture']},
-                \ 'deploy': {'lst': ['build', 'run', 'clean', 'test']},
-                \ 'lowest': {'lst': [0, 1]},
-                \ },
-            \ 'sub': {
-                \ 'cmd': {sopt, sel -> extend(l:cfg, {sopt : sel})},
-                \ 'get': {sopt -> l:cfg[sopt]},
-                \ },
-            \ 'onCR': {sopt -> call('RunProject', ['r' . km.A . km.E, l:cfg])}
-            \ }
-        if km.E ==# 'p'
-            call extend(l:cfg, {'key': '', 'file': '', 'type': ''})
-            call extend(l:cfg, s:ws.rp)
-            let l:sel.lst = ['key', 'file', 'type'] + l:sel.lst
-        endif
-        call PopSelection(l:sel)
+        call s:popR(km)
     elseif km.E ==# 'p'
-        " save config of project
         if a:0 > 0
+            " save config of project
             let s:ws.rp = a:1
             let s:ws.rp.file = fnamemodify(s:ws.rp.file, ':p')
             if empty(s:ws.rp.type)
                 let s:ws.rp.type = getbufvar(fnamemodify(s:ws.rp.file, ':t'), '&filetype', &filetype)
             endif
         endif
-        call RunProject(
-            \ has_key(s:ws.rp, 'key') ? (km.S . km.A . s:ws.rp.key) : ('R' . km.A . km.E),
-            \ s:ws.rp)
+        if empty(get(s:ws.rp, 'key', ''))
+            call RunProject('R' . km.A . km.E)
+        else
+            " use args from keys priorly
+            let l:cfg = extend(deepcopy(s:ws.rp), s:parseProps(km))
+            call RunProject(km.S . km.A . s:ws.rp.key, l:cfg)
+        end
     else
         " run project with config or echo message from exception
         try
-            let l:cfg = {
-                \ 'key'   : km.E,
-                \ 'term'  : get({'l': 'floaterm', 't': 'right', 'e': 'external'}, km.A, ''),
-                \ 'agen'  : '',
-                \ 'abld'  : '',
-                \ 'arun'  : '',
-                \ 'deploy': get({'b': 'build', 'c': 'clean'}, km.A, 'run'),
-                \ 'lowest': (km.A ==# 'o') ? 1 : 0,
-                \ }
-            if a:0 > 0
-                call extend(l:cfg, a:1)
-            endif
+            let l:cfg = (a:0 > 0) ? a:1 :
+                \ extend({'key': km.E , 'agen': '', 'abld': '', 'arun': ''}, s:parseProps(km))
             call s:rp.run(l:cfg)
         catch
             echo v:exception
@@ -519,7 +528,7 @@ endfunction
 function! s:FnGMake(cfg)
     let [l:dir, l:out] = s:vout(a:cfg)
     if a:cfg.deploy !=# 'clean'
-        const l:fmts = {
+        let l:fmts = {
             \ 'u': 'cmake %s -G "Unix Makefiles" .. && cmake --build . %s',
             \ 'n': 'vcvars64.bat && cmake %s -G "NMake Makefiles" .. && cmake --build . %s',
             \ 'j': 'cmake %s -G Ninja .. && cmake --build . %s',
@@ -854,7 +863,7 @@ function! FindW(keys, ...)
                 \ 'cmd': {sopt, sel -> extend(l:cfg, {sopt : sel})},
                 \ 'get': {sopt -> l:cfg[sopt]},
                 \ },
-            \ 'onCR': {sopt -> call('FindW', ['f' . km.A0 . km.A1 . km.E, l:cfg])}
+            \ 'onCR': {sopt -> FindW('f' . km.A0 . km.A1 . km.E, l:cfg)}
             \ }
         call PopSelection(l:sel)
     else
@@ -934,7 +943,7 @@ function! FindWFuzzy(keys, ...)
                 \            'cmd': {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
                 \            'get': {sopt -> s:fw.engine.fuzzy}},
                 \ },
-            \ 'onCR': {sopt -> call('FindWFuzzy', ['f' . km.A . km.E, l:cfg])}
+            \ 'onCR': {sopt -> FindWFuzzy('f' . km.A . km.E, l:cfg)}
             \ }
         call PopSelection(l:sel)
     else
