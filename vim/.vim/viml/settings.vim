@@ -1,4 +1,4 @@
-let s:use = Sv_use()
+let s:use = Sv_Use()
 
 " Options {{{
 " Defaults {{{
@@ -186,19 +186,11 @@ let g:did_install_default_menus = 1     " 禁止加载缺省菜单
 let g:did_install_syntax_menu = 1       " 禁止加载Syntax菜单
 
 " Fonts {{{
-let s:gui_fontsize = 12
-if IsWin()
-    let s:gui_font = s:use.powerfont ? 'Consolas\ For\ Powerline' : 'Consolas'
-    let s:gui_fontwide = IsNVim() ? 'Microsoft\ YaHei\ UI' : 'Microsoft\ YaHei\ Mono'
-else
-    let s:gui_font = s:use.powerfont ? 'DejaVu\ Sans\ Mono\ for\ Powerline' : 'DejaVu\ Sans'
-    let s:gui_fontwide = 'WenQuanYi\ Micro\ Hei\ Mono'
-endif
-
 function! GuiAdjustFontSize(inc)
-    let s:gui_fontsize += a:inc
-    execute printf('set guifont=%s:h%d', s:gui_font, s:gui_fontsize)
-    execute printf('set guifontwide=%s:h%d', s:gui_fontwide, s:gui_fontsize - 1)
+    let s:use.ui.fontsize += a:inc
+    let s:use.ui.widesize += a:inc
+    execute printf('set guifont=%s:h%d', escape(s:use.ui.font, ' '), s:use.ui.fontsize)
+    execute printf('set guifontwide=%s:h%d', escape(s:use.ui.wide, ' '), s:use.ui.widesize)
 endfunction
 
 nnoremap <kPlus> :call GuiAdjustFontSize(1)<CR>
@@ -258,6 +250,8 @@ endif
 
 " Mappings {{{
 " Misc {{{
+nnoremap ' `
+nnoremap ` '
 " 回退操作
 nnoremap <S-u> <C-r>
 " 行移动

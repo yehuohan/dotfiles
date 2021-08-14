@@ -1,4 +1,4 @@
-let s:use = Sv_use()
+let s:use = Sv_Use()
 
 " Struct: s:plug {{{
 let s:plug = {
@@ -69,6 +69,11 @@ endif
 if s:use.lightline
     Plug 'yehuohan/lightline.vim'
 endif
+if s:use.ui.patch
+if IsNVim()
+    Plug 'kyazdani42/nvim-web-devicons'
+endif
+endif
     Plug 'luochen1990/rainbow'
     Plug 'Yggdroot/indentLine'
     Plug 'yehuohan/popc'
@@ -82,6 +87,10 @@ endif
     Plug 'junegunn/fzf.vim'
 if s:use.leaderf
     Plug 'Yggdroot/LeaderF', {'do': IsWin() ? './install.bat' : './install.sh'}
+endif
+if IsNVim()
+    Plug 'nvim-lua/plenary.nvim'
+    Plug 'nvim-telescope/telescope.nvim'
 endif
     " codings
 if s:use.ycm
@@ -110,10 +119,13 @@ if s:use.snip
     Plug 'SirVer/ultisnips'
     Plug 'honza/vim-snippets'
 endif
+if IsNVim() && s:use.ui.patch
+    Plug 'folke/trouble.nvim'
+endif
     Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
     Plug 'jiangmiao/auto-pairs'
     Plug 'tpope/vim-surround'
-    Plug 'majutsushi/tagbar', {'on': 'TagbarToggle'}
+    Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
     Plug 'scrooloose/nerdcommenter'
     Plug 't9md/vim-quickhl'
     Plug 'RRethy/vim-illuminate'
@@ -137,7 +149,6 @@ endif
     Plug 'beyondmarc/hlsl.vim', {'for': 'hlsl'}
     Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
     " utils
-if s:use.utils
 if IsVim()
     Plug 'yianwillis/vimcdoc', {'for': 'help'}
 endif
@@ -152,7 +163,6 @@ endif
     Plug 'arecarn/vim-selection'
     Plug 'voldikss/vim-translator'
     Plug 'brglng/vim-im-select'
-endif
 call plug#end()
 " }}}
 
@@ -380,9 +390,9 @@ if s:use.lightline
                 \ 'chk_indent'  : 'error',
                 \ 'chk_trailing': 'error',
                 \ },
-        \ 'fallback' : {'tagbar': 0, 'nerdtree': 0, 'Popc': 0, 'coc-explorer': '%{getcwd()}'},
+        \ 'fallback' : {'Popc': 0, 'vista': 'Vista', 'nerdtree': 0, 'coc-explorer': 'coc-explorer'},
         \ }
-    if s:use.powerfont
+    if s:use.ui.patch
         let g:lightline.separator            = {'left': '', 'right': ''}
         let g:lightline.subseparator         = {'left': '', 'right': ''}
         let g:lightline.tabline_separator    = {'left': '', 'right': ''}
@@ -432,25 +442,23 @@ if s:use.lightline
 
     " Function: lightline components {{{
     function! Plug_ll_mode()
-        return &ft ==# 'tagbar' ? 'Tagbar' :
-            \ &ft ==# 'nerdtree' ? 'NERDTree' :
+        return &ft ==# 'Popc' ? 'Popc' :
+            \ &ft ==# 'startify' ? 'Startify' :
             \ &ft ==# 'qf' ? (QuickfixType() ==# 'c' ? 'Quickfix' : 'Location') :
             \ &ft ==# 'help' ? 'Help' :
-            \ &ft ==# 'Popc' ? 'Popc' :
-            \ &ft ==# 'startify' ? 'Startify' :
-            \ winwidth(0) > 60 ? lightline#mode() : ''
+            \ lightline#mode()
     endfunction
 
     function! Plug_ll_msgLeft()
         if &ft ==# 'qf'
             return 'cwd = ' . getcwd()
         else
-            return substitute(expand('%:p'), '^' . escape(expand(Sv_ws().fw.path), '\'), '', '')
+            return substitute(expand('%:p'), '^' . escape(expand(Sv_Ws().fw.path), '\'), '', '')
         endif
     endfunction
 
     function! Plug_ll_msgRight()
-        return Sv_ws().fw.path
+        return Sv_Ws().fw.path
     endfunction
 
     function! Plug_ll_checkMixedIndent()
@@ -505,8 +513,8 @@ endif
         \ }
     let g:Popc_useTabline = 1
     let g:Popc_useStatusline = 1
-    let g:Popc_usePowerFont = s:use.powerfont
-if s:use.powerfont
+    let g:Popc_usePowerFont = s:use.ui.patch
+if s:use.ui.patch
     let g:Popc_selectPointer = ''
     let g:Popc_separator = {'left' : '', 'right': ''}
     let g:Popc_subSeparator = {'left' : '', 'right': ''}
@@ -625,7 +633,7 @@ if s:use.leaderf
     "let g:Lf_WindowPosition = 'popup'
     "let g:Lf_PreviewInPopup = 1
     let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0}
-    let g:Lf_StlSeparator = s:use.powerfont ? {'left': '', 'right': ''} : {'left': '', 'right': ''}
+    let g:Lf_StlSeparator = s:use.ui.patch ? {'left': '', 'right': ''} : {'left': '', 'right': ''}
     let g:Lf_ShowDevIcons = 0
     let g:Lf_ShortcutF = ''
     let g:Lf_ShortcutB = ''
@@ -655,6 +663,25 @@ if s:use.leaderf
     nnoremap <leader>ls :LeaderfSelf<CR>
     nnoremap <leader>lh :LeaderfHistorySearch<CR>
     nnoremap <leader>le :LeaderfHistoryCmd<CR>
+endif
+" }}}
+
+" telescope {{{ 模糊查找
+if IsNVim()
+silent! lua << EOF
+require('telescope').setup{
+    defaults = {
+        borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
+        color_devicons = true,
+        history = {
+            path = vim.env.DotVimCachePath  .. '/telescope_history',
+        },
+    }
+}
+EOF
+    nnoremap <leader><leader>n :Telescope<Space>
+    nnoremap <leader>nf :Telescope find_files<CR>
+    nnoremap <leader>nl :Telescope live_grep<CR>
 endif
 " }}}
 " }}}
@@ -801,6 +828,23 @@ if s:use.snip
 endif
 " }}}
 
+" trouble {{{ 列表视图
+if IsNVim() && s:use.ui.patch           " 没有devicon不好看，不如不用
+silent! lua << EOF
+require('trouble').setup {
+    icons = true,
+    action_keys = {
+        jump_close = {'O'},
+        toggle_fold = {'zA', 'za', 'o'},
+    },
+    auto_preview = false,
+}
+EOF
+    nnoremap <leader>vq :TroubleToggle quickfix<CR>
+    nnoremap <leader>vl :TroubleToggle loclist<CR>
+endif
+" }}}
+
 " neoformat {{{ 代码格式化
     let g:neoformat_basic_format_align = 1
     let g:neoformat_basic_format_retab = 1
@@ -860,10 +904,12 @@ endif
     xmap <leader>sW <Plug>VgSurround
 " }}}
 
-" tagbar {{{ 代码结构查看
-    let g:tagbar_width = 30
-    let g:tagbar_map_showproto = ''     " 取消tagbar对<Space>的占用
-    nnoremap <leader>tt :TagbarToggle<CR>
+" Vista {{{ 代码Tags
+let g:vista_echo_cursor = 0
+let g:vista_stay_on_open = 0
+nnoremap <leader>tt :Vista!!<CR>
+nnoremap <leader>vt :Vista!!<CR>
+nnoremap <leader>vc :Vista coc<CR>
 " }}}
 
 " nerdcommenter {{{ 批量注释
@@ -892,7 +938,7 @@ endif
 
 " illuminate {{{ 自动高亮
     let g:Illuminate_delay = 250
-    let g:Illuminate_ftblacklist = ['nerdtree', 'tagbar', 'coc-explorer']
+    let g:Illuminate_ftblacklist = ['nerdtree', 'coc-explorer']
     nnoremap <leader>tg :IlluminationToggle<CR>
     highlight link illuminatedWord MatchParen
 " }}}
@@ -977,7 +1023,6 @@ endif
 " }}}
 
 " Utils {{{
-if s:use.utils
 " MarkDown {{{
     let g:markdown_include_jekyll_support = 0
     let g:markdown_enable_mappings = 0
@@ -1080,7 +1125,6 @@ if IsWin() || IsGw()
 endif
     let g:ImSelectSetImCmd = {key -> ['im-select', key]}
 " }}}
-endif
 " }}}
 
 call s:plug.init()

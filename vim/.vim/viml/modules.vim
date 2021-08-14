@@ -1,4 +1,4 @@
-function! Sv_ws()
+function! Sv_Ws()
     return s:ws
 endfunction
 

@@ -261,11 +261,10 @@ g.Popc_highlight = {
     text     = 'Pmenu',
     selected = 'CursorLineNr',
 }
-g.Popc_usePowerFont = 1
 g.Popc_useTabline = 1
 g.Popc_useStatusline = 1
-g.Popc_usePowerFont = use.powerfont
-if use.powerfont then
+g.Popc_usePowerFont = use.ui.patch
+if use.ui.patch then
     g.Popc_selectPointer = ''
     g.Popc_separator = {left = '', right = ''}
     g.Popc_subSeparator = {left = '', right = ''}

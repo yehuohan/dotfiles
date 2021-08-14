@@ -1,11 +1,10 @@
-function! Sv_use()
+function! Sv_Use()
     return s:use
 endfunction
 
 let s:use_file = $DotVimCachePath . '/.use.json'
 let s:use = {
     \ 'fastgit'   : v:false,
-    \ 'powerfont' : v:false,
     \ 'lightline' : v:false,
     \ 'startify'  : v:false,
     \ 'ycm'       : v:false,
@@ -31,7 +30,13 @@ let s:use = {
     \ 'snip'      : v:false,
     \ 'spector'   : v:false,
     \ 'leaderf'   : v:false,
-    \ 'utils'     : v:false,
+    \ 'ui'        : {
+        \ 'patch'    : v:false,
+        \ 'font'     : 'Consolas',
+        \ 'fontsize' : 12,
+        \ 'wide'     : 'Microsoft YaHei UI',
+        \ 'widesize' : 11,
+        \ }
     \ }
 
 " Function: s:useLoad() {{{
@@ -46,9 +51,12 @@ function! s:useLoad()
     else
         call s:useSave()
     endif
-    if IsVim() && s:use.coc        " vim中coc容易卡，补全用ycm
-        let s:use.ycm = v:true
-        let s:use.coc = v:false
+    if IsVim()
+        if s:use.coc               " vim中coc容易卡，补全用ycm
+            let s:use.ycm = v:true
+            let s:use.coc = v:false
+        endif
+        let s:use.ui.wide = 'Microsoft YaHei Mono'
     endif
 endfunction
 " }}}
@@ -69,9 +77,37 @@ function! s:useInit()
         \ 'lst' : sort(keys(s:use.coc_exts)),
         \ 'dic' : map(copy(s:use.coc_exts), '{}'),
         \ 'sub' : {
-            \ 'lst': [v:true, v:false],
-            \ 'cmd': {sopt, sel -> extend(s:use.coc_exts, {sopt : sel})},
-            \ 'get': {sopt -> s:use.coc_exts[sopt]},
+            \ 'lst' : [v:true, v:false],
+            \ 'cmd' : {sopt, sel -> extend(s:use.coc_exts, {sopt : sel})},
+            \ 'get' : {sopt -> s:use.coc_exts[sopt]},
+            \ },
+        \ 'onCR': funcref('s:useSave'),
+        \ }
+
+    " Set ui selections
+    let l:fontlst = [
+        \ 'Consolas',
+        \ 'Consolas Nerd Font Mono',
+        \ 'agave Nerd Font Mono',
+        \ 'UbuntuMono Nerd Font Mono',
+        \ 'Microsoft YaHei UI',
+        \ 'Microsoft YaHei Mono',
+        \ 'WenQuanYi Micro Hei Mono',
+        \ ]
+    let l:fontsizelst = [9, 10, 11, 12, 13, 14, 15]
+    let l:dic.ui = {
+        \ 'dsr' : 'set ui',
+        \ 'lst' : sort(keys(s:use.ui)),
+        \ 'dic' : {
+            \ 'patch'    : {'lst' : [v:true, v:false]},
+            \ 'font'     : {'dsr' : 'set guifont', 'lst' : l:fontlst},
+            \ 'wide'     : {'dsr' : 'set guifontwide', 'lst' : l:fontlst},
+            \ 'fontsize' : {'lst' : l:fontsizelst},
+            \ 'widesize' : {'lst' : l:fontsizelst},
+            \ },
+        \ 'sub' : {
+            \ 'cmd' : {sopt, sel -> extend(s:use.ui, {sopt : sel})},
+            \ 'get' : {sopt -> s:use.ui[sopt]},
             \ },
         \ 'onCR': funcref('s:useSave'),
         \ }

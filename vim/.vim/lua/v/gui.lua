@@ -3,28 +3,11 @@ local map = vim.api.nvim_set_keymap
 local use = require('v.use').use
 
 
--- Init font and font size
-local gui_fontsize = 12
-local gui_font = ''
-local gui_fontwide = ''
-if IsWin() then
-    if use.powerfont
-    then gui_font = 'Consolas For Powerline'
-    else gui_font = 'Consolas'
-    end
-    gui_fontwide = 'Microsoft YaHei UI'
-else
-    if use.powerfont
-    then gui_font = 'DejaVu Sans Mono for Powerline'
-    else gui_font = 'DejaVu Sans'
-    end
-    gui_fontwide = 'WenQuanYi Micro Hei Mono'
-end
-
 local function adjust_fontsize(inc)
-    gui_fontsize = gui_fontsize + inc
-    vim.o.guifont = gui_font .. ':h' .. tostring(gui_fontsize)
-    vim.o.guifontwide = gui_fontwide .. ':h' .. tostring(gui_fontsize - 1)
+    use.ui.fontsize = use.ui.fontsize + inc
+    use.ui.widesize = use.ui.widesize + inc
+    vim.o.guifont = use.ui.font .. ':h' .. tostring(use.ui.fontsize)
+    vim.o.guifontwide = use.ui.wide .. ':h' .. tostring(use.ui.widesize)
 end
 
 -- Set gui of Neovim-qt

@@ -3,7 +3,6 @@ local fn = vim.fn
 local use_file = vim.env.DotVimCachePath .. '/.use.json'
 local use = {
     fastgit   = false,
-    powerfont = false,
     lightline = false,
     startify  = false,
     ycm       = false,
@@ -29,7 +28,13 @@ local use = {
     snip      = false,
     spector   = false,
     leaderf   = false,
-    utils     = false,
+    ui        = {
+        patch    = false,
+        font     = 'Consolas',
+        fontsize = 12,
+        wide     = 'Microsoft YaHei UI',
+        widesize = 11,
+    }
 }
 
 local function use_save(_)
@@ -51,8 +56,8 @@ end
 
 local function use_init()
     -- Set coc-extension selections
-    local cocdic = vim.tbl_map(function() return vim.empty_dict() end, use)
-    cocdic.coc_exts = {
+    local udic = vim.tbl_map(function() return vim.empty_dict() end, use)
+    udic.coc_exts = {
         dsr = 'coc extensions',
         lst = fn.sort(vim.tbl_keys(use.coc_exts)),
         dic = vim.tbl_map(function() return vim.empty_dict() end, use.coc_exts),
@@ -64,10 +69,37 @@ local function use_init()
         onCR = use_save,
     }
 
+    -- Set ui selections
+    local fontlst = {
+        'Consolas',
+        'Consolas Nerd Font Mono',
+        'agave Nerd Font Mono',
+        'UbuntuMono Nerd Font Mono',
+        'Microsoft YaHei UI',
+        'WenQuanYi Micro Hei Mono',
+        }
+    local fontsizelst = {9, 10, 11, 12, 13, 14, 15}
+    udic.ui = {
+        dsr = 'set ui',
+        lst = fn.sort(vim.tbl_keys(use.ui)),
+        dic = {
+            patch    = {lst = {true, false}},
+            font     = {dsr = 'set guifont', lst = fontlst},
+            wide     = {dsr = 'set guifontwide', lst = fontlst},
+            fontsize = {lst = fontsizelst},
+            widesize = {lst = fontsizelst},
+            },
+        sub = {
+            cmd = function(sopt, sel) use.ui[sopt] = sel end,
+            get = function(sopt) return use.ui[sopt] end,
+            },
+        onCR = use_save,
+        }
+
     fn.PopSelection({
         opt = 'select use settings',
         lst = fn.sort(vim.tbl_keys(use)),
-        dic = cocdic,
+        dic = udic,
         sub = {
             lst = {true, false},
             cmd = function(sopt, sel) use[sopt] = sel end,
