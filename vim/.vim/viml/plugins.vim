@@ -445,16 +445,12 @@ if s:use.lightline
         if &ft ==# 'qf'
             return 'cwd = ' . getcwd()
         else
-            let s:ws = Sv_ws()
-            return exists('s:ws.fw.path') ?
-                \ substitute(expand('%:p'), '^' . escape(expand(s:ws.fw.path), '\'), '', '') :
-                \ expand('%:p')
+            return substitute(expand('%:p'), '^' . escape(expand(Sv_ws().fw.path), '\'), '', '')
         endif
     endfunction
 
     function! Plug_ll_msgRight()
-        let s:ws = Sv_ws()
-        return exists('s:ws.fw.path') ? s:ws.fw.path : ''
+        return Sv_ws().fw.path
     endfunction
 
     function! Plug_ll_checkMixedIndent()

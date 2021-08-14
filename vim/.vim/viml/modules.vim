@@ -207,7 +207,7 @@ augroup UserModulesWorkspace
     autocmd User PopcLayerWksSavePre call popc#layer#wks#SetSettings(s:ws)
     autocmd User PopcLayerWksLoaded call extend(s:ws, popc#layer#wks#GetSettings(), 'force') |
                                     \ let s:ws.root = popc#layer#wks#GetCurrentWks('root') |
-                                    \ if empty(get(s:ws.fw, 'path', '')) |
+                                    \ if empty(s:ws.fw.path) |
                                     \   let s:ws.fw.path = s:ws.root |
                                     \ endif
     autocmd User AsyncRunStop call s:wsd.display()
@@ -589,16 +589,18 @@ nnoremap <leader>rv
 " Find {{{
 " Struct: s:fw {{{
 " @attribute engine: see FindW, FindWFuzzy
+" @attribute default: 用于engine的默认参数
 " @attribute rg: 预置的rg搜索命令，用于搜索指定文本
 " @attribute fuzzy: 预置的模糊搜索命令，用于文件和文本等模糊搜索
 let s:fw = {
     \ 'engine' : { 'rg' : '', 'fuzzy' : '' },
-    \ 'selfuzzy' : {
-        \ 'opt' : 'select fuzzy engine',
-        \ 'lst' : ['fzf', 'leaderf'],
-        \ 'cmd' : {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
-        \ 'get' : {sopt -> s:fw.engine.fuzzy},
-    \ },
+    \ 'default' : {
+        \ 'path'   : '',
+        \ 'pathlst': [],
+        \ 'filters': '',
+        \ 'globlst': '',
+        \ 'exargs' : ''
+        \ },
     \ 'rg' : {
         \ 'asyncrun' : {
             \ 'chars' : '"#%',
@@ -667,6 +669,7 @@ function! s:fw.exec(fmt) dict
 endfunction
 " }}}
 
+call extend(s:ws.fw, s:fw.default, 'keep')
 call s:fw.setEngine('rg', 'asyncrun')
 call s:fw.setEngine('fuzzy', 'leaderf')
 " }}}
@@ -676,7 +679,7 @@ function! s:unifyPath(path)
     if empty(a:path)
         return a:path
     endif
-    let l:path = fnamemodify(a:path, ':p')
+    let l:path = fnamemodify(a:path . '/', ':p')
     if l:path =~# '[/\\]$'
         let l:path = strcharpart(l:path, 0, strchars(l:path) - 1)
     endif
@@ -800,7 +803,52 @@ function! s:parseVimgrep(km, fmt)
 endfunction
 " }}}
 
-" Function: FindW(keys, [cfg]) {{{ 查找
+" FUNCTION: s:popF(km, type) {{{
+function! s:popF(km, type)
+    let l:cfg = deepcopy(s:fw.default)
+    call extend(l:cfg, s:ws.fw)
+
+    function! s:oncr(sopt) closure
+        let s:ws.fw = l:cfg
+        let s:ws.fw.path = s:unifyPath(s:ws.fw.path)
+        if !empty(s:ws.fw.path)
+            call add(s:ws.fw.pathlst, s:ws.fw.path)
+            call uniq(sort(s:ws.fw.pathlst))
+        endif
+        if a:type
+            call FindW('f' . a:km.A0 . a:km.A1 . a:km.E)
+        else
+            call FindWFuzzy('f' . a:km.A . a:km.E)
+        endif
+    endfunction
+
+    let l:sel = {
+        \ 'opt': 'config find',
+        \ 'lst': a:type ? ['path', 'filters', 'globlst', 'exargs'] : ['path', 'fuzzy'],
+        \ 'dic': {
+            \ 'path'   : {'dsr': 'cached find path list',
+            \             'lst': s:ws.fw.pathlst,
+            \             'cpl': 'file'},
+            \ 'filters': {'dsr': {sopt -> '-g*.{' . l:cfg.filters . '}'}},
+            \ 'globlst': {'dsr': {sopt -> '-g' . join(split(l:cfg.globlst), ' -g')},
+            \             'cpl': 'file'},
+            \ 'exargs' : {'lst': ['--word-regexp', '--no-fixed-strings', '--hidden', '--no-ignore', '--encoding gbk']},
+            \ 'fuzzy'  : {'lst': ['fzf', 'leaderf'],
+            \             'cmd': {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
+            \             'get': {sopt -> s:fw.engine.fuzzy}},
+            \ },
+        \ 'sub' : {
+            \ 'cmd': {sopt, sel -> extend(l:cfg, {sopt : sel})},
+            \ 'get': {sopt -> l:cfg[sopt]},
+            \ },
+        \ 'onCR': funcref('s:oncr')
+        \ }
+
+    call PopSelection(l:sel)
+endfunction
+" }}}
+
+" Function: FindW(keys) {{{ 查找
 " {{{
 " @param keys: [fF][av][btop][IiWwSs=]
 "              [%1][%2][%3  ][4%     ]
@@ -830,56 +878,16 @@ endfunction
 "   UpperCase: [IWS] find in case match
 " @param cfg: first priority of config
 " }}}
-function! FindW(keys, ...)
+function! FindW(keys)
     let km = {
         \ 'S' : a:keys[0],
         \ 'A0': a:keys[1:-2][0],
         \ 'A1': a:keys[1:-2][-1:-1],
         \ 'E' : a:keys[-1:-1],
         \ }
-    let l:default = {
-        \ 'path'   : '',
-        \ 'pathlst': [],
-        \ 'filters': '',
-        \ 'globlst': '',
-        \ 'exargs' : ''
-        \ }
     if km.S ==# 'F'
-        " input config
-        let l:cfg = extend(l:default, s:ws.fw)
-        let l:sel = {
-            \ 'opt': 'config find',
-            \ 'lst': ['path', 'filters', 'globlst', 'exargs'],
-            \ 'dic': {
-                \ 'path'   : {'dsr': 'cached find path list',
-                \             'lst': get(s:ws.fw, 'pathlst', []),
-                \             'cpl': 'file'},
-                \ 'filters': {'dsr': {sopt -> '-g*.{' . l:cfg.filters . '}'}},
-                \ 'globlst': {'dsr': {sopt -> '-g' . join(split(l:cfg.globlst), ' -g')},
-                \             'cpl': 'file'},
-                \ 'exargs' : {'lst': ['--word-regexp', '--no-fixed-strings', '--hidden', '--no-ignore', '--encoding gbk']},
-                \ },
-            \ 'sub' : {
-                \ 'cmd': {sopt, sel -> extend(l:cfg, {sopt : sel})},
-                \ 'get': {sopt -> l:cfg[sopt]},
-                \ },
-            \ 'onCR': {sopt -> FindW('f' . km.A0 . km.A1 . km.E, l:cfg)}
-            \ }
-        call PopSelection(l:sel)
+        call s:popF(km, v:true)
     else
-        if a:0 > 0
-            " save config
-            let s:ws.fw = a:1
-            let s:ws.fw.path = s:unifyPath(s:ws.fw.path)
-            if !empty(s:ws.fw.path)
-                call add(s:ws.fw.pathlst, s:ws.fw.path)
-                call uniq(sort(s:ws.fw.pathlst))
-            endif
-        else
-            " extend default as config
-            call extend(s:ws.fw, l:default, 'keep')
-        endif
-        " find with config
         let l:pat = s:parsePattern(km)
         if !empty(l:pat)
             let l:fmt = { 'cmd': '', 'opt': '', 'pat': '', 'loc': '' }
@@ -900,7 +908,7 @@ function! FindW(keys, ...)
 endfunction
 " }}}
 
-" Function: FindWFuzzy(keys, [cfg]) {{{ 模糊搜索
+" Function: FindWFuzzy(keys) {{{ 模糊搜索
 " {{{
 " @param keys: [fF][p ][fFlLhHdg]
 "              [%1][%2][%3      ]
@@ -918,46 +926,15 @@ endfunction
 "   d : fuzzy gtags definitions with <cword>
 "   g : fuzzy gtags references with <cword>
 " }}}
-function! FindWFuzzy(keys, ...)
+function! FindWFuzzy(keys)
     let km = {
         \ 'S': a:keys[0],
         \ 'A': a:keys[1:-2],
         \ 'E': a:keys[-1:-1],
         \ }
-    let l:default = {
-        \ 'path'   : '',
-        \ 'pathlst': [],
-        \ }
     if km.S ==# 'F'
-        let l:cfg = extend(l:default, s:ws.fw)
-        let l:sel = {
-            \ 'opt': 'config fuzzy find',
-            \ 'lst': ['path', 'fuzzy'],
-            \ 'dic': {
-                \ 'path'  : {'dsr': 'cached find path list',
-                \            'lst': get(s:ws.fw, 'pathlst', []),
-                \            'cmd': {sopt, sel -> extend(l:cfg, {sopt : sel})},
-                \            'get': {sopt -> l:cfg[sopt]},
-                \            'cpl': 'file'},
-                \ 'fuzzy' : {'lst': ['fzf', 'leaderf'],
-                \            'cmd': {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
-                \            'get': {sopt -> s:fw.engine.fuzzy}},
-                \ },
-            \ 'onCR': {sopt -> FindWFuzzy('f' . km.A . km.E, l:cfg)}
-            \ }
-        call PopSelection(l:sel)
+        call s:popF(km, v:false)
     else
-        if a:0 > 0
-            let s:ws.fw = a:1
-            let s:ws.fw.path = s:unifyPath(s:ws.fw.path)
-            if !empty(s:ws.fw.path)
-                call add(s:ws.fw.pathlst, s:ws.fw.path)
-                call uniq(sort(s:ws.fw.pathlst))
-            endif
-        else
-            call extend(s:ws.fw, l:default, 'keep')
-        endif
-        " fuzzy find with config
         let l:path = s:ws.fw.path
         if (km.A !=# 'p') && empty(l:path)
             let l:path = popc#utils#FindRoot()
