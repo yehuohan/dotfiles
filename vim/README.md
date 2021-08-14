@@ -59,6 +59,7 @@ setup_link_msys64.bat
 - [lua](https://www.lua.org/)
 - Git: [Msys2](http://www.msys2.org/) or [Cygwin](https://cygwin.com)
   - `git config --global http.proxy addr:port`
+- [Nerd Font](https://www.nerdfonts.com/)
 - [LLVM](http://llvm.org/) or [Clangd](https://github.com/clangd/clangd)
 - [Ripgrep](https://github.com/BurntSushi/ripgrep) or [Ag](https://github.com/k-takata/the_silver_searcher-win32)
 - [Fzf](https://github.com/junegunn/fzf)
