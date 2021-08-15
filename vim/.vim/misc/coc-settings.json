@@ -112,7 +112,7 @@
     "lua.enable": true,
     "Lua.color.mode": "Semantic",
     "Lua.completion.enable": true,
-    "Lua.runtime.version": "Lua 5.1",
+    "Lua.runtime.version": "Lua 5.2",
     "Lua.diagnostics.globals": ["vim"],
 
     /* coc-pyright */
