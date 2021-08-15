@@ -56,6 +56,7 @@ function! s:useLoad()
             let s:use.ycm = v:true
             let s:use.coc = v:false
         endif
+        let s:use.ui.font = 'Consolas For Powerline'
         let s:use.ui.wide = 'Microsoft YaHei Mono'
     endif
 endfunction

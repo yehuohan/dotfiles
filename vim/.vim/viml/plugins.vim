@@ -676,6 +676,12 @@ require('telescope').setup{
         history = {
             path = vim.env.DotVimCachePath  .. '/telescope_history',
         },
+        mappings = {
+            i = {
+                ['<C-j>'] = 'move_selection_next',
+                ['<C-k>'] = 'move_selection_previous',
+            },
+        }
     }
 }
 EOF
