@@ -119,7 +119,7 @@ if s:use.snip
     Plug 'SirVer/ultisnips'
     Plug 'honza/vim-snippets'
 endif
-if IsNVim() && s:use.ui.patch
+if IsNVim()
     Plug 'folke/trouble.nvim'
 endif
     Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
@@ -835,7 +835,7 @@ endif
 " }}}
 
 " trouble {{{ 列表视图
-if IsNVim() && s:use.ui.patch           " 没有devicon不好看，不如不用
+if IsNVim()
 silent! lua << EOF
 require('trouble').setup {
     icons = true,
