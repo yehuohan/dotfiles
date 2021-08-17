@@ -193,6 +193,7 @@ function! GuiAdjustFontSize(inc)
     execute printf('set guifontwide=%s:h%d', escape(s:use.ui.wide, ' '), s:use.ui.widesize)
 endfunction
 
+nnoremap <k0> :call GuiAdjustFontSize(0)<CR>
 nnoremap <kPlus> :call GuiAdjustFontSize(1)<CR>
 nnoremap <kMinus> :call GuiAdjustFontSize(-1)<CR>
 " }}}
@@ -339,6 +340,7 @@ nnoremap yd
     \ echo v:count1 . ' deleted lines append' <CR>
 nnoremap <leader>p "0p
 nnoremap <leader>P "0P
+nnoremap <leader>ap p`[<Left>
 " ctrl-c & ctrl-v
 vnoremap <leader>c "+y
 nnoremap <leader>cp "+p

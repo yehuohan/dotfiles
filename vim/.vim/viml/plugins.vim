@@ -1080,8 +1080,8 @@ let g:vimtex_complete_enabled = 1       " 使用vimtex#complete#omnifunc补全
 let g:vimtex_complete_close_braces = 1
 let g:vimtex_compiler_method = 'latexmk'
 nmap <leader>at <Plug>(vimtex-toc-toggle)
-nmap <leader>ap <Plug>(vimtex-compile-ss)
-nmap <leader>aP <Plug>(vimtex-compile)
+nmap <leader>ab <Plug>(vimtex-compile-ss)
+nmap <leader>aB <Plug>(vimtex-compile)
 nmap <leader>as <Plug>(vimtex-stop)
 nmap <leader>ac <Plug>(vimtex-clean)
 nmap <leader>am <Plug>(vimtex-toggle-main)
