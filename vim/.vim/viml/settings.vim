@@ -519,7 +519,7 @@ endfunction
 " }}}
 
 nnoremap <leader>qo <Cmd>botright copen<CR>
-nnoremap <leader>qO <Cmd>cclose <Bar> vertical botright copen 35<CR>
+nnoremap <leader>qO <Cmd>cclose <Bar> vertical botright copen 55<CR>
 nnoremap <leader>qc
     \ <Cmd>
     \ if &filetype ==# 'qf' <Bar> wincmd p <Bar> endif <Bar>

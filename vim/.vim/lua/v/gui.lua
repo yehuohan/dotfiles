@@ -10,14 +10,6 @@ local function adjust_fontsize(inc)
     vim.o.guifontwide = use.ui.wide .. ':h' .. tostring(use.ui.widesize)
 end
 
--- Set gui of Neovim-qt
-vim.cmd[[
-augroup UserSettingsGui
-    autocmd!
-    autocmd UIEnter * :lua require('v.gui').set_gui_neovimqt()
-augroup END
-]]
-
 local function set_gui_neovimqt()
     -- 在UIEnter之后才起作用
     if fn.exists('g:GuiLoaded') == 1 then
@@ -34,6 +26,24 @@ local function set_gui_neovimqt()
     end
 end
 
+-- Set gui of Neovim-qt
+vim.cmd[[
+augroup UserSettingsGui
+    autocmd!
+    autocmd UIEnter * :lua require('v.gui').set_gui_neovimqt()
+augroup END
+]]
+
+vim.o.guicursor =
+    [[n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50]] ..
+    [[,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor]] ..
+    [[,sm:block-blinkwait175-blinkoff150-blinkon175]]
+
+map('n', '<k0>'    , [[:lua require('v.gui').adjust_fontsize(0)<CR>]] , { noremap = true })
+map('n', '<kPlus>' , [[:lua require('v.gui').adjust_fontsize(1)<CR>]] , { noremap = true })
+map('n', '<kMinus>', [[:lua require('v.gui').adjust_fontsize(-1)<CR>]], { noremap = true })
+
 return {
+    adjust_fontsize = adjust_fontsize,
     set_gui_neovimqt = set_gui_neovimqt,
 }

@@ -144,10 +144,10 @@ map('n', '<leader>al', [[<Plug>(EasyAlign)ip]], {})
 map('x', '<leader>al', [[<Plug>(EasyAlign)]],   {})
 -- :EasyAlign[!] [N-th] DELIMITER_KEY [OPTIONS]
 -- :EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
-map('n', '<leader><leader>a', [[vip:EasyAlign<Space>*//<Left>]], { noremap = true })
-map('v', '<leader><leader>a', [[:EasyAlign<Space>*//<Left>]]   , { noremap = true })
-map('n', '<leader><leader>A', [[vip:EasyAlign<Space>]]         , { noremap = true })
-map('v', '<leader><leader>A', [[:EasyAlign<Space>]]            , { noremap = true })
+map('n', '<leader><leader>a', [[vip:EasyAlign<Space>*//l0><Left><Left><Left><Left>]], { noremap = true })
+map('v', '<leader><leader>a', [[:EasyAlign<Space>*//l0><Left><Left><Left><Left>]]   , { noremap = true })
+map('n', '<leader><leader>A', [[vip:EasyAlign<Space>]]                              , { noremap = true })
+map('v', '<leader><leader>A', [[:EasyAlign<Space>]]                                 , { noremap = true })
 -- }}}
 
 -- smoothie {{{ 平滑滚动
