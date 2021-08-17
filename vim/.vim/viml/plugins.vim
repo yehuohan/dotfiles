@@ -257,8 +257,8 @@ nmap <leader>al <Plug>(LiveEasyAlign)ip
 xmap <leader>al <Plug>(LiveEasyAlign)
 ":EasyAlign[!] [N-th] DELIMITER_KEY [OPTIONS]
 ":EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
-nnoremap <leader><leader>a vip:EasyAlign<Space>*//<Left>
-vnoremap <leader><leader>a :EasyAlign<Space>*//<Left>
+nnoremap <leader><leader>a vip:EasyAlign<Space>*//l0><Left><Left><Left><Left>
+vnoremap <leader><leader>a :EasyAlign<Space>*//l0><Left><Left><Left><Left>
 nnoremap <leader><leader>A vip:EasyAlign<Space>
 vnoremap <leader><leader>A :EasyAlign<Space>
 " }}}
