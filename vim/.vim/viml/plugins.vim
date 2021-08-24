@@ -79,6 +79,9 @@ endif
     Plug 'yehuohan/popc'
     Plug 'yehuohan/popset'
     Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTree']}
+if IsNVim()
+    Plug 'kyazdani42/nvim-tree.lua'
+endif
 if s:use.startify
     Plug 'mhinz/vim-startify'
 endif
@@ -169,7 +172,7 @@ call plug#end()
 " Editing {{{
 " hop, easy-motion {{{ 快速跳转
 if IsNVim()
-silent! lua require'hop'.setup({ dict_list = { 'ascii', 'zh_sc' }, create_hl_autocmd = true })
+silent! lua require'hop'.setup({ match_mappings = { 'zh', 'zh_sc' }, create_hl_autocmd = true })
 noremap s <Cmd>HopChar1MW<CR>
 noremap <leader>ms <Cmd>HopChar2MW<CR>
 noremap <leader><leader>s <Cmd>HopPatternMW<CR>
@@ -294,10 +297,8 @@ omap au <Plug>(textobj-underscore-a)
 omap iu <Plug>(textobj-underscore-i)
 xmap au <Plug>(textobj-underscore-a)
 xmap iu <Plug>(textobj-underscore-i)
-nnoremap <leader>tv :call Plug_to_motion('v')<CR>
-nnoremap <leader>tV :call Plug_to_motion('V')<CR>
-nnoremap <leader>td :call Plug_to_motion('d')<CR>
-nnoremap <leader>tD :call Plug_to_motion('D')<CR>
+nnoremap <leader>to :call Plug_to_motion('v')<CR>
+nnoremap <leader>tO :call Plug_to_motion('V')<CR>
 
 function! Plug_to_motion(motion)
     call PopSelection({
@@ -391,7 +392,7 @@ let g:lightline = {
             \ 'chk_indent'  : 'error',
             \ 'chk_trailing': 'error',
             \ },
-    \ 'fallback' : {'Popc': 0, 'vista': 'Vista', 'nerdtree': 0, 'coc-explorer': 'coc-explorer'},
+    \ 'fallback' : {'Popc': 0, 'vista': 'Vista', 'nerdtree': 0, 'NvimTree': 'NvimTree'},
     \ }
 if s:use.ui.patch
 let g:lightline.separator            = {'left': '', 'right': ''}
@@ -552,10 +553,10 @@ let g:NERDTreeMapPreview = 'go'
 let g:NERDTreeMapCloseDir = 'x'
 let g:NERDTreeMapOpenInTab = 't'
 let g:NERDTreeMapOpenInTabSilent = 'gt'
-let g:NERDTreeMapOpenSplit = 's'
-let g:NERDTreeMapPreviewSplit = 'gs'
 let g:NERDTreeMapOpenVSplit = 'i'
-let g:NERDTreeMapPreviewVSplit = 'gi'
+let g:NERDTreeMapOpenSplit = 'gi'
+let g:NERDTreeMapPreviewSplit = ''
+let g:NERDTreeMapPreviewVSplit = ''
 let g:NERDTreeMapJumpLastChild = 'J'
 let g:NERDTreeMapJumpFirstChild = 'K'
 let g:NERDTreeMapJumpNextSibling = '<C-n>'
@@ -564,8 +565,8 @@ let g:NERDTreeMapJumpParent = 'p'
 let g:NERDTreeMapChangeRoot = 'cd'
 let g:NERDTreeMapChdir = ''
 let g:NERDTreeMapCWD = ''
-let g:NERDTreeMapUpdir = 'u'
-let g:NERDTreeMapUpdirKeepOpen = 'U'
+let g:NERDTreeMapUpdir = 'U'
+let g:NERDTreeMapUpdirKeepOpen = 'u'
 let g:NERDTreeMapRefresh = 'r'
 let g:NERDTreeMapRefreshRoot = 'R'
 let g:NERDTreeMapToggleHidden = '.'
@@ -576,6 +577,50 @@ let g:NERDTreeMapMenu = 'M'
 nnoremap <leader>te :NERDTreeToggle<CR>
 nnoremap <leader>tE
     \ <Cmd>execute ':NERDTree ' . expand('%:p:h')<CR>
+" }}}
+
+" nvim-tree {{{ 目录树导航
+let g:nvim_tree_show_icons = {
+    \ 'git': 0,
+    \ 'folders': 1,
+    \ 'files': 1,
+    \ 'folder_arrows': 1,
+    \ }
+let g:nvim_tree_disable_default_keybindings = 1
+silent! lua << EOF
+    local tcb = require'nvim-tree.config'.nvim_tree_callback
+    vim.g.nvim_tree_bindings = {
+        { key = {'<CR>', 'o', '<2-LeftMouse>'},
+                         cb = tcb('edit') },
+        { key = 'i'    , cb = tcb('vsplit') },
+        { key = 'gi'   , cb = tcb('split') },
+        { key = 't'    , cb = tcb('tabnew') },
+        { key = '<Tab>', cb = tcb('preview') },
+        { key = 'cd'   , cb = tcb('cd') },
+        { key = 'u'    , cb = tcb('dir_up') },
+        { key = 'K'    , cb = tcb('first_sibling') },
+        { key = 'J'    , cb = tcb('last_sibling') },
+        { key = '<C-p>', cb = tcb('prev_sibling') },
+        { key = '<C-n>', cb = tcb('next_sibling') },
+        { key = 'p'    , cb = tcb('parent_node') },
+        { key = '.'    , cb = tcb('toggle_dotfiles') },
+        { key = 'I'    , cb = tcb('toggle_ignored') },
+        { key = 'r'    , cb = tcb('refresh') },
+        { key = 'q'    , cb = tcb('close') },
+        { key = '?'    , cb = tcb('toggle_help') },
+        { key = 'O'    , cb = tcb('system_open') },
+        { key = 'A'    , cb = tcb('create') },
+        { key = 'D'    , cb = tcb('remove') },
+        { key = 'R'    , cb = tcb('rename') },
+        { key = '<C-r>', cb = tcb('full_rename') },
+        { key = 'X'    , cb = tcb('cut') },
+        { key = 'C'    , cb = tcb('copy') },
+        { key = 'P'    , cb = tcb('paste') },
+        { key = 'y'    , cb = tcb('copy_name') },
+        { key = 'Y'    , cb = tcb('copy_absolute_path') },
+    }
+EOF
+nnoremap <leader>tt :NvimTreeToggle<CR>
 " }}}
 
 " startify {{{ 启动首页
@@ -914,8 +959,7 @@ xmap <leader>sW <Plug>VgSurround
 " Vista {{{ 代码Tags
 let g:vista_echo_cursor = 0
 let g:vista_stay_on_open = 0
-nnoremap <leader>tt :Vista!!<CR>
-nnoremap <leader>vt :Vista!!<CR>
+nnoremap <leader>tv :Vista!!<CR>
 nnoremap <leader>vc :Vista coc<CR>
 " }}}
 
@@ -945,7 +989,7 @@ nmap <leader>th <Plug>(quickhl-manual-toggle)
 
 " illuminate {{{ 自动高亮
 let g:Illuminate_delay = 250
-let g:Illuminate_ftblacklist = ['nerdtree', 'coc-explorer']
+let g:Illuminate_ftblacklist = ['nerdtree']
 nnoremap <leader>tg :IlluminationToggle<CR>
 highlight link illuminatedWord MatchParen
 " }}}

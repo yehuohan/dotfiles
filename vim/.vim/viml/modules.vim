@@ -827,7 +827,7 @@ function! s:popF(km, type)
         \ 'lst': a:type ? ['path', 'filters', 'globlst', 'exargs'] : ['path', 'fuzzy'],
         \ 'dic': {
             \ 'path'   : {'dsr': 'cached find path list',
-            \             'lst': s:ws.fw.pathlst,
+            \             'lst': get(s:ws.fw, 'pathlst', []),
             \             'cpl': 'file'},
             \ 'filters': {'dsr': {sopt -> '-g*.{' . l:cfg.filters . '}'}},
             \ 'globlst': {'dsr': {sopt -> '-g' . join(split(l:cfg.globlst), ' -g')},

@@ -12,7 +12,6 @@ let s:use = {
     \ 'coc_exts'  : {
         \ 'coc-snippets'      : v:false,
         \ 'coc-yank'          : v:false,
-        \ 'coc-explorer'      : v:false,
         \ 'coc-json'          : v:false,
         \ 'coc-clangd'        : v:false,
         \ 'coc-rust-analyzer' : v:false,
