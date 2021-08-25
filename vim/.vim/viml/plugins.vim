@@ -73,6 +73,7 @@ if s:use.ui.patch
 if IsNVim()
     Plug 'kyazdani42/nvim-web-devicons'
 endif
+    Plug 'ryanoasis/vim-devicons'
 endif
     Plug 'luochen1990/rainbow'
     Plug 'Yggdroot/indentLine'
@@ -485,11 +486,12 @@ endif
 
 " rainbow {{{ 彩色括号
 let g:rainbow_active = 1
+let g:rainbow_conf = {
+    \ 'ctermfgs': g:rainbow_ctermfgs,
+    \ 'guifgs': g:rainbow_guifgs,
+    \ 'separately': { 'nerdtree': 0, 'cmake': 0 }
+    \ }                         " 使用gruvbox中的颜色设置
 nnoremap <leader>tr :RainbowToggle<CR>
-augroup PluginRainbow
-    autocmd!
-    autocmd Filetype cmake RainbowToggleOff
-augroup END
 " }}}
 
 " indentLine {{{ 显示缩进标识
@@ -548,6 +550,7 @@ let g:NERDTreeShowHidden = 1
 let g:NERDTreeDirArrowExpandable = '▸'
 let g:NERDTreeDirArrowCollapsible = '▾'
 let g:NERDTreeMapActivateNode = 'o'
+let g:NERDTreeMapOpenExpl = ''
 let g:NERDTreeMapOpenRecursively = 'O'
 let g:NERDTreeMapPreview = 'go'
 let g:NERDTreeMapCloseDir = 'x'
