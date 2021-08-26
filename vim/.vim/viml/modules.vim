@@ -611,44 +611,42 @@ let s:fw = {
         \ },
     \ 'fuzzy' : {
         \ 'fzf' : {
-            \ 'ff' : ':FzfFiles',
-            \ 'fF' : ':FzfFiles',
-            \ 'fl' : ':execute "FzfRg " . expand("<cword>")',
-            \ 'fL' : ':FzfRg',
-            \ 'fh' : ':execute "FzfTags " . expand("<cword>")',
-            \ 'fH' : ':FzfTags'
+            \ 'ff' : ':FzfFiles %s',
+            \ 'fl' : ':FzfRg %s',
+            \ 'fh' : ':FzfTags %s',
             \ },
         \ 'leaderf' : {
-            \ 'ff' : ':Leaderf file',
-            \ 'fF' : ':Leaderf file --cword',
-            \ 'fl' : ':Leaderf rg --nowrap --cword',
-            \ 'fL' : ':Leaderf rg --nowrap',
-            \ 'fh' : ':Leaderf tag --nowrap --cword',
-            \ 'fH' : ':Leaderf tag --nowrap',
-            \ 'fd' : ':execute "Leaderf gtags --auto-jump -d " .expand("<cword>")',
-            \ 'fg' : ':execute "Leaderf gtags -r " .expand("<cword>")',
+            \ 'ff' : ':Leaderf file --input "%s"',
+            \ 'fl' : ':Leaderf rg --nowrap --input "%s"',
+            \ 'fh' : ':Leaderf tag --nowrap --input "%s"',
+            \ 'fd' : ':Leaderf gtags --auto-jump -d %s',
+            \ 'fg' : ':Leaderf gtags -r %s',
             \ }
         \ },
     \ }
 " s:fw_mappings {{{
 const s:fw_mappings_rg = [
-    \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'Fi',  'FI',
-    \  'fw',  'fbw',  'ftw',  'fow',  'fpw',  'fW',  'fbW',  'ftW',  'foW',  'fpW',  'Fw',  'FW',
-    \  'fs',  'fbs',  'fts',  'fos',  'fps',  'fS',  'fbS',  'ftS',  'foS',  'fpS',  'Fs',  'FS',
-    \  'f=',  'fb=',  'ft=',  'fo=',  'fp=',  'f=',  'fb=',  'ft=',  'fo=',  'fp=',  'F=',  'F=',
-    \ 'fai', 'fabi', 'fati', 'faoi', 'fapi', 'faI', 'fabI', 'fatI', 'faoI', 'fapI', 'Fai', 'FaI',
-    \ 'faw', 'fabw', 'fatw', 'faow', 'fapw', 'faW', 'fabW', 'fatW', 'faoW', 'fapW', 'Faw', 'FaW',
-    \ 'fas', 'fabs', 'fats', 'faos', 'faps', 'faS', 'fabS', 'fatS', 'faoS', 'fapS', 'Fas', 'FaS',
-    \ 'fa=', 'fab=', 'fat=', 'fao=', 'fap=', 'fa=', 'fab=', 'fat=', 'fao=', 'fap=', 'Fa=', 'Fa=',
-    \ 'fvi', 'fvpi', 'fvI',  'fvpI',
-    \ 'fvw', 'fvpw', 'fvW',  'fvpW',
-    \ 'fvs', 'fvps', 'fvS',  'fvpS',
-    \ 'fv=', 'fvp=', 'fv=',  'fvp=',
+    \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'Fi',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'FI',
+    \  'fw',  'fbw',  'ftw',  'fow',  'fpw',  'Fw',  'fW',  'fbW',  'ftW',  'foW',  'fpW',  'FW',
+    \  'fs',  'fbs',  'fts',  'fos',  'fps',  'Fs',  'fS',  'fbS',  'ftS',  'foS',  'fpS',  'FS',
+    \  'fy',  'fby',  'fty',  'foy',  'fpy',  'Fy',  'fY',  'fbY',  'ftY',  'foY',  'fpY',  'FY',
+    \  'fu',  'fbu',  'ftu',  'fou',  'fpu',  'Fu',  'fU',  'fbU',  'ftU',  'foU',  'fpU',  'FU',
+    \ 'fai', 'fabi', 'fati', 'faoi', 'fapi', 'Fai', 'faI', 'fabI', 'fatI', 'faoI', 'fapI', 'FaI',
+    \ 'faw', 'fabw', 'fatw', 'faow', 'fapw', 'Faw', 'faW', 'fabW', 'fatW', 'faoW', 'fapW', 'FaW',
+    \ 'fas', 'fabs', 'fats', 'faos', 'faps', 'Fas', 'faS', 'fabS', 'fatS', 'faoS', 'fapS', 'FaS',
+    \ 'fay', 'faby', 'faty', 'faoy', 'fapy', 'Fay', 'faY', 'fabY', 'fatY', 'faoY', 'fapY', 'FaY',
+    \ 'fau', 'fabu', 'fatu', 'faou', 'fapu', 'Fau', 'faU', 'fabU', 'fatU', 'faoU', 'fapU', 'FaU',
+    \ 'fvi', 'fvpi',  'fvI', 'fvpI',
+    \ 'fvw', 'fvpw',  'fvW', 'fvpW',
+    \ 'fvs', 'fvps',  'fvS', 'fvpS',
+    \ 'fvy', 'fvpy',  'fvY', 'fvpY',
+    \ 'fvu', 'fvpu',  'fvU', 'fvpU',
     \ ]
 const s:fw_mappings_fuzzy = [
-    \  'Ff',  'FF',  'Fl',  'FL',  'Fh',  'FH',
-    \  'ff',  'fF',  'fl',  'fL',  'fh',  'fH',  'fd',  'fg',
-    \ 'fpf', 'fpF', 'fpl', 'fpL', 'fph', 'fpH', 'fpd', 'fpg',
+    \ 'ff', 'fpf', 'Ff',
+    \ 'fl', 'fpl', 'Fl',
+    \ 'fh', 'fph', 'Fh',
+    \ 'fd', 'fg',
     \ ]
 " }}}
 
@@ -712,7 +710,9 @@ function! s:parsePattern(km)
             let l:pat = l:selected
         endif
     endif
-    if a:km.E ==# '='
+    if a:km.E ==? 'y'
+        let l:pat = getreg('0')
+    elseif a:km.E ==? 'u'
         let l:pat = getreg('+')
     endif
     return l:pat
@@ -749,8 +749,8 @@ endfunction
 " Function: s:parseOptions(km) {{{
 function! s:parseOptions(km)
     let l:opt = ''
-    if a:km.E ==? 's'     | let l:opt .= '-w ' | endif
-    if a:km.E =~# '[iws]' | let l:opt .= '-i ' | elseif a:km.E =~# '[IWS]' | let l:opt .= '-s ' | endif
+    if a:km.E ==? 's'       | let l:opt .= '-w ' | endif
+    if a:km.E =~# '[iwsyu]' | let l:opt .= '-i ' | elseif a:km.E =~# '[IWSYU]' | let l:opt .= '-s ' | endif
     if a:km.A1 !~# '[btop]'
         if !empty(s:ws.fw.filters)
             let l:opt .= '-g"*.{' . s:ws.fw.filters . '}" '
@@ -782,7 +782,7 @@ endfunction
 function! s:parseVimgrep(km, fmt)
     " get options in which %s is the pattern
     let l:opt = (a:km.E ==? 's') ? '\<%s\>' : '%s'
-    let l:opt .= (a:km.E =~# '[iws]') ? '\c' : '\C'
+    let l:opt .= (a:km.E =~# '[iwsyu]') ? '\c' : '\C'
     let a:fmt.opt = ''
 
     " get loaction
@@ -850,8 +850,8 @@ endfunction
 
 " Function: FindW(keys) {{{ 查找
 " {{{
-" @param keys: [fF][av][btop][IiWwSs=]
-"              [%1][%2][%3  ][4%     ]
+" @param keys: [fF][av][btop][IiWwSsYyUu]
+"              [%1][%2][%3  ][4%        ]
 " Find: %1 = km.S
 "   F : find with inputing args
 " Command: %2 = km.A0
@@ -865,7 +865,6 @@ endfunction
 "   p : find with inputing path
 "  '' : find with s:ws.fw
 " Pattern: %4 = km.E
-"   = : find text from clipboard
 "   Normal Mode:
 "   i : find input
 "   w : find word
@@ -874,8 +873,10 @@ endfunction
 "   i : find input    with selected
 "   w : find visual   with selected
 "   s : find selected with boundaries
-"   LowerCase: [iws] find in ignorecase
-"   UpperCase: [IWS] find in case match
+"   LowerCase: [iwsyu] find in ignorecase
+"   UpperCase: [IWSYU] find in case insensitive
+"   y : find text from register "0
+"   u : find text from register "+ (clipboard of system)
 " @param cfg: first priority of config
 " }}}
 function! FindW(keys)
@@ -910,21 +911,18 @@ endfunction
 
 " Function: FindWFuzzy(keys) {{{ 模糊搜索
 " {{{
-" @param keys: [fF][p ][fFlLhHdg]
-"              [%1][%2][%3      ]
+" @param keys: [fF][p ][flhdg]
+"              [%1][%2][%3   ]
 " Find: %1 = km.S
-"   F : find with inputing path
+"   F : fuzzy with inputing args
 " Location: %2 = km.A
-"   p : find with inputing temp path
+"   p : fuzzy with inputing temp path
 " Action: %3 = km.E
 "   f : fuzzy files
-"   F : fuzzy files with <cword>
-"   l : fuzzy line text with <cword>
-"   L : fuzzy line text
-"   h : fuzzy ctags with <cword>
-"   H : fuzzy ctags
-"   d : fuzzy gtags definitions with <cword>
-"   g : fuzzy gtags references with <cword>
+"   l : fuzzy line text
+"   h : fuzzy ctags and default with <cword>
+"   d : fuzzy gtags definition and default with <cword>
+"   g : fuzzy gtags reference and default with <cword>
 " }}}
 function! FindWFuzzy(keys)
     let km = {
@@ -935,19 +933,29 @@ function! FindWFuzzy(keys)
     if km.S ==# 'F'
         call s:popF(km, v:false)
     else
-        let l:path = s:ws.fw.path
-        if (km.A !=# 'p') && empty(l:path)
-            let l:path = popc#utils#FindRoot()
-            if !empty(l:path)
-                let s:ws.fw.path = l:path
+        let l:pat = ''
+        if mode() ==# 'n'
+            if km.E =~# '[hdg]'
+                let l:pat = expand('<cword>')
+            endif
+        else
+            let l:pat = GetSelected('')
+        endif
+
+        let l:loc = s:ws.fw.path
+        if (km.A !=# 'p') && empty(l:loc)
+            let l:loc = popc#utils#FindRoot()
+            if !empty(l:loc)
+                let s:ws.fw.path = l:loc
                 call add(s:ws.fw.pathlst, s:ws.fw.path)
             endif
         endif
-        if (km.A ==# 'p') || empty(l:path)
-            let l:path = Input2Str('fuzzy path: ', '', 'dir', expand('%:p:h'))
+        if (km.A ==# 'p') || empty(l:loc)
+            let l:loc = Input2Str('fuzzy path: ', '', 'dir', expand('%:p:h'))
         endif
-        if !empty(l:path)
-            let l:exec = printf(":lcd %s | %s", l:path, s:fw.engine['f' . km.E])
+
+        if !empty(l:loc)
+            let l:exec = printf(":lcd %s | %s", l:loc, printf(s:fw.engine['f' . km.E], l:pat))
             call SetExecLast(l:exec)
             execute l:exec
         endif
@@ -960,7 +968,7 @@ for key in s:fw_mappings_rg
     execute printf('noremap <leader>%s <Cmd>call FindW("%s")<CR>', key, key)
 endfor
 for key in s:fw_mappings_fuzzy
-    execute printf('nnoremap <leader>%s <Cmd>call FindWFuzzy("%s")<CR>', key, key)
+    execute printf('noremap <leader>%s <Cmd>call FindWFuzzy("%s")<CR>', key, key)
 endfor
 nnoremap <leader>fk :call FindWKill()<CR>
 " }}}

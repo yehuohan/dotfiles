@@ -583,6 +583,7 @@ nnoremap <leader>tE
 " }}}
 
 " nvim-tree {{{ 目录树导航
+if IsNVim()
 let g:nvim_tree_show_icons = {
     \ 'git': 0,
     \ 'folders': 1,
@@ -624,6 +625,7 @@ silent! lua << EOF
     }
 EOF
 nnoremap <leader>tt :NvimTreeToggle<CR>
+endif
 " }}}
 
 " startify {{{ 启动首页
@@ -928,7 +930,7 @@ let g:neoformat_enabled_c = ['astyle']
 let g:neoformat_enabled_cpp = ['astyle']
 let g:neoformat_enabled_java = ['astyle']
 let g:neoformat_enabled_python = ['autopep8']
-noremap <leader>fc :Neoformat<CR>
+noremap <leader>fm :Neoformat<CR>
 " }}}
 
 " auto-pairs {{{ 自动括号
