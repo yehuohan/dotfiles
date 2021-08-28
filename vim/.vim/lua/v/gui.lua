@@ -1,6 +1,8 @@
 local fn = vim.fn
-local map = vim.api.nvim_set_keymap
 local use = require('v.use').get()
+local noremap = require('v.libs').keymap.noremap
+local nnoremap = require('v.libs').keymap.nnoremap
+local inoremap = require('v.libs').keymap.inoremap
 
 
 local function gui_setfonts(inc)
@@ -19,10 +21,10 @@ local function gui_neovimqt()
             GuiTabline 0
             GuiPopupmenu 0
         ]]
-        map('' , '<RightMouse>', [[<Cmd>call GuiShowContextMenu()<CR>]]                       , { noremap = true })
-        map('i', '<RightMouse>', [[<Cmd>call GuiShowContextMenu()<CR>]]                       , { noremap = true })
-        map('n', '<leader>tf'  , [[<Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>]], { noremap = true })
-        map('n', '<leader>tm'  , [[<Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>]]  , { noremap = true })
+        noremap{'<RightMouse>' , [[<Cmd>call GuiShowContextMenu()<CR>]]                       }
+        inoremap{'<RightMouse>', [[<Cmd>call GuiShowContextMenu()<CR>]]                       }
+        nnoremap{'<leader>tf'  , [[<Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>]]}
+        nnoremap{'<leader>tm'  , [[<Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>]]  }
     end
 end
 
@@ -40,9 +42,9 @@ local function gui_setup()
         [[,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor]] ..
         [[,sm:block-blinkwait175-blinkoff150-blinkon175]]
 
-    map('n', '<k0>'    , [[:lua require('v.gui').setfonts(0)<CR>]] , { noremap = true })
-    map('n', '<kPlus>' , [[:lua require('v.gui').setfonts(1)<CR>]] , { noremap = true })
-    map('n', '<kMinus>', [[:lua require('v.gui').setfonts(-1)<CR>]], { noremap = true })
+    nnoremap{'<k0>'    , [[:lua require('v.gui').setfonts(0)<CR>]] }
+    nnoremap{'<kPlus>' , [[:lua require('v.gui').setfonts(1)<CR>]] }
+    nnoremap{'<kMinus>', [[:lua require('v.gui').setfonts(-1)<CR>]]}
 end
 
 return {
