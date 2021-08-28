@@ -10,7 +10,6 @@ local use = {
     coc_exts  = {
         ['coc-snippets']      = false,
         ['coc-yank']          = false,
-        ['coc-explorer']      = false,
         ['coc-json']          = false,
         ['coc-clangd']        = false,
         ['coc-rust-analyzer'] = false,
@@ -109,12 +108,16 @@ local function use_init()
     })
 end
 
+local function use_get()
+    return use
+end
 
-vim.cmd[[command! -nargs=0 Use :lua require('v.use').init()]]
-
-use_load()
 
 return {
-    use = use,
-    init = use_init,
+    setup = function()
+        vim.cmd[[command! -nargs=0 Use :lua require('v.use').cfg()]]
+        use_load()
+    end,
+    get = use_get,
+    cfg = use_init,
 }

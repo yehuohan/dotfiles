@@ -48,12 +48,13 @@ local function setup(dotvim)
     vim.api.nvim_set_keymap('v' , ';' , ':' , { noremap = true })
     vim.api.nvim_set_keymap('n' , ':' , ';' , { noremap = true })
 
-    require('v.env')
-    require('v.use')
-    require('v.pkgs')
-    require('v.opts')
-    require('v.gui')
-    require('v.maps')
+    require('v.env').setup()
+    require('v.use').setup()
+    require('v.pkgs').setup()
+    require('v.mods').setup()
+    require('v.opts').setup()
+    require('v.gui').setup()
+    require('v.maps').setup()
 end
 
 return {

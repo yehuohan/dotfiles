@@ -56,8 +56,7 @@ local function env_coc_settings()
     }
 end
 
-env_init()
-
 return {
+    setup = env_init,
     env_coc_settings = env_coc_settings,
 }
