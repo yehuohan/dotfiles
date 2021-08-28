@@ -348,8 +348,6 @@ nnoremap <leader>cP "+P
 vnoremap <C-c> "+y
 nnoremap <C-v> "+p
 inoremap <C-v> <Esc>"+pi
-" 使用i-C-a代替i-C-v
-inoremap <C-a> <C-v>
 " 矩形选择
 noremap vv <C-v>
 xnoremap <C-g> <C-g><Cmd>echo 'mode: ' . string(mode(1))<CR>

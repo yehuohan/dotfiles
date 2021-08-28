@@ -547,11 +547,12 @@ nnoremap <leader>ty
 
 " nerdtree {{{ 目录树导航
 let g:NERDTreeShowHidden = 1
+let g:NERDTreeMinimalUI = 1
 let g:NERDTreeDirArrowExpandable = '▸'
 let g:NERDTreeDirArrowCollapsible = '▾'
 let g:NERDTreeMapActivateNode = 'o'
 let g:NERDTreeMapOpenExpl = ''
-let g:NERDTreeMapOpenRecursively = 'O'
+let g:NERDTreeMapOpenRecursively = ''
 let g:NERDTreeMapPreview = 'go'
 let g:NERDTreeMapCloseDir = 'x'
 let g:NERDTreeMapOpenInTab = 't'
@@ -577,6 +578,7 @@ let g:NERDTreeMapToggleZoom = 'Z'
 let g:NERDTreeMapQuit = 'q'
 let g:NERDTreeMapToggleFiles = 'F'
 let g:NERDTreeMapMenu = 'M'
+let g:NERDTreeMapToggleBookmarks = ''
 nnoremap <leader>te :NERDTreeToggle<CR>
 nnoremap <leader>tE
     \ <Cmd>execute ':NERDTree ' . expand('%:p:h')<CR>
@@ -867,7 +869,6 @@ nnoremap <leader>os <Cmd>CocList --normal sources<CR>
 nnoremap <leader>ox <Cmd>CocList --normal extensions<CR>
 " coc-extensions
 nnoremap <leader>oy <Cmd>CocList --normal yank<CR>
-nnoremap <leader>oe <Cmd>CocCommand explorer<CR>
 nmap <leader>oc <Plug>(coc-calc-result-append)
 highlight default link CocMenuSel CursorLineNr
 endif
