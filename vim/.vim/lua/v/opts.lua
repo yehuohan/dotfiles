@@ -91,7 +91,7 @@ end
 
 local function opts_autocmd()
     vim.cmd[[
-    augroup UserSettingsCmd
+    augroup UserAutocmd
         autocmd!
         autocmd BufNewFile *                    set fileformat=unix
         autocmd BufRead,BufNewFile *.tex        set filetype=tex

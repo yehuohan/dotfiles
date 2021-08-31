@@ -151,7 +151,7 @@ nnoremap <leader>in :call OptionFns('number')<CR>
 nnoremap <leader>ih :call OptionFns('syntax')<CR>
 " }}}
 
-" Auto commands {{{
+" Autocmds {{{
 " Function: s:onLargeFile() {{{
 function! s:onLargeFile()
     let l:fsize = getfsize(expand('<afile>'))
@@ -211,20 +211,19 @@ if IsVim() && has('gui_running')
 endif
 " }}}
 
+" Gui-nvim {{{
 if IsNVim()
-" Gui-neovim {{{
-set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
-    \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
-    \,sm:block-blinkwait175-blinkoff150-blinkon175
-
 augroup UserSettingsGui
     autocmd!
-    autocmd UIEnter * call s:NVimQt_setGui()
+    autocmd UIEnter * call s:onUIEnter()
 augroup END
 
-" Function: s:NVimQt_setGui() {{{
-function! s:NVimQt_setGui()
-    if exists('g:GuiLoaded')            " 在UIEnter之后才起作用
+function! s:onUIEnter()
+    " Gui-neovim, 在UIEnter之后才起作用
+    if exists('g:GuiLoaded')
+        set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
+            \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
+            \,sm:block-blinkwait175-blinkoff150-blinkon175
         GuiLinespace 0
         GuiTabline 0
         GuiPopupmenu 0
@@ -234,19 +233,17 @@ function! s:NVimQt_setGui()
         nnoremap <leader>tf <Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
         nnoremap <leader>tm <Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>
     endif
-endfunction
-" }}}
-" }}}
 
-" Gui-neovide {{{
-if exists('g:neovide')
-    set guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20
-    let g:neovide_cursor_antialiasing = v:false
-    let g:neovide_cursor_vfx_mode = "railgun"
-    call GuiAdjustFontSize(4)
+    " Gui-neovide
+    if exists('g:neovide')
+        set guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20
+        let g:neovide_cursor_antialiasing = v:false
+        let g:neovide_cursor_vfx_mode = "railgun"
+        call GuiAdjustFontSize(4)
+    endif
+endfunction
 endif
 " }}}
-endif
 " }}}
 
 " Mappings {{{
