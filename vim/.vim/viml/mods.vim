@@ -202,7 +202,7 @@ function! s:wsd.display() dict
 endfunction
 " }}}
 
-augroup UserModulesWorkspace
+augroup UserModsWorkspace
     autocmd!
     autocmd User PopcLayerWksSavePre call popc#layer#wks#SetSettings(s:ws)
     autocmd User PopcLayerWksLoaded call extend(s:ws, popc#layer#wks#GetSettings(), 'force') |

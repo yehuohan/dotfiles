@@ -59,6 +59,6 @@ nnoremap : ;
 
 source $DotVimVimLPath/env.vim
 source $DotVimVimLPath/use.vim
-source $DotVimVimLPath/plugins.vim
-source $DotVimVimLPath/modules.vim
-source $DotVimVimLPath/settings.vim
+source $DotVimVimLPath/pkgs.vim
+source $DotVimVimLPath/mods.vim
+source $DotVimVimLPath/sets.vim

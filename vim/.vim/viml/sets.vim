@@ -166,7 +166,7 @@ function! s:onLargeFile()
 endfunction
 " }}}
 
-augroup UserSettingsCmd
+augroup UserSetsCmd
     autocmd!
     autocmd BufNewFile *                    set fileformat=unix
     autocmd BufRead,BufNewFile *.tex        set filetype=tex
@@ -213,7 +213,7 @@ endif
 
 " Gui-nvim {{{
 if IsNVim()
-augroup UserSettingsGui
+augroup UserSetsGui
     autocmd!
     autocmd UIEnter * call s:onUIEnter()
 augroup END

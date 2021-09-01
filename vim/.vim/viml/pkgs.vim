@@ -21,7 +21,7 @@ endfunction
 " Function: s:plug.init() dict {{{
 function! s:plug.init() dict
     if !empty(self.onVimEnter.exec)
-        augroup PluginPlug
+        augroup PkgsPlug
             autocmd!
             autocmd VimEnter * call execute(s:plug.onVimEnter.exec)
         augroup END
@@ -415,7 +415,7 @@ nnoremap <leader>tk
     \ echo 'b:lightline_check_flg = ' . b:lightline_check_flg<CR>
 
 " Augroup: PluginLightline {{{
-augroup PluginLightline
+augroup PkgsLightline
     autocmd!
     autocmd ColorScheme * call Plug_ll_colorScheme()
     autocmd CursorHold,BufWritePost * call Plug_ll_checkRefresh()
@@ -497,6 +497,7 @@ nnoremap <leader>tr :RainbowToggle<CR>
 " indentLine {{{ 显示缩进标识
 let g:indentLine_char = '⁞'             " 设置标识符样式
 let g:indentLinet_color_term = 200      " 设置标识符颜色
+let g:indentLine_fileTypeExclude = ['startify']
 nnoremap <leader>ti :IndentLinesToggle<CR>
 " }}}
 
@@ -650,10 +651,6 @@ let g:startify_lists = [
 let g:startify_files_number = 8
 let g:startify_custom_header = 'startify#pad(startify#fortune#cowsay(Plug_stt_todo(), "─", "│", "┌", "┐", "┘", "└"))'
 nnoremap <leader>su :Startify<CR>
-augroup PluginStartify
-    autocmd!
-    autocmd User StartifyReady setlocal conceallevel=0
-augroup END
 
 function! Plug_stt_todo()
     if filereadable($DotVimCachePath.'/todo.md')
@@ -675,7 +672,7 @@ let g:fzf_command_prefix = 'Fzf'
 let g:fzf_layout = { 'down': '40%' }
 let g:fzf_preview_window = ['right:40%,border-sharp']
 nnoremap <leader><leader>f :Fzf
-augroup PluginFzf
+augroup PkgsFzf
     autocmd!
     autocmd Filetype fzf tnoremap <buffer> <Esc> <C-c>
 augroup END
