@@ -1120,10 +1120,14 @@ nnoremap <leader>er  :call FnEditFile('rs', 0)<CR>
 nnoremap <leader>etr :call FnEditFile('rs', 1)<CR>
 nnoremap <leader>ep  :call FnEditFile('py', 0)<CR>
 nnoremap <leader>etp :call FnEditFile('py', 1)<CR>
-nnoremap <leader>eh <Cmd>call Input2Fn(['Divide H: '], 'FnInsertSpace', 'h')<CR>
-nnoremap <leader>eb <Cmd>call Input2Fn(['Divide B: '], 'FnInsertSpace', 'b')<CR>
-nnoremap <leader>el <Cmd>call Input2Fn(['Divide L: '], 'FnInsertSpace', 'l')<CR>
-nnoremap <leader>ed <Cmd>call Input2Fn(['Divide D: '], 'FnInsertSpace', 'd')<CR>
+nnoremap <leader>el  :call FnEditFile('lua', 0)<CR>
+nnoremap <leader>etl :call FnEditFile('lua', 1)<CR>
+nnoremap <leader>em  :call FnEditFile('md', 0)<CR>
+nnoremap <leader>etm :call FnEditFile('md', 1)<CR>
+nnoremap <silent> <leader>dh :call Input2Fn(['Divide Right: '] , 'FnInsertSpace', 'h')<CR>
+nnoremap <silent> <leader>db :call Input2Fn(['Divide Both: ']  , 'FnInsertSpace', 'b')<CR>
+nnoremap <silent> <leader>dl :call Input2Fn(['Divide Left: ']  , 'FnInsertSpace', 'l')<CR>
+nnoremap <silent> <leader>dd :call Input2Fn(['Divide Delete: '], 'FnInsertSpace', 'd')<CR>
 nnoremap <leader>sf
     \ <Cmd>call FnSwitchFile({'lhs': ['c', 'cc', 'cpp', 'cxx'], 'rhs': ['h', 'hh', 'hpp', 'hxx']})<CR>
 " }}}

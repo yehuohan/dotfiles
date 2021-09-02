@@ -186,16 +186,16 @@ let g:did_install_default_menus = 1     " 禁止加载缺省菜单
 let g:did_install_syntax_menu = 1       " 禁止加载Syntax菜单
 
 " Fonts {{{
-function! GuiAdjustFontSize(inc)
+function! GuiSetFonts(inc)
     let s:use.ui.fontsize += a:inc
     let s:use.ui.widesize += a:inc
     execute printf('set guifont=%s:h%d', escape(s:use.ui.font, ' '), s:use.ui.fontsize)
     execute printf('set guifontwide=%s:h%d', escape(s:use.ui.wide, ' '), s:use.ui.widesize)
 endfunction
 
-nnoremap <k0> :call GuiAdjustFontSize(0)<CR>
-nnoremap <kPlus> :call GuiAdjustFontSize(1)<CR>
-nnoremap <kMinus> :call GuiAdjustFontSize(-1)<CR>
+nnoremap <k0> :call GuiSetFonts(0)<CR>
+nnoremap <kPlus> :call GuiSetFonts(1)<CR>
+nnoremap <kMinus> :call GuiSetFonts(-1)<CR>
 " }}}
 
 " Gui-vim {{{
@@ -203,7 +203,7 @@ if IsVim() && has('gui_running')
     set lines=25
     set columns=90
     set linespace=0
-    call GuiAdjustFontSize(0)
+    call GuiSetFonts(0)
     if IsWin()
         nnoremap <leader>tf
             \ <Cmd>call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)<CR>
@@ -227,7 +227,7 @@ function! s:onUIEnter()
         GuiLinespace 0
         GuiTabline 0
         GuiPopupmenu 0
-        call GuiAdjustFontSize(0)
+        call GuiSetFonts(0)
         noremap <RightMouse> <Cmd>call GuiShowContextMenu()<CR>
         inoremap <RightMouse> <Cmd>call GuiShowContextMenu()<CR>
         nnoremap <leader>tf <Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
@@ -239,7 +239,7 @@ function! s:onUIEnter()
         set guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20
         let g:neovide_cursor_antialiasing = v:false
         let g:neovide_cursor_vfx_mode = "railgun"
-        call GuiAdjustFontSize(4)
+        call GuiSetFonts(4)
     endif
 endfunction
 endif

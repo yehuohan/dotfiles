@@ -1059,8 +1059,8 @@ nmap <F12>  <Plug>VimspectorStepOut
 nnoremap <leader>dr :VimspectorReset<CR>
 nnoremap <leader>de :VimspectorEval<Space>
 nnoremap <leader>dw :VimspectorWatch<Space>
-nnoremap <leader>dh :VimspectorShowOutput<Space>
-nnoremap <leader>db
+nnoremap <leader>dW :VimspectorShowOutput<Space>
+nnoremap <leader>di
     \ <Cmd>call PopSelection({
         \ 'opt' : 'select debug configuration',
         \ 'lst' : keys(json_decode(join(readfile('.vimspector.json'))).configurations),
