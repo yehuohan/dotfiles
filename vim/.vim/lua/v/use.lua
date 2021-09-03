@@ -108,16 +108,12 @@ local function use_init()
     })
 end
 
-local function use_get()
-    return use
-end
-
 
 return {
     setup = function()
         vim.cmd[[command! -nargs=0 Use :lua require('v.use').cfg()]]
         use_load()
     end,
-    get = use_get,
+    get = function() return use end,
     cfg = use_init,
 }

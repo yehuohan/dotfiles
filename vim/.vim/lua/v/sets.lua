@@ -1,9 +1,18 @@
+local M = {}
+local api = vim.api
 local fn = vim.fn
 local o = vim.o
 local opt = vim.opt
+local use = require('v.use').get()
+local noremap = require('v.mods').keymap.noremap
+local nnoremap = require('v.mods').keymap.nnoremap
+local inoremap = require('v.mods').keymap.inoremap
 
 
-local function opts_set()
+--------------------------------------------------------------------------------
+-- Options
+--------------------------------------------------------------------------------
+local function opts_default()
     o.synmaxcol = 512                       -- 最大高亮列数
     o.number = true                         -- 显示行号
     o.relativenumber = true                 -- 显示相对行号
@@ -77,7 +86,10 @@ local function opts_set()
     o.ttimeoutlen = 70                      -- 键码超时时间为70ms
 end
 
-local function on_large_file()
+--------------------------------------------------------------------------------
+-- Autocmds
+--------------------------------------------------------------------------------
+function M.onLargeFile()
     local fsize = fn.getfsize(fn.expand('<afile>'))
     if fsize >= 5 * 1024 * 1024 or fsize == -2 then
         vim.b.lightline_check_flg = 0   -- 禁止MixedIndent和Trailing检测
@@ -89,28 +101,105 @@ local function on_large_file()
     end
 end
 
-local function opts_autocmd()
+--------------------------------------------------------------------------------
+-- Gui
+--------------------------------------------------------------------------------
+function M.setfonts(inc)
+    use.ui.fontsize = use.ui.fontsize + inc
+    use.ui.widesize = use.ui.widesize + inc
+    vim.o.guifont = use.ui.font .. ':h' .. tostring(use.ui.fontsize)
+    vim.o.guifontwide = use.ui.wide .. ':h' .. tostring(use.ui.widesize)
+end
+
+function M.onUIEnter()
+    -- 在UIEnter之后才起作用
+    if fn.exists('g:GuiLoaded') == 1 then
+        vim.o.guicursor =
+            [[n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50]] ..
+            [[,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor]] ..
+            [[,sm:block-blinkwait175-blinkoff150-blinkon175]]
+        M.setfonts(0)
+        vim.cmd[[
+            GuiLinespace 0
+            GuiTabline 0
+            GuiPopupmenu 0
+        ]]
+        noremap{'<RightMouse>' , [[<Cmd>call GuiShowContextMenu()<CR>]]                       }
+        inoremap{'<RightMouse>', [[<Cmd>call GuiShowContextMenu()<CR>]]                       }
+        nnoremap{'<leader>tf'  , [[<Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>]]}
+        nnoremap{'<leader>tm'  , [[<Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>]]  }
+    end
+
+    nnoremap{'<k0>'        , [[:lua require('v.sets').setfonts(0)<CR>]] }
+    nnoremap{'<kPlus>'     , [[:lua require('v.sets').setfonts(1)<CR>]] }
+    nnoremap{'<kMinus>'    , [[:lua require('v.sets').setfonts(-1)<CR>]]}
+end
+
+--------------------------------------------------------------------------------
+-- Mappings
+--------------------------------------------------------------------------------
+-- 跳转到下一个floating窗口
+function M.WinGotoNextFloating()
+    for _, wid in ipairs(api.nvim_list_wins()) do
+        if wid ~= api.nvim_get_current_win() then
+            local cfg = api.nvim_win_get_config(wid)
+            if fn.get(cfg, 'relative', '') ~= '' and fn.get(cfg, 'focusable', true) == true then
+                fn.win_gotoid(wid)
+            end
+        end
+    end
+end
+
+-- 移动窗口的分界，改变窗口大小
+-- 只有最bottom-right的窗口是移动其top-left的分界，其余窗口移动其bottom-right分界
+function M.WinMoveSpliter(dir, inc)
+    local wnr = fn.winnr()
+    local pos = fn.win_screenpos(wnr)
+    local hei = fn.winheight(wnr) + pos[1] + o.cmdheight
+    local wid = fn.winwidth(wnr) - 1 + pos[2]
+    local all_hei = o.lines
+    local all_wid = o.columns
+
+    inc = inc * vim.v.count1
+    local cmd
+    local sig
+    if dir == 'e' then
+        if (hei >= all_hei and pos[1] >= 3)
+        then sig = '+'
+        else sig = '-'
+        end
+        cmd = string.format('resize%s%d', sig, inc)
+    elseif dir == 'd' then
+        if (hei >= all_hei and pos[1] >= 3)
+        then sig = '-'
+        else sig = '+'
+        end
+        cmd = string.format('resize%s%d', sig, inc)
+    elseif dir == 's' then
+        if (wid >= all_wid)
+        then sig = '+'
+        else sig = '-'
+        end
+        cmd = string.format('vertical resize%s%d', sig, inc)
+    elseif dir == 'f' then
+        if (wid >= all_wid)
+        then sig = '-'
+        else sig = '+'
+        end
+        cmd = string.format('vertical resize%s%d', sig, inc)
+    end
+    api.nvim_command(cmd)
+end
+
+
+function M.setup()
+    opts_default()
     vim.cmd[[
-    augroup UserAutocmd
+    augroup UserGui
         autocmd!
-        autocmd BufNewFile *                    set fileformat=unix
-        autocmd BufRead,BufNewFile *.tex        set filetype=tex
-        autocmd BufRead,BufNewFile *.log        set filetype=log
-        autocmd BufRead,BufNewFile *.usf,*ush   set filetype=hlsl
-        autocmd Filetype vim,tex                setlocal foldmethod=marker
-        autocmd Filetype c,cpp,javascript       setlocal foldmethod=syntax
-        autocmd Filetype python                 setlocal foldmethod=indent
-        autocmd FileType txt,log                setlocal foldmethod=manual
-        autocmd BufReadPre * :lua require('v.opts').on_large_file()
+        autocmd UIEnter * :lua require('v.sets').onUIEnter()
     augroup END
     ]]
 end
 
-
-return {
-    setup = function()
-        opts_set()
-        opts_autocmd()
-    end,
-    on_large_file = on_large_file,
-}
+return M

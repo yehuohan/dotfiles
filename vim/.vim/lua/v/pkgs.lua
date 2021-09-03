@@ -1,15 +1,15 @@
 local fn = vim.fn
 local g = vim.g
 local use = require('v.use').get()
-local map      = require('v.libs').keymap.map
-local nmap     = require('v.libs').keymap.nmap
-local vmap     = require('v.libs').keymap.vmap
-local xmap     = require('v.libs').keymap.xmap
-local omap     = require('v.libs').keymap.omap
-local noremap  = require('v.libs').keymap.noremap
-local nnoremap = require('v.libs').keymap.nnoremap
-local vnoremap = require('v.libs').keymap.vnoremap
-local xnoremap = require('v.libs').keymap.xnoremap
+local map      = require('v.mods').keymap.map
+local nmap     = require('v.mods').keymap.nmap
+local vmap     = require('v.mods').keymap.vmap
+local xmap     = require('v.mods').keymap.xmap
+local omap     = require('v.mods').keymap.omap
+local noremap  = require('v.mods').keymap.noremap
+local nnoremap = require('v.mods').keymap.nnoremap
+local vnoremap = require('v.mods').keymap.vnoremap
+local xnoremap = require('v.mods').keymap.xnoremap
 
 
 local function pkgs_packer()
@@ -62,7 +62,6 @@ end
 --------------------------------------------------------------------------------
 -- Editing
 --------------------------------------------------------------------------------
-
 -- 快速跳转
 local function pkgs_hop()
     require'hop'.setup({ match_mappings = { 'zh', 'zh_sc' }, create_hl_autocmd = true })
@@ -191,12 +190,12 @@ local function pkgs_textobj_user()
     omap{'iu', [[<Plug>(textobj-underscore-i)]] }
     vmap{'au', [[<Plug>(textobj-underscore-a)]] }
     vmap{'iu', [[<Plug>(textobj-underscore-i)]] }
-    nnoremap{'<leader>to', [[:lua PlugToMotion('v')<CR>]]}
-    nnoremap{'<leader>tO', [[:lua PlugToMotion('V')<CR>]]}
+    nnoremap{'<leader>to', [[:lua Plug_to_motion('v')<CR>]]}
+    nnoremap{'<leader>tO', [[:lua Plug_to_motion('V')<CR>]]}
 end
 
 local textobj_motion = vim.regex('/l')
-function PlugToMotion(motion)
+function Plug_to_motion(motion)
     fn.PopSelection({
         opt = 'select text object motion',
         lst = vim.split([[w W s p ( b [ < t { B " ' ` i f c m u]], ' '),
@@ -248,7 +247,6 @@ end
 --------------------------------------------------------------------------------
 -- Manager
 --------------------------------------------------------------------------------
-
 -- Vim主题(ColorScheme, StatusLine, TabLine)
 local function pkgs_theme()
     g.gruvbox_contrast_dark = 'soft'        -- 背景选项：dark, medium, soft
