@@ -4,7 +4,6 @@ local use_file = vim.env.DotVimCachePath .. '/.use.json'
 local use = {
     fastgit   = false,
     lightline = false,
-    startify  = false,
     ycm       = false,
     coc       = false,
     coc_exts  = {

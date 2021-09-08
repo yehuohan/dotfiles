@@ -6,7 +6,6 @@ let s:use_file = $DotVimCachePath . '/.use.json'
 let s:use = {
     \ 'fastgit'   : v:false,
     \ 'lightline' : v:false,
-    \ 'startify'  : v:false,
     \ 'ycm'       : v:false,
     \ 'coc'       : v:false,
     \ 'coc_exts'  : {

@@ -83,9 +83,7 @@ endif
 if IsNVim()
     Plug 'kyazdani42/nvim-tree.lua'
 endif
-if s:use.startify
     Plug 'mhinz/vim-startify'
-endif
     Plug 'itchyny/screensaver.vim'
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
@@ -632,7 +630,6 @@ endif
 " }}}
 
 " startify {{{ 启动首页
-if s:use.startify
 if IsWin()
 let g:startify_bookmarks = [
     \ {'c': '$DotVimPath/.init.vim'},
@@ -660,7 +657,6 @@ function! Plug_stt_todo()
         return ''
     endif
 endfunction
-endif
 " }}}
 
 " screensaver {{{ 屏保
