@@ -369,7 +369,7 @@ function! s:vout(cfg)
     if a:cfg.deploy ==# 'run'
         let l:pats = {
             \ 'target'  : '\mTARGET\s*:\?=\s*\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
-            \ 'project' : '\mproject(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
+            \ 'project' : '\mproject\s*(\(\<[a-zA-Z0-9_][a-zA-Z0-9_\-]*\)',
             \ }
         let l:pat = (a:cfg.key =~# '[mq]') ? l:pats.target : l:pats.project
 
@@ -387,19 +387,11 @@ function! s:vout(cfg)
 endfunction
 " }}}
 
-" FUNCTION: s:parseProps(km) {{{
-function! s:parseProps(km)
-    return {
-        \ 'term'  : get({'l': 'floaterm', 't': 'right', 'e': 'external'}, a:km.A, ''),
-        \ 'deploy': get({'b': 'build', 'c': 'clean'}, a:km.A, 'run'),
-        \ 'lowest': (a:km.A ==# 'o') ? 1 : 0,
-        \ }
-endfunction
-" }}}
-
-" FUNCTION: s:popR(km) {{{
-function! s:popR(km)
+" FUNCTION: s:parseProps(km, [cfg]) {{{
+" @param cfg: default config
+function! s:parseProps(km, ...)
     let l:cfg = {
+        \ 'key'   : a:km.E,
         \ 'term'  : '',
         \ 'agen'  : '',
         \ 'abld'  : '',
@@ -407,6 +399,37 @@ function! s:popR(km)
         \ 'deploy': 'run',
         \ 'lowest': 0,
         \ }
+    if a:0 > 0
+        let l:cfg = extend(l:cfg, a:1)
+    endif
+    return {
+        \ 'key'   : l:cfg.key,
+        \ 'term'  : get({'l': 'floaterm', 't': 'right', 'e': 'external'}, a:km.A, l:cfg.term),
+        \ 'agen'  : l:cfg.agen,
+        \ 'abld'  : l:cfg.abld,
+        \ 'arun'  : l:cfg.arun,
+        \ 'deploy': get({'b': 'build', 'c': 'clean'}, a:km.A, l:cfg.deploy),
+        \ 'lowest': (a:km.A ==# 'o') ? 1 : l:cfg.lowest,
+        \ }
+endfunction
+" }}}
+
+" FUNCTION: s:popR(km) {{{
+function! s:popRonCR(sopt, earg)
+    if a:earg.km.E ==# 'p'
+        " save config of project
+        let s:ws.rp = a:earg.cfg
+        let s:ws.rp.file = fnamemodify(s:ws.rp.file, ':p')
+        if empty(s:ws.rp.type)
+            let s:ws.rp.type = getbufvar(fnamemodify(s:ws.rp.file, ':t'), '&filetype', &filetype)
+        endif
+    endif
+    call RunProject('r' . a:earg.km.E, a:earg.cfg)
+endfunction
+
+function! s:popR(km)
+    let l:cfg = s:parseProps(a:km)
+    " pop initial selections with km, and pass l:cfg to 'onCR' but not km.A
     let l:sel = {
         \ 'opt': 'config project',
         \ 'lst': ['term', 'agen', 'abld', 'arun', 'deploy', 'lowest'],
@@ -426,7 +449,8 @@ function! s:popR(km)
             \ 'cmd': {sopt, sel -> extend(l:cfg, {sopt : sel})},
             \ 'get': {sopt -> l:cfg[sopt]},
             \ },
-        \ 'onCR': {sopt -> RunProject('r' . a:km.A . a:km.E, l:cfg)}
+        \ 'arg': {'km': a:km, 'cfg': l:cfg},
+        \ 'onCR': funcref('s:popRonCR')
         \ }
     if a:km.E ==# 'p'
         call extend(l:cfg, {'key': '', 'file': '', 'type': ''})
@@ -444,7 +468,7 @@ endfunction
 " Run: %1 = km.S
 "   r : build and run
 "   R : insert or append global args(can use with %2 together)
-" Command: %2 = km.A
+" Property: %2 = km.A
 "   c : clean project
 "   b : build without run
 "   l : run project in floaterm
@@ -454,7 +478,11 @@ endfunction
 " Project: %3 = km.E
 "   p : run project from s:ws.rp
 "   ... : supported project from s:rp.proj
-" @param cfg: first priority of config
+" Forward:
+"   'Rp'  -> 'rp'  -> 'r^p'
+"   'R^p' -> 'r^p'
+"   'r^p'
+" @param cfg: properties to extend
 " }}}
 function! RunProject(keys, ...)
     let km = {
@@ -465,27 +493,18 @@ function! RunProject(keys, ...)
     if km.S ==# 'R'
         call s:popR(km)
     elseif km.E ==# 'p'
-        if a:0 > 0
-            " save config of project
-            let s:ws.rp = a:1
-            let s:ws.rp.file = fnamemodify(s:ws.rp.file, ':p')
-            if empty(s:ws.rp.type)
-                let s:ws.rp.type = getbufvar(fnamemodify(s:ws.rp.file, ':t'), '&filetype', &filetype)
-            endif
-        endif
         if empty(get(s:ws.rp, 'key', ''))
-            call RunProject('R' . km.A . km.E)
+            let km.S = 'R'
+            call s:popR(km)
         else
-            " use args from keys priorly
-            let l:cfg = extend(deepcopy(s:ws.rp), s:parseProps(km))
-            call RunProject(km.S . km.A . s:ws.rp.key, l:cfg)
+            let l:cfg = (a:0 > 0) ? deepcopy(s:ws.rp) : s:parseProps(km, s:ws.rp)
+            " pass l:cfg with km to 'RunProject' but not km.A
+            call RunProject(km.S . s:ws.rp.key, l:cfg)
         end
     else
-        " run project with config or echo message from exception
+        " run project with config or echo message from exception(use v:throwpoint to debug)
         try
-            let l:cfg = (a:0 > 0) ? a:1 :
-                \ extend({'key': km.E , 'agen': '', 'abld': '', 'arun': ''}, s:parseProps(km))
-            call s:rp.run(l:cfg)
+            call s:rp.run(get(a:000, 0, s:parseProps(km)))
         catch
             echo v:exception
         endtry
@@ -531,7 +550,7 @@ function! s:FnGMake(cfg)
         let l:fmts = {
             \ 'u': 'cmake %s -G "Unix Makefiles" .. && cmake --build . %s',
             \ 'n': 'vcvars64.bat && cmake %s -G "NMake Makefiles" .. && cmake --build . %s',
-            \ 'j': 'cmake %s -G Ninja .. && cmake --build . %s',
+            \ 'j': (IsWin() ? 'vcvars64.bat && ' : '') . 'cmake %s -G Ninja .. && cmake --build . %s',
             \ 'q': IsWin() ?
             \      'vcvars64.bat && qmake %s ../"%s" && nmake %s' :
             \      'qmake %s ../"%s" && make %s',
@@ -804,23 +823,23 @@ endfunction
 " }}}
 
 " FUNCTION: s:popF(km, type) {{{
+function! s:popFonCR(sopt, earg)
+    let s:ws.fw = a:earg.cfg
+    let s:ws.fw.path = s:unifyPath(s:ws.fw.path)
+    if !empty(s:ws.fw.path)
+        call add(s:ws.fw.pathlst, s:ws.fw.path)
+        call uniq(sort(s:ws.fw.pathlst))
+    endif
+    if a:earg.type
+        call FindW('f' . a:earg.km.A0 . a:earg.km.A1 . a:earg.km.E)
+    else
+        call FindWFuzzy('f' . a:earg.km.A . a:earg.km.E)
+    endif
+endfunction
+
 function! s:popF(km, type)
     let l:cfg = deepcopy(s:fw.default)
     call extend(l:cfg, s:ws.fw)
-
-    function! s:oncr(sopt) closure
-        let s:ws.fw = l:cfg
-        let s:ws.fw.path = s:unifyPath(s:ws.fw.path)
-        if !empty(s:ws.fw.path)
-            call add(s:ws.fw.pathlst, s:ws.fw.path)
-            call uniq(sort(s:ws.fw.pathlst))
-        endif
-        if a:type
-            call FindW('f' . a:km.A0 . a:km.A1 . a:km.E)
-        else
-            call FindWFuzzy('f' . a:km.A . a:km.E)
-        endif
-    endfunction
 
     let l:sel = {
         \ 'opt': 'config find',
@@ -841,9 +860,9 @@ function! s:popF(km, type)
             \ 'cmd': {sopt, sel -> extend(l:cfg, {sopt : sel})},
             \ 'get': {sopt -> l:cfg[sopt]},
             \ },
-        \ 'onCR': funcref('s:oncr')
+        \ 'arg': {'km': a:km, 'cfg': l:cfg, 'type': a:type},
+        \ 'onCR': funcref('s:popFonCR')
         \ }
-
     call PopSelection(l:sel)
 endfunction
 " }}}
@@ -933,6 +952,7 @@ function! FindWFuzzy(keys)
     if km.S ==# 'F'
         call s:popF(km, v:false)
     else
+        " parse pattern
         let l:pat = ''
         if mode() ==# 'n'
             if km.E =~# '[hdg]'
@@ -941,7 +961,7 @@ function! FindWFuzzy(keys)
         else
             let l:pat = GetSelected('')
         endif
-
+        " parse location
         let l:loc = s:ws.fw.path
         if (km.A !=# 'p') && empty(l:loc)
             let l:loc = popc#utils#FindRoot()
