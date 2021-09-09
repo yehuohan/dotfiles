@@ -696,7 +696,7 @@ function! s:unifyPath(path)
     if empty(a:path)
         return a:path
     endif
-    let l:path = fnamemodify(a:path . '/', ':p')
+    let l:path = fnamemodify(a:path, ':p')
     if l:path =~# '[/\\]$'
         let l:path = strcharpart(l:path, 0, strchars(l:path) - 1)
     endif
