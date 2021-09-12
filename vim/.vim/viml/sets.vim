@@ -173,7 +173,8 @@ augroup UserSetsCmd
     autocmd BufRead,BufNewFile *.log        set filetype=log
     autocmd BufRead,BufNewFile *.usf,*ush   set filetype=hlsl
     autocmd Filetype vim,tex                setlocal foldmethod=marker
-    autocmd Filetype c,cpp,javascript       setlocal foldmethod=syntax
+    autocmd Filetype c,cpp,rust             setlocal foldmethod=syntax
+    autocmd Filetype glsl,hlsl              setlocal foldmethod=syntax
     autocmd Filetype python                 setlocal foldmethod=indent
     autocmd FileType txt,log                setlocal foldmethod=manual
     autocmd BufReadPre * call s:onLargeFile()
