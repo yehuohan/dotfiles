@@ -1,5 +1,16 @@
 let s:use = Sv_Use()
 
+" Standard {{{
+let g:loaded_gzip = 1
+let g:loaded_tarPlugin = 1
+let g:loaded_tar = 1
+let g:loaded_zipPlugin = 1
+let g:loaded_zip = 1
+let g:loaded_netrw = 1
+let g:loaded_netrwPlugin = 1
+"let g:loaded_matchparen = 1
+" }}}
+
 " Struct: s:plug {{{
 let s:plug = {
     \ 'onVimEnter' : {'exec': []},

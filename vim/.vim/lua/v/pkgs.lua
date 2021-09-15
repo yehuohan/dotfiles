@@ -12,6 +12,16 @@ local vnoremap = require('v.mods').keymap.vnoremap
 local xnoremap = require('v.mods').keymap.xnoremap
 
 
+local function pkgs_standard()
+    g.loaded_gzip = 1
+    g.loaded_tarPlugin = 1
+    g.loaded_tar = 1
+    g.loaded_zipPlugin = 1
+    g.loaded_zip = 1
+    g.loaded_netrw = 1
+    g.loaded_netrwPlugin = 1
+end
+
 local function pkgs_packer()
     local packer_config = {
         package_root = vim.env.DotVimPath .. '/pack',
@@ -306,6 +316,7 @@ end
 
 
 local function pkgs_setup()
+    pkgs_standard()
     pkgs_packer()
     -- editing
     pkgs_hop()
