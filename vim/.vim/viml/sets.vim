@@ -316,6 +316,10 @@ nnoremap <leader>xr :%!xxd -r<CR>
 " lua的echo测试代码
 nnoremap <leader><leader>u :lua print(
 nnoremap <leader><leader>U :lua print(vim.inspect(
+vnoremap <leader><leader>u
+    \ <Cmd>call feedkeys(':lua print(' . GetSelected('') . ')', 'n')<CR>
+vnoremap <leader><leader>U
+    \ <Cmd>call feedkeys(':lua print(vim.inspect(' . GetSelected('') . '))', 'n')<CR>
 " 查看help文档
 nnoremap <leader><leader>k :h <C-r><C-w>
 vnoremap <leader><leader>k
