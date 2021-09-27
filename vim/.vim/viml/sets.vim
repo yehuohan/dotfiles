@@ -344,6 +344,7 @@ nnoremap yd
 nnoremap <leader>p "0p
 nnoremap <leader>P "0P
 nnoremap <leader>ap p`[<Left>
+nnoremap <leader>aP P`[
 " ctrl-c & ctrl-v
 vnoremap <leader>c "+y
 nnoremap <leader>cp "+p

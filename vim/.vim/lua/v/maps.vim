@@ -2,14 +2,15 @@
 " Autocmds {{{
 augroup UserSetsCmd
     autocmd!
-    autocmd BufNewFile *                    set fileformat=unix
-    autocmd BufRead,BufNewFile *.tex        set filetype=tex
-    autocmd BufRead,BufNewFile *.log        set filetype=log
-    autocmd BufRead,BufNewFile *.usf,*ush   set filetype=hlsl
-    autocmd Filetype vim,tex                setlocal foldmethod=marker
-    autocmd Filetype c,cpp,javascript       setlocal foldmethod=syntax
-    autocmd Filetype python                 setlocal foldmethod=indent
-    autocmd FileType txt,log                setlocal foldmethod=manual
+    autocmd BufNewFile *                            set fileformat=unix
+    autocmd BufRead,BufNewFile *.tex                set filetype=tex
+    autocmd BufRead,BufNewFile *.log                set filetype=log
+    autocmd BufRead,BufNewFile *.usf,*ush           set filetype=hlsl
+    autocmd BufRead,BufNewFile *.uproject,*.uplugin set filetype=jsonc
+    autocmd Filetype vim,tex                        setlocal foldmethod=marker
+    autocmd Filetype c,cpp,javascript               setlocal foldmethod=syntax
+    autocmd Filetype python                         setlocal foldmethod=indent
+    autocmd FileType txt,log                        setlocal foldmethod=manual
     autocmd BufReadPre * call v:lua.require('v.sets').onLargeFile()
 augroup END
 " }}}
@@ -82,6 +83,10 @@ nnoremap <leader>xr :%!xxd -r<CR>
 " lua的echo测试代码
 nnoremap <leader><leader>u :lua print(
 nnoremap <leader><leader>U :lua print(vim.inspect(
+vnoremap <leader><leader>u
+    \ <Cmd>call feedkeys(':lua print(' . v:lua.require'v.mods'.GetSelected('') . ')', 'n')<CR>
+vnoremap <leader><leader>U
+    \ <Cmd>call feedkeys(':lua print(vim.inspect(' . v:lua.require'v.mods'.GetSelected('') . '))', 'n')<CR>
 " 查看help文档
 nnoremap <leader><leader>k :h <C-r><C-w>
 vnoremap <leader><leader>k

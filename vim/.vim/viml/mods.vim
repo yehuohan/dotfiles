@@ -30,8 +30,6 @@ function! GetEval(str, type)
         let l:result = execute(a:str)
     elseif a:type ==# 'function'
         let l:result = eval(a:str)
-    elseif a:type ==# 'registers'
-        let l:result = eval('@' . a:str)
     endif
     if type(l:result) != v:t_string
         let l:result = string(l:result)
@@ -164,14 +162,6 @@ nnoremap <leader><leader>. :call ExecLast(0)<CR>
 nnoremap <M-;> @:
 vnoremap <leader><leader>;
     \ <Cmd>call feedkeys(':' . GetSelected(''), 'n')<CR>
-nnoremap <leader>ae
-    \ <Cmd>call Input2Fn(['Command: ', '', 'command'], {str -> append(line('.'), GetEval(str, 'command'))})<CR>
-nnoremap <leader>af
-    \ <Cmd>call Input2Fn(['Function: ', '', 'function'], {str -> append(line('.'), GetEval(str, 'function'))})<CR>
-vnoremap <leader>ae
-    \ <Cmd>call append(line('.'), GetEval(GetSelected(''), 'command'))<CR>
-vnoremap <leader>af
-    \ <Cmd>call append(line('.'), GetEval(GetSelected(''), 'function'))<CR>
 " }}}
 
 " Workspace {{{
@@ -1126,6 +1116,24 @@ function! FnSwitchFile(sf)
 endfunction
 " }}}
 
+" FUNCTION: FnEvalStr(type, itext) {{{
+" @param itext: 是否将Eval结果放入当前编辑的文本中
+function! FnEvalStr(type, itext)
+    let l:str = (mode() ==# 'n') ? Input2Str(printf('Eval %s: ', a:type), '', a:type) : GetSelected('')
+    if empty(l:str)
+        return
+    endif
+
+    let l:res = GetEval(l:str, a:type)
+    if a:itext
+        call append(line('.'), l:res)
+    else
+        call setreg('0', l:res)
+        echo ' -> copied'
+    endif
+endfunction
+" }}}
+
 let ScriptEval = function('popset#set#PopSelection', [s:rs.sel])
 nnoremap <leader>se :call ScriptEval()<CR>
 nnoremap <leader>ei
@@ -1150,4 +1158,8 @@ nnoremap <silent> <leader>dl :call Input2Fn(['Divide Left: ']  , 'FnInsertSpace'
 nnoremap <silent> <leader>dd :call Input2Fn(['Divide Delete: '], 'FnInsertSpace', 'd')<CR>
 nnoremap <leader>sf
     \ <Cmd>call FnSwitchFile({'lhs': ['c', 'cc', 'cpp', 'cxx'], 'rhs': ['h', 'hh', 'hpp', 'hxx']})<CR>
+noremap <leader>ae  :call FnEvalStr('command', 1)<CR>
+noremap <leader>af  :call FnEvalStr('function', 1)<CR>
+noremap <leader>age :call FnEvalStr('command', 0)<CR>
+noremap <leader>agf :call FnEvalStr('function', 0)<CR>
 " }}}
