@@ -36,7 +36,7 @@ local use = {
 }
 
 local function use_save(_)
-    fn.writefile({ fn.json_encode(use) }, use_file)
+    fn.writefile({ vim.json.encode(use) }, use_file)
     print('s:use save successful!')
 end
 
@@ -45,7 +45,7 @@ local function use_load()
         use = vim.tbl_deep_extend(
             'force',
             use,
-            fn.json_decode(fn.join(fn.readfile(use_file)))
+            vim.json.decode(fn.join(fn.readfile(use_file)))
         )
     else
         use_save()
