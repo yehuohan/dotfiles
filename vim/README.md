@@ -21,8 +21,9 @@ setup_link_msys64.bat
 
 - `.vim/viml/env.vim`: 设置vim用的环境变量
 - `.vim/viml/use.vim`: 设置全局`使能`变量
-- `.vim/viml/plugins.vim`: 插件加载和配置
-- `.vim/viml/modules.vim`: Workspace等模块功能配置
+- `.vim/viml/pkgs.vim`: 插件加载和配置
+- `.vim/viml/mods.vim`: Workspace等模块功能配置
+- `.vim/viml/sets.vim`: 设置vim各种参数
 
 > *Workspace run project:*
 
@@ -35,8 +36,6 @@ setup_link_msys64.bat
 <div align="center">
 <img alt="workspace find" src="README/ws-fw.gif"  width=75% height=75% />
 </div>
-
-- `.vim/viml/settings.vim`: 设置vim各种参数
 
 
 ---
