@@ -1090,6 +1090,7 @@ let g:markdown_enable_mappings = 0
 let g:markdown_enable_spell_checking = 0
 let g:markdown_enable_folding = 0       " 感觉MarkDown折叠引起卡顿时，关闭此项
 let g:markdown_enable_conceal = 0       " 在Vim中显示MarkDown预览
+let g:markdown_enable_input_abbreviations = 0
 let g:mkdp_auto_start = 0
 let g:mkdp_auto_close = 1
 let g:mkdp_refresh_slow = 0             " 即时预览MarkDown
