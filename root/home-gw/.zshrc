@@ -54,7 +54,7 @@ DISABLE_AUTO_UPDATE="true"
 
 
 # 插件
-plugins=(git zsh-completions)
+plugins=(git)
 
 autoload -U compinit && compinit
 

@@ -1,6 +1,7 @@
 
-## Dotconfigs
+## dotconfigs
 
-- [root](./root): Linux config
+- [root](./root): Linux/Windows configs
+- [reg](./reg): Reg settings for windows 
 - [vim](./vim)
 - misc

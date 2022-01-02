@@ -2,6 +2,7 @@
 
 if not %APPS_HOME%\dotconfigs\vim\setup == %cd% (
     echo Is NOT in %APPS_HOME%\dotconfigs\vim\setup
+    pause
     exit
 )
 

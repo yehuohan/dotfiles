@@ -1,0 +1,6 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\Environment]
+"ANDROID_HOME"="D:\\Android\\SDK"
+"ANDROID_PATH"="%ANDROID_HOME%\\ndk-bundle;%ANDROID_HOME%\\emulator;%ANDROID_HOME%\\platform-tools"
+"GRADLE_USER_HOME"="%ANDROID_HOME%\\.gradle"
