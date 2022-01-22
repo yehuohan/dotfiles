@@ -111,7 +111,7 @@ if s:use.ycm
         " (first installed) or (PlugInstall! or PlugUpdate!)
         if a:info.status == 'installed' || a:info.force
             if IsWin()
-                !python install.py --clangd-completer --msvc 15 --build-dir ycm_build
+                !python install.py --clangd-completer --msvc 17 --build-dir ycm_build
             else
                 !python install.py --clangd-completer --build-dir ycm_build
             endif
@@ -697,6 +697,9 @@ let g:Lf_ShortcutF = ''
 let g:Lf_ShortcutB = ''
 let g:Lf_ReverseOrder = 1
 let g:Lf_ShowHidden = 1                 " 搜索隐藏文件和目录
+let g:Lf_DefaultExternalTool = 'rg'
+let g:Lf_UseVersionControlTool = 1
+"let g:Lf_ExternalCommand = 'rg --files --no-ignore "%s"'
 let g:Lf_GtagsAutoGenerate = 0          " 禁止自动生成gtags
 let g:Lf_Gtagslabel = 'native-pygments' " gtags: pip install Pygments
 let g:Lf_GtagsStoreInRootMarker = 1

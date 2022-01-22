@@ -1129,6 +1129,7 @@ function! FnEvalStr(type, itext)
         call append(line('.'), l:res)
     else
         call setreg('0', l:res)
+        call setreg('+', l:res)
         echo ' -> copied'
     endif
 endfunction
