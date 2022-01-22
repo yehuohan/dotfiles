@@ -86,6 +86,7 @@ if IsNVim()
 endif
     Plug 'ryanoasis/vim-devicons'
 endif
+    Plug 'rcarriga/nvim-notify'
     Plug 'luochen1990/rainbow'
     Plug 'Yggdroot/indentLine'
     Plug 'yehuohan/popc'
@@ -490,6 +491,15 @@ function! Plug_ll_checkTrailing()
     return (l:ret == 0) ? '' : 'T:'.string(l:ret)
 endfunction
 " }}}
+endif
+" }}}
+
+" notify {{{ 消息提示
+if IsNVim()
+silent! lua << EOF
+require('notify').setup{ }
+--vim.notify = require('notify')
+EOF
 endif
 " }}}
 
