@@ -44,9 +44,9 @@ local function setup(dotvim)
 
     vim.o.encoding = 'utf-8'
     vim.g.mapleader = ' '
-    vim.api.nvim_set_keymap('n' , ';' , ':' , { noremap = true })
-    vim.api.nvim_set_keymap('v' , ';' , ':' , { noremap = true })
-    vim.api.nvim_set_keymap('n' , ':' , ';' , { noremap = true })
+    vim.keymap.set('n' , ';' , ':' , { noremap = true })
+    vim.keymap.set('v' , ';' , ':' , { noremap = true })
+    vim.keymap.set('n' , ':' , ';' , { noremap = true })
 
     require('v.env').setup()
     require('v.use').setup()

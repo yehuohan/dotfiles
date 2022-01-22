@@ -110,7 +110,7 @@ end
 
 return {
     setup = function()
-        vim.cmd[[command! -nargs=0 Use :lua require('v.use').cfg()]]
+        vim.api.nvim_add_user_command('Use', 'lua require("v.use").cfg()', {nargs = 0})
         use_load()
     end,
     get = function() return use end,

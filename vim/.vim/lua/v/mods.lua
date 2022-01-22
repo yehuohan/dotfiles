@@ -104,7 +104,7 @@ end
 -- local tnoremap = require('v.mods').keymap.tnoremap
 --------------------------------------------------------------------------------
 M.keymap = {}
-local setmap = vim.api.nvim_set_keymap
+local setmap = vim.keymap.set
 local function setopts(opts, defaults)
     local map_opts = {}
     for k, v in pairs(opts) do
@@ -118,16 +118,16 @@ local function setopts(opts, defaults)
     return map_opts
 end
 
-function M.keymap.map(opts)      setmap('',  opts[1], opts[2], setopts(opts)) end
-function M.keymap.nmap(opts)     setmap('n', opts[1], opts[2], setopts(opts)) end
-function M.keymap.vmap(opts)     setmap('v', opts[1], opts[2], setopts(opts)) end
-function M.keymap.xmap(opts)     setmap('x', opts[1], opts[2], setopts(opts)) end
-function M.keymap.smap(opts)     setmap('s', opts[1], opts[2], setopts(opts)) end
-function M.keymap.omap(opts)     setmap('o', opts[1], opts[2], setopts(opts)) end
-function M.keymap.imap(opts)     setmap('i', opts[1], opts[2], setopts(opts)) end
-function M.keymap.lmap(opts)     setmap('l', opts[1], opts[2], setopts(opts)) end
-function M.keymap.cmap(opts)     setmap('c', opts[1], opts[2], setopts(opts)) end
-function M.keymap.tmap(opts)     setmap('t', opts[1], opts[2], setopts(opts)) end
+function M.keymap.map(opts)      setmap('',  opts[1], opts[2], setopts(opts, { remap = true })) end
+function M.keymap.nmap(opts)     setmap('n', opts[1], opts[2], setopts(opts, { remap = true })) end
+function M.keymap.vmap(opts)     setmap('v', opts[1], opts[2], setopts(opts, { remap = true })) end
+function M.keymap.xmap(opts)     setmap('x', opts[1], opts[2], setopts(opts, { remap = true })) end
+function M.keymap.smap(opts)     setmap('s', opts[1], opts[2], setopts(opts, { remap = true })) end
+function M.keymap.omap(opts)     setmap('o', opts[1], opts[2], setopts(opts, { remap = true })) end
+function M.keymap.imap(opts)     setmap('i', opts[1], opts[2], setopts(opts, { remap = true })) end
+function M.keymap.lmap(opts)     setmap('l', opts[1], opts[2], setopts(opts, { remap = true })) end
+function M.keymap.cmap(opts)     setmap('c', opts[1], opts[2], setopts(opts, { remap = true })) end
+function M.keymap.tmap(opts)     setmap('t', opts[1], opts[2], setopts(opts, { remap = true })) end
 function M.keymap.noremap(opts)  setmap('',  opts[1], opts[2], setopts(opts, { noremap = true })) end
 function M.keymap.nnoremap(opts) setmap('n', opts[1], opts[2], setopts(opts, { noremap = true })) end
 function M.keymap.vnoremap(opts) setmap('v', opts[1], opts[2], setopts(opts, { noremap = true })) end
