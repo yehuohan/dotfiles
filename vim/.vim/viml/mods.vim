@@ -276,9 +276,9 @@ const s:rp_mappings = [
 "   type: 用于设置encoding, errorformat ...
 " }
 function! s:rp.run(cfg) dict
-    " get file and wdir for calling l:Fn before use type because l:Fn may change filetype
+    " set file and wdir to call l:Fn before accessing type, because l:Fn may change filetype
     let [l:Fn, l:pat] = self.proj[a:cfg.key]
-    if !has_key(a:cfg, 'file')
+    if empty(a:cfg.file)
         if l:pat == v:null
             let a:cfg.file = expand('%:p')
         else
@@ -293,11 +293,10 @@ function! s:rp.run(cfg) dict
     let l:cmd = function(l:Fn)(a:cfg)
 
     " set efm and enc
-    let l:type = get(a:cfg, 'type', '')
-    if has_key(self.efm, l:type)
-        execute 'setlocal efm=' . self.efm[l:type]
+    if has_key(self.efm, a:cfg.type)
+        execute 'setlocal efm=' . self.efm[a:cfg.type]
     endif
-    let g:asyncrun_encs = get(self.enc, l:type, (IsWin() || IsGw()) ? 'gbk' : 'utf-8')
+    let g:asyncrun_encs = get(self.enc, a:cfg.type, (IsWin() || IsGw()) ? 'gbk' : 'utf-8')
 
     " execute
     let l:dir = fnameescape(a:cfg.wdir)
@@ -382,6 +381,8 @@ endfunction
 function! s:parseProps(km, ...)
     let l:cfg = {
         \ 'key'   : a:km.E,
+        \ 'file'  : '',
+        \ 'type'  : '',
         \ 'term'  : '',
         \ 'agen'  : '',
         \ 'abld'  : '',
@@ -392,15 +393,10 @@ function! s:parseProps(km, ...)
     if a:0 > 0
         let l:cfg = extend(l:cfg, a:1)
     endif
-    return {
-        \ 'key'   : l:cfg.key,
-        \ 'term'  : get({'l': 'floaterm', 't': 'right', 'e': 'external'}, a:km.A, l:cfg.term),
-        \ 'agen'  : l:cfg.agen,
-        \ 'abld'  : l:cfg.abld,
-        \ 'arun'  : l:cfg.arun,
-        \ 'deploy': get({'b': 'build', 'c': 'clean'}, a:km.A, l:cfg.deploy),
-        \ 'lowest': (a:km.A ==# 'o') ? 1 : l:cfg.lowest,
-        \ }
+    let l:cfg.term   = get({'l': 'floaterm', 't': 'right', 'e': 'external'}, a:km.A, l:cfg.term)
+    let l:cfg.deploy = get({'b': 'build', 'c': 'clean'}, a:km.A, l:cfg.deploy)
+    let l:cfg.lowest = (a:km.A ==# 'o') ? 1 : l:cfg.lowest
+    return l:cfg
 endfunction
 " }}}
 
@@ -409,9 +405,11 @@ function! s:popRonCR(sopt, earg)
     if a:earg.km.E ==# 'p'
         " save config of project
         let s:ws.rp = a:earg.cfg
-        let s:ws.rp.file = fnamemodify(s:ws.rp.file, ':p')
-        if empty(s:ws.rp.type)
-            let s:ws.rp.type = getbufvar(fnamemodify(s:ws.rp.file, ':t'), '&filetype', &filetype)
+        if !empty(s:ws.rp.file)
+            let s:ws.rp.file = fnamemodify(s:ws.rp.file, ':p')
+            if empty(s:ws.rp.type)
+                let s:ws.rp.type = getbufvar(fnamemodify(s:ws.rp.file, ':t'), '&filetype', &filetype)
+            endif
         endif
     endif
     call RunProject('r' . a:earg.km.E, a:earg.cfg)
@@ -487,16 +485,17 @@ function! RunProject(keys, ...)
             let km.S = 'R'
             call s:popR(km)
         else
+            " when a:0 > 0, use s:ws.rp for km.E = 'p' at s:popRonCR
             let l:cfg = (a:0 > 0) ? deepcopy(s:ws.rp) : s:parseProps(km, s:ws.rp)
             " pass l:cfg with km to 'RunProject' but not km.A
             call RunProject(km.S . s:ws.rp.key, l:cfg)
         end
     else
-        " run project with config or echo message from exception(use v:throwpoint to debug)
         try
             call s:rp.run(get(a:000, 0, s:parseProps(km)))
         catch
             echo v:exception
+            echo v:throwpoint
         endtry
     endif
 endfunction
@@ -504,7 +503,7 @@ endfunction
 
 " Function: s:FnFile(cfg) {{{
 function! s:FnFile(cfg)
-    let l:type = get(a:cfg, 'type', &filetype)
+    let l:type = empty(a:cfg.type) ? &filetype : a:cfg.type
     if !has_key(s:rp.type, l:type) || ('dosbatch' ==? l:type && !IsWin())
         throw 's:rp.type doesn''t support "' . l:type . '"'
     else
