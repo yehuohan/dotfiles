@@ -99,7 +99,7 @@ function! Input2Str(prompt, ...)
     elseif a:0 == 2
         return input(a:prompt, a:1, a:2)
     elseif a:0 == 3
-        execute 'lcd ' . a:3
+        execute 'lcd ' . escape(a:3, ' \')
         return input(a:prompt, a:1, a:2)
     endif
 endfunction
@@ -305,7 +305,7 @@ function! s:rp.run(cfg) dict
         let l:exec .= printf('-mode=term -pos=%s ', a:cfg.term)
     endif
     let l:exec .= l:cmd
-    execute 'lcd ' . l:dir
+    execute 'lcd ' . escape(l:dir, ' \')
     call SetExecLast(l:exec)
     execute l:exec
 endfunction
@@ -964,7 +964,7 @@ function! FindWFuzzy(keys)
         endif
 
         if !empty(l:loc)
-            let l:exec = printf(":lcd %s | %s", l:loc, printf(s:fw.engine['f' . km.E], l:pat))
+            let l:exec = printf(":lcd %s | %s", escape(l:loc, ' \'), printf(s:fw.engine['f' . km.E], l:pat))
             call SetExecLast(l:exec)
             execute l:exec
         endif
