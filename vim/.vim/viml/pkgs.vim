@@ -782,7 +782,6 @@ let g:ycm_use_ultisnips_completer = 1                       " 收集UltiSnips补
 let g:ycm_autoclose_preview_window_after_insertion = 1      " 自动关闭预览窗口
 let g:ycm_filetype_whitelist = {'*': 1}                     " YCM只在whitelist出现且blacklist未出现的filetype工作
 let g:ycm_language_server = []                              " LSP支持
-let g:ycm_semantic_triggers = {'tex' : g:vimtex#re#youcompleteme}
 let g:ycm_key_detailed_diagnostics = ''                     " 直接使用:YcmShowDetailedDiagnostic命令
 let g:ycm_key_list_select_completion = ['<C-j>', '<M-j>', '<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-k>', '<M-k>', '<C-p>', '<Up>']
