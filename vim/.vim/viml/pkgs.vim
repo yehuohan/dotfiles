@@ -880,12 +880,13 @@ nnoremap <leader>of <Cmd>call CocActionAsync('format')<CR>
 nnoremap <leader>oR :CocRestart<CR>
 nnoremap <leader>on :CocConfig<CR>
 nnoremap <leader>oN :CocLocalConfig<CR>
-nnoremap <leader>ol <Cmd>CocList lists<CR>
+nnoremap <leader>ol <Cmd>CocList --normal lists<CR>
 nnoremap <leader>os <Cmd>CocList --normal sources<CR>
 nnoremap <leader>ox <Cmd>CocList --normal extensions<CR>
+nnoremap <leader>oc <Cmd>CocList commands<CR>
 " coc-extensions
 nnoremap <leader>oy <Cmd>CocList --normal yank<CR>
-nmap <leader>oc <Plug>(coc-calc-result-append)
+nmap <leader>oe <Plug>(coc-calc-result-append)
 highlight default link CocMenuSel CursorLineNr
 endif
 " }}}
