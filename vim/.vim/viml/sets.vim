@@ -314,8 +314,8 @@ vnoremap <leader><leader>O
 nnoremap <leader>xx :%!xxd<CR>
 nnoremap <leader>xr :%!xxd -r<CR>
 " lua的echo测试代码
-nnoremap <leader><leader>u :lua print(
-nnoremap <leader><leader>U :lua print(vim.inspect(
+nnoremap <leader><leader>u :lua print()<Left>
+nnoremap <leader><leader>U :lua print(vim.inspect())<Left><Left>
 vnoremap <leader><leader>u
     \ <Cmd>call feedkeys(':lua print(' . GetSelected('') . ')', 'n')<CR>
 vnoremap <leader><leader>U

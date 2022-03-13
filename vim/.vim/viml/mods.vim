@@ -4,6 +4,7 @@ endfunction
 
 " Libs {{{
 " Function: GetSelected(...) {{{ 获取选区内容
+" GetSelected用在vmap中时需要使用<Cmd>才能正确获取选区内容，不能用':'
 " @param sep: 提供sep，当选区是多行时，使用sep连接成一行
 function! GetSelected(...)
     let l:reg_var = getreg('9', 1)
@@ -1158,8 +1159,8 @@ nnoremap <silent> <leader>dl :call Input2Fn(['Divide Left: ']  , 'FnInsertSpace'
 nnoremap <silent> <leader>dd :call Input2Fn(['Divide Delete: '], 'FnInsertSpace', 'd')<CR>
 nnoremap <leader>sf
     \ <Cmd>call FnSwitchFile({'lhs': ['c', 'cc', 'cpp', 'cxx'], 'rhs': ['h', 'hh', 'hpp', 'hxx']})<CR>
-noremap <leader>ae  :call FnEvalStr('command', 1)<CR>
-noremap <leader>af  :call FnEvalStr('function', 1)<CR>
-noremap <leader>age :call FnEvalStr('command', 0)<CR>
-noremap <leader>agf :call FnEvalStr('function', 0)<CR>
+noremap <leader>ae  <Cmd>call FnEvalStr('command', 1)<CR>
+noremap <leader>af  <Cmd>call FnEvalStr('function', 1)<CR>
+noremap <leader>age <Cmd>call FnEvalStr('command', 0)<CR>
+noremap <leader>agf <Cmd>call FnEvalStr('function', 0)<CR>
 " }}}
