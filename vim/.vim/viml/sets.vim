@@ -1,4 +1,4 @@
-let s:use = Sv_Use()
+let s:use = SvarUse()
 
 " Options {{{
 " Defaults {{{

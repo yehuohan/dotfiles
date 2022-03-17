@@ -1,4 +1,4 @@
-let s:use = Sv_Use()
+let s:use = SvarUse()
 
 " Standard {{{
 let g:loaded_gzip = 1
@@ -467,12 +467,12 @@ function! Plug_ll_msgLeft()
     if &ft ==# 'qf'
         return 'cwd = ' . getcwd()
     else
-        return substitute(expand('%:p'), '^' . escape(expand(Sv_Ws().fw.path), '\'), '', '')
+        return substitute(expand('%:p'), '^' . escape(expand(SvarWs().fw.path), '\'), '', '')
     endif
 endfunction
 
 function! Plug_ll_msgRight()
-    return Sv_Ws().fw.path
+    return SvarWs().fw.path
 endfunction
 
 function! Plug_ll_checkMixedIndent()

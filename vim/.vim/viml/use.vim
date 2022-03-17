@@ -1,7 +1,8 @@
-function! Sv_Use()
+function! SvarUse()
     return s:use
 endfunction
 
+" Struct s:use {{{
 let s:use_file = $DotVimCachePath . '/.use.json'
 let s:use = {
     \ 'fastgit'   : v:false,
@@ -36,6 +37,7 @@ let s:use = {
         \ 'widesize' : 11,
         \ }
     \ }
+" }}}
 
 " Function: s:useLoad() {{{
 function! s:useLoad()
