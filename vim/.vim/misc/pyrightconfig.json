@@ -3,7 +3,8 @@
         {
             "root": ".",
             "extraPaths": [
-                "src"
+                "src",
+                "../other_src"
             ]
         }
     ]
