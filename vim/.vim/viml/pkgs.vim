@@ -187,9 +187,9 @@ silent! lua require'hop'.setup({ match_mappings = { 'zh', 'zh_sc' }, create_hl_a
 noremap s <Cmd>HopChar1MW<CR>
 noremap <leader>ms <Cmd>HopChar2MW<CR>
 noremap <leader><leader>s <Cmd>HopPatternMW<CR>
-noremap <leader>j <Cmd>HopLineCursor<CR>
-noremap <leader><leader>j <Cmd>HopLineMW<CR>
-noremap <leader>mj <Cmd>HopLineStartMW<CR>
+noremap <leader>j <Cmd>HopLineCursorMW<CR>
+noremap <leader><leader>j <Cmd>HopLineStartMW<CR>
+noremap <leader>mj <Cmd>HopLineMW<CR>
 noremap <leader>mw <Cmd>HopWord<CR>
 else
 let g:EasyMotion_dict = 'zh-cn'         " 支持简体中文拼音
