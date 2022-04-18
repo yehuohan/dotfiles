@@ -183,13 +183,18 @@ call plug#end()
 " Editing {{{
 " hop, easy-motion {{{ 快速跳转
 if IsNVim()
-silent! lua require'hop'.setup({ match_mappings = { 'zh', 'zh_sc' }, create_hl_autocmd = true })
+silent! lua << EOF
+require'hop'.setup{
+    match_mappings = { 'zh', 'zh_sc' },
+    create_hl_autocmd = true
+}
+EOF
 noremap s <Cmd>HopChar1MW<CR>
 noremap <leader>ms <Cmd>HopChar2MW<CR>
 noremap <leader><leader>s <Cmd>HopPatternMW<CR>
 noremap <leader>j <Cmd>HopLineCursorMW<CR>
-noremap <leader><leader>j <Cmd>HopLineStartMW<CR>
-noremap <leader>mj <Cmd>HopLineMW<CR>
+noremap <leader><leader>j <Cmd>HopLineMW<CR>
+noremap <leader>mj <Cmd>HopLineStartMW<CR>
 noremap <leader>mw <Cmd>HopWord<CR>
 else
 let g:EasyMotion_dict = 'zh-cn'         " 支持简体中文拼音
@@ -613,39 +618,45 @@ let g:nvim_tree_show_icons = {
     \ 'files': 1,
     \ 'folder_arrows': 1,
     \ }
-let g:nvim_tree_disable_default_keybindings = 1
 silent! lua << EOF
-    local tcb = require'nvim-tree.config'.nvim_tree_callback
-    vim.g.nvim_tree_bindings = {
-        { key = {'<CR>', 'o', '<2-LeftMouse>'},
-                         cb = tcb('edit') },
-        { key = 'i'    , cb = tcb('vsplit') },
-        { key = 'gi'   , cb = tcb('split') },
-        { key = 't'    , cb = tcb('tabnew') },
-        { key = '<Tab>', cb = tcb('preview') },
-        { key = 'cd'   , cb = tcb('cd') },
-        { key = 'u'    , cb = tcb('dir_up') },
-        { key = 'K'    , cb = tcb('first_sibling') },
-        { key = 'J'    , cb = tcb('last_sibling') },
-        { key = '<C-p>', cb = tcb('prev_sibling') },
-        { key = '<C-n>', cb = tcb('next_sibling') },
-        { key = 'p'    , cb = tcb('parent_node') },
-        { key = '.'    , cb = tcb('toggle_dotfiles') },
-        { key = 'I'    , cb = tcb('toggle_ignored') },
-        { key = 'r'    , cb = tcb('refresh') },
-        { key = 'q'    , cb = tcb('close') },
-        { key = '?'    , cb = tcb('toggle_help') },
-        { key = 'O'    , cb = tcb('system_open') },
-        { key = 'A'    , cb = tcb('create') },
-        { key = 'D'    , cb = tcb('remove') },
-        { key = 'R'    , cb = tcb('rename') },
-        { key = '<C-r>', cb = tcb('full_rename') },
-        { key = 'X'    , cb = tcb('cut') },
-        { key = 'C'    , cb = tcb('copy') },
-        { key = 'P'    , cb = tcb('paste') },
-        { key = 'y'    , cb = tcb('copy_name') },
-        { key = 'Y'    , cb = tcb('copy_absolute_path') },
-    }
+local tcb = require'nvim-tree.config'.nvim_tree_callback
+require("nvim-tree").setup{
+  view = {
+        mappings = {
+            custom_only = true,
+            list = {
+                { key = {'<CR>', 'o', '<2-LeftMouse>'},
+                                 cb = tcb('edit') },
+                { key = 'i'    , cb = tcb('vsplit') },
+                { key = 'gi'   , cb = tcb('split') },
+                { key = 't'    , cb = tcb('tabnew') },
+                { key = '<Tab>', cb = tcb('preview') },
+                { key = 'cd'   , cb = tcb('cd') },
+                { key = 'u'    , cb = tcb('dir_up') },
+                { key = 'K'    , cb = tcb('first_sibling') },
+                { key = 'J'    , cb = tcb('last_sibling') },
+                { key = '<C-p>', cb = tcb('prev_sibling') },
+                { key = '<C-n>', cb = tcb('next_sibling') },
+                { key = 'p'    , cb = tcb('parent_node') },
+                { key = '.'    , cb = tcb('toggle_dotfiles') },
+                { key = 'I'    , cb = tcb('toggle_ignored') },
+                { key = 'r'    , cb = tcb('refresh') },
+                { key = 'q'    , cb = tcb('close') },
+                { key = '?'    , cb = tcb('toggle_help') },
+                { key = 'O'    , cb = tcb('system_open') },
+                { key = 'A'    , cb = tcb('create') },
+                { key = 'D'    , cb = tcb('remove') },
+                { key = 'R'    , cb = tcb('rename') },
+                { key = '<C-r>', cb = tcb('full_rename') },
+                { key = 'X'    , cb = tcb('cut') },
+                { key = 'C'    , cb = tcb('copy') },
+                { key = 'P'    , cb = tcb('paste') },
+                { key = 'y'    , cb = tcb('copy_name') },
+                { key = 'Y'    , cb = tcb('copy_absolute_path') },
+            },
+        },
+    },
+}
 EOF
 nnoremap <leader>tt :NvimTreeToggle<CR>
 endif
@@ -907,7 +918,7 @@ endif
 " trouble {{{ 列表视图
 if IsNVim()
 silent! lua << EOF
-require('trouble').setup {
+require('trouble').setup{
     icons = true,
     action_keys = {
         jump_close = {'O'},
