@@ -66,7 +66,6 @@ endif
     Plug 'terryma/vim-expand-region'
     Plug 'kana/vim-textobj-user'
     Plug 'kana/vim-textobj-indent'
-    Plug 'kana/vim-textobj-function'
     Plug 'glts/vim-textobj-comment'
     Plug 'adriaanzon/vim-textobj-matchit'
     Plug 'lucapette/vim-textobj-underscore'
@@ -798,8 +797,8 @@ let g:ycm_key_detailed_diagnostics = ''                     " 直接使用:YcmSh
 let g:ycm_key_list_select_completion = ['<C-j>', '<M-j>', '<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-k>', '<M-k>', '<C-p>', '<Up>']
 let g:ycm_key_list_stop_completion = ['<C-y>']              " 关闭补全menu
-let g:ycm_key_invoke_completion = '<C-l>'                   " 显示补全内容，YCM使用completefunc，使用omnifunc集成其它补全
-imap <M-l> <C-l>
+let g:ycm_key_invoke_completion = '<C-i>'                   " 显示补全内容，YCM使用completefunc，使用omnifunc集成其它补全
+imap <M-i> <C-i>
 imap <M-y> <C-y>
 nnoremap <leader>gg :YcmCompleter<CR>
 nnoremap <leader>gt :YcmCompleter GoTo<CR>
@@ -852,17 +851,23 @@ inoremap <expr> <C-j> pumvisible() ? "\<C-n>" : "\<C-j>"
 inoremap <expr> <C-k> pumvisible() ? "\<C-p>" : "\<C-k>"
 imap <M-j> <C-j>
 imap <M-k> <C-k>
-inoremap <silent><expr> <C-l>
+inoremap <silent><expr> <C-i>
     \ pumvisible() ? "\<C-g>u" : coc#refresh()
-imap <M-l> <C-l>
+imap <M-i> <C-i>
 inoremap <C-o> <Cmd>call CocActionAsync('showSignatureHelp')<CR>
 imap <M-o> <C-o>
 nnoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? coc#float#scroll(1) : ":call WinMoveSpliter('f', 5)\<CR>"
 nnoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? coc#float#scroll(0) : ":call WinMoveSpliter('d', 5)\<CR>"
-inoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(1)\<CR>" : "\<Right>"
-inoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(0)\<CR>" : "\<Left>"
+inoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(1)\<CR>" : "\<M-f>"
+inoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(0)\<CR>" : "\<M-d>"
 vnoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<M-f>"
 vnoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? coc#float#scroll(0) : "\<M-d>"
+nmap     <silent><nowait><expr> <M-n> coc#float#has_scroll() ? coc#float#scroll(1) : "<Plug>(SmoothieDownwards)"
+nmap     <silent><nowait><expr> <M-m> coc#float#has_scroll() ? coc#float#scroll(0) : "<Plug>(SmoothieUpwards)"
+inoremap <silent><nowait><expr> <M-n> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(1)\<CR>" : "\<M-n>"
+inoremap <silent><nowait><expr> <M-m> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(0)\<CR>" : "\<M-m>"
+vnoremap <silent><nowait><expr> <M-n> coc#float#has_scroll() ? coc#float#scroll(1) : "\<M-n>"
+vnoremap <silent><nowait><expr> <M-m> coc#float#has_scroll() ? coc#float#scroll(0) : "\<M-m>"
 nmap         gd <Plug>(coc-definition)
 nmap         gD <Plug>(coc-declaration)
 nmap <leader>gd <Plug>(coc-definition)
@@ -889,6 +894,10 @@ nnoremap <leader>od
 nnoremap <leader>or <Cmd>call CocActionAsync('diagnosticRefresh')<CR>
 vnoremap <leader>of <Cmd>call CocActionAsync('formatSelected', 'v')<CR>
 nnoremap <leader>of <Cmd>call CocActionAsync('format')<CR>
+xmap if <Plug>(coc-funcobj-i)
+omap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap af <Plug>(coc-funcobj-a)
 nnoremap <leader>oR :CocRestart<CR>
 nnoremap <leader>on :CocConfig<CR>
 nnoremap <leader>oN :CocLocalConfig<CR>

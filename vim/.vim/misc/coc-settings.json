@@ -2,7 +2,6 @@
     /* coc */
     "suggest.autoTrigger": "always",
     "suggest.enablePreview": true,
-    "suggest.echodocSupport": false,
     "diagnostic.enable": true,
     "diagnostic.level": "hint",
     "diagnostic.enableSign": true,
