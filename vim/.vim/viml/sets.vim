@@ -5,6 +5,7 @@ let s:use = SvarUse()
 set synmaxcol=512                       " 最大高亮列数
 set number                              " 显示行号
 set relativenumber                      " 显示相对行号
+set signcolumn=number                   " 共用number的区域用于显示sign
 set cursorline                          " 高亮当前行
 set cursorcolumn                        " 高亮当前列
 set hlsearch                            " 设置高亮显示查找到的文本
@@ -83,7 +84,7 @@ let s:opt = {
     \ 'lst' : {
         \ 'conceallevel' : [2, 0],
         \ 'virtualedit'  : ['all', ''],
-        \ 'signcolumn'   : ['no', 'yes', 'auto'],
+        \ 'signcolumn'   : ['no', 'yes', 'auto', 'number'],
         \ },
     \ 'fns' : {},
     \ }
