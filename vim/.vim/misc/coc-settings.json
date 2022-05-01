@@ -67,10 +67,13 @@
     //"rust.all_features": true,
 
     /* coc-rust-analyzer */
+    "rust-analyzer.enable": true,
+    "rust-analyzer.updates.checkOnStartup": false,
     "rust-analyzer.updates.channel": "nightly",
     "rust-analyzer.cargo.allFeatures": true,
     "rust-analyzer.notifications.cargoTomlNotFound": false,
     "rust-analyzer.diagnostics.disabled": ["inactive-code"],
+    "rust-analyzer.procMacro.enable": true,
 
     /* coc-java
      * required: download jdt.ls from https://download.eclipse.org/jdtls/snapshots
