@@ -845,6 +845,7 @@ nnoremap <leader>oN :CocLocalConfig<CR>
 nnoremap <leader>ol <Cmd>CocList --normal lists<CR>
 nnoremap <leader>os <Cmd>CocList --normal sources<CR>
 nnoremap <leader>ox <Cmd>CocList --normal extensions<CR>
+nnoremap <leader>ow <Cmd>CocList --normal folders<CR>
 nnoremap <leader>oc <Cmd>CocList commands<CR>
 " coc-extensions
 nnoremap <leader>oy <Cmd>CocList --normal yank<CR>
