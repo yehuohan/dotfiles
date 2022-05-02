@@ -874,10 +874,12 @@ nmap <leader>gd <Plug>(coc-definition)
 nmap <leader>gD <Plug>(coc-declaration)
 nmap <leader>gi <Plug>(coc-implementation)
 nmap <leader>gr <Plug>(coc-references)
+nmap <leader>gR <Plug>(coc-references-used)
 nmap <leader>gt <Plug>(coc-type-definition)
 nmap <leader>gf <Plug>(coc-fix-current)
 nmap <leader>gn <Plug>(coc-rename)
 nmap <leader>gj <Plug>(coc-float-jump)
+nmap <leader>gc <Plug>(coc-float-hide)
 nnoremap <leader>gh <Cmd>call CocActionAsync('doHover')<CR>
 nnoremap <leader>gs <Cmd>CocCommand clangd.switchSourceHeader<CR>
 nnoremap <leader>gm <Cmd>CocCommand clangd.symbolInfo<CR>
@@ -890,10 +892,9 @@ nnoremap <leader>oD <Cmd>call CocAction('diagnosticToggle')<CR>
 nnoremap <leader>od
     \ <Cmd>
     \ call coc#config('diagnostic.enable', !coc#util#get_config('diagnostic').enable) <Bar>
-    \ echo 'diagnostic.enable: ' . coc#util#get_config('diagnostic').enable<CR>
-nnoremap <leader>or <Cmd>call CocActionAsync('diagnosticRefresh')<CR>
-vnoremap <leader>of <Cmd>call CocActionAsync('formatSelected', 'v')<CR>
-nnoremap <leader>of <Cmd>call CocActionAsync('format')<CR>
+    \ echo 'Display diagnostics: ' . coc#util#get_config('diagnostic').enable<CR>
+vmap <leader>of <Plug>(coc-format-selected)
+nmap <leader>of <Plug>(coc-format)
 xmap if <Plug>(coc-funcobj-i)
 omap if <Plug>(coc-funcobj-i)
 xmap af <Plug>(coc-funcobj-a)
