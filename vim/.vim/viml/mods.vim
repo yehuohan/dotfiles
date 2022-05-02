@@ -745,7 +745,7 @@ function! s:parseLocation(km)
         if empty(l:loc)
             let l:loc = popc#utils#FindRoot()
             if empty(l:loc)
-                let l:loc = '.'
+                let l:loc = expand('%:p:h')
             else
                 let s:ws.fw.path = l:loc
                 call add(s:ws.fw.pathlst, s:ws.fw.path)
