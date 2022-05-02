@@ -7,7 +7,6 @@ let s:use_file = $DotVimCachePath . '/.use.json'
 let s:use = {
     \ 'fastgit'   : v:false,
     \ 'lightline' : v:false,
-    \ 'ycm'       : v:false,
     \ 'coc'       : v:false,
     \ 'coc_exts'  : {
         \ 'coc-snippets'      : v:false,
@@ -52,10 +51,6 @@ function! s:useLoad()
         call s:useSave()
     endif
     if IsVim()
-        if s:use.coc               " vim中coc容易卡，补全用ycm
-            let s:use.ycm = v:true
-            let s:use.coc = v:false
-        endif
         let s:use.ui.font = 'Consolas For Powerline'
         let s:use.ui.wide = 'Microsoft YaHei Mono'
     endif

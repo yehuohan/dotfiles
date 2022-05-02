@@ -106,19 +106,6 @@ if IsNVim()
     Plug 'nvim-telescope/telescope.nvim'
 endif
     " codings
-if s:use.ycm
-    function! Plug_ycm_build(info)
-        " (first installed) or (PlugInstall! or PlugUpdate!)
-        if a:info.status == 'installed' || a:info.force
-            if IsWin()
-                !python install.py --clangd-completer --msvc 17 --build-dir ycm_build
-            else
-                !python install.py --clangd-completer --build-dir ycm_build
-            endif
-        endif
-    endfunction
-    Plug 'ycm-core/YouCompleteMe', {'do': function('Plug_ycm_build'), 'on': []}
-endif
 if s:use.coc
     Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
     Plug 'neoclide/jsonc.vim'
@@ -774,53 +761,6 @@ endif
 " }}}
 
 " Codings {{{
-" YouCompleteMe {{{ 自动补全
-if s:use.ycm
-call s:plug.reg('onDelay', 'load', 'YouCompleteMe')
-let g:ycm_global_ycm_extra_conf = $DotVimMiscPath . '/.ycm_extra_conf.py'
-let g:ycm_enable_diagnostic_signs = 1                       " 开启语法检测
-let g:ycm_max_diagnostics_to_display = 30
-let g:ycm_warning_symbol = '►'                              " Warning符号
-let g:ycm_error_symbol = '✘'                                " Error符号
-let g:ycm_auto_start_csharp_server = 0                      " 禁止C#补全
-let g:ycm_cache_omnifunc = 0                                " 禁止缓存匹配项，每次都重新生成匹配项
-let g:ycm_complete_in_strings = 1                           " 开启对字符串补全
-let g:ycm_complete_in_comments = 1                          " 开启对注释补全
-let g:ycm_collect_identifiers_from_comments_and_strings = 0 " 收集注释和字符串补全
-let g:ycm_collect_identifiers_from_tags_files = 1           " 收集标签补全
-let g:ycm_seed_identifiers_with_syntax = 1                  " 收集语法关键字补全
-let g:ycm_use_ultisnips_completer = 1                       " 收集UltiSnips补全
-let g:ycm_autoclose_preview_window_after_insertion = 1      " 自动关闭预览窗口
-let g:ycm_filetype_whitelist = {'*': 1}                     " YCM只在whitelist出现且blacklist未出现的filetype工作
-let g:ycm_language_server = []                              " LSP支持
-let g:ycm_key_detailed_diagnostics = ''                     " 直接使用:YcmShowDetailedDiagnostic命令
-let g:ycm_key_list_select_completion = ['<C-j>', '<M-j>', '<C-n>', '<Down>']
-let g:ycm_key_list_previous_completion = ['<C-k>', '<M-k>', '<C-p>', '<Up>']
-let g:ycm_key_list_stop_completion = ['<C-y>']              " 关闭补全menu
-let g:ycm_key_invoke_completion = '<C-i>'                   " 显示补全内容，YCM使用completefunc，使用omnifunc集成其它补全
-imap <M-i> <C-i>
-imap <M-y> <C-y>
-nnoremap <leader>gg :YcmCompleter<CR>
-nnoremap <leader>gt :YcmCompleter GoTo<CR>
-nnoremap <leader>gI :YcmCompleter GoToInclude<CR>
-nnoremap         gd :YcmCompleter GoToDefinition<CR>
-nnoremap         gD :YcmCompleter GoToDeclaration<CR>
-nnoremap <leader>gd :YcmCompleter GoToDefinition<CR>
-nnoremap <leader>gD :YcmCompleter GoToDeclaration<CR>
-nnoremap <leader>gi :YcmCompleter GoToImplementation<CR>
-nnoremap <leader>gr :YcmCompleter GoToReferences<CR>
-nnoremap <leader>gp :YcmCompleter GetParent<CR>
-nnoremap <leader>gh :YcmCompleter GetDoc<CR>
-nnoremap <leader>gy :YcmCompleter GetType<CR>
-nnoremap <leader>gf :YcmCompleter FixIt<CR>
-nnoremap <leader>gc :YcmCompleter ClearCompilationFlagCache<CR>
-nnoremap <leader>gs :YcmCompleter RestartServer<CR>
-nnoremap <leader>yr :YcmRestartServer<CR>
-nnoremap <leader>yd :YcmDiags<CR>
-nnoremap <leader>yD :YcmDebugInfo<CR>
-endif
-" }}}
-
 " coc {{{ 自动补全
 if s:use.coc
 call s:plug.reg('onDelay', 'load', 'coc.nvim')
