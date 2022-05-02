@@ -77,3 +77,7 @@ setup_link_msys64.bat
 * Failed installations like vim plugins or coc extensions for permission operation on windows?
 
 Try with administrator.
+
+* Coc started normally but no completion?
+
+Check worksapce folders.
