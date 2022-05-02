@@ -68,3 +68,12 @@ setup_link_msys64.bat
 - [Typora](https://typora.io/)
 - [MuPDF](https://www.mupdf.com)
 - [SumatraPDF](https://www.sumatrapdfreader.org)
+
+
+---
+
+## FAQ
+
+* Failed installations like vim plugins or coc extensions for permission operation on windows?
+
+Try with administrator.
