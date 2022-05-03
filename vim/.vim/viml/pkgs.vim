@@ -536,8 +536,8 @@ let g:Popc_selectPointer = ''
 let g:Popc_separator = {'left' : '', 'right': ''}
 let g:Popc_subSeparator = {'left' : '', 'right': ''}
 endif
-let g:Popc_useLayerPath = 0
-let g:Popc_useLayerRoots = ['.popc', '.git', '.svn', '.hg', 'tags', '.LfGtags']
+let g:Popc_wksSaveUnderRoot = 0
+let g:Popc_wksRootPatterns = ['.popc', '.git', '.svn', '.hg', 'tags', '.LfGtags']
 nnoremap <leader><leader>h :PopcBuffer<CR>
 nnoremap <M-u> :PopcBufferSwitchTabLeft!<CR>
 nnoremap <M-p> :PopcBufferSwitchTabRight!<CR>
@@ -823,6 +823,7 @@ nmap <leader>gc <Plug>(coc-float-hide)
 nnoremap <leader>gh <Cmd>call CocActionAsync('doHover')<CR>
 nnoremap <leader>gs <Cmd>CocCommand clangd.switchSourceHeader<CR>
 nnoremap <leader>gm <Cmd>CocCommand clangd.symbolInfo<CR>
+nnoremap <leader>ge <Cmd>CocCommand rust-analyzer.expandMacro<CR>
 nmap <leader>oi <Plug>(coc-diagnostic-info)
 nmap <leader>oj <Plug>(coc-diagnostic-next-error)
 nmap <leader>ok <Plug>(coc-diagnostic-prev-error)
