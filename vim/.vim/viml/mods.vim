@@ -286,7 +286,7 @@ function! s:rp.run(cfg) dict
         else
             let l:files = s:glob(l:pat, a:cfg.lowest)
             if empty(l:files)
-                throw 'None of ' . l:pat . ' was found!'
+                throw '[RP] None of ' . l:pat . ' was found!'
             endif
             let a:cfg.file = l:files[0]
         endif
@@ -351,7 +351,7 @@ function! s:vout(cfg)
         let l:outdir = a:cfg.wdir . '/' . l:dir
         if a:cfg.deploy ==# 'clean'
             call delete(l:outdir, 'rf')
-            throw l:dir . ' was removed'
+            throw '[RP] ' . l:dir . ' was removed'
         endif
         silent! call mkdir(l:outdir, 'p')
     endif
@@ -495,6 +495,8 @@ function! RunProject(keys, ...)
     else
         try
             call s:rp.run(get(a:000, 0, s:parseProps(km)))
+		catch /\V\^[RP] /
+            echo v:exception
         catch
             echo v:exception
             echo v:throwpoint
@@ -507,7 +509,7 @@ endfunction
 function! s:FnFile(cfg)
     let l:type = empty(a:cfg.type) ? &filetype : a:cfg.type
     if !has_key(s:rp.type, l:type) || ('dosbatch' ==? l:type && !IsWin())
-        throw 's:rp.type doesn''t support "' . l:type . '"'
+        throw '[RP] s:rp.type doesn''t support "' . l:type . '"'
     else
         let a:cfg.type = l:type
         let a:cfg.srcf = '"' . fnamemodify(a:cfg.file, ':t') . '"'
@@ -1080,7 +1082,7 @@ function! FnInsertSpace(string, pos) range
         let l:line = getline(k)
         let l:fie = ' '
         for ch in l:chars
-            let l:pch = '\m\s*\M' . escape(ch, '\') . '\m\s*\C'
+            let l:pch = '\m\s*\V' . escape(ch, '\') . '\m\s*\C'
             if a:pos == 'h'
                 let l:sch = l:fie . escape(ch, '&\')
             elseif a:pos == 'b'
