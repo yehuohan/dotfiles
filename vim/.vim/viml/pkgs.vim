@@ -1122,7 +1122,7 @@ nmap <leader>av <Plug>(vimtex-view)
 
 " open-browser {{{ 在线搜索
 let g:openbrowser_default_search = 'bing'
-let g:openbrowser_search_engines = {'bing' : 'https://bing.com/search?q={query}'}
+let g:openbrowser_search_engines = {'bing' : 'https://cn.bing.com/search?q={query}'}
 map <leader>bs <Plug>(openbrowser-smart-search)
 nnoremap <leader>big :OpenBrowserSearch -google<Space>
 nnoremap <leader>bib :OpenBrowserSearch -bing<Space>
