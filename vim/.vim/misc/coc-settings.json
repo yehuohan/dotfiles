@@ -57,6 +57,7 @@
     "clangd.arguments": [], // arguments for clangd server
     "clangd.compilationDatabasePath": "", // specifies the directory containing the compilation database
     "clangd.fallbackFlags": [
+        "-std=c++20",
         "-D__VBUILD__"
     ], // extra clang flags used to parse files when no compilation database is found
     "clangd.path": "clangd",

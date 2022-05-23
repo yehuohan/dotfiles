@@ -223,7 +223,7 @@ let s:rp = {
         \ },
     \ 'type' : {
         \ 'c'          : ['gcc -g %s %s -o "%s" && "./%s" %s',            'abld', 'srcf', 'outf', 'outf', 'arun'],
-        \ 'cpp'        : ['g++ -g -std=c++17 %s %s -o "%s" && "./%s" %s', 'abld', 'srcf', 'outf', 'outf', 'arun'],
+        \ 'cpp'        : ['g++ -g -std=c++20 %s %s -o "%s" && "./%s" %s', 'abld', 'srcf', 'outf', 'outf', 'arun'],
         \ 'rust'       : [IsWin() ? 'rustc %s %s -o "%s.exe" && "./%s" %s'
         \                         : 'rustc %s %s -o "%s" && "./%s" %s',   'abld', 'srcf', 'outf', 'outf', 'arun'],
         \ 'java'       : ['javac %s && java "%s" %s', 'srcf', 'outf', 'arun'],
