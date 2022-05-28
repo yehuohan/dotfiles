@@ -189,6 +189,10 @@ function! s:wsd.display() dict
         for str in self[l:mod].str
             execute printf('syntax match %s %s', self[l:mod].hl, str)
         endfor
+        syntax match wsdQuickfix /\m^|| / conceal
+        setlocal nonumber
+        setlocal norelativenumber
+        setlocal signcolumn=no
     endif
 endfunction
 " }}}
