@@ -19,7 +19,7 @@ project(main LANGUAGES CXX)
 #set(OpenCV_DIR <path-to-opencv-cmake>) # 设置package的cmake文件查找路径
 #find_package(OpenCV REQUIRED)
 #include_directories(${OpenCV_INCLUDE_DIRS})
-#target_link_libraries(${PROJECT_NAME}, ${OpenCV_LIBS})
+#target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc)
 #file(GLOB_RECURSE SRC ${CMAKE_CURRENT_SOURCE_DIR}/src)
