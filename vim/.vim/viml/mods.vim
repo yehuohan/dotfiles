@@ -311,7 +311,7 @@ function! s:rp.run(cfg) dict
         let l:exec .= printf('-mode=term -pos=%s ', a:cfg.term)
     endif
     let l:exec .= l:cmd
-    execute 'lcd ' . escape(l:dir, ' \')
+    execute 'lcd ' . l:dir
     call SetExecLast(l:exec)
     execute l:exec
 endfunction
