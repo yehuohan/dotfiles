@@ -635,8 +635,6 @@ let s:fw = {
             \ 'ff' : ':Leaderf file --input "%s"',
             \ 'fl' : ':Leaderf rg --nowrap --input "%s"',
             \ 'fh' : ':Leaderf tag --nowrap --input "%s"',
-            \ 'fd' : ':Leaderf gtags --auto-jump -d %s',
-            \ 'fg' : ':Leaderf gtags -r %s',
             \ }
         \ },
     \ }
@@ -662,7 +660,6 @@ const s:fw_mappings_fuzzy = [
     \ 'ff', 'fpf', 'Ff',
     \ 'fl', 'fpl', 'Fl',
     \ 'fh', 'fph', 'Fh',
-    \ 'fd', 'fg',
     \ ]
 " }}}
 
@@ -937,8 +934,6 @@ endfunction
 "   f : fuzzy files
 "   l : fuzzy line text
 "   h : fuzzy ctags and default with <cword>
-"   d : fuzzy gtags definition and default with <cword>
-"   g : fuzzy gtags reference and default with <cword>
 " }}}
 function! FindWFuzzy(keys)
     let km = {
@@ -1004,7 +999,6 @@ let s:rs = {
             \ 'edit ++enc=cp936',
             \ 'syntax match QC /\v^[^|]*\|[^|]*\| / conceal',
             \ 'call mkdir(fnamemodify(tempname(), ":h"), "p")',
-            \ 'Leaderf gtags --update',
             \ 'execAssembly',
             \ 'copyConfig',
             \ 'lineToTop',

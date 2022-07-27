@@ -537,7 +537,7 @@ let g:Popc_separator = {'left' : '', 'right': ''}
 let g:Popc_subSeparator = {'left' : '', 'right': ''}
 endif
 let g:Popc_wksSaveUnderRoot = 0
-let g:Popc_wksRootPatterns = ['.popc', '.git', '.svn', '.hg', 'tags', '.LfGtags']
+let g:Popc_wksRootPatterns = ['.popc', '.git', '.svn', '.hg', 'tags']
 nnoremap <leader><leader>h :PopcBuffer<CR>
 nnoremap <M-u> :PopcBufferSwitchTabLeft!<CR>
 nnoremap <M-p> :PopcBufferSwitchTabRight!<CR>
@@ -708,9 +708,6 @@ let g:Lf_ShowHidden = 1                 " 搜索隐藏文件和目录
 let g:Lf_DefaultExternalTool = 'rg'
 let g:Lf_UseVersionControlTool = 1
 "let g:Lf_ExternalCommand = 'rg --files --no-ignore "%s"'
-let g:Lf_GtagsAutoGenerate = 0          " 禁止自动生成gtags
-let g:Lf_Gtagslabel = 'native-pygments' " gtags: pip install Pygments
-let g:Lf_GtagsStoreInRootMarker = 1
 let g:Lf_WildIgnore = {
     \ 'dir': ['.git', '.svn', '.hg'],
     \ 'file': []
