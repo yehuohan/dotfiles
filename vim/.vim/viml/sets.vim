@@ -264,7 +264,7 @@ noremap <leader>ak <C-a>
 vnoremap <leader>agj g<C-x>
 vnoremap <leader>agk g<C-a>
 " 大小写切换
-vnoremap <leader>u ~
+noremap <leader>u ~
 " 匹配符跳转
 packadd matchit
 map <S-s> %
