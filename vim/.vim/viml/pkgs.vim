@@ -77,6 +77,7 @@ endif
     " component
     Plug 'morhetz/gruvbox'
     Plug 'rakr/vim-one'
+    Plug 'tanvirtin/monokai.nvim'
 if s:use.lightline
     Plug 'yehuohan/lightline.vim'
 endif
@@ -541,7 +542,7 @@ nnoremap <leader>ti :IndentLinesToggle<CR>
 " popset {{{
 let g:Popset_SelectionData = [{
         \ 'opt' : ['colorscheme', 'colo'],
-        \ 'lst' : ['gruvbox', 'one'],
+        \ 'lst' : ['gruvbox', 'one', 'monokai_pro', 'monokai_soda'],
     \}]
 nnoremap <leader><leader>p :PopSet<Space>
 nnoremap <leader>sp :PopSet popset<CR>
