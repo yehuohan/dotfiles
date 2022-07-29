@@ -1,6 +1,6 @@
 let s:use = SvarUse()
 
-" Standard {{{
+" Built-in {{{
 let g:loaded_gzip = 1
 let g:loaded_tarPlugin = 1
 let g:loaded_tar = 1
@@ -49,7 +49,7 @@ if s:use.fastgit
     let g:plug_url_format = 'https://hub.fastgit.org/%s.git'
 endif
 call plug#begin($DotVimPath.'/bundle')  " 设置插件位置，且自动设置了syntax enable和filetype plugin indent on
-    " editing
+    " editor
 if IsNVim()
     Plug 'yehuohan/hop.nvim'
 else
@@ -73,7 +73,8 @@ endif
     Plug 'kshenoy/vim-signature'
     Plug 'Konfekt/FastFold'
     Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
-    " managers
+    Plug 'gelguy/wilder.nvim'
+    " component
     Plug 'morhetz/gruvbox'
     Plug 'rakr/vim-one'
 if s:use.lightline
@@ -105,7 +106,7 @@ if IsNVim()
     Plug 'nvim-lua/plenary.nvim'
     Plug 'nvim-telescope/telescope.nvim'
 endif
-    " codings
+    " coding
 if s:use.coc
     Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
     Plug 'neoclide/jsonc.vim'
@@ -166,7 +167,7 @@ endif
 call plug#end()
 " }}}
 
-" Editing {{{
+" Editor {{{
 " hop, easy-motion {{{ 快速跳转
 if IsNVim()
 silent! lua << EOF
@@ -343,9 +344,34 @@ nmap <leader>zu <Plug>(FastFoldUpdate)
 " undotree {{{ 撤消历史
 nnoremap <leader>tu :UndotreeToggle<CR>
 " }}}
+
+" wilder {{{ 命令行增强
+call wilder#setup({
+    \ 'modes': [':'],
+    \ 'enable_cmdline_enter': 0,
+    \ })
+call wilder#set_option({
+    \ 'renderer': wilder#popupmenu_renderer(wilder#popupmenu_border_theme({
+        \ 'highlighter': wilder#basic_highlighter(),
+        \ 'highlights': { 'default': 'Normal', 'accent': 'Constant' },
+        \ 'left': [' ', wilder#popupmenu_devicons()],
+        \ 'right': [' ', wilder#popupmenu_scrollbar()],
+        \ 'max_height': '95%',
+        \ 'border': 'rounded',
+        \ })),
+    \ 'pipeline': [wilder#branch(
+        \ wilder#cmdline_pipeline({
+            \ 'language': 'vim',
+            \ 'fuzzy': 1,
+            \ 'fuzzy_filter': wilder#vim_fuzzy_filter(),
+            \ }),
+        \ )]
+    \ })
+nnoremap <leader>t; :call wilder#toggle()<CR>
+" }}}
 " }}}
 
-" Manager {{{
+" Component {{{
 " theme {{{ Vim主题(ColorScheme, StatusLine, TabLine)
 let g:gruvbox_contrast_dark='soft'      " 背景选项：dark, medium, soft
 let g:gruvbox_italic = 1
@@ -757,7 +783,7 @@ endif
 " }}}
 " }}}
 
-" Codings {{{
+" Coding {{{
 " coc {{{ 自动补全
 if s:use.coc
 call s:plug.reg('onDelay', 'load', 'coc.nvim')
