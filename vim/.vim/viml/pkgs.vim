@@ -1035,7 +1035,7 @@ endif
 nnoremap <leader>tZ :terminal<CR>
 nnoremap <leader>tz :FloatermToggle<CR>
 nnoremap <leader><leader>m :Popc Floaterm<CR>
-nnoremap <leader><leader>z :FloatermNew<Space>
+nnoremap <leader><leader>z :FloatermNew --cwd=.<Space>
 tnoremap <M-u> <C-\><C-n>:FloatermFirst<CR>
 tnoremap <M-i> <C-\><C-n>:FloatermPrev<CR>
 tnoremap <M-o> <C-\><C-n>:FloatermNext<CR>

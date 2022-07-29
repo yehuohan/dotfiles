@@ -172,12 +172,12 @@ augroup UserSetsCmd
     autocmd BufNewFile *                            set fileformat=unix
     autocmd BufRead,BufNewFile *.tex                set filetype=tex
     autocmd BufRead,BufNewFile *.log                set filetype=log
-    autocmd BufRead,BufNewFile *.usf,*ush           set filetype=hlsl
+    autocmd BufRead,BufNewFile *.usf,*.ush          set filetype=hlsl
     autocmd BufRead,BufNewFile *.uproject,*.uplugin set filetype=jsonc
     autocmd Filetype vim,tex                        setlocal foldmethod=marker
     autocmd Filetype c,cpp,rust                     setlocal foldmethod=syntax
     autocmd Filetype glsl,hlsl                      setlocal foldmethod=syntax
-    autocmd Filetype python                         setlocal foldmethod=indent
+    autocmd Filetype python                         setlocal foldmethod=indent foldignore=
     autocmd FileType txt,log                        setlocal foldmethod=manual
     autocmd BufReadPre * call s:onLargeFile()
 augroup END
