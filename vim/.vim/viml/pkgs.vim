@@ -100,7 +100,11 @@ endif
 if IsNVim()
     Plug 'kyazdani42/nvim-tree.lua'
 endif
+if IsNVim()
+    Plug 'goolord/alpha-nvim'
+else
     Plug 'mhinz/vim-startify'
+endif
     Plug 'itchyny/screensaver.vim'
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
@@ -188,7 +192,9 @@ noremap <leader>j <Cmd>HopLineCursorMW<CR>
 noremap <leader><leader>j <Cmd>HopLineMW<CR>
 noremap <leader>mj <Cmd>HopLineStartMW<CR>
 noremap <leader>mw <Cmd>HopWord<CR>
+
 else
+
 let g:EasyMotion_dict = 'zh-cn'         " 支持简体中文拼音
 let g:EasyMotion_do_mapping = 0         " 禁止默认map
 let g:EasyMotion_smartcase = 1          " 不区分大小写
@@ -362,7 +368,7 @@ call wilder#set_option({
         \ 'left': [' ', wilder#popupmenu_devicons()],
         \ 'right': [' ', wilder#popupmenu_scrollbar()],
         \ 'max_height': '95%',
-        \ 'border': 'rounded',
+        \ 'border': 'single',
         \ })),
     \ 'pipeline': [wilder#branch(
         \ wilder#cmdline_pipeline({
@@ -480,6 +486,7 @@ endfunction
 " Function: lightline components {{{
 function! Plug_ll_mode()
     return &ft ==# 'Popc' ? 'Popc' :
+        \ &ft ==# 'alpha' ? 'Alpha' :
         \ &ft ==# 'startify' ? 'Startify' :
         \ &ft ==# 'qf' ? (QuickfixType() ==# 'c' ? 'Quickfix' : 'Location') :
         \ &ft ==# 'help' ? 'Help' :
@@ -561,7 +568,7 @@ nnoremap <leader>tr :RainbowToggle<CR>
 " indentLine {{{ 显示缩进标识
 let g:indentLine_char = '⁞'             " 设置标识符样式
 let g:indentLinet_color_term = 200      " 设置标识符颜色
-let g:indentLine_fileTypeExclude = ['startify']
+let g:indentLine_fileTypeExclude = ['startify', 'alpha']
 nnoremap <leader>ti :IndentLinesToggle<CR>
 " }}}
 
@@ -701,18 +708,63 @@ nnoremap <leader>tt :NvimTreeToggle<CR>
 endif
 " }}}
 
-" startify {{{ 启动首页
-if IsWin()
+" alpha, startify {{{ 启动首页
+if IsNVim()
+silent! lua << EOF
+local tmp = require'alpha.themes.startify'
+tmp.section.header.val = function()
+    if vim.fn.filereadable(vim.env.DotVimCachePath .. '/todo.md') == 1 then
+        local todo = vim.fn.filter(vim.fn.readfile(vim.env.DotVimCachePath .. '/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
+        if vim.tbl_isempty(todo) then
+            return ''
+        end
+        return todo
+    else
+        return ''
+    end
+end
+tmp.section.bookmarks = {
+    type = "group",
+    val = {
+        { type = "padding", val = 1 },
+        { type = "text", val = "Bookmarks", opts = { hl = "SpecialComment" } },
+        { type = "padding", val = 1 },
+        { type = "group", val = {
+            tmp.file_button('$DotVimPath/.init.vim', 'c'),
+            tmp.file_button('$NVimConfigPath/init.vim', 'd'),
+            tmp.file_button('$DotVimCachePath/todo.md', 'o'),
+        }},
+    },
+}
+tmp.section.mru = {
+    type = "group",
+    val = {
+        { type = "padding", val = 1 },
+        { type = "text", val = "Recent Files", opts = { hl = "SpecialComment" } },
+        { type = "padding", val = 1 },
+        { type = "group", val = function() return { tmp.mru(0, false, 8) } end },
+    },
+}
+tmp.config.layout = {
+    { type = "padding", val = 1 },
+    tmp.section.header,
+    { type = "padding", val = 2 },
+    tmp.section.top_buttons,
+    tmp.section.bookmarks,
+    tmp.section.mru,
+    { type = "padding", val = 1 },
+    tmp.section.bottom_buttons,
+}
+require'alpha'.setup(tmp.config)
+EOF
+nnoremap <leader>su :Alpha<CR>
+
+else
+
 let g:startify_bookmarks = [
     \ {'c': '$DotVimPath/.init.vim'},
-    \ {'d': '$LOCALAPPDATA/nvim/init.vim'},
+    \ {'d': '$NVimConfigPath/init.vim'},
     \ {'o': '$DotVimCachePath/todo.md'} ]
-else
-let g:startify_bookmarks = [
-    \ {'c': '~/.vim/.init.vim'},
-    \ {'d': '~/.config/nvim/init.vim'},
-    \ {'o': '$DotVimCachePath/todo.md'} ]
-endif
 let g:startify_lists = [
     \ {'type': 'bookmarks', 'header': ['   Bookmarks']},
     \ {'type': 'files',     'header': ['   Recent Files']},
@@ -729,6 +781,7 @@ function! Plug_stt_todo()
         return ''
     endif
 endfunction
+endif
 " }}}
 
 " screensaver {{{ 屏保

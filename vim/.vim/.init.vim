@@ -33,6 +33,7 @@ let $DotVimCachePath=$DotVimPath . '/.cache'
 set rtp^=$DotVimPath
 
 if IsNVim()
+    let $NVimConfigPath=stdpath('config')
 if IsWin()
     let g:python3_host_prog = $APPS_HOME . '/Python/python.exe'
     let g:node_host_prog = $DotVimPath . '/local/node_modules/.bin/neovim-node-host.cmd'
