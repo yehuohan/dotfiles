@@ -1059,12 +1059,24 @@ endfunction
 " }}}
 " }}}
 
-" Function: FnEditFile(suffix, ntab) {{{ 编辑临时文件
+" Function: FnEditFile(suffix, type) {{{ 编辑临时文件
 " @param suffix: 临时文件附加后缀
-" @param ntab: 在新tab中打开
-function! FnEditFile(suffix, ntab)
+" @param type: 编辑窗口类型
+function! FnEditFile(suffix, type)
+if IsNVim() && a:type ==# 'f'
+    let l:buf = nvim_create_buf(v:true, v:false)
+    let l:opts = {
+        \ 'relative': 'editor',
+        \ 'width': float2nr(0.6 * &columns),
+        \ 'height': float2nr(0.7 * &lines),
+        \ 'col': 2,
+        \ 'row': 1,
+        \ 'border': 'single',
+        \ }
+    call nvim_open_win(l:buf, v:true, l:opts)
+endif
     execute printf('%s %s.%s',
-                \ a:ntab ? 'tabedit' : 'edit',
+                \ a:type ==# 't' ? 'tabedit' : 'edit',
                 \ fnamemodify(tempname(), ':r'),
                 \ empty(a:suffix) ? 'tmp' : a:suffix)
 endfunction
@@ -1139,21 +1151,31 @@ endfunction
 let ScriptEval = function('popset#set#PopSelection', [s:rs.sel])
 nnoremap <leader>se :call ScriptEval()<CR>
 nnoremap <leader>ei
-    \ <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 0)<CR>
+    \ <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 'e')<CR>
+nnoremap <leader>ec  :call FnEditFile('c'  , 'e')<CR>
+nnoremap <leader>ea  :call FnEditFile('cpp', 'e')<CR>
+nnoremap <leader>er  :call FnEditFile('rs' , 'e')<CR>
+nnoremap <leader>ep  :call FnEditFile('py' , 'e')<CR>
+nnoremap <leader>em  :call FnEditFile('md' , 'e')<CR>
+nnoremap <leader>el  :call FnEditFile('lua', 'e')<CR>
 nnoremap <leader>eti
-    \ <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 1)<CR>
-nnoremap <leader>ec  :call FnEditFile('c', 0)<CR>
-nnoremap <leader>etc :call FnEditFile('c', 1)<CR>
-nnoremap <leader>ea  :call FnEditFile('cpp', 0)<CR>
-nnoremap <leader>eta :call FnEditFile('cpp', 1)<CR>
-nnoremap <leader>er  :call FnEditFile('rs', 0)<CR>
-nnoremap <leader>etr :call FnEditFile('rs', 1)<CR>
-nnoremap <leader>ep  :call FnEditFile('py', 0)<CR>
-nnoremap <leader>etp :call FnEditFile('py', 1)<CR>
-nnoremap <leader>el  :call FnEditFile('lua', 0)<CR>
-nnoremap <leader>etl :call FnEditFile('lua', 1)<CR>
-nnoremap <leader>em  :call FnEditFile('md', 0)<CR>
-nnoremap <leader>etm :call FnEditFile('md', 1)<CR>
+    \ <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 't')<CR>
+nnoremap <leader>etc :call FnEditFile('c'  , 't')<CR>
+nnoremap <leader>eta :call FnEditFile('cpp', 't')<CR>
+nnoremap <leader>etr :call FnEditFile('rs' , 't')<CR>
+nnoremap <leader>etp :call FnEditFile('py' , 't')<CR>
+nnoremap <leader>etm :call FnEditFile('md' , 't')<CR>
+nnoremap <leader>etl :call FnEditFile('lua', 't')<CR>
+if IsNVim()
+nnoremap <leader>efi
+    \ <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 'f')<CR>
+nnoremap <leader>efc :call FnEditFile('c'  , 'f')<CR>
+nnoremap <leader>efa :call FnEditFile('cpp', 'f')<CR>
+nnoremap <leader>efr :call FnEditFile('rs' , 'f')<CR>
+nnoremap <leader>efp :call FnEditFile('py' , 'f')<CR>
+nnoremap <leader>efl :call FnEditFile('lua', 'f')<CR>
+nnoremap <leader>efm :call FnEditFile('md' , 'f')<CR>
+endif
 nnoremap <silent> <leader>dh :call Input2Fn(['Divide Right: '] , 'FnInsertSpace', 'h')<CR>
 nnoremap <silent> <leader>db :call Input2Fn(['Divide Both: ']  , 'FnInsertSpace', 'b')<CR>
 nnoremap <silent> <leader>dl :call Input2Fn(['Divide Left: ']  , 'FnInsertSpace', 'l')<CR>
