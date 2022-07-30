@@ -87,7 +87,11 @@ if IsNVim()
 endif
     Plug 'ryanoasis/vim-devicons'
 endif
+if IsNVim()
     Plug 'rcarriga/nvim-notify'
+    Plug 'stevearc/dressing.nvim'
+    Plug 'ziontee113/icon-picker.nvim'
+endif
     Plug 'luochen1990/rainbow'
     Plug 'Yggdroot/indentLine'
     Plug 'yehuohan/popc'
@@ -516,9 +520,31 @@ endif
 " notify {{{ 消息提示
 if IsNVim()
 silent! lua << EOF
-require('notify').setup{ }
+--require('notify').setup{ }
 --vim.notify = require('notify')
 EOF
+endif
+" }}}
+
+" dressing {{{ 字体图标
+if IsNVim()
+silent! lua << EOF
+require('dressing').setup{
+    input = { enabled = true },
+    select = { enabled = true },
+}
+EOF
+endif
+" }}}
+
+" icon-picker {{{ 字体图标
+if IsNVim()
+silent! lua << EOF
+require("icon-picker").setup{ disable_legacy_commands = true }
+EOF
+nnoremap <leader>ip <Cmd>IconPickerNormal alt_font symbols nerd_font emoji<CR>
+nnoremap <leader>iP <Cmd>IconPickerYank alt_font symbols nerd_font emoji<CR>
+inoremap <M-p> <Cmd>IconPickerInsert alt_font symbols nerd_font emoji<CR>
 endif
 " }}}
 
@@ -941,7 +967,7 @@ noremap <leader>fm :Neoformat<CR>
 
 " auto-pairs {{{ 自动括号
 let g:AutoPairsShortcutToggle = ''
-let g:AutoPairsShortcutFastWrap = '<M-p>'
+let g:AutoPairsShortcutFastWrap = ''
 let g:AutoPairsShortcutJump = ''
 let g:AutoPairsShortcutFastBackInsert = ''
 nnoremap <leader>tp :call AutoPairsToggle()<CR>
