@@ -24,19 +24,19 @@ end
 
 
 local function setup(dotvim)
-    vim.env.DotVimPath      = dotvim
-    vim.env.DotVimMiscPath  = vim.env.DotVimPath .. '/misc'
-    vim.env.DotVimCachePath = vim.env.DotVimPath .. '/.cache'
+    vim.env.DotVimDir   = dotvim
+    vim.env.DotVimMisc  = vim.env.DotVimDir .. '/misc'
+    vim.env.DotVimCache = vim.env.DotVimDir .. '/.cache'
 
     if IsWin() then
         vim.g.python3_host_prog = vim.env.APPS_HOME .. '/Python/python.exe'
-        vim.g.node_host_prog = vim.env.DotVimPath .. '/local/node_modules/.bin/neovim-node-host.cmd'
+        vim.g.node_host_prog = vim.env.DotVimDir .. '/local/node_modules/.bin/neovim-node-host.cmd'
         if vim.fn.filereadable(vim.g.node_host_prog) == 0 then
             vim.g.node_host_prog = vim.env.APPS_HOME .. '/nodejs/node_modules/neovim-node-host.cmd'
         end
     else
         vim.g.python3_host_prog = '/usr/bin/python3'
-        vim.g.node_host_prog = vim.env.DotVimPath .. '/local/node_modules/.bin/neovim-node-host'
+        vim.g.node_host_prog = vim.env.DotVimDir .. '/local/node_modules/.bin/neovim-node-host'
         if vim.fn.filereadable(vim.g.node_host_prog) == 0 then
             vim.g.node_host_prog = '/usr/bin/neovim-node-host'
         end
@@ -53,7 +53,7 @@ local function setup(dotvim)
     require('v.pkgs').setup()
     require('v.mods').setup()
     require('v.sets').setup()
-    vim.api.nvim_command[[source $DotVimPath/lua/v/maps.vim]]
+    vim.api.nvim_command[[source $DotVimDir/lua/v/maps.vim]]
 end
 
 return {

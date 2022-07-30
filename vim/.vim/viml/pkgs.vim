@@ -48,7 +48,7 @@ endfunction
 if s:use.fastgit
     let g:plug_url_format = 'https://hub.fastgit.org/%s.git'
 endif
-call plug#begin($DotVimPath.'/bundle')  " 设置插件位置，且自动设置了syntax enable和filetype plugin indent on
+call plug#begin($DotVimDir.'/bundle')  " 设置插件位置，且自动设置了syntax enable和filetype plugin indent on
     " editor
 if IsNVim()
     Plug 'yehuohan/hop.nvim'
@@ -582,7 +582,7 @@ nnoremap <leader>sp :PopSet popset<CR>
 " }}}
 
 " popc {{{
-let g:Popc_jsonPath = $DotVimCachePath
+let g:Popc_jsonPath = $DotVimCache
 let g:Popc_useFloatingWin = 1
 let g:Popc_highlight = {
     \ 'text'     : 'Pmenu',
@@ -713,8 +713,8 @@ if IsNVim()
 silent! lua << EOF
 local tmp = require'alpha.themes.startify'
 tmp.section.header.val = function()
-    if vim.fn.filereadable(vim.env.DotVimCachePath .. '/todo.md') == 1 then
-        local todo = vim.fn.filter(vim.fn.readfile(vim.env.DotVimCachePath .. '/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
+    if vim.fn.filereadable(vim.env.DotVimCache .. '/todo.md') == 1 then
+        local todo = vim.fn.filter(vim.fn.readfile(vim.env.DotVimCache .. '/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
         if vim.tbl_isempty(todo) then
             return ''
         end
@@ -730,9 +730,9 @@ tmp.section.bookmarks = {
         { type = "text", val = "Bookmarks", opts = { hl = "SpecialComment" } },
         { type = "padding", val = 1 },
         { type = "group", val = {
-            tmp.file_button('$DotVimPath/.init.vim', 'c'),
+            tmp.file_button('$DotVimDir/.init.vim', 'c'),
             tmp.file_button('$NVimConfigPath/init.vim', 'd'),
-            tmp.file_button('$DotVimCachePath/todo.md', 'o'),
+            tmp.file_button('$DotVimCache/todo.md', 'o'),
         }},
     },
 }
@@ -762,9 +762,9 @@ nnoremap <leader>su :Alpha<CR>
 else
 
 let g:startify_bookmarks = [
-    \ {'c': '$DotVimPath/.init.vim'},
+    \ {'c': '$DotVimDir/.init.vim'},
     \ {'d': '$NVimConfigPath/init.vim'},
-    \ {'o': '$DotVimCachePath/todo.md'} ]
+    \ {'o': '$DotVimCache/todo.md'} ]
 let g:startify_lists = [
     \ {'type': 'bookmarks', 'header': ['   Bookmarks']},
     \ {'type': 'files',     'header': ['   Recent Files']},
@@ -774,8 +774,8 @@ let g:startify_custom_header = 'startify#pad(startify#fortune#cowsay(Plug_stt_to
 nnoremap <leader>su :Startify<CR>
 
 function! Plug_stt_todo()
-    if filereadable($DotVimCachePath.'/todo.md')
-        let l:todo = filter(readfile($DotVimCachePath.'/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
+    if filereadable($DotVimCache.'/todo.md')
+        let l:todo = filter(readfile($DotVimCache.'/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
         return empty(l:todo) ? '' : l:todo
     else
         return ''
@@ -802,7 +802,7 @@ augroup END
 " LeaderF {{{ 模糊查找
 if s:use.leaderf
 "call s:plug.reg('onVimEnter', 'exec', 'autocmd! LeaderF_Mru')
-let g:Lf_CacheDirectory = $DotVimCachePath
+let g:Lf_CacheDirectory = $DotVimCache
 let g:Lf_PreviewInPopup = 1
 let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0}
 let g:Lf_StlSeparator = s:use.ui.patch ? {'left': '', 'right': ''} : {'left': '', 'right': ''}
@@ -845,7 +845,7 @@ require('telescope').setup{
         borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
         color_devicons = true,
         history = {
-            path = vim.env.DotVimCachePath  .. '/telescope_history',
+            path = vim.env.DotVimCache  .. '/telescope_history',
         },
         mappings = {
             i = {
@@ -873,8 +873,8 @@ function! s:Plug_coc_settings()
         call coc#config(sec, val)
     endfor
 endfunction
-let g:coc_config_home = $DotVimMiscPath
-let g:coc_data_home = $DotVimCachePath . '/.coc'
+let g:coc_config_home = $DotVimMisc
+let g:coc_data_home = $DotVimCache . '/.coc'
 let g:coc_global_extensions = keys(filter(copy(s:use.coc_exts), 'v:val'))
 let g:coc_status_error_sign = '✘'
 let g:coc_status_warning_sign = '!'
@@ -961,7 +961,7 @@ endif
 " ultisnips {{{ 代码片段
 if s:use.snip
 let g:UltiSnipsEditSplit = 'vertical'
-let g:UltiSnipsSnippetDirectories = [$DotVimPath . '/snips', 'UltiSnips']
+let g:UltiSnipsSnippetDirectories = [$DotVimDir . '/snips', 'UltiSnips']
 let g:UltiSnipsExpandTrigger = '<Tab>'
 let g:UltiSnipsJumpForwardTrigger = '<C-j>'
 let g:UltiSnipsJumpBackwardTrigger = '<C-k>'
@@ -1209,7 +1209,7 @@ endif
 " }}}
 
 " vimtex {{{ Latex
-let g:vimtex_cache_root = $DotVimCachePath . '/.vimtex'
+let g:vimtex_cache_root = $DotVimCache . '/.vimtex'
 let g:vimtex_view_general_viewer = 'SumatraPDF'
 let g:vimtex_complete_enabled = 1       " 使用vimtex#complete#omnifunc补全
 let g:vimtex_complete_close_braces = 1

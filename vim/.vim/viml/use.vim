@@ -3,7 +3,7 @@ function! SvarUse()
 endfunction
 
 " Struct s:use {{{
-let s:use_file = $DotVimCachePath . '/.use.json'
+let s:use_file = $DotVimCache . '/.use.json'
 let s:use = {
     \ 'fastgit'   : v:false,
     \ 'lightline' : v:false,

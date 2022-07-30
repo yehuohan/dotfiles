@@ -26,23 +26,23 @@ endfunction
 " }}}
 
 " Globals {{{
-let $DotVimPath=resolve(expand('<sfile>:p:h'))
-let $DotVimVimLPath=$DotVimPath . '/viml'
-let $DotVimMiscPath=$DotVimPath . '/misc'
-let $DotVimCachePath=$DotVimPath . '/.cache'
-set rtp^=$DotVimPath
+let $DotVimDir=resolve(expand('<sfile>:p:h'))
+let $DotVimVimL=$DotVimDir . '/viml'
+let $DotVimMisc=$DotVimDir . '/misc'
+let $DotVimCache=$DotVimDir . '/.cache'
+set rtp^=$DotVimDir
 
 if IsNVim()
     let $NVimConfigPath=stdpath('config')
 if IsWin()
     let g:python3_host_prog = $APPS_HOME . '/Python/python.exe'
-    let g:node_host_prog = $DotVimPath . '/local/node_modules/.bin/neovim-node-host.cmd'
+    let g:node_host_prog = $DotVimDir . '/local/node_modules/.bin/neovim-node-host.cmd'
     if !filereadable(g:node_host_prog)
         let g:node_host_prog = $APPS_HOME . '/nodejs/node_modules/neovim-node-host.cmd'
     endif
 else
     let g:python3_host_prog = '/usr/bin/python3'
-    let g:node_host_prog = $DotVimPath . '/local/node_modules/.bin/neovim-node-host'
+    let g:node_host_prog = $DotVimDir . '/local/node_modules/.bin/neovim-node-host'
     if !filereadable(g:node_host_prog)
         let g:node_host_prog = '/usr/bin/neovim-node-host'
     endif
@@ -58,8 +58,8 @@ vnoremap ; :
 nnoremap : ;
 " }}}
 
-source $DotVimVimLPath/env.vim
-source $DotVimVimLPath/use.vim
-source $DotVimVimLPath/pkgs.vim
-source $DotVimVimLPath/mods.vim
-source $DotVimVimLPath/sets.vim
+source $DotVimVimL/env.vim
+source $DotVimVimL/use.vim
+source $DotVimVimL/pkgs.vim
+source $DotVimVimL/mods.vim
+source $DotVimVimL/sets.vim

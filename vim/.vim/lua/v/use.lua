@@ -1,6 +1,6 @@
 local fn = vim.fn
 
-local use_file = vim.env.DotVimCachePath .. '/.use.json'
+local use_file = vim.env.DotVimCache .. '/.use.json'
 local use = {
     fastgit   = false,
     lightline = false,

@@ -1049,7 +1049,7 @@ endfunction
 
 " Function: s:rs.fns.copyConfig(filename) dict {{{ 复制配置文件到当前目录
 function! s:rs.fns.copyConfig(filename) dict
-    let l:srcfile = $DotVimMiscPath . '/' . a:filename
+    let l:srcfile = $DotVimMisc . '/' . a:filename
     let l:dstfile = expand('%:p:h') . '/' . a:filename
     if !filereadable(l:dstfile)
         call writefile(readfile(l:srcfile), l:dstfile)

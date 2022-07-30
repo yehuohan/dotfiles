@@ -24,8 +24,8 @@ end
 
 local function pkgs_packer()
     local packer_config = {
-        package_root = vim.env.DotVimPath .. '/pack',
-        compile_path = vim.env.DotVimPath .. '/pack/packer_compiled.lua',
+        package_root = vim.env.DotVimDir .. '/pack',
+        compile_path = vim.env.DotVimDir .. '/pack/packer_compiled.lua',
         plugin_package = 'packer',
         git = {
             default_url_format = 'https://github.com/%s',
@@ -279,7 +279,7 @@ end
 
 -- buffer管理
 local function pkgs_popc()
-    g.Popc_jsonPath = vim.env.DotVimCachePath
+    g.Popc_jsonPath = vim.env.DotVimCache
     g.Popc_useFloatingWin = 1
     g.Popc_highlight = {
         text     = 'Pmenu',
