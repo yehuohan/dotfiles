@@ -2,8 +2,8 @@ local fn = vim.fn
 
 local env = {
     ['local'] = {
-        vim.env.DotVimDir .. '/local',
-        vim.env.DotVimDir .. '/local/bin',
+        vim.env.DotVimLocal,
+        vim.env.DotVimLocal .. '/bin',
     },
     ['unix'] = {
         '~/ubin',

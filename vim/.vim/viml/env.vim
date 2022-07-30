@@ -1,7 +1,7 @@
 const s:env = {
     \ 'local': [
-        \ $DotVimDir . '/local',
-        \ $DotVimDir . '/local/bin',
+        \ $DotVimLocal,
+        \ $DotVimLocal . '/bin',
     \ ],
     \ 'unix': [
         \ '~/ubin',
