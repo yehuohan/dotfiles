@@ -158,6 +158,9 @@ endif
     Plug 'tikhomirov/vim-glsl'
     Plug 'beyondmarc/hlsl.vim', {'for': 'hlsl'}
     Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
+if s:use.treesitter && IsNVim()
+    Plug 'nvim-treesitter/nvim-treesitter'
+endif
     " utils
 if IsVim()
     Plug 'yianwillis/vimcdoc', {'for': 'help'}
@@ -180,7 +183,7 @@ call plug#end()
 " hop, easy-motion {{{ 快速跳转
 if IsNVim()
 silent! lua << EOF
-require'hop'.setup{
+require('hop').setup{
     match_mappings = { 'zh', 'zh_sc' },
     create_hl_autocmd = true
 }
@@ -547,7 +550,7 @@ endif
 " icon-picker {{{ 字体图标
 if IsNVim()
 silent! lua << EOF
-require("icon-picker").setup{ disable_legacy_commands = true }
+require('icon-picker').setup{ disable_legacy_commands = true }
 EOF
 nnoremap <leader>ip <Cmd>IconPickerNormal alt_font symbols nerd_font emoji<CR>
 nnoremap <leader>iP <Cmd>IconPickerYank alt_font symbols nerd_font emoji<CR>
@@ -665,8 +668,8 @@ let g:nvim_tree_show_icons = {
     \ 'folder_arrows': 1,
     \ }
 silent! lua << EOF
-local tcb = require'nvim-tree.config'.nvim_tree_callback
-require("nvim-tree").setup{
+local tcb = require('nvim-tree.config').nvim_tree_callback
+require('nvim-tree').setup{
   view = {
         mappings = {
             custom_only = true,
@@ -711,7 +714,7 @@ endif
 " alpha, startify {{{ 启动首页
 if IsNVim()
 silent! lua << EOF
-local tmp = require'alpha.themes.startify'
+local tmp = require('alpha.themes.startify')
 tmp.section.header.val = function()
     if vim.fn.filereadable(vim.env.DotVimCache .. '/todo.md') == 1 then
         local todo = vim.fn.filter(vim.fn.readfile(vim.env.DotVimCache .. '/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
@@ -730,9 +733,9 @@ tmp.section.bookmarks = {
         { type = "text", val = "Bookmarks", opts = { hl = "SpecialComment" } },
         { type = "padding", val = 1 },
         { type = "group", val = {
-            tmp.file_button('$DotVimDir/.init.vim', 'c'),
-            tmp.file_button('$NVimConfigPath/init.vim', 'd'),
-            tmp.file_button('$DotVimCache/todo.md', 'o'),
+            tmp.file_button("$DotVimDir/.init.vim", "c"),
+            tmp.file_button("$NVimConfigPath/init.vim", "d"),
+            tmp.file_button("$DotVimCache/todo.md", "o"),
         }},
     },
 }
@@ -755,7 +758,7 @@ tmp.config.layout = {
     { type = "padding", val = 1 },
     tmp.section.bottom_buttons,
 }
-require'alpha'.setup(tmp.config)
+require('alpha').setup(tmp.config)
 EOF
 nnoremap <leader>su :Alpha<CR>
 
@@ -785,7 +788,7 @@ endif
 " }}}
 
 " screensaver {{{ 屏保
-nnoremap <leader>ss :ScreenSaver<CR>
+nnoremap <leader>so <Cmd>ScreenSaver clock<CR>
 " }}}
 
 " fzf {{{ 模糊查找
@@ -1160,6 +1163,38 @@ endif
 let g:default_julia_version = 'devel'
 let g:latex_to_unicode_tab = 1          " 使用<Tab>输入unicode字符
 nnoremap <leader>tn :call LaTeXtoUnicode#Toggle()<CR>
+" }}}
+
+" treesitter {{{ 语法树
+if s:use.treesitter && IsNVim()
+silent! lua << EOF
+require('nvim-treesitter.configs').setup{
+    parser_install_dir = vim.env.DotVimLocal,
+    --ensure_installed = { 'c', 'cpp', 'rust', 'vim', 'lua', 'python', 'markdown', 'markdown_inline', },
+    --auto_install = true,
+    highlight = {
+        enable = true,
+        additional_vim_regex_highlighting = false,
+    },
+    indent = {
+        enable = true
+    },
+    incremental_selection = {
+        enable = true,
+        keymaps = {
+            init_selection = '<M-g>',
+            node_incremental = '<M-g>',
+            node_decremental = '<M-t>',
+            scope_incremental = '<M-v>',
+        },
+    },
+}
+vim.opt.runtimepath:append(vim.env.DotVimLocal)
+EOF
+nnoremap <leader>sh :TSBufToggle highlight<CR>
+nnoremap <leader>si :TSBufToggle indent<CR>
+nnoremap <leader>ss :TSBufToggle incremental_selection<CR>
+endif
 " }}}
 " }}}
 

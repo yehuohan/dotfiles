@@ -25,6 +25,7 @@ let s:use = {
         \ 'coc-calc'          : v:false,
         \ },
     \ 'nlsp'      : v:false,
+    \ 'treesitter': v:false,
     \ 'snip'      : v:false,
     \ 'spector'   : v:false,
     \ 'leaderf'   : v:false,
