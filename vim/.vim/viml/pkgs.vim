@@ -734,7 +734,7 @@ tmp.section.bookmarks = {
         { type = "padding", val = 1 },
         { type = "group", val = {
             tmp.file_button("$DotVimDir/.init.vim", "c"),
-            tmp.file_button("$NVimConfigPath/init.vim", "d"),
+            tmp.file_button("$NVimConfigDir/init.vim", "d"),
             tmp.file_button("$DotVimCache/todo.md", "o"),
         }},
     },
@@ -766,7 +766,7 @@ else
 
 let g:startify_bookmarks = [
     \ {'c': '$DotVimDir/.init.vim'},
-    \ {'d': '$NVimConfigPath/init.vim'},
+    \ {'d': '$NVimConfigDir/init.vim'},
     \ {'o': '$DotVimCache/todo.md'} ]
 let g:startify_lists = [
     \ {'type': 'bookmarks', 'header': ['   Bookmarks']},
