@@ -926,6 +926,7 @@ nmap <leader>gf <Plug>(coc-fix-current)
 nmap <leader>gn <Plug>(coc-rename)
 nmap <leader>gj <Plug>(coc-float-jump)
 nmap <leader>gc <Plug>(coc-float-hide)
+nmap <leader>ga <Plug>(coc-codeaction-cursor)
 nnoremap <leader>gh <Cmd>call CocActionAsync('doHover')<CR>
 nnoremap <leader>gs <Cmd>CocCommand clangd.switchSourceHeader<CR>
 nnoremap <leader>gm <Cmd>CocCommand clangd.symbolInfo<CR>
@@ -956,6 +957,7 @@ nnoremap <leader>ow <Cmd>CocList --normal folders<CR>
 nnoremap <leader>oc <Cmd>CocList commands<CR>
 " coc-extensions
 nnoremap <leader>oy <Cmd>CocList --normal yank<CR>
+nnoremap <leader>op <Cmd>CocCommand cSpell.toggleEnableSpellChecker<CR>
 nmap <leader>oe <Plug>(coc-calc-result-append)
 highlight default link CocMenuSel CursorLineNr
 endif

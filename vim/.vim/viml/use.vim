@@ -23,6 +23,7 @@ let s:use = {
         \ 'coc-vimtex'        : v:false,
         \ 'coc-cmake'         : v:false,
         \ 'coc-calc'          : v:false,
+        \ 'coc-spell-checker' : v:false,
         \ },
     \ 'nlsp'      : v:false,
     \ 'treesitter': v:false,
