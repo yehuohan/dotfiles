@@ -884,21 +884,15 @@ let g:coc_status_warning_sign = '!'
 let g:coc_filetype_map = {}
 let g:coc_snippet_next = '<C-j>'
 let g:coc_snippet_prev = '<C-k>'
-"inoremap <silent><expr> <Tab>
-"    \ pumvisible() ? coc#_select_confirm() :
-"    \ coc#expandable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-"    \ Plug_coc_check_bs() ? "\<Tab>" :
-"    \ coc#refresh()
-"function! Plug_coc_check_bs() abort
-"    let col = col('.') - 1
-"    return !col || getline('.')[col - 1]  =~# '\s'
-"endfunction
-inoremap <expr> <C-j> pumvisible() ? "\<C-n>" : "\<C-j>"
-inoremap <expr> <C-k> pumvisible() ? "\<C-p>" : "\<C-k>"
+inoremap <silent><expr> <CR>
+    \ coc#pum#visible() ? coc#pum#confirm() :
+    \ "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+inoremap <silent><expr> <C-j> coc#pum#visible() ? coc#pum#next(1) : "\<C-j>"
+inoremap <silent><expr> <C-k> coc#pum#visible() ? coc#pum#prev(1) : "\<C-k>"
 imap <M-j> <C-j>
 imap <M-k> <C-k>
 inoremap <silent><expr> <C-i>
-    \ pumvisible() ? "\<C-g>u" : coc#refresh()
+    \ coc#pum#visible() ? coc#pum#cancel() : coc#refresh()
 imap <M-i> <C-i>
 inoremap <C-o> <Cmd>call CocActionAsync('showSignatureHelp')<CR>
 imap <M-o> <C-o>
