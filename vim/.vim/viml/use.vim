@@ -87,6 +87,8 @@ function! s:useInit()
         \ 'Consolas',
         \ 'Consolas Nerd Font Mono',
         \ 'agave Nerd Font Mono',
+        \ 'FantasqueSansMono Nerd Font Mono',
+        \ 'JetBrainsMono Nerd Font Mono',
         \ 'UbuntuMono Nerd Font Mono',
         \ 'Microsoft YaHei UI',
         \ 'Microsoft YaHei Mono',
