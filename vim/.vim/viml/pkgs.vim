@@ -162,9 +162,6 @@ if s:use.treesitter && IsNVim()
     Plug 'nvim-treesitter/nvim-treesitter'
 endif
     " utils
-if IsVim()
-    Plug 'yianwillis/vimcdoc', {'for': 'help'}
-endif
     Plug 'gabrielelana/vim-markdown', {'for': 'markdown'}
     Plug 'iamcco/markdown-preview.nvim', {'for': 'markdown', 'do': { -> mkdp#util#install()}}
     Plug 'joker1007/vim-markdown-quote-syntax', {'for': 'markdown'}
