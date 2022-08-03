@@ -1,2 +1,6 @@
 
-- 对于`APPS_PATH`等环境变量，需要修改类型为`可扩展字符串`。
+## reg
+
+> For windows registry
+
+- `APPS_PATH`环境变量，需要修改类型为`可扩展字符串`。
