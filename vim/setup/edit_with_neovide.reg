@@ -1,0 +1,9 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\*\Shell\Neovide]
+@="Edit with &Neovide"
+"Icon"="\"C:\\apps\\Neovim\\bin\\neovide.exe\""
+
+[HKEY_CLASSES_ROOT\*\Shell\Neovide\command]
+@="\"C:\\apps\\Neovim\\bin\\neovide.exe\" \"--geometry=90x25\" \"--neovim-bin=C:\\apps\\Neovim\\bin\\nvim.exe\" \"%1\""
+

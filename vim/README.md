@@ -38,18 +38,39 @@ setup_link_msys64.bat
 </div>
 
 
+## Remote
+
+- Start server
+
+```sh
+# Run in remote machine
+nvim --headless --listen localhost:6666
+# Or run in local machine via ssh
+ssh -L 6666:localhost:6666 <ip of remote machine> <path of nvim in remote machine> --headless --listen localhost:6666
+```
+
+- Connect to server
+
+```sh
+# Run in local machine
+neovide --remote-tcp=localhost:6666
+```
+
+
 ---
 
 ## Links
 
-- [vim/vim](https://github.com/vim/vim)
+- [vim](https://github.com/vim/vim)
   - [GvimFullscreen](./gvimfullscreen)
-- [neovim/neovim](https://github.com/neovim/neovim)
+- [neovim](https://github.com/neovim/neovim)
   - `pacman -S xclip or xsel`
   - [nvim.appimage](https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage)
   - [nvim-win64.zip](https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.zip)
   - [neovim-qt-mingw-x64.zip](https://github.com/yehuohan/neovim-qt/releases/download/lastest/neovim-qt-mingw-x64.zip)
   - [neovim-qt-msvc-x64.zip](https://github.com/yehuohan/neovim-qt/releases/download/lastest/neovim-qt-msvc-x64.zip)
+- [neovide](https://github.com/neovide/neovide)
+  - [neovide-windows](https://github.com/neovide/neovide/releases/latest/download/neovide-windows.zip)
 - [Python](https://www.python.org/)
   - `pip install pynvim`
 - [NodeJs](https://nodejs.org)

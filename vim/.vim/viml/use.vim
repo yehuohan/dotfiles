@@ -85,7 +85,9 @@ function! s:useInit()
     " Set ui selections
     let l:fontlst = [
         \ 'Consolas',
+        \ 'Consolas,CaskaydiaCove Nerd Font Mono',
         \ 'Consolas Nerd Font Mono',
+        \ 'CaskaydiaCove Nerd Font Mono',
         \ 'agave Nerd Font Mono',
         \ 'FantasqueSansMono Nerd Font Mono',
         \ 'JetBrainsMono Nerd Font Mono',

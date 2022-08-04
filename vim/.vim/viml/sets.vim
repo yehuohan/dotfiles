@@ -222,11 +222,12 @@ augroup UserSetsGui
 augroup END
 
 function! s:onUIEnter()
+    set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
+        \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
+        \,sm:block-blinkwait175-blinkoff150-blinkon175
+
     " Gui-neovim, 在UIEnter之后才起作用
     if exists('g:GuiLoaded')
-        set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
-            \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
-            \,sm:block-blinkwait175-blinkoff150-blinkon175
         GuiLinespace 0
         GuiTabline 0
         GuiPopupmenu 0
@@ -239,10 +240,11 @@ function! s:onUIEnter()
 
     " Gui-neovide
     if exists('g:neovide')
-        set guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20
+        let g:neovide_remember_window_size = v:true
         let g:neovide_cursor_antialiasing = v:false
         let g:neovide_cursor_vfx_mode = "railgun"
-        call GuiSetFonts(4)
+        call GuiSetFonts(0)
+        nnoremap <leader>tf <Cmd>let g:neovide_fullscreen=!g:neovide_fullscreen<CR>
     endif
 endfunction
 endif
