@@ -950,7 +950,6 @@ nnoremap <leader>oc <Cmd>CocList commands<CR>
 nnoremap <leader>oy <Cmd>CocList --normal yank<CR>
 nnoremap <leader>op <Cmd>CocCommand cSpell.toggleEnableSpellChecker<CR>
 nmap <leader>oe <Plug>(coc-calc-result-append)
-highlight default link CocMenuSel CursorLineNr
 endif
 " }}}
 
