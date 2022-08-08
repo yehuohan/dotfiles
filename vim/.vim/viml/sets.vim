@@ -439,11 +439,11 @@ nnoremap <leader>wL <C-w>L
 nnoremap <leader>wT <C-w>T
 " 改变窗口大小
 nnoremap <leader>w= <C-w>=
-nnoremap <M-e> :call WinMoveSpliter('e', 5)<CR>
-nnoremap <M-s> :call WinMoveSpliter('s', 5)<CR>
+nnoremap <silent> <M-e> :call WinMoveSpliter('e', 5)<CR>
+nnoremap <silent> <M-s> :call WinMoveSpliter('s', 5)<CR>
 if !s:use.coc
-nnoremap <M-d> :call WinMoveSpliter('d', 5)<CR>
-nnoremap <M-f> :call WinMoveSpliter('f', 5)<CR>
+nnoremap <silent> <M-d> :call WinMoveSpliter('d', 5)<CR>
+nnoremap <silent> <M-f> :call WinMoveSpliter('f', 5)<CR>
 endif
 nnoremap <M-Up> :call WinMoveSpliter('e', 1)<CR>
 nnoremap <M-Down> :call WinMoveSpliter('d', 1)<CR>

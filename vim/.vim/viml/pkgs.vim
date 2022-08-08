@@ -145,7 +145,6 @@ else
     Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
 endif
     Plug 'skywind3000/asyncrun.vim'
-    Plug 'skywind3000/asyncrun.extra'
     Plug 'voldikss/vim-floaterm'
     Plug 'yehuohan/popc-floaterm'
     Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
