@@ -67,6 +67,7 @@
     /* coc-yank */
     "yank.highlight.enable": true,
     "yank.highlight.duration": 200,
+    "yank.priority": 1,
 
     /* coc-lua */
     "lua.enable": true,
