@@ -1094,7 +1094,7 @@ tnoremap <M-h> <C-\><C-n>:FloatermHide<CR>
 tnoremap <M-n> <C-\><C-n>:FloatermUpdate --height=0.6 --width=0.6<CR>
 tnoremap <M-m> <C-\><C-n>:FloatermUpdate --height=0.9 --width=0.9<CR>
 tnoremap <M-l> <C-\><C-n>:FloatermUpdate --position=topright<CR>
-tnoremap <M-c> <C-\><C-n>:FloatermUpdate --position=center<CR>
+tnoremap <M-k> <C-\><C-n>:FloatermUpdate --position=center<CR>
 nnoremap <leader>mf :FloatermNew lf<CR>
 highlight default link FloatermBorder Constant
 " }}}
