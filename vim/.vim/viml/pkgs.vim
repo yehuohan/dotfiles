@@ -73,7 +73,6 @@ endif
     Plug 'kshenoy/vim-signature'
     Plug 'Konfekt/FastFold'
     Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
-    Plug 'gelguy/wilder.nvim'
     " component
     Plug 'morhetz/gruvbox'
     Plug 'rakr/vim-one'
@@ -353,31 +352,6 @@ nmap <leader>zu <Plug>(FastFoldUpdate)
 
 " undotree {{{ 撤消历史
 nnoremap <leader>tu :UndotreeToggle<CR>
-" }}}
-
-" wilder {{{ 命令行增强
-call wilder#setup({
-    \ 'modes': [':'],
-    \ 'enable_cmdline_enter': 0,
-    \ })
-call wilder#set_option({
-    \ 'renderer': wilder#popupmenu_renderer(wilder#popupmenu_border_theme({
-        \ 'highlighter': wilder#basic_highlighter(),
-        \ 'highlights': { 'default': 'Normal', 'accent': 'Constant' },
-        \ 'left': [' ', wilder#popupmenu_devicons()],
-        \ 'right': [' ', wilder#popupmenu_scrollbar()],
-        \ 'max_height': '95%',
-        \ 'border': 'single',
-        \ })),
-    \ 'pipeline': [wilder#branch(
-        \ wilder#cmdline_pipeline({
-            \ 'language': 'vim',
-            \ 'fuzzy': 1,
-            \ 'fuzzy_filter': wilder#vim_fuzzy_filter(),
-            \ }),
-        \ )]
-    \ })
-nnoremap <leader>t; :call wilder#toggle()<CR>
 " }}}
 " }}}
 
