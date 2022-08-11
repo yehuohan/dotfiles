@@ -765,6 +765,7 @@ nnoremap <leader>so <Cmd>ScreenSaver clock<CR>
 let g:fzf_command_prefix = 'Fzf'
 let g:fzf_layout = { 'down': '40%' }
 let g:fzf_preview_window = ['right:40%,border-sharp']
+let $FZF_DEFAULT_OPTS='--bind alt-j:down,alt-k:up'
 nnoremap <leader><leader>f :Fzf
 augroup PkgsFzf
     autocmd!
@@ -822,8 +823,8 @@ require('telescope').setup{
         },
         mappings = {
             i = {
-                ['<C-j>'] = 'move_selection_next',
-                ['<C-k>'] = 'move_selection_previous',
+                ['<M-j>'] = 'move_selection_next',
+                ['<M-k>'] = 'move_selection_previous',
             },
         }
     }
@@ -852,20 +853,18 @@ let g:coc_global_extensions = keys(filter(copy(s:use.coc_exts), 'v:val'))
 let g:coc_status_error_sign = '✘'
 let g:coc_status_warning_sign = '!'
 let g:coc_filetype_map = {}
-let g:coc_snippet_next = '<C-j>'
-let g:coc_snippet_prev = '<C-k>'
+let g:coc_snippet_next = '<M-l>'
+let g:coc_snippet_prev = '<M-h>'
 inoremap <silent><expr> <CR>
     \ coc#pum#visible() ? coc#pum#confirm() :
     \ "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-inoremap <silent><expr> <C-j> coc#pum#visible() ? coc#pum#next(1) : "\<C-j>"
-inoremap <silent><expr> <C-k> coc#pum#visible() ? coc#pum#prev(1) : "\<C-k>"
-imap <M-j> <C-j>
-imap <M-k> <C-k>
-inoremap <silent><expr> <C-i>
+inoremap <silent><expr> <M-j> coc#pum#visible() ? coc#pum#next(1) : "\<M-j>"
+inoremap <silent><expr> <M-k> coc#pum#visible() ? coc#pum#prev(1) : "\<M-k>"
+imap <C-j> <M-j>
+imap <C-k> <M-k>
+inoremap <silent><expr> <M-i>
     \ coc#pum#visible() ? coc#pum#cancel() : coc#refresh()
-imap <M-i> <C-i>
-inoremap <C-o> <Cmd>call CocActionAsync('showSignatureHelp')<CR>
-imap <M-o> <C-o>
+inoremap <M-o> <Cmd>call CocActionAsync('showSignatureHelp')<CR>
 nnoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? coc#float#scroll(1) : ":call WinMoveSpliter('f', 5)\<CR>"
 nnoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? coc#float#scroll(0) : ":call WinMoveSpliter('d', 5)\<CR>"
 inoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(1)\<CR>" : "\<M-f>"
@@ -931,10 +930,9 @@ if s:use.snip
 let g:UltiSnipsEditSplit = 'vertical'
 let g:UltiSnipsSnippetDirectories = [$DotVimDir . '/snips', 'UltiSnips']
 let g:UltiSnipsExpandTrigger = '<Tab>'
-let g:UltiSnipsJumpForwardTrigger = '<C-j>'
-let g:UltiSnipsJumpBackwardTrigger = '<C-k>'
-let g:UltiSnipsListSnippets = '<C-u>'
-imap <M-u> <C-u>
+let g:UltiSnipsJumpForwardTrigger = '<M-l>'
+let g:UltiSnipsJumpBackwardTrigger = '<M-h>'
+let g:UltiSnipsListSnippets = '<M-u>'
 endif
 " }}}
 
@@ -1093,8 +1091,8 @@ tnoremap <M-q> <C-\><C-n>:FloatermKill<CR>
 tnoremap <M-h> <C-\><C-n>:FloatermHide<CR>
 tnoremap <M-n> <C-\><C-n>:FloatermUpdate --height=0.6 --width=0.6<CR>
 tnoremap <M-m> <C-\><C-n>:FloatermUpdate --height=0.9 --width=0.9<CR>
-tnoremap <M-l> <C-\><C-n>:FloatermUpdate --position=topright<CR>
-tnoremap <M-k> <C-\><C-n>:FloatermUpdate --position=center<CR>
+tnoremap <M-r> <C-\><C-n>:FloatermUpdate --position=topright<CR>
+tnoremap <M-c> <C-\><C-n>:FloatermUpdate --position=center<CR>
 nnoremap <leader>mf :FloatermNew lf<CR>
 highlight default link FloatermBorder Constant
 " }}}
