@@ -1,6 +1,7 @@
 {
     /* coc */
     "suggest.autoTrigger": "always",
+    "suggest.virtualText": true,
     "suggest.completionItemKindLabels": {
         "keyword"       : "\uf1de",
         "variable"      : "\ue79b",
