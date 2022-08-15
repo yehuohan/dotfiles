@@ -77,9 +77,7 @@ endif
     Plug 'morhetz/gruvbox'
     Plug 'rakr/vim-one'
     Plug 'tanvirtin/monokai.nvim'
-if s:use.lightline
     Plug 'yehuohan/lightline.vim'
-endif
 if s:use.ui.patch
 if IsNVim()
     Plug 'kyazdani42/nvim-web-devicons'
@@ -107,7 +105,7 @@ endif
     Plug 'itchyny/screensaver.vim'
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
-if s:use.leaderf
+if s:use.has_py
     Plug 'Yggdroot/LeaderF', {'do': IsWin() ? './install.bat' : './install.sh'}
 endif
 if IsNVim()
@@ -122,9 +120,9 @@ endif
 if s:use.nlsp
     Plug 'neovim/nvim-lspconfig'
     Plug 'kabouzeid/nvim-lspinstall'
-    Plug 'hrsh7th/nvim-compe'
+    Plug 'hrsh7th/nvim-cmp'
 endif
-if s:use.snip
+if s:use.has_py
     Plug 'SirVer/ultisnips'
     Plug 'honza/vim-snippets'
 endif
@@ -367,7 +365,6 @@ catch /^Vim\%((\a\+)\)\=:E185/          " E185: 找不到主题
     silent! colorscheme default
 endtry
 
-if s:use.lightline
 let g:lightline = {
     \ 'enable' : {'statusline': 1, 'tabline': 0},
     \ 'colorscheme' : 'gruvbox',
@@ -447,7 +444,7 @@ function! Plug_ll_colorScheme()
 endfunction
 
 function! Plug_ll_checkRefresh()
-    if get(b:, 'lightline_changedtick', 0) == b:changedtick
+    if !exists('g:loaded_lightline') || get(b:, 'lightline_changedtick', 0) == b:changedtick
         return
     endif
     unlet! b:lightline_changedtick
@@ -494,7 +491,6 @@ function! Plug_ll_checkTrailing()
     return (l:ret == 0) ? '' : 'T:'.string(l:ret)
 endfunction
 " }}}
-endif
 " }}}
 
 " notify {{{ 消息提示
@@ -774,7 +770,7 @@ augroup END
 " }}}
 
 " LeaderF {{{ 模糊查找
-if s:use.leaderf
+if s:use.has_py
 "call s:plug.reg('onVimEnter', 'exec', 'autocmd! LeaderF_Mru')
 let g:Lf_CacheDirectory = $DotVimCache
 let g:Lf_PreviewInPopup = 1
@@ -926,7 +922,7 @@ endif
 " }}}
 
 " ultisnips {{{ 代码片段
-if s:use.snip
+if s:use.has_py
 let g:UltiSnipsEditSplit = 'vertical'
 let g:UltiSnipsSnippetDirectories = [$DotVimDir . '/snips', 'UltiSnips']
 let g:UltiSnipsExpandTrigger = '<Tab>'
@@ -1251,7 +1247,7 @@ vnoremap <leader>ev :Crunch<CR>
 " }}}
 
 " translator {{{ 翻译
-let g:translator_default_engines = ['haici', 'youdao']
+let g:translator_default_engines = ['haici', 'bing', 'youdao']
 nmap <Leader>tw <Plug>TranslateW
 vmap <Leader>tw <Plug>TranslateWV
 nnoremap <leader><leader>t :TranslateW<Space>

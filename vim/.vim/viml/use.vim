@@ -6,7 +6,6 @@ endfunction
 let s:use_file = $DotVimCache . '/.use.json'
 let s:use = {
     \ 'fastgit'   : v:false,
-    \ 'lightline' : v:false,
     \ 'coc'       : v:false,
     \ 'coc_exts'  : {
         \ 'coc-snippets'      : v:false,
@@ -27,9 +26,8 @@ let s:use = {
         \ },
     \ 'nlsp'      : v:false,
     \ 'treesitter': v:false,
-    \ 'snip'      : v:false,
     \ 'spector'   : v:false,
-    \ 'leaderf'   : v:false,
+    \ 'has_py'    : v:false,
     \ 'ui'        : {
         \ 'patch'    : v:false,
         \ 'font'     : 'Consolas',
