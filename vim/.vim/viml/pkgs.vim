@@ -853,7 +853,7 @@ let g:coc_snippet_next = '<M-l>'
 let g:coc_snippet_prev = '<M-h>'
 inoremap <silent><expr> <CR>
     \ coc#pum#visible() ? coc#pum#confirm() :
-    \ "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+    \ "\<C-g>u\<CR>\<C-r>=coc#on_enter()\<CR>"
 inoremap <silent><expr> <M-j> coc#pum#visible() ? coc#pum#next(1) : "\<M-j>"
 inoremap <silent><expr> <M-k> coc#pum#visible() ? coc#pum#prev(1) : "\<M-k>"
 imap <C-j> <M-j>
@@ -863,16 +863,16 @@ inoremap <silent><expr> <M-i>
 inoremap <M-o> <Cmd>call CocActionAsync('showSignatureHelp')<CR>
 nnoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? coc#float#scroll(1) : ":call WinMoveSpliter('f', 5)\<CR>"
 nnoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? coc#float#scroll(0) : ":call WinMoveSpliter('d', 5)\<CR>"
-inoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(1)\<CR>" : "\<M-f>"
-inoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(0)\<CR>" : "\<M-d>"
-vnoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<M-f>"
-vnoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? coc#float#scroll(0) : "\<M-d>"
+inoremap <M-f> <Cmd>call coc#float#scroll(1)<CR>
+inoremap <M-d> <Cmd>call coc#float#scroll(0)<CR>
+vnoremap <M-f> <Cmd>call coc#float#scroll(1)<CR>
+vnoremap <M-d> <Cmd>call coc#float#scroll(0)<CR>
 nmap     <silent><nowait><expr> <M-n> coc#float#has_scroll() ? coc#float#scroll(1) : "<Plug>(SmoothieDownwards)"
 nmap     <silent><nowait><expr> <M-m> coc#float#has_scroll() ? coc#float#scroll(0) : "<Plug>(SmoothieUpwards)"
-inoremap <silent><nowait><expr> <M-n> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(1)\<CR>" : "\<M-n>"
-inoremap <silent><nowait><expr> <M-m> coc#float#has_scroll() ? "\<C-r>=coc#float#scroll(0)\<CR>" : "\<M-m>"
-vnoremap <silent><nowait><expr> <M-n> coc#float#has_scroll() ? coc#float#scroll(1) : "\<M-n>"
-vnoremap <silent><nowait><expr> <M-m> coc#float#has_scroll() ? coc#float#scroll(0) : "\<M-m>"
+inoremap <M-n> <Cmd>call coc#float#scroll(1)<CR>
+inoremap <M-m> <Cmd>call coc#float#scroll(0)<CR>
+vnoremap <M-n> <Cmd>call coc#float#scroll(1)<CR>
+vnoremap <M-m> <Cmd>call coc#float#scroll(0)<CR>
 nmap         gd <Plug>(coc-definition)
 nmap         gD <Plug>(coc-declaration)
 nmap <leader>gd <Plug>(coc-definition)
