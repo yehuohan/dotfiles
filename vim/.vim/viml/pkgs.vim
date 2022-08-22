@@ -16,20 +16,16 @@ let s:plug = {
     \ 'onVimEnter' : {'exec': []},
     \ 'onDelay'    : {'delay': 700, 'load': [], 'exec': []},
     \ }
-" Function: s:plug.reg(event, type, name) dict {{{
+
 function! s:plug.reg(event, type, name) dict
     call add(self[a:event][a:type], a:name)
 endfunction
-" }}}
 
-" Function: s:plug.run(timer) dict {{{
 function! s:plug.run(timer) dict
     call plug#load(self.onDelay.load)
     call execute(self.onDelay.exec)
 endfunction
-" }}}
 
-" Function: s:plug.init() dict {{{
 function! s:plug.init() dict
     if !empty(self.onVimEnter.exec)
         augroup PkgsPlug
@@ -41,7 +37,6 @@ function! s:plug.init() dict
         call timer_start(self.onDelay.delay, funcref('s:plug.run', [], s:plug))
     endif
 endfunction
-" }}}
 " }}}
 
 " Plug {{{
@@ -74,60 +69,63 @@ endif
     Plug 'Konfekt/FastFold'
     Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
     " component
+if IsNVim()
+if s:use.ui.patch
+    Plug 'kyazdani42/nvim-web-devicons'
+endif
+    Plug 'goolord/alpha-nvim'
+    Plug 'rcarriga/nvim-notify'
+    Plug 'stevearc/dressing.nvim'
+    Plug 'ziontee113/icon-picker.nvim'
+    Plug 'kyazdani42/nvim-tree.lua'
+    Plug 'nvim-lua/plenary.nvim'
+    Plug 'nvim-telescope/telescope.nvim'
+else
+    Plug 'mhinz/vim-startify'
+endif
+if s:use.ui.patch
+    Plug 'ryanoasis/vim-devicons'
+endif
     Plug 'morhetz/gruvbox'
     Plug 'rakr/vim-one'
     Plug 'tanvirtin/monokai.nvim'
     Plug 'yehuohan/lightline.vim'
-if s:use.ui.patch
-if IsNVim()
-    Plug 'kyazdani42/nvim-web-devicons'
-endif
-    Plug 'ryanoasis/vim-devicons'
-endif
-if IsNVim()
-    Plug 'rcarriga/nvim-notify'
-    Plug 'stevearc/dressing.nvim'
-    Plug 'ziontee113/icon-picker.nvim'
-endif
     Plug 'luochen1990/rainbow'
     Plug 'Yggdroot/indentLine'
     Plug 'yehuohan/popc'
     Plug 'yehuohan/popset'
     Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTree']}
-if IsNVim()
-    Plug 'kyazdani42/nvim-tree.lua'
-endif
-if IsNVim()
-    Plug 'goolord/alpha-nvim'
-else
-    Plug 'mhinz/vim-startify'
-endif
     Plug 'itchyny/screensaver.vim'
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
 if s:use.has_py
     Plug 'Yggdroot/LeaderF', {'do': IsWin() ? './install.bat' : './install.sh'}
 endif
-if IsNVim()
-    Plug 'nvim-lua/plenary.nvim'
-    Plug 'nvim-telescope/telescope.nvim'
-endif
     " coding
-if s:use.coc
-    Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
-    Plug 'neoclide/jsonc.vim'
-endif
+if IsNVim()
+    Plug 'folke/trouble.nvim'
+    Plug 'norcalli/nvim-colorizer.lua', {'on': 'ColorizerToggle'}
 if s:use.nlsp
     Plug 'neovim/nvim-lspconfig'
     Plug 'kabouzeid/nvim-lspinstall'
     Plug 'hrsh7th/nvim-cmp'
 endif
+if s:use.treesitter
+    Plug 'nvim-treesitter/nvim-treesitter'
+endif
+else
+    Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
+endif
+if s:use.coc
+    Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
+    Plug 'neoclide/jsonc.vim'
+endif
 if s:use.has_py
     Plug 'SirVer/ultisnips'
     Plug 'honza/vim-snippets'
 endif
-if IsNVim()
-    Plug 'folke/trouble.nvim'
+if s:use.spector
+    Plug 'puremourning/vimspector'
 endif
     Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
     Plug 'jiangmiao/auto-pairs'
@@ -136,27 +134,16 @@ endif
     Plug 'scrooloose/nerdcommenter'
     Plug 't9md/vim-quickhl'
     Plug 'RRethy/vim-illuminate'
-if IsNVim()
-    Plug 'norcalli/nvim-colorizer.lua', {'on': 'ColorizerToggle'}
-else
-    Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
-endif
     Plug 'skywind3000/asyncrun.vim'
     Plug 'voldikss/vim-floaterm'
     Plug 'yehuohan/popc-floaterm'
     Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
-if s:use.spector
-    Plug 'puremourning/vimspector'
-endif
     Plug 'euclidianAce/BetterLua.vim', {'for': 'lua'}
     Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
     Plug 'rust-lang/rust.vim'
     Plug 'tikhomirov/vim-glsl'
     Plug 'beyondmarc/hlsl.vim', {'for': 'hlsl'}
     Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
-if s:use.treesitter && IsNVim()
-    Plug 'nvim-treesitter/nvim-treesitter'
-endif
     " utils
     Plug 'gabrielelana/vim-markdown', {'for': 'markdown'}
     Plug 'iamcco/markdown-preview.nvim', {'for': 'markdown', 'do': { -> mkdp#util#install()}}
@@ -173,34 +160,7 @@ call plug#end()
 " }}}
 
 " Editor {{{
-" hop, easy-motion {{{ 快速跳转
-if IsNVim()
-silent! lua << EOF
-require('hop').setup{
-    match_mappings = { 'zh', 'zh_sc' },
-    create_hl_autocmd = true
-}
-EOF
-noremap s <Cmd>HopChar1MW<CR>
-noremap <leader>ms <Cmd>HopChar2MW<CR>
-noremap <leader><leader>s <Cmd>HopPatternMW<CR>
-noremap <leader>j <Cmd>HopLineCursorMW<CR>
-noremap <leader><leader>j <Cmd>HopLineMW<CR>
-noremap <leader>mj <Cmd>HopLineStartMW<CR>
-noremap <leader>mw <Cmd>HopWord<CR>
-
-else
-
-let g:EasyMotion_dict = 'zh-cn'         " 支持简体中文拼音
-let g:EasyMotion_do_mapping = 0         " 禁止默认map
-let g:EasyMotion_smartcase = 1          " 不区分大小写
-nmap s <Plug>(easymotion-overwin-f)
-nmap <leader>ms <Plug>(easymotion-overwin-f2)
-nmap <leader><leader>s <Plug>(easymotion-sn)
-nmap <leader>j <Plug>(easymotion-bd-jk)
-nmap <leader><leader>j <Plug>(easymotion-overwin-line)
-nmap <leader>mw <Plug>(easymotion-bd-w)
-endif
+" incsearch {{{ 模糊查找
 nnoremap <silent><expr>  z/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/'}))
 nnoremap <silent><expr> zg/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/', 'is_stay': 1}))
 " }}}
@@ -493,37 +453,6 @@ endfunction
 " }}}
 " }}}
 
-" notify {{{ 消息提示
-if IsNVim()
-silent! lua << EOF
---require('notify').setup{ }
---vim.notify = require('notify')
-EOF
-endif
-" }}}
-
-" dressing {{{ 字体图标
-if IsNVim()
-silent! lua << EOF
-require('dressing').setup{
-    input = { enabled = true },
-    select = { enabled = true },
-}
-EOF
-endif
-" }}}
-
-" icon-picker {{{ 字体图标
-if IsNVim()
-silent! lua << EOF
-require('icon-picker').setup{ disable_legacy_commands = true }
-EOF
-nnoremap <leader>ip <Cmd>IconPickerNormal alt_font symbols nerd_font emoji<CR>
-nnoremap <leader>iP <Cmd>IconPickerYank alt_font symbols nerd_font emoji<CR>
-inoremap <M-p> <Cmd>IconPickerInsert alt_font symbols nerd_font emoji<CR>
-endif
-" }}}
-
 " rainbow {{{ 彩色括号
 let g:rainbow_active = 1
 let g:rainbow_conf = {
@@ -625,134 +554,6 @@ nnoremap <leader>tE
     \ <Cmd>execute ':NERDTree ' . expand('%:p:h')<CR>
 " }}}
 
-" nvim-tree {{{ 目录树导航
-if IsNVim()
-let g:nvim_tree_show_icons = {
-    \ 'git': 0,
-    \ 'folders': 1,
-    \ 'files': 1,
-    \ 'folder_arrows': 1,
-    \ }
-silent! lua << EOF
-local tcb = require('nvim-tree.config').nvim_tree_callback
-require('nvim-tree').setup{
-  view = {
-        mappings = {
-            custom_only = true,
-            list = {
-                { key = {'<CR>', 'o', '<2-LeftMouse>'},
-                                 cb = tcb('edit') },
-                { key = 'i'    , cb = tcb('vsplit') },
-                { key = 'gi'   , cb = tcb('split') },
-                { key = 't'    , cb = tcb('tabnew') },
-                { key = '<Tab>', cb = tcb('preview') },
-                { key = 'cd'   , cb = tcb('cd') },
-                { key = 'u'    , cb = tcb('dir_up') },
-                { key = 'K'    , cb = tcb('first_sibling') },
-                { key = 'J'    , cb = tcb('last_sibling') },
-                { key = '<C-p>', cb = tcb('prev_sibling') },
-                { key = '<C-n>', cb = tcb('next_sibling') },
-                { key = 'p'    , cb = tcb('parent_node') },
-                { key = '.'    , cb = tcb('toggle_dotfiles') },
-                { key = 'I'    , cb = tcb('toggle_ignored') },
-                { key = 'r'    , cb = tcb('refresh') },
-                { key = 'q'    , cb = tcb('close') },
-                { key = '?'    , cb = tcb('toggle_help') },
-                { key = 'O'    , cb = tcb('system_open') },
-                { key = 'A'    , cb = tcb('create') },
-                { key = 'D'    , cb = tcb('remove') },
-                { key = 'R'    , cb = tcb('rename') },
-                { key = '<C-r>', cb = tcb('full_rename') },
-                { key = 'X'    , cb = tcb('cut') },
-                { key = 'C'    , cb = tcb('copy') },
-                { key = 'P'    , cb = tcb('paste') },
-                { key = 'y'    , cb = tcb('copy_name') },
-                { key = 'Y'    , cb = tcb('copy_absolute_path') },
-            },
-        },
-    },
-}
-EOF
-nnoremap <leader>tt :NvimTreeToggle<CR>
-endif
-" }}}
-
-" alpha, startify {{{ 启动首页
-if IsNVim()
-silent! lua << EOF
-local tmp = require('alpha.themes.startify')
-tmp.section.header.val = function()
-    if vim.fn.filereadable(vim.env.DotVimCache .. '/todo.md') == 1 then
-        local todo = vim.fn.filter(vim.fn.readfile(vim.env.DotVimCache .. '/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
-        if vim.tbl_isempty(todo) then
-            return ''
-        end
-        return todo
-    else
-        return ''
-    end
-end
-tmp.section.bookmarks = {
-    type = "group",
-    val = {
-        { type = "padding", val = 1 },
-        { type = "text", val = "Bookmarks", opts = { hl = "SpecialComment" } },
-        { type = "padding", val = 1 },
-        { type = "group", val = {
-            tmp.file_button("$DotVimDir/.init.vim", "c"),
-            tmp.file_button("$NVimConfigDir/init.vim", "d"),
-            tmp.file_button("$DotVimCache/todo.md", "o"),
-        }},
-    },
-}
-tmp.section.mru = {
-    type = "group",
-    val = {
-        { type = "padding", val = 1 },
-        { type = "text", val = "Recent Files", opts = { hl = "SpecialComment" } },
-        { type = "padding", val = 1 },
-        { type = "group", val = function() return { tmp.mru(0, false, 8) } end },
-    },
-}
-tmp.config.layout = {
-    { type = "padding", val = 1 },
-    tmp.section.header,
-    { type = "padding", val = 2 },
-    tmp.section.top_buttons,
-    tmp.section.bookmarks,
-    tmp.section.mru,
-    { type = "padding", val = 1 },
-    tmp.section.bottom_buttons,
-}
-require('alpha').setup(tmp.config)
-EOF
-nnoremap <leader>su :Alpha<CR>
-
-else
-
-let g:startify_bookmarks = [
-    \ {'c': '$DotVimDir/.init.vim'},
-    \ {'d': '$NVimConfigDir/init.vim'},
-    \ {'o': '$DotVimCache/todo.md'} ]
-let g:startify_lists = [
-    \ {'type': 'bookmarks', 'header': ['   Bookmarks']},
-    \ {'type': 'files',     'header': ['   Recent Files']},
-    \ ]
-let g:startify_files_number = 8
-let g:startify_custom_header = 'startify#pad(startify#fortune#cowsay(Plug_stt_todo(), "─", "│", "┌", "┐", "┘", "└"))'
-nnoremap <leader>su :Startify<CR>
-
-function! Plug_stt_todo()
-    if filereadable($DotVimCache.'/todo.md')
-        let l:todo = filter(readfile($DotVimCache.'/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
-        return empty(l:todo) ? '' : l:todo
-    else
-        return ''
-    endif
-endfunction
-endif
-" }}}
-
 " screensaver {{{ 屏保
 nnoremap <leader>so <Cmd>ScreenSaver clock<CR>
 " }}}
@@ -804,31 +605,6 @@ nnoremap <leader>lM :LeaderfMruCwd<CR>
 nnoremap <leader>ls :LeaderfSelf<CR>
 nnoremap <leader>lh :LeaderfHistorySearch<CR>
 nnoremap <leader>le :LeaderfHistoryCmd<CR>
-endif
-" }}}
-
-" telescope {{{ 模糊查找
-if IsNVim()
-silent! lua << EOF
-require('telescope').setup{
-    defaults = {
-        borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
-        color_devicons = true,
-        history = {
-            path = vim.env.DotVimCache  .. '/telescope_history',
-        },
-        mappings = {
-            i = {
-                ['<M-j>'] = 'move_selection_next',
-                ['<M-k>'] = 'move_selection_previous',
-            },
-        }
-    }
-}
-EOF
-nnoremap <leader><leader>n :Telescope<Space>
-nnoremap <leader>nf :Telescope find_files<CR>
-nnoremap <leader>nl :Telescope live_grep<CR>
 endif
 " }}}
 " }}}
@@ -932,20 +708,29 @@ let g:UltiSnipsListSnippets = '<M-u>'
 endif
 " }}}
 
-" trouble {{{ 列表视图
-if IsNVim()
-silent! lua << EOF
-require('trouble').setup{
-    icons = true,
-    action_keys = {
-        jump_close = {'O'},
-        toggle_fold = {'zA', 'za', 'o'},
-    },
-    auto_preview = false,
-}
-EOF
-nnoremap <leader>vq :TroubleToggle quickfix<CR>
-nnoremap <leader>vl :TroubleToggle loclist<CR>
+" vimspector {{{ 调试
+if s:use.spector
+let g:vimspector_install_gadgets = ['debugpy', 'vscode-cpptools', 'CodeLLDB']
+nmap <F3>   <Plug>VimspectorStop
+nmap <F4>   <Plug>VimspectorRestart
+nmap <F5>   <Plug>VimspectorContinue
+nmap <F6>   <Plug>VimspectorPause
+nmap <F7>   <Plug>VimspectorToggleConditionalBreakpoint
+nmap <F8>   <Plug>VimspectorAddFunctionBreakpoint
+nmap <F9>   <Plug>VimspectorToggleBreakpoint
+nmap <F10>  <Plug>VimspectorStepOver
+nmap <F11>  <Plug>VimspectorStepInto
+nmap <F12>  <Plug>VimspectorStepOut
+nnoremap <leader>dr :VimspectorReset<CR>
+nnoremap <leader>de :VimspectorEval<Space>
+nnoremap <leader>dw :VimspectorWatch<Space>
+nnoremap <leader>dW :VimspectorShowOutput<Space>
+nnoremap <leader>di
+    \ <Cmd>call PopSelection({
+        \ 'opt' : 'select debug configuration',
+        \ 'lst' : keys(json_decode(join(readfile('.vimspector.json'))).configurations),
+        \ 'cmd' : {sopt, sel -> vimspector#LaunchWithSettings({'configuration': sel})}
+        \})<CR>
 endif
 " }}}
 
@@ -1046,16 +831,6 @@ nnoremap <leader>tg :IlluminationToggle<CR>
 highlight link illuminatedWord MatchParen
 " }}}
 
-" colorizer {{{ 颜色预览
-if IsNVim()
-nnoremap <leader>tc :ColorizerToggle<CR>
-else
-let g:colorizer_nomap = 1
-let g:colorizer_startup = 0
-nnoremap <leader>tc :ColorToggle<CR>
-endif
-" }}}
-
 " asyncrun {{{ 导步运行程序
 let g:asyncrun_open = 8                 " 自动打开quickfix window
 let g:asyncrun_save = 1                 " 自动保存当前文件
@@ -1093,70 +868,10 @@ nnoremap <leader>mf :FloatermNew lf<CR>
 highlight default link FloatermBorder Constant
 " }}}
 
-" vimspector {{{ 调试
-if s:use.spector
-let g:vimspector_install_gadgets = ['debugpy', 'vscode-cpptools', 'CodeLLDB']
-nmap <F3>   <Plug>VimspectorStop
-nmap <F4>   <Plug>VimspectorRestart
-nmap <F5>   <Plug>VimspectorContinue
-nmap <F6>   <Plug>VimspectorPause
-nmap <F7>   <Plug>VimspectorToggleConditionalBreakpoint
-nmap <F8>   <Plug>VimspectorAddFunctionBreakpoint
-nmap <F9>   <Plug>VimspectorToggleBreakpoint
-nmap <F10>  <Plug>VimspectorStepOver
-nmap <F11>  <Plug>VimspectorStepInto
-nmap <F12>  <Plug>VimspectorStepOut
-nnoremap <leader>dr :VimspectorReset<CR>
-nnoremap <leader>de :VimspectorEval<Space>
-nnoremap <leader>dw :VimspectorWatch<Space>
-nnoremap <leader>dW :VimspectorShowOutput<Space>
-nnoremap <leader>di
-    \ <Cmd>call PopSelection({
-        \ 'opt' : 'select debug configuration',
-        \ 'lst' : keys(json_decode(join(readfile('.vimspector.json'))).configurations),
-        \ 'cmd' : {sopt, sel -> vimspector#LaunchWithSettings({'configuration': sel})}
-        \})<CR>
-endif
-" }}}
-
 " julia {{{ Julia支持
 let g:default_julia_version = 'devel'
 let g:latex_to_unicode_tab = 1          " 使用<Tab>输入unicode字符
 nnoremap <leader>tn :call LaTeXtoUnicode#Toggle()<CR>
-" }}}
-
-" treesitter {{{ 语法树
-if s:use.treesitter && IsNVim()
-silent! lua << EOF
-require('nvim-treesitter.configs').setup{
-    parser_install_dir = vim.env.DotVimLocal,
-    --ensure_installed = { 'c', 'cpp', 'rust', 'vim', 'lua', 'python', 'markdown', 'markdown_inline', },
-    --auto_install = true,
-    highlight = {
-        enable = true,
-        disable = { 'markdown', 'markdown_inline' },
-        additional_vim_regex_highlighting = false,
-    },
-    indent = {
-        enable = true,
-        disable = { 'python' },
-    },
-    incremental_selection = {
-        enable = true,
-        keymaps = {
-            init_selection = '<M-g>',
-            node_incremental = '<M-g>',
-            node_decremental = '<M-t>',
-            scope_incremental = '<M-v>',
-        },
-    },
-}
-vim.opt.runtimepath:append(vim.env.DotVimLocal)
-EOF
-nnoremap <leader>sh :TSBufToggle highlight<CR>
-nnoremap <leader>si :TSBufToggle indent<CR>
-nnoremap <leader>ss :TSBufToggle incremental_selection<CR>
-endif
 " }}}
 " }}}
 
@@ -1264,5 +979,11 @@ endif
 let g:ImSelectSetImCmd = {key -> ['im-select', key]}
 " }}}
 " }}}
+
+if IsNVim()
+    source $DotVimVimL/pkgs.ext.nvim
+else
+    source $DotVimVimL/pkgs.ext.vim
+endif
 
 call s:plug.init()

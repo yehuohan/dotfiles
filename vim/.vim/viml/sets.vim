@@ -170,6 +170,7 @@ endfunction
 augroup UserSetsCmd
     autocmd!
     autocmd BufNewFile *                            set fileformat=unix
+    autocmd BufRead,BufNewFile *.nvim               set filetype=vim
     autocmd BufRead,BufNewFile *.tex                set filetype=tex
     autocmd BufRead,BufNewFile *.log                set filetype=log
     autocmd BufRead,BufNewFile *.usf,*.ush          set filetype=hlsl
