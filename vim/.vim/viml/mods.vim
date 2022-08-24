@@ -173,7 +173,7 @@ vnoremap <leader><leader>;
 " Struct s:ws {{{
 let s:ws = {'root': '', 'rp': {}, 'fw': {}}
 let s:wsd = {
-    \ 'rp': {'hl': 'WarningMsg', 'str': ['/\V\c|| "\=[RP]Warning: \.\*\$/hs=s+3']},
+    \ 'rp': {'hl': 'WarningMsg', 'str': ['/\V\c"\=[RP]Warning: \.\*\$/hs=s']},
     \ 'fw': {'hl': 'IncSearch', 'str': []},
     \ }
 " FUNCTION: s:wsd.display() dict {{{ 设置结果显示
