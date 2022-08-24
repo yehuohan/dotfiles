@@ -47,6 +47,7 @@ call plug#begin($DotVimDir.'/bundle')  " 设置插件位置，且自动设置了
     " editor
 if IsNVim()
     Plug 'yehuohan/hop.nvim'
+    "Plug 'chentoast/marks.nvim'
 else
     Plug 'yehuohan/vim-easymotion'
 endif
@@ -73,6 +74,7 @@ endif
     Plug 'rcarriga/nvim-notify'
     Plug 'stevearc/dressing.nvim'
     Plug 'ziontee113/icon-picker.nvim'
+    Plug 'lukas-reineke/virt-column.nvim'
     Plug 'kyazdani42/nvim-tree.lua'
     Plug 'nvim-lua/plenary.nvim'
     Plug 'nvim-telescope/telescope.nvim'

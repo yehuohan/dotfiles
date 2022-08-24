@@ -8,6 +8,7 @@ set relativenumber                      " 显示相对行号
 set signcolumn=number                   " 共用number的区域用于显示sign
 set cursorline                          " 高亮当前行
 set cursorcolumn                        " 高亮当前列
+set colorcolumn=80                      " 设置宽度参考线
 set hlsearch                            " 设置高亮显示查找到的文本
 set incsearch                           " 预览当前的搜索内容
 set termguicolors                       " 在终端中使用24位彩色

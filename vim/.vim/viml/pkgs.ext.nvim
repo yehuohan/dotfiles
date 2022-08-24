@@ -17,6 +17,26 @@ noremap <leader><leader>j <Cmd>HopLineMW<CR>
 noremap <leader>mj <Cmd>HopLineStartMW<CR>
 noremap <leader>mw <Cmd>HopWord<CR>
 " }}}
+
+" marks {{{ 书签管理
+"silent! lua << EOF
+"require('marks').setup{
+"    default_mappings = false,
+"    force_write_shada = true,
+"    mappings = {
+"        set = 'm',
+"        toggle = 'm.',
+"        delete = 'dm',
+"        delete_line = '<leader>ml',
+"        delete_buf = '<leader>mc',
+"        next = '<M-.>',
+"        prev = '<M-,>',
+"    }
+"}
+"EOF
+"nnoremap <leader>ts :MarksToggleSigns<CR>
+"nnoremap <leader>ma :MarksListBuf<CR>
+" }}}
 " }}}
 
 " Component {{{
@@ -94,6 +114,12 @@ EOF
 nnoremap <leader>ip <Cmd>IconPickerNormal alt_font symbols nerd_font emoji<CR>
 nnoremap <leader>iP <Cmd>IconPickerYank alt_font symbols nerd_font emoji<CR>
 inoremap <M-p> <Cmd>IconPickerInsert alt_font symbols nerd_font emoji<CR>
+" }}}
+
+" virt-column {{{ 刻度线
+silent! lua << EOF
+require('virt-column').setup{ char = '┊' }
+EOF
 " }}}
 
 " nvim-tree {{{ 目录树导航
