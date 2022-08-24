@@ -631,6 +631,11 @@ let s:fw = {
             \ 'ff' : ':Leaderf file --input "%s"',
             \ 'fl' : ':Leaderf rg --nowrap --input "%s"',
             \ 'fh' : ':Leaderf tag --nowrap --input "%s"',
+            \ },
+        \ 'telescope' : {
+            \ 'ff' : ':lua require("telescope.builtin").find_files({search_file="%s"})',
+            \ 'fl' : ':lua require("telescope.builtin").live_grep({placeholder="%s"})',
+            \ 'fh' : ':lua require("telescope.builtin").tags({placeholder="%s"})',
             \ }
         \ },
     \ }
@@ -842,7 +847,7 @@ function! s:popF(km, type)
             \ 'globlst': {'dsr': {sopt -> '-g' . join(split(l:cfg.globlst), ' -g')},
             \             'cpl': 'file'},
             \ 'exargs' : {'lst': ['--word-regexp', '--no-fixed-strings', '--hidden', '--no-ignore', '--encoding gbk']},
-            \ 'fuzzy'  : {'lst': ['fzf', 'leaderf'],
+            \ 'fuzzy'  : {'lst': keys(s:fw.fuzzy),
             \             'cmd': {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
             \             'get': {sopt -> s:fw.engine.fuzzy}},
             \ },
@@ -943,7 +948,7 @@ function! FindWFuzzy(keys)
         " parse pattern
         let l:pat = ''
         if mode() ==# 'n'
-            if km.E =~# '[hdg]'
+            if km.E =~# '[h]'
                 let l:pat = expand('<cword>')
             endif
         else
