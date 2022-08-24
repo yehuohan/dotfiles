@@ -9,6 +9,7 @@ require('hop').setup{
 }
 EOF
 noremap s <Cmd>HopChar1MW<CR>
+noremap f <Cmd>HopChar1CurrentLine<CR>
 noremap <leader>ms <Cmd>HopChar2MW<CR>
 noremap <leader><leader>s <Cmd>HopPatternMW<CR>
 noremap <leader>j <Cmd>HopLineCursorMW<CR>
@@ -166,6 +167,7 @@ EOF
 nnoremap <leader><leader>n :Telescope<Space>
 nnoremap <leader>nf :Telescope find_files<CR>
 nnoremap <leader>nl :Telescope live_grep<CR>
+nnoremap <leader>nm :Telescope oldfiles<CR>
 " }}}
 " }}}
 

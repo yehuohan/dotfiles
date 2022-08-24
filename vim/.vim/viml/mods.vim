@@ -166,10 +166,6 @@ vnoremap <leader><leader>;
 " }}}
 
 " Workspace {{{
-" Required: 'yehuohan/popc', 'yehuohan/popset'
-"           'skywind3000/asyncrun.vim', 'voldikss/floaterm'
-"           'Yggdroot/LeaderF', 'junegunn/fzf.vim'
-
 " Struct s:ws {{{
 let s:ws = {'root': '', 'rp': {}, 'fw': {}}
 let s:wsd = {

@@ -6,6 +6,7 @@ let g:EasyMotion_dict = 'zh-cn'         " 支持简体中文拼音
 let g:EasyMotion_do_mapping = 0         " 禁止默认map
 let g:EasyMotion_smartcase = 1          " 不区分大小写
 nmap s <Plug>(easymotion-overwin-f)
+nmap f <Plug>(easymotion-bd-fl)
 nmap <leader>ms <Plug>(easymotion-overwin-f2)
 nmap <leader><leader>s <Plug>(easymotion-sn)
 nmap <leader>j <Plug>(easymotion-bd-jk)

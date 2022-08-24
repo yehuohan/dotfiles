@@ -50,9 +50,6 @@ if IsNVim()
 else
     Plug 'yehuohan/vim-easymotion'
 endif
-    Plug 'haya14busa/incsearch.vim'
-    Plug 'haya14busa/incsearch-fuzzy.vim'
-    Plug 'rhysd/clever-f.vim'
     Plug 'mg979/vim-visual-multi'
     Plug 't9md/vim-textmanip'
     Plug 'markonm/traces.vim'
@@ -66,7 +63,6 @@ endif
     Plug 'lucapette/vim-textobj-underscore'
     Plug 'tpope/vim-repeat'
     Plug 'kshenoy/vim-signature'
-    Plug 'Konfekt/FastFold'
     Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
     " component
 if IsNVim()
@@ -134,7 +130,7 @@ endif
     Plug 'scrooloose/nerdcommenter'
     Plug 't9md/vim-quickhl'
     Plug 'RRethy/vim-illuminate'
-    Plug 'skywind3000/asyncrun.vim'
+    Plug 'yehuohan/asyncrun.vim'
     Plug 'voldikss/vim-floaterm'
     Plug 'yehuohan/popc-floaterm'
     Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
@@ -160,17 +156,6 @@ call plug#end()
 " }}}
 
 " Editor {{{
-" incsearch {{{ 模糊查找
-nnoremap <silent><expr>  z/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/'}))
-nnoremap <silent><expr> zg/ incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/', 'is_stay': 1}))
-" }}}
-
-" clever-f {{{ 行跳转
-let g:clever_f_across_no_line = 1
-let g:clever_f_show_prompt = 1
-let g:clever_f_smart_case = 1
-" }}}
-
 " vim-visual-multi {{{ 多光标编辑
 " Usage: https://github.com/mg979/vim-visual-multi/wiki
 " Tab: 切换cursor/extend模式
@@ -298,14 +283,6 @@ nnoremap <leader>mc :call signature#mark#Purge('all')<CR>
 nnoremap <leader>ml :call signature#mark#Purge('line')<CR>
 nnoremap <M-,>      :call signature#mark#Goto('prev', 'line', 'pos')<CR>
 nnoremap <M-.>      :call signature#mark#Goto('next', 'line', 'pos')<CR>
-" }}}
-
-" FastFold {{{ 更新折叠
-let g:fastfold_savehook = 0             " 只允许手动更新folds
-let g:fastfold_fold_command_suffixes = ['x','X','a','A','o','O','c','C']
-let g:fastfold_fold_movement_commands = ['z[', 'z]', 'zj', 'zk']
-                                        " 允许指定的命令更新folds
-nmap <leader>zu <Plug>(FastFoldUpdate)
 " }}}
 
 " undotree {{{ 撤消历史
@@ -592,19 +569,9 @@ let g:Lf_WildIgnore = {
 nnoremap <leader><leader>l :Leaderf
 nnoremap <leader>lf :LeaderfFile<CR>
 nnoremap <leader>lu :LeaderfFunction<CR>
-nnoremap <leader>lU :LeaderfFunctionAll<CR>
-nnoremap <leader>lt :LeaderfBufTag<CR>
-nnoremap <leader>lT :LeaderfBufTagAll<CR>
 nnoremap <leader>ll :LeaderfLine<CR>
-nnoremap <leader>lL :LeaderfLineAll<CR>
 nnoremap <leader>lb :LeaderfBuffer<CR>
-nnoremap <leader>lB :LeaderfBufferAll<CR>
-nnoremap <leader>lr :LeaderfRgInteractive<CR>
 nnoremap <leader>lm :LeaderfMru<CR>
-nnoremap <leader>lM :LeaderfMruCwd<CR>
-nnoremap <leader>ls :LeaderfSelf<CR>
-nnoremap <leader>lh :LeaderfHistorySearch<CR>
-nnoremap <leader>le :LeaderfHistoryCmd<CR>
 endif
 " }}}
 " }}}
