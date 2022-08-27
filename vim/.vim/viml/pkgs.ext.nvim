@@ -43,6 +43,7 @@ noremap <leader>mw <Cmd>HopWord<CR>
 " alpha {{{ 启动首页
 silent! lua << EOF
 local tmp = require('alpha.themes.startify')
+tmp.nvim_web_devicons.enabled = vim.fn.SvarUse().ui.patch
 tmp.section.header.val = function()
     if vim.fn.filereadable(vim.env.DotVimCache .. '/todo.md') == 1 then
         local todo = vim.fn.filter(vim.fn.readfile(vim.env.DotVimCache .. '/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
@@ -120,6 +121,18 @@ inoremap <M-p> <Cmd>IconPickerInsert alt_font symbols nerd_font emoji<CR>
 silent! lua << EOF
 require('virt-column').setup{ char = '┊' }
 EOF
+" }}}
+
+" scrollbar {{{ 滑动条
+let g:scrollbar_max_size = 6
+let g:scrollbar_min_size = 3
+let g:scrollbar_excluded_filetypes = ['alpha']
+augroup PkgsScrollbar
+    autocmd!
+    autocmd WinScrolled,VimResized,QuitPre * silent! lua require('scrollbar').show()
+    autocmd WinEnter,FocusGained           * silent! lua require('scrollbar').show()
+    autocmd WinLeave,BufLeave,BufWinLeave,FocusLost * silent! lua require('scrollbar').clear()
+augroup end
 " }}}
 
 " nvim-tree {{{ 目录树导航

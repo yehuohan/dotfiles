@@ -75,6 +75,7 @@ endif
     Plug 'stevearc/dressing.nvim'
     Plug 'ziontee113/icon-picker.nvim'
     Plug 'lukas-reineke/virt-column.nvim'
+    Plug 'Xuyuanp/scrollbar.nvim'
     Plug 'kyazdani42/nvim-tree.lua'
     Plug 'nvim-lua/plenary.nvim'
     Plug 'nvim-telescope/telescope.nvim'
