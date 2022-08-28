@@ -47,9 +47,10 @@ call plug#begin($DotVimDir.'/bundle')  " 设置插件位置，且自动设置了
     " editor
 if IsNVim()
     Plug 'yehuohan/hop.nvim'
-    "Plug 'chentoast/marks.nvim'
+    Plug 'yehuohan/marks.nvim'
 else
     Plug 'yehuohan/vim-easymotion'
+    Plug 'kshenoy/vim-signature'
 endif
     Plug 'mg979/vim-visual-multi'
     Plug 't9md/vim-textmanip'
@@ -63,7 +64,6 @@ endif
     Plug 'adriaanzon/vim-textobj-matchit'
     Plug 'lucapette/vim-textobj-underscore'
     Plug 'tpope/vim-repeat'
-    Plug 'kshenoy/vim-signature'
     Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
     " component
 if IsNVim()
@@ -266,26 +266,6 @@ function! Plug_to_motion(motion)
         \ 'cmd' : {sopt, sel -> execute('normal! ' . tolower(a:motion) . (a:motion =~# '\l' ? 'i' : 'a' ) . sel)}
         \ })
 endfunction
-" }}}
-
-" signature {{{ 书签管理
-let g:SignatureMap = {
-    \ 'Leader'            : "m",
-    \ 'PlaceNextMark'     : "m,",
-    \ 'ToggleMarkAtLine'  : "m.",
-    \ 'PurgeMarksAtLine'  : "m-",
-    \ 'DeleteMark'        : '', 'PurgeMarks'        : '', 'PurgeMarkers'      : '',
-    \ 'GotoNextLineAlpha' : '', 'GotoPrevLineAlpha' : '', 'GotoNextLineByPos' : '', 'GotoPrevLineByPos' : '',
-    \ 'GotoNextSpotAlpha' : '', 'GotoPrevSpotAlpha' : '', 'GotoNextSpotByPos' : '', 'GotoPrevSpotByPos' : '',
-    \ 'GotoNextMarker'    : '', 'GotoPrevMarker'    : '', 'GotoNextMarkerAny' : '', 'GotoPrevMarkerAny' : '',
-    \ 'ListBufferMarks'   : '', 'ListBufferMarkers' : '',
-    \ }
-nnoremap <leader>ts :SignatureToggleSigns<CR>
-nnoremap <leader>ma :SignatureListBufferMarks<CR>
-nnoremap <leader>mc :call signature#mark#Purge('all')<CR>
-nnoremap <leader>ml :call signature#mark#Purge('line')<CR>
-nnoremap <M-,>      :call signature#mark#Goto('prev', 'line', 'pos')<CR>
-nnoremap <M-.>      :call signature#mark#Goto('next', 'line', 'pos')<CR>
 " }}}
 
 " undotree {{{ 撤消历史

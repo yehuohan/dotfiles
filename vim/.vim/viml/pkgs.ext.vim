@@ -13,6 +13,26 @@ nmap <leader>j <Plug>(easymotion-bd-jk)
 nmap <leader><leader>j <Plug>(easymotion-overwin-line)
 nmap <leader>mw <Plug>(easymotion-bd-w)
 " }}}
+
+" signature {{{ 书签管理
+let g:SignatureMap = {
+    \ 'Leader'            : "m",
+    \ 'PlaceNextMark'     : "m,",
+    \ 'ToggleMarkAtLine'  : "m.",
+    \ 'PurgeMarksAtLine'  : "m-",
+    \ 'DeleteMark'        : '', 'PurgeMarks'        : '', 'PurgeMarkers'      : '',
+    \ 'GotoNextLineAlpha' : '', 'GotoPrevLineAlpha' : '', 'GotoNextLineByPos' : '', 'GotoPrevLineByPos' : '',
+    \ 'GotoNextSpotAlpha' : '', 'GotoPrevSpotAlpha' : '', 'GotoNextSpotByPos' : '', 'GotoPrevSpotByPos' : '',
+    \ 'GotoNextMarker'    : '', 'GotoPrevMarker'    : '', 'GotoNextMarkerAny' : '', 'GotoPrevMarkerAny' : '',
+    \ 'ListBufferMarks'   : '', 'ListBufferMarkers' : '',
+    \ }
+nnoremap <leader>ts :SignatureToggleSigns<CR>
+nnoremap <leader>ma :SignatureListBufferMarks<CR>
+nnoremap <leader>mc :call signature#mark#Purge('all')<CR>
+nnoremap <leader>ml :call signature#mark#Purge('line')<CR>
+nnoremap <M-,>      :call signature#mark#Goto('prev', 'line', 'pos')<CR>
+nnoremap <M-.>      :call signature#mark#Goto('next', 'line', 'pos')<CR>
+" }}}
 " }}}
 
 " Component {{{

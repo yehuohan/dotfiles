@@ -5,7 +5,8 @@ let s:use = SvarUse()
 silent! lua << EOF
 require('hop').setup{
     match_mappings = { 'zh', 'zh_sc' },
-    create_hl_autocmd = true
+    create_hl_autocmd = true,
+    excluded_filetypes = { 'scrollbar' }
 }
 EOF
 noremap s <Cmd>HopChar1MW<CR>
@@ -19,23 +20,22 @@ noremap <leader>mw <Cmd>HopWord<CR>
 " }}}
 
 " marks {{{ 书签管理
-"silent! lua << EOF
-"require('marks').setup{
-"    default_mappings = false,
-"    force_write_shada = true,
-"    mappings = {
-"        set = 'm',
-"        toggle = 'm.',
-"        delete = 'dm',
-"        delete_line = '<leader>ml',
-"        delete_buf = '<leader>mc',
-"        next = '<M-.>',
-"        prev = '<M-,>',
-"    }
-"}
-"EOF
-"nnoremap <leader>ts :MarksToggleSigns<CR>
-"nnoremap <leader>ma :MarksListBuf<CR>
+silent! lua << EOF
+require('marks').setup{
+    default_mappings = false,
+    force_write_shada = true,
+    cyclic = false,
+    mappings = {
+        toggle_mark = 'm',
+        delete_line = '<leader>ml',
+        delete_buf = '<leader>mc',
+        next = '<M-.>',
+        prev = '<M-,>',
+    }
+}
+EOF
+nnoremap <leader>ts :MarksToggleSigns<CR>
+nnoremap <leader>ma :MarksListBuf<CR>
 " }}}
 " }}}
 
@@ -124,9 +124,14 @@ EOF
 " }}}
 
 " scrollbar {{{ 滑动条
-let g:scrollbar_max_size = 6
+let g:scrollbar_max_size = 5
 let g:scrollbar_min_size = 3
 let g:scrollbar_excluded_filetypes = ['alpha']
+let g:scrollbar_shape = {
+    \ 'head': '┃',
+    \ 'body': '┃',
+    \ 'tail': '┃',
+    \ }
 augroup PkgsScrollbar
     autocmd!
     autocmd WinScrolled,VimResized,QuitPre * silent! lua require('scrollbar').show()
