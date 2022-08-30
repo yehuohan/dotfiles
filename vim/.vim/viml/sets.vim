@@ -23,7 +23,8 @@ set listchars=tab:⤜⤚→,eol:↲,space:·,nbsp:␣,precedes:<,extends:>,trail
                                         " 不可见字符显示
 set autoindent                          " 使用autoindent缩进
 set nobreakindent                       " 折行时不缩进
-set conceallevel=0                      " 显示高样样式中的隐藏字符
+set conceallevel=2                      " 显示高样样式中conceal掉的字符
+set concealcursor=nvic                  " 设置nvic模式下不显示conceal掉的字符
 set foldenable                          " 充许折叠
 set foldopen-=search                    " 查找时不自动展开折叠
 set foldcolumn=0                        " 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠

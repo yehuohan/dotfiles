@@ -235,6 +235,19 @@ nnoremap <leader>vl :TroubleToggle loclist<CR>
 nnoremap <leader>tc :ColorizerToggle<CR>
 " }}}
 
+" autopairs {{{ 自动括号
+silent! lua << EOF
+require('nvim-autopairs').setup{
+    map_cr = false,
+}
+vim.keymap.set('n', '<leader>tp', function()
+    ap = require('nvim-autopairs').state.disabled
+    print('Auto pairs:', ap)
+    require('nvim-autopairs').state.disabled = not ap
+    end, { noremap = true})
+EOF
+" }}}
+
 " treesitter {{{ 语法树
 if s:use.treesitter
 silent! lua << EOF

@@ -66,6 +66,14 @@ let g:colorizer_nomap = 1
 let g:colorizer_startup = 0
 nnoremap <leader>tc :ColorToggle<CR>
 " }}}
+
+" auto-pairs {{{ 自动括号
+let g:AutoPairsShortcutToggle = ''
+let g:AutoPairsShortcutFastWrap = ''
+let g:AutoPairsShortcutJump = ''
+let g:AutoPairsShortcutFastBackInsert = ''
+nnoremap <leader>tp :call AutoPairsToggle()<CR>
+" }}}
 " }}}
 
 " Utils {{{

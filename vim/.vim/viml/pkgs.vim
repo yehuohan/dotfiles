@@ -104,6 +104,7 @@ endif
 if IsNVim()
     Plug 'folke/trouble.nvim'
     Plug 'norcalli/nvim-colorizer.lua', {'on': 'ColorizerToggle'}
+    Plug 'windwp/nvim-autopairs'
 if s:use.nlsp
     Plug 'neovim/nvim-lspconfig'
     Plug 'kabouzeid/nvim-lspinstall'
@@ -114,6 +115,7 @@ if s:use.treesitter
 endif
 else
     Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
+    Plug 'jiangmiao/auto-pairs'
 endif
 if s:use.coc
     Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
@@ -127,7 +129,6 @@ if s:use.spector
     Plug 'puremourning/vimspector'
 endif
     Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
-    Plug 'jiangmiao/auto-pairs'
     Plug 'tpope/vim-surround'
     Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
     Plug 'scrooloose/nerdcommenter'
@@ -426,6 +427,7 @@ nnoremap <leader>tr :RainbowToggle<CR>
 " indentLine {{{ 显示缩进标识
 let g:indentLine_char = '⁞'             " 设置标识符样式
 let g:indentLinet_color_term = 200      " 设置标识符颜色
+let g:indentLine_concealcursor = 'nvic'
 let g:indentLine_fileTypeExclude = ['startify', 'alpha']
 nnoremap <leader>ti :IndentLinesToggle<CR>
 " }}}
@@ -713,14 +715,6 @@ let g:neoformat_enabled_cpp = ['astyle']
 let g:neoformat_enabled_java = ['astyle']
 let g:neoformat_enabled_python = ['autopep8']
 noremap <leader>fm :Neoformat<CR>
-" }}}
-
-" auto-pairs {{{ 自动括号
-let g:AutoPairsShortcutToggle = ''
-let g:AutoPairsShortcutFastWrap = ''
-let g:AutoPairsShortcutJump = ''
-let g:AutoPairsShortcutFastBackInsert = ''
-nnoremap <leader>tp :call AutoPairsToggle()<CR>
 " }}}
 
 " surround {{{ 添加包围符
