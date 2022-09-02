@@ -469,9 +469,9 @@ endfunction
 "   p : run project from s:ws.rp
 "   ... : supported project from s:rp.proj
 " Forward:
-"   'Rp'  -> 'rp'  -> 'r^p'
-"   'R^p' -> 'r^p'
-"   'r^p'
+"   Rp  -> rp  -> r^p (r^p means r[km.E != p])
+"   R^p -> r^p
+"   r^p
 " @param cfg: properties to extend
 " }}}
 function! RunProject(keys, ...)

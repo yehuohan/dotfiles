@@ -37,15 +37,15 @@ if IsNVim()
     let $NVimConfigDir=stdpath('config')
 if IsWin()
     let g:python3_host_prog = $APPS_HOME . '/Python/python.exe'
-    let g:node_host_prog = $DotVimLocal . '/node_modules/.bin/neovim-node-host.cmd'
+    let g:node_host_prog = $DotVimLocal . '/node_modules/neovim/bin/cli.js'
     if !filereadable(g:node_host_prog)
-        let g:node_host_prog = $APPS_HOME . '/nodejs/node_modules/neovim-node-host.cmd'
+        let g:node_host_prog = $APPS_HOME . '/nodejs/node_modules/neovim/bin/cli.js'
     endif
 else
     let g:python3_host_prog = '/usr/bin/python3'
-    let g:node_host_prog = $DotVimLocal . '/node_modules/.bin/neovim-node-host'
+    let g:node_host_prog = $DotVimLocal . '/node_modules/neovim/bin/cli.js'
     if !filereadable(g:node_host_prog)
-        let g:node_host_prog = '/usr/bin/neovim-node-host'
+        let g:node_host_prog = '~/.node_modules/neovim/bin/cli.js'
     endif
 endif
     let &packpath = &rtp
