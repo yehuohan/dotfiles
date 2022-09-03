@@ -273,7 +273,6 @@ vnoremap <leader>agk g<C-a>
 noremap <leader>u ~
 " 匹配符跳转
 packadd matchit
-map <S-s> %
 map <S-m> %
 " 行移动
 noremap j gj

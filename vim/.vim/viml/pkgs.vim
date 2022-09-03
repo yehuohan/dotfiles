@@ -106,6 +106,7 @@ if IsNVim()
     Plug 'norcalli/nvim-colorizer.lua', {'on': 'ColorizerToggle'}
     Plug 'windwp/nvim-autopairs'
     Plug 'numToStr/Comment.nvim'
+    Plug 'kylechui/nvim-surround'
 if s:use.nlsp
     Plug 'neovim/nvim-lspconfig'
     Plug 'kabouzeid/nvim-lspinstall'
@@ -118,6 +119,7 @@ else
     Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
     Plug 'jiangmiao/auto-pairs'
     Plug 'scrooloose/nerdcommenter'
+    Plug 'tpope/vim-surround'
 endif
 if s:use.coc
     Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
@@ -131,7 +133,6 @@ if s:use.spector
     Plug 'puremourning/vimspector'
 endif
     Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
-    Plug 'tpope/vim-surround'
     Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
     Plug 't9md/vim-quickhl'
     Plug 'RRethy/vim-illuminate'
@@ -716,26 +717,6 @@ let g:neoformat_enabled_cpp = ['astyle']
 let g:neoformat_enabled_java = ['astyle']
 let g:neoformat_enabled_python = ['autopep8']
 noremap <leader>fm :Neoformat<CR>
-" }}}
-
-" surround {{{ 添加包围符
-let g:surround_no_mappings = 1
-" 修改和删除Surround
-nmap <leader>sd <Plug>Dsurround
-nmap <leader>sc <Plug>Csurround
-nmap <leader>sC <Plug>CSurround
-" 给Text Object添加Surround
-nmap ys <Plug>Ysurround
-nmap yS <Plug>YSurround
-nmap <leader>sw ysiw
-nmap <leader>si ysw
-nmap <leader>sW ySiw
-nmap <leader>sI ySw
-" 给行添加Surround
-nmap <leader>sl <Plug>Yssurround
-nmap <leader>sL <Plug>YSsurround
-xmap <leader>sw <Plug>VSurround
-xmap <leader>sW <Plug>VgSurround
 " }}}
 
 " Vista {{{ 代码Tags

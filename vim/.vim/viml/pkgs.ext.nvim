@@ -11,6 +11,7 @@ require('hop').setup{
 EOF
 noremap s <Cmd>HopChar1MW<CR>
 noremap f <Cmd>HopChar1CurrentLine<CR>
+noremap F <Cmd>HopAnywhereCurrentLine<CR>
 noremap <leader>ms <Cmd>HopPatternMW<CR>
 noremap <leader>j <Cmd>HopLineCursorMW<CR>
 noremap <leader><leader>j <Cmd>HopLineMW<CR>
@@ -268,6 +269,25 @@ vim.keymap.set('n', '<leader>cu',
         pcall(function() c.uncomment.linewise.count(vim.v.count1) end)
     end, { noremap = true })
 EOF
+" }}}
+
+" surround {{{ 添加包围符
+silent! lua << EOF
+require('nvim-surround').setup{
+    keymaps = {
+        visual = 'ys',
+        visual_line = 'yS',
+        normal = 'ys',
+        normal_line = 'yS',
+        normal_cur = 'ysl',
+        normal_cur_line = 'ysL',
+        delete = 'ds',
+        change = 'cs',
+    },
+}
+EOF
+nmap <leader>sw ysiw
+nmap <leader>sW ySiw
 " }}}
 
 " treesitter {{{ 语法树
