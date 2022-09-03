@@ -1,5 +1,5 @@
 #===============================================================================
-# dir
+# dirs
 #===============================================================================
 DIR_OUT := ./__VBuildOut
 DIR_OBJ := ${DIR_OUT}/obj
@@ -67,3 +67,40 @@ clean:
 .PHONY: tags
 tags:
 	${CTAGS} -R ${DIR_INC} ${DIR_SRC}
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# CMake targets
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+BUILD_DIR := __VBuildOut
+BUILD_TYPE := Debug
+#BUILD_TYPE := Release
+#BUILD_GEN := "Unix Makefiles"
+#BUILD_GEN := "NMake Makefiles"
+BUILD_GEN := "Ninja"
+BUILD_JOB := -j4
+
+.PHONY: all
+all:
+	cmake --build ${BUILD_DIR} ${BUILD_JOB}
+
+.PHONY: src
+src:
+	cmake -G ${BUILD_GEN} -Wno-dev \
+		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+		-DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
+		-S . -B ${BUILD_DIR}
+	cmake --build ${BUILD_DIR} ${BUILD_JOB}
+	cmake --install ${BUILD_DIR}
+
+.PHONY: cc
+cc: src
+	cp ${BUILD_DIR}/compile_commands.json ./
+
+.PHONY: tags
+tags:
+	cmake -G ${BUILD_GEN} -Wno-dev \
+		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+		-DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
+		-S . -B ${BUILD_DIR}
+	cmake --build ${BUILD_DIR} ${BUILD_JOB} --target tags
