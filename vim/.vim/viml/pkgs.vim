@@ -105,6 +105,7 @@ if IsNVim()
     Plug 'folke/trouble.nvim'
     Plug 'norcalli/nvim-colorizer.lua', {'on': 'ColorizerToggle'}
     Plug 'windwp/nvim-autopairs'
+    Plug 'numToStr/Comment.nvim'
 if s:use.nlsp
     Plug 'neovim/nvim-lspconfig'
     Plug 'kabouzeid/nvim-lspinstall'
@@ -116,6 +117,7 @@ endif
 else
     Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
     Plug 'jiangmiao/auto-pairs'
+    Plug 'scrooloose/nerdcommenter'
 endif
 if s:use.coc
     Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
@@ -131,7 +133,6 @@ endif
     Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
     Plug 'tpope/vim-surround'
     Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
-    Plug 'scrooloose/nerdcommenter'
     Plug 't9md/vim-quickhl'
     Plug 'RRethy/vim-illuminate'
     Plug 'yehuohan/asyncrun.vim'
@@ -742,22 +743,6 @@ let g:vista_echo_cursor = 0
 let g:vista_stay_on_open = 0
 nnoremap <leader>tv :Vista!!<CR>
 nnoremap <leader>vc :Vista coc<CR>
-" }}}
-
-" nerdcommenter {{{ 批量注释
-let g:NERDCreateDefaultMappings = 0
-let g:NERDSpaceDelims = 0               " 在Comment后添加Space
-nmap <leader>cc <Plug>NERDCommenterComment
-nmap <leader>cm <Plug>NERDCommenterMinimal
-nmap <leader>cs <Plug>NERDCommenterSexy
-nmap <leader>cb <Plug>NERDCommenterAlignBoth
-nmap <leader>cl <Plug>NERDCommenterAlignLeft
-nmap <leader>ci <Plug>NERDCommenterInvert
-nmap <leader>cy <Plug>NERDCommenterYank
-nmap <leader>ce <Plug>NERDCommenterToEOL
-nmap <leader>ca <Plug>NERDCommenterAppend
-nmap <leader>ct <Plug>NERDCommenterAltDelims
-nmap <leader>cu <Plug>NERDCommenterUncomment
 " }}}
 
 " quickhl {{{ 单词高亮

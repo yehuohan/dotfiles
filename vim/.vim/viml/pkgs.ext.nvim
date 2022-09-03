@@ -11,8 +11,7 @@ require('hop').setup{
 EOF
 noremap s <Cmd>HopChar1MW<CR>
 noremap f <Cmd>HopChar1CurrentLine<CR>
-noremap <leader>ms <Cmd>HopChar2MW<CR>
-noremap <leader><leader>s <Cmd>HopPatternMW<CR>
+noremap <leader>ms <Cmd>HopPatternMW<CR>
 noremap <leader>j <Cmd>HopLineCursorMW<CR>
 noremap <leader><leader>j <Cmd>HopLineMW<CR>
 noremap <leader>mj <Cmd>HopLineStartMW<CR>
@@ -240,11 +239,34 @@ silent! lua << EOF
 require('nvim-autopairs').setup{
     map_cr = false,
 }
-vim.keymap.set('n', '<leader>tp', function()
-    ap = require('nvim-autopairs').state.disabled
-    print('Auto pairs:', ap)
-    require('nvim-autopairs').state.disabled = not ap
-    end, { noremap = true})
+vim.keymap.set('n', '<leader>tp',
+    function()
+        ap = require('nvim-autopairs').state.disabled
+        print('Auto pairs:', ap)
+        require('nvim-autopairs').state.disabled = not ap
+    end, { noremap = true })
+EOF
+" }}}
+
+" comment {{{ 批量注释
+silent! lua << EOF
+require('Comment').setup{
+    toggler = { line = 'gcc', block = 'gbc' },
+    opleader = { line = 'gc', block = 'gb' },
+    mappings = {
+        basic = true,
+        extra = false,
+        extended = false,
+    },
+}
+local c = require('Comment.api')
+vim.keymap.set('n', '<leader>ci', function() c.toggle.linewise.count(vim.v.count1) end, { noremap = true })
+vim.keymap.set('n', '<leader>cl', function() c.comment.linewise.count(vim.v.count1) end, { noremap = true })
+vim.keymap.set('n', '<leader>cu',
+    function()
+        -- ignore errors when uncommenting a non-commented line
+        pcall(function() c.uncomment.linewise.count(vim.v.count1) end)
+    end, { noremap = true })
 EOF
 " }}}
 

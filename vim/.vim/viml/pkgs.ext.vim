@@ -74,6 +74,15 @@ let g:AutoPairsShortcutJump = ''
 let g:AutoPairsShortcutFastBackInsert = ''
 nnoremap <leader>tp :call AutoPairsToggle()<CR>
 " }}}
+
+" nerdcommenter {{{ 批量注释
+let g:NERDCreateDefaultMappings = 0
+let g:NERDSpaceDelims = 0               " 在Comment后添加Space
+nmap <leader>ci <Plug>NERDCommenterInvert
+nmap <leader>cl <Plug>NERDCommenterAlignBoth
+nmap <leader>cu <Plug>NERDCommenterUncomment
+nmap <leader>ct <Plug>NERDCommenterAltDelims
+" }}}
 " }}}
 
 " Utils {{{
