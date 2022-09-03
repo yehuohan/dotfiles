@@ -40,7 +40,7 @@ nnoremap <leader>ma :MarksListBuf<CR>
 
 " gomove {{{ 块编辑
 silent! lua << EOF
-require("gomove").setup {
+require('gomove').setup {
     map_defaults = false,
     reindent = true,
     undojoin = true,
@@ -55,6 +55,39 @@ xmap <M-j> <Plug>GoVSDDown
 xmap <M-k> <Plug>GoVSDUp
 xmap <M-h> <Plug>GoVSDLeft
 xmap <M-l> <Plug>GoVSDRight
+" }}}
+
+" winpick {{{ 窗口跳转
+silent! lua << EOF
+local winpick = require('winpick')
+local excluded_filetypes = { 'scrollbar' }
+winpick.setup{
+    border = 'single',
+    filter = function(winid, bufnr)
+        if vim.tbl_contains(excluded_filetypes, vim.api.nvim_buf_get_option(bufnr, 'filetype')) then
+            return false
+        end
+        return true
+    end,
+    prompt = "Pick a window: ",
+    format_label = winpick.defaults.format_label,
+    chars = { 'f', 'j' },
+}
+vim.keymap.set('n', '<leader>wi',
+    function()
+        local winid, bufnr = winpick.select()
+        if winid then
+            vim.api.nvim_set_current_win(winid)
+        end
+    end, { noremap = true })
+EOF
+" }}}
+
+" winshift {{{ 窗口移动
+silent! lua << EOF
+require('winshift').setup{ }
+EOF
+nnoremap <C-m> :WinShift<CR>
 " }}}
 " }}}
 
@@ -294,8 +327,8 @@ EOF
 silent! lua << EOF
 require('nvim-surround').setup{
     keymaps = {
-        visual = 'ys',
-        visual_line = 'yS',
+        visual = 'gs',
+        visual_line = 'gS',
         normal = 'ys',
         normal_line = 'yS',
         normal_cur = 'ysl',

@@ -49,6 +49,8 @@ if IsNVim()
     Plug 'yehuohan/hop.nvim'
     Plug 'yehuohan/marks.nvim'
     Plug 'booperlv/nvim-gomove'
+    Plug 'gbrlsnchs/winpick.nvim'
+    Plug 'sindrets/winshift.nvim'
 else
     Plug 'yehuohan/vim-easymotion'
     Plug 'kshenoy/vim-signature'
