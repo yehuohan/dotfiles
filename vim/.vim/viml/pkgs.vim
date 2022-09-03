@@ -875,7 +875,7 @@ let g:ImSelectSetImCmd = {key -> ['im-select', key]}
 " }}}
 
 if IsNVim()
-    source $DotVimVimL/pkgs.ext.nvim
+    luafile $DotVimVimL/pkgs.ext.lua
 else
     source $DotVimVimL/pkgs.ext.vim
 endif
