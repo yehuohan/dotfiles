@@ -37,6 +37,25 @@ EOF
 nnoremap <leader>ts :MarksToggleSigns<CR>
 nnoremap <leader>ma :MarksListBuf<CR>
 " }}}
+
+" gomove {{{ 块编辑
+silent! lua << EOF
+require("gomove").setup {
+    map_defaults = false,
+    reindent = true,
+    undojoin = true,
+    move_past_end_col = false,
+}
+EOF
+xmap <C-j> <Plug>GoVSMDown
+xmap <C-k> <Plug>GoVSMUp
+xmap <C-h> <Plug>GoVSMLeft
+xmap <C-l> <Plug>GoVSMRight
+xmap <M-j> <Plug>GoVSDDown
+xmap <M-k> <Plug>GoVSDUp
+xmap <M-h> <Plug>GoVSDLeft
+xmap <M-l> <Plug>GoVSDRight
+" }}}
 " }}}
 
 " Component {{{
@@ -315,6 +334,11 @@ require('nvim-treesitter.configs').setup{
             scope_incremental = '<M-v>',
         },
     },
+    rainbow = {
+        enable = true,
+        extended_mode = true,
+        max_file_lines = nil,
+    }
 }
 vim.opt.runtimepath:append(vim.env.DotVimLocal)
 EOF

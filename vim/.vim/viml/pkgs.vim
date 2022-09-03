@@ -48,12 +48,13 @@ call plug#begin($DotVimDir.'/bundle')  " 设置插件位置，且自动设置了
 if IsNVim()
     Plug 'yehuohan/hop.nvim'
     Plug 'yehuohan/marks.nvim'
+    Plug 'booperlv/nvim-gomove'
 else
     Plug 'yehuohan/vim-easymotion'
     Plug 'kshenoy/vim-signature'
+    Plug 't9md/vim-textmanip'
 endif
     Plug 'mg979/vim-visual-multi'
-    Plug 't9md/vim-textmanip'
     Plug 'markonm/traces.vim'
     Plug 'junegunn/vim-easy-align'
     Plug 'psliwka/vim-smoothie'
@@ -93,6 +94,7 @@ endif
     Plug 'Yggdroot/indentLine'
     Plug 'yehuohan/popc'
     Plug 'yehuohan/popset'
+    Plug 'yehuohan/popc-floaterm'
     Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTree']}
     Plug 'itchyny/screensaver.vim'
     Plug 'junegunn/fzf'
@@ -114,6 +116,7 @@ if s:use.nlsp
 endif
 if s:use.treesitter
     Plug 'nvim-treesitter/nvim-treesitter'
+    Plug 'p00f/nvim-ts-rainbow'
 endif
 else
     Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
@@ -138,7 +141,6 @@ endif
     Plug 'RRethy/vim-illuminate'
     Plug 'yehuohan/asyncrun.vim'
     Plug 'voldikss/vim-floaterm'
-    Plug 'yehuohan/popc-floaterm'
     Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
     Plug 'euclidianAce/BetterLua.vim', {'for': 'lua'}
     Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
@@ -187,26 +189,6 @@ let g:VM_custom_remaps = {
     \ '<C-c>' : 'Q',
     \ 's'     : '<Cmd>HopChar1<CR>',
     \ }
-" }}}
-
-" textmanip {{{ 块编辑
-let g:textmanip_enable_mappings = 0
-" 切换Insert/Replace Mode
-xnoremap <M-o>
-    \ <Cmd>
-    \ let g:textmanip_current_mode = (g:textmanip_current_mode == 'replace') ? 'insert' : 'replace' <Bar>
-    \ echo 'textmanip mode: ' . g:textmanip_current_mode<CR>
-xmap <C-o> <M-o>
-" 更据Mode使用Move-Insert或Move-Replace
-xmap <C-j> <Plug>(textmanip-move-down)
-xmap <C-k> <Plug>(textmanip-move-up)
-xmap <C-h> <Plug>(textmanip-move-left)
-xmap <C-l> <Plug>(textmanip-move-right)
-" 更据Mode使用Duplicate-Insert或Duplicate-Replace
-xmap <M-j> <Plug>(textmanip-duplicate-down)
-xmap <M-k> <Plug>(textmanip-duplicate-up)
-xmap <M-h> <Plug>(textmanip-duplicate-left)
-xmap <M-l> <Plug>(textmanip-duplicate-right)
 " }}}
 
 " traces {{{ 预览增强

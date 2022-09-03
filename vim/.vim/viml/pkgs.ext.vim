@@ -33,6 +33,26 @@ nnoremap <leader>ml :call signature#mark#Purge('line')<CR>
 nnoremap <M-,>      :call signature#mark#Goto('prev', 'line', 'pos')<CR>
 nnoremap <M-.>      :call signature#mark#Goto('next', 'line', 'pos')<CR>
 " }}}
+
+" textmanip {{{ 块编辑
+let g:textmanip_enable_mappings = 0
+" 切换Insert/Replace Mode
+xnoremap <M-o>
+    \ <Cmd>
+    \ let g:textmanip_current_mode = (g:textmanip_current_mode == 'replace') ? 'insert' : 'replace' <Bar>
+    \ echo 'textmanip mode: ' . g:textmanip_current_mode<CR>
+xmap <C-o> <M-o>
+" 更据Mode使用Move-Insert或Move-Replace
+xmap <C-j> <Plug>(textmanip-move-down)
+xmap <C-k> <Plug>(textmanip-move-up)
+xmap <C-h> <Plug>(textmanip-move-left)
+xmap <C-l> <Plug>(textmanip-move-right)
+" 更据Mode使用Duplicate-Insert或Duplicate-Replace
+xmap <M-j> <Plug>(textmanip-duplicate-down)
+xmap <M-k> <Plug>(textmanip-duplicate-up)
+xmap <M-h> <Plug>(textmanip-duplicate-left)
+xmap <M-l> <Plug>(textmanip-duplicate-right)
+" }}}
 " }}}
 
 " Component {{{
