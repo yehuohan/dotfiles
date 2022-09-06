@@ -92,7 +92,7 @@ xmap{'<M-l>', '<Plug>GoVSDRight'}
 local winpick = require('winpick')
 local winpick_exfts = { 'scrollbar' }
 winpick.setup{
-    border = 'single',
+    border = 'none',
     filter = function(_, bufnr)
         if vim.tbl_contains(winpick_exfts, vim.api.nvim_buf_get_option(bufnr, 'filetype')) then
             return false
