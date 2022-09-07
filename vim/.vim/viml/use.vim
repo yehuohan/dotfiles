@@ -77,7 +77,6 @@ function! s:useInit()
             \ 'cmd' : {sopt, sel -> extend(s:use.coc_exts, {sopt : sel})},
             \ 'get' : {sopt -> s:use.coc_exts[sopt]},
             \ },
-        \ 'onCR': funcref('s:useSave'),
         \ }
 
     " Set ui selections
@@ -109,7 +108,6 @@ function! s:useInit()
             \ 'cmd' : {sopt, sel -> extend(s:use.ui, {sopt : sel})},
             \ 'get' : {sopt -> s:use.ui[sopt]},
             \ },
-        \ 'onCR': funcref('s:useSave'),
         \ }
 
     call PopSelection({

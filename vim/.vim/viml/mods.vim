@@ -403,7 +403,7 @@ endfunction
 " }}}
 
 " FUNCTION: s:popR(km) {{{
-function! s:popRonCR(sopt, earg)
+function! s:popRonCR(earg, sopt)
     if a:earg.km.E ==# 'p'
         " save config of project
         let s:ws.rp = a:earg.cfg
@@ -439,8 +439,7 @@ function! s:popR(km)
             \ 'cmd': {sopt, sel -> extend(l:cfg, {sopt : sel})},
             \ 'get': {sopt -> l:cfg[sopt]},
             \ },
-        \ 'arg': {'km': a:km, 'cfg': l:cfg},
-        \ 'onCR': funcref('s:popRonCR')
+        \ 'onCR': funcref('s:popRonCR', [{'km': a:km, 'cfg': l:cfg}]),
         \ }
     if a:km.E ==# 'p'
         call extend(l:cfg, {'key': '', 'file': '', 'type': ''})
@@ -818,7 +817,7 @@ endfunction
 " }}}
 
 " FUNCTION: s:popF(km, type) {{{
-function! s:popFonCR(sopt, earg)
+function! s:popFonCR(earg, sopt)
     let s:ws.fw = a:earg.cfg
     let s:ws.fw.path = s:unifyPath(s:ws.fw.path)
     if !empty(s:ws.fw.path)
@@ -855,8 +854,7 @@ function! s:popF(km, type)
             \ 'cmd': {sopt, sel -> extend(l:cfg, {sopt : sel})},
             \ 'get': {sopt -> l:cfg[sopt]},
             \ },
-        \ 'arg': {'km': a:km, 'cfg': l:cfg, 'type': a:type},
-        \ 'onCR': funcref('s:popFonCR')
+        \ 'onCR': funcref('s:popFonCR', [{'km': a:km, 'cfg': l:cfg, 'type': a:type}]),
         \ }
     call PopSelection(l:sel)
 endfunction
