@@ -212,12 +212,6 @@ augroup end
 -- }}}
 
 -- nvim-tree {{{ 目录树导航
-vim.g.nvim_tree_show_icons = {
-    git = 0,
-    folders = 1,
-    files = 1,
-    folder_arrows = 1,
-}
 local tcb = require('nvim-tree.config').nvim_tree_callback
 require('nvim-tree').setup{
     view = {
@@ -238,7 +232,7 @@ require('nvim-tree').setup{
                 { key = '<C-n>', cb = tcb('next_sibling') },
                 { key = 'p'    , cb = tcb('parent_node') },
                 { key = '.'    , cb = tcb('toggle_dotfiles') },
-                { key = 'I'    , cb = tcb('toggle_ignored') },
+                { key = 'm'    , cb = tcb('toggle_file_info') },
                 { key = 'r'    , cb = tcb('refresh') },
                 { key = 'q'    , cb = tcb('close') },
                 { key = '?'    , cb = tcb('toggle_help') },
@@ -255,6 +249,18 @@ require('nvim-tree').setup{
             },
         },
     },
+    renderer = {
+        indent_markers = {
+            enable = true,
+            icons = {
+                corner = '└ ',
+                edge = '│ ',
+                none = '  ',
+            },
+        },
+    },
+    diagnostics = { enable = false },
+    git = { enable = false },
 }
 nnoremap{'<leader>tt', ':NvimTreeToggle<CR>'}
 -- }}}
