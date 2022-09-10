@@ -167,28 +167,31 @@ call plug#end()
 
 " Editor {{{
 " vim-visual-multi {{{ 多光标编辑
-" Usage: https://github.com/mg979/vim-visual-multi/wiki
 " Tab: 切换cursor/extend模式
-" C-n: 添加word或selected region作为cursor
-" C-Up/Down: 移动当前position并添加cursor
-" <VM_leader>a: 查找当前word作为cursor
-" <VM_leader>/: 查找regex作为cursor（n/N用于查找下/上一个）
-" <VM_leader>,: 添加当前position作为cursor（使用/或arrows或Hop跳转位置）
-" <VM_leader>a <VM_leader>c: 添加visual区域作为cursor
-" v: 文本对象（类似于viw等）
 let g:VM_mouse_mappings = 0         " 禁用鼠标
 let g:VM_leader = ','
 let g:VM_maps = {
-    \ 'Find Under'         : '<C-n>',
-    \ 'Find Subword Under' : '<C-n>',
-    \ 'Select All'         : ',a',
-    \ 'Add Cursor At Pos'  : ',,',
-    \ 'Select Operator'    : 'v',
+    \ 'Find Under'           : '<C-n>',
+    \ 'Cursor Down'          : '<C-Down>',
+    \ 'Cursor Up'            : '<C-Up>',
+    \ 'Select All'           : ',a',
+    \ 'Start Regex Search'   : ',/',
+    \ 'Add Cursor At Pos'    : ',,',
+    \ 'Visual All'           : ',A',
+    \ 'Visual Regex'         : ',/',
+    \ 'Visual Cursors'       : ',c',
+    \ 'Visual Add'           : ',a',
+    \ 'Find Next'            : 'n',
+    \ 'Find Prev'            : 'N',
+    \ 'Goto Next'            : ']',
+    \ 'Goto Prev'            : '[',
+    \ 'Skip Region'          : 'q',
+    \ 'Remove Region'        : 'Q',
+    \ 'Select Operator'      : 'v',
+    \ 'Toggle Mappings'      : ',<Space>',
+    \ 'Toggle Single Region' : ',<CR>',
     \ }
 let g:VM_custom_remaps = {
-    \ '<C-p>' : '[',
-    \ '<C-s>' : 'q',
-    \ '<C-c>' : 'Q',
     \ 's'     : '<Cmd>HopChar1<CR>',
     \ }
 " }}}
