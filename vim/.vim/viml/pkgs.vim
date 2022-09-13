@@ -141,7 +141,7 @@ endif
     Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
     Plug 't9md/vim-quickhl'
     Plug 'RRethy/vim-illuminate'
-    Plug 'yehuohan/asyncrun.vim'
+    Plug 'skywind3000/asyncrun.vim'
     Plug 'voldikss/vim-floaterm'
     Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
     Plug 'euclidianAce/BetterLua.vim', {'for': 'lua'}
