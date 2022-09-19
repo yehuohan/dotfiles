@@ -540,6 +540,8 @@ let g:Lf_WildIgnore = {
     \ 'dir': ['.git', '.svn', '.hg'],
     \ 'file': []
     \ }
+let g:Lf_GtagsAutoGenerate = 0
+let g:Lf_GtagsAutoUpdate = 0
 nnoremap <leader><leader>l :Leaderf
 nnoremap <leader>lf :LeaderfFile<CR>
 nnoremap <leader>lu :LeaderfFunction<CR>

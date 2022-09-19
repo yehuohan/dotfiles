@@ -1,6 +1,6 @@
 local use = vim.fn.SvarUse()
 
--- convenient map functions {{{
+-- Maps {{{
 local setmap = vim.keymap.set
 local function setopts(opts, defaults)
     local map_opts = {}
@@ -214,6 +214,7 @@ augroup end
 -- nvim-tree {{{ 目录树导航
 local tcb = require('nvim-tree.config').nvim_tree_callback
 require('nvim-tree').setup{
+    auto_reload_on_write = false,
     view = {
         mappings = {
             custom_only = true,
