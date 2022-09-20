@@ -1012,8 +1012,8 @@ let s:rs = {
                 \ 'lst' : [
                     \ 'rustc --emit asm=%.asm %',
                     \ 'rustc --emit asm=%.asm -C "llvm-args=-x86-asm-syntax=intel" %',
-                    \ 'gcc -S -masm=att %',
-                    \ 'gcc -S -masm=intel %',
+                    \ 'gcc -S -masm=att -fverbose-asm %',
+                    \ 'gcc -S -masm=intel -fverbose-asm %',
                     \ ],
                 \ 'cmd' : {sopt, arg -> execute('AsyncRun ' . arg)}
                 \ },

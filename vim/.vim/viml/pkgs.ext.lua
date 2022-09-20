@@ -342,8 +342,8 @@ vim.keymap.set('n', '<leader>cu',
 -- surround {{{ 添加包围符
 require('nvim-surround').setup{
     keymaps = {
-        visual = 'gs',
-        visual_line = 'gS',
+        visual = 'vs',
+        visual_line = 'vS',
         normal = 'ys',
         normal_line = 'yS',
         normal_cur = 'ysl',

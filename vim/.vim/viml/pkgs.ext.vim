@@ -106,8 +106,8 @@ nmap <leader>ct <Plug>NERDCommenterAltDelims
 
 " surround {{{ 添加包围符
 let g:surround_no_mappings = 1
-xmap gs  <Plug>VSurround
-xmap gS  <Plug>VgSurround
+xmap vs  <Plug>VSurround
+xmap vS  <Plug>VgSurround
 nmap ys  <Plug>Ysurround
 nmap yS  <Plug>YSurround
 nmap <leader>sw ysiw

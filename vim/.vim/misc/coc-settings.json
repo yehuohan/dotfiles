@@ -2,6 +2,7 @@
     /* coc */
     "suggest.autoTrigger": "always",
     "suggest.virtualText": true,
+    "suggest.noselect": true,
     "suggest.completionItemKindLabels": {
         "keyword"       : "",
         "variable"      : "",
