@@ -15,7 +15,11 @@ local function setopts(opts, defaults)
     return map_opts
 end
 
-local function map(opts)      setmap('',  opts[1], opts[2], setopts(opts, { remap = true })) end
+-- map works at normal and visual mode by default here
+local function map(opts)
+    setmap('n',  opts[1], opts[2], setopts(opts, { remap = true }))
+    setmap('v',  opts[1], opts[2], setopts(opts, { remap = true }))
+end
 local function nmap(opts)     setmap('n', opts[1], opts[2], setopts(opts, { remap = true })) end
 local function vmap(opts)     setmap('v', opts[1], opts[2], setopts(opts, { remap = true })) end
 local function xmap(opts)     setmap('x', opts[1], opts[2], setopts(opts, { remap = true })) end
@@ -25,7 +29,10 @@ local function imap(opts)     setmap('i', opts[1], opts[2], setopts(opts, { rema
 local function lmap(opts)     setmap('l', opts[1], opts[2], setopts(opts, { remap = true })) end
 local function cmap(opts)     setmap('c', opts[1], opts[2], setopts(opts, { remap = true })) end
 local function tmap(opts)     setmap('t', opts[1], opts[2], setopts(opts, { remap = true })) end
-local function noremap(opts)  setmap('',  opts[1], opts[2], setopts(opts, { noremap = true })) end
+local function noremap(opts)
+    setmap('n',  opts[1], opts[2], setopts(opts, { noremap = true }))
+    setmap('v',  opts[1], opts[2], setopts(opts, { noremap = true }))
+end
 local function nnoremap(opts) setmap('n', opts[1], opts[2], setopts(opts, { noremap = true })) end
 local function vnoremap(opts) setmap('v', opts[1], opts[2], setopts(opts, { noremap = true })) end
 local function xnoremap(opts) setmap('x', opts[1], opts[2], setopts(opts, { noremap = true })) end
@@ -103,13 +110,13 @@ winpick.setup{
     format_label = winpick.defaults.format_label,
     chars = { 'f', 'j', 'd', 'k', 's', 'l' },
 }
-vim.keymap.set('n', '<leader>wi',
+nnoremap{'<leader>wi',
     function()
         local winid, _ = winpick.select()
         if winid then
             vim.api.nvim_set_current_win(winid)
         end
-    end, { noremap = true })
+    end}
 -- }}}
 
 -- winshift {{{ 窗口移动
@@ -311,12 +318,12 @@ nnoremap{'<leader>tc', ':ColorizerToggle<CR>'}
 require('nvim-autopairs').setup{
     map_cr = false,
 }
-vim.keymap.set('n', '<leader>tp',
+nnoremap{'<leader>tp',
     function()
         local ap = require('nvim-autopairs').state.disabled
         print('Auto pairs:', ap)
         require('nvim-autopairs').state.disabled = not ap
-    end, { noremap = true })
+    end}
 -- }}}
 
 -- comment {{{ 批量注释
@@ -330,13 +337,13 @@ require('Comment').setup{
     },
 }
 local comment = require('Comment.api')
-vim.keymap.set('n', '<leader>ci', function() comment.toggle.linewise.count(vim.v.count1) end, { noremap = true })
-vim.keymap.set('n', '<leader>cl', function() comment.comment.linewise.count(vim.v.count1) end, { noremap = true })
-vim.keymap.set('n', '<leader>cu',
+nnoremap{'<leader>ci', function() comment.toggle.linewise.count(vim.v.count1) end}
+nnoremap{'<leader>cl', function() comment.comment.linewise.count(vim.v.count1) end}
+nnoremap{'<leader>cu',
     function()
         -- ignore errors when uncommenting a non-commented line
         pcall(function() comment.uncomment.linewise.count(vim.v.count1) end)
-    end, { noremap = true })
+    end}
 -- }}}
 
 -- surround {{{ 添加包围符
@@ -392,7 +399,7 @@ ufo.setup{
         return ''
     end
 }
-vim.keymap.set('n', '<leader>td',
+nnoremap{'<leader>to',
     function()
         local bufnr = vim.api.nvim_get_current_buf()
         if ufo.hasAttached(bufnr) then
@@ -400,7 +407,7 @@ vim.keymap.set('n', '<leader>td',
         else
             ufo.attach(bufnr)
         end
-    end, { noremap = true })
+    end}
 -- }}}
 
 -- treesitter {{{ 语法树

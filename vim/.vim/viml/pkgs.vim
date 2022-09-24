@@ -248,16 +248,6 @@ omap au <Plug>(textobj-underscore-a)
 omap iu <Plug>(textobj-underscore-i)
 xmap au <Plug>(textobj-underscore-a)
 xmap iu <Plug>(textobj-underscore-i)
-nnoremap <leader>to :call Plug_to_motion('v')<CR>
-nnoremap <leader>tO :call Plug_to_motion('V')<CR>
-
-function! Plug_to_motion(motion)
-    call PopSelection({
-        \ 'opt' : 'select text object motion',
-        \ 'lst' : split('w W s p ( b [ < t { B " '' ` i f c m u', ' '),
-        \ 'cmd' : {sopt, sel -> execute('normal! ' . tolower(a:motion) . (a:motion =~# '\l' ? 'i' : 'a' ) . sel)}
-        \ })
-endfunction
 " }}}
 
 " undotree {{{ 撤消历史
