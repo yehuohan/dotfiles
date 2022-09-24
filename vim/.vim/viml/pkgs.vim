@@ -111,6 +111,8 @@ if IsNVim()
     Plug 'windwp/nvim-autopairs'
     Plug 'numToStr/Comment.nvim'
     Plug 'kylechui/nvim-surround'
+    Plug 'kevinhwang91/nvim-ufo'
+    Plug 'kevinhwang91/promise-async'
 if s:use.nlsp
     Plug 'neovim/nvim-lspconfig'
     Plug 'kabouzeid/nvim-lspinstall'

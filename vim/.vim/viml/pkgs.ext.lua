@@ -356,6 +356,53 @@ nmap{'<leader>sw', 'ysiw'}
 nmap{'<leader>sW', 'ySiw'}
 -- }}}
 
+-- ufo {{{ 代码折叠
+local ufo = require('ufo')
+ufo.setup{
+    fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
+        local res = {}
+        local tag = '» '
+        if use.ui.patch then
+            tag = ' '
+        end
+        local tag_wid = vim.fn.strdisplaywidth(tag)
+
+        for k, chunk in ipairs(virtText) do
+            if k == 1 then
+                -- only match whitespace characters of first chunk
+                local txt = chunk[1]
+                local s, e = vim.regex([[^\s*]]):match_str(txt)
+                if s and e then
+                    local wid = vim.fn.strdisplaywidth(txt:sub(s, e))
+                    if wid >= tag_wid then
+                        txt = txt:sub(e + 1)
+                        tag = tag .. ('·'):rep(wid - tag_wid - 1) .. ' '
+                    end
+                end
+                table.insert(res, {tag, 'Comment'})
+                table.insert(res, {txt, chunk[2]})
+            else
+                table.insert(res, chunk)
+            end
+        end
+        table.insert(res, {('  %d '):format(endLnum - lnum), 'MoreMsg'})
+        return res
+    end,
+    provider_selector = function(bufnr, filetype, buftype)
+        return ''
+    end
+}
+vim.keymap.set('n', '<leader>td',
+    function()
+        local bufnr = vim.api.nvim_get_current_buf()
+        if ufo.hasAttached(bufnr) then
+            ufo.detach(bufnr)
+        else
+            ufo.attach(bufnr)
+        end
+    end, { noremap = true })
+-- }}}
+
 -- treesitter {{{ 语法树
 if use.treesitter then
 require('nvim-treesitter.configs').setup{
