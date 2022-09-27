@@ -123,6 +123,18 @@ nnoremap{'<leader>wi',
 require('winshift').setup{ }
 nnoremap{'<C-m>', ':WinShift<CR>'}
 -- }}}
+
+-- modes {{{ 模式高亮美化
+require('modes').setup{
+    colors = {
+        copy = '#f0c050',
+        delete = '#c05060',
+        insert = '#00c0c0',
+        visual = '#ffffff',
+    },
+	set_cursorline = false,
+}
+-- }}}
 -- }}}
 
 -- Component {{{
@@ -383,7 +395,9 @@ ufo.setup{
                     local wid = vim.fn.strdisplaywidth(txt:sub(s, e))
                     if wid >= tag_wid then
                         txt = txt:sub(e + 1)
-                        tag = tag .. ('·'):rep(wid - tag_wid - 1) .. ' '
+                        if wid > tag_wid then
+                            tag = tag .. ('·'):rep(wid - tag_wid - 1) .. ' '
+                        end
                     end
                 end
                 table.insert(res, {tag, 'Comment'})
