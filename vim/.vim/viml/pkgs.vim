@@ -367,11 +367,7 @@ function! Plug_ll_mode()
 endfunction
 
 function! Plug_ll_msgLeft()
-    if &ft ==# 'qf'
-        return 'cwd = ' . getcwd()
-    else
-        return substitute(expand('%:p'), '^' . escape(expand(SvarWs().fw.path), '\'), '', '')
-    endif
+    return substitute(expand('%:p'), '^' . escape(expand(SvarWs().fw.path), '\'), '', '')
 endfunction
 
 function! Plug_ll_msgRight()

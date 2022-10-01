@@ -214,10 +214,10 @@ let s:rp = {
     \ 'proj' : {
         \ 'f' : ['s:FnFile'  , v:null],
         \ 'm' : ['s:FnMake'  , 'makefile'],
-        \ 'u' : ['s:FnGMake' , 'cmakelists.txt'],
-        \ 'n' : ['s:FnGMake' , 'cmakelists.txt'],
-        \ 'j' : ['s:FnGMake' , 'cmakelists.txt'],
-        \ 'q' : ['s:FnGMake' , '*.pro'],
+        \ 'u' : ['s:FnCMake' , 'cmakelists.txt'],
+        \ 'n' : ['s:FnCMake' , 'cmakelists.txt'],
+        \ 'j' : ['s:FnCMake' , 'cmakelists.txt'],
+        \ 'q' : ['s:FnQMake' , '*.pro'],
         \ 'a' : ['s:FnCargo' , 'Cargo.toml'],
         \ 'h' : ['s:FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
         \ },
@@ -344,17 +344,17 @@ endfunction
 " }}}
 
 " Function: s:vout(cfg) {{{
-" 设置__VBuildOut输出和运行（用于FnMake和FnGMake）
+" 设置__VBuildOut输出和运行（用于FnMake和FnCMake）
 function! s:vout(cfg)
     let l:dir = '__VBuildOut'
-    if a:cfg.key !=# 'm'
-        let l:outdir = a:cfg.wdir . '/' . l:dir
-        if a:cfg.deploy ==# 'clean'
-            call delete(l:outdir, 'rf')
-            throw '[RP] ' . l:dir . ' was removed'
-        endif
-        silent! call mkdir(l:outdir, 'p')
+    let l:outdir = a:cfg.wdir . '/' . l:dir
+
+    if a:cfg.deploy ==# 'clean'
+        call delete(l:outdir, 'rf')
+        throw '[RP] ' . l:dir . ' was removed'
     endif
+
+    silent! call mkdir(l:outdir, 'p')
 
     let l:out = ''
     if a:cfg.deploy ==# 'run'
@@ -525,36 +525,44 @@ function! s:FnMake(cfg)
         let l:cmd = 'make clean'
     else
         let [_, l:out] = s:vout(a:cfg)
-        let l:cmd = printf('make %s %s', a:cfg.abld, l:out)
+        let l:fmt = (IsWin() ? 'vcvars64.bat && ' : '') . 'make %s %s'
+        let l:cmd = printf(l:fmt, a:cfg.abld, l:out)
     endif
     return l:cmd
 endfunction
 " }}}
 
-" Function: s:FnGMake(cfg) {{{
+" Function: s:FnCMake(cfg) {{{
 " u: cmake for unix makefiles
 " n: cmake for nmake makefiles
 " j: cmake for ninja
-" q: qmake
-function! s:FnGMake(cfg)
+function! s:FnCMake(cfg)
     let [l:dir, l:out] = s:vout(a:cfg)
     if a:cfg.deploy !=# 'clean'
-        let l:fmts = {
-            \ 'u': 'cmake %s -G "Unix Makefiles" .. && cmake --build . %s',
-            \ 'n': 'vcvars64.bat && cmake %s -G "NMake Makefiles" .. && cmake --build . %s',
-            \ 'j': (IsWin() ? 'vcvars64.bat && ' : '') . 'cmake %s -G Ninja .. && cmake --build . %s',
-            \ 'q': IsWin() ?
-            \      'vcvars64.bat && qmake %s ../"%s" && nmake %s' :
-            \      'qmake %s ../"%s" && make %s',
-            \ }
-        let l:fmt = l:fmts[a:cfg.key]
+        let l:gen = {
+            \ 'u': 'Unix Makefiles',
+            \ 'n': 'NMake Makefiles',
+            \ 'j': 'Ninja',
+            \ }[a:cfg.key]
+        let l:fmt = (IsWin() ? 'vcvars64.bat && ' : '')
+            \ . 'cmake -DCMAKE_INSTALL_PREFIX=. %s -G "%s" ..'
+            \ . '&& cmake --build . %s'
+            \ . '&& cmake --install .'
+        let l:cmd = printf(l:fmt, a:cfg.agen, l:gen, a:cfg.abld)
+        return printf('cd %s && %s && cd .. %s', l:dir, l:cmd, l:out)
+    endif
+endfunction
+" }}}
 
-        if a:cfg.key ==# 'q'
-            let l:srcfile = fnamemodify(a:cfg.file, ':t')
-            let l:cmd = printf(l:fmt, a:cfg.agen, l:srcfile, a:cfg.abld)
-        else
-            let l:cmd = printf(l:fmt, a:cfg.agen, a:cfg.abld)
-        endif
+" Function: s:FnQMake(cfg) {{{
+function! s:FnQMake(cfg)
+    let [l:dir, l:out] = s:vout(a:cfg)
+    if a:cfg.deploy !=# 'clean'
+        let l:fmt = IsWin()
+            \ ? 'vcvars64.bat && qmake %s ../"%s" && nmake %s'
+            \ : 'qmake %s ../"%s" && make %s'
+        let l:srcfile = fnamemodify(a:cfg.file, ':t')
+        let l:cmd = printf(l:fmt, a:cfg.agen, l:srcfile, a:cfg.abld)
         return printf('cd %s && %s && cd .. %s', l:dir, l:cmd, l:out)
     endif
 endfunction
