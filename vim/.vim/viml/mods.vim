@@ -598,10 +598,8 @@ for key in s:rp_mappings
 endfor
 nnoremap <leader>rv
     \ <Cmd>silent w <Bar>
-    \ if &filetype==?'vim' <Bar>
-    \   execute ':source %' <Bar>
-    \ elseif &filetype==?'lua' <Bar>
-    \   execute ':luafile %' <Bar>
+    \ if &filetype=~?'\v(vim)\|(lua)' <Bar>
+    \   source % <Bar>
     \ endif<CR>
 " }}}
 

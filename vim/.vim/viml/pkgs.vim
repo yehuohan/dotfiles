@@ -49,18 +49,18 @@ if IsNVim()
     Plug 'yehuohan/hop.nvim'
     Plug 'yehuohan/marks.nvim'
     Plug 'booperlv/nvim-gomove'
+    Plug 'karb94/neoscroll.nvim'
     Plug 'gbrlsnchs/winpick.nvim'
     Plug 'sindrets/winshift.nvim'
-    Plug 'mvllow/modes.nvim'
 else
     Plug 'yehuohan/vim-easymotion'
     Plug 'kshenoy/vim-signature'
     Plug 't9md/vim-textmanip'
+    Plug 'psliwka/vim-smoothie'
 endif
     Plug 'mg979/vim-visual-multi'
     Plug 'markonm/traces.vim'
     Plug 'junegunn/vim-easy-align'
-    Plug 'psliwka/vim-smoothie'
     Plug 'terryma/vim-expand-region'
     Plug 'kana/vim-textobj-user'
     Plug 'kana/vim-textobj-indent'
@@ -114,6 +114,7 @@ if IsNVim()
     Plug 'kylechui/nvim-surround'
     Plug 'kevinhwang91/nvim-ufo'
     Plug 'kevinhwang91/promise-async'
+    Plug 'RRethy/vim-illuminate'
 if s:use.nlsp
     Plug 'neovim/nvim-lspconfig'
     Plug 'kabouzeid/nvim-lspinstall'
@@ -128,6 +129,7 @@ else
     Plug 'jiangmiao/auto-pairs'
     Plug 'scrooloose/nerdcommenter'
     Plug 'tpope/vim-surround'
+    Plug 'RRethy/vim-illuminate'
 endif
 if s:use.coc
     Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
@@ -143,7 +145,6 @@ endif
     Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
     Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
     Plug 't9md/vim-quickhl'
-    Plug 'RRethy/vim-illuminate'
     Plug 'skywind3000/asyncrun.vim'
     Plug 'voldikss/vim-floaterm'
     Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
@@ -218,16 +219,6 @@ nnoremap <leader><leader>A vip:EasyAlign<Space>
 vnoremap <leader><leader>A :EasyAlign<Space>
 " }}}
 
-" smoothie {{{ 平滑滚动
-let g:smoothie_no_default_mappings = v:true
-let g:smoothie_update_interval = 30
-let g:smoothie_base_speed = 20
-nmap <M-n> <Plug>(SmoothieDownwards)
-nmap <M-m> <Plug>(SmoothieUpwards)
-nmap <M-j> <Plug>(SmoothieForwards)
-nmap <M-k> <Plug>(SmoothieBackwards)
-" }}}
-
 " expand-region {{{ 快速块选择
 map <M-r> <Plug>(expand_region_expand)
 map <M-w> <Plug>(expand_region_shrink)
@@ -258,8 +249,9 @@ nnoremap <leader>tu :UndotreeToggle<CR>
 
 " Component {{{
 " theme {{{ Vim主题(ColorScheme, StatusLine, TabLine)
-let g:gruvbox_contrast_dark='soft'      " 背景选项：dark, medium, soft
+let g:gruvbox_contrast_dark = 'soft'    " 背景选项：dark, medium, soft
 let g:gruvbox_italic = 1
+let g:gruvbox_invert_selection = 0
 let g:one_allow_italics = 1
 try
     set background=dark
@@ -569,14 +561,14 @@ imap <C-k> <M-k>
 inoremap <silent><expr> <M-i>
     \ coc#pum#visible() ? coc#pum#cancel() : coc#refresh()
 inoremap <M-o> <Cmd>call CocActionAsync('showSignatureHelp')<CR>
-nnoremap <silent><nowait><expr> <M-f> coc#float#has_scroll() ? coc#float#scroll(1) : ":call WinMoveSpliter('f', 5)\<CR>"
-nnoremap <silent><nowait><expr> <M-d> coc#float#has_scroll() ? coc#float#scroll(0) : ":call WinMoveSpliter('d', 5)\<CR>"
+nnoremap <M-f> <Cmd>call coc#float#scroll(1)<CR>
+nnoremap <M-d> <Cmd>call coc#float#scroll(0)<CR>
 inoremap <M-f> <Cmd>call coc#float#scroll(1)<CR>
 inoremap <M-d> <Cmd>call coc#float#scroll(0)<CR>
 vnoremap <M-f> <Cmd>call coc#float#scroll(1)<CR>
 vnoremap <M-d> <Cmd>call coc#float#scroll(0)<CR>
-nmap     <silent><nowait><expr> <M-n> coc#float#has_scroll() ? coc#float#scroll(1) : "<Plug>(SmoothieDownwards)"
-nmap     <silent><nowait><expr> <M-m> coc#float#has_scroll() ? coc#float#scroll(0) : "<Plug>(SmoothieUpwards)"
+nnoremap <M-n> <Cmd>call coc#float#scroll(1)<CR>
+nnoremap <M-m> <Cmd>call coc#float#scroll(0)<CR>
 inoremap <M-n> <Cmd>call coc#float#scroll(1)<CR>
 inoremap <M-m> <Cmd>call coc#float#scroll(0)<CR>
 vnoremap <M-n> <Cmd>call coc#float#scroll(1)<CR>
@@ -711,13 +703,6 @@ map <leader>hs <Plug>(quickhl-manual-this-whole-word)
 map <leader>hc <Plug>(quickhl-manual-clear)
 nmap <leader>hr <Plug>(quickhl-manual-reset)
 nmap <leader>th <Plug>(quickhl-manual-toggle)
-" }}}
-
-" illuminate {{{ 自动高亮
-let g:Illuminate_delay = 250
-let g:Illuminate_ftblacklist = ['nerdtree']
-nnoremap <leader>tg :IlluminationToggle<CR>
-highlight link illuminatedWord MatchParen
 " }}}
 
 " asyncrun {{{ 导步运行程序

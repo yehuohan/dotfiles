@@ -19,8 +19,9 @@ set shiftwidth=4                        " 设置>和<命令移动宽度为4
 set nowrap                              " 默认关闭折行
 set noequalalways                       " 禁止自动调窗口大小
 set textwidth=0                         " 关闭自动换行
-set listchars=tab:⤜⤚→,eol:↲,space:·,nbsp:␣,precedes:<,extends:>,trail:~
-                                        " 不可见字符显示
+set listchars=tab:⟼⟶→,eol:↲,space:·,nbsp:␣,precedes:<,extends:>,trail:~
+                                        " 不可见字符显示, '⤜⟶→', '⟼⟶→'
+let &showbreak='↪ '                     " wrap标志符
 set autoindent                          " 使用autoindent缩进
 set nobreakindent                       " 折行时不缩进
 set conceallevel=2                      " 显示高样样式中conceal掉的字符
@@ -444,12 +445,10 @@ nnoremap <leader>wL <C-w>L
 nnoremap <leader>wT <C-w>T
 " 改变窗口大小
 nnoremap <leader>w= <C-w>=
-nnoremap <silent> <M-e> :call WinMoveSpliter('e', 5)<CR>
-nnoremap <silent> <M-s> :call WinMoveSpliter('s', 5)<CR>
-if !s:use.coc
-nnoremap <silent> <M-d> :call WinMoveSpliter('d', 5)<CR>
-nnoremap <silent> <M-f> :call WinMoveSpliter('f', 5)<CR>
-endif
+nnoremap <silent> <M-e> <Cmd>call WinMoveSpliter('e', 5)<CR>
+nnoremap <silent> <M-s> <Cmd>call WinMoveSpliter('s', 5)<CR>
+nnoremap <silent><nowait><expr> <M-f> (SvarUse().coc && coc#float#has_scroll()) ? coc#float#scroll(1) : "<Cmd>call WinMoveSpliter('f', 5)\<CR>"
+nnoremap <silent><nowait><expr> <M-d> (SvarUse().coc && coc#float#has_scroll()) ? coc#float#scroll(0) : "<Cmd>call WinMoveSpliter('d', 5)\<CR>"
 nnoremap <M-Up> :call WinMoveSpliter('e', 1)<CR>
 nnoremap <M-Down> :call WinMoveSpliter('d', 1)<CR>
 nnoremap <M-Left> :call WinMoveSpliter('s', 1)<CR>

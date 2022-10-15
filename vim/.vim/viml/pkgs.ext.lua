@@ -16,10 +16,7 @@ local function setopts(opts, defaults)
 end
 
 -- map works at normal and visual mode by default here
-local function map(opts)
-    setmap('n',  opts[1], opts[2], setopts(opts, { remap = true }))
-    setmap('v',  opts[1], opts[2], setopts(opts, { remap = true }))
-end
+local function map(opts)      setmap({'n', 'v'},  opts[1], opts[2], setopts(opts, { remap = true })) end
 local function nmap(opts)     setmap('n', opts[1], opts[2], setopts(opts, { remap = true })) end
 local function vmap(opts)     setmap('v', opts[1], opts[2], setopts(opts, { remap = true })) end
 local function xmap(opts)     setmap('x', opts[1], opts[2], setopts(opts, { remap = true })) end
@@ -29,10 +26,7 @@ local function imap(opts)     setmap('i', opts[1], opts[2], setopts(opts, { rema
 local function lmap(opts)     setmap('l', opts[1], opts[2], setopts(opts, { remap = true })) end
 local function cmap(opts)     setmap('c', opts[1], opts[2], setopts(opts, { remap = true })) end
 local function tmap(opts)     setmap('t', opts[1], opts[2], setopts(opts, { remap = true })) end
-local function noremap(opts)
-    setmap('n',  opts[1], opts[2], setopts(opts, { noremap = true }))
-    setmap('v',  opts[1], opts[2], setopts(opts, { noremap = true }))
-end
+local function noremap(opts)  setmap({'n', 'v'},  opts[1], opts[2], setopts(opts, { noremap = true })) end
 local function nnoremap(opts) setmap('n', opts[1], opts[2], setopts(opts, { noremap = true })) end
 local function vnoremap(opts) setmap('v', opts[1], opts[2], setopts(opts, { noremap = true })) end
 local function xnoremap(opts) setmap('x', opts[1], opts[2], setopts(opts, { noremap = true })) end
@@ -95,6 +89,32 @@ xmap{'<M-h>', '<Plug>GoVSDLeft'}
 xmap{'<M-l>', '<Plug>GoVSDRight'}
 -- }}}
 
+-- neoscroll {{{ 平滑滚动
+local neoscroll = require('neoscroll')
+neoscroll.setup{
+    hide_cursor = false,
+    stop_eof = true,
+}
+nnoremap{'<M-n>',
+    function()
+        if use.coc and vim.fn['coc#float#has_scroll']() == 1 then
+            vim.fn['coc#float#scroll'](1)
+        else
+            neoscroll.scroll(vim.wo.scroll, true, 200)
+        end
+    end, {silent = true, nowait = true, expr = true} }
+nnoremap{'<M-m>',
+    function()
+        if use.coc and vim.fn['coc#float#has_scroll']() == 1 then
+            vim.fn['coc#float#scroll'](0)
+        else
+            neoscroll.scroll(-vim.wo.scroll, true, 200)
+        end
+    end, {silent = true, nowait = true, expr = true} }
+nnoremap{'<M-j>', function() neoscroll.scroll(vim.api.nvim_win_get_height(0), true, 300) end }
+nnoremap{'<M-k>', function() neoscroll.scroll(-vim.api.nvim_win_get_height(0), true, 300) end }
+-- }}}
+
 -- winpick {{{ 窗口跳转
 local winpick = require('winpick')
 local winpick_exfts = { 'scrollbar' }
@@ -122,18 +142,6 @@ nnoremap{'<leader>wi',
 -- winshift {{{ 窗口移动
 require('winshift').setup{ }
 nnoremap{'<C-m>', ':WinShift<CR>'}
--- }}}
-
--- modes {{{ 模式高亮美化
-require('modes').setup{
-    colors = {
-        copy = '#f0c050',
-        delete = '#c05060',
-        insert = '#00c0c0',
-        visual = '#ffffff',
-    },
-	set_cursorline = false,
-}
 -- }}}
 -- }}}
 
@@ -311,6 +319,7 @@ nnoremap{'<leader>nm', ':Telescope oldfiles<CR>'}
 -- Coding {{{
 -- trouble {{{ 列表视图
 require('trouble').setup{
+    mode = 'quickfix',
     icons = true,
     action_keys = {
         jump_close = {'O'},
@@ -422,6 +431,18 @@ nnoremap{'<leader>to',
             ufo.attach(bufnr)
         end
     end}
+-- }}}
+
+-- illuminate {{{ 自动高亮
+require('illuminate').configure{
+    delay = 200,
+    filetypes_denylist = { 'nerdtree', 'NvimTree' },
+}
+nnoremap{'<leader>tg', ':IlluminateToggle<CR>'}
+vim.cmd[[
+highlight link illuminatedWordText MatchParen
+highlight link illuminatedWordRead MatchParen
+]]
 -- }}}
 
 -- treesitter {{{ 语法树

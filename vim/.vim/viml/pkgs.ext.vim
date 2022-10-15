@@ -1,4 +1,4 @@
-"let s:use = SvarUse()
+" let s:use = SvarUse()
 
 " Editor {{{
 " easy-motion {{{ 快速跳转
@@ -52,6 +52,16 @@ xmap <M-j> <Plug>(textmanip-duplicate-down)
 xmap <M-k> <Plug>(textmanip-duplicate-up)
 xmap <M-h> <Plug>(textmanip-duplicate-left)
 xmap <M-l> <Plug>(textmanip-duplicate-right)
+" }}}
+
+" smoothie {{{ 平滑滚动
+let g:smoothie_no_default_mappings = v:true
+let g:smoothie_update_interval = 30
+let g:smoothie_base_speed = 20
+nmap <silent><nowait><expr> <M-n> (SvarUse().coc && coc#float#has_scroll()) ? coc#float#scroll(1) : "<Plug>(SmoothieDownwards)"
+nmap <silent><nowait><expr> <M-m> (SvarUse().coc && coc#float#has_scroll()) ? coc#float#scroll(0) : "<Plug>(SmoothieUpwards)"
+nmap <M-j> <Plug>(SmoothieForwards)
+nmap <M-k> <Plug>(SmoothieBackwards)
 " }}}
 " }}}
 
@@ -116,6 +126,13 @@ nmap ysl <Plug>Yssurround
 nmap ysL <Plug>YSsurround
 nmap ds  <Plug>Dsurround
 nmap cs  <Plug>Csurround
+" }}}
+
+" illuminate {{{ 自动高亮
+let g:Illuminate_delay = 200
+let g:Illuminate_ftblacklist = ['nerdtree', 'NvimTree']
+nnoremap <leader>tg :IlluminationToggle<CR>
+highlight link illuminatedWord MatchParen
 " }}}
 " }}}
 

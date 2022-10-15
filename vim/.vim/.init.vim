@@ -57,6 +57,8 @@ let mapleader="\<Space>"                " Space leader
 nnoremap ; :
 vnoremap ; :
 nnoremap : ;
+map <CR> <CR>
+map <Tab> <Tab>
 " }}}
 
 source $DotVimVimL/env.vim
