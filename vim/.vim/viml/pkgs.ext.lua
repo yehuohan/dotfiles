@@ -197,8 +197,8 @@ nnoremap{'<leader>su', ':Alpha<CR>'}
 -- }}}
 
 -- notify {{{ 消息提示
---require('notify').setup{ }
---vim.notify = require('notify')
+require('notify').setup{ }
+vim.notify = require('notify')
 -- }}}
 
 -- dressing {{{ 字体图标

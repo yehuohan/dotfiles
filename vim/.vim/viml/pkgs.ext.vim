@@ -40,7 +40,7 @@ let g:textmanip_enable_mappings = 0
 xnoremap <M-o>
     \ <Cmd>
     \ let g:textmanip_current_mode = (g:textmanip_current_mode == 'replace') ? 'insert' : 'replace' <Bar>
-    \ echo 'textmanip mode: ' . g:textmanip_current_mode<CR>
+    \ call Notify('textmanip mode: ' . g:textmanip_current_mode)<CR>
 xmap <C-o> <M-o>
 " 更据Mode使用Move-Insert或Move-Replace
 xmap <C-j> <Plug>(textmanip-move-down)

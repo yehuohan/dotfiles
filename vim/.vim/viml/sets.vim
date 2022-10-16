@@ -112,10 +112,10 @@ endfunction
 function! s:opt.fns.syntax()
     if exists('g:syntax_on')
         syntax off
-        echo 'syntax off'
+        call Notify('syntax off')
     else
         syntax on
-        echo 'syntax on'
+        call Notify('syntax on')
     endif
 endfunction
 " }}}
@@ -124,7 +124,7 @@ endfunction
 " Function: OptionInv(opt) {{{ 切换参数值（bool取反）
 function! OptionInv(opt)
     execute printf('setlocal inv%s', a:opt)
-    execute printf('echo "%s = " . &%s', a:opt, a:opt)
+    execute printf('call Notify("%s = " . &%s)', a:opt, a:opt)
 endfunction
 " }}}
 
@@ -134,7 +134,7 @@ function! OptionLst(opt)
     let l:idx = index(l:lst, eval('&' . a:opt))
     let l:idx = (l:idx + 1) % len(l:lst)
     execute printf('set %s=%s', a:opt, l:lst[l:idx])
-    execute printf('echo "%s = " . &%s', a:opt, a:opt)
+    execute printf('call Notify("%s = " . &%s)', a:opt, a:opt)
 endfunction
 " }}}
 
@@ -321,7 +321,7 @@ vnoremap <leader><leader>O
 " HEX编辑
 nnoremap <leader>xx :%!xxd<CR>
 nnoremap <leader>xr :%!xxd -r<CR>
-" lua的echo测试代码
+" lua测试代码
 nnoremap <leader><leader>u :lua print()<Left>
 nnoremap <leader><leader>U :lua print(vim.inspect())<Left><Left>
 vnoremap <leader><leader>u
@@ -343,12 +343,12 @@ nnoremap ya
     \ <Cmd>
     \ execute 'silent normal! "9' . v:count1 . 'yy' <Bar>
     \ let @0 .= @" <Bar>
-    \ echo v:count1 . ' lines append' <CR>
+    \ call Notify(v:count1 . ' lines append') <CR>
 nnoremap yd
     \ <Cmd>
     \ execute 'silent normal! ' . v:count1 . 'dd' <Bar>
     \ let @0 .= @" <Bar>
-    \ echo v:count1 . ' deleted lines append' <CR>
+    \ call Notify(v:count1 . ' deleted lines append') <CR>
 nnoremap <leader>p "0p
 nnoremap <leader>P "0P
 nnoremap <leader>ap p`[<Left>
@@ -363,8 +363,8 @@ inoremap <C-v> <Esc>"+pi
 inoremap <M-v> <C-v>
 " 矩形选择
 noremap vv <C-v>
-xnoremap <C-g> <C-g><Cmd>echo 'mode: ' . string(mode(1))<CR>
-snoremap <C-g> <C-g><Cmd>echo 'mode: ' . string(mode(1))<CR>
+xnoremap <C-g> <C-g><Cmd>call Notify('mode: ' . string(mode(1)))<CR>
+snoremap <C-g> <C-g><Cmd>call Notify('mode: ' . string(mode(1)))<CR>
 
 for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
     " 寄存器快速复制与粘贴

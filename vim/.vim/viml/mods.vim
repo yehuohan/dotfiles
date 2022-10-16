@@ -90,6 +90,16 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
 endfunction
 " }}}
 
+" FUNCTION: Notify(msg) {{{ 信息通知
+function! Notify(msg)
+    if IsNVim()
+        call v:lua.vim.notify(a:msg)
+    else
+        echo a:msg
+    endif
+endfunction
+" }}}
+
 " Function: Input2Str(prompt, [text, completion, workdir]) {{{ 输入字符串
 " @param workdir: 设置工作目录，用于文件和目录补全
 function! Input2Str(prompt, ...)
@@ -125,10 +135,10 @@ function! Input2Fn(iargs, fn, ...) range
 endfunction
 " }}}
 
-" Function: SetExecLast(string, [execution_echo]) {{{ 设置execution
+" Function: SetExecLast(string, [execution_disp]) {{{ 设置execution
 function! SetExecLast(string, ...)
     let s:execution = a:string
-    let s:execution_echo = (a:0 >= 1) ? a:1 : a:string
+    let s:execution_disp = (a:0 >= 1) ? a:1 : a:string
     silent! call repeat#set("\<Plug>ExecLast")
 endfunction
 " }}}
@@ -139,8 +149,8 @@ function! ExecLast(exe)
     if exists('s:execution') && !empty(s:execution)
         if a:exe
             silent execute s:execution
-            if exists('s:execution_echo') && s:execution_echo != v:null
-                echo s:execution_echo
+            if exists('s:execution_disp') && s:execution_disp != v:null
+                echo s:execution_disp
             endif
         else
             call feedkeys(s:execution, 'n')
@@ -495,7 +505,7 @@ function! RunProject(keys, ...)
         try
             call s:rp.run(get(a:000, 0, s:parseProps(km)))
 		catch /\V\^[RP] /
-            echo v:exception
+            call Notify(v:exception)
         catch
             echo v:exception
             echo v:throwpoint
@@ -1148,7 +1158,7 @@ function! FnEvalStr(type, itext)
     else
         call setreg('0', l:res)
         call setreg('+', l:res)
-        echo ' -> copied'
+        call Notify(' -> copied')
     endif
 endfunction
 " }}}

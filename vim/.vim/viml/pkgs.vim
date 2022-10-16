@@ -316,7 +316,7 @@ nnoremap <leader>tk
     \ <Cmd>
     \ let b:lightline_check_flg = !get(b:, 'lightline_check_flg', 1) <Bar>
     \ call lightline#update() <Bar>
-    \ echo 'b:lightline_check_flg = ' . b:lightline_check_flg<CR>
+    \ call Notify('b:lightline_check_flg = ' . b:lightline_check_flg)<CR>
 
 " Augroup: PluginLightline {{{
 augroup PkgsLightline
@@ -600,7 +600,7 @@ nnoremap <leader>oD <Cmd>call CocAction('diagnosticToggle')<CR>
 nnoremap <leader>od
     \ <Cmd>
     \ call coc#config('diagnostic.enable', !coc#util#get_config('diagnostic').enable) <Bar>
-    \ echo 'Display diagnostics: ' . coc#util#get_config('diagnostic').enable<CR>
+    \ call Notify('Display diagnostics: ' . coc#util#get_config('diagnostic').enable)<CR>
 vmap <leader>of <Plug>(coc-format-selected)
 nmap <leader>of <Plug>(coc-format)
 xmap if <Plug>(coc-funcobj-i)
@@ -764,12 +764,12 @@ let g:mkdp_command_for_global = 0       " 只有markdown文件可以预览
 let g:mkdp_browser = 'firefox'
 nnoremap <leader>vm
     \ <Cmd>
-    \ echo get(b:, 'MarkdownPreviewToggleBool') ? 'Close markdown preview' : 'Open markdown preview' <Bar>
+    \ call Notify(get(b:, 'MarkdownPreviewToggleBool') ? 'Close markdown preview' : 'Open markdown preview') <Bar>
     \ call mkdp#util#toggle_preview()<CR>
 nnoremap <leader>tb
     \ <Cmd>
     \ let g:mkdp_browser = (g:mkdp_browser ==# 'firefox') ? 'chrome' : 'firefox' <Bar>
-    \ echo 'Browser: ' . g:mkdp_browser<CR>
+    \ call Notify('Browser: ' . g:mkdp_browser)<CR>
 " }}}
 
 " ReStructruedText {{{
@@ -789,7 +789,7 @@ else
 " 需要安装 https://github.com/Rykka/instant-rst.py
 nnoremap <leader>vr
     \ <Cmd>
-    \ echo g:_instant_rst_daemon_started ? 'Close rst' : 'Open rst' <Bar>
+    \ cal Notify(g:_instant_rst_daemon_started ? 'Close rst' : 'Open rst') <Bar>
     \ execute g:_instant_rst_daemon_started ? 'StopInstantRst' : 'InstantRst'<CR>
 endif
 " }}}
