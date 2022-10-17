@@ -43,7 +43,6 @@ local function tnoremap(opts) setmap('t', opts[1], opts[2], setopts(opts, { nore
 require('hop').setup{
     match_mappings = { 'zh', 'zh_sc' },
     create_hl_autocmd = true,
-    excluded_filetypes = { 'scrollbar' }
 }
 noremap{'s', '<Cmd>HopChar1MW<CR>'}
 noremap{'f', '<Cmd>HopChar1CurrentLine<CR>'}
@@ -117,15 +116,8 @@ nnoremap{'<M-k>', function() neoscroll.scroll(-vim.api.nvim_win_get_height(0), t
 
 -- winpick {{{ 窗口跳转
 local winpick = require('winpick')
-local winpick_exfts = { 'scrollbar' }
 winpick.setup{
     border = 'none',
-    filter = function(_, bufnr)
-        if vim.tbl_contains(winpick_exfts, vim.api.nvim_buf_get_option(bufnr, 'filetype')) then
-            return false
-        end
-        return true
-    end,
     prompt = "Pick a window: ",
     format_label = winpick.defaults.format_label,
     chars = { 'f', 'j', 'd', 'k', 's', 'l' },
@@ -220,22 +212,37 @@ require('virt-column').setup{ char = '┊' }
 -- }}}
 
 -- scrollbar {{{ 滑动条
-vim.g.scrollbar_max_size = 5
-vim.g.scrollbar_min_size = 3
-vim.g.scrollbar_excluded_filetypes = { 'alpha' }
-vim.g.scrollbar_shape = {
-    head = '┃',
-    body = '┃',
-    tail = '┃',
+require('scrollbar').setup{
+    handle = {
+        text = '┃',
+        color = nil,
+        cterm = nil,
+        highlight = 'Normal',
+        hide_if_all_visible = true,
+    },
+    handlers = {
+        diagnostic = false,
+        search = false,
+    },
+    autocmd = {
+        render = {
+            'BufWinEnter',
+            'TabEnter',
+            'TermEnter',
+            'WinEnter',
+            'CmdwinLeave',
+            'TextChanged',
+            'VimResized',
+            'WinScrolled',
+        },
+        clear = {
+            'BufWinLeave',
+            'TabLeave',
+            'TermLeave',
+            'WinLeave',
+        },
+    },
 }
-vim.cmd([[
-augroup PkgsScrollbar
-    autocmd!
-    autocmd WinScrolled,VimResized,QuitPre * silent! lua require('scrollbar').show()
-    autocmd WinEnter,FocusGained           * silent! lua require('scrollbar').show()
-    autocmd WinLeave,BufLeave,BufWinLeave,FocusLost * silent! lua require('scrollbar').clear()
-augroup end
-]])
 -- }}}
 
 -- nvim-tree {{{ 目录树导航

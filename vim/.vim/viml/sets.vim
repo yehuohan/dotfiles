@@ -322,12 +322,12 @@ vnoremap <leader><leader>O
 nnoremap <leader>xx :%!xxd<CR>
 nnoremap <leader>xr :%!xxd -r<CR>
 " lua测试代码
-nnoremap <leader><leader>u :lua print()<Left>
-nnoremap <leader><leader>U :lua print(vim.inspect())<Left><Left>
+nnoremap <leader><leader>u :lua vim.pretty_print()<Left>
+nnoremap <leader><leader>U :lua print()<Left>
 vnoremap <leader><leader>u
-    \ <Cmd>call feedkeys(':lua print(' . GetSelected('') . ')', 'n')<CR>
+    \ <Cmd>call feedkeys(':lua vim.pretty_print(' . GetSelected('') . ')', 'n')<CR>
 vnoremap <leader><leader>U
-    \ <Cmd>call feedkeys(':lua print(vim.inspect(' . GetSelected('') . '))', 'n')<CR>
+    \ <Cmd>call feedkeys(':lua print(' . GetSelected('') . ')', 'n')<CR>
 " 查看help文档
 nnoremap <leader><leader>k :h <C-r><C-w>
 vnoremap <leader><leader>k
