@@ -91,6 +91,7 @@ xmap{'<M-l>', '<Plug>GoVSDRight'}
 -- neoscroll {{{ 平滑滚动
 local neoscroll = require('neoscroll')
 neoscroll.setup{
+    mappings = {},
     hide_cursor = false,
     stop_eof = true,
 }
@@ -294,6 +295,12 @@ require('nvim-tree').setup{
             },
         },
     },
+    actions = {
+        open_file = {
+            resize_window = false,
+        },
+    },
+    filesystem_watchers = { enable = false },
     diagnostics = { enable = false },
     git = { enable = false },
 }
