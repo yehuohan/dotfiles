@@ -305,6 +305,7 @@ require('nvim-tree').setup{
     git = { enable = false },
 }
 nnoremap{'<leader>tt', ':NvimTreeToggle<CR>'}
+nnoremap{'<leader>tT', '<Cmd>execute ":NvimTreeOpen " . expand("%:p:h")<CR>'}
 -- }}}
 
 -- telescope {{{ 模糊查找

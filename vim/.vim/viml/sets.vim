@@ -19,8 +19,8 @@ set shiftwidth=4                        " 设置>和<命令移动宽度为4
 set nowrap                              " 默认关闭折行
 set noequalalways                       " 禁止自动调窗口大小
 set textwidth=0                         " 关闭自动换行
-set listchars=tab:⟼⟶→,eol:↲,space:·,nbsp:␣,precedes:<,extends:>,trail:~
-                                        " 不可见字符显示, '⤜⟶→', '⟼⟶→'
+set listchars=tab:ﲒ,eol:↲,space:·,nbsp:␣,precedes:<,extends:>,trail:~
+                                        " 不可见字符显示, ' ﲒ ײַ'
 let &showbreak='↪ '                     " wrap标志符
 set autoindent                          " 使用autoindent缩进
 set nobreakindent                       " 折行时不缩进
