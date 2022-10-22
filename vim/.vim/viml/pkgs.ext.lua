@@ -305,7 +305,12 @@ require('nvim-tree').setup{
     git = { enable = false },
 }
 nnoremap{'<leader>tt', ':NvimTreeToggle<CR>'}
-nnoremap{'<leader>tT', '<Cmd>execute ":NvimTreeOpen " . expand("%:p:h")<CR>'}
+nnoremap{'<leader>tT',
+    function()
+        local tapi = require('nvim-tree.api')
+        tapi.tree.close()
+        tapi.tree.open(vim.fn.expand('%:p:h'))
+    end}
 -- }}}
 
 -- telescope {{{ 模糊查找
