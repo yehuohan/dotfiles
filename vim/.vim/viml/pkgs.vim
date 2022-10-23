@@ -114,7 +114,6 @@ if IsNVim()
     Plug 'kylechui/nvim-surround'
     Plug 'kevinhwang91/nvim-ufo'
     Plug 'kevinhwang91/promise-async'
-    Plug 'RRethy/vim-illuminate'
 if s:use.nlsp
     Plug 'neovim/nvim-lspconfig'
     Plug 'kabouzeid/nvim-lspinstall'
@@ -129,7 +128,6 @@ else
     Plug 'jiangmiao/auto-pairs'
     Plug 'scrooloose/nerdcommenter'
     Plug 'tpope/vim-surround'
-    Plug 'RRethy/vim-illuminate'
 endif
 if s:use.coc
     Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
@@ -145,6 +143,7 @@ endif
     Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
     Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
     Plug 't9md/vim-quickhl'
+    Plug 'RRethy/vim-illuminate'
     Plug 'skywind3000/asyncrun.vim'
     Plug 'voldikss/vim-floaterm'
     Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
@@ -153,7 +152,6 @@ endif
     Plug 'rust-lang/rust.vim'
     Plug 'tikhomirov/vim-glsl'
     Plug 'beyondmarc/hlsl.vim', {'for': 'hlsl'}
-    Plug 'JuliaEditorSupport/julia-vim', {'for': 'julia'}
     " utils
     Plug 'gabrielelana/vim-markdown', {'for': 'markdown'}
     Plug 'iamcco/markdown-preview.nvim', {'for': 'markdown', 'do': { -> mkdp#util#install()}}
@@ -705,6 +703,14 @@ nmap <leader>hr <Plug>(quickhl-manual-reset)
 nmap <leader>th <Plug>(quickhl-manual-toggle)
 " }}}
 
+" illuminate {{{ 自动高亮
+let g:Illuminate_useDeprecated = 1
+let g:Illuminate_delay = 200
+let g:Illuminate_ftblacklist = ['nerdtree', 'NvimTree']
+nnoremap <leader>tg :IlluminationToggle<CR>
+highlight link illuminatedWord MatchParen
+" }}}
+
 " asyncrun {{{ 导步运行程序
 let g:asyncrun_open = 8                 " 自动打开quickfix window
 let g:asyncrun_save = 1                 " 自动保存当前文件
@@ -740,12 +746,6 @@ tnoremap <M-r> <C-\><C-n>:FloatermUpdate --position=topright<CR>
 tnoremap <M-c> <C-\><C-n>:FloatermUpdate --position=center<CR>
 nnoremap <leader>mf :FloatermNew lf<CR>
 highlight default link FloatermBorder Constant
-" }}}
-
-" julia {{{ Julia支持
-let g:default_julia_version = 'devel'
-let g:latex_to_unicode_tab = 1          " 使用<Tab>输入unicode字符
-nnoremap <leader>tn :call LaTeXtoUnicode#Toggle()<CR>
 " }}}
 " }}}
 

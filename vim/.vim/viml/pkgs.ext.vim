@@ -127,13 +127,6 @@ nmap ysL <Plug>YSsurround
 nmap ds  <Plug>Dsurround
 nmap cs  <Plug>Csurround
 " }}}
-
-" illuminate {{{ 自动高亮
-let g:Illuminate_delay = 200
-let g:Illuminate_ftblacklist = ['nerdtree', 'NvimTree']
-nnoremap <leader>tg :IlluminationToggle<CR>
-highlight link illuminatedWord MatchParen
-" }}}
 " }}}
 
 " Utils {{{
