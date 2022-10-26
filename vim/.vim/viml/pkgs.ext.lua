@@ -207,6 +207,7 @@ end
 local function pkg_notify()
     require('notify').setup{ }
     vim.notify = require('notify')
+    nnoremap{'<leader>dm', function() vim.notify.dismiss() end}
 end
 -- }}}
 
@@ -536,6 +537,7 @@ end
 -- Utils {{{
 -- }}}
 
+-- Setup {{{
 local function setup()
     pkg_hop()
     pkg_marks()
@@ -562,5 +564,6 @@ local function setup()
     pkg_treesitter()
 end
 setup()
+-- }}}
 
 -- vim: fdm=marker
