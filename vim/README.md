@@ -46,7 +46,7 @@ setup_link_msys64.bat
 # Run in remote machine
 nvim --headless --listen localhost:6666
 # Or run in local machine via ssh
-ssh -L 6666:localhost:6666 <ip of remote machine> <path of nvim in remote machine> --headless --listen localhost:6666
+ssh -L 6666:localhost:6666 <remote machine IP> <remote machine nvim path> --headless --listen localhost:6666
 ```
 
 - Connect to server
@@ -101,4 +101,4 @@ Try with administrator.
 
 * Coc started normally but no completion?
 
-Check worksapce folders.
+Check workspace folders.
