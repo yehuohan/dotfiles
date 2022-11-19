@@ -249,7 +249,6 @@ let s:rp = {
         \ 'dosbatch'   : ['%s %s'                   , 'srcf', 'arun'],
         \ 'glsl'       : ['glslangValidator %s %s'  , 'abld', 'srcf'],
         \ 'json'       : ['python -m json.tool %s'  , 'srcf'],
-        \ 'markdown'   : ['typora %s'               , 'srcf'],
         \ 'html'       : ['firefox %s'              , 'srcf'],
         \ 'tex'        : ['xelatex -file-line-error %s && SumatraPDF "%s.pdf"', 'srcf', 'outf'],
         \ },

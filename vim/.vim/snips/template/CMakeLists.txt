@@ -48,6 +48,7 @@ target_compile_options(${PROJECT_NAME} INTERFACE|PUBLIC|PRIVATE -g -Wall -DMYVAR
 target_link_libraries(${PROJECT_NAME} lib)
 
 install(DIRECTORY,FILES <src-dirs> DESTINATION <dst-dir>)
+install(TARGETS ${PROJECT_NAME} DESTINATION <dst-dir>)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # External library
