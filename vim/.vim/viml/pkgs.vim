@@ -108,7 +108,7 @@ endif
     " coding
 if IsNVim()
     Plug 'folke/trouble.nvim'
-    Plug 'norcalli/nvim-colorizer.lua', {'on': 'ColorizerToggle'}
+    Plug 'uga-rosa/ccc.nvim'
     Plug 'windwp/nvim-autopairs'
     Plug 'numToStr/Comment.nvim'
     Plug 'kylechui/nvim-surround'

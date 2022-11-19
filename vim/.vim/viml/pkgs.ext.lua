@@ -382,9 +382,27 @@ local function pkg_trouble()
 end
 -- }}}
 
--- colorizer {{{ 颜色预览
-local function pkg_colorizer()
-    nnoremap{'<leader>tc', ':ColorizerToggle<CR>'}
+-- ccc {{{ 颜色预览
+local function pkg_ccc()
+    nnoremap{'<leader>tc', ':CccHighlighterToggle<CR>'}
+    nnoremap{'<leader>lp', ':CccPick<CR>'}
+    local ccc = require('ccc')
+    ccc.setup{
+        disable_default_mappings = true,
+        mappings = {
+            ['<CR>'] = ccc.mapping.complete,
+            ['q'] = ccc.mapping.quit,
+            ['m'] = ccc.mapping.toggle_input_mode,
+            ['f'] = ccc.mapping.toggle_output_mode,
+            ['a'] = ccc.mapping.toggle_alpha,
+            ['l'] = ccc.mapping.increase1,
+            ['o'] = ccc.mapping.increase5,
+            ['L'] = ccc.mapping.increase10,
+            ['h'] = ccc.mapping.decrease1,
+            ['i'] = ccc.mapping.decrease5,
+            ['H'] = ccc.mapping.decrease10,
+        },
+    }
 end
 -- }}}
 
@@ -556,7 +574,7 @@ local function setup()
     pkg_telescope()
 
     pkg_trouble()
-    pkg_colorizer()
+    pkg_ccc()
     pkg_autopairs()
     pkg_comment()
     pkg_surround()
