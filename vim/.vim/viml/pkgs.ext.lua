@@ -543,16 +543,13 @@ if use.treesitter then
             max_file_lines = nil,
         }
     }
-    vim.opt.runtimepath:append(vim.env.DotVimLocal)
+    vim.opt.runtimepath:append(vim.env.DotVimCache .. '/.treesitter')
     nnoremap{'<leader>sh', ':TSBufToggle highlight<CR>'}
     nnoremap{'<leader>si', ':TSBufToggle indent<CR>'}
     nnoremap{'<leader>ss', ':TSBufToggle incremental_selection<CR>'}
 end
 end
 -- }}}
--- }}}
-
--- Utils {{{
 -- }}}
 
 -- Setup {{{

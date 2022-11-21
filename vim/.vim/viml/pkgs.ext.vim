@@ -128,6 +128,3 @@ nmap ds  <Plug>Dsurround
 nmap cs  <Plug>Csurround
 " }}}
 " }}}
-
-" Utils {{{
-" }}}
