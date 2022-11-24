@@ -114,14 +114,14 @@ if IsNVim()
     Plug 'kylechui/nvim-surround'
     Plug 'kevinhwang91/nvim-ufo'
     Plug 'kevinhwang91/promise-async'
-if s:use.nlsp
-    Plug 'neovim/nvim-lspconfig'
-    Plug 'kabouzeid/nvim-lspinstall'
-    Plug 'hrsh7th/nvim-cmp'
-endif
 if s:use.treesitter
     Plug 'nvim-treesitter/nvim-treesitter'
     Plug 'p00f/nvim-ts-rainbow'
+endif
+if s:use.nlsp
+    Plug 'neovim/nvim-lspconfig'
+    Plug 'williamboman/mason.nvim'
+    Plug 'hrsh7th/nvim-cmp'
 endif
 else
     Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}

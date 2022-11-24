@@ -49,9 +49,9 @@ local function pkg_hop()
     noremap{'f', '<Cmd>HopChar1CurrentLine<CR>'}
     noremap{'F', '<Cmd>HopAnywhereCurrentLine<CR>'}
     noremap{'<leader>ms', '<Cmd>HopPatternMW<CR>'}
-    noremap{'<leader>j', '<Cmd>HopLineCursorMW<CR>'}
-    noremap{'<leader><leader>j', '<Cmd>HopLineMW<CR>'}
-    noremap{'<leader>mj', '<Cmd>HopLineStartMW<CR>'}
+    noremap{'<leader>j', '<Cmd>HopLineCursor<CR>'}
+    noremap{'<leader><leader>j', '<Cmd>HopLine<CR>'}
+    noremap{'<leader>mj', '<Cmd>HopLineStart<CR>'}
     noremap{'<leader>mw', '<Cmd>HopWord<CR>'}
 end
 -- }}}
@@ -550,6 +550,16 @@ if use.treesitter then
 end
 end
 -- }}}
+
+-- nlsp {{{ 补全
+local function pkg_nlsp()
+if use.nlsp then
+    local cmp = require'cmp'
+    cmp.setup{
+    }
+end
+end
+-- }}}
 -- }}}
 
 -- Setup {{{
@@ -577,6 +587,7 @@ local function setup()
     pkg_surround()
     pkg_ufo()
     pkg_treesitter()
+    pkg_nlsp()
 end
 setup()
 -- }}}
