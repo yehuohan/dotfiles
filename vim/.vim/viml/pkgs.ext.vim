@@ -58,8 +58,8 @@ xmap <M-l> <Plug>(textmanip-duplicate-right)
 let g:smoothie_no_default_mappings = v:true
 let g:smoothie_update_interval = 30
 let g:smoothie_base_speed = 20
-nmap <silent><nowait><expr> <M-n> (SvarUse().coc && coc#float#has_scroll()) ? coc#float#scroll(1) : "<Plug>(SmoothieDownwards)"
-nmap <silent><nowait><expr> <M-m> (SvarUse().coc && coc#float#has_scroll()) ? coc#float#scroll(0) : "<Plug>(SmoothieUpwards)"
+nmap <M-n> <Plug>(SmoothieDownwards)
+nmap <M-m> <Plug>(SmoothieUpwards)
 nmap <M-j> <Plug>(SmoothieForwards)
 nmap <M-k> <Plug>(SmoothieBackwards)
 " }}}

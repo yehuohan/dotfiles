@@ -7,23 +7,6 @@ let s:use_file = $DotVimCache . '/.use.json'
 let s:use = {
     \ 'fastgit'   : v:false,
     \ 'coc'       : v:false,
-    \ 'coc_exts'  : {
-        \ 'coc-snippets'      : v:false,
-        \ 'coc-yank'          : v:false,
-        \ 'coc-json'          : v:false,
-        \ 'coc-clangd'        : v:false,
-        \ 'coc-rust-analyzer' : v:false,
-        \ 'coc-pyright'       : v:false,
-        \ 'coc-java'          : v:false,
-        \ 'coc-tsserver'      : v:false,
-        \ 'coc-vimlsp'        : v:false,
-        \ 'coc-lua'           : v:false,
-        \ 'coc-toml'          : v:false,
-        \ 'coc-vimtex'        : v:false,
-        \ 'coc-cmake'         : v:false,
-        \ 'coc-calc'          : v:false,
-        \ 'coc-spell-checker' : v:false,
-        \ },
     \ 'nlsp'      : v:false,
     \ 'treesitter': v:false,
     \ 'spector'   : v:false,
@@ -42,10 +25,6 @@ let s:use = {
 function! s:useLoad()
     if filereadable(s:use_file)
         let l:dic = json_decode(join(readfile(s:use_file)))
-        if has_key(l:dic, 'coc_exts')
-            call extend(s:use.coc_exts, l:dic.coc_exts)
-            unlet l:dic.coc_exts
-        endif
         call extend(s:use, l:dic)
     else
         call s:useSave()
@@ -66,18 +45,7 @@ endfunction
 
 " Function: s:useInit() {{{
 function! s:useInit()
-    " Set coc-extension selections
     let l:dic = map(copy(s:use), '{}')
-    let l:dic.coc_exts = {
-        \ 'dsr' : 'coc extensions',
-        \ 'lst' : sort(keys(s:use.coc_exts)),
-        \ 'dic' : map(copy(s:use.coc_exts), '{}'),
-        \ 'sub' : {
-            \ 'lst' : [v:true, v:false],
-            \ 'cmd' : {sopt, sel -> extend(s:use.coc_exts, {sopt : sel})},
-            \ 'get' : {sopt -> s:use.coc_exts[sopt]},
-            \ },
-        \ }
 
     " Set ui selections
     let l:fontlst = [

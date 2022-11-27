@@ -2,31 +2,13 @@ local fn = vim.fn
 
 local use_file = vim.env.DotVimCache .. '/.use.json'
 local use = {
-    fastgit   = false,
-    lightline = false,
-    ycm       = false,
-    coc       = false,
-    coc_exts  = {
-        ['coc-snippets']      = false,
-        ['coc-yank']          = false,
-        ['coc-json']          = false,
-        ['coc-clangd']        = false,
-        ['coc-rust-analyzer'] = false,
-        ['coc-pyright']       = false,
-        ['coc-java']          = false,
-        ['coc-tsserver']      = false,
-        ['coc-vimlsp']        = false,
-        ['coc-lua']           = false,
-        ['coc-toml']          = false,
-        ['coc-vimtex']        = false,
-        ['coc-cmake']         = false,
-        ['coc-calc']          = false,
-    },
-    nlsp      = false,
-    snip      = false,
-    spector   = false,
-    leaderf   = false,
-    ui        = {
+    fastgit    = false,
+    coc        = false,
+    nlsp       = false,
+    treesitter = false,
+    spector    = false,
+    has_py     = false,
+    ui         = {
         patch    = false,
         font     = 'Consolas',
         fontsize = 12,
@@ -53,19 +35,7 @@ local function use_load()
 end
 
 local function use_init()
-    -- Set coc-extension selections
     local udic = vim.tbl_map(function() return vim.empty_dict() end, use)
-    udic.coc_exts = {
-        dsr = 'coc extensions',
-        lst = fn.sort(vim.tbl_keys(use.coc_exts)),
-        dic = vim.tbl_map(function() return vim.empty_dict() end, use.coc_exts),
-        sub = {
-            lst = {true, false},
-            cmd = function(sopt, sel) use.coc_exts[sopt] = sel end,
-            get = function(sopt) return use.coc_exts[sopt] end,
-        },
-        onCR = use_save,
-    }
 
     -- Set ui selections
     local fontlst = {

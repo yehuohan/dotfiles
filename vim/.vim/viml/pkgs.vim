@@ -120,8 +120,15 @@ if s:use.treesitter
 endif
 if s:use.nlsp
     Plug 'neovim/nvim-lspconfig'
-    Plug 'williamboman/mason.nvim'
     Plug 'hrsh7th/nvim-cmp'
+    Plug 'hrsh7th/cmp-nvim-lsp'
+    Plug 'hrsh7th/cmp-buffer'
+    Plug 'hrsh7th/cmp-path'
+    Plug 'hrsh7th/cmp-cmdline'
+    Plug 'hrsh7th/cmp-calc'
+    Plug 'quangnguyen30192/cmp-nvim-ultisnips'
+    Plug 'f3fora/cmp-spell'
+    Plug 'williamboman/mason.nvim'
 endif
 else
     Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
@@ -543,15 +550,15 @@ function! s:Plug_coc_settings()
 endfunction
 let g:coc_config_home = $DotVimMisc
 let g:coc_data_home = $DotVimCache . '/.coc'
-let g:coc_global_extensions = keys(filter(copy(s:use.coc_exts), 'v:val'))
+let g:coc_global_extensions = ['coc-marketplace']
 let g:coc_status_error_sign = '✘'
 let g:coc_status_warning_sign = '!'
 let g:coc_filetype_map = {}
 let g:coc_snippet_next = '<M-l>'
 let g:coc_snippet_prev = '<M-h>'
-inoremap <silent><expr> <CR>
-    \ coc#pum#visible() ? coc#pum#confirm() :
-    \ "\<C-g>u\<CR>\<C-r>=coc#on_enter()\<CR>"
+" inoremap <silent><expr> <CR>
+"     \ coc#pum#visible() ? coc#pum#confirm() :
+"     \ "\<C-g>u\<CR>\<C-r>=coc#on_enter()\<CR>"
 inoremap <silent><expr> <M-j> coc#pum#visible() ? coc#pum#next(1) : "\<M-j>"
 inoremap <silent><expr> <M-k> coc#pum#visible() ? coc#pum#prev(1) : "\<M-k>"
 imap <C-j> <M-j>
@@ -579,7 +586,6 @@ nmap <leader>gi <Plug>(coc-implementation)
 nmap <leader>gt <Plug>(coc-type-definition)
 nmap <leader>gr <Plug>(coc-references)
 nmap <leader>gR <Plug>(coc-references-used)
-nmap <leader>gt <Plug>(coc-type-definition)
 nmap <leader>gf <Plug>(coc-fix-current)
 nmap <leader>gn <Plug>(coc-rename)
 nmap <leader>gj <Plug>(coc-float-jump)
@@ -612,6 +618,7 @@ nnoremap <leader>ol <Cmd>CocList --normal lists<CR>
 nnoremap <leader>os <Cmd>CocList --normal sources<CR>
 nnoremap <leader>ox <Cmd>CocList --normal extensions<CR>
 nnoremap <leader>ow <Cmd>CocList --normal folders<CR>
+nnoremap <leader>om <Cmd>CocList --normal marketplace<CR>
 nnoremap <leader>oc <Cmd>CocList commands<CR>
 " coc-extensions
 nnoremap <leader>oy <Cmd>CocList --normal yank<CR>
