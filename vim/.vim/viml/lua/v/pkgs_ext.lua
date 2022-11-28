@@ -1,45 +1,30 @@
 local use = vim.fn.SvarUse()
+local map      = require('v.maps').map
+local nmap     = require('v.maps').nmap
+local vmap     = require('v.maps').vmap
+local xmap     = require('v.maps').xmap
+local smap     = require('v.maps').smap
+local omap     = require('v.maps').omap
+local imap     = require('v.maps').imap
+local lmap     = require('v.maps').lmap
+local cmap     = require('v.maps').cmap
+local tmap     = require('v.maps').tmap
+local noremap  = require('v.maps').noremap
+local nnoremap = require('v.maps').nnoremap
+local vnoremap = require('v.maps').vnoremap
+local xnoremap = require('v.maps').xnoremap
+local snoremap = require('v.maps').snoremap
+local onoremap = require('v.maps').onoremap
+local inoremap = require('v.maps').inoremap
+local lnoremap = require('v.maps').lnoremap
+local cnoremap = require('v.maps').cnoremap
+local tnoremap = require('v.maps').tnoremap
 
--- Maps {{{
-local setmap = vim.keymap.set
-local function setopts(opts, defaults)
-    local map_opts = {}
-    for k, v in pairs(opts) do
-        if type(k) == 'string' then
-            map_opts[k] = v
-        end
-    end
-    if defaults then
-        map_opts = vim.tbl_extend('keep', map_opts, defaults)
-    end
-    return map_opts
-end
 
--- map works at normal and visual mode by default here
-local function map(opts)      setmap({'n', 'v'},  opts[1], opts[2], setopts(opts, { remap = true })) end
-local function nmap(opts)     setmap('n', opts[1], opts[2], setopts(opts, { remap = true })) end
-local function vmap(opts)     setmap('v', opts[1], opts[2], setopts(opts, { remap = true })) end
-local function xmap(opts)     setmap('x', opts[1], opts[2], setopts(opts, { remap = true })) end
-local function smap(opts)     setmap('s', opts[1], opts[2], setopts(opts, { remap = true })) end
-local function omap(opts)     setmap('o', opts[1], opts[2], setopts(opts, { remap = true })) end
-local function imap(opts)     setmap('i', opts[1], opts[2], setopts(opts, { remap = true })) end
-local function lmap(opts)     setmap('l', opts[1], opts[2], setopts(opts, { remap = true })) end
-local function cmap(opts)     setmap('c', opts[1], opts[2], setopts(opts, { remap = true })) end
-local function tmap(opts)     setmap('t', opts[1], opts[2], setopts(opts, { remap = true })) end
-local function noremap(opts)  setmap({'n', 'v'},  opts[1], opts[2], setopts(opts, { noremap = true })) end
-local function nnoremap(opts) setmap('n', opts[1], opts[2], setopts(opts, { noremap = true })) end
-local function vnoremap(opts) setmap('v', opts[1], opts[2], setopts(opts, { noremap = true })) end
-local function xnoremap(opts) setmap('x', opts[1], opts[2], setopts(opts, { noremap = true })) end
-local function snoremap(opts) setmap('s', opts[1], opts[2], setopts(opts, { noremap = true })) end
-local function onoremap(opts) setmap('o', opts[1], opts[2], setopts(opts, { noremap = true })) end
-local function inoremap(opts) setmap('i', opts[1], opts[2], setopts(opts, { noremap = true })) end
-local function lnoremap(opts) setmap('l', opts[1], opts[2], setopts(opts, { noremap = true })) end
-local function cnoremap(opts) setmap('c', opts[1], opts[2], setopts(opts, { noremap = true })) end
-local function tnoremap(opts) setmap('t', opts[1], opts[2], setopts(opts, { noremap = true })) end
--- }}}
-
--- Editor {{{
--- hop {{{ 快速跳转
+--------------------------------------------------------------------------------
+-- Editor
+--------------------------------------------------------------------------------
+-- 快速跳转
 local function pkg_hop()
     require('hop').setup{
         match_mappings = { 'zh', 'zh_sc' },
@@ -54,9 +39,8 @@ local function pkg_hop()
     noremap{'<leader>mj', '<Cmd>HopLineStart<CR>'}
     noremap{'<leader>mw', '<Cmd>HopWord<CR>'}
 end
--- }}}
 
--- marks {{{ 书签管理
+-- 书签管理
 local function pkg_marks()
     require('marks').setup{
         default_mappings = false,
@@ -73,9 +57,8 @@ local function pkg_marks()
     nnoremap{'<leader>ts', ':MarksToggleSigns<CR>'}
     nnoremap{'<leader>ma', ':MarksListBuf<CR>'}
 end
--- }}}
 
--- gomove {{{ 块编辑
+-- 块编辑
 local function pkg_gomove()
     require('gomove').setup {
         map_defaults = false,
@@ -92,9 +75,8 @@ local function pkg_gomove()
     xmap{'<M-h>', '<Plug>GoVSDLeft'}
     xmap{'<M-l>', '<Plug>GoVSDRight'}
 end
--- }}}
 
--- neoscroll {{{ 平滑滚动
+-- 平滑滚动
 local function pkg_neoscroll()
     local neoscroll = require('neoscroll')
     neoscroll.setup{
@@ -121,9 +103,8 @@ local function pkg_neoscroll()
     nnoremap{'<M-j>', function() neoscroll.scroll(vim.api.nvim_win_get_height(0), true, 300) end }
     nnoremap{'<M-k>', function() neoscroll.scroll(-vim.api.nvim_win_get_height(0), true, 300) end }
 end
--- }}}
 
--- winpick {{{ 窗口跳转
+-- 窗口跳转
 local function pkg_winpick()
     local winpick = require('winpick')
     winpick.setup{
@@ -140,18 +121,17 @@ local function pkg_winpick()
             end
         end}
 end
--- }}}
 
--- winshift {{{ 窗口移动
+-- 窗口移动
 local function pkg_winshift()
     require('winshift').setup{ }
     nnoremap{'<C-m>', ':WinShift<CR>'}
 end
--- }}}
--- }}}
 
--- Component {{{
--- alpha {{{ 启动首页
+--------------------------------------------------------------------------------
+-- Component
+--------------------------------------------------------------------------------
+-- 启动首页
 local function pkg_alpha()
     local tmp = require('alpha.themes.startify')
     tmp.nvim_web_devicons.enabled = use.ui.patch
@@ -201,41 +181,36 @@ local function pkg_alpha()
     require('alpha').setup(tmp.config)
     nnoremap{'<leader>su', ':Alpha<CR>'}
 end
--- }}}
 
--- notify {{{ 消息提示
+-- 消息提示
 local function pkg_notify()
     require('notify').setup{ }
     vim.notify = require('notify')
     nnoremap{'<leader>dm', function() vim.notify.dismiss() end}
 end
--- }}}
 
--- dressing {{{ ui界面美化
+-- ui界面美化
 local function pkg_dressing()
     require('dressing').setup{
         input = { enabled = true },
         select = { enabled = true },
     }
 end
--- }}}
 
--- icon-picker {{{ 字体图标
+-- 字体图标
 local function pkg_icon_picker()
     require('icon-picker').setup{ disable_legacy_commands = true }
     nnoremap{'<leader>ip', '<Cmd>IconPickerNormal alt_font symbols nerd_font emoji<CR>'}
     nnoremap{'<leader>iP', '<Cmd>IconPickerYank alt_font symbols nerd_font emoji<CR>'}
     inoremap{'<M-p>', '<Cmd>IconPickerInsert alt_font symbols nerd_font emoji<CR>'}
 end
--- }}}
 
--- virt-column {{{ 刻度线
+-- 刻度线
 local function pkg_virt_column()
     require('virt-column').setup{ char = '┊' }
 end
--- }}}
 
--- scrollbar {{{ 滑动条
+-- 滑动条
 local function pkg_scrollbar()
     require('scrollbar').setup{
         handle = {
@@ -269,9 +244,8 @@ local function pkg_scrollbar()
         },
     }
 end
--- }}}
 
--- nvim-tree {{{ 目录树导航
+-- 目录树导航
 local function pkg_tree()
     local tcb = require('nvim-tree.config').nvim_tree_callback
     require('nvim-tree').setup{
@@ -338,9 +312,8 @@ local function pkg_tree()
             tapi.tree.open(vim.fn.expand('%:p:h'))
         end}
 end
--- }}}
 
--- telescope {{{ 模糊查找
+-- 模糊查找
 local function pkg_telescope()
     require('telescope').setup{
         defaults = {
@@ -362,11 +335,11 @@ local function pkg_telescope()
     nnoremap{'<leader>nl', ':Telescope live_grep<CR>'}
     nnoremap{'<leader>nm', ':Telescope oldfiles<CR>'}
 end
--- }}}
--- }}}
 
--- Coding {{{
--- trouble {{{ 列表视图
+--------------------------------------------------------------------------------
+-- Coding
+--------------------------------------------------------------------------------
+-- 列表视图
 local function pkg_trouble()
     require('trouble').setup{
         mode = 'quickfix',
@@ -380,9 +353,8 @@ local function pkg_trouble()
     nnoremap{'<leader>vq', ':TroubleToggle quickfix<CR>'}
     nnoremap{'<leader>vl', ':TroubleToggle loclist<CR>'}
 end
--- }}}
 
--- ccc {{{ 颜色预览
+-- 颜色预览
 local function pkg_ccc()
     nnoremap{'<leader>tc', ':CccHighlighterToggle<CR>'}
     nnoremap{'<leader>lp', ':CccPick<CR>'}
@@ -404,9 +376,8 @@ local function pkg_ccc()
         },
     }
 end
--- }}}
 
--- autopairs {{{ 自动括号
+-- 自动括号
 local function pkg_autopairs()
     require('nvim-autopairs').setup{
         map_cr = false,
@@ -418,9 +389,8 @@ local function pkg_autopairs()
             require('nvim-autopairs').state.disabled = not ap
         end}
 end
--- }}}
 
--- comment {{{ 批量注释
+-- 批量注释
 local function pkg_comment()
     require('Comment').setup{
         toggler = { line = 'gcc', block = 'gbc' },
@@ -440,9 +410,8 @@ local function pkg_comment()
             pcall(function() comment.uncomment.linewise.count(vim.v.count1) end)
         end}
 end
--- }}}
 
--- surround {{{ 添加包围符
+-- 添加包围符
 local function pkg_surround()
     require('nvim-surround').setup{
         keymaps = {
@@ -459,9 +428,8 @@ local function pkg_surround()
     nmap{'<leader>sw', 'ysiw'}
     nmap{'<leader>sW', 'ySiw'}
 end
--- }}}
 
--- ufo {{{ 代码折叠
+-- 代码折叠
 local function pkg_ufo()
     local ufo = require('ufo')
     ufo.setup{
@@ -510,9 +478,8 @@ local function pkg_ufo()
             end
         end}
 end
--- }}}
 
--- treesitter {{{ 语法树
+-- 语法树
 local function pkg_treesitter()
 if use.treesitter then
     require('nvim-treesitter.configs').setup{
@@ -549,136 +516,16 @@ if use.treesitter then
     nnoremap{'<leader>ss', ':TSBufToggle incremental_selection<CR>'}
 end
 end
--- }}}
 
--- nlsp {{{ Language Server
-local function pkg_nlsp()
-if use.nlsp then
-    local lspconfig = require('lspconfig')
-    lspconfig.clangd.setup{ }
-    lspconfig.cmake.setup{
-        init_options = {
-            buildDirectory = '__VBuildOut',
-        },
-    }
-    lspconfig.rust_analyzer.setup{
-        ['rust-analyzer'] = {
-            updates = {
-                checkOnStartup = false,
-                channel = 'nightly',
-            },
-            cargo = { allFeatures = true, },
-            notifications = { cargoTomlNotFound = false, },
-            diagnostics = { disabled = {'inactive-code'}, },
-            procMacro = { enable = true, },
-        },
-    }
-    lspconfig.pyright.setup{
-        python = {
-            analysis = {
-                stubPath = 'typings',
-            },
-        },
-    }
-    lspconfig.sumneko_lua.setup{ }
-    lspconfig.vimls.setup{ }
-    lspconfig.ltex.setup{ }
-
-    local cmp = require('cmp')
-    cmp.setup{
-        mapping = {
-            ['<M-i>'] = cmp.mapping(function()
-                if cmp.visible()
-                then cmp.abort()
-                else cmp.complete()
-                end
-            end, {'i'}),
-            ['<M-j>'] = cmp.mapping.select_next_item(),
-            ['<M-k>'] = cmp.mapping.select_prev_item(),
-            ['<M-n>'] = cmp.mapping.scroll_docs(4),
-            ['<M-m>'] = cmp.mapping.scroll_docs(-4),
-            ['<M-f>'] = cmp.mapping.scroll_docs(4),
-            ['<M-d>'] = cmp.mapping.scroll_docs(-4),
-        },
-        sources = cmp.config.sources({
-            { name = 'nvim_lsp' },
-            { name = 'ultisnips' },
-            { name = 'path' },
-        }, {
-            { name = 'buffer' },
-        }),
-    }
-    cmp.setup.cmdline('/', {
-        mapping = cmp.mapping.preset.cmdline(),
-        sources = {
-            { name = 'buffer' }
-        }
-    })
-    cmp.setup.cmdline(':', {
-        mapping = cmp.mapping.preset.cmdline(),
-        sources = cmp.config.sources({
-            { name = 'path' }
-        }, {
-            { name = 'cmdline' }
-        })
-    })
-
-    require('mason').setup{
-        install_root_dir = vim.env.DotVimCache .. '/.mason',
-        ui = {
-            check_outdated_packages_on_open = true,
-            border = 'single',
-            icons = {
-                package_installed = '√',
-                package_pending = '●',
-                package_uninstalled = '○',
-            },
-        },
-    }
-
-    vim.diagnostic.config({
-        virtual_text = { prefix = '▪' },
-    })
-
-    inoremap{     '<M-o>', vim.lsp.buf.signature_help}
-    nnoremap{        'gd', vim.lsp.buf.definition}
-    nnoremap{        'gD', vim.lsp.buf.declaration}
-    nnoremap{'<leader>gd', vim.lsp.buf.definition}
-    nnoremap{'<leader>gD', vim.lsp.buf.declaration}
-    nnoremap{'<leader>gi', vim.lsp.buf.implementation}
-    nnoremap{'<leader>gt', vim.lsp.buf.type_definition}
-    nnoremap{'<leader>gr', vim.lsp.buf.references}
-    nnoremap{'<leader>gf', function() vim.lsp.buf.code_action({apply = true}) end}
-    nnoremap{'<leader>ga', vim.lsp.buf.code_action}
-    nnoremap{'<leader>gn', vim.lsp.buf.rename}
-    nnoremap{'<leader>gh', vim.lsp.buf.hover}
-    -- nnoremap{'<leader>gj', vim.lsp.buf.jump_float}
-    -- nnoremap{'<leader>gc', vim.lsp.buf.clear_float}
-    nnoremap{'<leader>of', vim.lsp.buf.format}
-    vnoremap{'<leader>of', vim.lsp.buf.format}
-    nnoremap{'<leader>oj', function() vim.diagnostic.goto_next({severity = vim.diagnostic.severity.ERROR }) end}
-    nnoremap{'<leader>ok', function() vim.diagnostic.goto_prev({severity = vim.diagnostic.severity.ERROR }) end}
-    nnoremap{'<leader>oJ', vim.diagnostic.goto_next}
-    nnoremap{'<leader>oK', vim.diagnostic.goto_prev}
-    nnoremap{'<leader>oi', vim.diagnostic.open_float}
-    -- nnoremap{'<leader>od', vim.diagnostic.toggle}
-    -- nnoremap{'<leader>ow', vim.lsp.buf.manage_workspace_folder}
-    -- nnoremap{'<leader>oc', vim.lsp.buf.execute_command}
-    nnoremap{'<leader>om', ':Mason<CR>'}
-end
-end
--- }}}
--- }}}
-
--- Setup {{{
-local function setup()
+local function pkg_setup()
+    -- Editor
     pkg_hop()
     pkg_marks()
     pkg_gomove()
     pkg_neoscroll()
     pkg_winpick()
     pkg_winshift()
-
+    -- Component
     pkg_alpha()
     pkg_notify()
     pkg_dressing()
@@ -687,7 +534,7 @@ local function setup()
     pkg_scrollbar()
     pkg_tree()
     pkg_telescope()
-
+    -- Coding
     pkg_trouble()
     pkg_ccc()
     pkg_autopairs()
@@ -695,9 +542,8 @@ local function setup()
     pkg_surround()
     pkg_ufo()
     pkg_treesitter()
-    pkg_nlsp()
 end
-setup()
--- }}}
 
--- vim: fdm=marker
+return {
+    setup = pkg_setup
+}
