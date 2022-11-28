@@ -4,9 +4,9 @@ local fn = vim.fn
 local o = vim.o
 local opt = vim.opt
 local use = require('v.use').get()
-local noremap = require('v.mods').keymap.noremap
-local nnoremap = require('v.mods').keymap.nnoremap
-local inoremap = require('v.mods').keymap.inoremap
+local noremap = require('v.maps').noremap
+local nnoremap = require('v.maps').nnoremap
+local inoremap = require('v.maps').inoremap
 
 
 --------------------------------------------------------------------------------

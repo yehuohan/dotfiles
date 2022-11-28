@@ -53,7 +53,6 @@ local function setup(dotvim)
     require('v.pkgs').setup()
     require('v.mods').setup()
     require('v.sets').setup()
-    vim.api.nvim_command[[source $DotVimDir/lua/v/maps.vim]]
 end
 
 return {

@@ -14,7 +14,7 @@ if [[ `uname` == "Linux" ]]; then
     cp ~/.vim/.init.vim                             ./vim/.vim/
     cp -r ~/.vim/autoload                           ./vim/.vim/
     cp -r ~/.vim/viml                               ./vim/.vim/
-    cp -r ~/.vim/lua                                ./vim/.vim/
+    # cp -r ~/.vim/lua                                ./vim/.vim/
     cp -r ~/.vim/rplugin                            ./vim/.vim/
     cp -r ~/.vim/pythonx                            ./vim/.vim/
     cp -r ~/.vim/snips                              ./vim/.vim/
@@ -82,7 +82,7 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp $APPS_HOME/dotvim/.init.vim                  ./vim/.vim/
     cp -r $APPS_HOME/dotvim/autoload                ./vim/.vim/
     cp -r $APPS_HOME/dotvim/viml                    ./vim/.vim/
-    cp -r $APPS_HOME/dotvim/lua                     ./vim/.vim/
+    # cp -r $APPS_HOME/dotvim/lua                     ./vim/.vim/
     cp -r $APPS_HOME/dotvim/rplugin                 ./vim/.vim/
     cp -r $APPS_HOME/dotvim/pythonx                 ./vim/.vim/
     cp -r $APPS_HOME/dotvim/snips                   ./vim/.vim/

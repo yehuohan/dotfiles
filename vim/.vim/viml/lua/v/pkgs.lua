@@ -1,18 +1,17 @@
 local fn = vim.fn
 local g = vim.g
 local use = require('v.use').get()
-local map      = require('v.mods').keymap.map
-local nmap     = require('v.mods').keymap.nmap
-local vmap     = require('v.mods').keymap.vmap
-local xmap     = require('v.mods').keymap.xmap
-local omap     = require('v.mods').keymap.omap
-local noremap  = require('v.mods').keymap.noremap
-local nnoremap = require('v.mods').keymap.nnoremap
-local vnoremap = require('v.mods').keymap.vnoremap
-local xnoremap = require('v.mods').keymap.xnoremap
+local map      = require('v.maps').map
+local nmap     = require('v.maps').nmap
+local vmap     = require('v.maps').vmap
+local xmap     = require('v.maps').xmap
+local omap     = require('v.maps').omap
+local noremap  = require('v.maps').noremap
+local nnoremap = require('v.maps').nnoremap
+local vnoremap = require('v.maps').vnoremap
 
 
-local function pkgs_standard()
+local function pkg_standard()
     g.loaded_gzip = 1
     g.loaded_tarPlugin = 1
     g.loaded_tar = 1
@@ -22,7 +21,7 @@ local function pkgs_standard()
     g.loaded_netrwPlugin = 1
 end
 
-local function pkgs_packer()
+local function pkg_packer()
     local packer_config = {
         package_root = vim.env.DotVimDir .. '/pack',
         compile_path = vim.env.DotVimDir .. '/pack/packer_compiled.lua',
@@ -42,14 +41,9 @@ local function pkgs_packer()
 
         -- editing
         add 'yehuohan/hop.nvim'
-        add 'haya14busa/incsearch.vim'
-        add 'haya14busa/incsearch-fuzzy.vim'
-        add 'rhysd/clever-f.vim'
         add 'mg979/vim-visual-multi'
-        add 't9md/vim-textmanip'
         add 'markonm/traces.vim'
         add 'junegunn/vim-easy-align'
-        add 'psliwka/vim-smoothie'
         add 'terryma/vim-expand-region'
         add 'kana/vim-textobj-user'
         add 'kana/vim-textobj-indent'
@@ -58,8 +52,6 @@ local function pkgs_packer()
         add 'adriaanzon/vim-textobj-matchit'
         add 'lucapette/vim-textobj-underscore'
         add 'tpope/vim-repeat'
-        add 'kshenoy/vim-signature'
-        add 'Konfekt/FastFold'
         add 'mbbill/undotree'
 
         -- managers
@@ -73,7 +65,7 @@ end
 -- Editing
 --------------------------------------------------------------------------------
 -- 快速跳转
-local function pkgs_hop()
+local function pkg_hop()
     require'hop'.setup({ match_mappings = { 'zh', 'zh_sc' }, create_hl_autocmd = true })
     noremap{'s'                , [[<Cmd>HopChar1MW<CR>]]    }
     noremap{'<leader>ms'       , [[<Cmd>HopChar2MW<CR>]]    }
@@ -81,23 +73,10 @@ local function pkgs_hop()
     noremap{'<leader>j'        , [[<Cmd>HopLineStartMW<CR>]]}
     noremap{'<leader><leader>j', [[<Cmd>HopLineMW<CR>]]     }
     noremap{'<leader>mw'       , [[<Cmd>HopWord<CR>]]       }
-    nnoremap{'z/',
-        [[incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/'}))]],
-        silent = true, expr = true }
-    nnoremap{'zg/',
-        [[incsearch#go(incsearch#config#fuzzy#make({'prompt': 'z/', 'is_stay': 1}))]],
-        silent = true, expr = true }
-end
-
--- 行跳转
-local function pkgs_clever_f()
-    g.clever_f_across_no_line = 1
-    g.clever_f_show_prompt = 1
-    g.clever_f_smart_case = 1
 end
 
 -- 多光标编辑
-local function pkgs_visual_multi()
+local function pkg_visual_multi()
     -- Usage: https://github.com/mg979/vim-visual-multi/wiki
     -- Tab: 切换cursor/extend模式
     -- C-n: 添加word或selected region作为cursor
@@ -124,35 +103,14 @@ local function pkgs_visual_multi()
     }
 end
 
--- 块编辑
-local function pkgs_textmanip()
-    g.textmanip_enable_mappings = 0
-    -- 切换Insert/Replace Mode
-    xnoremap{'<M-o>',
-        [[<Cmd>]] ..
-        [[let g:textmanip_current_mode = (g:textmanip_current_mode == 'replace') ? 'insert' : 'replace'<Bar>]] ..
-        [[echo 'textmanip mode: ' . g:textmanip_current_mode<CR>]]}
-    xmap{'<C-o>', '<M-o>'}
-    -- 更据Mode使用Move-Insert或Move-Replace
-    xmap{'<C-j>', [[<Plug>(textmanip-move-down)]] }
-    xmap{'<C-k>', [[<Plug>(textmanip-move-up)]]   }
-    xmap{'<C-h>', [[<Plug>(textmanip-move-left)]] }
-    xmap{'<C-l>', [[<Plug>(textmanip-move-right)]]}
-    -- 更据Mode使用Duplicate-Insert或Duplicate-Replace
-    xmap{'<M-j>', [[<Plug>(textmanip-duplicate-down)]] }
-    xmap{'<M-k>', [[<Plug>(textmanip-duplicate-up)]]   }
-    xmap{'<M-h>', [[<Plug>(textmanip-duplicate-left)]] }
-    xmap{'<M-l>', [[<Plug>(textmanip-duplicate-right)]]}
-end
-
 -- 预览增强
-local function pkgs_traces()
+local function pkg_traces()
     -- 支持:s, :g, :v, :sort, :range预览
     g.traces_num_range_preview = 1          -- 支持:N,M预览
 end
 
 -- 字符对齐
-local function pkgs_easy_align()
+local function pkg_easy_align()
     g.easy_align_bypass_fold = 1
     g.easy_align_ignore_groups = {}         -- 默认任何group都进行对齐
     -- 默认对齐内含段落（Text Object: vip）
@@ -166,25 +124,14 @@ local function pkgs_easy_align()
     vnoremap{'<leader><leader>A', [[:EasyAlign<Space>]]                                 }
 end
 
--- 平滑滚动
-local function pkgs_smoothie()
-    g.smoothie_no_default_mappings = true
-    g.smoothie_update_interval = 30
-    g.smoothie_base_speed = 20
-    nmap{'<M-n>', [[<Plug>(SmoothieDownwards)]]}
-    nmap{'<M-m>', [[<Plug>(SmoothieUpwards)]]  }
-    nmap{'<M-j>', [[<Plug>(SmoothieForwards)]] }
-    nmap{'<M-k>', [[<Plug>(SmoothieBackwards)]]}
-end
-
 --  快速块选择
-local function pkgs_expand_region()
+local function pkg_expand_region()
     map{'<M-r>', [[<Plug>(expand_region_expand)]]}
     map{'<M-w>', [[<Plug>(expand_region_shrink)]]}
 end
 
 -- 文本对象
-local function pkgs_textobj_user()
+local function pkg_textobj_user()
     -- vdc-ia-wWsp(b[<t{B"'`
     -- vdc-ia-ifcmu
     g.textobj_indent_no_default_key_mappings = 1
@@ -219,38 +166,8 @@ function Plug_to_motion(motion)
     })
 end
 
--- 书签管理
-local function pkgs_signature()
-    g.SignatureMap = {
-        Leader            = 'm',
-        PlaceNextMark     = 'm,',
-        ToggleMarkAtLine  = 'm.',
-        PurgeMarksAtLine  = 'm-',
-        DeleteMark        = '', PurgeMarks        = '', PurgeMarkers      = '',
-        GotoNextLineAlpha = '', GotoPrevLineAlpha = '', GotoNextLineByPos = '', GotoPrevLineByPos = '',
-        GotoNextSpotAlpha = '', GotoPrevSpotAlpha = '', GotoNextSpotByPos = '', GotoPrevSpotByPos = '',
-        GotoNextMarker    = '', GotoPrevMarker    = '', GotoNextMarkerAny = '', GotoPrevMarkerAny = '',
-        ListBufferMarks   = '', ListBufferMarkers = '',
-    }
-    nnoremap{'<leader>ts', [[:SignatureToggleSigns<CR>]]                           }
-    nnoremap{'<leader>ma', [[:SignatureListBufferMarks<CR>]]                       }
-    nnoremap{'<leader>mc', [[:call signature#mark#Purge('all')<CR>]]               }
-    nnoremap{'<leader>ml', [[:call signature#mark#Purge('line')<CR>]]              }
-    nnoremap{'<M-,>'     , [[:call signature#mark#Goto('prev', 'line', 'pos')<CR>]]}
-    nnoremap{'<M-.>'     , [[:call signature#mark#Goto('next', 'line', 'pos')<CR>]]}
-end
-
--- 更新折叠
-local function pkgs_fastfold()
-    g.fastfold_savehook = 0                 -- 只允许手动更新folds
-    g.fastfold_fold_command_suffixes = {'x','X','a','A','o','O','c','C'}
-    g.fastfold_fold_movement_commands = {'z[', 'z]', 'zj', 'zk'}
-                                            -- 允许指定的命令更新folds
-    nmap{'<leader>zu', [[<Plug>(FastFoldUpdate)]]}
-end
-
 -- 撤消历史
-local function pkgs_undotree()
+local function pkg_undotree()
     nnoremap{'<leader>tu', [[:UndotreeToggle<CR>]]}
 end
 
@@ -258,7 +175,7 @@ end
 -- Manager
 --------------------------------------------------------------------------------
 -- Vim主题(ColorScheme, StatusLine, TabLine)
-local function pkgs_theme()
+local function pkg_theme()
     g.gruvbox_contrast_dark = 'soft'        -- 背景选项：dark, medium, soft
     g.gruvbox_italic = 1
     vim.o.background = 'dark'
@@ -268,7 +185,7 @@ local function pkgs_theme()
 end
 
 -- 弹出选项
-local function pkgs_popset()
+local function pkg_popset()
     g.Popset_SelectionData = {{
             opt = {'colorscheme', 'colo'},
             lst = {'gruvbox', 'one'},
@@ -278,7 +195,7 @@ local function pkgs_popset()
 end
 
 -- buffer管理
-local function pkgs_popc()
+local function pkg_popc()
     g.Popc_jsonPath = vim.env.DotVimCache
     g.Popc_useFloatingWin = 1
     g.Popc_highlight = {
@@ -315,28 +232,23 @@ local function pkgs_popc()
 end
 
 
-local function pkgs_setup()
-    pkgs_standard()
-    pkgs_packer()
+local function pkg_setup()
+    pkg_standard()
+    pkg_packer()
     -- editing
-    pkgs_hop()
-    pkgs_clever_f()
-    pkgs_visual_multi()
-    pkgs_textmanip()
-    pkgs_traces()
-    pkgs_easy_align()
-    pkgs_smoothie()
-    pkgs_expand_region()
-    pkgs_textobj_user()
-    pkgs_signature()
-    pkgs_fastfold()
-    pkgs_undotree()
+    pkg_hop()
+    pkg_visual_multi()
+    pkg_traces()
+    pkg_easy_align()
+    pkg_expand_region()
+    pkg_textobj_user()
+    pkg_undotree()
     -- managers
-    pkgs_theme()
-    pkgs_popset()
-    pkgs_popc()
+    pkg_theme()
+    pkg_popset()
+    pkg_popc()
 end
 
 return {
-    setup = pkgs_setup,
+    setup = pkg_setup,
 }
