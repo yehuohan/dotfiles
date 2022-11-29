@@ -119,16 +119,21 @@ if s:use.treesitter
     Plug 'p00f/nvim-ts-rainbow'
 endif
 if s:use.nlsp
+    Plug 'williamboman/mason.nvim'
+    Plug 'williamboman/mason-lspconfig.nvim'
     Plug 'neovim/nvim-lspconfig'
     Plug 'hrsh7th/nvim-cmp'
     Plug 'hrsh7th/cmp-nvim-lsp'
     Plug 'hrsh7th/cmp-buffer'
     Plug 'hrsh7th/cmp-path'
     Plug 'hrsh7th/cmp-cmdline'
+    Plug 'hrsh7th/cmp-nvim-lua'
+    Plug 'hrsh7th/cmp-nvim-lsp-signature-help'
     Plug 'hrsh7th/cmp-calc'
     Plug 'quangnguyen30192/cmp-nvim-ultisnips'
     Plug 'f3fora/cmp-spell'
-    Plug 'williamboman/mason.nvim'
+    Plug 'kdheepak/cmp-latex-symbols'
+    Plug 'uga-rosa/cmp-dictionary'
 endif
 else
     Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}

@@ -4,8 +4,28 @@ local vnoremap = require('v.maps').vnoremap
 local inoremap = require('v.maps').inoremap
 
 
-local function nlsp_setup()
-if use.nlsp then
+-- server settings
+local function __mason()
+    require('mason').setup{
+        install_root_dir = vim.env.DotVimCache .. '/.mason',
+        ui = {
+            check_outdated_packages_on_open = true,
+            border = 'single',
+            icons = {
+                package_installed = '√',
+                package_pending = '●',
+                package_uninstalled = '○',
+            },
+        },
+    }
+
+    require('mason-lspconfig').setup{ }
+    -- require('mason-lspconfig').setup_handlers{
+    --     function(server_name)
+    --         require('lspconfig')[server_name].setup{ }
+    --     end
+    -- }
+
     local lspconfig = require('lspconfig')
     lspconfig.clangd.setup{ }
     lspconfig.cmake.setup{
@@ -34,10 +54,51 @@ if use.nlsp then
     }
     lspconfig.sumneko_lua.setup{ }
     lspconfig.vimls.setup{ }
-    lspconfig.ltex.setup{ }
+    -- lspconfig.ltex.setup{ }
+end
+
+local kind_icons = {
+    Text          = '',
+    Method        = '',
+    Function      = '',
+    Constructor   = '',
+    Field         = '',
+    Variable      = 'ω',
+    Class         = 'ﴯ',
+    Interface     = '',
+    Module        = '',
+    Property      = 'ﰠ',
+    Unit          = '',
+    Value         = '',
+    Enum          = '',
+    Keyword       = '',
+    Snippet       = '',
+    Color         = '',
+    File          = '',
+    Reference     = '',
+    Folder        = '',
+    EnumMember    = '',
+    Constant      = '',
+    Struct        = '',
+    Event         = '',
+    Operator      = '',
+    TypeParameter = ''
+}
+
+local kind_texts = {
+    buffer        = 'Buf',
+    nvim_lsp      = 'Lsp',
+    ultisnips     = 'Snp',
+    nvim_lua      = 'Lua',
+    latex_symbols = 'Tex',
+}
+
+-- completion settings
+local function __cmp()
+    vim.api.nvim_set_hl(0, 'CmpItemMenu', { link='Comment' })
+    vim.api.nvim_set_hl(0, 'CmpItemAbbrMatch', { link='Identifier' })
 
     local cmp = require('cmp')
-    vim.api.nvim_set_hl(0, 'CmpItemMenu', { link='Comment' })
     cmp.setup{
         mapping = {
             ['<M-i>'] = cmp.mapping(function()
@@ -57,9 +118,20 @@ if use.nlsp then
             { name = 'nvim_lsp' },
             { name = 'ultisnips' },
             { name = 'path' },
+            -- { name = 'nvim_lua' },
+            -- { name = 'dictionary' },
+            -- { name = 'latex_symbols' },
+            -- { name = 'nvim_lsp_signature_help' },
         }, {
             { name = 'buffer' },
         }),
+        formatting = {
+            format = function(entry, vitem)
+                vitem.kind = string.format('%s %s', kind_icons[vitem.kind], vitem.kind)
+                vitem.menu = kind_texts[entry.source.name]
+                return vitem
+            end
+        },
     }
     cmp.setup.cmdline('/', {
         mapping = cmp.mapping.preset.cmdline(),
@@ -76,18 +148,6 @@ if use.nlsp then
         })
     })
 
-    require('mason').setup{
-        install_root_dir = vim.env.DotVimCache .. '/.mason',
-        ui = {
-            check_outdated_packages_on_open = true,
-            border = 'single',
-            icons = {
-                package_installed = '√',
-                package_pending = '●',
-                package_uninstalled = '○',
-            },
-        },
-    }
 
     vim.diagnostic.config({
         virtual_text = { prefix = '▪' },
@@ -118,6 +178,12 @@ if use.nlsp then
     -- nnoremap{'<leader>ow', vim.lsp.buf.manage_workspace_folder}
     -- nnoremap{'<leader>oc', vim.lsp.buf.execute_command}
     nnoremap{'<leader>om', ':Mason<CR>'}
+end
+
+local function nlsp_setup()
+if use.nlsp then
+    __mason()
+    __cmp()
 end
 end
 

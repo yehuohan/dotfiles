@@ -3,6 +3,7 @@
     "suggest.autoTrigger": "always",
     "suggest.virtualText": true,
     "suggest.noselect": true,
+    "suggest.labelMaxLength": 80,
     "suggest.completionItemKindLabels": {
         "keyword"       : "",
         "variable"      : "",
@@ -126,18 +127,6 @@
             "rootPatterns": ["compile_flags.txt", "compile_commands.json", "tags"],
             "filetypes": ["c", "cc", "cpp", "c++", "objc", "objcpp"]
         },
-        */
-        /* Not in use
-        "julia": {
-            "command": "julia",
-            "args": [
-                "--startup-file=no",
-                "--history-file=no",
-                "-e",
-                "using LanguageServer;\n       using Pkg;\n       import StaticLint;\n       import SymbolServer;\n       env_path = dirname(Pkg.Types.Context().env.project_file);\n       debug = false;\n       server = LanguageServer.LanguageServerInstance(stdin, stdout, debug, env_path, \"\", Dict());\n       server.runlinter = true;\n       run(server);"
-            ],
-            "filetypes": ["julia"]
-        }
         */
     }
 }
