@@ -48,6 +48,7 @@ call plug#begin($DotVimDir.'/bundle')  " 设置插件位置，且自动设置了
 if IsNVim()
     Plug 'yehuohan/hop.nvim'
     Plug 'yehuohan/marks.nvim'
+    Plug 'xiyaowong/nvim-cursorword'
     Plug 'booperlv/nvim-gomove'
     Plug 'karb94/neoscroll.nvim'
     Plug 'gbrlsnchs/winpick.nvim'
@@ -55,6 +56,7 @@ if IsNVim()
 else
     Plug 'yehuohan/vim-easymotion'
     Plug 'kshenoy/vim-signature'
+    Plug 'RRethy/vim-illuminate'
     Plug 't9md/vim-textmanip'
     Plug 'psliwka/vim-smoothie'
 endif
@@ -155,7 +157,6 @@ endif
     Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
     Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
     Plug 't9md/vim-quickhl'
-    Plug 'RRethy/vim-illuminate'
     Plug 'skywind3000/asyncrun.vim'
     Plug 'voldikss/vim-floaterm'
     Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
@@ -712,14 +713,6 @@ map <leader>hs <Plug>(quickhl-manual-this-whole-word)
 map <leader>hc <Plug>(quickhl-manual-clear)
 nmap <leader>hr <Plug>(quickhl-manual-reset)
 nmap <leader>th <Plug>(quickhl-manual-toggle)
-" }}}
-
-" illuminate {{{ 自动高亮
-let g:Illuminate_useDeprecated = 1
-let g:Illuminate_delay = 200
-let g:Illuminate_ftblacklist = ['nerdtree', 'NvimTree']
-nnoremap <leader>tg :IlluminationToggle<CR>
-highlight link illuminatedWord MatchParen
 " }}}
 
 " asyncrun {{{ 导步运行程序

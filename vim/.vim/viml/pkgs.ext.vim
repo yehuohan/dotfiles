@@ -34,6 +34,14 @@ nnoremap <M-,>      :call signature#mark#Goto('prev', 'line', 'pos')<CR>
 nnoremap <M-.>      :call signature#mark#Goto('next', 'line', 'pos')<CR>
 " }}}
 
+" illuminate {{{ 自动高亮
+let g:Illuminate_useDeprecated = 1
+let g:Illuminate_delay = 200
+let g:Illuminate_ftblacklist = ['nerdtree', 'NvimTree']
+nnoremap <leader>tg :IlluminationToggle<CR>
+highlight link illuminatedWord MatchParen
+" }}}
+
 " textmanip {{{ 块编辑
 let g:textmanip_enable_mappings = 0
 " 切换Insert/Replace Mode

@@ -58,6 +58,15 @@ local function pkg_marks()
     nnoremap{'<leader>ma', ':MarksListBuf<CR>'}
 end
 
+-- 自动高亮当前word
+local function pkg_cursorword()
+    vim.g.cursorword_disable_filetypes = {'nerdtree', 'NvimTree'}
+    vim.g.cursorword_disable_at_startup = false
+    vim.g.cursorword_min_width = 2
+    vim.g.cursorword_max_width = 64
+    vim.api.nvim_set_hl(0, 'CursorWord', { ctermbg=60, bg='#505060' })
+end
+
 -- 块编辑
 local function pkg_gomove()
     require('gomove').setup {
@@ -527,6 +536,7 @@ local function pkg_setup()
     -- Editor
     pkg_hop()
     pkg_marks()
+    pkg_cursorword()
     pkg_gomove()
     pkg_neoscroll()
     pkg_winpick()
