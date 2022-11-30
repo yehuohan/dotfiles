@@ -186,6 +186,9 @@ augroup UserSetsCmd
     autocmd Filetype python                         setlocal foldmethod=indent foldignore=
     autocmd FileType txt,log                        setlocal foldmethod=manual
     autocmd BufReadPre * call s:onLargeFile()
+if IsNVim()
+    autocmd TextYankPost * silent! lua vim.highlight.on_yank{higroup='IncSearch', timeout=200}
+endif
 augroup END
 " }}}
 

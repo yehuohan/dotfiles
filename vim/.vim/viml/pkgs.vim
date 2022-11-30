@@ -626,7 +626,6 @@ nnoremap <leader>ow <Cmd>CocList --normal folders<CR>
 nnoremap <leader>om <Cmd>CocList --normal marketplace<CR>
 nnoremap <leader>oc <Cmd>CocList commands<CR>
 " coc-extensions
-nnoremap <leader>oy <Cmd>CocList --normal yank<CR>
 nnoremap <leader>op <Cmd>CocCommand cSpell.toggleEnableSpellChecker<CR>
 nmap <leader>oe <Plug>(coc-calc-result-append)
 endif
