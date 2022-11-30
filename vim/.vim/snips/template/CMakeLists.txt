@@ -35,7 +35,7 @@ add_custom_target(tags # 定义目标（类似于Makefile中的target）
 project(libname)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc)
-file(GLOB_RECURSE SRC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+file(GLOB_RECURSE SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/*.*)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/src SRC)
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 add_compile_options(-g -Wall -DMYVAR=1)

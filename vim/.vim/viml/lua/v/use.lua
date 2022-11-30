@@ -65,7 +65,7 @@ local function use_init()
         }
 
     fn.PopSelection({
-        opt = 'select use settings',
+        opt = 'use',
         lst = fn.sort(vim.tbl_keys(use)),
         dic = udic,
         sub = {

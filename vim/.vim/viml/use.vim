@@ -79,7 +79,7 @@ function! s:useInit()
         \ }
 
     call PopSelection({
-        \ 'opt' : 'select use settings',
+        \ 'opt' : 'use',
         \ 'lst' : sort(keys(s:use)),
         \ 'dic' : l:dic,
         \ 'sub' : {

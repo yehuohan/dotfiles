@@ -716,8 +716,14 @@ endfunction
 " Function: s:getMultiDirs() {{{
 function! s:getMultiDirs()
     let l:loc = Input2Str('Location: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
-    return empty(l:loc) ? [] :
-        \ map(split(l:loc, '|'), {key, val -> (val =~# '[/\\]$') ? val[0:-2] : val})
+    if empty(l:loc)
+        let l:loc = []
+    else
+        let l:loc = split(l:loc, '|')
+        let l:loc = map(l:loc, {key, val -> fnamemodify(val, ':p')})
+        let l:loc = map(l:loc, {key, val -> (val =~# '[/\\]$') ? val[0:-2] : val})
+    endif
+    return l:loc
 endfunction
 " }}}
 
