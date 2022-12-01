@@ -64,7 +64,7 @@ local function pkg_cursorword()
     vim.g.cursorword_disable_at_startup = false
     vim.g.cursorword_min_width = 2
     vim.g.cursorword_max_width = 64
-    vim.api.nvim_set_hl(0, 'CursorWord', { ctermbg=60, bg='#505060' })
+    vim.api.nvim_set_hl(0, 'CursorWord', { ctermbg = 60, bg = '#505060' })
 end
 
 -- 块编辑

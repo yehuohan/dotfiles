@@ -58,31 +58,31 @@ local function __mason()
 end
 
 local kind_icons = {
-    Text          = '',
-    Method        = '',
-    Function      = '',
-    Constructor   = '',
-    Field         = '',
-    Variable      = 'ω',
-    Class         = 'ﴯ',
-    Interface     = '',
-    Module        = '',
-    Property      = 'ﰠ',
-    Unit          = '',
-    Value         = '',
-    Enum          = '',
-    Keyword       = '',
-    Snippet       = '',
-    Color         = '',
-    File          = '',
-    Reference     = '',
-    Folder        = '',
-    EnumMember    = '',
-    Constant      = '',
-    Struct        = '',
-    Event         = '',
-    Operator      = '',
-    TypeParameter = ''
+    Text          = {'', 'Txt' },
+    Method        = {'', 'Meth'},
+    Function      = {'', 'Fun' },
+    Constructor   = {'', 'CnSt'},
+    Field         = {'', 'Fied'},
+    Variable      = {'ω', 'Var' },
+    Class         = {'ﴯ', 'Cla' },
+    Interface     = {'', 'InF' },
+    Module        = {'', 'Mod' },
+    Property      = {'ﰠ', 'Prop'},
+    Unit          = {'', 'Unit'},
+    Value         = {'', 'Val' },
+    Enum          = {'', 'Enum'},
+    Keyword       = {'', 'Key' },
+    Snippet       = {'', 'Snip'},
+    Color         = {'', 'Clr' },
+    File          = {'', 'File'},
+    Reference     = {'', 'Ref' },
+    Folder        = {'', 'Dir' },
+    EnumMember    = {'', 'EnuM'},
+    Constant      = {'', 'Cons'},
+    Struct        = {'', 'Stru'},
+    Event         = {'', 'Evnt'},
+    Operator      = {'', 'Oprt'},
+    TypeParameter = {'', 'TyPa'},
 }
 
 local kind_texts = {
@@ -95,8 +95,10 @@ local kind_texts = {
 
 -- completion settings
 local function __cmp()
-    vim.api.nvim_set_hl(0, 'CmpItemMenu', { link='Comment' })
-    vim.api.nvim_set_hl(0, 'CmpItemAbbrMatch', { link='Identifier' })
+    vim.api.nvim_set_hl(0, 'CmpItemMenu', { ctermfg = 175, fg = '#d3869b', italic = true })
+    vim.api.nvim_set_hl(0, 'CmpItemAbbrMatch', { ctermfg = 208, fg = '#fe8019' })
+    vim.api.nvim_set_hl(0, 'CmpItemAbbrMatchFuzzy', { ctermfg = 208, fg = '#fe8019' })
+    vim.api.nvim_set_hl(0, 'CmpItemKind', { ctermfg = 142, fg = '#b8bb26' })
 
     local cmp = require('cmp')
     cmp.setup{
@@ -125,10 +127,27 @@ local function __cmp()
         }, {
             { name = 'buffer' },
         }),
+        window = {
+            completion = {
+                winhighlight = 'Normal:Pmenu,FloatBorder:Pmenu,Search:None',
+                col_offset = -2,
+                side_padding = 0,
+            },
+        },
         formatting = {
+            fields = { 'kind', 'abbr', 'menu' },
             format = function(entry, vitem)
-                vitem.kind = string.format('%s %s', kind_icons[vitem.kind], vitem.kind)
-                vitem.menu = kind_texts[entry.source.name]
+                local ico = kind_icons[vitem.kind]
+                local txt = kind_texts[entry.source.name]
+                vitem.kind = string.format(' %s', ico[1])
+                if string.len(vitem.abbr) > 80 then
+                    vitem.abbr = string.sub(vitem.abbr, 1, 78) .. ' …'
+                end
+                if txt then
+                    vitem.menu = string.format('%4s %3s', ico[2], txt)
+                else
+                    vitem.menu = string.format('%4s', ico[2])
+                end
                 return vitem
             end
         },
@@ -177,6 +196,7 @@ local function __cmp()
     -- nnoremap{'<leader>od', vim.diagnostic.toggle}
     -- nnoremap{'<leader>ow', vim.lsp.buf.manage_workspace_folder}
     -- nnoremap{'<leader>oc', vim.lsp.buf.execute_command}
+    -- vim.diagnostic.setloclist()
     nnoremap{'<leader>om', ':Mason<CR>'}
 end
 
