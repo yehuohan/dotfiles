@@ -160,7 +160,7 @@ nnoremap <leader>ih :call OptionFns('syntax')<CR>
 " Autocmds {{{
 " Function: s:onLargeFile() {{{
 function! s:onLargeFile()
-    let l:fsize = getfsize(expand('<afile>'))
+    let l:fsize = getfsize(Expand('<afile>'))
     if l:fsize >= 5 * 1024 * 1024 || l:fsize == -2
         let b:lightline_check_flg = 0   " 禁止MixedIndent和Trailing检测
         set eventignore+=FileType
@@ -562,9 +562,9 @@ nnoremap <leader>ql
 
 " Diff {{{
 nnoremap <leader>ds
-    \ <Cmd>call Input2Fn(['File: ', '', 'file', expand('%:p:h')], {filename -> execute('diffsplit ' . filename)})<CR>
+    \ <Cmd>call Input2Fn(['File: ', '', 'file', Expand('%', ':p:h')], {filename -> execute('diffsplit ' . filename)})<CR>
 nnoremap <leader>dv
-    \ <Cmd>call Input2Fn(['File: ', '', 'file', expand('%:p:h')], {filename -> execute('vertical diffsplit ' . filename)})<CR>
+    \ <Cmd>call Input2Fn(['File: ', '', 'file', Expand('%', ':p:h')], {filename -> execute('vertical diffsplit ' . filename)})<CR>
 " 比较当前文件（已经分屏）
 nnoremap <leader>dt :diffthis<CR>
 nnoremap <leader>do :diffoff<CR>

@@ -100,6 +100,18 @@ function! Notify(msg)
 endfunction
 " }}}
 
+" FUNCTION: Expand(expr, [mods]) {{{ 路径扩展
+" @param expr: 扩展表达式，对于%，会受到lcd的影响
+function! Expand(expr, ...)
+    let l:mods = a:0 > 0 ? a:1 : ''
+    if a:expr ==# '%'
+        return fnamemodify(getbufinfo('%')[0].name, l:mods)
+    else
+        return expand(a:expr . l:mods)
+    endif
+endfunction
+" }}}
+
 " Function: Input2Str(prompt, [text, completion, workdir]) {{{ 输入字符串
 " @param workdir: 设置工作目录，用于文件和目录补全
 function! Input2Str(prompt, ...)
@@ -291,7 +303,7 @@ function! s:rp.run(cfg) dict
     let [l:Fn, l:pat] = self.proj[a:cfg.key]
     if empty(a:cfg.file)
         if l:pat == v:null
-            let a:cfg.file = expand('%:p')
+            let a:cfg.file = Expand('%', ':p')
         else
             let l:files = s:glob(l:pat, a:cfg.lowest)
             if empty(l:files)
@@ -328,7 +340,7 @@ endfunction
 " @param low: true:查找到存在pat的最低层目录 false:查找到存在pat的最高层目录
 " @return 返回找到的文件列表
 function! s:glob(pat, low)
-    let l:dir      = expand('%:p:h')
+    let l:dir      = Expand('%', ':p:h')
     let l:dir_last = ''
 
     " widows文件不区分大小写，其它需要通过正则式实现
@@ -715,7 +727,7 @@ endfunction
 
 " Function: s:getMultiDirs() {{{
 function! s:getMultiDirs()
-    let l:loc = Input2Str('Location: ', '', 'customlist,GetMultiFilesCompletion', expand('%:p:h'))
+    let l:loc = Input2Str('Location: ', '', 'customlist,GetMultiFilesCompletion', Expand('%', ':p:h'))
     if empty(l:loc)
         let l:loc = []
     else
@@ -734,7 +746,7 @@ function! s:parsePattern(km)
         if a:km.E ==? 'i'
             let l:pat = Input2Str('Pattern: ')
         elseif a:km.E =~? '[ws]'
-            let l:pat = expand('<cword>')
+            let l:pat = Expand('<cword>')
         endif
     else
         let l:selected = GetSelected('')
@@ -757,7 +769,7 @@ endfunction
 function! s:parseLocation(km)
     let l:loc = ''
     if a:km.A0 ==# 'b'
-        let l:loc = expand('%:p')
+        let l:loc = Expand('%', ':p')
     elseif a:km.A0 ==# 't'
         let l:loc = join(popc#layer#buf#GetFiles('sigtab'), '" "')
     elseif a:km.A0 ==# 'o'
@@ -769,7 +781,7 @@ function! s:parseLocation(km)
         if empty(l:loc)
             let l:loc = popc#utils#FindRoot()
             if empty(l:loc)
-                let l:loc = expand('%:p:h')
+                let l:loc = Expand('%', ':p:h')
             else
                 let s:ws.fw.path = l:loc
                 call add(s:ws.fw.pathlst, s:ws.fw.path)
@@ -968,7 +980,7 @@ function! FindWFuzzy(keys)
         let l:pat = ''
         if mode() ==# 'n'
             if km.E =~# '[h]'
-                let l:pat = expand('<cword>')
+                let l:pat = Expand('<cword>')
             endif
         else
             let l:pat = GetSelected('')
@@ -983,7 +995,7 @@ function! FindWFuzzy(keys)
             endif
         endif
         if (km.A ==# 'p') || empty(l:loc)
-            let l:loc = Input2Str('fuzzy path: ', '', 'dir', expand('%:p:h'))
+            let l:loc = Input2Str('fuzzy path: ', '', 'dir', Expand('%', ':p:h'))
         endif
 
         if !empty(l:loc)
@@ -1070,7 +1082,7 @@ endfunction
 " Function: s:rs.fns.copyConfig(filename) dict {{{ 复制配置文件到当前目录
 function! s:rs.fns.copyConfig(filename) dict
     let l:srcfile = $DotVimMisc . '/' . a:filename
-    let l:dstfile = expand('%:p:h') . '/' . a:filename
+    let l:dstfile = Expand('%', ':p:h') . '/' . a:filename
     if !filereadable(l:dstfile)
         call writefile(readfile(l:srcfile), l:dstfile)
     endif
@@ -1132,8 +1144,8 @@ endfunction
 
 " Function: FnSwitchFile(sf) {{{ 切换文件
 function! FnSwitchFile(sf)
-    let l:ext = expand('%:e')
-    let l:file = expand('%:p:r')
+    let l:ext = Expand('%', ':e')
+    let l:file = Expand('%', ':p:r')
     let l:try = []
     if index(a:sf.lhs, l:ext, 0, 1) >= 0
         let l:try = a:sf.rhs

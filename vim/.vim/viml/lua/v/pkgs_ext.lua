@@ -324,7 +324,7 @@ local function pkg_tree()
         function()
             local tapi = require('nvim-tree.api')
             tapi.tree.close()
-            tapi.tree.open(vim.fn.expand('%:p:h'))
+            tapi.tree.open(vim.fn.Expand('%', ':p:h'))
         end}
 end
 

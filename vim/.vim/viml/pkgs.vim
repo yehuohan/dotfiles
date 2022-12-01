@@ -370,7 +370,7 @@ function! Plug_ll_mode()
 endfunction
 
 function! Plug_ll_msgLeft()
-    return substitute(expand('%:p'), '^' . escape(expand(SvarWs().fw.path), '\'), '', '')
+    return substitute(Expand('%', ':p'), '^' . escape(Expand(SvarWs().fw.path), '\'), '', '')
 endfunction
 
 function! Plug_ll_msgRight()
@@ -494,7 +494,7 @@ let g:NERDTreeMapMenu = 'M'
 let g:NERDTreeMapToggleBookmarks = ''
 nnoremap <leader>te :NERDTreeToggle<CR>
 nnoremap <leader>tE
-    \ <Cmd>execute ':NERDTree ' . expand('%:p:h')<CR>
+    \ <Cmd>execute ':NERDTree ' . Expand('%', ':p:h')<CR>
 " }}}
 
 " screensaver {{{ 屏保
@@ -787,7 +787,7 @@ if IsWin()
 " 需要安装 https://github.com/mgedmin/restview
 nnoremap <leader>vr
     \ <Cmd>
-    \ execute ':AsyncRun restview ' . expand('%:p:t') <Bar>
+    \ execute ':AsyncRun restview ' . Expand('%', ':p:t') <Bar>
     \ cclose<CR>
 else
 " 需要安装 https://github.com/Rykka/instant-rst.py
@@ -820,9 +820,9 @@ map <leader>bs <Plug>(openbrowser-smart-search)
 nnoremap <leader>big :OpenBrowserSearch -google<Space>
 nnoremap <leader>bib :OpenBrowserSearch -bing<Space>
 nnoremap <leader>bih :OpenBrowserSearch -github<Space>
-nnoremap <leader>bb  <Cmd>call openbrowser#search(expand('<cword>'), 'bing')<CR>
-nnoremap <leader>bg  <Cmd>call openbrowser#search(expand('<cword>'), 'google')<CR>
-nnoremap <leader>bh  <Cmd>call openbrowser#search(expand('<cword>'), 'github')<CR>
+nnoremap <leader>bb  <Cmd>call openbrowser#search(Expand('<cword>'), 'bing')<CR>
+nnoremap <leader>bg  <Cmd>call openbrowser#search(Expand('<cword>'), 'google')<CR>
+nnoremap <leader>bh  <Cmd>call openbrowser#search(Expand('<cword>'), 'github')<CR>
 vnoremap <leader>bb  <Cmd>call openbrowser#search(GetSelected(' '), 'bing')<CR>
 vnoremap <leader>bg  <Cmd>call openbrowser#search(GetSelected(' '), 'google')<CR>
 vnoremap <leader>bh  <Cmd>call openbrowser#search(GetSelected(' '), 'github')<CR>
