@@ -1,23 +1,44 @@
 @echo off
 
-if not %APPS_HOME%\dotconfigs\vim\setup == %cd% (
-    echo Is NOT in %APPS_HOME%\dotconfigs\vim\setup
+for %%i in ("%~dp0\..\") do set DIR_VIM=%%~dpi
+set DIR_DOT=%APPS_HOME%\dotvim
+:: set InitFile=init.lua
+set InitFile=init.vim
+
+echo DIR_VIM: %DIR_VIM%
+echo DIR_DOT: %DIR_DOT%
+echo Init file: %InitFile%
+
+:: check APPS_HOME
+if not defined APPS_HOME (
+    echo ERROR: "APPS_HOME" is not set
     pause
     exit
 )
 
-:: .vim
-if not exist %APPS_HOME%\dotvim (
-    md %APPS_HOME%\dotvim
+:: check DIR_VIM
+if not exist %DIR_VIM%\.vim (
+    echo ERROR: "%DIR_VIM%\.vim" is not existed
+    pause
+    exit
 )
-xcopy %APPS_HOME%\dotconfigs\vim\.vim           %APPS_HOME%\dotvim\ /E /R /Y
+if not exist %DIR_VIM%\nvim\%InitFile% (
+    echo ERROR: "%DIR_VIM%\nvim\%InitFile%" is not existed
+    pause
+    exit
+)
 
-:: nvim
+:: copy .vim
+if not exist %DIR_DOT% (
+    md %DIR_DOT%
+)
+xcopy %DIR_VIM%\.vim %DIR_DOT%\ /E /R /Y
+
+:: copy nvim
 if not exist %LOCALAPPDATA%\nvim (
     md %LOCALAPPDATA%\nvim
 )
-copy %APPS_HOME%\dotconfigs\vim\nvim\init.vim   %LOCALAPPDATA%\nvim\
-REM copy %APPS_HOME%\dotconfigs\vim\nvim\init.lua   %LOCALAPPDATA%\nvim\
+copy %DIR_VIM%\nvim\%InitFile%  %LOCALAPPDATA%\nvim\
 
 echo Dotvim setup was completed!
 pause
