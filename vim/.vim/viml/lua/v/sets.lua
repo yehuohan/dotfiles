@@ -4,9 +4,7 @@ local fn = vim.fn
 local o = vim.o
 local opt = vim.opt
 local use = require('v.use').get()
-local noremap = require('v.maps').noremap
-local nnoremap = require('v.maps').nnoremap
-local inoremap = require('v.maps').inoremap
+local m = require('v.maps')
 
 
 --------------------------------------------------------------------------------
@@ -124,15 +122,15 @@ function M.onUIEnter()
             GuiTabline 0
             GuiPopupmenu 0
         ]]
-        noremap{'<RightMouse>' , [[<Cmd>call GuiShowContextMenu()<CR>]]                       }
-        inoremap{'<RightMouse>', [[<Cmd>call GuiShowContextMenu()<CR>]]                       }
-        nnoremap{'<leader>tf'  , [[<Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>]]}
-        nnoremap{'<leader>tm'  , [[<Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>]]  }
+        m.nore{'<RightMouse>' , [[<Cmd>call GuiShowContextMenu()<CR>]]                       }
+        m.inore{'<RightMouse>', [[<Cmd>call GuiShowContextMenu()<CR>]]                       }
+        m.nnore{'<leader>tf'  , [[<Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>]]}
+        m.nnore{'<leader>tm'  , [[<Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>]]  }
     end
 
-    nnoremap{'<k0>'        , [[:lua require('v.sets').setfonts(0)<CR>]] }
-    nnoremap{'<kPlus>'     , [[:lua require('v.sets').setfonts(1)<CR>]] }
-    nnoremap{'<kMinus>'    , [[:lua require('v.sets').setfonts(-1)<CR>]]}
+    m.nnore{'<k0>'    , [[:lua require('v.sets').setfonts(0)<CR>]] }
+    m.nnore{'<kPlus>' , [[:lua require('v.sets').setfonts(1)<CR>]] }
+    m.nnore{'<kMinus>', [[:lua require('v.sets').setfonts(-1)<CR>]]}
 end
 
 --------------------------------------------------------------------------------

@@ -1,24 +1,5 @@
 local use = vim.fn.SvarUse()
-local map      = require('v.maps').map
-local nmap     = require('v.maps').nmap
-local vmap     = require('v.maps').vmap
-local xmap     = require('v.maps').xmap
-local smap     = require('v.maps').smap
-local omap     = require('v.maps').omap
-local imap     = require('v.maps').imap
-local lmap     = require('v.maps').lmap
-local cmap     = require('v.maps').cmap
-local tmap     = require('v.maps').tmap
-local noremap  = require('v.maps').noremap
-local nnoremap = require('v.maps').nnoremap
-local vnoremap = require('v.maps').vnoremap
-local xnoremap = require('v.maps').xnoremap
-local snoremap = require('v.maps').snoremap
-local onoremap = require('v.maps').onoremap
-local inoremap = require('v.maps').inoremap
-local lnoremap = require('v.maps').lnoremap
-local cnoremap = require('v.maps').cnoremap
-local tnoremap = require('v.maps').tnoremap
+local m = require('v.maps')
 
 
 --------------------------------------------------------------------------------
@@ -30,14 +11,14 @@ local function pkg_hop()
         match_mappings = { 'zh', 'zh_sc' },
         create_hl_autocmd = true,
     }
-    noremap{'s', '<Cmd>HopChar1MW<CR>'}
-    noremap{'f', '<Cmd>HopChar1CurrentLine<CR>'}
-    noremap{'F', '<Cmd>HopAnywhereCurrentLine<CR>'}
-    noremap{'<leader>ms', '<Cmd>HopPatternMW<CR>'}
-    noremap{'<leader>j', '<Cmd>HopLineCursor<CR>'}
-    noremap{'<leader><leader>j', '<Cmd>HopLine<CR>'}
-    noremap{'<leader>mj', '<Cmd>HopLineStart<CR>'}
-    noremap{'<leader>mw', '<Cmd>HopWord<CR>'}
+    m.nore{'s', '<Cmd>HopChar1MW<CR>'}
+    m.nore{'f', '<Cmd>HopChar1CurrentLine<CR>'}
+    m.nore{'F', '<Cmd>HopAnywhereCurrentLine<CR>'}
+    m.nore{'<leader>ms', '<Cmd>HopPatternMW<CR>'}
+    m.nore{'<leader>j', '<Cmd>HopLineCursor<CR>'}
+    m.nore{'<leader><leader>j', '<Cmd>HopLine<CR>'}
+    m.nore{'<leader>mj', '<Cmd>HopLineStart<CR>'}
+    m.nore{'<leader>mw', '<Cmd>HopWord<CR>'}
 end
 
 -- 书签管理
@@ -54,8 +35,8 @@ local function pkg_marks()
             prev = '<M-,>',
         }
     }
-    nnoremap{'<leader>ts', ':MarksToggleSigns<CR>'}
-    nnoremap{'<leader>ma', ':MarksListBuf<CR>'}
+    m.nnore{'<leader>ts', ':MarksToggleSigns<CR>'}
+    m.nnore{'<leader>ma', ':MarksListBuf<CR>'}
 end
 
 -- 自动高亮当前word
@@ -75,14 +56,14 @@ local function pkg_gomove()
         undojoin = true,
         move_past_end_col = false,
     }
-    xmap{'<C-j>', '<Plug>GoVSMDown'}
-    xmap{'<C-k>', '<Plug>GoVSMUp'}
-    xmap{'<C-h>', '<Plug>GoVSMLeft'}
-    xmap{'<C-l>', '<Plug>GoVSMRight'}
-    xmap{'<M-j>', '<Plug>GoVSDDown'}
-    xmap{'<M-k>', '<Plug>GoVSDUp'}
-    xmap{'<M-h>', '<Plug>GoVSDLeft'}
-    xmap{'<M-l>', '<Plug>GoVSDRight'}
+    m.xmap{'<C-j>', '<Plug>GoVSMDown'}
+    m.xmap{'<C-k>', '<Plug>GoVSMUp'}
+    m.xmap{'<C-h>', '<Plug>GoVSMLeft'}
+    m.xmap{'<C-l>', '<Plug>GoVSMRight'}
+    m.xmap{'<M-j>', '<Plug>GoVSDDown'}
+    m.xmap{'<M-k>', '<Plug>GoVSDUp'}
+    m.xmap{'<M-h>', '<Plug>GoVSDLeft'}
+    m.xmap{'<M-l>', '<Plug>GoVSDRight'}
 end
 
 -- 平滑滚动
@@ -93,24 +74,24 @@ local function pkg_neoscroll()
         hide_cursor = false,
         stop_eof = true,
     }
-    nnoremap{'<M-n>',
+    m.nnore{'<M-n>',
         function()
             if use.coc and vim.fn['coc#float#has_scroll']() == 1 then
                 vim.fn['coc#float#scroll'](1)
             else
                 neoscroll.scroll(vim.wo.scroll, true, 200)
             end
-        end, {silent = true, nowait = true, expr = true} }
-    nnoremap{'<M-m>',
+        end}
+    m.nnore{'<M-m>',
         function()
             if use.coc and vim.fn['coc#float#has_scroll']() == 1 then
                 vim.fn['coc#float#scroll'](0)
             else
                 neoscroll.scroll(-vim.wo.scroll, true, 200)
             end
-        end, {silent = true, nowait = true, expr = true} }
-    nnoremap{'<M-j>', function() neoscroll.scroll(vim.api.nvim_win_get_height(0), true, 300) end }
-    nnoremap{'<M-k>', function() neoscroll.scroll(-vim.api.nvim_win_get_height(0), true, 300) end }
+        end}
+    m.nnore{'<M-j>', function() neoscroll.scroll(vim.api.nvim_win_get_height(0), true, 300) end }
+    m.nnore{'<M-k>', function() neoscroll.scroll(-vim.api.nvim_win_get_height(0), true, 300) end }
 end
 
 -- 窗口跳转
@@ -122,7 +103,7 @@ local function pkg_winpick()
         format_label = winpick.defaults.format_label,
         chars = { 'f', 'j', 'd', 'k', 's', 'l' },
     }
-    nnoremap{'<leader>wi',
+    m.nnore{'<leader>wi',
         function()
             local winid, _ = winpick.select()
             if winid then
@@ -134,7 +115,7 @@ end
 -- 窗口移动
 local function pkg_winshift()
     require('winshift').setup{ }
-    nnoremap{'<C-m>', ':WinShift<CR>'}
+    m.nnore{'<C-m>', ':WinShift<CR>'}
 end
 
 --------------------------------------------------------------------------------
@@ -188,7 +169,7 @@ local function pkg_alpha()
         tmp.section.bottom_buttons,
     }
     require('alpha').setup(tmp.config)
-    nnoremap{'<leader>su', ':Alpha<CR>'}
+    m.nnore{'<leader>su', ':Alpha<CR>'}
 end
 
 -- 消息提示
@@ -201,7 +182,7 @@ local function pkg_notify()
         top_down = false,
     }
     vim.notify = require('notify')
-    nnoremap{'<leader>dm', function() vim.notify.dismiss() end}
+    m.nnore{'<leader>dm', function() vim.notify.dismiss() end}
 end
 
 -- ui界面美化
@@ -215,9 +196,9 @@ end
 -- 字体图标
 local function pkg_icon_picker()
     require('icon-picker').setup{ disable_legacy_commands = true }
-    nnoremap{'<leader>ip', '<Cmd>IconPickerNormal alt_font symbols nerd_font emoji<CR>'}
-    nnoremap{'<leader>iP', '<Cmd>IconPickerYank alt_font symbols nerd_font emoji<CR>'}
-    inoremap{'<M-p>', '<Cmd>IconPickerInsert alt_font symbols nerd_font emoji<CR>'}
+    m.nnore{'<leader>ip', '<Cmd>IconPickerNormal alt_font symbols nerd_font emoji<CR>'}
+    m.nnore{'<leader>iP', '<Cmd>IconPickerYank alt_font symbols nerd_font emoji<CR>'}
+    m.inore{'<M-p>', '<Cmd>IconPickerInsert alt_font symbols nerd_font emoji<CR>'}
 end
 
 -- 刻度线
@@ -319,8 +300,8 @@ local function pkg_tree()
         diagnostics = { enable = false },
         git = { enable = false },
     }
-    nnoremap{'<leader>tt', ':NvimTreeToggle<CR>'}
-    nnoremap{'<leader>tT',
+    m.nnore{'<leader>tt', ':NvimTreeToggle<CR>'}
+    m.nnore{'<leader>tT',
         function()
             local tapi = require('nvim-tree.api')
             tapi.tree.close()
@@ -345,10 +326,10 @@ local function pkg_telescope()
             }
         }
     }
-    nnoremap{'<leader><leader>n', ':Telescope<Space>'}
-    nnoremap{'<leader>nf', ':Telescope find_files<CR>'}
-    nnoremap{'<leader>nl', ':Telescope live_grep<CR>'}
-    nnoremap{'<leader>nm', ':Telescope oldfiles<CR>'}
+    m.nnore{'<leader><leader>n', ':Telescope<Space>'}
+    m.nnore{'<leader>nf', ':Telescope find_files<CR>'}
+    m.nnore{'<leader>nl', ':Telescope live_grep<CR>'}
+    m.nnore{'<leader>nm', ':Telescope oldfiles<CR>'}
 end
 
 --------------------------------------------------------------------------------
@@ -365,14 +346,14 @@ local function pkg_trouble()
         },
         auto_preview = false,
     }
-    nnoremap{'<leader>vq', ':TroubleToggle quickfix<CR>'}
-    nnoremap{'<leader>vl', ':TroubleToggle loclist<CR>'}
+    m.nnore{'<leader>vq', ':TroubleToggle quickfix<CR>'}
+    m.nnore{'<leader>vl', ':TroubleToggle loclist<CR>'}
 end
 
 -- 颜色预览
 local function pkg_ccc()
-    nnoremap{'<leader>tc', ':CccHighlighterToggle<CR>'}
-    nnoremap{'<leader>lp', ':CccPick<CR>'}
+    m.nnore{'<leader>tc', ':CccHighlighterToggle<CR>'}
+    m.nnore{'<leader>lp', ':CccPick<CR>'}
     local ccc = require('ccc')
     ccc.setup{
         disable_default_mappings = true,
@@ -397,7 +378,7 @@ local function pkg_autopairs()
     require('nvim-autopairs').setup{
         map_cr = false,
     }
-    nnoremap{'<leader>tp',
+    m.nnore{'<leader>tp',
         function()
             local ap = require('nvim-autopairs').state.disabled
             print('Auto pairs:', ap)
@@ -417,9 +398,9 @@ local function pkg_comment()
         },
     }
     local comment = require('Comment.api')
-    nnoremap{'<leader>ci', function() comment.toggle.linewise.count(vim.v.count1) end}
-    nnoremap{'<leader>cl', function() comment.comment.linewise.count(vim.v.count1) end}
-    nnoremap{'<leader>cu',
+    m.nnore{'<leader>ci', function() comment.toggle.linewise.count(vim.v.count1) end}
+    m.nnore{'<leader>cl', function() comment.comment.linewise.count(vim.v.count1) end}
+    m.nnore{'<leader>cu',
         function()
             -- ignore errors when uncommenting a non-commented line
             pcall(function() comment.uncomment.linewise.count(vim.v.count1) end)
@@ -440,8 +421,8 @@ local function pkg_surround()
             change = 'cs',
         },
     }
-    nmap{'<leader>sw', 'ysiw'}
-    nmap{'<leader>sW', 'ySiw'}
+    m.nmap{'<leader>sw', 'ysiw'}
+    m.nmap{'<leader>sW', 'ySiw'}
 end
 
 -- 代码折叠
@@ -483,7 +464,7 @@ local function pkg_ufo()
             return ''
         end
     }
-    nnoremap{'<leader>to',
+    m.nnore{'<leader>to',
         function()
             local bufnr = vim.api.nvim_get_current_buf()
             if ufo.hasAttached(bufnr) then
@@ -526,9 +507,9 @@ if use.treesitter then
         }
     }
     vim.opt.runtimepath:append(vim.env.DotVimCache .. '/.treesitter')
-    nnoremap{'<leader>sh', ':TSBufToggle highlight<CR>'}
-    nnoremap{'<leader>si', ':TSBufToggle indent<CR>'}
-    nnoremap{'<leader>ss', ':TSBufToggle incremental_selection<CR>'}
+    m.nnore{'<leader>sh', ':TSBufToggle highlight<CR>'}
+    m.nnore{'<leader>si', ':TSBufToggle indent<CR>'}
+    m.nnore{'<leader>ss', ':TSBufToggle incremental_selection<CR>'}
 end
 end
 

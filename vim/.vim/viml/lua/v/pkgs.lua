@@ -1,14 +1,7 @@
 local fn = vim.fn
 local g = vim.g
 local use = require('v.use').get()
-local map      = require('v.maps').map
-local nmap     = require('v.maps').nmap
-local vmap     = require('v.maps').vmap
-local xmap     = require('v.maps').xmap
-local omap     = require('v.maps').omap
-local noremap  = require('v.maps').noremap
-local nnoremap = require('v.maps').nnoremap
-local vnoremap = require('v.maps').vnoremap
+local m = require('v.maps')
 
 
 local function pkg_standard()
@@ -64,17 +57,6 @@ end
 --------------------------------------------------------------------------------
 -- Editing
 --------------------------------------------------------------------------------
--- 快速跳转
-local function pkg_hop()
-    require'hop'.setup({ match_mappings = { 'zh', 'zh_sc' }, create_hl_autocmd = true })
-    noremap{'s'                , [[<Cmd>HopChar1MW<CR>]]    }
-    noremap{'<leader>ms'       , [[<Cmd>HopChar2MW<CR>]]    }
-    noremap{'<leader><leader>s', [[<Cmd>HopPatternMW<CR>]]  }
-    noremap{'<leader>j'        , [[<Cmd>HopLineStartMW<CR>]]}
-    noremap{'<leader><leader>j', [[<Cmd>HopLineMW<CR>]]     }
-    noremap{'<leader>mw'       , [[<Cmd>HopWord<CR>]]       }
-end
-
 -- 多光标编辑
 local function pkg_visual_multi()
     -- Usage: https://github.com/mg979/vim-visual-multi/wiki
@@ -114,20 +96,20 @@ local function pkg_easy_align()
     g.easy_align_bypass_fold = 1
     g.easy_align_ignore_groups = {}         -- 默认任何group都进行对齐
     -- 默认对齐内含段落（Text Object: vip）
-    nmap{'<leader>al', [[<Plug>(LiveEasyAlign)ip]]}
-    xmap{'<leader>al', [[<Plug>(LiveEasyAlign)]]  }
+    m.nmap{'<leader>al', [[<Plug>(LiveEasyAlign)ip]]}
+    m.xmap{'<leader>al', [[<Plug>(LiveEasyAlign)]]  }
     -- :EasyAlign[!] [N-th] DELIMITER_KEY [OPTIONS]
     -- :EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
-    nnoremap{'<leader><leader>a', [[vip:EasyAlign<Space>*//l0><Left><Left><Left><Left>]]}
-    vnoremap{'<leader><leader>a', [[:EasyAlign<Space>*//l0><Left><Left><Left><Left>]]   }
-    nnoremap{'<leader><leader>A', [[vip:EasyAlign<Space>]]                              }
-    vnoremap{'<leader><leader>A', [[:EasyAlign<Space>]]                                 }
+    m.nnore{'<leader><leader>a', [[vip:EasyAlign<Space>*//l0><Left><Left><Left><Left>]]}
+    m.vnore{'<leader><leader>a', [[:EasyAlign<Space>*//l0><Left><Left><Left><Left>]]   }
+    m.nnore{'<leader><leader>A', [[vip:EasyAlign<Space>]]                              }
+    m.vnore{'<leader><leader>A', [[:EasyAlign<Space>]]                                 }
 end
 
 --  快速块选择
 local function pkg_expand_region()
-    map{'<M-r>', [[<Plug>(expand_region_expand)]]}
-    map{'<M-w>', [[<Plug>(expand_region_shrink)]]}
+    m.map{'<M-r>', [[<Plug>(expand_region_expand)]]}
+    m.map{'<M-w>', [[<Plug>(expand_region_shrink)]]}
 end
 
 -- 文本对象
@@ -135,20 +117,20 @@ local function pkg_textobj_user()
     -- vdc-ia-wWsp(b[<t{B"'`
     -- vdc-ia-ifcmu
     g.textobj_indent_no_default_key_mappings = 1
-    omap{'aI', [[<Plug>(textobj-indent-a)]]     }
-    omap{'iI', [[<Plug>(textobj-indent-i)]]     }
-    omap{'ai', [[<Plug>(textobj-indent-same-a)]]}
-    omap{'ii', [[<Plug>(textobj-indent-same-i)]]}
-    vmap{'aI', [[<Plug>(textobj-indent-a)]]     }
-    vmap{'iI', [[<Plug>(textobj-indent-i)]]     }
-    vmap{'ai', [[<Plug>(textobj-indent-same-a)]]}
-    vmap{'ii', [[<Plug>(textobj-indent-same-i)]]}
-    omap{'au', [[<Plug>(textobj-underscore-a)]] }
-    omap{'iu', [[<Plug>(textobj-underscore-i)]] }
-    vmap{'au', [[<Plug>(textobj-underscore-a)]] }
-    vmap{'iu', [[<Plug>(textobj-underscore-i)]] }
-    nnoremap{'<leader>to', [[:lua Plug_to_motion('v')<CR>]]}
-    nnoremap{'<leader>tO', [[:lua Plug_to_motion('V')<CR>]]}
+    m.omap{'aI', [[<Plug>(textobj-indent-a)]]     }
+    m.omap{'iI', [[<Plug>(textobj-indent-i)]]     }
+    m.omap{'ai', [[<Plug>(textobj-indent-same-a)]]}
+    m.omap{'ii', [[<Plug>(textobj-indent-same-i)]]}
+    m.vmap{'aI', [[<Plug>(textobj-indent-a)]]     }
+    m.vmap{'iI', [[<Plug>(textobj-indent-i)]]     }
+    m.vmap{'ai', [[<Plug>(textobj-indent-same-a)]]}
+    m.vmap{'ii', [[<Plug>(textobj-indent-same-i)]]}
+    m.omap{'au', [[<Plug>(textobj-underscore-a)]] }
+    m.omap{'iu', [[<Plug>(textobj-underscore-i)]] }
+    m.vmap{'au', [[<Plug>(textobj-underscore-a)]] }
+    m.vmap{'iu', [[<Plug>(textobj-underscore-i)]] }
+    m.nnore{'<leader>to', [[:lua Plug_to_motion('v')<CR>]]}
+    m.nnore{'<leader>tO', [[:lua Plug_to_motion('V')<CR>]]}
 end
 
 local textobj_motion = vim.regex('/l')
@@ -168,7 +150,7 @@ end
 
 -- 撤消历史
 local function pkg_undotree()
-    nnoremap{'<leader>tu', [[:UndotreeToggle<CR>]]}
+    m.nnore{'<leader>tu', [[:UndotreeToggle<CR>]]}
 end
 
 --------------------------------------------------------------------------------
@@ -190,8 +172,8 @@ local function pkg_popset()
             opt = {'colorscheme', 'colo'},
             lst = {'gruvbox', 'one'},
         }}
-    nnoremap{'<leader><leader>p', ':PopSet<Space>'    }
-    nnoremap{'<leader>sp'       , ':PopSet popset<CR>'}
+    m.nnore{'<leader><leader>p', ':PopSet<Space>'    }
+    m.nnore{'<leader>sp'       , ':PopSet popset<CR>'}
 end
 
 -- buffer管理
@@ -213,19 +195,19 @@ local function pkg_popc()
     g.Popc_useLayerPath = 0
     g.Popc_useLayerRoots = {'.popc', '.git', '.svn', '.hg', 'tags', '.LfGtags'}
     g.Popc_enableLog = 1
-    nnoremap{'<leader><leader>h', [[:PopcBuffer<CR>]]               }
-    nnoremap{'<M-u>'            , [[:PopcBufferSwitchTabLeft!<CR>]] }
-    nnoremap{'<M-p>'            , [[:PopcBufferSwitchTabRight!<CR>]]}
-    nnoremap{'<M-i>'            , [[:PopcBufferSwitchLeft!<CR>]]    }
-    nnoremap{'<M-o>'            , [[:PopcBufferSwitchRight!<CR>]]   }
-    nnoremap{'<C-i>'            , [[:PopcBufferJumpPrev<CR>]]       }
-    nnoremap{'<C-o>'            , [[:PopcBufferJumpNext<CR>]]       }
-    nnoremap{'<C-u>'            , [[<C-o>]]                         }
-    nnoremap{'<C-p>'            , [[<C-i>]]                         }
-    nnoremap{'<leader>wq'       , [[:PopcBufferClose!<CR>]]         }
-    nnoremap{'<leader><leader>b', [[:PopcBookmark<CR>]]             }
-    nnoremap{'<leader><leader>w', [[:PopcWorkspace<CR>]]            }
-    nnoremap{'<leader>ty',
+    m.nnore{'<leader><leader>h', [[:PopcBuffer<CR>]]               }
+    m.nnore{'<M-u>'            , [[:PopcBufferSwitchTabLeft!<CR>]] }
+    m.nnore{'<M-p>'            , [[:PopcBufferSwitchTabRight!<CR>]]}
+    m.nnore{'<M-i>'            , [[:PopcBufferSwitchLeft!<CR>]]    }
+    m.nnore{'<M-o>'            , [[:PopcBufferSwitchRight!<CR>]]   }
+    m.nnore{'<C-i>'            , [[:PopcBufferJumpPrev<CR>]]       }
+    m.nnore{'<C-o>'            , [[:PopcBufferJumpNext<CR>]]       }
+    m.nnore{'<C-u>'            , [[<C-o>]]                         }
+    m.nnore{'<C-p>'            , [[<C-i>]]                         }
+    m.nnore{'<leader>wq'       , [[:PopcBufferClose!<CR>]]         }
+    m.nnore{'<leader><leader>b', [[:PopcBookmark<CR>]]             }
+    m.nnore{'<leader><leader>w', [[:PopcWorkspace<CR>]]            }
+    m.nnore{'<leader>ty',
         [=[<Cmd>]=] ..
         [=[let g:Popc_tabline_layout = (get(g:, 'Popc_tabline_layout', 0) + 1) % 3<Bar>]=] ..
         [=[call call('popc#stl#TabLineSetLayout', [['buffer', 'tab'], ['buffer', ''], ['', 'tab']][g:Popc_tabline_layout])<CR>]=]}
@@ -236,7 +218,6 @@ local function pkg_setup()
     pkg_standard()
     pkg_packer()
     -- editing
-    pkg_hop()
     pkg_visual_multi()
     pkg_traces()
     pkg_easy_align()

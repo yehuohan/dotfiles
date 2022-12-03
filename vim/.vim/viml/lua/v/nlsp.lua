@@ -1,7 +1,5 @@
 local use = vim.fn.SvarUse()
-local nnoremap = require('v.maps').nnoremap
-local vnoremap = require('v.maps').vnoremap
-local inoremap = require('v.maps').inoremap
+local m = require('v.maps')
 
 
 -- server settings
@@ -167,37 +165,35 @@ local function __cmp()
         })
     })
 
-
     vim.diagnostic.config({
         virtual_text = { prefix = '▪' },
     })
 
-    inoremap{     '<M-o>', vim.lsp.buf.signature_help}
-    nnoremap{        'gd', vim.lsp.buf.definition}
-    nnoremap{        'gD', vim.lsp.buf.declaration}
-    nnoremap{'<leader>gd', vim.lsp.buf.definition}
-    nnoremap{'<leader>gD', vim.lsp.buf.declaration}
-    nnoremap{'<leader>gi', vim.lsp.buf.implementation}
-    nnoremap{'<leader>gt', vim.lsp.buf.type_definition}
-    nnoremap{'<leader>gr', vim.lsp.buf.references}
-    nnoremap{'<leader>gf', function() vim.lsp.buf.code_action({apply = true}) end}
-    nnoremap{'<leader>ga', vim.lsp.buf.code_action}
-    nnoremap{'<leader>gn', vim.lsp.buf.rename}
-    nnoremap{'<leader>gh', vim.lsp.buf.hover}
-    -- nnoremap{'<leader>gj', vim.lsp.buf.jump_float}
-    -- nnoremap{'<leader>gc', vim.lsp.buf.clear_float}
-    nnoremap{'<leader>of', vim.lsp.buf.format}
-    vnoremap{'<leader>of', vim.lsp.buf.format}
-    nnoremap{'<leader>oj', function() vim.diagnostic.goto_next({severity = vim.diagnostic.severity.ERROR }) end}
-    nnoremap{'<leader>ok', function() vim.diagnostic.goto_prev({severity = vim.diagnostic.severity.ERROR }) end}
-    nnoremap{'<leader>oJ', vim.diagnostic.goto_next}
-    nnoremap{'<leader>oK', vim.diagnostic.goto_prev}
-    nnoremap{'<leader>oi', vim.diagnostic.open_float}
-    -- nnoremap{'<leader>od', vim.diagnostic.toggle}
-    -- nnoremap{'<leader>ow', vim.lsp.buf.manage_workspace_folder}
-    -- nnoremap{'<leader>oc', vim.lsp.buf.execute_command}
+    m.inore{     '<M-o>', vim.lsp.buf.signature_help}
+    m.nnore{        'gd', vim.lsp.buf.definition}
+    m.nnore{        'gD', vim.lsp.buf.declaration}
+    m.nnore{'<leader>gd', vim.lsp.buf.definition}
+    m.nnore{'<leader>gD', vim.lsp.buf.declaration}
+    m.nnore{'<leader>gi', vim.lsp.buf.implementation}
+    m.nnore{'<leader>gt', vim.lsp.buf.type_definition}
+    m.nnore{'<leader>gr', vim.lsp.buf.references}
+    m.nnore{'<leader>gf', function() vim.lsp.buf.code_action({apply = true}) end}
+    m.nnore{'<leader>ga', vim.lsp.buf.code_action}
+    m.nnore{'<leader>gn', vim.lsp.buf.rename}
+    m.nnore{'<leader>gh', vim.lsp.buf.hover}
+    -- m.nnore{'<leader>gj', vim.lsp.buf.jump_float}
+    -- m.nnore{'<leader>gc', vim.lsp.buf.clear_float}
+    m.nore{'<leader>of', vim.lsp.buf.format}
+    m.nnore{'<leader>oj', function() vim.diagnostic.goto_next({severity = vim.diagnostic.severity.ERROR }) end}
+    m.nnore{'<leader>ok', function() vim.diagnostic.goto_prev({severity = vim.diagnostic.severity.ERROR }) end}
+    m.nnore{'<leader>oJ', vim.diagnostic.goto_next}
+    m.nnore{'<leader>oK', vim.diagnostic.goto_prev}
+    m.nnore{'<leader>oi', vim.diagnostic.open_float}
+    -- m.nnore{'<leader>od', vim.diagnostic.toggle}
+    -- m.nnore{'<leader>ow', vim.lsp.buf.manage_workspace_folder}
+    -- m.nnore{'<leader>oc', vim.lsp.buf.execute_command}
     -- vim.diagnostic.setloclist()
-    nnoremap{'<leader>om', ':Mason<CR>'}
+    m.nnore{'<leader>om', ':Mason<CR>'}
 end
 
 local function nlsp_setup()
