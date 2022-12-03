@@ -35,7 +35,7 @@
     "diagnostic.enable": true,
     "diagnostic.level": "hint",
     "diagnostic.enableSign": true,
-    "diagnostic.errorSign": "✘",
+    "diagnostic.errorSign": "𝙭",
     "diagnostic.warningSign": "",
     "diagnostic.infoSign": "►",
     "diagnostic.hintSign": "►",

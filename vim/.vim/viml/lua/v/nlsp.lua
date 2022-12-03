@@ -1,9 +1,9 @@
+local api = vim.api
 local use = vim.fn.SvarUse()
 local m = require('v.maps')
 
 
--- server settings
-local function __mason()
+local function __servers()
     require('mason').setup{
         install_root_dir = vim.env.DotVimCache .. '/.mason',
         ui = {
@@ -53,6 +53,8 @@ local function __mason()
     lspconfig.sumneko_lua.setup{ }
     lspconfig.vimls.setup{ }
     -- lspconfig.ltex.setup{ }
+
+    m.nnore{'<leader>om', ':Mason<CR>'}
 end
 
 local kind_icons = {
@@ -83,20 +85,34 @@ local kind_icons = {
     TypeParameter = {'', 'TyPa'},
 }
 
-local kind_texts = {
-    buffer        = 'Buf',
-    nvim_lsp      = 'Lsp',
-    ultisnips     = 'Snp',
-    nvim_lua      = 'Lua',
-    latex_symbols = 'Tex',
+local kind_sources = {
+    buffer        = ' Buf',
+    nvim_lsp      = ' Lsp',
+    ultisnips     = ' Snp',
+    nvim_lua      = ' Lua',
+    latex_symbols = ' Tex',
 }
 
--- completion settings
-local function __cmp()
-    vim.api.nvim_set_hl(0, 'CmpItemMenu', { ctermfg = 175, fg = '#d3869b', italic = true })
-    vim.api.nvim_set_hl(0, 'CmpItemAbbrMatch', { ctermfg = 208, fg = '#fe8019' })
-    vim.api.nvim_set_hl(0, 'CmpItemAbbrMatchFuzzy', { ctermfg = 208, fg = '#fe8019' })
-    vim.api.nvim_set_hl(0, 'CmpItemKind', { ctermfg = 142, fg = '#b8bb26' })
+local function cmp_menu(entry, vitem)
+    local ico = kind_icons[vitem.kind]
+    local src = kind_sources[entry.source.name]
+    if use.ui.patch then
+        vitem.kind = string.format(' %s', ico[1])
+    else
+        vitem.kind = string.format(' %s', ico[2]:sub(1, 1))
+    end
+    if string.len(vitem.abbr) > 80 then
+        vitem.abbr = string.sub(vitem.abbr, 1, 78) .. ' …'
+    end
+    vitem.menu = string.format('%4s%s', ico[2], src or '')
+    return vitem
+end
+
+local function __completion()
+    api.nvim_set_hl(0, 'CmpItemMenu', { ctermfg = 175, fg = '#d3869b', italic = true })
+    api.nvim_set_hl(0, 'CmpItemAbbrMatch', { ctermfg = 208, fg = '#fe8019' })
+    api.nvim_set_hl(0, 'CmpItemAbbrMatchFuzzy', { ctermfg = 208, fg = '#fe8019' })
+    api.nvim_set_hl(0, 'CmpItemKind', { ctermfg = 142, fg = '#b8bb26' })
 
     local cmp = require('cmp')
     cmp.setup{
@@ -134,20 +150,7 @@ local function __cmp()
         },
         formatting = {
             fields = { 'kind', 'abbr', 'menu' },
-            format = function(entry, vitem)
-                local ico = kind_icons[vitem.kind]
-                local txt = kind_texts[entry.source.name]
-                vitem.kind = string.format(' %s', ico[1])
-                if string.len(vitem.abbr) > 80 then
-                    vitem.abbr = string.sub(vitem.abbr, 1, 78) .. ' …'
-                end
-                if txt then
-                    vitem.menu = string.format('%4s %3s', ico[2], txt)
-                else
-                    vitem.menu = string.format('%4s', ico[2])
-                end
-                return vitem
-            end
+            format = cmp_menu,
         },
     }
     cmp.setup.cmdline('/', {
@@ -164,6 +167,23 @@ local function __cmp()
             { name = 'cmdline' }
         })
     })
+end
+
+local function __lsp()
+    api.nvim_set_hl(0, 'DiagnosticUnderlineError', { undercurl = true, sp = 'Red'  })
+    api.nvim_set_hl(0, 'DiagnosticUnderlineWarn', { undercurl = true, sp = 'Orange' })
+    api.nvim_set_hl(0, 'DiagnosticUnderlineInfo', { undercurl = true, sp = 'LightBlue' })
+    api.nvim_set_hl(0, 'DiagnosticUnderlineHint', { undercurl = true, sp = 'LightGrey' })
+    if use.ui.patch then
+        for name, icon in pairs{
+            DiagnosticSignError = '𝙭',
+            DiagnosticSignWarn  = '',
+            DiagnosticSignInfo  = '►',
+            DiagnosticSignHint  = '',
+        } do
+            vim.fn.sign_define(name, { text = icon, texthl = name, numhl = name })
+        end
+    end
 
     vim.diagnostic.config({
         virtual_text = { prefix = '▪' },
@@ -189,20 +209,20 @@ local function __cmp()
     m.nnore{'<leader>oJ', vim.diagnostic.goto_next}
     m.nnore{'<leader>oK', vim.diagnostic.goto_prev}
     m.nnore{'<leader>oi', vim.diagnostic.open_float}
+    -- vim.diagnostic.setloclist()
     -- m.nnore{'<leader>od', vim.diagnostic.toggle}
     -- m.nnore{'<leader>ow', vim.lsp.buf.manage_workspace_folder}
     -- m.nnore{'<leader>oc', vim.lsp.buf.execute_command}
-    -- vim.diagnostic.setloclist()
-    m.nnore{'<leader>om', ':Mason<CR>'}
 end
 
-local function nlsp_setup()
+local function setup()
 if use.nlsp then
-    __mason()
-    __cmp()
+    __servers()
+    __completion()
+    __lsp()
 end
 end
 
 return {
-    setup = nlsp_setup
+    setup = setup
 }
