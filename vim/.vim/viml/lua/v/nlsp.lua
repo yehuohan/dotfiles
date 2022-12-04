@@ -88,12 +88,14 @@ local kind_icons = {
 local kind_sources = {
     buffer        = ' Buf',
     nvim_lsp      = ' Lsp',
-    ultisnips     = ' Snp',
     nvim_lua      = ' Lua',
+    ultisnips     = ' Snp',
+    path          = ' Pth',
+    calc          = ' Cal',
     latex_symbols = ' Tex',
 }
 
-local function cmp_menu(entry, vitem)
+local function cmp_format(entry, vitem)
     local ico = kind_icons[vitem.kind]
     local src = kind_sources[entry.source.name]
     if use.ui.patch then
@@ -123,6 +125,11 @@ local function __completion()
                 else cmp.complete()
                 end
             end, {'i'}),
+            ['<M-u>'] = cmp.mapping.complete({
+                config = {
+                    sources = { { name = 'ultisnips' } }
+                }
+            }),
             ['<M-j>'] = cmp.mapping.select_next_item(),
             ['<M-k>'] = cmp.mapping.select_prev_item(),
             ['<M-n>'] = cmp.mapping.scroll_docs(4),
@@ -132,12 +139,10 @@ local function __completion()
         },
         sources = cmp.config.sources({
             { name = 'nvim_lsp' },
+            { name = 'nvim_lua' },
             { name = 'ultisnips' },
             { name = 'path' },
-            -- { name = 'nvim_lua' },
-            -- { name = 'dictionary' },
-            -- { name = 'latex_symbols' },
-            -- { name = 'nvim_lsp_signature_help' },
+            { name = 'calc' },
         }, {
             { name = 'buffer' },
         }),
@@ -150,17 +155,34 @@ local function __completion()
         },
         formatting = {
             fields = { 'kind', 'abbr', 'menu' },
-            format = cmp_menu,
+            format = cmp_format,
         },
     }
-    cmp.setup.cmdline('/', {
-        mapping = cmp.mapping.preset.cmdline(),
+    cmp.setup.filetype({ 'tex', 'latex', 'markdown', 'restructuredtext', 'text', 'help' }, {
         sources = {
-            { name = 'buffer' }
+            { name = 'path' },
+            { name = 'latex_symbols' },
+            -- { name = 'spell' },
+            -- { name = 'dictionary' },
         }
     })
+
+    local cmdline_mapping = {
+        ['<M-i>'] = cmp.mapping(function(fallback)
+            if cmp.visible()
+            then cmp.abort()
+            else fallback()
+            end
+        end, {'c'}),
+        ['<M-j>'] = cmp.mapping(function() cmp.select_next_item() end, {'c'}),
+        ['<M-k>'] = cmp.mapping(function() cmp.select_prev_item() end, {'c'}),
+    }
+    cmp.setup.cmdline('/', {
+        mapping = cmdline_mapping,
+        sources = { { name = 'buffer' } }
+    })
     cmp.setup.cmdline(':', {
-        mapping = cmp.mapping.preset.cmdline(),
+        mapping = cmdline_mapping,
         sources = cmp.config.sources({
             { name = 'path' }
         }, {
@@ -170,6 +192,7 @@ local function __completion()
 end
 
 local function __lsp()
+    api.nvim_set_hl(0, 'LspSignatureActiveParameter', { link = 'Tag' })
     api.nvim_set_hl(0, 'DiagnosticUnderlineError', { undercurl = true, sp = 'Red'  })
     api.nvim_set_hl(0, 'DiagnosticUnderlineWarn', { undercurl = true, sp = 'Orange' })
     api.nvim_set_hl(0, 'DiagnosticUnderlineInfo', { undercurl = true, sp = 'LightBlue' })

@@ -304,16 +304,16 @@ nnoremap <M-l> 16zl
 nnoremap zh zt
 nnoremap zl zb
 " 命令行
-cnoremap <C-j> <Down>
-cnoremap <C-k> <Up>
 cnoremap <C-v> <C-r>+
 cnoremap <C-p> <C-r>0
+cnoremap <C-j> <Down>
+cnoremap <C-k> <Up>
 cnoremap <M-h> <Left>
 cnoremap <M-l> <Right>
-cnoremap <M-k> <C-Right>
-cnoremap <M-j> <C-Left>
-cnoremap <M-i> <C-b>
-cnoremap <M-o> <C-e>
+cnoremap <M-o> <C-Right>
+cnoremap <M-i> <C-Left>
+cnoremap <M-u> <C-b>
+cnoremap <M-p> <C-e>
 " 排序
 nnoremap <leader><leader>o :sort nr //<Left>
 nnoremap <leader><leader>O :sort! nr //<Left>

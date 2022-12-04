@@ -130,11 +130,10 @@ if s:use.nlsp
     Plug 'hrsh7th/cmp-path'
     Plug 'hrsh7th/cmp-cmdline'
     Plug 'hrsh7th/cmp-nvim-lua'
-    Plug 'hrsh7th/cmp-nvim-lsp-signature-help'
     Plug 'hrsh7th/cmp-calc'
     Plug 'quangnguyen30192/cmp-nvim-ultisnips'
-    Plug 'f3fora/cmp-spell'
     Plug 'kdheepak/cmp-latex-symbols'
+    Plug 'f3fora/cmp-spell'
     Plug 'uga-rosa/cmp-dictionary'
 endif
 else

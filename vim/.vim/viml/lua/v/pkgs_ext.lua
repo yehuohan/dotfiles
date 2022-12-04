@@ -220,6 +220,8 @@ local function pkg_scrollbar()
             diagnostic = false,
             search = false,
         },
+        excluded_buftypes = { 'nofile', 'terminal' },
+        excluded_filetypes = { 'prompt', 'TelescopePrompt' },
         autocmd = {
             render = {
                 'BufWinEnter',
