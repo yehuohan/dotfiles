@@ -124,6 +124,7 @@ if s:use.nlsp
     Plug 'williamboman/mason.nvim'
     Plug 'williamboman/mason-lspconfig.nvim'
     Plug 'neovim/nvim-lspconfig'
+    Plug 'glepnir/lspsaga.nvim'
     Plug 'hrsh7th/nvim-cmp'
     Plug 'hrsh7th/cmp-nvim-lsp'
     Plug 'hrsh7th/cmp-buffer'
@@ -131,6 +132,7 @@ if s:use.nlsp
     Plug 'hrsh7th/cmp-cmdline'
     Plug 'hrsh7th/cmp-nvim-lua'
     Plug 'hrsh7th/cmp-calc'
+    Plug 'ray-x/lsp_signature.nvim'
     Plug 'quangnguyen30192/cmp-nvim-ultisnips'
     Plug 'kdheepak/cmp-latex-symbols'
     Plug 'f3fora/cmp-spell'
@@ -556,7 +558,7 @@ endfunction
 let g:coc_config_home = $DotVimMisc
 let g:coc_data_home = $DotVimCache . '/.coc'
 let g:coc_global_extensions = ['coc-marketplace']
-let g:coc_status_error_sign = '✘'
+let g:coc_status_error_sign = '𝙭'
 let g:coc_status_warning_sign = '!'
 let g:coc_filetype_map = {}
 let g:coc_snippet_next = '<M-l>'
@@ -568,8 +570,8 @@ inoremap <silent><expr> <M-j> coc#pum#visible() ? coc#pum#next(1) : "\<M-j>"
 inoremap <silent><expr> <M-k> coc#pum#visible() ? coc#pum#prev(1) : "\<M-k>"
 imap <C-j> <M-j>
 imap <C-k> <M-k>
-inoremap <silent><expr> <M-i>
-    \ coc#pum#visible() ? coc#pum#cancel() : coc#refresh()
+inoremap <silent><expr> <M-i> coc#refresh()
+inoremap <M-e> <Cmd>call coc#pum#cancel()<CR>
 inoremap <M-o> <Cmd>call CocActionAsync('showSignatureHelp')<CR>
 nnoremap <M-f> <Cmd>call coc#float#scroll(1)<CR>
 nnoremap <M-d> <Cmd>call coc#float#scroll(0)<CR>
@@ -600,18 +602,14 @@ nnoremap <leader>gh <Cmd>call CocActionAsync('doHover')<CR>
 nnoremap <leader>gs <Cmd>CocCommand clangd.switchSourceHeader<CR>
 nnoremap <leader>gm <Cmd>CocCommand clangd.symbolInfo<CR>
 nnoremap <leader>ge <Cmd>CocCommand rust-analyzer.expandMacro<CR>
+vmap <leader>of <Plug>(coc-format-selected)
+nmap <leader>of <Plug>(coc-format)
+nnoremap <leader>od <Cmd>call CocAction('diagnosticToggle')<CR>
 nmap <leader>oi <Plug>(coc-diagnostic-info)
 nmap <leader>oj <Plug>(coc-diagnostic-next-error)
 nmap <leader>ok <Plug>(coc-diagnostic-prev-error)
 nmap <leader>oJ <Plug>(coc-diagnostic-next)
 nmap <leader>oK <Plug>(coc-diagnostic-prev)
-nnoremap <leader>oD <Cmd>call CocAction('diagnosticToggle')<CR>
-nnoremap <leader>od
-    \ <Cmd>
-    \ call coc#config('diagnostic.enable', !coc#util#get_config('diagnostic').enable) <Bar>
-    \ call Notify('Display diagnostics: ' . coc#util#get_config('diagnostic').enable)<CR>
-vmap <leader>of <Plug>(coc-format-selected)
-nmap <leader>of <Plug>(coc-format)
 xmap if <Plug>(coc-funcobj-i)
 omap if <Plug>(coc-funcobj-i)
 xmap af <Plug>(coc-funcobj-a)

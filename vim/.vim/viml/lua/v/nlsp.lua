@@ -119,17 +119,13 @@ local function __completion()
     local cmp = require('cmp')
     cmp.setup{
         mapping = {
-            ['<M-i>'] = cmp.mapping(function()
-                if cmp.visible()
-                then cmp.abort()
-                else cmp.complete()
-                end
-            end, {'i'}),
+            ['<M-i>'] = cmp.mapping.complete(),
             ['<M-u>'] = cmp.mapping.complete({
                 config = {
                     sources = { { name = 'ultisnips' } }
                 }
             }),
+            ['<M-e>'] = cmp.mapping.abort(),
             ['<M-j>'] = cmp.mapping.select_next_item(),
             ['<M-k>'] = cmp.mapping.select_prev_item(),
             ['<M-n>'] = cmp.mapping.scroll_docs(4),
@@ -166,16 +162,12 @@ local function __completion()
             -- { name = 'dictionary' },
         }
     })
-
     local cmdline_mapping = {
-        ['<M-i>'] = cmp.mapping(function(fallback)
-            if cmp.visible()
-            then cmp.abort()
-            else fallback()
-            end
-        end, {'c'}),
+        ['<M-e>'] = cmp.mapping(function() cmp.abort() end, {'c'}),
         ['<M-j>'] = cmp.mapping(function() cmp.select_next_item() end, {'c'}),
         ['<M-k>'] = cmp.mapping(function() cmp.select_prev_item() end, {'c'}),
+        ['<Tab>'] = cmp.mapping(function() cmp.select_next_item() end, {'c'}),
+        ['<S-Tab>'] = cmp.mapping(function() cmp.select_prev_item() end, {'c'}),
     }
     cmp.setup.cmdline('/', {
         mapping = cmdline_mapping,
@@ -189,6 +181,15 @@ local function __completion()
             { name = 'cmdline' }
         })
     })
+
+    require('lsp_signature').setup{
+        bind = true,
+        hint_enable = true,
+        hint_prefix = '» ',
+        handler_opts = {
+            border = 'none',
+        },
+    }
 end
 
 local function __lsp()
@@ -212,9 +213,9 @@ local function __lsp()
         virtual_text = { prefix = '▪' },
     })
 
-    m.inore{     '<M-o>', vim.lsp.buf.signature_help}
-    m.nnore{        'gd', vim.lsp.buf.definition}
-    m.nnore{        'gD', vim.lsp.buf.declaration}
+    m.inore{'<M-o>', vim.lsp.buf.signature_help}
+    m.nnore{'gd', vim.lsp.buf.definition}
+    m.nnore{'gD', vim.lsp.buf.declaration}
     m.nnore{'<leader>gd', vim.lsp.buf.definition}
     m.nnore{'<leader>gD', vim.lsp.buf.declaration}
     m.nnore{'<leader>gi', vim.lsp.buf.implementation}
@@ -224,18 +225,16 @@ local function __lsp()
     m.nnore{'<leader>ga', vim.lsp.buf.code_action}
     m.nnore{'<leader>gn', vim.lsp.buf.rename}
     m.nnore{'<leader>gh', vim.lsp.buf.hover}
-    -- m.nnore{'<leader>gj', vim.lsp.buf.jump_float}
-    -- m.nnore{'<leader>gc', vim.lsp.buf.clear_float}
     m.nore{'<leader>of', vim.lsp.buf.format}
+    m.nnore{'<leader>od', vim.diagnostic.setloclist}
+    m.nnore{'<leader>oi', vim.diagnostic.open_float}
     m.nnore{'<leader>oj', function() vim.diagnostic.goto_next({severity = vim.diagnostic.severity.ERROR }) end}
     m.nnore{'<leader>ok', function() vim.diagnostic.goto_prev({severity = vim.diagnostic.severity.ERROR }) end}
     m.nnore{'<leader>oJ', vim.diagnostic.goto_next}
     m.nnore{'<leader>oK', vim.diagnostic.goto_prev}
-    m.nnore{'<leader>oi', vim.diagnostic.open_float}
-    -- vim.diagnostic.setloclist()
-    -- m.nnore{'<leader>od', vim.diagnostic.toggle}
     -- m.nnore{'<leader>ow', vim.lsp.buf.manage_workspace_folder}
     -- m.nnore{'<leader>oc', vim.lsp.buf.execute_command}
+    m.nnore{'<leader>oR', ':LspRestart<CR>'}
 end
 
 local function setup()
