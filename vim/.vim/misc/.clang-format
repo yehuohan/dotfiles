@@ -15,4 +15,5 @@ AllowAllParametersOfDeclarationOnNextLine: true
 BreakConstructorInitializers: BeforeComma
 # 指针和引用的位置
 DerivePointerAlignment: false
+IndentPPDirectives: BeforeHash
 PointerAlignment: Left
