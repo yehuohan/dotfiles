@@ -16,7 +16,6 @@ local function __servers()
             },
         },
     }
-
     require('mason-lspconfig').setup{ }
     -- require('mason-lspconfig').setup_handlers{
     --     function(server_name)
@@ -32,25 +31,44 @@ local function __servers()
         },
     }
     lspconfig.rust_analyzer.setup{
-        ['rust-analyzer'] = {
-            updates = {
-                checkOnStartup = false,
-                channel = 'nightly',
+        settings = {
+            ['rust-analyzer'] = {
+                updates = {
+                    checkOnStartup = false,
+                    channel = 'nightly',
+                },
+                cargo = { allFeatures = true, },
+                notifications = { cargoTomlNotFound = false, },
+                diagnostics = { disabled = { 'inactive-code' }, },
+                procMacro = { enable = true },
             },
-            cargo = { allFeatures = true, },
-            notifications = { cargoTomlNotFound = false, },
-            diagnostics = { disabled = {'inactive-code'}, },
-            procMacro = { enable = true, },
         },
     }
     lspconfig.pyright.setup{
-        python = {
-            analysis = {
-                stubPath = 'typings',
+        settings = {
+            python = {
+                analysis = {
+                    stubPath = 'typings',
+                },
             },
         },
     }
-    lspconfig.sumneko_lua.setup{ }
+    lspconfig.sumneko_lua.setup{
+        settings = {
+            Lua = {
+                runtime = { version = 'Lua 5.2' }, -- LuaJIT
+                workspace = {
+                    library = {
+                        vim.env.VIMRUNTIME .. '/lua',
+                        vim.env.VIMRUNTIME .. '/lua/vim',
+                        vim.env.VIMRUNTIME .. '/lua/vim/lsp',
+                        vim.env.VIMRUNTIME .. '/lua/vim/treesitter',
+                    }
+                },
+                telemetry = { enable = false },
+            },
+        },
+    }
     lspconfig.vimls.setup{ }
     -- lspconfig.ltex.setup{ }
 
@@ -166,8 +184,18 @@ local function __completion()
         ['<M-e>'] = cmp.mapping(function() cmp.abort() end, {'c'}),
         ['<M-j>'] = cmp.mapping(function() cmp.select_next_item() end, {'c'}),
         ['<M-k>'] = cmp.mapping(function() cmp.select_prev_item() end, {'c'}),
-        ['<Tab>'] = cmp.mapping(function() cmp.select_next_item() end, {'c'}),
-        ['<S-Tab>'] = cmp.mapping(function() cmp.select_prev_item() end, {'c'}),
+        ['<Tab>'] = cmp.mapping(function()
+            if cmp.visible()
+            then cmp.select_next_item()
+            else cmp.complete()
+            end
+        end, {'c'}),
+        ['<S-Tab>'] = cmp.mapping(function()
+            if cmp.visible()
+            then cmp.select_prev_item()
+            else cmp.complete()
+            end
+        end, {'c'}),
     }
     cmp.setup.cmdline('/', {
         mapping = cmdline_mapping,
@@ -197,7 +225,7 @@ local function __lsp()
     api.nvim_set_hl(0, 'DiagnosticUnderlineError', { undercurl = true, sp = 'Red'  })
     api.nvim_set_hl(0, 'DiagnosticUnderlineWarn', { undercurl = true, sp = 'Orange' })
     api.nvim_set_hl(0, 'DiagnosticUnderlineInfo', { undercurl = true, sp = 'LightBlue' })
-    api.nvim_set_hl(0, 'DiagnosticUnderlineHint', { undercurl = true, sp = 'LightGrey' })
+    api.nvim_set_hl(0, 'DiagnosticUnderlineHint', { link = 'Comment' })
     if use.ui.patch then
         for name, icon in pairs{
             DiagnosticSignError = '𝙭',
@@ -208,7 +236,6 @@ local function __lsp()
             vim.fn.sign_define(name, { text = icon, texthl = name, numhl = name })
         end
     end
-
     vim.diagnostic.config({
         virtual_text = { prefix = '▪' },
     })
@@ -232,6 +259,7 @@ local function __lsp()
     m.nnore{'<leader>ok', function() vim.diagnostic.goto_prev({severity = vim.diagnostic.severity.ERROR }) end}
     m.nnore{'<leader>oJ', vim.diagnostic.goto_next}
     m.nnore{'<leader>oK', vim.diagnostic.goto_prev}
+    -- TODO: list for workspace, sources, servers, commands
     -- m.nnore{'<leader>ow', vim.lsp.buf.manage_workspace_folder}
     -- m.nnore{'<leader>oc', vim.lsp.buf.execute_command}
     m.nnore{'<leader>oR', ':LspRestart<CR>'}
