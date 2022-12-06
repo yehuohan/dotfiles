@@ -315,11 +315,11 @@ cnoremap <M-i> <C-Left>
 cnoremap <M-u> <C-b>
 cnoremap <M-p> <C-e>
 " 排序
-nnoremap <leader><leader>o :sort nr //<Left>
-nnoremap <leader><leader>O :sort! nr //<Left>
-vnoremap <leader><leader>o
+nnoremap <leader><leader>s :sort nr //<Left>
+nnoremap <leader><leader>S :sort! nr //<Left>
+vnoremap <leader><leader>s
     \ :<C-u>sort nr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
-vnoremap <leader><leader>O
+vnoremap <leader><leader>S
     \ :<C-u>sort! nr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
 " HEX编辑
 nnoremap <leader>xx :%!xxd<CR>
