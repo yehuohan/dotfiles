@@ -310,8 +310,8 @@ floating_modifier $mod
 # {{{
 # terminal
 bindsym $mod+Return exec xfce4-terminal || gnome-terminal
-bindsym $mod+mod1+Return exec xterm || xfce4-terminal || gnome-terminal
-bindsym $mod+Shift+Return exec alacritty || xfce4-terminal || gnome-terminal
+bindsym $mod+mod1+Return exec alacritty || xfce4-terminal || gnome-terminal
+bindsym $mod+Shift+Return exec xterm || xfce4-terminal || gnome-terminal
 
 # file manager
 bindsym $mod+e exec nautilus

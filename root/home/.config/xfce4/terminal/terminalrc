@@ -39,6 +39,7 @@ ColorBoldUseDefault=FALSE
 ShortcutsNoMnemonics=TRUE
 ShortcutsNoHelpkey=TRUE
 ShortcutsNoMenukey=TRUE
-FontName=UbuntuMono Nerd Font Mono 13
+FontName=FantasqueSansMono Nerd Font Mono 13
 CellHeightScale=1.050000
+MiscRightClickAction=TERMINAL_RIGHT_CLICK_ACTION_CONTEXT_MENU
 

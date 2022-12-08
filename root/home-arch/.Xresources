@@ -43,6 +43,7 @@ xterm.termName: xterm-256color
 
 ! font
 xterm*faceName: UbuntuMono Nerd Font Mono:antialias=True:pixelsize=20
+!xterm*faceName: FantasqueSansMono Nerd Font:antialias=True:pixelsize=20
 !xterm*faceNameDoublesize: WenQuanYi Micro Hei Mono:antialias=True:pixelsize=19
 xterm*faceNameDoublesize: Microsoft YaHei:antialias=True:pixelsize=18
 xterm*faceSize: 13

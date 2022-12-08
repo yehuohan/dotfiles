@@ -43,6 +43,7 @@ if [[ `uname` == "Linux" ]]; then
     if [[ `uname -r` =~ "arch" ]]; then
         # home/.config
         cp ~/.config/xfce4/terminal/terminalrc      ./root/home/.config/xfce4/terminal/
+        cp ~/.config/alacritty/alacritty.yml        ./root/home/.config/alacritty/
         # X11
         cp ~/.Xresources                            ./root/home-arch/
         cp ~/.xinitrc                               ./root/home-arch/
