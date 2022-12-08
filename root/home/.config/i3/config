@@ -68,7 +68,7 @@ set $bp 3
 set $Terminal "(XTerm)|(Gnome-terminal)|(Xfce4-terminal)|(Alacritty)"
 set $NonTerminal "^(?!((XTerm)|(Gnome-terminal)|(Xfce4-terminal)|(Alacritty)))"
 set $Desktop "(VirtualBox Manager)|(netease-cloud-music)|(jetbrains-studio)"
-assign [class="(Firefox)|(Nightly)"] workspace $WS1
+assign [class="(firefox)|(Nightly)"] workspace $WS1
 assign [class="(Google-chrome)|(Chromium)"] workspace $WS1
 assign [class="Nautilus"] workspace $WS2
 assign [class=$Desktop] workspace $WS3
