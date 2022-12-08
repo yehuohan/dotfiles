@@ -23,8 +23,8 @@ local function pkg_packer()
             default_url_format = 'https://github.com/%s',
         },
     }
-    if use.fastgit then
-        packer_config.git.default_url_format = 'https://hub.fastgit.org/%s'
+    if use.xgit then
+        packer_config.git.default_url_format = 'https://kgithub.com/%s'
     end
 
     require('packer').startup({

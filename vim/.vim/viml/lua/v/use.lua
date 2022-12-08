@@ -2,7 +2,7 @@ local fn = vim.fn
 
 local use_file = vim.env.DotVimCache .. '/.use.json'
 local use = {
-    fastgit    = false,
+    xgit       = false,
     coc        = false,
     nlsp       = false,
     treesitter = false,

@@ -5,7 +5,7 @@ endfunction
 " Struct s:use {{{
 let s:use_file = $DotVimCache . '/.use.json'
 let s:use = {
-    \ 'fastgit'   : v:false,
+    \ 'xgit'      : v:false,
     \ 'coc'       : v:false,
     \ 'nlsp'      : v:false,
     \ 'treesitter': v:false,

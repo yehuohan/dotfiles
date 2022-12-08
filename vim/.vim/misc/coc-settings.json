@@ -52,7 +52,7 @@
     "coc.preferences.enableMessageDialog": true,
     "coc.preferences.promptInput": true,
     "coc.preferences.extensionUpdateCheck": "weekly",
-    "coc.preferences.rootPatterns": [".popc", ".git", ".svn", ".hg"],
+    "workspace.rootPatterns": [".popc", ".git", ".svn", ".hg"],
     "coc.preferences.jumpCommand": "edit",
     "list.nextKeymap": "<C-j>",
     "list.previousKeymap": "<C-k>",

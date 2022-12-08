@@ -40,8 +40,8 @@ endfunction
 " }}}
 
 " Plug {{{
-if s:use.fastgit
-    let g:plug_url_format = 'https://hub.fastgit.org/%s.git'
+if s:use.xgit
+    let g:plug_url_format = 'https://kgithub.com/%s.git'
 endif
 call plug#begin($DotVimDir.'/bundle')  " 设置插件位置，且自动设置了syntax enable和filetype plugin indent on
     " editor
