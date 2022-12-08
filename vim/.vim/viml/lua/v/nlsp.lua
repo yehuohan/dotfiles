@@ -4,8 +4,13 @@ local m = require('v.maps')
 
 
 local function __servers()
+    local url = 'https://github.com/%s/releases/download/%s/%s'
+    if use.xgit then
+        url = 'https://kgithub.com/%s/releases/download/%s/%s'
+    end
     require('mason').setup{
         install_root_dir = vim.env.DotVimCache .. '/.mason',
+        github = { download_url_template = url },
         ui = {
             check_outdated_packages_on_open = true,
             border = 'single',
