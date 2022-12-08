@@ -45,7 +45,7 @@ else
     let g:python3_host_prog = '/usr/bin/python3'
     let g:node_host_prog = $DotVimLocal . '/node_modules/neovim/bin/cli.js'
     if !filereadable(g:node_host_prog)
-        let g:node_host_prog = '~/.node_modules/neovim/bin/cli.js'
+        let g:node_host_prog = '/usr/lib/node_modules/neovim/bin/cli.js'
     endif
 endif
     let &packpath = &rtp
