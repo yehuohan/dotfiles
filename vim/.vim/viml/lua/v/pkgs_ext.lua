@@ -216,12 +216,22 @@ local function pkg_scrollbar()
             highlight = 'Normal',
             hide_if_all_visible = true,
         },
+        marks = {
+            Cursor = {
+                text = '⁞',
+                priority = 0,
+                color = nil,
+                cterm = nil,
+                highlight = 'Normal',
+            },
+        },
         handlers = {
             diagnostic = false,
+            gitsigns = false,
             search = false,
         },
         excluded_buftypes = { 'nofile', 'terminal' },
-        excluded_filetypes = { 'prompt', 'TelescopePrompt' },
+        excluded_filetypes = { 'prompt', 'TelescopePrompt', 'noice' },
         autocmd = {
             render = {
                 'BufWinEnter',

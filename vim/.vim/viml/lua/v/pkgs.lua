@@ -1,4 +1,3 @@
-local fn = vim.fn
 local g = vim.g
 local use = require('v.use').get()
 local m = require('v.maps')
@@ -129,23 +128,6 @@ local function pkg_textobj_user()
     m.omap{'iu', [[<Plug>(textobj-underscore-i)]] }
     m.vmap{'au', [[<Plug>(textobj-underscore-a)]] }
     m.vmap{'iu', [[<Plug>(textobj-underscore-i)]] }
-    m.nnore{'<leader>to', [[:lua Plug_to_motion('v')<CR>]]}
-    m.nnore{'<leader>tO', [[:lua Plug_to_motion('V')<CR>]]}
-end
-
-local textobj_motion = vim.regex('/l')
-function Plug_to_motion(motion)
-    fn.PopSelection({
-        opt = 'select text object motion',
-        lst = vim.split([[w W s p ( b [ < t { B " ' ` i f c m u]], ' '),
-        cmd = function(_, sel)
-            local c = ''
-            if textobj_motion:match_str(motion)
-            then c = 'i'
-            else c = 'a' end
-            vim.cmd(string.format('normal! %s%s%s', string.lower(motion), c, sel))
-        end
-    })
 end
 
 -- 撤消历史

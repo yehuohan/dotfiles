@@ -182,7 +182,7 @@ endfunction
 nnoremap <Plug>ExecLast    :call ExecLast(1)<CR>
 nnoremap <leader>.         :call ExecLast(1)<CR>
 nnoremap <leader><leader>. :call ExecLast(0)<CR>
-nnoremap <M-;> @:
+nnoremap <C-;> @:
 vnoremap <leader><leader>;
     \ <Cmd>call feedkeys(':' . GetSelected(''), 'n')<CR>
 " }}}
