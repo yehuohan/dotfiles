@@ -178,12 +178,14 @@ local function __completion()
         },
     }
     cmp.setup.filetype({ 'tex', 'latex', 'markdown', 'restructuredtext', 'text', 'help' }, {
-        sources = {
-            { name = 'path' },
+        sources = cmp.config.sources({
+            { name = 'path' }
+        }, {
             { name = 'latex_symbols' },
             -- { name = 'spell' },
             -- { name = 'dictionary' },
-        }
+        })
+
     })
     local cmdline_mapping = {
         ['<M-e>'] = cmp.mapping(function() cmp.abort() end, {'c'}),
