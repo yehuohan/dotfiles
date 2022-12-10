@@ -116,6 +116,7 @@ local kind_sources = {
     path          = ' Pth',
     calc          = ' Cal',
     latex_symbols = ' Tex',
+    IM            = ' IMs',
 }
 
 local function cmp_format(entry, vitem)
@@ -139,6 +140,14 @@ local function __completion()
     api.nvim_set_hl(0, 'CmpItemAbbrMatchFuzzy', { ctermfg = 208, fg = '#fe8019' })
     api.nvim_set_hl(0, 'CmpItemKind', { ctermfg = 142, fg = '#b8bb26' })
 
+    local cmp_im = require('cmp_im')
+    cmp_im.setup{
+        tables = require('cmp_im_zh').tables{'wubi', 'pinyin'}
+    }
+    m.add({'n', 'v', 'c', 'i'}, {'<M-;>', function()
+        vim.notify(string.format('IM is %s', cmp_im.toggle() and 'enabled' or 'disabled'))
+    end})
+
     local cmp = require('cmp')
     cmp.setup{
         mapping = {
@@ -155,6 +164,7 @@ local function __completion()
             ['<M-m>'] = cmp.mapping.scroll_docs(-4),
             ['<M-f>'] = cmp.mapping.scroll_docs(4),
             ['<M-d>'] = cmp.mapping.scroll_docs(-4),
+            ['<Space>'] = cmp.mapping(cmp_im.select, { 'i' }),
         },
         sources = cmp.config.sources({
             { name = 'nvim_lsp' },
@@ -179,6 +189,7 @@ local function __completion()
     }
     cmp.setup.filetype({ 'tex', 'latex', 'markdown', 'restructuredtext', 'text', 'help' }, {
         sources = cmp.config.sources({
+            { name = 'IM' },
             { name = 'path' }
         }, {
             { name = 'latex_symbols' },
@@ -203,14 +214,19 @@ local function __completion()
             else cmp.complete()
             end
         end, {'c'}),
+        ['<Space>'] = cmp.mapping(cmp_im.select, { 'c' }),
     }
     cmp.setup.cmdline('/', {
         mapping = cmdline_mapping,
-        sources = { { name = 'buffer' } }
+        sources = {
+            { name = 'IM' },
+            { name = 'buffer' },
+        }
     })
     cmp.setup.cmdline(':', {
         mapping = cmdline_mapping,
         sources = cmp.config.sources({
+            { name = 'IM' },
             { name = 'path' }
         }, {
             { name = 'cmdline' }

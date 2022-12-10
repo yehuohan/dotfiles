@@ -132,6 +132,8 @@ if s:use.nlsp
     Plug 'hrsh7th/cmp-nvim-lua'
     Plug 'hrsh7th/cmp-calc'
     Plug 'yehuohan/cmp-path'
+    Plug 'yehuohan/cmp-im'
+    Plug 'yehuohan/cmp-im-zh'
     Plug 'ray-x/lsp_signature.nvim'
     Plug 'quangnguyen30192/cmp-nvim-ultisnips'
     Plug 'kdheepak/cmp-latex-symbols'
@@ -178,8 +180,6 @@ endif
     Plug 'arecarn/vim-selection'
     Plug 'voldikss/vim-translator'
     Plug 'brglng/vim-im-select'
-    Plug 'ZSaberLv0/ZFVimIM'
-    Plug 'ZSaberLv0/ZFVimIM_wubi_base'
 call plug#end()
 " }}}
 
@@ -854,14 +854,6 @@ let g:im_select_get_im_cmd = 'im-select'
 let g:im_select_default = '1033'        " 输入法代码：切换到期望的默认输入法，运行im-select
 endif
 let g:ImSelectSetImCmd = {key -> ['im-select', key]}
-" }}}
-
-" ZFVimIM {{{ 内置输入法
-let g:ZFVimIM_keymap = 0
-let g:ZFVimIM_cachePath = $DotVimCache . '/ZFVimIM'
-nnoremap <expr><silent> <M-;> ZFVimIME_keymap_toggle_n()
-inoremap <expr><silent> <M-;> ZFVimIME_keymap_toggle_i()
-vnoremap <expr><silent> <M-;> ZFVimIME_keymap_toggle_v()
 " }}}
 " }}}
 
