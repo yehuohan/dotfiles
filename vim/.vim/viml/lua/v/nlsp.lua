@@ -113,6 +113,7 @@ local kind_sources = {
     nvim_lsp      = ' Lsp',
     nvim_lua      = ' Lua',
     ultisnips     = ' Snp',
+    cmdline       = ' Cmd',
     path          = ' Pth',
     calc          = ' Cal',
     latex_symbols = ' Tex',
@@ -142,7 +143,8 @@ local function __completion()
 
     local cmp_im = require('cmp_im')
     cmp_im.setup{
-        tables = require('cmp_im_zh').tables{'wubi', 'pinyin'}
+        tables = require('cmp_im_zh').tables{'wubi', 'pinyin'},
+        maxn = 5,
     }
     m.add({'n', 'v', 'c', 'i'}, {'<M-;>', function()
         vim.notify(string.format('IM is %s', cmp_im.toggle() and 'enabled' or 'disabled'))
@@ -164,7 +166,7 @@ local function __completion()
             ['<M-m>'] = cmp.mapping.scroll_docs(-4),
             ['<M-f>'] = cmp.mapping.scroll_docs(4),
             ['<M-d>'] = cmp.mapping.scroll_docs(-4),
-            ['<Space>'] = cmp.mapping(cmp_im.select, { 'i' }),
+            ['<Space>'] = cmp.mapping(cmp_im.select(), {'i'}),
         },
         sources = cmp.config.sources({
             { name = 'nvim_lsp' },
@@ -196,7 +198,6 @@ local function __completion()
             -- { name = 'spell' },
             -- { name = 'dictionary' },
         })
-
     })
     local cmdline_mapping = {
         ['<M-e>'] = cmp.mapping(function() cmp.abort() end, {'c'}),
@@ -214,7 +215,7 @@ local function __completion()
             else cmp.complete()
             end
         end, {'c'}),
-        ['<Space>'] = cmp.mapping(cmp_im.select, { 'c' }),
+        ['<Space>'] = cmp.mapping(cmp_im.select(), {'c'}),
     }
     cmp.setup.cmdline('/', {
         mapping = cmdline_mapping,
