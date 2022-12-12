@@ -14,6 +14,9 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_ROOT}/__VBuildOut/${CMAKE_BUILD_TYPE})
 
 project(main LANGUAGES CXX)
 
+# Args for COMMAND should be list(print from message() is a;b;c),
+# or use separate_arguments()
+execute_process(COMMAND xxx)
 add_custom_command(TARGET ${PROJECT_NAME} # add_executable或add_library时执行的命令
     PRE_BUILD or PRE_LINK or POST_BUILD
     COMMAND xxx
@@ -45,7 +48,7 @@ add_library(${PROJECT_NAME} SHARED|STATIC ${SRC})
 
 target_include_directories() # target_xxx命令：其它Target链接此Target需要的include_directories
 target_compile_options(${PROJECT_NAME} INTERFACE|PUBLIC|PRIVATE -g -Wall -DMYVAR=1)
-target_link_libraries(${PROJECT_NAME} lib)
+target_link_libraries(${PROJECT_NAME} INTERFACE|PUBLIC|PRIVATE lib)
 
 install(DIRECTORY,FILES <src-dirs> DESTINATION <dst-dir>)
 install(TARGETS ${PROJECT_NAME} DESTINATION <dst-dir>)
