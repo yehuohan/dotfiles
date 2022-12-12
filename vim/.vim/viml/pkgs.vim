@@ -11,34 +11,6 @@ let g:loaded_netrwPlugin = 1
 "let g:loaded_matchparen = 1
 " }}}
 
-" Struct: s:plug {{{
-let s:plug = {
-    \ 'onVimEnter' : {'exec': []},
-    \ 'onDelay'    : {'delay': 700, 'load': [], 'exec': []},
-    \ }
-
-function! s:plug.reg(event, type, name) dict
-    call add(self[a:event][a:type], a:name)
-endfunction
-
-function! s:plug.run(timer) dict
-    call plug#load(self.onDelay.load)
-    call execute(self.onDelay.exec)
-endfunction
-
-function! s:plug.init() dict
-    if !empty(self.onVimEnter.exec)
-        augroup PkgsPlug
-            autocmd!
-            autocmd VimEnter * call execute(s:plug.onVimEnter.exec)
-        augroup END
-    endif
-    if !empty(self.onDelay.load)
-        call timer_start(self.onDelay.delay, funcref('s:plug.run', [], s:plug))
-    endif
-endfunction
-" }}}
-
 " Plug {{{
 if s:use.xgit
     let g:plug_url_format = 'https://kgithub.com/%s.git'
@@ -518,7 +490,7 @@ augroup END
 
 " LeaderF {{{ 模糊查找
 if s:use.has_py
-"call s:plug.reg('onVimEnter', 'exec', 'autocmd! LeaderF_Mru')
+" autocmd VimEnter * call execute('autocmd! LeaderF_Mru')
 let g:Lf_CacheDirectory = $DotVimCache
 let g:Lf_PreviewInPopup = 1
 let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0}
@@ -550,13 +522,13 @@ endif
 " Coding {{{
 " coc {{{ 自动补全
 if s:use.coc
-call s:plug.reg('onDelay', 'load', 'coc.nvim')
-call s:plug.reg('onDelay', 'exec', 'call s:Plug_coc_settings()')
-function! s:Plug_coc_settings()
+function! Plug_coc_setup(timer)
+    call plug#load('coc.nvim')
     for [sec, val] in items(Env_coc_settings())
         call coc#config(sec, val)
     endfor
 endfunction
+call timer_start(700, 'Plug_coc_setup')
 let g:coc_config_home = $DotVimMisc
 let g:coc_data_home = $DotVimCache . '/.coc'
 let g:coc_global_extensions = ['coc-marketplace']
@@ -866,5 +838,3 @@ EOF
 else
     source $DotVimVimL/pkgs.ext.vim
 endif
-
-call s:plug.init()

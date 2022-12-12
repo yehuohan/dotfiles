@@ -174,6 +174,7 @@ local function __completion()
             { name = 'ultisnips' },
             { name = 'path' },
             { name = 'calc' },
+            { name = 'IM' },
         }, {
             { name = 'buffer' },
         }),
@@ -191,8 +192,10 @@ local function __completion()
     }
     cmp.setup.filetype({ 'tex', 'latex', 'markdown', 'restructuredtext', 'text', 'help' }, {
         sources = cmp.config.sources({
+            { name = 'ultisnips' },
+            { name = 'path' },
+            { name = 'calc' },
             { name = 'IM' },
-            { name = 'path' }
         }, {
             { name = 'latex_symbols' },
             -- { name = 'spell' },

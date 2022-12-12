@@ -490,6 +490,11 @@ end
 -- 语法树
 local function pkg_treesitter()
 if use.treesitter then
+    if use.xgit then
+        for _, c in pairs(require('nvim-treesitter.parsers').get_parser_configs()) do
+            c.install_info.url = c.install_info.url:gsub('https://github.com/', 'https://kgithub.com/')
+        end
+    end
     require('nvim-treesitter.configs').setup{
         parser_install_dir = vim.env.DotVimCache .. '/.treesitter',
         --ensure_installed = { 'c', 'cpp', 'rust', 'vim', 'lua', 'python', 'markdown', 'markdown_inline', },

@@ -314,16 +314,14 @@ cnoremap <M-o> <C-Right>
 cnoremap <M-i> <C-Left>
 cnoremap <M-u> <C-b>
 cnoremap <M-p> <C-e>
-" 排序
-nnoremap <leader><leader>s :sort nr //<Left>
-nnoremap <leader><leader>S :sort! nr //<Left>
+" 替换
+nnoremap <leader><leader>s :%s/<C-r><C-w>/
 vnoremap <leader><leader>s
-    \ :<C-u>sort nr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
+    \ <Cmd>call feedkeys(':%s/' . GetSelected('') . '/', 'n')<CR>
+" 排序
+nnoremap <leader><leader>S :sort nr //<Left>
 vnoremap <leader><leader>S
-    \ :<C-u>sort! nr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
-" HEX编辑
-nnoremap <leader>xx :%!xxd<CR>
-nnoremap <leader>xr :%!xxd -r<CR>
+    \ :<C-u>sort nr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
 " lua测试代码
 nnoremap <leader><leader>u :lua vim.pretty_print()<Left>
 nnoremap <leader><leader>U :lua print()<Left>
@@ -335,6 +333,9 @@ vnoremap <leader><leader>U
 nnoremap <leader><leader>k :h <C-r><C-w>
 vnoremap <leader><leader>k
     \ <Cmd>call feedkeys(':h ' . GetSelected(''), 'n')<CR>
+" HEX编辑
+nnoremap <leader>xx :%!xxd<CR>
+nnoremap <leader>xr :%!xxd -r<CR>
 " }}}
 
 " Copy & Paste {{{
