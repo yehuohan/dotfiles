@@ -620,7 +620,7 @@ endfor
 nnoremap <leader>rv
     \ <Cmd>silent w <Bar>
     \ if &filetype=~?'\v(vim)\|(lua)' <Bar>
-    \   source % <Bar>
+    \   execute 'source ' . Expand('%') <Bar>
     \ endif<CR>
 " }}}
 

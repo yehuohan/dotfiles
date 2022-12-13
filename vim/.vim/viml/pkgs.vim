@@ -532,8 +532,8 @@ call timer_start(700, 'Plug_coc_setup')
 let g:coc_config_home = $DotVimMisc
 let g:coc_data_home = $DotVimCache . '/.coc'
 let g:coc_global_extensions = ['coc-marketplace']
-let g:coc_status_error_sign = '𝙭'
-let g:coc_status_warning_sign = '!'
+let g:coc_status_error_sign = '🗴'
+let g:coc_status_warning_sign = ''
 let g:coc_filetype_map = {}
 let g:coc_snippet_next = '<M-l>'
 let g:coc_snippet_prev = '<M-h>'

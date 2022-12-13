@@ -255,7 +255,7 @@ local function __lsp()
     api.nvim_set_hl(0, 'DiagnosticUnderlineHint', { link = 'Comment' })
     if use.ui.patch then
         for name, icon in pairs{
-            DiagnosticSignError = '𝙭',
+            DiagnosticSignError = '🗴',
             DiagnosticSignWarn  = '',
             DiagnosticSignInfo  = '►',
             DiagnosticSignHint  = '',
