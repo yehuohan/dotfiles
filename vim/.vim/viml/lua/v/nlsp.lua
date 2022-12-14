@@ -5,8 +5,8 @@ local m = require('v.maps')
 
 local function __servers()
     local url = 'https://github.com/%s/releases/download/%s/%s'
-    if use.xgit then
-        url = 'https://kgithub.com/%s/releases/download/%s/%s'
+    if vim.fn.empty(use.xgit) == 0 then
+        url = use.xgit .. '/%s/releases/download/%s/%s'
     end
     require('mason').setup{
         install_root_dir = vim.env.DotVimCache .. '/.mason',

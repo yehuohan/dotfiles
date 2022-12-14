@@ -5,7 +5,7 @@ endfunction
 " Struct s:use {{{
 let s:use_file = $DotVimCache . '/.use.json'
 let s:use = {
-    \ 'xgit'      : v:false,
+    \ 'xgit'      : v:null,
     \ 'coc'       : v:false,
     \ 'nlsp'      : v:false,
     \ 'treesitter': v:false,
@@ -29,10 +29,6 @@ function! s:useLoad()
     else
         call s:useSave()
     endif
-    if IsVim()
-        let s:use.ui.font = 'Consolas For Powerline'
-        let s:use.ui.wide = 'Microsoft YaHei Mono'
-    endif
 endfunction
 " }}}
 
@@ -45,9 +41,11 @@ endfunction
 
 " Function: s:useInit() {{{
 function! s:useInit()
+    " Init with empty dict '{}' to indicate sub-selection
     let l:dic = map(copy(s:use), '{}')
-
-    " Set ui selections
+    " Set xgit
+    let l:dic.xgit = { 'lst': [v:null, 'https://kgithub.com'] }
+    " Set ui
     let l:fontlst = [
         \ 'Consolas',
         \ 'Consolas,CaskaydiaCove Nerd Font Mono',

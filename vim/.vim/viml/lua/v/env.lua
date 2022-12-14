@@ -38,25 +38,6 @@ local function env_init()
     end
 end
 
-local function env_coc_settings()
-    return {
-        Lua = {
-            workspace = {
-                library = {
-                    [vim.env.VIMRUNTIME .. "/lua"] = true,
-                    [vim.env.VIMRUNTIME .. "/lua/vim"] = true,
-                    [vim.env.VIMRUNTIME .. "/lua/vim/lsp"] = true,
-                    [vim.env.VIMRUNTIME .. "/lua/vim/treesitter"] = true
-                }
-            }
-        },
-        python = {
-            pythonPath = vim.env.VPathPython .. "/python"
-        }
-    }
-end
-
 return {
     setup = env_init,
-    env_coc_settings = env_coc_settings,
 }

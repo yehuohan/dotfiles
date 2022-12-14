@@ -319,9 +319,9 @@ nnoremap <leader><leader>s :%s/<C-r><C-w>/
 vnoremap <leader><leader>s
     \ <Cmd>call feedkeys(':%s/' . GetSelected('') . '/', 'n')<CR>
 " 排序
-nnoremap <leader><leader>S :sort nr //<Left>
+nnoremap <leader><leader>S :sort fr //<Left>
 vnoremap <leader><leader>S
-    \ :<C-u>sort nr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
+    \ :<C-u>sort fr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
 " lua测试代码
 nnoremap <leader><leader>u :lua vim.pretty_print()<Left>
 nnoremap <leader><leader>U :lua print()<Left>

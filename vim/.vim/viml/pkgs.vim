@@ -12,8 +12,8 @@ let g:loaded_netrwPlugin = 1
 " }}}
 
 " Plug {{{
-if s:use.xgit
-    let g:plug_url_format = 'https://kgithub.com/%s.git'
+if !empty(s:use.xgit)
+    let g:plug_url_format = s:use.xgit . '/%s.git'
 endif
 call plug#begin($DotVimDir.'/bundle')  " 设置插件位置，且自动设置了syntax enable和filetype plugin indent on
     " editor

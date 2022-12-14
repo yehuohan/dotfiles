@@ -22,8 +22,8 @@ local function pkg_packer()
             default_url_format = 'https://github.com/%s',
         },
     }
-    if use.xgit then
-        packer_config.git.default_url_format = 'https://kgithub.com/%s'
+    if vim.fn.empty(use.xgit) == 0 then
+        packer_config.git.default_url_format = use.xgit .. '/%s'
     end
 
     require('packer').startup({

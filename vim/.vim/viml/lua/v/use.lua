@@ -2,7 +2,7 @@ local fn = vim.fn
 
 local use_file = vim.env.DotVimCache .. '/.use.json'
 local use = {
-    xgit       = false,
+    xgit       = vim.v.null,
     coc        = false,
     nlsp       = false,
     treesitter = false,
@@ -35,9 +35,11 @@ local function use_load()
 end
 
 local function use_init()
+    -- Init with empty dict '{}' to indicate sub-selection
     local udic = vim.tbl_map(function() return vim.empty_dict() end, use)
-
-    -- Set ui selections
+    -- Set xgit
+    udic.xgit = { lst = {vim.v.null, 'https://kgithub.com'} }
+    -- Set ui
     local fontlst = {
         'Consolas',
         'Consolas Nerd Font Mono',
