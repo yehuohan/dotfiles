@@ -495,13 +495,13 @@ if use.treesitter then
             c.install_info.url = c.install_info.url:gsub('https://github.com', use.xgit)
         end
     end
+    local parser_dir = vim.env.DotVimCache .. '/.treesitter'
     require('nvim-treesitter.configs').setup{
-        parser_install_dir = vim.env.DotVimCache .. '/.treesitter',
+        parser_install_dir = parser_dir,
         --ensure_installed = { 'c', 'cpp', 'rust', 'vim', 'lua', 'python', 'markdown', 'markdown_inline', },
         --auto_install = true,
         highlight = {
             enable = true,
-            disable = { 'markdown', 'markdown_inline' },
             additional_vim_regex_highlighting = false,
         },
         indent = {
@@ -523,12 +523,35 @@ if use.treesitter then
             max_file_lines = nil,
         }
     }
-    vim.opt.runtimepath:append(vim.env.DotVimCache .. '/.treesitter')
+    vim.opt.runtimepath:append(parser_dir)
     m.nnore{'<leader>sh', ':TSBufToggle highlight<CR>'}
     m.nnore{'<leader>si', ':TSBufToggle indent<CR>'}
     m.nnore{'<leader>ss', ':TSBufToggle incremental_selection<CR>'}
 end
 end
+
+--------------------------------------------------------------------------------
+-- Utils
+--------------------------------------------------------------------------------
+local function pkg_peek()
+    -- Dependency: sudo pacman -S webkit2gtk
+    local peek = require('peek')
+    peek.setup{
+        auto_load = false,
+        syntax = true,
+        theme = 'light',
+    }
+    m.nnore{'<leader>vm',
+        function()
+            if peek.is_open() then
+                peek.close()
+            else
+                peek.open()
+            end
+            vim.notify('Markdown preview is ' .. (peek.is_open() and 'enabled' or 'disabled'))
+        end}
+end
+
 
 local function pkg_setup()
     -- Editor
@@ -556,6 +579,8 @@ local function pkg_setup()
     pkg_surround()
     pkg_ufo()
     pkg_treesitter()
+    -- Utils
+    pkg_peek()
 end
 
 return {
