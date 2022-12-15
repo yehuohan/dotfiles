@@ -76,6 +76,7 @@ neovide --remote-tcp=localhost:6666
 - [NodeJs](https://nodejs.org)
   - `HTTPS_PROXY=addr:port npm install -g neovim`
   - `cd $DotVimPath/local && HTTPS_PROXY=addr:port npm install neovim`
+- [Deno](https://github.com/denoland/deno)
 - [lua](https://www.lua.org/)
 - Git: [Msys2](http://www.msys2.org/) or [Cygwin](https://cygwin.com)
   - `git config --global http.proxy addr:port`
@@ -86,9 +87,7 @@ neovide --remote-tcp=localhost:6666
 - [Astyle](http://astyle.sourceforge.net)
 - [Ctags](https://github.com/universal-ctags/ctags)
 - [Lf](https://github.com/gokcehan/lf)
-- [Typora](https://typora.io/)
-- [MuPDF](https://www.mupdf.com)
-- [SumatraPDF](https://www.sumatrapdfreader.org)
+- [sioyek](https://github.com/ahrm/sioyek)
 
 
 ---
