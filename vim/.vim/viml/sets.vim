@@ -56,6 +56,8 @@ set notildeop                           " 使切换大小写的~，类似于c,y,
 set nrformats=bin,octal,hex,alpha       " CTRL-A-X支持数字和字母
 set mouse=a                             " 使能鼠标
 set noimdisable                         " 不禁用输入法
+set nospell                             " 默认关闭拼写检查
+set spelllang=en_us                     " 设置拼写语言
 set visualbell                          " 使用可视响铃代替鸣声
 set noerrorbells                        " 关闭错误信息响铃
 set belloff=all                         " 关闭所有事件的响铃
@@ -150,6 +152,7 @@ nnoremap <leader>ii :call OptionInv('ignorecase')<CR>
 nnoremap <leader>if :call OptionInv('foldenable')<CR>
 nnoremap <leader>ie :call OptionInv('expandtab')<CR>
 nnoremap <leader>ib :call OptionInv('scrollbind')<CR>
+nnoremap <leader>ip :call OptionInv('spell')<CR>
 nnoremap <leader>iv :call OptionLst('virtualedit')<CR>
 nnoremap <leader>ic :call OptionLst('conceallevel')<CR>
 nnoremap <leader>is :call OptionLst('signcolumn')<CR>

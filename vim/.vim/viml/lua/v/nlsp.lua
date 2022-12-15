@@ -109,20 +109,21 @@ local kind_icons = {
 }
 
 local kind_sources = {
-    buffer        = ' Buf',
-    nvim_lsp      = ' Lsp',
-    nvim_lua      = ' Lua',
-    ultisnips     = ' Snp',
-    cmdline       = ' Cmd',
-    path          = ' Pth',
-    calc          = ' Cal',
-    latex_symbols = ' Tex',
-    IM            = ' IMs',
+    buffer        = 'Buf',
+    nvim_lsp      = 'Lsp',
+    nvim_lua      = 'Lua',
+    ultisnips     = 'Snp',
+    cmdline       = 'Cmd',
+    path          = 'Pth',
+    calc          = 'Cal',
+    IM            = 'IMs',
+    latex_symbols = 'Tex',
+    spell         = 'Spl', -- It's enabling depends on 'spell' option
 }
 
 local function cmp_format(entry, vitem)
     local ico = kind_icons[vitem.kind]
-    local src = kind_sources[entry.source.name]
+    local src = kind_sources[entry.source.name] or entry.source.name
     if use.ui.patch then
         vitem.kind = string.format(' %s', ico[1])
     else
@@ -131,7 +132,7 @@ local function cmp_format(entry, vitem)
     if string.len(vitem.abbr) > 80 then
         vitem.abbr = string.sub(vitem.abbr, 1, 78) .. ' …'
     end
-    vitem.menu = string.format('%4s%s', ico[2], src or '')
+    vitem.menu = string.format('%3s.%s', src, ico[2])
     return vitem
 end
 
@@ -167,6 +168,16 @@ local function __completion()
             ['<M-f>'] = cmp.mapping.scroll_docs(4),
             ['<M-d>'] = cmp.mapping.scroll_docs(-4),
             ['<Space>'] = cmp.mapping(cmp_im.select(), {'i'}),
+            ['1'] = cmp.mapping(cmp_im.select(1), {'i'}),
+            ['2'] = cmp.mapping(cmp_im.select(2), {'i'}),
+            ['3'] = cmp.mapping(cmp_im.select(3), {'i'}),
+            ['4'] = cmp.mapping(cmp_im.select(4), {'i'}),
+            ['5'] = cmp.mapping(cmp_im.select(5), {'i'}),
+            ['6'] = cmp.mapping(cmp_im.select(6), {'i'}),
+            ['7'] = cmp.mapping(cmp_im.select(7), {'i'}),
+            ['8'] = cmp.mapping(cmp_im.select(8), {'i'}),
+            ['9'] = cmp.mapping(cmp_im.select(9), {'i'}),
+            ['0'] = cmp.mapping(cmp_im.select(10), {'i'}),
         },
         sources = cmp.config.sources({
             { name = 'nvim_lsp' },
@@ -198,8 +209,7 @@ local function __completion()
             { name = 'IM' },
         }, {
             { name = 'latex_symbols' },
-            -- { name = 'spell' },
-            -- { name = 'dictionary' },
+            { name = 'spell'},
         })
     })
     local cmdline_mapping = {
@@ -242,7 +252,7 @@ local function __completion()
         hint_enable = true,
         hint_prefix = '» ',
         handler_opts = {
-            border = 'none',
+            border = 'single',
         },
     }
 end

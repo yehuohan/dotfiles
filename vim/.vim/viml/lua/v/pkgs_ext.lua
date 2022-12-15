@@ -196,8 +196,6 @@ end
 -- 字体图标
 local function pkg_icon_picker()
     require('icon-picker').setup{ disable_legacy_commands = true }
-    m.nnore{'<leader>ip', '<Cmd>IconPickerNormal alt_font symbols nerd_font emoji<CR>'}
-    m.nnore{'<leader>iP', '<Cmd>IconPickerYank alt_font symbols nerd_font emoji<CR>'}
     m.inore{'<M-p>', '<Cmd>IconPickerInsert alt_font symbols nerd_font emoji<CR>'}
 end
 

@@ -110,7 +110,6 @@ if s:use.nlsp
     Plug 'quangnguyen30192/cmp-nvim-ultisnips'
     Plug 'kdheepak/cmp-latex-symbols'
     Plug 'f3fora/cmp-spell'
-    Plug 'uga-rosa/cmp-dictionary'
 endif
 else
     Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
