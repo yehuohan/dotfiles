@@ -25,20 +25,6 @@ function! GetSelected(...)
 endfunction
 " }}}
 
-" Function: GetEval(str, type) {{{ 获取计算结果
-function! GetEval(str, type)
-    if a:type ==# 'command'
-        let l:result = execute(a:str)
-    elseif a:type ==# 'function'
-        let l:result = eval(a:str)
-    endif
-    if type(l:result) != v:t_string
-        let l:result = string(l:result)
-    endif
-    return split(l:result, "\n")
-endfunction
-" }}}
-
 " Function: GetArgs(str) {{{ 解析字符串参数到列表中
 " @param str: 参数字符串，如 '"Test", 10, g:a'
 " @return 返回参数列表，如 ["Test", 10, g:a]
@@ -1161,21 +1147,55 @@ function! FnSwitchFile(sf)
 endfunction
 " }}}
 
-" FUNCTION: FnEvalStr(type, itext) {{{
-" @param itext: 是否将Eval结果放入当前编辑的文本中
-function! FnEvalStr(type, itext)
-    let l:str = (mode() ==# 'n') ? Input2Str(printf('Eval %s: ', a:type), '', a:type) : GetSelected('')
-    if empty(l:str)
-        return
+" FUNCTION: FnEvalStr(fn, iotype) {{{
+" @param inp: input string
+"   'i': input() or visual select
+"   'l': getline() or visual select
+" @param out: output result
+"   'a': append to line/visul end
+"   'n': insert to next line
+"   'c': copy
+function! FnEvalStr(fn, inp, out)
+    let l:mode = (mode() ==# 'n') ? 'n' : 'v'
+    let l:cmdtype = {
+        \ 'execute' : 'command',
+        \ 'eval'    : 'function',
+        \ 'luaeval' : 'function',
+        \ }
+    if l:mode ==# 'n'
+        let l:str = (a:inp == 'i')
+            \ ? Input2Str(printf('Eval %s: ', a:fn), '', l:cmdtype[a:fn])
+            \ : getline('.')
+    else
+        let l:str = GetSelected('')
     endif
 
-    let l:res = GetEval(l:str, a:type)
-    if a:itext
-        call append(line('.'), l:res)
-    else
-        call setreg('0', l:res)
-        call setreg('+', l:res)
-        call Notify(' -> copied')
+    if !empty(l:str)
+        " trick code to re-eval line
+        if l:mode ==# 'n' && a:inp == 'l' && a:out == 'a'
+            let l:str = substitute(l:str, ' = [^=]*$', '', '')
+        endif
+        let l:res = function(a:fn)(l:str)
+        if type(l:res) != v:t_string
+            let l:res = string(l:res)
+        endif
+
+        if a:out ==# 'a'
+            if l:mode ==# 'n'
+                let l:txt = printf('%s = %s', l:str, l:res)
+            else
+                let l:col = getpos("'>")[2]
+                let l:txt = getline('.')
+                let l:txt = printf('%s = %s %s', l:txt[:l:col-1], l:res, l:txt[l:col:])
+            endif
+            call setline(line('.'), l:txt)
+        elseif a:out ==# 'n'
+            call append(line('.'), split(l:res, "\n"))
+        elseif a:out ==# 'c'
+            call setreg('0', l:res)
+            call setreg('+', l:res)
+            call Notify(' -> copied')
+        endif
     endif
 endfunction
 " }}}
@@ -1214,8 +1234,12 @@ nnoremap <silent> <leader>dl :call Input2Fn(['Divide Left: ']  , 'FnInsertSpace'
 nnoremap <silent> <leader>dd :call Input2Fn(['Divide Delete: '], 'FnInsertSpace', 'd')<CR>
 nnoremap <leader>sf
     \ <Cmd>call FnSwitchFile({'lhs': ['c', 'cc', 'cpp', 'cxx'], 'rhs': ['h', 'hh', 'hpp', 'hxx']})<CR>
-noremap <leader>ae  <Cmd>call FnEvalStr('command', 1)<CR>
-noremap <leader>af  <Cmd>call FnEvalStr('function', 1)<CR>
-noremap <leader>age <Cmd>call FnEvalStr('command', 0)<CR>
-noremap <leader>agf <Cmd>call FnEvalStr('function', 0)<CR>
+noremap <leader>ae  <Cmd>call FnEvalStr('execute', 'i', 'n')<CR>
+noremap <leader>age <Cmd>call FnEvalStr('execute', 'i', 'c')<CR>
+noremap <leader>af  <Cmd>call FnEvalStr('eval', 'i', 'n')<CR>
+noremap <leader>agf <Cmd>call FnEvalStr('eval', 'i', 'c')<CR>
+noremap <leader>ev  <Cmd>call FnEvalStr('eval', 'l', 'a')<CR>
+noremap <leader>egv <Cmd>call FnEvalStr('eval', 'l', 'c')<CR>
+noremap <leader>eu  <Cmd>call FnEvalStr('luaeval', 'l', 'a')<CR>
+noremap <leader>egu <Cmd>call FnEvalStr('luaeval', 'l', 'c')<CR>
 " }}}

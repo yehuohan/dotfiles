@@ -151,8 +151,6 @@ endif
     Plug 'Rykka/InstantRst', {'for': 'rst'}
     Plug 'lervag/vimtex', {'for': 'tex'}
     Plug 'tyru/open-browser.vim'
-    Plug 'arecarn/vim-crunch'
-    Plug 'arecarn/vim-selection'
     Plug 'voldikss/vim-translator'
     Plug 'brglng/vim-im-select'
 call plug#end()
@@ -778,17 +776,6 @@ nnoremap <leader>bh  <Cmd>call openbrowser#search(Expand('<cword>'), 'github')<C
 vnoremap <leader>bb  <Cmd>call openbrowser#search(GetSelected(' '), 'bing')<CR>
 vnoremap <leader>bg  <Cmd>call openbrowser#search(GetSelected(' '), 'google')<CR>
 vnoremap <leader>bh  <Cmd>call openbrowser#search(GetSelected(' '), 'github')<CR>
-" }}}
-
-" crunch {{{ 计算器
-let g:crunch_user_variables = {
-    \ 'e': '2.718281828459045',
-    \ 'pi': '3.141592653589793'
-    \ }
-nnoremap <leader><leader>e :Crunch<Space>
-nnoremap <leader>ev
-    \ <Cmd>execute 'silent .,+' . string(v:count1-1) . 'Crunch'<CR>
-vnoremap <leader>ev :Crunch<CR>
 " }}}
 
 " translator {{{ 翻译

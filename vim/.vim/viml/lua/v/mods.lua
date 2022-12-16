@@ -23,19 +23,6 @@ function M.GetSelected(sep)
     end
 end
 
--- 获取计算结果
-function M.GetEval(str, ty)
-    local result = ''
-    if ty == 'command'       then result = fn.execute(str)
-    elseif ty == 'function'  then result = fn.eval(str)
-    elseif ty == 'registers' then result = fn.eval('@' .. str)
-    end
-    if fn.type(result) ~= vim.v.t_string then
-        result = fn.string(result)
-    end
-    return fn.split(result, "\n")
-end
-
 -- 解析字符串参数到列表中
 -- @param str: 参数字符串，如 '"Test", 10, g:a'
 -- @return 返回参数列表，如 ["Test", 10, g:a]
