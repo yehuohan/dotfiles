@@ -801,7 +801,7 @@ let g:ImSelectSetImCmd = {key -> ['im-select', key]}
 if IsNVim()
     set rtp^=$DotVimVimL
 lua << EOF
-    require('v.pkgs_ext').setup()
+    require('v.pkgs').setup()
     require('v.nlsp').setup()
 EOF
 else

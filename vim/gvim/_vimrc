@@ -1,6 +1,8 @@
 source $APPS_HOME/dotvim/.init.vim
 
-let s:use = SvarUse()
-let s:use.ui.font = 'Consolas For Powerline'
-let s:use.ui.wide = 'Microsoft YaHei Mono'
-call GuiSetFonts(0)
+if IsWin()
+    let s:use = SvarUse()
+    let s:use.ui.font = 'Consolas For Powerline'
+    let s:use.ui.wide = 'Microsoft YaHei Mono'
+    call GuiSetFonts(0)
+endif

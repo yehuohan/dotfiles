@@ -47,11 +47,13 @@ local function setup(dotvim)
     vim.keymap.set('n' , ';' , ':' , { noremap = true })
     vim.keymap.set('v' , ';' , ':' , { noremap = true })
     vim.keymap.set('n' , ':' , ';' , { noremap = true })
+    vim.keymap.set({'n', 'v', 'o', 'i', 'c'} , '<CR>' , '<CR>' , { remap = true })
+    vim.keymap.set({'n', 'v', 'o', 'i', 'c'} , '<Tab>' , '<Tab>' , { remap = true })
 
     require('v.env').setup()
     require('v.use').setup()
     require('v.pkgs').setup()
-    require('v.mods').setup()
+    -- require('v.mods').setup()
     require('v.sets').setup()
 end
 

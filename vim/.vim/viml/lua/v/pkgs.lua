@@ -1,217 +1,617 @@
-local g = vim.g
-local use = require('v.use').get()
+local use = vim.fn.SvarUse()
 local m = require('v.maps')
 
 
-local function pkg_standard()
-    g.loaded_gzip = 1
-    g.loaded_tarPlugin = 1
-    g.loaded_tar = 1
-    g.loaded_zipPlugin = 1
-    g.loaded_zip = 1
-    g.loaded_netrw = 1
-    g.loaded_netrwPlugin = 1
-end
-
 local function pkg_packer()
+    local url = 'https://github.com/%s'
+    if vim.fn.empty(use.xgit) == 0 then
+        url = use.xgit .. '/%s'
+    end
     local packer_config = {
         package_root = vim.env.DotVimDir .. '/pack',
         compile_path = vim.env.DotVimDir .. '/pack/packer_compiled.lua',
         plugin_package = 'packer',
-        git = {
-            default_url_format = 'https://github.com/%s',
-        },
+        git = { default_url_format = url },
     }
-    if vim.fn.empty(use.xgit) == 0 then
-        packer_config.git.default_url_format = use.xgit .. '/%s'
-    end
 
-    require('packer').startup({
-    function()
+    require('packer').startup{function()
         local add = require('packer').use
         add 'wbthomason/packer.nvim'
-
-        -- editing
-        add 'yehuohan/hop.nvim'
-        add 'mg979/vim-visual-multi'
-        add 'markonm/traces.vim'
-        add 'junegunn/vim-easy-align'
-        add 'terryma/vim-expand-region'
-        add 'kana/vim-textobj-user'
-        add 'kana/vim-textobj-indent'
-        add 'kana/vim-textobj-function'
-        add 'glts/vim-textobj-comment'
-        add 'adriaanzon/vim-textobj-matchit'
-        add 'lucapette/vim-textobj-underscore'
-        add 'tpope/vim-repeat'
-        add 'mbbill/undotree'
-
-        -- managers
-        add 'morhetz/gruvbox'
-        add 'yehuohan/popc'
-        add 'yehuohan/popset'
-    end, config = packer_config})
+    end, config = packer_config}
 end
 
 --------------------------------------------------------------------------------
--- Editing
+-- Editor
 --------------------------------------------------------------------------------
--- 多光标编辑
-local function pkg_visual_multi()
-    -- Usage: https://github.com/mg979/vim-visual-multi/wiki
-    -- Tab: 切换cursor/extend模式
-    -- C-n: 添加word或selected region作为cursor
-    -- C-Up/Down: 移动当前position并添加cursor
-    -- <VM_leader>a: 查找当前word作为cursor
-    -- <VM_leader>/: 查找regex作为cursor（n/N用于查找下/上一个）
-    -- <VM_leader>\: 添加当前position作为cursor（使用/或arrows或Hop跳转位置）
-    -- <VM_leader>a <VM_leader>c: 添加visual区域作为cursor
-    -- v: 文本对象（类似于viw等）
-    g.VM_mouse_mappings = 0         -- 禁用鼠标
-    g.VM_leader = ','
-    g.VM_maps = {
-        ['Find Under']         = '<C-n>',
-        ['Find Subword Under'] = '<C-n>',
-        ['Select All']         = ',a',
-        ['Add Cursor At Pos']  = ',,',
-        ['Select Operator']    = 'v',
+-- 快速跳转
+local function pkg_hop()
+    require('hop').setup{
+        match_mappings = { 'zh', 'zh_sc' },
+        create_hl_autocmd = true,
     }
-    g.VM_custom_remaps = {
-        ['<C-p>'] = '[',
-        ['<C-s>'] = 'q',
-        ['<C-c>'] = 'Q',
-        ['s']     = '<Cmd>HopChar1<CR>',
+    m.nore{'s', '<Cmd>HopChar1MW<CR>'}
+    m.nore{'f', '<Cmd>HopChar1CurrentLine<CR>'}
+    m.nore{'F', '<Cmd>HopAnywhereCurrentLine<CR>'}
+    m.nore{'<leader>ms', '<Cmd>HopPatternMW<CR>'}
+    m.nore{'<leader>j', '<Cmd>HopLineCursor<CR>'}
+    m.nore{'<leader><leader>j', '<Cmd>HopLine<CR>'}
+    m.nore{'<leader>mj', '<Cmd>HopLineStart<CR>'}
+    m.nore{'<leader>mw', '<Cmd>HopWord<CR>'}
+end
+
+-- 书签管理
+local function pkg_marks()
+    require('marks').setup{
+        default_mappings = false,
+        force_write_shada = true,
+        cyclic = false,
+        mappings = {
+            toggle_mark = 'm',
+            delete_line = '<leader>ml',
+            delete_buf = '<leader>mc',
+            next = '<M-.>',
+            prev = '<M-,>',
+        }
+    }
+    m.nnore{'<leader>ts', ':MarksToggleSigns<CR>'}
+    m.nnore{'<leader>ma', ':MarksListBuf<CR>'}
+end
+
+-- 自动高亮当前word
+local function pkg_cursorword()
+    vim.g.cursorword_disable_filetypes = {'nerdtree', 'NvimTree'}
+    vim.g.cursorword_disable_at_startup = false
+    vim.g.cursorword_min_width = 2
+    vim.g.cursorword_max_width = 64
+    vim.api.nvim_set_hl(0, 'CursorWord', { ctermbg = 60, bg = '#505060' })
+end
+
+-- 块编辑
+local function pkg_gomove()
+    require('gomove').setup {
+        map_defaults = false,
+        reindent = true,
+        undojoin = true,
+        move_past_end_col = false,
+    }
+    m.xmap{'<C-j>', '<Plug>GoVSMDown'}
+    m.xmap{'<C-k>', '<Plug>GoVSMUp'}
+    m.xmap{'<C-h>', '<Plug>GoVSMLeft'}
+    m.xmap{'<C-l>', '<Plug>GoVSMRight'}
+    m.xmap{'<M-j>', '<Plug>GoVSDDown'}
+    m.xmap{'<M-k>', '<Plug>GoVSDUp'}
+    m.xmap{'<M-h>', '<Plug>GoVSDLeft'}
+    m.xmap{'<M-l>', '<Plug>GoVSDRight'}
+end
+
+-- 平滑滚动
+local function pkg_neoscroll()
+    local neoscroll = require('neoscroll')
+    neoscroll.setup{
+        mappings = {},
+        hide_cursor = false,
+        stop_eof = true,
+    }
+    m.nnore{'<M-n>',
+        function()
+            if use.coc and vim.fn['coc#float#has_scroll']() == 1 then
+                vim.fn['coc#float#scroll'](1)
+            else
+                neoscroll.scroll(vim.wo.scroll, true, 200)
+            end
+        end}
+    m.nnore{'<M-m>',
+        function()
+            if use.coc and vim.fn['coc#float#has_scroll']() == 1 then
+                vim.fn['coc#float#scroll'](0)
+            else
+                neoscroll.scroll(-vim.wo.scroll, true, 200)
+            end
+        end}
+    m.nnore{'<M-j>', function() neoscroll.scroll(vim.api.nvim_win_get_height(0), true, 300) end }
+    m.nnore{'<M-k>', function() neoscroll.scroll(-vim.api.nvim_win_get_height(0), true, 300) end }
+end
+
+-- 窗口跳转
+local function pkg_winpick()
+    local winpick = require('winpick')
+    winpick.setup{
+        border = 'none',
+        prompt = "Pick a window: ",
+        format_label = winpick.defaults.format_label,
+        chars = { 'f', 'j', 'd', 'k', 's', 'l' },
+    }
+    m.nnore{'<leader>wi',
+        function()
+            local winid, _ = winpick.select()
+            if winid then
+                vim.api.nvim_set_current_win(winid)
+            end
+        end}
+end
+
+-- 窗口移动
+local function pkg_winshift()
+    require('winshift').setup{ }
+    m.nnore{'<C-m>', ':WinShift<CR>'}
+end
+
+-- 高亮窗口边界
+local function pkg_winsep()
+    require('colorful-winsep').setup{
+        highlight = {
+            guibg = '#32302f',
+            guifg = '#3d669c',
+        },
+        symbols = { '━', '┃', '┏', '┓', '┗', '┛' },
     }
 end
 
--- 预览增强
-local function pkg_traces()
-    -- 支持:s, :g, :v, :sort, :range预览
-    g.traces_num_range_preview = 1          -- 支持:N,M预览
-end
-
--- 字符对齐
-local function pkg_easy_align()
-    g.easy_align_bypass_fold = 1
-    g.easy_align_ignore_groups = {}         -- 默认任何group都进行对齐
-    -- 默认对齐内含段落（Text Object: vip）
-    m.nmap{'<leader>al', [[<Plug>(LiveEasyAlign)ip]]}
-    m.xmap{'<leader>al', [[<Plug>(LiveEasyAlign)]]  }
-    -- :EasyAlign[!] [N-th] DELIMITER_KEY [OPTIONS]
-    -- :EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
-    m.nnore{'<leader><leader>a', [[vip:EasyAlign<Space>*//l0><Left><Left><Left><Left>]]}
-    m.vnore{'<leader><leader>a', [[:EasyAlign<Space>*//l0><Left><Left><Left><Left>]]   }
-    m.nnore{'<leader><leader>A', [[vip:EasyAlign<Space>]]                              }
-    m.vnore{'<leader><leader>A', [[:EasyAlign<Space>]]                                 }
-end
-
---  快速块选择
-local function pkg_expand_region()
-    m.map{'<M-r>', [[<Plug>(expand_region_expand)]]}
-    m.map{'<M-w>', [[<Plug>(expand_region_shrink)]]}
-end
-
--- 文本对象
-local function pkg_textobj_user()
-    -- vdc-ia-wWsp(b[<t{B"'`
-    -- vdc-ia-ifcmu
-    g.textobj_indent_no_default_key_mappings = 1
-    m.omap{'aI', [[<Plug>(textobj-indent-a)]]     }
-    m.omap{'iI', [[<Plug>(textobj-indent-i)]]     }
-    m.omap{'ai', [[<Plug>(textobj-indent-same-a)]]}
-    m.omap{'ii', [[<Plug>(textobj-indent-same-i)]]}
-    m.vmap{'aI', [[<Plug>(textobj-indent-a)]]     }
-    m.vmap{'iI', [[<Plug>(textobj-indent-i)]]     }
-    m.vmap{'ai', [[<Plug>(textobj-indent-same-a)]]}
-    m.vmap{'ii', [[<Plug>(textobj-indent-same-i)]]}
-    m.omap{'au', [[<Plug>(textobj-underscore-a)]] }
-    m.omap{'iu', [[<Plug>(textobj-underscore-i)]] }
-    m.vmap{'au', [[<Plug>(textobj-underscore-a)]] }
-    m.vmap{'iu', [[<Plug>(textobj-underscore-i)]] }
-end
-
--- 撤消历史
-local function pkg_undotree()
-    m.nnore{'<leader>tu', [[:UndotreeToggle<CR>]]}
-end
-
 --------------------------------------------------------------------------------
--- Manager
+-- Component
 --------------------------------------------------------------------------------
--- Vim主题(ColorScheme, StatusLine, TabLine)
-local function pkg_theme()
-    g.gruvbox_contrast_dark = 'soft'        -- 背景选项：dark, medium, soft
-    g.gruvbox_italic = 1
-    vim.o.background = 'dark'
-    if not pcall(vim.cmd, [[colorscheme gruvbox]]) then
-        vim.cmd[[colorscheme default]]
+-- 启动首页
+local function pkg_alpha()
+    local tmp = require('alpha.themes.startify')
+    tmp.nvim_web_devicons.enabled = use.ui.patch
+    tmp.section.header.val = function()
+        if vim.fn.filereadable(vim.env.DotVimCache .. '/todo.md') == 1 then
+            local todo = vim.fn.filter(vim.fn.readfile(vim.env.DotVimCache .. '/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
+            if vim.tbl_isempty(todo) then
+                return ''
+            end
+            return todo
+        else
+            return ''
+        end
     end
-end
-
--- 弹出选项
-local function pkg_popset()
-    g.Popset_SelectionData = {{
-            opt = {'colorscheme', 'colo'},
-            lst = {'gruvbox', 'one'},
-        }}
-    m.nnore{'<leader><leader>p', ':PopSet<Space>'    }
-    m.nnore{'<leader>sp'       , ':PopSet popset<CR>'}
-end
-
--- buffer管理
-local function pkg_popc()
-    g.Popc_jsonPath = vim.env.DotVimCache
-    g.Popc_useFloatingWin = 1
-    g.Popc_highlight = {
-        text     = 'Pmenu',
-        selected = 'CursorLineNr',
+    tmp.section.bookmarks = {
+        type = 'group',
+        val = {
+            { type = 'padding', val = 1 },
+            { type = 'text', val = 'Bookmarks', opts = { hl = 'SpecialComment' } },
+            { type = 'padding', val = 1 },
+            { type = 'group', val = {
+                tmp.file_button('$DotVimDir/.init.vim', 'c'),
+                tmp.file_button('$NVimConfigDir/init.vim', 'd'),
+                tmp.file_button('$DotVimCache/todo.md', 'o'),
+            }},
+        },
     }
-    g.Popc_useTabline = 1
-    g.Popc_useStatusline = 1
-    g.Popc_usePowerFont = use.ui.patch
-    if use.ui.patch then
-        g.Popc_selectPointer = ''
-        g.Popc_separator = {left = '', right = ''}
-        g.Popc_subSeparator = {left = '', right = ''}
+    tmp.section.mru = {
+        type = 'group',
+        val = {
+            { type = 'padding', val = 1 },
+            { type = 'text', val = 'Recent Files', opts = { hl = 'SpecialComment' } },
+            { type = 'padding', val = 1 },
+            { type = 'group', val = function() return { tmp.mru(0, false, 8) } end },
+        },
+    }
+    tmp.config.layout = {
+        { type = 'padding', val = 1 },
+        tmp.section.header,
+        { type = 'padding', val = 2 },
+        tmp.section.top_buttons,
+        tmp.section.bookmarks,
+        tmp.section.mru,
+        { type = 'padding', val = 1 },
+        tmp.section.bottom_buttons,
+    }
+    require('alpha').setup(tmp.config)
+    m.nnore{'<leader>su', ':Alpha<CR>'}
+end
+
+-- 消息提示
+local function pkg_notify()
+    require('notify').setup{
+        max_width = function()
+            return vim.api.nvim_get_option('columns') * 0.7
+        end,
+        minimum_width = 30,
+        top_down = false,
+    }
+    vim.notify = require('notify')
+    m.nnore{'<leader>dm', function() vim.notify.dismiss() end}
+end
+
+-- ui界面美化
+local function pkg_dressing()
+    require('dressing').setup{
+        input = { enabled = true },
+        select = { enabled = true },
+    }
+end
+
+-- 字体图标
+local function pkg_icon_picker()
+    require('icon-picker').setup{ disable_legacy_commands = true }
+    m.inore{'<M-p>', '<Cmd>IconPickerInsert alt_font symbols nerd_font emoji<CR>'}
+end
+
+-- 刻度线
+local function pkg_virt_column()
+    require('virt-column').setup{ char = '┊' }
+end
+
+-- 滑动条
+local function pkg_scrollbar()
+    require('scrollbar').setup{
+        handle = {
+            text = '┃',
+            color = nil,
+            cterm = nil,
+            highlight = 'Normal',
+            hide_if_all_visible = true,
+        },
+        marks = {
+            Cursor = {
+                text = '⁞',
+                priority = 0,
+                color = nil,
+                cterm = nil,
+                highlight = 'Normal',
+            },
+        },
+        handlers = {
+            diagnostic = false,
+            gitsigns = false,
+            search = false,
+        },
+        excluded_buftypes = { 'nofile', 'terminal' },
+        excluded_filetypes = { 'prompt', 'TelescopePrompt', 'noice' },
+        autocmd = {
+            render = {
+                'BufWinEnter',
+                'TabEnter',
+                'TermEnter',
+                'WinEnter',
+                'CmdwinLeave',
+                'TextChanged',
+                'VimResized',
+                'WinScrolled',
+            },
+            clear = {
+                'BufWinLeave',
+                'TabLeave',
+                'TermLeave',
+                'WinLeave',
+            },
+        },
+    }
+end
+
+-- 目录树导航
+local function pkg_tree()
+    local tcb = require('nvim-tree.config').nvim_tree_callback
+    require('nvim-tree').setup{
+        auto_reload_on_write = false,
+        view = {
+            mappings = {
+                custom_only = true,
+                list = {
+                    { key = {'<CR>', 'o', '<2-LeftMouse>'},
+                                     cb = tcb('edit') },
+                    { key = 'i'    , cb = tcb('vsplit') },
+                    { key = 'gi'   , cb = tcb('split') },
+                    { key = 't'    , cb = tcb('tabnew') },
+                    { key = '<Tab>', cb = tcb('preview') },
+                    { key = 'cd'   , cb = tcb('cd') },
+                    { key = 'u'    , cb = tcb('dir_up') },
+                    { key = 'K'    , cb = tcb('first_sibling') },
+                    { key = 'J'    , cb = tcb('last_sibling') },
+                    { key = '<C-p>', cb = tcb('prev_sibling') },
+                    { key = '<C-n>', cb = tcb('next_sibling') },
+                    { key = 'p'    , cb = tcb('parent_node') },
+                    { key = '.'    , cb = tcb('toggle_dotfiles') },
+                    { key = 'm'    , cb = tcb('toggle_file_info') },
+                    { key = 'r'    , cb = tcb('refresh') },
+                    { key = 'q'    , cb = tcb('close') },
+                    { key = '?'    , cb = tcb('toggle_help') },
+                    { key = 'O'    , cb = tcb('system_open') },
+                    { key = 'A'    , cb = tcb('create') },
+                    { key = 'D'    , cb = tcb('remove') },
+                    { key = 'R'    , cb = tcb('rename') },
+                    { key = '<C-r>', cb = tcb('full_rename') },
+                    { key = 'X'    , cb = tcb('cut') },
+                    { key = 'C'    , cb = tcb('copy') },
+                    { key = 'P'    , cb = tcb('paste') },
+                    { key = 'y'    , cb = tcb('copy_name') },
+                    { key = 'Y'    , cb = tcb('copy_absolute_path') },
+                },
+            },
+        },
+        renderer = {
+            indent_markers = {
+                enable = true,
+                icons = {
+                    corner = '└ ',
+                    edge = '│ ',
+                    none = '  ',
+                },
+            },
+        },
+        actions = {
+            open_file = {
+                resize_window = false,
+            },
+        },
+        filesystem_watchers = { enable = false },
+        diagnostics = { enable = false },
+        git = { enable = false },
+    }
+    m.nnore{'<leader>tt', ':NvimTreeToggle<CR>'}
+    m.nnore{'<leader>tT',
+        function()
+            local tapi = require('nvim-tree.api')
+            tapi.tree.close()
+            tapi.tree.open(vim.fn.Expand('%', ':p:h'))
+        end}
+end
+
+-- 模糊查找
+local function pkg_telescope()
+    require('telescope').setup{
+        defaults = {
+            borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
+            color_devicons = true,
+            history = {
+                path = vim.env.DotVimCache  .. '/telescope_history',
+            },
+            mappings = {
+                i = {
+                    ['<M-j>'] = 'move_selection_next',
+                    ['<M-k>'] = 'move_selection_previous',
+                },
+            }
+        }
+    }
+    m.nnore{'<leader><leader>n', ':Telescope<Space>'}
+    m.nnore{'<leader>nf', ':Telescope find_files<CR>'}
+    m.nnore{'<leader>nl', ':Telescope live_grep<CR>'}
+    m.nnore{'<leader>nm', ':Telescope oldfiles<CR>'}
+end
+
+--------------------------------------------------------------------------------
+-- Coding
+--------------------------------------------------------------------------------
+-- 列表视图
+local function pkg_trouble()
+    require('trouble').setup{
+        mode = 'quickfix',
+        icons = true,
+        action_keys = {
+            jump_close = {'O'},
+            toggle_fold = {'zA', 'za', 'o'},
+        },
+        auto_preview = false,
+    }
+    m.nnore{'<leader>vq', ':TroubleToggle quickfix<CR>'}
+    m.nnore{'<leader>vl', ':TroubleToggle loclist<CR>'}
+end
+
+-- 颜色预览
+local function pkg_ccc()
+    m.nnore{'<leader>tc', ':CccHighlighterToggle<CR>'}
+    m.nnore{'<leader>lp', ':CccPick<CR>'}
+    local ccc = require('ccc')
+    ccc.setup{
+        disable_default_mappings = true,
+        mappings = {
+            ['<CR>'] = ccc.mapping.complete,
+            ['q'] = ccc.mapping.quit,
+            ['m'] = ccc.mapping.toggle_input_mode,
+            ['f'] = ccc.mapping.toggle_output_mode,
+            ['a'] = ccc.mapping.toggle_alpha,
+            ['l'] = ccc.mapping.increase1,
+            ['o'] = ccc.mapping.increase5,
+            ['L'] = ccc.mapping.increase10,
+            ['h'] = ccc.mapping.decrease1,
+            ['i'] = ccc.mapping.decrease5,
+            ['H'] = ccc.mapping.decrease10,
+        },
+    }
+end
+
+-- 自动括号
+local function pkg_autopairs()
+    require('nvim-autopairs').setup{
+        map_cr = false,
+    }
+    m.nnore{'<leader>tp',
+        function()
+            local ap = require('nvim-autopairs').state.disabled
+            print('Auto pairs:', ap)
+            require('nvim-autopairs').state.disabled = not ap
+        end}
+end
+
+-- 批量注释
+local function pkg_comment()
+    require('Comment').setup{
+        toggler = { line = 'gcc', block = 'gbc' },
+        opleader = { line = 'gc', block = 'gb' },
+        mappings = {
+            basic = true,
+            extra = false,
+            extended = false,
+        },
+    }
+    local comment = require('Comment.api')
+    m.nnore{'<leader>ci', function() comment.toggle.linewise.count(vim.v.count1) end}
+    m.nnore{'<leader>cl', function() comment.comment.linewise.count(vim.v.count1) end}
+    m.nnore{'<leader>cu',
+        function()
+            -- ignore errors when uncommenting a non-commented line
+            pcall(function() comment.uncomment.linewise.count(vim.v.count1) end)
+        end}
+end
+
+-- 添加包围符
+local function pkg_surround()
+    require('nvim-surround').setup{
+        keymaps = {
+            visual = 'vs',
+            visual_line = 'vS',
+            normal = 'ys',
+            normal_line = 'yS',
+            normal_cur = 'ysl',
+            normal_cur_line = 'ysL',
+            delete = 'ds',
+            change = 'cs',
+        },
+    }
+    m.nmap{'<leader>sw', 'ysiw'}
+    m.nmap{'<leader>sW', 'ySiw'}
+end
+
+-- 代码折叠
+local function pkg_ufo()
+    local ufo = require('ufo')
+    ufo.setup{
+        fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
+            local res = {}
+            local tag = '» '
+            if use.ui.patch then
+                tag = ' '
+            end
+            local tag_wid = vim.fn.strdisplaywidth(tag)
+
+            for k, chunk in ipairs(virtText) do
+                if k == 1 then
+                    -- only match whitespace characters of first chunk
+                    local txt = chunk[1]
+                    local s, e = vim.regex([[^\s*]]):match_str(txt)
+                    if s and e then
+                        local wid = vim.fn.strdisplaywidth(txt:sub(s, e))
+                        if wid >= tag_wid then
+                            txt = txt:sub(e + 1)
+                            if wid > tag_wid then
+                                tag = tag .. ('·'):rep(wid - tag_wid - 1) .. ' '
+                            end
+                        end
+                    end
+                    table.insert(res, {tag, 'Comment'})
+                    table.insert(res, {txt, chunk[2]})
+                else
+                    table.insert(res, chunk)
+                end
+            end
+            table.insert(res, {('  %d '):format(endLnum - lnum), 'MoreMsg'})
+            return res
+        end,
+        provider_selector = function(bufnr, filetype, buftype)
+            return ''
+        end
+    }
+    m.nnore{'<leader>to',
+        function()
+            local bufnr = vim.api.nvim_get_current_buf()
+            if ufo.hasAttached(bufnr) then
+                ufo.detach(bufnr)
+            else
+                ufo.attach(bufnr)
+            end
+        end}
+end
+
+-- 语法树
+local function pkg_treesitter()
+if use.treesitter then
+    if vim.fn.empty(use.xgit) == 0 then
+        for _, c in pairs(require('nvim-treesitter.parsers').get_parser_configs()) do
+            c.install_info.url = c.install_info.url:gsub('https://github.com', use.xgit)
+        end
     end
-    g.Popc_useLayerPath = 0
-    g.Popc_useLayerRoots = {'.popc', '.git', '.svn', '.hg', 'tags', '.LfGtags'}
-    g.Popc_enableLog = 1
-    m.nnore{'<leader><leader>h', [[:PopcBuffer<CR>]]               }
-    m.nnore{'<M-u>'            , [[:PopcBufferSwitchTabLeft!<CR>]] }
-    m.nnore{'<M-p>'            , [[:PopcBufferSwitchTabRight!<CR>]]}
-    m.nnore{'<M-i>'            , [[:PopcBufferSwitchLeft!<CR>]]    }
-    m.nnore{'<M-o>'            , [[:PopcBufferSwitchRight!<CR>]]   }
-    m.nnore{'<C-i>'            , [[:PopcBufferJumpPrev<CR>]]       }
-    m.nnore{'<C-o>'            , [[:PopcBufferJumpNext<CR>]]       }
-    m.nnore{'<C-u>'            , [[<C-o>]]                         }
-    m.nnore{'<C-p>'            , [[<C-i>]]                         }
-    m.nnore{'<leader>wq'       , [[:PopcBufferClose!<CR>]]         }
-    m.nnore{'<leader><leader>b', [[:PopcBookmark<CR>]]             }
-    m.nnore{'<leader><leader>w', [[:PopcWorkspace<CR>]]            }
-    m.nnore{'<leader>ty',
-        [=[<Cmd>]=] ..
-        [=[let g:Popc_tabline_layout = (get(g:, 'Popc_tabline_layout', 0) + 1) % 3<Bar>]=] ..
-        [=[call call('popc#stl#TabLineSetLayout', [['buffer', 'tab'], ['buffer', ''], ['', 'tab']][g:Popc_tabline_layout])<CR>]=]}
+    local parser_dir = vim.env.DotVimCache .. '/.treesitter'
+    require('nvim-treesitter.configs').setup{
+        parser_install_dir = parser_dir,
+        --ensure_installed = { 'c', 'cpp', 'rust', 'vim', 'lua', 'python', 'markdown', 'markdown_inline', },
+        --auto_install = true,
+        highlight = {
+            enable = true,
+            additional_vim_regex_highlighting = false,
+        },
+        indent = {
+            enable = true,
+            disable = { 'python' },
+        },
+        incremental_selection = {
+            enable = true,
+            keymaps = {
+                init_selection = '<M-g>',
+                node_incremental = '<M-g>',
+                node_decremental = '<M-a>',
+                scope_incremental = '<M-v>',
+            },
+        },
+        rainbow = {
+            enable = true,
+            extended_mode = true,
+            max_file_lines = nil,
+        }
+    }
+    vim.opt.runtimepath:append(parser_dir)
+    m.nnore{'<leader>sh', ':TSBufToggle highlight<CR>'}
+    m.nnore{'<leader>si', ':TSBufToggle indent<CR>'}
+    m.nnore{'<leader>ss', ':TSBufToggle incremental_selection<CR>'}
+end
+end
+
+--------------------------------------------------------------------------------
+-- Utils
+--------------------------------------------------------------------------------
+local function pkg_peek()
+    -- Dependency: sudo pacman -S webkit2gtk
+    local peek = require('peek')
+    peek.setup{
+        auto_load = false,
+        syntax = true,
+        theme = 'light',
+    }
+    m.nnore{'<leader>vm',
+        function()
+            if peek.is_open() then
+                peek.close()
+            else
+                peek.open()
+            end
+            vim.notify('Markdown preview is ' .. (peek.is_open() and 'enabled' or 'disabled'))
+        end}
 end
 
 
 local function pkg_setup()
-    pkg_standard()
-    pkg_packer()
-    -- editing
-    pkg_visual_multi()
-    pkg_traces()
-    pkg_easy_align()
-    pkg_expand_region()
-    pkg_textobj_user()
-    pkg_undotree()
-    -- managers
-    pkg_theme()
-    pkg_popset()
-    pkg_popc()
+    -- pkg_packer()
+    -- Editor
+    pkg_hop()
+    pkg_marks()
+    pkg_cursorword()
+    pkg_gomove()
+    pkg_neoscroll()
+    pkg_winpick()
+    pkg_winshift()
+    pkg_winsep()
+    -- Component
+    pkg_alpha()
+    pkg_notify()
+    pkg_dressing()
+    pkg_icon_picker()
+    pkg_virt_column()
+    pkg_scrollbar()
+    pkg_tree()
+    pkg_telescope()
+    -- Coding
+    pkg_trouble()
+    pkg_ccc()
+    pkg_autopairs()
+    pkg_comment()
+    pkg_surround()
+    pkg_ufo()
+    pkg_treesitter()
+    -- Utils
+    pkg_peek()
 end
 
 return {
-    setup = pkg_setup,
+    setup = pkg_setup
 }
