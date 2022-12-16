@@ -25,6 +25,7 @@ if IsNVim()
     Plug 'karb94/neoscroll.nvim'
     Plug 'gbrlsnchs/winpick.nvim'
     Plug 'sindrets/winshift.nvim'
+    Plug 'nvim-zh/colorful-winsep.nvim'
 else
     Plug 'yehuohan/vim-easymotion'
     Plug 'kshenoy/vim-signature'

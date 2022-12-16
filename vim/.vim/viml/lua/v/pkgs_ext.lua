@@ -118,6 +118,17 @@ local function pkg_winshift()
     m.nnore{'<C-m>', ':WinShift<CR>'}
 end
 
+-- 高亮窗口边界
+local function pkg_winsep()
+    require('colorful-winsep').setup{
+        highlight = {
+            guibg = '#32302f',
+            guifg = '#3d669c',
+        },
+        symbols = { '━', '┃', '┏', '┓', '┗', '┛' },
+    }
+end
+
 --------------------------------------------------------------------------------
 -- Component
 --------------------------------------------------------------------------------
@@ -560,6 +571,7 @@ local function pkg_setup()
     pkg_neoscroll()
     pkg_winpick()
     pkg_winshift()
+    pkg_winsep()
     -- Component
     pkg_alpha()
     pkg_notify()
