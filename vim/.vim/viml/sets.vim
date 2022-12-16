@@ -311,6 +311,8 @@ cnoremap <C-v> <C-r>+
 cnoremap <C-p> <C-r>0
 cnoremap <C-j> <Down>
 cnoremap <C-k> <Up>
+cnoremap <M-j> <C-n>
+cnoremap <M-k> <C-p>
 cnoremap <M-h> <Left>
 cnoremap <M-l> <Right>
 cnoremap <M-o> <C-Right>

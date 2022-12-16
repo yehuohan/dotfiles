@@ -152,33 +152,51 @@ local function __completion()
     end})
 
     local cmp = require('cmp')
-    cmp.setup{
-        mapping = {
-            ['<M-i>'] = cmp.mapping.complete(),
-            ['<M-u>'] = cmp.mapping.complete({
+    local cmp_mappings = {
+        ['<M-i>'] = cmp.mapping(function() cmp.complete() end, {'i'}),
+        ['<M-u>'] = cmp.mapping(function()
+            cmp.complete({
                 config = {
                     sources = { { name = 'ultisnips' } }
                 }
-            }),
-            ['<M-e>'] = cmp.mapping.abort(),
-            ['<M-j>'] = cmp.mapping.select_next_item(),
-            ['<M-k>'] = cmp.mapping.select_prev_item(),
-            ['<M-n>'] = cmp.mapping.scroll_docs(4),
-            ['<M-m>'] = cmp.mapping.scroll_docs(-4),
-            ['<M-f>'] = cmp.mapping.scroll_docs(4),
-            ['<M-d>'] = cmp.mapping.scroll_docs(-4),
-            ['<Space>'] = cmp.mapping(cmp_im.select(), {'i'}),
-            ['1'] = cmp.mapping(cmp_im.select(1), {'i'}),
-            ['2'] = cmp.mapping(cmp_im.select(2), {'i'}),
-            ['3'] = cmp.mapping(cmp_im.select(3), {'i'}),
-            ['4'] = cmp.mapping(cmp_im.select(4), {'i'}),
-            ['5'] = cmp.mapping(cmp_im.select(5), {'i'}),
-            ['6'] = cmp.mapping(cmp_im.select(6), {'i'}),
-            ['7'] = cmp.mapping(cmp_im.select(7), {'i'}),
-            ['8'] = cmp.mapping(cmp_im.select(8), {'i'}),
-            ['9'] = cmp.mapping(cmp_im.select(9), {'i'}),
-            ['0'] = cmp.mapping(cmp_im.select(10), {'i'}),
-        },
+            })
+        end, {'i'}),
+        ['<M-e>'] = cmp.mapping(function() cmp.abort() end, {'i', 'c'}),
+        ['<M-j>'] = cmp.mapping(function() cmp.select_next_item() end, {'i', 'c' }),
+        ['<M-k>'] = cmp.mapping(function() cmp.select_prev_item() end, {'i', 'c' }),
+        ['<M-n>'] = cmp.mapping.scroll_docs(4),
+        ['<M-m>'] = cmp.mapping.scroll_docs(-4),
+        ['<M-f>'] = cmp.mapping.scroll_docs(4),
+        ['<M-d>'] = cmp.mapping.scroll_docs(-4),
+        ['<Tab>'] = cmp.mapping(function()
+            if cmp.visible()
+            then cmp.select_next_item()
+            else cmp.complete()
+            end
+        end, {'c'}),
+        ['<S-Tab>'] = cmp.mapping(function()
+            if cmp.visible()
+            then cmp.select_prev_item()
+            else cmp.complete()
+            end
+        end, {'c'}),
+        ['<Space>'] = cmp.mapping(cmp_im.select(), {'i', 'c'}),
+        ['1'] = cmp.mapping(cmp_im.select(1), {'i', 'c'}),
+        ['2'] = cmp.mapping(cmp_im.select(2), {'i', 'c'}),
+        ['3'] = cmp.mapping(cmp_im.select(3), {'i', 'c'}),
+        ['4'] = cmp.mapping(cmp_im.select(4), {'i', 'c'}),
+        ['5'] = cmp.mapping(cmp_im.select(5), {'i', 'c'}),
+        ['6'] = cmp.mapping(cmp_im.select(6), {'i', 'c'}),
+        ['7'] = cmp.mapping(cmp_im.select(7), {'i', 'c'}),
+        ['8'] = cmp.mapping(cmp_im.select(8), {'i', 'c'}),
+        ['9'] = cmp.mapping(cmp_im.select(9), {'i', 'c'}),
+        ['0'] = cmp.mapping(cmp_im.select(10), {'i', 'c'}),
+    }
+    m.imap{'<C-j>', '<M-j>'}
+    m.imap{'<C-k>', '<M-k>'}
+
+    cmp.setup{
+        mapping = cmp_mappings,
         sources = cmp.config.sources({
             { name = 'nvim_lsp' },
             { name = 'nvim_lua' },
@@ -212,33 +230,15 @@ local function __completion()
             { name = 'spell'},
         })
     })
-    local cmdline_mapping = {
-        ['<M-e>'] = cmp.mapping(function() cmp.abort() end, {'c'}),
-        ['<M-j>'] = cmp.mapping(function() cmp.select_next_item() end, {'c'}),
-        ['<M-k>'] = cmp.mapping(function() cmp.select_prev_item() end, {'c'}),
-        ['<Tab>'] = cmp.mapping(function()
-            if cmp.visible()
-            then cmp.select_next_item()
-            else cmp.complete()
-            end
-        end, {'c'}),
-        ['<S-Tab>'] = cmp.mapping(function()
-            if cmp.visible()
-            then cmp.select_prev_item()
-            else cmp.complete()
-            end
-        end, {'c'}),
-        ['<Space>'] = cmp.mapping(cmp_im.select(), {'c'}),
-    }
-    cmp.setup.cmdline('/', {
-        mapping = cmdline_mapping,
+    cmp.setup.cmdline({'/', '?'}, {
+        mapping = cmp_mappings,
         sources = {
             { name = 'IM' },
             { name = 'buffer' },
         }
     })
-    cmp.setup.cmdline(':', {
-        mapping = cmdline_mapping,
+    cmp.setup.cmdline({':', '@'}, {
+        mapping = cmp_mappings,
         sources = cmp.config.sources({
             { name = 'IM' },
             { name = 'path' }
