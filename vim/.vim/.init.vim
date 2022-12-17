@@ -58,11 +58,7 @@ nnoremap ; :
 vnoremap ; :
 nnoremap : ;
 map <CR> <CR>
-imap <CR> <CR>
-cmap <CR> <CR>
 map <Tab> <Tab>
-imap <Tab> <Tab>
-cmap <Tab> <Tab>
 " }}}
 
 source $DotVimVimL/env.vim
