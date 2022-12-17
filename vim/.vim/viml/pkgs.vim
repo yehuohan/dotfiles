@@ -547,7 +547,7 @@ inoremap <silent><expr> <M-k> coc#pum#visible() ? coc#pum#prev(1) : "\<M-k>"
 imap <C-j> <M-j>
 imap <C-k> <M-k>
 inoremap <silent><expr> <M-i> coc#refresh()
-inoremap <M-e> <Cmd>call coc#pum#cancel()<CR>
+inoremap <silent><expr> <M-e> coc#pum#cancel()
 inoremap <M-o> <Cmd>call CocActionAsync('showSignatureHelp')<CR>
 nnoremap <M-f> <Cmd>call coc#float#scroll(1)<CR>
 nnoremap <M-d> <Cmd>call coc#float#scroll(0)<CR>
