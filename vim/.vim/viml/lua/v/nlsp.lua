@@ -22,62 +22,64 @@ local function __servers()
         },
     }
     require('mason-lspconfig').setup{ }
-    -- require('mason-lspconfig').setup_handlers{
-    --     function(server_name)
-    --         require('lspconfig')[server_name].setup{ }
-    --     end
-    -- }
-
     local lspconfig = require('lspconfig')
-    lspconfig.clangd.setup{ }
-    lspconfig.cmake.setup{
-        init_options = {
-            buildDirectory = '__VBuildOut',
-        },
-    }
-    lspconfig.rust_analyzer.setup{
-        settings = {
-            ['rust-analyzer'] = {
-                updates = {
-                    checkOnStartup = false,
-                    channel = 'nightly',
+    require('mason-lspconfig').setup_handlers{
+        function(server_name)
+            lspconfig[server_name].setup{ }
+        end,
+        ['cmake'] = function()
+            lspconfig.cmake.setup{
+                init_options = {
+                    buildDirectory = '__VBuildOut',
                 },
-                cargo = { allFeatures = true, },
-                notifications = { cargoTomlNotFound = false, },
-                diagnostics = { disabled = { 'inactive-code' }, },
-                procMacro = { enable = true },
-            },
-        },
-    }
-    lspconfig.pyright.setup{
-        settings = {
-            python = {
-                analysis = {
-                    stubPath = 'typings',
+            }
+        end,
+        ['rust_analyzer'] = function()
+            lspconfig.rust_analyzer.setup{
+                settings = {
+                    ['rust-analyzer'] = {
+                        updates = {
+                            checkOnStartup = false,
+                            channel = 'nightly',
+                        },
+                        cargo = { allFeatures = true, },
+                        notifications = { cargoTomlNotFound = false, },
+                        diagnostics = { disabled = { 'inactive-code' }, },
+                        procMacro = { enable = true },
+                    },
                 },
-            },
-        },
-    }
-    lspconfig.sumneko_lua.setup{
-        settings = {
-            Lua = {
-                runtime = { version = 'Lua 5.2' }, -- LuaJIT
-                workspace = {
-                    library = {
-                        vim.env.VIMRUNTIME .. '/lua',
-                        vim.env.VIMRUNTIME .. '/lua/vim',
-                        vim.env.VIMRUNTIME .. '/lua/vim/lsp',
-                        vim.env.VIMRUNTIME .. '/lua/vim/treesitter',
-                    }
+            }
+        end,
+        ['pyright'] = function()
+            lspconfig.pyright.setup{
+                settings = {
+                    python = {
+                        analysis = {
+                            stubPath = 'typings',
+                        },
+                    },
                 },
-                telemetry = { enable = false },
-            },
-        },
+            }
+        end,
+        ['sumneko_lua'] = function()
+            lspconfig.sumneko_lua.setup{
+                settings = {
+                    Lua = {
+                        runtime = { version = 'Lua 5.2' }, -- LuaJIT
+                        workspace = {
+                            library = {
+                                vim.env.VIMRUNTIME .. '/lua',
+                                vim.env.VIMRUNTIME .. '/lua/vim',
+                                vim.env.VIMRUNTIME .. '/lua/vim/lsp',
+                                vim.env.VIMRUNTIME .. '/lua/vim/treesitter',
+                            }
+                        },
+                        telemetry = { enable = false },
+                    },
+                },
+            }
+        end
     }
-    lspconfig.vimls.setup{ }
-    -- lspconfig.ltex.setup{ }
-
-    m.nnore{'<leader>om', ':Mason<CR>'}
 end
 
 local kind_icons = {
@@ -246,15 +248,6 @@ local function __completion()
             { name = 'cmdline' }
         })
     })
-
-    require('lsp_signature').setup{
-        bind = true,
-        hint_enable = true,
-        hint_prefix = '» ',
-        handler_opts = {
-            border = 'single',
-        },
-    }
 end
 
 local function __lsp()
@@ -277,6 +270,17 @@ local function __lsp()
         virtual_text = { prefix = '▪' },
     })
 
+    require('lsp_signature').setup{
+        bind = true,
+        hint_enable = true,
+        hint_prefix = '» ',
+        handler_opts = {
+            border = 'single',
+        },
+    }
+end
+
+local function __mappings()
     m.inore{'<M-o>', vim.lsp.buf.signature_help}
     m.nnore{'gd', vim.lsp.buf.definition}
     m.nnore{'gD', vim.lsp.buf.declaration}
@@ -300,6 +304,10 @@ local function __lsp()
     -- m.nnore{'<leader>ow', vim.lsp.buf.manage_workspace_folder}
     -- m.nnore{'<leader>oc', vim.lsp.buf.execute_command}
     m.nnore{'<leader>oR', ':LspRestart<CR>'}
+    m.nnore{'<leader>ol', ':LspInfo<CR>'}
+    m.nnore{'<leader>om', ':Mason<CR>'}
+    m.nnore{'<leader>os', ':CmpStatus<CR>'}
+    m.nnore{'<leader>oh', ':ClangdSwitchSourceHeader<CR>'}
 end
 
 local function setup()
@@ -307,6 +315,7 @@ if use.nlsp then
     __servers()
     __completion()
     __lsp()
+    __mappings()
 end
 end
 

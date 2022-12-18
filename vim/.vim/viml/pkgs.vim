@@ -89,7 +89,7 @@ if IsNVim()
     Plug 'kylechui/nvim-surround'
     Plug 'kevinhwang91/nvim-ufo'
     Plug 'kevinhwang91/promise-async'
-if s:use.treesitter
+if s:use.nts
     Plug 'nvim-treesitter/nvim-treesitter'
     Plug 'p00f/nvim-ts-rainbow'
 endif
@@ -97,7 +97,9 @@ if s:use.nlsp
     Plug 'williamboman/mason.nvim'
     Plug 'williamboman/mason-lspconfig.nvim'
     Plug 'neovim/nvim-lspconfig'
-    Plug 'glepnir/lspsaga.nvim'
+    Plug 'ray-x/lsp_signature.nvim'
+    " Plug 'glepnir/lspsaga.nvim'
+    " Plug 'simrat39/rust-tools.nvim'
     Plug 'hrsh7th/nvim-cmp'
     Plug 'hrsh7th/cmp-nvim-lsp'
     Plug 'hrsh7th/cmp-buffer'
@@ -107,7 +109,6 @@ if s:use.nlsp
     Plug 'yehuohan/cmp-path'
     Plug 'yehuohan/cmp-im'
     Plug 'yehuohan/cmp-im-zh'
-    Plug 'ray-x/lsp_signature.nvim'
     Plug 'quangnguyen30192/cmp-nvim-ultisnips'
     Plug 'kdheepak/cmp-latex-symbols'
     Plug 'f3fora/cmp-spell'
@@ -126,7 +127,7 @@ if s:use.has_py
     Plug 'SirVer/ultisnips'
     Plug 'honza/vim-snippets'
 endif
-if s:use.spector
+if s:use.ndap
     Plug 'puremourning/vimspector'
 endif
     Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
@@ -575,9 +576,6 @@ nmap <leader>gj <Plug>(coc-float-jump)
 nmap <leader>gc <Plug>(coc-float-hide)
 nmap <leader>ga <Plug>(coc-codeaction-cursor)
 nnoremap <leader>gh <Cmd>call CocActionAsync('doHover')<CR>
-nnoremap <leader>gs <Cmd>CocCommand clangd.switchSourceHeader<CR>
-nnoremap <leader>gm <Cmd>CocCommand clangd.symbolInfo<CR>
-nnoremap <leader>ge <Cmd>CocCommand rust-analyzer.expandMacro<CR>
 vmap <leader>of <Plug>(coc-format-selected)
 nmap <leader>of <Plug>(coc-format)
 nnoremap <leader>od <Cmd>call CocAction('diagnosticToggle')<CR>
@@ -600,6 +598,8 @@ nnoremap <leader>ow <Cmd>CocList --normal folders<CR>
 nnoremap <leader>om <Cmd>CocList --normal marketplace<CR>
 nnoremap <leader>oc <Cmd>CocList commands<CR>
 " coc-extensions
+nnoremap <leader>oh <Cmd>CocCommand clangd.switchSourceHeader<CR>
+nnoremap <leader>oe <Cmd>CocCommand rust-analyzer.expandMacro<CR>
 nnoremap <leader>op <Cmd>CocCommand cSpell.toggleEnableSpellChecker<CR>
 nmap <leader>oe <Plug>(coc-calc-result-append)
 endif
@@ -617,7 +617,7 @@ endif
 " }}}
 
 " vimspector {{{ 调试
-if s:use.spector
+if s:use.ndap
 let g:vimspector_install_gadgets = ['debugpy', 'vscode-cpptools', 'CodeLLDB']
 nmap <F3>   <Plug>VimspectorStop
 nmap <F4>   <Plug>VimspectorRestart

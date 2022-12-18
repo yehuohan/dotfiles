@@ -5,13 +5,13 @@ endfunction
 " Struct s:use {{{
 let s:use_file = $DotVimCache . '/.use.json'
 let s:use = {
-    \ 'xgit'      : v:null,
-    \ 'coc'       : v:false,
-    \ 'nlsp'      : v:false,
-    \ 'treesitter': v:false,
-    \ 'spector'   : v:false,
-    \ 'has_py'    : v:false,
-    \ 'ui'        : {
+    \ 'xgit'   : v:null,
+    \ 'coc'    : v:false,
+    \ 'nlsp'   : v:false,
+    \ 'nts'    : v:false,
+    \ 'ndap'   : v:false,
+    \ 'has_py' : v:false,
+    \ 'ui'     : {
         \ 'patch'    : v:false,
         \ 'font'     : 'Consolas',
         \ 'fontsize' : 12,
