@@ -32,6 +32,7 @@ else
     Plug 'RRethy/vim-illuminate'
     Plug 't9md/vim-textmanip'
     Plug 'psliwka/vim-smoothie'
+    Plug 'tpope/vim-repeat'
 endif
     Plug 'mg979/vim-visual-multi'
     Plug 'markonm/traces.vim'
@@ -42,7 +43,6 @@ endif
     Plug 'glts/vim-textobj-comment'
     Plug 'adriaanzon/vim-textobj-matchit'
     Plug 'lucapette/vim-textobj-underscore'
-    Plug 'tpope/vim-repeat'
     Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
     " component
 if IsNVim()
@@ -136,7 +136,6 @@ endif
     Plug 'skywind3000/asyncrun.vim'
     Plug 'voldikss/vim-floaterm'
     Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
-    Plug 'euclidianAce/BetterLua.vim', {'for': 'lua'}
     Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
     Plug 'rust-lang/rust.vim'
     Plug 'tikhomirov/vim-glsl'

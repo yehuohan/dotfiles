@@ -137,7 +137,6 @@ endfunction
 function! SetExecLast(string, ...)
     let s:execution = a:string
     let s:execution_disp = (a:0 >= 1) ? a:1 : a:string
-    silent! call repeat#set("\<Plug>ExecLast")
 endfunction
 " }}}
 
