@@ -109,6 +109,7 @@ if s:use.nlsp
     Plug 'yehuohan/cmp-path'
     Plug 'yehuohan/cmp-im'
     Plug 'yehuohan/cmp-im-zh'
+    Plug 'dmitmel/cmp-cmdline-history'
     Plug 'quangnguyen30192/cmp-nvim-ultisnips'
     Plug 'kdheepak/cmp-latex-symbols'
     Plug 'f3fora/cmp-spell'

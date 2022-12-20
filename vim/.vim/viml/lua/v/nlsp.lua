@@ -111,16 +111,17 @@ local kind_icons = {
 }
 
 local kind_sources = {
-    buffer        = 'Buf',
-    nvim_lsp      = 'Lsp',
-    nvim_lua      = 'Lua',
-    ultisnips     = 'Snp',
-    cmdline       = 'Cmd',
-    path          = 'Pth',
-    calc          = 'Cal',
-    IM            = 'IMs',
-    latex_symbols = 'Tex',
-    spell         = 'Spl', -- It's enabling depends on 'spell' option
+    buffer          = 'Buf',
+    nvim_lsp        = 'Lsp',
+    nvim_lua        = 'Lua',
+    ultisnips       = 'Snp',
+    cmdline         = 'Cmd',
+    cmdline_history = 'Cmh',
+    path            = 'Pth',
+    calc            = 'Cal',
+    IM              = 'IMs',
+    latex_symbols   = 'Tex',
+    spell           = 'Spl', -- It's enabling depends on 'spell' option
 }
 
 local function cmp_format(entry, vitem)
@@ -243,9 +244,10 @@ local function __completion()
         mapping = cmp_mappings,
         sources = cmp.config.sources({
             { name = 'IM' },
-            { name = 'path' }
+            { name = 'path' },
         }, {
-            { name = 'cmdline' }
+            { name = 'cmdline' },
+            { name = 'cmdline_history', max_item_count = 5 },
         })
     })
 end
