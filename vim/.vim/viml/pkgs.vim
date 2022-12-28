@@ -56,6 +56,7 @@ endif
     Plug 'lukas-reineke/virt-column.nvim'
     Plug 'petertriho/nvim-scrollbar'
     Plug 'kyazdani42/nvim-tree.lua'
+    Plug 'echasnovski/mini.nvim'
     Plug 'nvim-lua/plenary.nvim'
     Plug 'nvim-telescope/telescope.nvim'
 else
@@ -217,14 +218,10 @@ map <M-w> <Plug>(expand_region_shrink)
 " vdc-ia-wWsp(b[<t{B"'`
 " vdc-ia-ifcmu
 let g:textobj_indent_no_default_key_mappings = 1
-omap aI <Plug>(textobj-indent-a)
-omap iI <Plug>(textobj-indent-i)
-omap ai <Plug>(textobj-indent-same-a)
-omap ii <Plug>(textobj-indent-same-i)
-xmap aI <Plug>(textobj-indent-a)
-xmap iI <Plug>(textobj-indent-i)
-xmap ai <Plug>(textobj-indent-same-a)
-xmap ii <Plug>(textobj-indent-same-i)
+omap ai <Plug>(textobj-indent-a)
+omap ii <Plug>(textobj-indent-i)
+xmap ai <Plug>(textobj-indent-a)
+xmap ii <Plug>(textobj-indent-i)
 omap au <Plug>(textobj-underscore-a)
 omap iu <Plug>(textobj-underscore-i)
 xmap au <Plug>(textobj-underscore-a)

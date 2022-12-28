@@ -348,6 +348,18 @@ local function pkg_tree()
         end}
 end
 
+-- 缩进显示
+local function pkg_mini()
+    local indentscope = require('mini.indentscope')
+    indentscope.setup{
+        draw = {
+            delay = 0,
+            animation = indentscope.gen_animation.none(),
+        },
+        symbol = '⁞',
+    }
+end
+
 -- 模糊查找
 local function pkg_telescope()
     require('telescope').setup{
@@ -599,6 +611,7 @@ local function pkg_setup()
     pkg_virt_column()
     pkg_scrollbar()
     pkg_tree()
+    pkg_mini()
     pkg_telescope()
     -- Coding
     pkg_trouble()
