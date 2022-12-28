@@ -9,7 +9,7 @@ Language: Cpp
 # public等属性对齐偏移
 AccessModifierOffset: -4
 AlignConsecutiveMacros: Consecutive
-AlignEscapedNewlines: Right
+AlignEscapedNewlines: Left
 AllowAllParametersOfDeclarationOnNextLine: true
 # 类构造函数初始化列表对方式
 BreakConstructorInitializers: BeforeComma
