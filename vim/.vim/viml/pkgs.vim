@@ -42,7 +42,6 @@ endif
     Plug 'glts/vim-textobj-comment'
     Plug 'adriaanzon/vim-textobj-matchit'
     Plug 'lucapette/vim-textobj-underscore'
-    Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
     " component
 if IsNVim()
 if s:use.ui.patch
@@ -131,7 +130,6 @@ endif
 if s:use.ndap
     Plug 'puremourning/vimspector'
 endif
-    Plug 'sbdchd/neoformat', {'on': 'Neoformat'}
     Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
     Plug 't9md/vim-quickhl'
     Plug 'skywind3000/asyncrun.vim'
@@ -225,10 +223,6 @@ omap au <Plug>(textobj-underscore-a)
 omap iu <Plug>(textobj-underscore-i)
 xmap au <Plug>(textobj-underscore-a)
 xmap iu <Plug>(textobj-underscore-i)
-" }}}
-
-" undotree {{{ 撤消历史
-nnoremap <leader>tu :UndotreeToggle<CR>
 " }}}
 " }}}
 
@@ -615,16 +609,16 @@ endif
 " vimspector {{{ 调试
 if s:use.ndap
 let g:vimspector_install_gadgets = ['debugpy', 'vscode-cpptools', 'CodeLLDB']
-nmap <F3>   <Plug>VimspectorStop
-nmap <F4>   <Plug>VimspectorRestart
-nmap <F5>   <Plug>VimspectorContinue
-nmap <F6>   <Plug>VimspectorPause
-nmap <F7>   <Plug>VimspectorToggleConditionalBreakpoint
-nmap <F8>   <Plug>VimspectorAddFunctionBreakpoint
-nmap <F9>   <Plug>VimspectorToggleBreakpoint
-nmap <F10>  <Plug>VimspectorStepOver
-nmap <F11>  <Plug>VimspectorStepInto
-nmap <F12>  <Plug>VimspectorStepOut
+nmap <F3>  <Plug>VimspectorStop
+nmap <F4>  <Plug>VimspectorRestart
+nmap <F5>  <Plug>VimspectorContinue
+nmap <F6>  <Plug>VimspectorPause
+nmap <F7>  <Plug>VimspectorToggleConditionalBreakpoint
+nmap <F8>  <Plug>VimspectorAddFunctionBreakpoint
+nmap <F9>  <Plug>VimspectorToggleBreakpoint
+nmap <F10> <Plug>VimspectorStepOver
+nmap <F11> <Plug>VimspectorStepInto
+nmap <F12> <Plug>VimspectorStepOut
 nnoremap <leader>dr :VimspectorReset<CR>
 nnoremap <leader>de :VimspectorEval<Space>
 nnoremap <leader>dw :VimspectorWatch<Space>
@@ -636,37 +630,6 @@ nnoremap <leader>di
         \ 'cmd' : {sopt, sel -> vimspector#LaunchWithSettings({'configuration': sel})}
         \})<CR>
 endif
-" }}}
-
-" neoformat {{{ 代码格式化
-let g:neoformat_basic_format_align = 1
-let g:neoformat_basic_format_retab = 1
-let g:neoformat_basic_format_trim = 1
-let g:neoformat_c_astyle = {
-    \ 'exe' : 'astyle',
-    \ 'args' : ['--style=attach', '--pad-oper'],
-    \ 'stdin' : 1,
-    \ }
-let g:neoformat_cpp_astyle = g:neoformat_c_astyle
-let g:neoformat_java_astyle = {
-    \ 'exe' : 'astyle',
-    \ 'args' : ['--mode=java --style=google', '--pad-oper'],
-    \ 'stdin' : 1,
-    \ }
-let g:neoformat_python_autopep8 = {
-    \ 'exe': 'autopep8',
-    \ 'args': ['-s 4', '-E'],
-    \ 'replace': 1,
-    \ 'stdin': 1,
-    \ 'env': ['DEBUG=1'],
-    \ 'valid_exit_codes': [0, 23],
-    \ 'no_append': 1,
-    \ }
-let g:neoformat_enabled_c = ['astyle']
-let g:neoformat_enabled_cpp = ['astyle']
-let g:neoformat_enabled_java = ['astyle']
-let g:neoformat_enabled_python = ['autopep8']
-noremap <leader>fm :Neoformat<CR>
 " }}}
 
 " Vista {{{ 代码Tags
