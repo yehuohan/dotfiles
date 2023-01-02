@@ -1,19 +1,14 @@
 
-global !p
-from snips_utils import load_template
-endglobal
-
-
 snippet lt-doc "doc template for latex"
-`!p snip.rv = load_template('basedoc.tex')`
+`!v PkgLoadSnip('basedoc.tex')`
 endsnippet
 
 snippet lt-pic "pic template for latex"
-`!p snip.rv = load_template('basepic.tex')`
+`!v PkgLoadSnip('basepic.tex')`
 endsnippet
 
 snippet lt-sty "sty template for latex"
-`!p snip.rv = load_template('basesty.sty')`
+`!v PkgLoadSnip('basesty.sty')`
 endsnippet
 
 snippet tikz-calc0 "coordinate with factor: sin(30)*(2,2)+(1,1)"

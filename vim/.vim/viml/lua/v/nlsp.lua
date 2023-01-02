@@ -200,6 +200,11 @@ local function __completion()
 
     cmp.setup{
         mapping = cmp_mappings,
+        snippet = {
+            expand = function(args)
+                vim.fn['UltiSnips#Anon'](args.body)
+            end,
+        },
         sources = cmp.config.sources({
             { name = 'nvim_lsp' },
             { name = 'nvim_lua' },

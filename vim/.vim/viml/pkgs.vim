@@ -264,13 +264,13 @@ let g:lightline = {
             \ 'lite_info' : '%l/%L $%v %{winnr()}.%n%{&mod?"+":""}',
             \ },
     \ 'component_function': {
-            \ 'mode'      : 'Plug_ll_mode',
-            \ 'msg_left'  : 'Plug_ll_msgLeft',
-            \ 'msg_right' : 'Plug_ll_msgRight',
+            \ 'mode'      : 'PkgMode',
+            \ 'msg_left'  : 'PkgMsgLeft',
+            \ 'msg_right' : 'PkgMsgRight',
             \ },
     \ 'component_expand': {
-            \ 'chk_indent'  : 'Plug_ll_checkMixedIndent',
-            \ 'chk_trailing': 'Plug_ll_checkTrailing',
+            \ 'chk_indent'  : 'PkgCheckMixedIndent',
+            \ 'chk_trailing': 'PkgCheckTrailing',
             \ },
     \ 'component_type': {
             \ 'chk_indent'  : 'error',
@@ -300,11 +300,11 @@ nnoremap <leader>tk
 " Augroup: PluginLightline {{{
 augroup PkgsLightline
     autocmd!
-    autocmd ColorScheme * call Plug_ll_colorScheme()
-    autocmd CursorHold,BufWritePost * call Plug_ll_checkRefresh()
+    autocmd ColorScheme * call PkgOnColorScheme()
+    autocmd CursorHold,BufWritePost * call PkgCheckRefresh()
 augroup END
 
-function! Plug_ll_colorScheme()
+function! PkgOnColorScheme()
     if !exists('g:loaded_lightline')
         return
     endif
@@ -317,7 +317,7 @@ function! Plug_ll_colorScheme()
     endtry
 endfunction
 
-function! Plug_ll_checkRefresh()
+function! PkgCheckRefresh()
     if !exists('g:loaded_lightline') || get(b:, 'lightline_changedtick', 0) == b:changedtick
         return
     endif
@@ -328,7 +328,7 @@ endfunction
 " }}}
 
 " Function: lightline components {{{
-function! Plug_ll_mode()
+function! PkgMode()
     return &ft ==# 'Popc' ? 'Popc' :
         \ &ft ==# 'alpha' ? 'Alpha' :
         \ &ft ==# 'startify' ? 'Startify' :
@@ -337,15 +337,15 @@ function! Plug_ll_mode()
         \ lightline#mode()
 endfunction
 
-function! Plug_ll_msgLeft()
+function! PkgMsgLeft()
     return substitute(Expand('%', ':p'), '^' . escape(Expand(SvarWs().fw.path), '\'), '', '')
 endfunction
 
-function! Plug_ll_msgRight()
+function! PkgMsgRight()
     return SvarWs().fw.path
 endfunction
 
-function! Plug_ll_checkMixedIndent()
+function! PkgCheckMixedIndent()
     if !get(b:, 'lightline_check_flg', 1)
         return ''
     endif
@@ -353,7 +353,7 @@ function! Plug_ll_checkMixedIndent()
     return (l:ret == 0) ? '' : 'M:'.string(l:ret)
 endfunction
 
-function! Plug_ll_checkTrailing()
+function! PkgCheckTrailing()
     if !get(b:, 'lightline_check_flg', 1)
         return ''
     endif
@@ -515,13 +515,13 @@ endif
 " Coding {{{
 " coc {{{ 自动补全
 if s:use.coc
-function! Plug_coc_setup(timer)
+function! PkgSetupCoc(timer)
     call plug#load('coc.nvim')
     for [sec, val] in items(Env_coc_settings())
         call coc#config(sec, val)
     endfor
 endfunction
-call timer_start(700, 'Plug_coc_setup')
+call timer_start(700, 'PkgSetupCoc')
 let g:coc_config_home = $DotVimMisc
 let g:coc_data_home = $DotVimCache . '/.coc'
 let g:coc_global_extensions = ['coc-marketplace']
@@ -597,6 +597,9 @@ endif
 
 " ultisnips {{{ 代码片段
 if s:use.has_py
+function! PkgLoadSnip(filename)
+    return join(readfile($DotVimDir . '/snips/template/' . a:filename), "\n")
+endfunction
 let g:UltiSnipsEditSplit = 'vertical'
 let g:UltiSnipsSnippetDirectories = [$DotVimDir . '/snips', 'UltiSnips']
 let g:UltiSnipsExpandTrigger = '<Tab>'

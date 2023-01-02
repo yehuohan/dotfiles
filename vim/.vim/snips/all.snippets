@@ -1,29 +1,25 @@
 
-global !p
-from snips_utils import load_template
-endglobal
-
 #===============================================================================
 # build tools
 #===============================================================================
 snippet lt-mk "Makefile template"
-`!p snip.rv = load_template('Makefile')`
+`!v PkgLoadSnip('Makefile')`
 endsnippet
 
 snippet lt-cmk "CMake template"
-`!p snip.rv = load_template('CMakeLists.txt')`
+`!v PkgLoadSnip('CMakeLists.txt')`
 endsnippet
 
 snippet lt-cmsg "CMake cmsg macro"
-`!p snip.rv = load_template('cmsg.cmake')`
+`!v PkgLoadSnip('cmsg.cmake')`
 endsnippet
 
 snippet lt-qt "QMake for qt-console"
-`!p snip.rv = load_template('qcon.pro')`
+`!v PkgLoadSnip('qcon.pro')`
 endsnippet
 
 snippet lt-qtgui "QMake for qt-gui"
-`!p snip.rv = load_template('qgui.pro')`
+`!v PkgLoadSnip('qgui.pro')`
 endsnippet
 
 

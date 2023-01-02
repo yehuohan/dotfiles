@@ -1,10 +1,6 @@
 
-global !p
-from snips_utils import load_template
-endglobal
-
 snippet lt-sphinx "sphinx conf"
-`!p snip.rv = load_template('sphinx-conf.py')`
+`!v PkgLoadSnip('sphinx-conf.py')`
 endsnippet
 
 #===============================================================================
