@@ -80,6 +80,10 @@ BUILD_TYPE := Debug
 #BUILD_GEN := "NMake Makefiles"
 BUILD_GEN := "Ninja"
 BUILD_JOB := -j4
+NDK_ROOT := ${Android_SDK}/ndk-bundle
+NDK_ABI := arm64-v8a
+NDK_PLATFORM := android-27
+
 
 .PHONY: all
 all:
@@ -90,6 +94,19 @@ src:
 	cmake -G ${BUILD_GEN} -Wno-dev \
 		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
 		-DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
+		-S . -B ${BUILD_DIR}
+	cmake --build ${BUILD_DIR} ${BUILD_JOB}
+	cmake --install ${BUILD_DIR}
+
+.PHONY: src_android
+src_android:
+	cmake -G ${BUILD_GEN} -Wno-dev \
+		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+		-DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
+		-DCMAKE_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake \
+		-DANDROID_NDK=${NDK_ROOT} \
+		-DANDROID_ABI=${NDK_ABI} \
+		-DANDROID_PLATFORM=${NDK_PLATFORM} \
 		-S . -B ${BUILD_DIR}
 	cmake --build ${BUILD_DIR} ${BUILD_JOB}
 	cmake --install ${BUILD_DIR}
