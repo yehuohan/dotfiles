@@ -5,6 +5,20 @@ local conds = require('heirline.conditions')
 local utils = require('heirline.utils')
 
 
+-- Symbols
+local sep = { '', '' }
+local vos = ''
+if use.ui.patch then
+    sep = { '', '' }
+    if vim.fn.IsLinux() == 1 then
+        vos = ''
+    elseif vim.fn.IsMac() == 1 then
+        vos = ''
+    else
+        vos = ''
+    end
+end
+
 -- Contexts
 local ctxs = {}
 
@@ -27,18 +41,18 @@ function ctxs.mode()
 end
 
 function ctxs.hint()
+    local res = ctxs.mode()
     local ft = vim.bo.filetype
     if ft == 'Popc' then
-        return 'Popc'
+        res = 'Popc'
     elseif ft == 'alpha' then
-        return 'Alpha'
+        res = 'Alpha'
     elseif ft == 'qf' then
-        return vim.fn.QuickfixType() == 'c' and 'QF' or 'QL'
+        res = vim.fn.QuickfixType() == 'c' and 'QF' or 'QL'
     elseif ft == 'help' then
-        return 'Help'
-    else
-        return ctxs.mode()
+        res = 'Help'
     end
+    return vos .. ' ' .. res
 end
 
 function ctxs.root_path()
@@ -93,8 +107,6 @@ local function load_colors()
 end
 
 -- Components
-local sep = use.ui.patch and { '', '' } or { '', '' }
-
 local function pad(color, component, fileds)
     local res = utils.surround({'', ''}, 'blank', utils.surround(sep, color, component))
     if fileds then
