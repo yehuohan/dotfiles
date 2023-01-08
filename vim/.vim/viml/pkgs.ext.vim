@@ -1,4 +1,4 @@
-" let s:use = SvarUse()
+let s:use = SvarUse()
 
 " Editor {{{
 " easy-motion {{{ 快速跳转
@@ -73,6 +73,130 @@ nmap <M-k> <Plug>(SmoothieBackwards)
 " }}}
 
 " Component {{{
+" lightline {{{ StatusLine
+let g:lightline = {
+    \ 'enable' : {'statusline': 1, 'tabline': 0},
+    \ 'colorscheme' : 'gruvbox',
+    \ 'active': {
+            \ 'left' : [['mode'], [],
+            \           ['msg_left']],
+            \ 'right': [['chk_trailing', 'chk_indent', 'all_info'],
+            \           ['all_format'],
+            \           ['msg_right']],
+            \ },
+    \ 'inactive': {
+            \ 'left' : [['absolutepath']],
+            \ 'right': [['lite_info']],
+            \ },
+    \ 'tabline' : {
+            \ 'left' : [['tabs']],
+            \ 'right': [['close']],
+            \ },
+    \ 'component': {
+            \ 'all_format': '%{&ft!=#""?&ft."/":""}%{&fenc!=#""?&fenc:&enc}/%{&ff}',
+            \ 'all_info'  : 'U%-2B %p%% %l/%L $%v %{winnr()}.%n%{&mod?"+":""}',
+            \ 'lite_info' : '%l/%L $%v %{winnr()}.%n%{&mod?"+":""}',
+            \ },
+    \ 'component_function': {
+            \ 'mode'      : 'PkgMode',
+            \ 'msg_left'  : 'PkgMsgLeft',
+            \ 'msg_right' : 'PkgMsgRight',
+            \ },
+    \ 'component_expand': {
+            \ 'chk_indent'  : 'PkgCheckMixedIndent',
+            \ 'chk_trailing': 'PkgCheckTrailing',
+            \ },
+    \ 'component_type': {
+            \ 'chk_indent'  : 'error',
+            \ 'chk_trailing': 'error',
+            \ },
+    \ 'fallback' : {'Popc': 0, 'vista': 'Vista', 'nerdtree': 0, 'NvimTree': 'NvimTree'},
+    \ }
+if s:use.ui.patch
+let g:lightline.separator            = {'left': '', 'right': ''}
+let g:lightline.subseparator         = {'left': '', 'right': ''}
+let g:lightline.tabline_separator    = {'left': '', 'right': ''}
+let g:lightline.tabline_subseparator = {'left': '', 'right': ''}
+let g:lightline.component = {
+        \ 'all_format': '%{&ft!=#""?&ft."":""}%{&fenc!=#""?&fenc:&enc}%{&ff}',
+        \ 'all_info'  : 'U%-2B %p%% %l/%L %v %{winnr()}.%n%{&mod?"+":""}',
+        \ 'lite_info' : '%l/%L %v %{winnr()}.%n%{&mod?"+":""}',
+        \ }
+endif
+
+nnoremap <leader>tl :call lightline#toggle()<CR>
+nnoremap <leader>tk
+    \ <Cmd>
+    \ let b:statusline_check_enabled = !get(b:, 'statusline_check_enabled', v:true) <Bar>
+    \ call lightline#update() <Bar>
+    \ call Notify('b:statusline_check_enabled = ' . b:statusline_check_enabled)<CR>
+
+" Augroup: Lightline {{{
+augroup PkgLightline
+    autocmd!
+    autocmd ColorScheme * call PkgOnColorScheme()
+    autocmd CursorHold,BufWritePost * call PkgCheckRefresh()
+augroup END
+
+function! PkgOnColorScheme()
+    if !exists('g:loaded_lightline')
+        return
+    endif
+    try
+        let g:lightline.colorscheme = g:colors_name
+        call lightline#init()
+        call lightline#colorscheme()
+        call lightline#update()
+    catch /^Vim\%((\a\+)\)\=:E117/      " E117: 函数不存在
+    endtry
+endfunction
+
+function! PkgCheckRefresh()
+    if !exists('g:loaded_lightline') || get(b:, 'lightline_changedtick', 0) == b:changedtick
+        return
+    endif
+    unlet! b:lightline_changedtick
+    call lightline#update()
+    let b:lightline_changedtick = b:changedtick
+endfunction
+" }}}
+
+" Function: lightline components {{{
+function! PkgMode()
+    return &ft ==# 'Popc' ? 'Popc' :
+        \ &ft ==# 'alpha' ? 'Alpha' :
+        \ &ft ==# 'startify' ? 'Startify' :
+        \ &ft ==# 'qf' ? (QuickfixType() ==# 'c' ? 'Quickfix' : 'Location') :
+        \ &ft ==# 'help' ? 'Help' :
+        \ lightline#mode()
+endfunction
+
+function! PkgMsgLeft()
+    return substitute(Expand('%', ':p'), '^' . escape(Expand(SvarWs().fw.path), '\'), '', '')
+endfunction
+
+function! PkgMsgRight()
+    return SvarWs().fw.path
+endfunction
+
+function! PkgCheckMixedIndent()
+    if !get(b:, 'statusline_check_enabled', v:true)
+        return ''
+    endif
+    let l:ret = search('\m\(\t \| \t\)', 'nw')
+    return (l:ret == 0) ? '' : 'M:'.string(l:ret)
+endfunction
+
+function! PkgCheckTrailing()
+    if !get(b:, 'statusline_check_enabled', v:true)
+        return ''
+    endif
+    let ret = search('\m\s\+$', 'nw')
+    return (l:ret == 0) ? '' : 'T:'.string(l:ret)
+endfunction
+" }}}
+" }}}
+
 " startify {{{ 启动首页
 let g:startify_bookmarks = [
     \ {'c': '$DotVimDir/.init.vim'},
@@ -83,10 +207,10 @@ let g:startify_lists = [
     \ {'type': 'files',     'header': ['   Recent Files']},
     \ ]
 let g:startify_files_number = 8
-let g:startify_custom_header = 'startify#pad(startify#fortune#cowsay(Plug_stt_todo(), "─", "│", "┌", "┐", "┘", "└"))'
+let g:startify_custom_header = 'startify#pad(startify#fortune#cowsay(PkgTodo(), "─", "│", "┌", "┐", "┘", "└"))'
 nnoremap <leader>su :Startify<CR>
 
-function! Plug_stt_todo()
+function! PkgTodo()
     if filereadable($DotVimCache.'/todo.md')
         let l:todo = filter(readfile($DotVimCache.'/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
         return empty(l:todo) ? '' : l:todo

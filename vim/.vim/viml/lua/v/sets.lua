@@ -90,7 +90,7 @@ end
 function M.onLargeFile()
     local fsize = fn.getfsize(fn.expand('<afile>'))
     if fsize >= 5 * 1024 * 1024 or fsize == -2 then
-        vim.b.lightline_check_flg = 0   -- 禁止MixedIndent和Trailing检测
+        vim.b.statusline_check_enabled = false
         opt.eventignore:append('FileType')
         vim.bo.undolevels = -1
         vim.bo.swapfile = true
@@ -193,7 +193,7 @@ end
 function M.setup()
     opts_default()
     vim.cmd[[
-    augroup UserGui
+    augroup SetupGui
         autocmd!
         autocmd UIEnter * :lua require('v.sets').onUIEnter()
     augroup END

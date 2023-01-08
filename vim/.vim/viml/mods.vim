@@ -200,7 +200,7 @@ function! s:wsd.display() dict
 endfunction
 " }}}
 
-augroup UserModsWorkspace
+augroup ModWorkSpace
     autocmd!
     autocmd User PopcLayerWksSavePre call popc#layer#wks#SetSettings(s:ws)
     autocmd User PopcLayerWksLoaded call extend(s:ws, popc#layer#wks#GetSettings(), 'force') |
@@ -1059,7 +1059,7 @@ endfunction
 function! s:rs.fns.clearUndo() dict
     let l:ulbak = &undolevels
     setlocal undolevels=-1
-    execute "normal! a\<Bar>\<BS>\<Esc>"
+    execute "normal! a\<Space>\<BS>\<Esc>"
     let &undolevels = l:ulbak
 endfunction
 " }}}

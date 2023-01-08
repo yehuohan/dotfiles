@@ -44,6 +44,7 @@ endif
     Plug 'lucapette/vim-textobj-underscore'
     " component
 if IsNVim()
+    Plug 'rebelot/heirline.nvim'
 if s:use.ui.patch
     Plug 'kyazdani42/nvim-web-devicons'
 endif
@@ -58,6 +59,7 @@ endif
     Plug 'nvim-lua/plenary.nvim'
     Plug 'nvim-telescope/telescope.nvim'
 else
+    Plug 'yehuohan/lightline.vim'
     Plug 'mhinz/vim-startify'
 endif
 if s:use.ui.patch
@@ -66,7 +68,6 @@ endif
     Plug 'morhetz/gruvbox'
     Plug 'rakr/vim-one'
     Plug 'tanvirtin/monokai.nvim'
-    Plug 'yehuohan/lightline.vim'
     Plug 'luochen1990/rainbow'
     Plug 'Yggdroot/indentLine'
     Plug 'yehuohan/popc'
@@ -227,7 +228,7 @@ xmap iu <Plug>(textobj-underscore-i)
 " }}}
 
 " Component {{{
-" theme {{{ Vim主题(ColorScheme, StatusLine, TabLine)
+" theme {{{ Vim主题
 let g:gruvbox_contrast_dark = 'soft'    " 背景选项：dark, medium, soft
 let g:gruvbox_italic = 1
 let g:gruvbox_invert_selection = 0
@@ -238,129 +239,6 @@ try
 catch /^Vim\%((\a\+)\)\=:E185/          " E185: 找不到主题
     silent! colorscheme default
 endtry
-
-let g:lightline = {
-    \ 'enable' : {'statusline': 1, 'tabline': 0},
-    \ 'colorscheme' : 'gruvbox',
-    \ 'active': {
-            \ 'left' : [['mode'], [],
-            \           ['msg_left']],
-            \ 'right': [['chk_trailing', 'chk_indent', 'all_info'],
-            \           ['all_format'],
-            \           ['msg_right']],
-            \ },
-    \ 'inactive': {
-            \ 'left' : [['msg_left']],
-            \ 'right': [['lite_info'],
-            \           ['msg_right']],
-            \ },
-    \ 'tabline' : {
-            \ 'left' : [['tabs']],
-            \ 'right': [['close']],
-            \ },
-    \ 'component': {
-            \ 'all_format': '%{&ft!=#""?&ft."/":""}%{&fenc!=#""?&fenc:&enc}/%{&ff}',
-            \ 'all_info'  : 'U%B %p%% %l/%L $%v %{winnr()}.%n%{&mod?"+":""}',
-            \ 'lite_info' : '%l/%L $%v %{winnr()}.%n%{&mod?"+":""}',
-            \ },
-    \ 'component_function': {
-            \ 'mode'      : 'PkgMode',
-            \ 'msg_left'  : 'PkgMsgLeft',
-            \ 'msg_right' : 'PkgMsgRight',
-            \ },
-    \ 'component_expand': {
-            \ 'chk_indent'  : 'PkgCheckMixedIndent',
-            \ 'chk_trailing': 'PkgCheckTrailing',
-            \ },
-    \ 'component_type': {
-            \ 'chk_indent'  : 'error',
-            \ 'chk_trailing': 'error',
-            \ },
-    \ 'fallback' : {'Popc': 0, 'vista': 'Vista', 'nerdtree': 0, 'NvimTree': 'NvimTree'},
-    \ }
-if s:use.ui.patch
-let g:lightline.separator            = {'left': '', 'right': ''}
-let g:lightline.subseparator         = {'left': '', 'right': ''}
-let g:lightline.tabline_separator    = {'left': '', 'right': ''}
-let g:lightline.tabline_subseparator = {'left': '', 'right': ''}
-let g:lightline.component = {
-        \ 'all_format': '%{&ft!=#""?&ft."":""}%{&fenc!=#""?&fenc:&enc}%{&ff}',
-        \ 'all_info'  : 'U%B %p%% %l/%L %v %{winnr()}.%n%{&mod?"+":""}',
-        \ 'lite_info' : '%l/%L %v %{winnr()}.%n%{&mod?"+":""}',
-        \ }
-endif
-
-nnoremap <leader>tl :call lightline#toggle()<CR>
-nnoremap <leader>tk
-    \ <Cmd>
-    \ let b:lightline_check_flg = !get(b:, 'lightline_check_flg', 1) <Bar>
-    \ call lightline#update() <Bar>
-    \ call Notify('b:lightline_check_flg = ' . b:lightline_check_flg)<CR>
-
-" Augroup: PluginLightline {{{
-augroup PkgsLightline
-    autocmd!
-    autocmd ColorScheme * call PkgOnColorScheme()
-    autocmd CursorHold,BufWritePost * call PkgCheckRefresh()
-augroup END
-
-function! PkgOnColorScheme()
-    if !exists('g:loaded_lightline')
-        return
-    endif
-    try
-        let g:lightline.colorscheme = g:colors_name
-        call lightline#init()
-        call lightline#colorscheme()
-        call lightline#update()
-    catch /^Vim\%((\a\+)\)\=:E117/      " E117: 函数不存在
-    endtry
-endfunction
-
-function! PkgCheckRefresh()
-    if !exists('g:loaded_lightline') || get(b:, 'lightline_changedtick', 0) == b:changedtick
-        return
-    endif
-    unlet! b:lightline_changedtick
-    call lightline#update()
-    let b:lightline_changedtick = b:changedtick
-endfunction
-" }}}
-
-" Function: lightline components {{{
-function! PkgMode()
-    return &ft ==# 'Popc' ? 'Popc' :
-        \ &ft ==# 'alpha' ? 'Alpha' :
-        \ &ft ==# 'startify' ? 'Startify' :
-        \ &ft ==# 'qf' ? (QuickfixType() ==# 'c' ? 'Quickfix' : 'Location') :
-        \ &ft ==# 'help' ? 'Help' :
-        \ lightline#mode()
-endfunction
-
-function! PkgMsgLeft()
-    return substitute(Expand('%', ':p'), '^' . escape(Expand(SvarWs().fw.path), '\'), '', '')
-endfunction
-
-function! PkgMsgRight()
-    return SvarWs().fw.path
-endfunction
-
-function! PkgCheckMixedIndent()
-    if !get(b:, 'lightline_check_flg', 1)
-        return ''
-    endif
-    let l:ret = search('\m\(\t \| \t\)', 'nw')
-    return (l:ret == 0) ? '' : 'M:'.string(l:ret)
-endfunction
-
-function! PkgCheckTrailing()
-    if !get(b:, 'lightline_check_flg', 1)
-        return ''
-    endif
-    let ret = search('\m\s\+$', 'nw')
-    return (l:ret == 0) ? '' : 'T:'.string(l:ret)
-endfunction
-" }}}
 " }}}
 
 " rainbow {{{ 彩色括号
@@ -475,7 +353,7 @@ let g:fzf_layout = { 'down': '40%' }
 let g:fzf_preview_window = ['right:40%,border-sharp']
 let $FZF_DEFAULT_OPTS='--bind alt-j:down,alt-k:up'
 nnoremap <leader><leader>f :Fzf
-augroup PkgsFzf
+augroup PkgFzf
     autocmd!
     autocmd Filetype fzf tnoremap <buffer> <Esc> <C-c>
 augroup END
@@ -764,6 +642,7 @@ if IsNVim()
     set rtp^=$DotVimVimL
 lua << EOF
     require('v.pkgs').setup()
+    require('v.stl').setup()
     require('v.nlsp').setup()
 EOF
 else

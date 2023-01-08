@@ -165,7 +165,7 @@ nnoremap <leader>ih :call OptionFns('syntax')<CR>
 function! s:onLargeFile()
     let l:fsize = getfsize(Expand('<afile>'))
     if l:fsize >= 5 * 1024 * 1024 || l:fsize == -2
-        let b:lightline_check_flg = 0   " 禁止MixedIndent和Trailing检测
+        let b:statusline_check_enabled = v:false
         set eventignore+=FileType
         setlocal undolevels=-1
         setlocal noswapfile
@@ -175,7 +175,7 @@ function! s:onLargeFile()
 endfunction
 " }}}
 
-augroup UserSetsCmd
+augroup SetupCmd
     autocmd!
     autocmd BufNewFile *                            set fileformat=unix
     autocmd BufRead,BufNewFile *.nvim               set filetype=vim
@@ -228,7 +228,7 @@ endif
 
 " Gui-nvim {{{
 if IsNVim()
-augroup UserSetsGui
+augroup SetupGui
     autocmd!
     autocmd UIEnter * call s:onUIEnter()
 augroup END
