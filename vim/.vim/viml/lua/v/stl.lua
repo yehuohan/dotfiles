@@ -6,7 +6,7 @@ local utils = require('heirline.utils')
 
 
 -- Symbols
-local sep = { '', '' }
+local sep = { '(', ')' }
 local vos = ''
 if use.ui.patch then
     sep = { '', '' }
@@ -88,6 +88,20 @@ function ctxs.check_lines()
     return res
 end
 
+function ctxs.tabs_bufs(layout)
+    local buflst = layout.buf and vim.fn['popc#layer#buf#GetBufs'](vim.fn.tabpagenr()) or {}
+    local tablst = layout.tab and vim.fn['popc#layer#buf#GetTabs']() or {}
+    local buftab = vim.fn['popc#stl#ShortenTabsBufs'](buflst, tablst, 2)
+    local res = {}
+    if layout.buf then
+        res.buf = buftab[1]
+    end
+    if layout.tab then
+        res.tab = buftab[2]
+    end
+    return res
+end
+
 -- Colors
 local function load_colors()
     return {
@@ -95,7 +109,6 @@ local function load_colors()
         red    = '#fa461e',
         green  = '#b8bb26',
         blue   = '#83a598',
-
         -- gruvbox dark
         areaA = '#ff8019',
         areaB = '#beaa82',
@@ -119,6 +132,7 @@ local function wrap(component)
     return utils.surround({'', ''}, 'blank', component)
 end
 
+-- Statuslines
 local ComAlign = { provider = '%=' }
 local ComHint = pad(
     function()
@@ -184,7 +198,6 @@ local ComCheck = pad('areaA',
     }
 )
 
--- Statuslines
 local stl_default = {
     ComHint, ComPath,
     ComAlign,
@@ -223,6 +236,65 @@ local stls = wrap({
     stl_special, stl_terminal, stl_inactive, stl_default
 })
 
+-- Tablines
+local ComB = utils.surround({'', sep[2]}, 'areaA', {
+    provider = 'B',
+    hl = { fg = 'blank' },
+})
+local ComT = utils.surround({sep[1], ''}, 'areaA', {
+    provider = 'T',
+    hl = { fg = 'blank' }
+})
+
+local function ele(e)
+    local fg = 'textB'
+    local bg = 'areaC'
+    local txt = e.title
+    if e.modified == 0 and e.selected == 1 then
+        fg = 'blank'
+        bg = 'blue'
+    elseif e.modified == 1 and e.selected == 1 then
+        txt = txt .. '+'
+        fg = 'blank'
+        bg = 'green'
+    elseif e.modified == 1 and e.selected == 0 then
+        txt = txt .. '+'
+        fg = 'green'
+    end
+    return pad(bg, {
+        provider = txt,
+        hl = { fg = fg },
+    })
+end
+
+local tabs = wrap({
+    init = function(self)
+        local res = ctxs.tabs_bufs(vim.g.tabline_layout)
+        local children = {}
+        -- buffers
+        if res.buf then
+            table.insert(children, ComB)
+            for _, e in ipairs(res.buf) do
+                table.insert(children, ele(e))
+            end
+        end
+        table.insert(children, ComAlign)
+        -- tabpages
+        if res.tab then
+            for _, e in ipairs(res.tab) do
+                table.insert(children, ele(e))
+            end
+            table.insert(children, ComT)
+        end
+        -- instantiate new child with overwriting the previous one
+        self.child = self:new(children, 1)
+    end,
+    provider = function(self)
+        return self.child:eval()
+    end,
+})
+
+-- Setup
 local function toggle_check()
     if vim.b.statusline_check_enabled == nil then
         vim.b.statusline_check_enabled = true
@@ -231,8 +303,23 @@ local function toggle_check()
     vim.fn.Notify('b:statusline_check_enabled = ' .. tostring(vim.b.statusline_check_enabled))
 end
 
+vim.g.tabline_layout = { tab = true, buf = true }
+local function toggle_layout()
+    local layout = vim.g.tabline_layout
+    if layout.tab and layout.buf then
+        layout.tab = false
+    elseif not layout.tab and layout.buf then
+        layout.buf = false
+    elseif not layout.tab and not layout.buf then
+        layout.tab = true
+        layout.buf = true
+    end
+    vim.g.tabline_layout = layout
+end
+
 local function setup()
-    heirline.setup(stls)
+    vim.o.showtabline = 2
+    heirline.setup(stls, nil, tabs)
     heirline.load_colors(load_colors())
     vim.api.nvim_create_augroup('PkgHeirline', { clear = true })
     vim.api.nvim_create_autocmd('ColorScheme', {
@@ -243,6 +330,7 @@ local function setup()
         group = 'PkgHeirline',
     })
     m.nnore{'<leader>tk', toggle_check}
+    m.nnore{'<leader>ty', toggle_layout}
 end
 
 return {
