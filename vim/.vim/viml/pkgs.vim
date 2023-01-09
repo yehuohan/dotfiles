@@ -307,6 +307,7 @@ nnoremap <leader>ty
 " nerdtree {{{ 目录树导航
 let g:NERDTreeShowHidden = 1
 let g:NERDTreeMinimalUI = 1
+let g:NERDTreeStatusline = -1
 let g:NERDTreeDirArrowExpandable = '▸'
 let g:NERDTreeDirArrowCollapsible = '▾'
 let g:NERDTreeMapActivateNode = 'o'
@@ -516,6 +517,7 @@ endif
 " Vista {{{ 代码Tags
 let g:vista_echo_cursor = 0
 let g:vista_stay_on_open = 0
+let g:vista_disable_statusline = 1
 nnoremap <leader>tv :Vista!!<CR>
 nnoremap <leader>vc :Vista coc<CR>
 " }}}

@@ -110,7 +110,7 @@ let g:lightline = {
             \ 'chk_indent'  : 'error',
             \ 'chk_trailing': 'error',
             \ },
-    \ 'fallback' : {'Popc': 0, 'vista': 'Vista', 'nerdtree': 0, 'NvimTree': 'NvimTree'},
+    \ 'fallback' : {'Popc': 0, 'vista': 'Vista', 'nerdtree': 'NerdTree', 'NvimTree': 'NvimTree'},
     \ }
 if s:use.ui.patch
 let g:lightline.separator            = {'left': '', 'right': ''}

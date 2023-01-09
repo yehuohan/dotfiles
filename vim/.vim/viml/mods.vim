@@ -1059,7 +1059,7 @@ endfunction
 function! s:rs.fns.clearUndo() dict
     let l:ulbak = &undolevels
     setlocal undolevels=-1
-    execute "normal! a\<Space>\<BS>\<Esc>"
+    execute "normal! i\<Space>\<Esc>x"
     let &undolevels = l:ulbak
 endfunction
 " }}}

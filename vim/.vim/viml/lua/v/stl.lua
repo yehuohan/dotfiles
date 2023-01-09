@@ -99,29 +99,33 @@ local function load_colors()
         -- gruvbox dark
         areaA = '#ff8019',
         areaB = '#beaa82',
-        areaC = '#464240',
+        areaC = '#504b4b',
         textA = '#dc6919',
         textB = '#ebdcb4',
-        textC = '#aa9b87',
+        textC = '#c8b9a5',
     }
 end
 
 -- Components
 local function pad(color, component, fileds)
-    local res = utils.surround({'', ''}, 'blank', utils.surround(sep, color, component))
+    local res = utils.surround(sep, color, component)
     if fileds then
         res = utils.clone(res, fileds)
     end
     return res
 end
 
-local ComAlign = { provider = '%=', hl = { bg = 'blank' } }
+local function wrap(component)
+    return utils.surround({'', ''}, 'blank', component)
+end
+
+local ComAlign = { provider = '%=' }
 local ComHint = pad(
     function()
         local mch = ctxs.mode()
         if mch == 'V' or mch == 'S' or mch == '^V' or mch == '^S' then
             return 'red'
-        elseif mch == 'I' then
+        elseif mch == 'I' or mch == 'T' then
             return 'green'
         elseif mch == 'R' then
             return 'blue'
@@ -144,7 +148,15 @@ local ComPath = pad('areaC', {
 })
 local ComFile = pad('areaC', {
     provider = '%F',
-    hl = { fg = 'textC' },
+    hl = function()
+        return { fg = conds.is_active() and 'textB' or 'textC'}
+    end,
+})
+local ComType = pad('areaC', {
+    provider = '%y',
+    hl = function()
+        return { fg = conds.is_active() and 'textB' or 'textC'}
+    end,
 })
 local ComAttr = pad('areaC', {
     provider = ctxs.attr,
@@ -190,7 +202,7 @@ local stl_terminal = {
     end,
     {
         condition = conds.is_active,
-        ComHint, ComPath,
+        ComHint, ComFile,
     },
     {
         condition = conds.is_not_active,
@@ -204,12 +216,12 @@ local stl_special = {
             filetype = { 'vista', 'NvimTree', 'nerdtree' }
         })
     end,
-    provider = '%y%=',
+    ComType, ComAlign,
 }
-local stls = {
+local stls = wrap({
     fallthrough = false,
     stl_special, stl_terminal, stl_inactive, stl_default
-}
+})
 
 local function toggle_check()
     if vim.b.statusline_check_enabled == nil then
