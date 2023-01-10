@@ -28,6 +28,8 @@ macro(cmsg)
         set(Mode FATAL_ERROR)
     elseif(Mode STREQUAL INFO)
         set(Mode STATUS)
+    elseif(Mode STREQUAL WARN)
+        set(Mode WARNING)
     endif()
 
     if((Mode STREQUAL FATAL_ERROR) OR (Mode STREQUAL SEND_ERROR))
