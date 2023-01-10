@@ -8,12 +8,16 @@ local utils = require('heirline.utils')
 -- Symbols
 local sym = {
     sep = { '(', ')' },
+    row = '',
+    col = '$',
     vos = '',
     buf = 'B',
     tab = 'T',
 }
 if use.ui.patch then
     sym.sep = { '', '' }
+    sym.row = ''
+    sym.col = ''
     sym.buf = ''
     sym.tab = ''
     if vim.fn.IsLinux() == 1 then
@@ -29,11 +33,7 @@ end
 local ctxs = {}
 
 ctxs.attr = '%{&ft!=#""?&ft."│":""}%{&fenc!=#""?&fenc:&enc}│%{&ff}'
-if use.ui.patch then
-    ctxs.lite = '%l/%L %v %{winnr()}.%n%{&mod?"+":""}'
-else
-    ctxs.lite = '%l/%L $%v %{winnr()}.%n%{&mod?"+":""}'
-end
+ctxs.lite = sym.row .. '%l/%L ' .. sym.col .. '%v %{winnr()}.%n%{&mod?"+":""}'
 ctxs.info = 'U%-2B %p%% ' .. ctxs.lite
 
 function ctxs.mode()
@@ -123,7 +123,7 @@ local function load_colors()
         areaC = '#504b4b',
         textA = '#dc6919',
         textB = '#ebdcb4',
-        textC = '#c8b9a5',
+        textC = '#b4aa96',
     }
 end
 
@@ -142,6 +142,15 @@ end
 
 -- Statuslines
 local ComAlign = { provider = '%=' }
+local ComTrunc = {
+    provider = '%=%<',
+    hl = function()
+        return {
+            fg = conds.is_active() and 'blue' or 'textC',
+            strikethrough = true,
+        }
+    end,
+}
 local ComHint = pad(
     function()
         local mch = ctxs.mode()
@@ -208,17 +217,17 @@ local ComCheck = pad('areaA',
 
 local stl_default = {
     ComHint, ComPath,
-    ComAlign,
+    ComTrunc,
     ComCheck, ComAttr, ComInfo,
 }
 local stl_inactive = {
     condition = conds.is_not_active,
-    ComFile, ComAlign, ComLite,
+    ComFile, ComTrunc, ComLite,
 }
-local stl_terminal = {
+local stl_special = {
     condition = function()
         return conds.buffer_matches({
-            buftype = { 'terminal' }
+            buftype = { 'help', 'terminal' }
         })
     end,
     {
@@ -231,7 +240,7 @@ local stl_terminal = {
     },
     ComAlign,
 }
-local stl_special = {
+local stl_simple = {
     condition = function()
         return conds.buffer_matches({
             filetype = { 'vim%-plug', 'vista', 'NvimTree', 'nerdtree' }
@@ -241,7 +250,7 @@ local stl_special = {
 }
 local stls = wrap({
     fallthrough = false,
-    stl_special, stl_terminal, stl_inactive, stl_default
+    stl_simple, stl_special, stl_inactive, stl_default
 })
 
 -- Tablines
