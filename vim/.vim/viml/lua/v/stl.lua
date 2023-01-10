@@ -6,16 +6,22 @@ local utils = require('heirline.utils')
 
 
 -- Symbols
-local sep = { '(', ')' }
-local vos = ''
+local sym = {
+    sep = { '(', ')' },
+    vos = '',
+    buf = 'B',
+    tab = 'T',
+}
 if use.ui.patch then
-    sep = { '', '' }
+    sym.sep = { '', '' }
+    sym.buf = ''
+    sym.tab = ''
     if vim.fn.IsLinux() == 1 then
-        vos = ''
+        sym.vos = ''
     elseif vim.fn.IsMac() == 1 then
-        vos = ''
+        sym.vos = ''
     else
-        vos = ''
+        sym.vos = ''
     end
 end
 
@@ -52,7 +58,7 @@ function ctxs.hint()
     elseif ft == 'help' then
         res = 'Help'
     end
-    return vos .. ' ' .. res
+    return sym.vos .. ' ' .. res
 end
 
 function ctxs.root_path()
@@ -95,9 +101,11 @@ function ctxs.tabs_bufs(layout)
     local res = {}
     if layout.buf then
         res.buf = buftab[1]
+        res.buf_click = 'popc#stl#SwitchBuffer'
     end
     if layout.tab then
         res.tab = buftab[2]
+        res.tab_click = 'popc#stl#SwitchTab'
     end
     return res
 end
@@ -121,7 +129,7 @@ end
 
 -- Components
 local function pad(color, component, fileds)
-    local res = utils.surround(sep, color, component)
+    local res = utils.surround(sym.sep, color, component)
     if fileds then
         res = utils.clone(res, fileds)
     end
@@ -226,7 +234,7 @@ local stl_terminal = {
 local stl_special = {
     condition = function()
         return conds.buffer_matches({
-            filetype = { 'vista', 'NvimTree', 'nerdtree' }
+            filetype = { 'vim%-plug', 'vista', 'NvimTree', 'nerdtree' }
         })
     end,
     ComType, ComAlign,
@@ -237,16 +245,16 @@ local stls = wrap({
 })
 
 -- Tablines
-local ComB = utils.surround({'', sep[2]}, 'areaA', {
-    provider = 'B',
+local ComBuf = utils.surround({'', sym.sep[2]}, 'areaA', {
+    provider = sym.buf,
     hl = { fg = 'blank' },
 })
-local ComT = utils.surround({sep[1], ''}, 'areaA', {
-    provider = 'T',
+local ComTab = utils.surround({sym.sep[1], ''}, 'areaA', {
+    provider = sym.tab,
     hl = { fg = 'blank' }
 })
 
-local function ele(e)
+local function ele(e, fn)
     local fg = 'textB'
     local bg = 'areaC'
     local txt = e.title
@@ -261,10 +269,17 @@ local function ele(e)
         txt = txt .. '+'
         fg = 'green'
     end
-    return pad(bg, {
-        provider = txt,
-        hl = { fg = fg },
-    })
+    return pad(bg,
+        {
+            provider = txt,
+            hl = { fg = fg },
+        }, {
+            on_click = {
+                callback = fn,
+                minwid = e.index,
+            }
+        }
+    )
 end
 
 local tabs = wrap({
@@ -273,18 +288,18 @@ local tabs = wrap({
         local children = {}
         -- buffers
         if res.buf then
-            table.insert(children, ComB)
+            table.insert(children, ComBuf)
             for _, e in ipairs(res.buf) do
-                table.insert(children, ele(e))
+                table.insert(children, ele(e, res.buf_click))
             end
         end
         table.insert(children, ComAlign)
         -- tabpages
         if res.tab then
             for _, e in ipairs(res.tab) do
-                table.insert(children, ele(e))
+                table.insert(children, ele(e, res.tab_click))
             end
-            table.insert(children, ComT)
+            table.insert(children, ComTab)
         end
         -- instantiate new child with overwriting the previous one
         self.child = self:new(children, 1)
