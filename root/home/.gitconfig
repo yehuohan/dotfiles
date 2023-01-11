@@ -5,6 +5,7 @@
 	commitEncoding = utf-8
 [core]
 	editor = nvim
+	filemode = false
 [color]
 	ui = auto
 [pull]
