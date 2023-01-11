@@ -342,8 +342,12 @@ local function toggle_layout()
 end
 
 local function setup()
+    vim.o.termguicolors = 1
     vim.o.showtabline = 2
-    heirline.setup(stls, nil, tabs)
+    heirline.setup({
+        statusline = stls,
+        tabline = tabs,
+    })
     heirline.load_colors(load_colors())
     vim.api.nvim_create_augroup('PkgHeirline', { clear = true })
     vim.api.nvim_create_autocmd('ColorScheme', {

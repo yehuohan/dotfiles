@@ -221,6 +221,9 @@ local function __completion()
                 col_offset = -2,
                 side_padding = 0,
             },
+            documentation = {
+                max_width = 80,
+            },
         },
         formatting = {
             fields = { 'kind', 'abbr', 'menu' },
