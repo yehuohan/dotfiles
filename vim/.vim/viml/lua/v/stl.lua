@@ -327,7 +327,6 @@ local function toggle_check()
     vim.fn.Notify('b:statusline_check_enabled = ' .. tostring(vim.b.statusline_check_enabled))
 end
 
-vim.g.tabline_layout = { tab = true, buf = true }
 local function toggle_layout()
     local layout = vim.g.tabline_layout
     if layout.tab and layout.buf then
@@ -342,6 +341,8 @@ local function toggle_layout()
 end
 
 local function setup()
+    vim.g.Popc_useTabline = 0
+    vim.g.tabline_layout = { tab = true, buf = true }
     vim.o.termguicolors = 1
     vim.o.showtabline = 2
     heirline.setup({

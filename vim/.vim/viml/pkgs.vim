@@ -275,7 +275,7 @@ let g:Popc_highlight = {
     \ 'text'     : 'Pmenu',
     \ 'selected' : 'CursorLineNr',
     \ }
-let g:Popc_useTabline = 0
+let g:Popc_useTabline = 1
 let g:Popc_useStatusline = 1
 let g:Popc_usePowerFont = s:use.ui.patch
 if s:use.ui.patch
