@@ -98,7 +98,7 @@ if s:use.nlsp
     Plug 'williamboman/mason-lspconfig.nvim'
     Plug 'neovim/nvim-lspconfig'
     Plug 'ray-x/lsp_signature.nvim'
-    " Plug 'glepnir/lspsaga.nvim'
+    Plug 'glepnir/lspsaga.nvim'
     " Plug 'simrat39/rust-tools.nvim'
     Plug 'hrsh7th/nvim-cmp'
     Plug 'hrsh7th/cmp-nvim-lsp'
