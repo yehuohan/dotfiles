@@ -62,7 +62,7 @@ neovide --remote-tcp=localhost:6666
 ## Links
 
 - [vim](https://github.com/vim/vim)
-  - [GvimFullscreen](./gvimfullscreen)
+  - [GvimFullscreen](./gvim/gvimfullscreen)
 - [neovim](https://github.com/neovim/neovim)
   - `pacman -S xclip or xsel`
   - [nvim.appimage](https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage)
@@ -73,18 +73,17 @@ neovide --remote-tcp=localhost:6666
   - [neovide-windows](https://github.com/neovide/neovide/releases/latest/download/neovide-windows.zip)
 - [Python](https://www.python.org/)
   - `pip install pynvim`
+- [lua](https://www.lua.org/)
 - [NodeJs](https://nodejs.org)
   - `HTTPS_PROXY=addr:port npm install -g neovim`
   - `cd $DotVimPath/local && HTTPS_PROXY=addr:port npm install neovim`
 - [Deno](https://github.com/denoland/deno)
-- [lua](https://www.lua.org/)
 - Git: [Msys2](http://www.msys2.org/) or [Cygwin](https://cygwin.com)
   - `git config --global http.proxy addr:port`
 - [LLVM](http://llvm.org/) or [Clangd](https://github.com/clangd/clangd)
 - [Ripgrep](https://github.com/BurntSushi/ripgrep) or [Ag](https://github.com/k-takata/the_silver_searcher-win32)
 - [Fzf](https://github.com/junegunn/fzf)
 - [Bat](https://github.com/sharkdp/bat)
-- [Astyle](http://astyle.sourceforge.net)
 - [Ctags](https://github.com/universal-ctags/ctags)
 - [Lf](https://github.com/gokcehan/lf)
 - [sioyek](https://github.com/ahrm/sioyek)
