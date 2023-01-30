@@ -54,7 +54,8 @@ function ctxs.hint()
     elseif ft == 'alpha' then
         res = 'Alpha'
     elseif ft == 'qf' then
-        res = vim.fn.QuickfixType() == 'c' and 'QF' or 'QL'
+        local wi = vim.fn.getwininfo(vim.fn.win_getid())[1]
+        res = wi.loclist == 0 and 'QF' or 'QL'
     elseif ft == 'help' then
         res = 'Help'
     end

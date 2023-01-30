@@ -1193,7 +1193,7 @@ function! FnEvalStr(fn, inp, out)
         elseif a:out ==# 'c'
             call setreg('0', l:res)
             call setreg('+', l:res)
-            call Notify(' -> copied')
+            call Notify(l:res .. ' -> copied')
         endif
     endif
 endfunction
