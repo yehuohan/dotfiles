@@ -66,7 +66,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES   "${CMAKE_CURRENT_SOURCE_DIR}/inc"
     INTERFACE_SOURCES               "${CMAKE_CURRENT_SOURCE_DIR}/src"
     INTERFACE_COMPILE_DEFINITIONS   "VAR1=xxx;VAR2=xxx"
-    INTERFACE_LINK_LIBRARIES        "targetA;targetB")
+    INTERFACE_LINK_DIRECTORIES      "SoPath" # for libsoname.so
+    INTERFACE_LINK_LIBRARIES        "targetA;targetB;soname")
 
 add_library(${PROJECT_NAME} STATIC|SHARED IMPORTED GLOBAL)
 set_target_properties(${PROJECT_NAME} PROPERTIES
