@@ -167,6 +167,8 @@ local ComHint = pad(
     {
         provider = ctxs.hint,
         hl = { fg = 'blank', bold = true },
+    }, {
+        condition = conds.is_active,
     }
 )
 local ComPath = pad('areaC', {
@@ -202,6 +204,7 @@ local ComLite = pad('areaC', {
     provider = ctxs.lite,
     hl = { fg = 'textC' },
 })
+
 local ComCheck = pad('areaA',
     {
         provider = function(self)
@@ -216,43 +219,35 @@ local ComCheck = pad('areaA',
     }
 )
 
-local stl_default = {
-    ComHint, ComPath,
-    ComTrunc,
-    ComCheck, ComAttr, ComInfo,
-}
-local stl_inactive = {
-    condition = conds.is_not_active,
-    ComFile, ComTrunc, ComLite,
-}
-local stl_special = {
-    condition = function()
-        return conds.buffer_matches({
-            buftype = { 'help', 'terminal' }
-        })
-    end,
+local SecLeft = {
+    fallthrough = false,
     {
-        condition = conds.is_active,
-        ComHint, ComFile,
-    },
-    {
-        condition = conds.is_not_active,
+        condition = function()
+            return conds.buffer_matches({
+                filetype = { 'vim%-plug', 'vista', 'NvimTree', 'nerdtree' }
+            })
+        end,
+        ComType,
+    }, {
+        condition = function()
+            return conds.is_not_active() or conds.buffer_matches({
+                buftype = { 'help', 'terminal' }
+            })
+        end,
         ComFile,
     },
-    ComAlign,
+    ComPath,
 }
-local stl_simple = {
-    condition = function()
-        return conds.buffer_matches({
-            filetype = { 'vim%-plug', 'vista', 'NvimTree', 'nerdtree' }
-        })
-    end,
-    ComType, ComAlign,
-}
-local stls = wrap({
+local SecRight = {
     fallthrough = false,
-    stl_simple, stl_special, stl_inactive, stl_default
-})
+    {
+        condition = conds.is_active,
+        ComCheck, ComAttr, ComInfo,
+    },
+    ComLite,
+}
+
+local stls = wrap({ ComHint, SecLeft, ComTrunc, SecRight })
 
 -- Tablines
 local ComBuf = utils.surround({'', sym.sep[2]}, 'areaA', {

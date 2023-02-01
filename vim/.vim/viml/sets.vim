@@ -91,7 +91,7 @@ let s:opt = {
     \ 'lst' : {
         \ 'conceallevel' : [2, 0],
         \ 'virtualedit'  : ['all', ''],
-        \ 'signcolumn'   : ['no', 'yes', 'auto', 'number'],
+        \ 'laststatus'   : [2, 3],
         \ },
     \ 'fns' : {},
     \ }
@@ -126,7 +126,7 @@ endfunction
 " Function: OptionInv(opt) {{{ 切换参数值（bool取反）
 function! OptionInv(opt)
     execute printf('setlocal inv%s', a:opt)
-    execute printf('call Notify("%s = " . &%s)', a:opt, a:opt)
+    call Notify(printf('%s = %s', a:opt, eval('&' . a:opt)))
 endfunction
 " }}}
 
@@ -136,7 +136,7 @@ function! OptionLst(opt)
     let l:idx = index(l:lst, eval('&' . a:opt))
     let l:idx = (l:idx + 1) % len(l:lst)
     execute printf('set %s=%s', a:opt, l:lst[l:idx])
-    execute printf('call Notify("%s = " . &%s)', a:opt, a:opt)
+    call Notify(printf('%s = %s', a:opt, eval('&' . a:opt)))
 endfunction
 " }}}
 
@@ -149,13 +149,12 @@ endfunction
 nnoremap <leader>iw :call OptionInv('wrap')<CR>
 nnoremap <leader>il :call OptionInv('list')<CR>
 nnoremap <leader>ii :call OptionInv('ignorecase')<CR>
-nnoremap <leader>if :call OptionInv('foldenable')<CR>
 nnoremap <leader>ie :call OptionInv('expandtab')<CR>
 nnoremap <leader>ib :call OptionInv('scrollbind')<CR>
 nnoremap <leader>ip :call OptionInv('spell')<CR>
 nnoremap <leader>iv :call OptionLst('virtualedit')<CR>
 nnoremap <leader>ic :call OptionLst('conceallevel')<CR>
-nnoremap <leader>is :call OptionLst('signcolumn')<CR>
+nnoremap <leader>is :call OptionLst('laststatus')<CR>
 nnoremap <leader>in :call OptionFns('number')<CR>
 nnoremap <leader>ih :call OptionFns('syntax')<CR>
 " }}}
@@ -407,6 +406,9 @@ function! WinMoveSpliter(dir, inc) range
     let l:wnr = winnr()
     let l:pos = win_screenpos(l:wnr)
     let l:hei = winheight(l:wnr) + l:pos[0] + &cmdheight
+    if IsNVim()
+        let l:hei += (empty(&winbar) ? 0 : 1)
+    endif
     let l:wid = winwidth(l:wnr) - 1 + l:pos[1]
     let l:all_hei = &lines
     let l:all_wid = &columns
