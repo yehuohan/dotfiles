@@ -118,6 +118,7 @@ local function load_colors()
         red    = '#fa461e',
         green  = '#b8bb26',
         blue   = '#83a598',
+        gray   = '#665c54',
         -- gruvbox dark
         areaA = '#ff8019',
         areaB = '#beaa82',
@@ -145,12 +146,7 @@ end
 local ComAlign = { provider = '%=' }
 local ComTrunc = {
     provider = '%=%<',
-    hl = function()
-        return {
-            fg = conds.is_active() and 'blue' or 'textC',
-            strikethrough = true,
-        }
-    end,
+    hl = { fg = 'gray', strikethrough = true },
 }
 local ComHint = pad(
     function()
@@ -204,7 +200,6 @@ local ComLite = pad('areaC', {
     provider = ctxs.lite,
     hl = { fg = 'textC' },
 })
-
 local ComCheck = pad('areaA',
     {
         provider = function(self)
@@ -314,6 +309,23 @@ local tabs = wrap({
     end,
 })
 
+-- Winbars
+local bars = wrap({
+    fallthrough = false,
+    {
+        condition = function()
+            return vim.o.laststatus ~= 3 or conds.buffer_matches({
+                filetype = { 'alpha', 'vim%-plug', 'vista', 'NvimTree', 'nerdtree' },
+                buftype = { 'terminal',  'quickfix' },
+            })
+        end,
+        init = function()
+            vim.opt_local.winbar = nil
+        end
+    },
+    ComFile,
+})
+
 -- Setup
 local function toggle_check()
     if vim.b.statusline_check_enabled == nil then
@@ -344,6 +356,7 @@ local function setup()
     heirline.setup({
         statusline = stls,
         tabline = tabs,
+        winbar = bars,
     })
     heirline.load_colors(load_colors())
     vim.api.nvim_create_augroup('PkgHeirline', { clear = true })
