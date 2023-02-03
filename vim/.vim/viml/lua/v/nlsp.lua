@@ -23,12 +23,16 @@ local function __servers()
     }
     require('mason-lspconfig').setup{ }
     local lspconfig = require('lspconfig')
+    local capabilities = require('cmp_nvim_lsp').default_capabilities()
     require('mason-lspconfig').setup_handlers{
         function(server_name)
-            lspconfig[server_name].setup{ }
+            lspconfig[server_name].setup{
+                capabilities = capabilities
+            }
         end,
         ['cmake'] = function()
             lspconfig.cmake.setup{
+                capabilities = capabilities,
                 init_options = {
                     buildDirectory = '__VBuildOut',
                 },
@@ -36,6 +40,7 @@ local function __servers()
         end,
         ['rust_analyzer'] = function()
             lspconfig.rust_analyzer.setup{
+                capabilities = capabilities,
                 settings = {
                     ['rust-analyzer'] = {
                         updates = {
@@ -52,6 +57,7 @@ local function __servers()
         end,
         ['pyright'] = function()
             lspconfig.pyright.setup{
+                capabilities = capabilities,
                 settings = {
                     python = {
                         analysis = {
@@ -63,6 +69,7 @@ local function __servers()
         end,
         ['sumneko_lua'] = function()
             lspconfig.sumneko_lua.setup{
+                capabilities = capabilities,
                 settings = {
                     Lua = {
                         runtime = { version = 'Lua 5.2' }, -- LuaJIT
@@ -139,12 +146,45 @@ local function cmp_format(entry, vitem)
     return vitem
 end
 
-local function __completion()
+local function __hl() 
     api.nvim_set_hl(0, 'CmpItemMenu', { ctermfg = 175, fg = '#d3869b', italic = true })
     api.nvim_set_hl(0, 'CmpItemAbbrMatch', { ctermfg = 208, fg = '#fe8019' })
     api.nvim_set_hl(0, 'CmpItemAbbrMatchFuzzy', { ctermfg = 208, fg = '#fe8019' })
     api.nvim_set_hl(0, 'CmpItemKind', { ctermfg = 142, fg = '#b8bb26' })
+    api.nvim_set_hl(0, 'CmpItemKindText',  { fg = '#458588' })
+    api.nvim_set_hl(0, 'CmpItemKindMethod',  { fg = '#b8bb26' })
+    api.nvim_set_hl(0, 'CmpItemKindFunction',  { fg = '#b8bb26' })
+    api.nvim_set_hl(0, 'CmpItemKindConstructor',  { fg = '#e95678' })
+    api.nvim_set_hl(0, 'CmpItemKindField',  { fg = '#e95678' })
+    api.nvim_set_hl(0, 'CmpItemKindVariable',  { fg = '#458588' })
+    api.nvim_set_hl(0, 'CmpItemKindClass',  { fg = '#cc241d' })
+    api.nvim_set_hl(0, 'CmpItemKindInterface',  { fg = '#cc241d' })
+    api.nvim_set_hl(0, 'CmpItemKindModule',  { fg = '#689d6a' })
+    api.nvim_set_hl(0, 'CmpItemKindProperty',  { fg = '#689d6a' })
+    api.nvim_set_hl(0, 'CmpItemKindUnit',  { fg = '#afd700' })
+    api.nvim_set_hl(0, 'CmpItemKindValue',  { fg = '#afd700' })
+    api.nvim_set_hl(0, 'CmpItemKindEnum',  { fg = '#61afef' })
+    api.nvim_set_hl(0, 'CmpItemKindKeyword',  { fg = '#61afef' })
+    api.nvim_set_hl(0, 'CmpItemKindSnippet',  { fg = '#cba6f7' })
+    api.nvim_set_hl(0, 'CmpItemKindColor',  { fg = '#cba6f7' })
+    api.nvim_set_hl(0, 'CmpItemKindFile',  { fg = '#8f3f71' })
+    api.nvim_set_hl(0, 'CmpItemKindReference',  { fg = '#1abc9c' })
+    api.nvim_set_hl(0, 'CmpItemKindFolder',  { fg = '#8f3f71' })
+    api.nvim_set_hl(0, 'CmpItemKindEnumMember',  { fg = '#61afef' })
+    api.nvim_set_hl(0, 'CmpItemKindConstant',  { fg = '#1abc9c' })
+    api.nvim_set_hl(0, 'CmpItemKindStruct',  { fg = '#f7bb3b' })
+    api.nvim_set_hl(0, 'CmpItemKindEvent',  { fg = '#f7bb3b' })
+    api.nvim_set_hl(0, 'CmpItemKindOperator',  { fg = '#d3869b' })
+    api.nvim_set_hl(0, 'CmpItemKindTypeParameter',  { fg = '#d3869b' })
 
+    api.nvim_set_hl(0, 'LspSignatureActiveParameter', { link = 'Tag' })
+    api.nvim_set_hl(0, 'DiagnosticUnderlineError', { undercurl = true, sp = 'Red'  })
+    api.nvim_set_hl(0, 'DiagnosticUnderlineWarn', { undercurl = true, sp = 'Orange' })
+    api.nvim_set_hl(0, 'DiagnosticUnderlineInfo', { undercurl = true, sp = 'LightBlue' })
+    api.nvim_set_hl(0, 'DiagnosticUnderlineHint', { link = 'Comment' })
+end
+
+local function __completion()
     local cmp_im = require('cmp_im')
     cmp_im.setup{
         tables = require('cmp_im_zh').tables{'wubi', 'pinyin'},
@@ -261,11 +301,6 @@ local function __completion()
 end
 
 local function __lsp()
-    api.nvim_set_hl(0, 'LspSignatureActiveParameter', { link = 'Tag' })
-    api.nvim_set_hl(0, 'DiagnosticUnderlineError', { undercurl = true, sp = 'Red'  })
-    api.nvim_set_hl(0, 'DiagnosticUnderlineWarn', { undercurl = true, sp = 'Orange' })
-    api.nvim_set_hl(0, 'DiagnosticUnderlineInfo', { undercurl = true, sp = 'LightBlue' })
-    api.nvim_set_hl(0, 'DiagnosticUnderlineHint', { link = 'Comment' })
     if use.ui.patch then
         for name, icon in pairs{
             DiagnosticSignError = '🗴',
@@ -339,6 +374,7 @@ end
 local function setup()
 if use.nlsp then
     __servers()
+    __hl()
     __completion()
     __lsp()
     __mappings()

@@ -316,7 +316,7 @@ local bars = wrap({
         condition = function()
             return vim.o.laststatus ~= 3 or conds.buffer_matches({
                 filetype = { 'alpha', 'vim%-plug', 'vista', 'NvimTree', 'nerdtree' },
-                buftype = { 'terminal',  'quickfix' },
+                buftype = { 'nofile', 'terminal',  'quickfix' },
             })
         end,
         init = function()

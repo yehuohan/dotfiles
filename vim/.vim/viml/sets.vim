@@ -374,7 +374,7 @@ noremap vv <C-v>
 xnoremap <C-g> <C-g><Cmd>call Notify('mode: ' . string(mode(1)))<CR>
 snoremap <C-g> <C-g><Cmd>call Notify('mode: ' . string(mode(1)))<CR>
 
-for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m', ' ')
+for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m 0 1 2 3 4 5 6 7 8 9', ' ')
     " 寄存器快速复制与粘贴
     execute printf('vnoremap <leader>''%s "%sy', t, t)
     execute printf('nnoremap <leader>''%s "%sp', t, t)
