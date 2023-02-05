@@ -294,7 +294,7 @@ local function __completion()
             { name = 'IM' },
             { name = 'path' },
         }, {
-            { name = 'cmdline' },
+            { name = 'cmdline', max_item_count = 10 },
             { name = 'cmdline_history', max_item_count = 5 },
         })
     })
