@@ -176,6 +176,13 @@ local function pkg_alpha()
             { type = 'group', val = function() return { tmp.mru(0, false, 8) } end },
         },
     }
+    tmp.section.bottom_buttons.val = {
+        tmp.button('q', 'Quit', [[
+            <Cmd>try <Bar>
+                normal! <C-^> <Bar>
+            catch <Bar>
+                q <Bar>
+            endtry<CR>]])}
     tmp.config.layout = {
         { type = 'padding', val = 1 },
         tmp.section.header,
