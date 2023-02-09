@@ -30,6 +30,7 @@ local function pkg_hop()
         create_hl_autocmd = true,
     }
     m.nore{'s', '<Cmd>HopChar1MW<CR>'}
+    m.nore{'S', '<Cmd>HopChar1<CR>'}
     m.nore{'f', '<Cmd>HopChar1CurrentLine<CR>'}
     m.nore{'F', '<Cmd>HopAnywhereCurrentLine<CR>'}
     m.nore{'<leader>ms', '<Cmd>HopPatternMW<CR>'}
@@ -64,6 +65,7 @@ local function pkg_cursorword()
     vim.g.cursorword_min_width = 2
     vim.g.cursorword_max_width = 64
     vim.api.nvim_set_hl(0, 'CursorWord', { ctermbg = 60, bg = '#505060' })
+    m.nnore{'<leader>tg', ':CursorWordToggle<CR>'}
 end
 
 -- 块编辑
