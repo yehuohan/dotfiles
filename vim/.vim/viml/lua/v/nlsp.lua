@@ -294,7 +294,7 @@ local function __completion()
             { name = 'IM' },
             { name = 'path' },
         }, {
-            { name = 'cmdline', max_item_count = 10 },
+            { name = 'cmdline' },
             { name = 'cmdline_history', max_item_count = 5 },
         })
     })
@@ -315,8 +315,12 @@ local function __lsp()
         virtual_text = { prefix = '▪' },
     })
 
-    require('lspsaga').init_lsp_saga {
+    require('lspsaga').setup{
         border_style = 'single',
+        scroll_preview = {
+            scroll_down = '<M-f>',
+            scroll_up = '<M-d>',
+        },
         code_action_lightbulb = {
             enable = false,
         },
@@ -328,11 +332,17 @@ local function __lsp()
 
     require('lsp_signature').setup{
         bind = true,
+        doc_lines = 50,
+        max_height = 50,
+        max_width = 80,
         hint_enable = true,
         hint_prefix = '» ',
         handler_opts = {
-            border = 'single',
+            border = 'none',
         },
+        padding = ' ',
+        toggle_key = '<M-o>',
+        select_signature_key = '<M-l>',
     }
 end
 
@@ -349,9 +359,9 @@ local function __mappings()
     m.nnore{'<leader>ga', vim.lsp.buf.code_action}
     m.nnore{'<leader>gn', vim.lsp.buf.rename}
     -- m.nnore{'<leader>gh', vim.lsp.buf.hover}
-    m.nnore{'<leader>gs', '<Cmd>Lspsaga lsp_finder<CR>'}
-    m.nnore{'<leader>gp', '<Cmd>Lspsaga peek_definition<CR>'}
     m.nnore{'<leader>gh', '<Cmd>Lspsaga hover_doc<CR>'}
+    m.nnore{'<leader>gp', '<Cmd>Lspsaga peek_definition<CR>'}
+    m.nnore{'<leader>gs', '<Cmd>Lspsaga lsp_finder<CR>'}
 
     m.nore{'<leader>of', vim.lsp.buf.format}
     m.nnore{'<leader>od', vim.diagnostic.setloclist}
