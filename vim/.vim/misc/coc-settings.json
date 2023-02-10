@@ -4,6 +4,7 @@
     "suggest.virtualText": true,
     "suggest.noselect": true,
     "suggest.labelMaxLength": 80,
+    "suggest.formatItems": [ "kind", "abbr", "menu", "shortcut" ],
     "suggest.completionItemKindLabels": {
         "keyword"       : "",
         "variable"      : "",
@@ -52,15 +53,10 @@
     "coc.preferences.enableMessageDialog": true,
     "coc.preferences.promptInput": true,
     "coc.preferences.extensionUpdateCheck": "weekly",
-    "workspace.rootPatterns": [".popc", ".git", ".svn", ".hg"],
     "coc.preferences.jumpCommand": "edit",
+    "workspace.rootPatterns": [".popc", ".git", ".svn", ".hg"],
     "list.nextKeymap": "<C-j>",
     "list.previousKeymap": "<C-k>",
-
-    /* coc-lists(NOT in use) */
-    //"session.saveOnVimLeave" : false,
-    //"session.restartOnSessionLoad" : false,
-    //"list.source.grep.command": "rg",
 
     /* coc-snippets */
     "snippets.ultisnips.enable": true,
