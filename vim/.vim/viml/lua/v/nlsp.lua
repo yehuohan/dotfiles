@@ -316,13 +316,20 @@ local function __lsp()
     })
 
     require('lspsaga').setup{
-        border_style = 'single',
+        ui = {
+            border = 'single',
+        },
         scroll_preview = {
             scroll_down = '<M-f>',
             scroll_up = '<M-d>',
         },
-        code_action_lightbulb = {
-            enable = false,
+        code_action = {
+            keys = {
+                quit = { 'q', '<Esc>'}
+            },
+        },
+        lightbulb = {
+            enable = true,
         },
         symbol_in_winbar = {
             enable = true,
@@ -346,6 +353,7 @@ local function __lsp()
     }
 end
 
+
 local function __mappings()
     m.inore{'<M-o>', vim.lsp.buf.signature_help}
     m.nnore{'gd', vim.lsp.buf.definition}
@@ -356,12 +364,14 @@ local function __mappings()
     m.nnore{'<leader>gt', vim.lsp.buf.type_definition}
     m.nnore{'<leader>gr', vim.lsp.buf.references}
     m.nnore{'<leader>gf', function() vim.lsp.buf.code_action({apply = true}) end}
-    m.nnore{'<leader>ga', vim.lsp.buf.code_action}
     m.nnore{'<leader>gn', vim.lsp.buf.rename}
+    -- m.nnore{'<leader>ga', vim.lsp.buf.code_action}
     -- m.nnore{'<leader>gh', vim.lsp.buf.hover}
+    m.nnore{'<leader>ga', '<Cmd>Lspsaga code_action<CR>'}
     m.nnore{'<leader>gh', '<Cmd>Lspsaga hover_doc<CR>'}
     m.nnore{'<leader>gp', '<Cmd>Lspsaga peek_definition<CR>'}
     m.nnore{'<leader>gs', '<Cmd>Lspsaga lsp_finder<CR>'}
+    m.nnore{'<leader>go', '<Cmd>Lspsaga outline<CR>'}
 
     m.nore{'<leader>of', vim.lsp.buf.format}
     m.nnore{'<leader>od', vim.diagnostic.setloclist}
@@ -377,7 +387,6 @@ local function __mappings()
     m.nnore{'<leader>ol', ':LspInfo<CR>'}
     m.nnore{'<leader>om', ':Mason<CR>'}
     m.nnore{'<leader>os', ':CmpStatus<CR>'}
-    m.nnore{'<leader>ou', '<Cmd>LSoutlineToggle<CR>'}
     m.nnore{'<leader>oh', '<Cmd>ClangdSwitchSourceHeader<CR>'}
 end
 
