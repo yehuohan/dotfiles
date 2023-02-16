@@ -42,6 +42,7 @@ endif
     Plug 'glts/vim-textobj-comment'
     Plug 'adriaanzon/vim-textobj-matchit'
     Plug 'lucapette/vim-textobj-underscore'
+    Plug 'Konfekt/FastFold'
     " component
 if IsNVim()
     Plug 'rebelot/heirline.nvim'
@@ -224,6 +225,14 @@ omap au <Plug>(textobj-underscore-a)
 omap iu <Plug>(textobj-underscore-i)
 xmap au <Plug>(textobj-underscore-a)
 xmap iu <Plug>(textobj-underscore-i)
+" }}}
+
+" FastFold {{{ 更新折叠
+let g:fastfold_savehook = 0             " 只允许手动更新folds
+let g:fastfold_fold_command_suffixes = ['x','X','a','A','o','O','c','C']
+let g:fastfold_fold_movement_commands = ['z[', 'z]', 'zj', 'zk']
+                                        " 允许指定的命令更新folds
+nmap <leader>zu <Plug>(FastFoldUpdate)
 " }}}
 " }}}
 

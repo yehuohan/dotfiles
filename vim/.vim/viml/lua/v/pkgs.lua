@@ -514,7 +514,7 @@ local function pkg_ufo()
             return ''
         end
     }
-    m.nnore{'<leader>to',
+    m.nnore{'<leader>tu',
         function()
             local bufnr = vim.api.nvim_get_current_buf()
             if ufo.hasAttached(bufnr) then

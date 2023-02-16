@@ -310,13 +310,15 @@ local tabs = wrap({
 })
 
 -- Winbars
+local bar_excluded_filetypes = { 'alpha', 'vim%-plug', 'vista', 'NvimTree', 'nerdtree' }
+local bar_excluded_buftypes = { 'nofile', 'terminal',  'quickfix' }
 local bars = wrap({
     fallthrough = false,
     {
         condition = function()
             return vim.o.laststatus ~= 3 or conds.buffer_matches({
-                filetype = { 'alpha', 'vim%-plug', 'vista', 'NvimTree', 'nerdtree' },
-                buftype = { 'nofile', 'terminal',  'quickfix' },
+                filetype = bar_excluded_filetypes,
+                buftype = bar_excluded_buftypes,
             })
         end,
         init = function()
@@ -324,6 +326,17 @@ local bars = wrap({
         end
     },
     ComFile,
+})
+
+vim.api.nvim_create_autocmd('User', {
+    pattern = 'HeirlineInitWinbar',
+    callback = function(args)
+        local filetype = vim.tbl_contains(bar_excluded_filetypes, vim.bo[args.buf].filetype)
+        local buftype = vim.tbl_contains(bar_excluded_buftypes, vim.bo[args.buf].buftype)
+        if filetype or buftype or vim.api.nvim_win_get_config(0).relative ~= '' then
+            vim.opt_local.winbar = nil
+        end
+    end,
 })
 
 -- Setup
