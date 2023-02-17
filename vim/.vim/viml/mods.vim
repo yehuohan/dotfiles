@@ -1037,7 +1037,13 @@ let s:rs = {
                 \ },
             \ 'copyConfig' : {
                 \ 'dsr' : 'copy config file',
-                \ 'lst' : ['.ycm_extra_conf.py', '.clang-format', 'pyrightconfig.json', '.vimspector.json'],
+                \ 'lst' : [
+                    \ '.ycm_extra_conf.py',
+                    \ '.clang-format',
+                    \ 'pyrightconfig.json',
+                    \ 'pyproject.toml',
+                    \ '.vimspector.json',
+                    \ ],
                 \ 'cmd' : {sopt, arg -> execute('edit ' . s:rs.fns.copyConfig(arg))},
                 \ },
             \ },
