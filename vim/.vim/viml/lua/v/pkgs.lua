@@ -1,7 +1,6 @@
 local use = vim.fn.SvarUse()
 local m = require('v.maps')
 
-
 local function pkg_packer()
     local url = 'https://github.com/%s'
     if vim.fn.empty(use.xgit) == 0 then
@@ -14,10 +13,13 @@ local function pkg_packer()
         git = { default_url_format = url },
     }
 
-    require('packer').startup{function()
-        local add = require('packer').use
-        add 'wbthomason/packer.nvim'
-    end, config = packer_config}
+    require('packer').startup({
+        function()
+            local add = require('packer').use
+            add('wbthomason/packer.nvim')
+        end,
+        config = packer_config,
+    })
 end
 
 --------------------------------------------------------------------------------
@@ -25,24 +27,24 @@ end
 --------------------------------------------------------------------------------
 -- 快速跳转
 local function pkg_hop()
-    require('hop').setup{
+    require('hop').setup({
         match_mappings = { 'zh', 'zh_sc' },
         create_hl_autocmd = true,
-    }
-    m.nore{'s', '<Cmd>HopChar1MW<CR>'}
-    m.nore{'S', '<Cmd>HopChar1<CR>'}
-    m.nore{'f', '<Cmd>HopChar1CurrentLine<CR>'}
-    m.nore{'F', '<Cmd>HopAnywhereCurrentLine<CR>'}
-    m.nore{'<leader>ms', '<Cmd>HopPatternMW<CR>'}
-    m.nore{'<leader>j', '<Cmd>HopLineCursor<CR>'}
-    m.nore{'<leader><leader>j', '<Cmd>HopLine<CR>'}
-    m.nore{'<leader>mj', '<Cmd>HopLineStart<CR>'}
-    m.nore{'<leader>mw', '<Cmd>HopWord<CR>'}
+    })
+    m.nore({ 's', '<Cmd>HopChar1MW<CR>' })
+    m.nore({ 'S', '<Cmd>HopChar1<CR>' })
+    m.nore({ 'f', '<Cmd>HopChar1CurrentLine<CR>' })
+    m.nore({ 'F', '<Cmd>HopAnywhereCurrentLine<CR>' })
+    m.nore({ '<leader>ms', '<Cmd>HopPatternMW<CR>' })
+    m.nore({ '<leader>j', '<Cmd>HopLineCursor<CR>' })
+    m.nore({ '<leader><leader>j', '<Cmd>HopLine<CR>' })
+    m.nore({ '<leader>mj', '<Cmd>HopLineStart<CR>' })
+    m.nore({ '<leader>mw', '<Cmd>HopWord<CR>' })
 end
 
 -- 书签管理
 local function pkg_marks()
-    require('marks').setup{
+    require('marks').setup({
         default_mappings = false,
         force_write_shada = true,
         cyclic = false,
@@ -52,90 +54,106 @@ local function pkg_marks()
             delete_buf = '<leader>mc',
             next = '<M-.>',
             prev = '<M-,>',
-        }
-    }
-    m.nnore{'<leader>ts', ':MarksToggleSigns<CR>'}
-    m.nnore{'<leader>ma', ':MarksListBuf<CR>'}
+        },
+    })
+    m.nnore({ '<leader>ts', ':MarksToggleSigns<CR>' })
+    m.nnore({ '<leader>ma', ':MarksListBuf<CR>' })
 end
 
 -- 自动高亮当前word
 local function pkg_cursorword()
-    vim.g.cursorword_disable_filetypes = {'nerdtree', 'NvimTree'}
+    vim.g.cursorword_disable_filetypes = { 'nerdtree', 'NvimTree' }
     vim.g.cursorword_disable_at_startup = false
     vim.g.cursorword_min_width = 2
     vim.g.cursorword_max_width = 64
     vim.api.nvim_set_hl(0, 'CursorWord', { ctermbg = 60, bg = '#505060' })
-    m.nnore{'<leader>tg', ':CursorWordToggle<CR>'}
+    m.nnore({ '<leader>tg', ':CursorWordToggle<CR>' })
 end
 
 -- 块编辑
 local function pkg_gomove()
-    require('gomove').setup {
+    require('gomove').setup({
         map_defaults = false,
         reindent = true,
         undojoin = true,
         move_past_end_col = false,
-    }
-    m.xmap{'<C-j>', '<Plug>GoVSMDown'}
-    m.xmap{'<C-k>', '<Plug>GoVSMUp'}
-    m.xmap{'<C-h>', '<Plug>GoVSMLeft'}
-    m.xmap{'<C-l>', '<Plug>GoVSMRight'}
-    m.xmap{'<M-j>', '<Plug>GoVSDDown'}
-    m.xmap{'<M-k>', '<Plug>GoVSDUp'}
-    m.xmap{'<M-h>', '<Plug>GoVSDLeft'}
-    m.xmap{'<M-l>', '<Plug>GoVSDRight'}
+    })
+    m.xmap({ '<C-j>', '<Plug>GoVSMDown' })
+    m.xmap({ '<C-k>', '<Plug>GoVSMUp' })
+    m.xmap({ '<C-h>', '<Plug>GoVSMLeft' })
+    m.xmap({ '<C-l>', '<Plug>GoVSMRight' })
+    m.xmap({ '<M-j>', '<Plug>GoVSDDown' })
+    m.xmap({ '<M-k>', '<Plug>GoVSDUp' })
+    m.xmap({ '<M-h>', '<Plug>GoVSDLeft' })
+    m.xmap({ '<M-l>', '<Plug>GoVSDRight' })
 end
 
 -- 平滑滚动
 local function pkg_neoscroll()
     local neoscroll = require('neoscroll')
-    neoscroll.setup{
+    neoscroll.setup({
         mappings = {},
         hide_cursor = false,
         stop_eof = true,
-    }
-    m.nnore{'<M-n>',
+    })
+    m.nnore({
+        '<M-n>',
         function()
             if use.coc and vim.fn['coc#float#has_scroll']() == 1 then
                 vim.fn['coc#float#scroll'](1)
             else
                 neoscroll.scroll(vim.wo.scroll, true, 200)
             end
-        end}
-    m.nnore{'<M-m>',
+        end,
+    })
+    m.nnore({
+        '<M-m>',
         function()
             if use.coc and vim.fn['coc#float#has_scroll']() == 1 then
                 vim.fn['coc#float#scroll'](0)
             else
                 neoscroll.scroll(-vim.wo.scroll, true, 200)
             end
-        end}
-    m.nnore{'<M-j>', function() neoscroll.scroll(vim.api.nvim_win_get_height(0), true, 300) end }
-    m.nnore{'<M-k>', function() neoscroll.scroll(-vim.api.nvim_win_get_height(0), true, 300) end }
+        end,
+    })
+    m.nnore({
+        '<M-j>',
+        function()
+            neoscroll.scroll(vim.api.nvim_win_get_height(0), true, 300)
+        end,
+    })
+    m.nnore({
+        '<M-k>',
+        function()
+            neoscroll.scroll(-vim.api.nvim_win_get_height(0), true, 300)
+        end,
+    })
 end
 
 -- 窗口跳转
 local function pkg_winpick()
     local winpick = require('winpick')
-    winpick.setup{
+    winpick.setup({
         border = 'none',
-        prompt = "Pick a window: ",
+        prompt = 'Pick a window: ',
         format_label = winpick.defaults.format_label,
         chars = { 'f', 'j', 'd', 'k', 's', 'l' },
-    }
-    m.nnore{'<leader>wi',
+    })
+    m.nnore({
+        '<leader>wi',
         function()
             local winid, _ = winpick.select()
             if winid then
                 vim.api.nvim_set_current_win(winid)
             end
-        end}
+        end,
+    })
 end
 
 -- 窗口移动
 local function pkg_winshift()
-    require('winshift').setup{ }
-    m.nnore{'<C-m>', ':WinShift<CR>'}
+    require('winshift').setup({})
+    m.nnore({ '<C-m>', ':WinShift<CR>' })
 end
 
 --------------------------------------------------------------------------------
@@ -147,7 +165,10 @@ local function pkg_alpha()
     tmp.nvim_web_devicons.enabled = use.ui.patch
     tmp.section.header.val = function()
         if vim.fn.filereadable(vim.env.DotVimCache .. '/todo.md') == 1 then
-            local todo = vim.fn.filter(vim.fn.readfile(vim.env.DotVimCache .. '/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
+            local todo = vim.fn.filter(
+                vim.fn.readfile(vim.env.DotVimCache .. '/todo.md'),
+                'v:val !~ "\\m^[ \t]*$"'
+            )
             if vim.tbl_isempty(todo) then
                 return ''
             end
@@ -162,11 +183,14 @@ local function pkg_alpha()
             { type = 'padding', val = 1 },
             { type = 'text', val = 'Bookmarks', opts = { hl = 'SpecialComment' } },
             { type = 'padding', val = 1 },
-            { type = 'group', val = {
-                tmp.file_button('$DotVimDir/.init.vim', 'c'),
-                tmp.file_button('$NVimConfigDir/init.vim', 'd'),
-                tmp.file_button('$DotVimCache/todo.md', 'o'),
-            }},
+            {
+                type = 'group',
+                val = {
+                    tmp.file_button('$DotVimDir/.init.vim', 'c'),
+                    tmp.file_button('$NVimConfigDir/init.vim', 'd'),
+                    tmp.file_button('$DotVimCache/todo.md', 'o'),
+                },
+            },
         },
     }
     tmp.section.mru = {
@@ -175,16 +199,26 @@ local function pkg_alpha()
             { type = 'padding', val = 1 },
             { type = 'text', val = 'Recent Files', opts = { hl = 'SpecialComment' } },
             { type = 'padding', val = 1 },
-            { type = 'group', val = function() return { tmp.mru(0, false, 8) } end },
+            {
+                type = 'group',
+                val = function()
+                    return { tmp.mru(0, false, 8) }
+                end,
+            },
         },
     }
     tmp.section.bottom_buttons.val = {
-        tmp.button('q', 'Quit', [[
+        tmp.button(
+            'q',
+            'Quit',
+            [[
             <Cmd>try <Bar>
                 normal! <C-^> <Bar>
             catch <Bar>
                 q <Bar>
-            endtry<CR>]])}
+            endtry<CR>]]
+        ),
+    }
     tmp.config.layout = {
         { type = 'padding', val = 1 },
         tmp.section.header,
@@ -196,45 +230,50 @@ local function pkg_alpha()
         tmp.section.bottom_buttons,
     }
     require('alpha').setup(tmp.config)
-    m.nnore{'<leader>su', ':Alpha<CR>'}
+    m.nnore({ '<leader>su', ':Alpha<CR>' })
 end
 
 -- 消息提示
 local function pkg_notify()
-    require('notify').setup{
+    require('notify').setup({
         max_width = function()
             return vim.api.nvim_get_option('columns') * 0.7
         end,
         minimum_width = 30,
         top_down = false,
-    }
+    })
     vim.notify = require('notify')
-    m.nnore{'<leader>dm', function() vim.notify.dismiss() end}
+    m.nnore({
+        '<leader>dm',
+        function()
+            vim.notify.dismiss()
+        end,
+    })
 end
 
 -- ui界面美化
 local function pkg_dressing()
-    require('dressing').setup{
+    require('dressing').setup({
         input = { enabled = true },
         select = { enabled = true },
-    }
+    })
 end
 
 -- 字体图标
 local function pkg_icon_picker()
-    require('icon-picker').setup{ disable_legacy_commands = true }
-    m.inore{'<M-w>', '<Cmd>IconPickerInsert alt_font symbols nerd_font emoji<CR>'}
-    m.nnore{'<leader><leader>i', ':IconPickerInsert<Space>'}
+    require('icon-picker').setup({ disable_legacy_commands = true })
+    m.inore({ '<M-w>', '<Cmd>IconPickerInsert alt_font symbols nerd_font emoji<CR>' })
+    m.nnore({ '<leader><leader>i', ':IconPickerInsert<Space>' })
 end
 
 -- 刻度线
 local function pkg_virt_column()
-    require('virt-column').setup{ char = '┊' }
+    require('virt-column').setup({ char = '┊' })
 end
 
 -- 滑动条
 local function pkg_scrollbar()
-    require('scrollbar').setup{
+    require('scrollbar').setup({
         handle = {
             text = '┃',
             color = nil,
@@ -276,46 +315,48 @@ local function pkg_scrollbar()
                 'WinLeave',
             },
         },
-    }
+    })
 end
 
 -- 目录树导航
 local function pkg_tree()
     local tcb = require('nvim-tree.config').nvim_tree_callback
-    require('nvim-tree').setup{
+    require('nvim-tree').setup({
         auto_reload_on_write = false,
         view = {
             mappings = {
                 custom_only = true,
                 list = {
-                    { key = {'<CR>', 'o', '<2-LeftMouse>'},
-                                     cb = tcb('edit') },
-                    { key = 'i'    , cb = tcb('vsplit') },
-                    { key = 'gi'   , cb = tcb('split') },
-                    { key = 't'    , cb = tcb('tabnew') },
+                    {
+                        key = { '<CR>', 'o', '<2-LeftMouse>' },
+                        cb = tcb('edit'),
+                    },
+                    { key = 'i', cb = tcb('vsplit') },
+                    { key = 'gi', cb = tcb('split') },
+                    { key = 't', cb = tcb('tabnew') },
                     { key = '<Tab>', cb = tcb('preview') },
-                    { key = 'cd'   , cb = tcb('cd') },
-                    { key = 'u'    , cb = tcb('dir_up') },
-                    { key = 'K'    , cb = tcb('first_sibling') },
-                    { key = 'J'    , cb = tcb('last_sibling') },
+                    { key = 'cd', cb = tcb('cd') },
+                    { key = 'u', cb = tcb('dir_up') },
+                    { key = 'K', cb = tcb('first_sibling') },
+                    { key = 'J', cb = tcb('last_sibling') },
                     { key = '<C-p>', cb = tcb('prev_sibling') },
                     { key = '<C-n>', cb = tcb('next_sibling') },
-                    { key = 'p'    , cb = tcb('parent_node') },
-                    { key = '.'    , cb = tcb('toggle_dotfiles') },
-                    { key = 'm'    , cb = tcb('toggle_file_info') },
-                    { key = 'r'    , cb = tcb('refresh') },
-                    { key = 'q'    , cb = tcb('close') },
-                    { key = '?'    , cb = tcb('toggle_help') },
-                    { key = 'O'    , cb = tcb('system_open') },
-                    { key = 'A'    , cb = tcb('create') },
-                    { key = 'D'    , cb = tcb('remove') },
-                    { key = 'R'    , cb = tcb('rename') },
+                    { key = 'p', cb = tcb('parent_node') },
+                    { key = '.', cb = tcb('toggle_dotfiles') },
+                    { key = 'm', cb = tcb('toggle_file_info') },
+                    { key = 'r', cb = tcb('refresh') },
+                    { key = 'q', cb = tcb('close') },
+                    { key = '?', cb = tcb('toggle_help') },
+                    { key = 'O', cb = tcb('system_open') },
+                    { key = 'A', cb = tcb('create') },
+                    { key = 'D', cb = tcb('remove') },
+                    { key = 'R', cb = tcb('rename') },
                     { key = '<C-r>', cb = tcb('full_rename') },
-                    { key = 'X'    , cb = tcb('cut') },
-                    { key = 'C'    , cb = tcb('copy') },
-                    { key = 'P'    , cb = tcb('paste') },
-                    { key = 'y'    , cb = tcb('copy_name') },
-                    { key = 'Y'    , cb = tcb('copy_absolute_path') },
+                    { key = 'X', cb = tcb('cut') },
+                    { key = 'C', cb = tcb('copy') },
+                    { key = 'P', cb = tcb('paste') },
+                    { key = 'y', cb = tcb('copy_name') },
+                    { key = 'Y', cb = tcb('copy_absolute_path') },
                 },
             },
         },
@@ -337,49 +378,51 @@ local function pkg_tree()
         filesystem_watchers = { enable = false },
         diagnostics = { enable = false },
         git = { enable = false },
-    }
-    m.nnore{'<leader>tt', ':NvimTreeToggle<CR>'}
-    m.nnore{'<leader>tT',
+    })
+    m.nnore({ '<leader>tt', ':NvimTreeToggle<CR>' })
+    m.nnore({
+        '<leader>tT',
         function()
             local tapi = require('nvim-tree.api')
             tapi.tree.close()
             tapi.tree.open(vim.fn.Expand('%', ':p:h'))
-        end}
+        end,
+    })
 end
 
 -- 缩进显示
 local function pkg_mini()
     local indentscope = require('mini.indentscope')
-    indentscope.setup{
+    indentscope.setup({
         draw = {
             delay = 0,
             animation = indentscope.gen_animation.none(),
         },
         symbol = '⁞',
-    }
+    })
 end
 
 -- 模糊查找
 local function pkg_telescope()
-    require('telescope').setup{
+    require('telescope').setup({
         defaults = {
             borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
             color_devicons = true,
             history = {
-                path = vim.env.DotVimCache  .. '/telescope_history',
+                path = vim.env.DotVimCache .. '/telescope_history',
             },
             mappings = {
                 i = {
                     ['<M-j>'] = 'move_selection_next',
                     ['<M-k>'] = 'move_selection_previous',
                 },
-            }
-        }
-    }
-    m.nnore{'<leader><leader>n', ':Telescope<Space>'}
-    m.nnore{'<leader>nf', ':Telescope find_files<CR>'}
-    m.nnore{'<leader>nl', ':Telescope live_grep<CR>'}
-    m.nnore{'<leader>nm', ':Telescope oldfiles<CR>'}
+            },
+        },
+    })
+    m.nnore({ '<leader><leader>n', ':Telescope<Space>' })
+    m.nnore({ '<leader>nf', ':Telescope find_files<CR>' })
+    m.nnore({ '<leader>nl', ':Telescope live_grep<CR>' })
+    m.nnore({ '<leader>nm', ':Telescope oldfiles<CR>' })
 end
 
 --------------------------------------------------------------------------------
@@ -387,25 +430,25 @@ end
 --------------------------------------------------------------------------------
 -- 列表视图
 local function pkg_trouble()
-    require('trouble').setup{
+    require('trouble').setup({
         mode = 'quickfix',
         icons = true,
         action_keys = {
-            jump_close = {'O'},
-            toggle_fold = {'zA', 'za', 'o'},
+            jump_close = { 'O' },
+            toggle_fold = { 'zA', 'za', 'o' },
         },
         auto_preview = false,
-    }
-    m.nnore{'<leader>vq', ':TroubleToggle quickfix<CR>'}
-    m.nnore{'<leader>vl', ':TroubleToggle loclist<CR>'}
+    })
+    m.nnore({ '<leader>vq', ':TroubleToggle quickfix<CR>' })
+    m.nnore({ '<leader>vl', ':TroubleToggle loclist<CR>' })
 end
 
 -- 颜色预览
 local function pkg_ccc()
-    m.nnore{'<leader>tc', ':CccHighlighterToggle<CR>'}
-    m.nnore{'<leader>lp', ':CccPick<CR>'}
+    m.nnore({ '<leader>tc', ':CccHighlighterToggle<CR>' })
+    m.nnore({ '<leader>lp', ':CccPick<CR>' })
     local ccc = require('ccc')
-    ccc.setup{
+    ccc.setup({
         disable_default_mappings = true,
         mappings = {
             ['<CR>'] = ccc.mapping.complete,
@@ -420,25 +463,27 @@ local function pkg_ccc()
             ['i'] = ccc.mapping.decrease5,
             ['H'] = ccc.mapping.decrease10,
         },
-    }
+    })
 end
 
 -- 自动括号
 local function pkg_autopairs()
-    require('nvim-autopairs').setup{
+    require('nvim-autopairs').setup({
         map_cr = false,
-    }
-    m.nnore{'<leader>tp',
+    })
+    m.nnore({
+        '<leader>tp',
         function()
             local ap = require('nvim-autopairs').state.disabled
             print('Auto pairs:', ap)
             require('nvim-autopairs').state.disabled = not ap
-        end}
+        end,
+    })
 end
 
 -- 批量注释
 local function pkg_comment()
-    require('Comment').setup{
+    require('Comment').setup({
         toggler = { line = 'gcc', block = 'gbc' },
         opleader = { line = 'gc', block = 'gb' },
         mappings = {
@@ -446,20 +491,34 @@ local function pkg_comment()
             extra = false,
             extended = false,
         },
-    }
+    })
     local comment = require('Comment.api')
-    m.nnore{'<leader>ci', function() comment.toggle.linewise.count(vim.v.count1) end}
-    m.nnore{'<leader>cl', function() comment.comment.linewise.count(vim.v.count1) end}
-    m.nnore{'<leader>cu',
+    m.nnore({
+        '<leader>ci',
+        function()
+            comment.toggle.linewise.count(vim.v.count1)
+        end,
+    })
+    m.nnore({
+        '<leader>cl',
+        function()
+            comment.comment.linewise.count(vim.v.count1)
+        end,
+    })
+    m.nnore({
+        '<leader>cu',
         function()
             -- ignore errors when uncommenting a non-commented line
-            pcall(function() comment.uncomment.linewise.count(vim.v.count1) end)
-        end}
+            pcall(function()
+                comment.uncomment.linewise.count(vim.v.count1)
+            end)
+        end,
+    })
 end
 
 -- 添加包围符
 local function pkg_surround()
-    require('nvim-surround').setup{
+    require('nvim-surround').setup({
         keymaps = {
             visual = 'vs',
             visual_line = 'vS',
@@ -470,15 +529,15 @@ local function pkg_surround()
             delete = 'ds',
             change = 'cs',
         },
-    }
-    m.nmap{'<leader>sw', 'ysiw'}
-    m.nmap{'<leader>sW', 'ySiw'}
+    })
+    m.nmap({ '<leader>sw', 'ysiw' })
+    m.nmap({ '<leader>sW', 'ySiw' })
 end
 
 -- 代码折叠
 local function pkg_ufo()
     local ufo = require('ufo')
-    ufo.setup{
+    ufo.setup({
         fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
             local res = {}
             local tag = '» '
@@ -501,20 +560,21 @@ local function pkg_ufo()
                             end
                         end
                     end
-                    table.insert(res, {tag, 'Comment'})
-                    table.insert(res, {txt, chunk[2]})
+                    table.insert(res, { tag, 'Comment' })
+                    table.insert(res, { txt, chunk[2] })
                 else
                     table.insert(res, chunk)
                 end
             end
-            table.insert(res, {('  %d '):format(endLnum - lnum), 'MoreMsg'})
+            table.insert(res, { ('  %d '):format(endLnum - lnum), 'MoreMsg' })
             return res
         end,
         provider_selector = function(bufnr, filetype, buftype)
             return ''
-        end
-    }
-    m.nnore{'<leader>tu',
+        end,
+    })
+    m.nnore({
+        '<leader>tu',
         function()
             local bufnr = vim.api.nvim_get_current_buf()
             if ufo.hasAttached(bufnr) then
@@ -522,50 +582,51 @@ local function pkg_ufo()
             else
                 ufo.attach(bufnr)
             end
-        end}
+        end,
+    })
 end
 
 -- 语法树
 local function pkg_treesitter()
-if use.nts then
-    if vim.fn.empty(use.xgit) == 0 then
-        for _, c in pairs(require('nvim-treesitter.parsers').get_parser_configs()) do
-            c.install_info.url = c.install_info.url:gsub('https://github.com', use.xgit)
+    if use.nts then
+        if vim.fn.empty(use.xgit) == 0 then
+            for _, c in pairs(require('nvim-treesitter.parsers').get_parser_configs()) do
+                c.install_info.url = c.install_info.url:gsub('https://github.com', use.xgit)
+            end
         end
-    end
-    local parser_dir = vim.env.DotVimCache .. '/.treesitter'
-    require('nvim-treesitter.configs').setup{
-        parser_install_dir = parser_dir,
-        --ensure_installed = { 'c', 'cpp', 'rust', 'vim', 'lua', 'python', 'markdown', 'markdown_inline', },
-        --auto_install = true,
-        highlight = {
-            enable = true,
-            additional_vim_regex_highlighting = false,
-        },
-        indent = {
-            enable = true,
-            disable = { 'python' },
-        },
-        incremental_selection = {
-            enable = true,
-            keymaps = {
-                init_selection = '<M-g>',
-                node_incremental = '<M-g>',
-                node_decremental = '<M-a>',
-                scope_incremental = '<M-v>',
+        local parser_dir = vim.env.DotVimCache .. '/.treesitter'
+        require('nvim-treesitter.configs').setup({
+            parser_install_dir = parser_dir,
+            --ensure_installed = { 'c', 'cpp', 'rust', 'vim', 'lua', 'python', 'markdown', 'markdown_inline', },
+            --auto_install = true,
+            highlight = {
+                enable = true,
+                additional_vim_regex_highlighting = false,
             },
-        },
-        rainbow = {
-            enable = true,
-            extended_mode = true,
-            max_file_lines = nil,
-        }
-    }
-    vim.opt.runtimepath:append(parser_dir)
-    m.nnore{'<leader>sh', ':TSBufToggle highlight<CR>'}
-    m.nnore{'<leader>si', ':TSBufToggle indent<CR>'}
-    m.nnore{'<leader>ss', ':TSBufToggle incremental_selection<CR>'}
-end
+            indent = {
+                enable = true,
+                disable = { 'python' },
+            },
+            incremental_selection = {
+                enable = true,
+                keymaps = {
+                    init_selection = '<M-g>',
+                    node_incremental = '<M-g>',
+                    node_decremental = '<M-a>',
+                    scope_incremental = '<M-v>',
+                },
+            },
+            rainbow = {
+                enable = true,
+                extended_mode = true,
+                max_file_lines = nil,
+            },
+        })
+        vim.opt.runtimepath:append(parser_dir)
+        m.nnore({ '<leader>sh', ':TSBufToggle highlight<CR>' })
+        m.nnore({ '<leader>si', ':TSBufToggle indent<CR>' })
+        m.nnore({ '<leader>ss', ':TSBufToggle incremental_selection<CR>' })
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -574,12 +635,13 @@ end
 local function pkg_peek()
     -- Dependency: sudo pacman -S webkit2gtk
     local peek = require('peek')
-    peek.setup{
+    peek.setup({
         auto_load = false,
         syntax = true,
         theme = 'light',
-    }
-    m.nnore{'<leader>vm',
+    })
+    m.nnore({
+        '<leader>vm',
         function()
             if peek.is_open() then
                 peek.close()
@@ -587,9 +649,9 @@ local function pkg_peek()
                 peek.open()
             end
             vim.notify('Markdown preview is ' .. (peek.is_open() and 'enabled' or 'disabled'))
-        end}
+        end,
+    })
 end
-
 
 local function pkg_setup()
     -- pkg_packer()
@@ -624,5 +686,5 @@ local function pkg_setup()
 end
 
 return {
-    setup = pkg_setup
+    setup = pkg_setup,
 }

@@ -98,6 +98,7 @@ if s:use.nlsp
     Plug 'williamboman/mason.nvim'
     Plug 'williamboman/mason-lspconfig.nvim'
     Plug 'neovim/nvim-lspconfig'
+    Plug 'jose-elias-alvarez/null-ls.nvim'
     Plug 'glepnir/lspsaga.nvim'
     Plug 'ray-x/lsp_signature.nvim'
     " Plug 'simrat39/rust-tools.nvim'

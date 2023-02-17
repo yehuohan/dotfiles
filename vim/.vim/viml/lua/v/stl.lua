@@ -4,7 +4,6 @@ local heirline = require('heirline')
 local conds = require('heirline.conditions')
 local utils = require('heirline.utils')
 
-
 -- Symbols
 local sym = {
     sep = { '(', ')' },
@@ -114,11 +113,11 @@ end
 -- Colors
 local function load_colors()
     return {
-        blank  = utils.get_highlight('Normal').bg,
-        red    = '#fa461e',
-        green  = '#b8bb26',
-        blue   = '#83a598',
-        gray   = '#665c54',
+        blank = utils.get_highlight('Normal').bg,
+        red = '#fa461e',
+        green = '#b8bb26',
+        blue = '#83a598',
+        gray = '#665c54',
         -- gruvbox dark
         areaA = '#ff8019',
         areaB = '#beaa82',
@@ -139,7 +138,7 @@ local function pad(color, component, fileds)
 end
 
 local function wrap(component)
-    return utils.surround({'', ''}, 'blank', component)
+    return utils.surround({ '', '' }, 'blank', component)
 end
 
 -- Statuslines
@@ -148,30 +147,28 @@ local ComTrunc = {
     provider = '%=%<',
     hl = { fg = 'gray', strikethrough = true },
 }
-local ComHint = pad(
-    function()
-        local mch = ctxs.mode()
-        if mch == 'V' or mch == 'S' or mch == '^V' or mch == '^S' then
-            return 'red'
-        elseif mch == 'I' or mch == 'T' then
-            return 'green'
-        elseif mch == 'R' then
-            return 'blue'
-        end
-        return 'areaB'
-    end,
-    {
-        provider = ctxs.hint,
-        hl = { fg = 'blank', bold = true },
-    }, {
-        condition = conds.is_active,
-    }
-)
+local ComHint = pad(function()
+    local mch = ctxs.mode()
+    if mch == 'V' or mch == 'S' or mch == '^V' or mch == '^S' then
+        return 'red'
+    elseif mch == 'I' or mch == 'T' then
+        return 'green'
+    elseif mch == 'R' then
+        return 'blue'
+    end
+    return 'areaB'
+end, {
+    provider = ctxs.hint,
+    hl = { fg = 'blank', bold = true },
+}, {
+    condition = conds.is_active,
+})
 local ComPath = pad('areaC', {
     {
         provider = ctxs.root_path,
         hl = { fg = 'textA', bold = true },
-    }, {
+    },
+    {
         provider = ctxs.relative_path,
         hl = { fg = 'textB' },
     },
@@ -179,18 +176,18 @@ local ComPath = pad('areaC', {
 local ComFile = pad('areaC', {
     provider = '%F',
     hl = function()
-        return { fg = conds.is_active() and 'textB' or 'textC'}
+        return { fg = conds.is_active() and 'textB' or 'textC' }
     end,
 })
 local ComType = pad('areaC', {
     provider = '%y',
     hl = function()
-        return { fg = conds.is_active() and 'textB' or 'textC'}
+        return { fg = conds.is_active() and 'textB' or 'textC' }
     end,
 })
 local ComAttr = pad('areaC', {
     provider = ctxs.attr,
-    hl = { fg = 'textB' }
+    hl = { fg = 'textB' },
 })
 local ComInfo = pad('areaB', {
     provider = ctxs.info,
@@ -200,34 +197,34 @@ local ComLite = pad('areaC', {
     provider = ctxs.lite,
     hl = { fg = 'textC' },
 })
-local ComCheck = pad('areaA',
-    {
-        provider = function(self)
-            return self:nonlocal('check')
-        end,
-        hl = { fg = 'blank', italic = true },
-    }, {
-        condition = function(self)
-            self.check = ctxs.check_lines()
-            return self.check ~= ''
-        end,
-    }
-)
+local ComCheck = pad('areaA', {
+    provider = function(self)
+        return self:nonlocal('check')
+    end,
+    hl = { fg = 'blank', italic = true },
+}, {
+    condition = function(self)
+        self.check = ctxs.check_lines()
+        return self.check ~= ''
+    end,
+})
 
 local SecLeft = {
     fallthrough = false,
     {
         condition = function()
             return conds.buffer_matches({
-                filetype = { 'vim%-plug', 'vista', 'NvimTree', 'nerdtree' }
+                filetype = { 'vim%-plug', 'vista', 'NvimTree', 'nerdtree' },
             })
         end,
         ComType,
-    }, {
+    },
+    {
         condition = function()
-            return conds.is_not_active() or conds.buffer_matches({
-                buftype = { 'help', 'terminal' }
-            })
+            return conds.is_not_active()
+                or conds.buffer_matches({
+                    buftype = { 'help', 'terminal' },
+                })
         end,
         ComFile,
     },
@@ -237,7 +234,9 @@ local SecRight = {
     fallthrough = false,
     {
         condition = conds.is_active,
-        ComCheck, ComAttr, ComInfo,
+        ComCheck,
+        ComAttr,
+        ComInfo,
     },
     ComLite,
 }
@@ -245,13 +244,13 @@ local SecRight = {
 local stls = wrap({ ComHint, SecLeft, ComTrunc, SecRight })
 
 -- Tablines
-local ComBuf = utils.surround({'', sym.sep[2]}, 'areaA', {
+local ComBuf = utils.surround({ '', sym.sep[2] }, 'areaA', {
     provider = sym.buf,
     hl = { fg = 'blank' },
 })
-local ComTab = utils.surround({sym.sep[1], ''}, 'areaA', {
+local ComTab = utils.surround({ sym.sep[1], '' }, 'areaA', {
     provider = sym.tab,
-    hl = { fg = 'blank' }
+    hl = { fg = 'blank' },
 })
 
 local function ele(e, fn)
@@ -269,17 +268,15 @@ local function ele(e, fn)
         txt = txt .. '+'
         fg = 'green'
     end
-    return pad(bg,
-        {
-            provider = txt,
-            hl = { fg = fg },
-        }, {
-            on_click = {
-                callback = fn,
-                minwid = e.index,
-            }
-        }
-    )
+    return pad(bg, {
+        provider = txt,
+        hl = { fg = fg },
+    }, {
+        on_click = {
+            callback = fn,
+            minwid = e.index,
+        },
+    })
 end
 
 local tabs = wrap({
@@ -311,19 +308,20 @@ local tabs = wrap({
 
 -- Winbars
 local bar_excluded_filetypes = { 'alpha', 'vim%-plug', 'vista', 'NvimTree', 'nerdtree' }
-local bar_excluded_buftypes = { 'nofile', 'terminal',  'quickfix' }
+local bar_excluded_buftypes = { 'nofile', 'terminal', 'quickfix' }
 local bars = wrap({
     fallthrough = false,
     {
         condition = function()
-            return vim.o.laststatus ~= 3 or conds.buffer_matches({
-                filetype = bar_excluded_filetypes,
-                buftype = bar_excluded_buftypes,
-            })
+            return vim.o.laststatus ~= 3
+                or conds.buffer_matches({
+                    filetype = bar_excluded_filetypes,
+                    buftype = bar_excluded_buftypes,
+                })
         end,
         init = function()
             vim.opt_local.winbar = nil
-        end
+        end,
     },
     ComFile,
 })
@@ -380,10 +378,10 @@ local function setup()
         end,
         group = 'PkgHeirline',
     })
-    m.nnore{'<leader>tk', toggle_check}
-    m.nnore{'<leader>ty', toggle_layout}
+    m.nnore({ '<leader>tk', toggle_check })
+    m.nnore({ '<leader>ty', toggle_layout })
 end
 
 return {
-    setup = setup
+    setup = setup,
 }

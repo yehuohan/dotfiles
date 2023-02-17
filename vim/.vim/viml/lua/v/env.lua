@@ -8,7 +8,7 @@ local env = {
     ['unix'] = {
         '~/ubin',
         '~/uapps',
-    }
+    },
 }
 
 local function env_init()

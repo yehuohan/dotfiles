@@ -5,7 +5,7 @@
 --~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 function IsLinux()
-    return  (vim.fn.has('unix') == 1)
+    return (vim.fn.has('unix') == 1)
         and (vim.fn.has('macunix') == 0)
         and (vim.fn.has('win32unix') == 0)
 end
@@ -22,10 +22,9 @@ function IsMac()
     return vim.fn.has('mac') == 1
 end
 
-
 local function setup(dotvim)
-    vim.env.DotVimDir   = dotvim
-    vim.env.DotVimMisc  = vim.env.DotVimDir .. '/misc'
+    vim.env.DotVimDir = dotvim
+    vim.env.DotVimMisc = vim.env.DotVimDir .. '/misc'
     vim.env.DotVimCache = vim.env.DotVimDir .. '/.cache'
 
     if IsWin() then
@@ -44,11 +43,11 @@ local function setup(dotvim)
 
     vim.o.encoding = 'utf-8'
     vim.g.mapleader = ' '
-    vim.keymap.set('n' , ';' , ':' , { noremap = true })
-    vim.keymap.set('v' , ';' , ':' , { noremap = true })
-    vim.keymap.set('n' , ':' , ';' , { noremap = true })
-    vim.keymap.set({'n', 'v'} , '<CR>' , '<CR>' , { remap = true })
-    vim.keymap.set({'n', 'v'} , '<Tab>' , '<Tab>' , { remap = true })
+    vim.keymap.set('n', ';', ':', { noremap = true })
+    vim.keymap.set('v', ';', ':', { noremap = true })
+    vim.keymap.set('n', ':', ';', { noremap = true })
+    vim.keymap.set({ 'n', 'v' }, '<CR>', '<CR>', { remap = true })
+    vim.keymap.set({ 'n', 'v' }, '<Tab>', '<Tab>', { remap = true })
 
     require('v.env').setup()
     require('v.use').setup()
@@ -58,5 +57,5 @@ local function setup(dotvim)
 end
 
 return {
-    setup = setup
+    setup = setup,
 }
