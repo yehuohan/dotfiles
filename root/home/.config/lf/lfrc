@@ -1,5 +1,5 @@
-
 map <a-j> page-down
 map <a-k> page-up
 map <a-n> half-down
 map <a-m> half-up
+map . set hidden!
