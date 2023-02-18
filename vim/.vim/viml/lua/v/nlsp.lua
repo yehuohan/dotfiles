@@ -66,8 +66,8 @@ local function __servers()
                 },
             })
         end,
-        ['sumneko_lua'] = function()
-            lspconfig.sumneko_lua.setup({
+        ['lua_ls'] = function()
+            lspconfig.lua_ls.setup({
                 capabilities = capabilities,
                 settings = {
                     Lua = {
