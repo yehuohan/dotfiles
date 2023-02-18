@@ -1,0 +1,20 @@
+# vim: ft=yaml
+# .clang-format
+
+BasedOnStyle: Chromium
+IndentWidth: 4
+ColumnLimit: 80
+
+---
+Language: Cpp
+# public等属性对齐偏移
+AccessModifierOffset: -4
+AlignConsecutiveMacros: Consecutive
+AlignEscapedNewlines: Left
+AllowAllParametersOfDeclarationOnNextLine: true
+# 类构造函数初始化列表对方式
+BreakConstructorInitializers: BeforeComma
+# 指针和引用的位置
+DerivePointerAlignment: false
+IndentPPDirectives: BeforeHash
+PointerAlignment: Left

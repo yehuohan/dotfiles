@@ -1,0 +1,11 @@
+{
+    "executionEnvironments": [
+        {
+            "root": ".",
+            "extraPaths": [
+                "src",
+                "../other_src"
+            ]
+        }
+    ]
+}

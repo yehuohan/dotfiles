@@ -1017,7 +1017,6 @@ let s:rs = {
             \ 'syntax match QC /\v^[^|]*\|[^|]*\| / conceal',
             \ 'call mkdir(fnamemodify(tempname(), ":h"), "p")',
             \ 'execAssembly',
-            \ 'copyConfig',
             \ 'lineToTop',
             \ 'clearUndo',
             \ ],
@@ -1034,17 +1033,6 @@ let s:rs = {
                     \ 'gcc -S -masm=intel -fverbose-asm %',
                     \ ],
                 \ 'cmd' : {sopt, arg -> execute('AsyncRun ' . arg)}
-                \ },
-            \ 'copyConfig' : {
-                \ 'dsr' : 'copy config file',
-                \ 'lst' : [
-                    \ '.ycm_extra_conf.py',
-                    \ '.clang-format',
-                    \ 'pyrightconfig.json',
-                    \ 'pyproject.toml',
-                    \ '.vimspector.json',
-                    \ ],
-                \ 'cmd' : {sopt, arg -> execute('edit ' . s:rs.fns.copyConfig(arg))},
                 \ },
             \ },
         \ 'cmd' : {sopt, arg -> has_key(s:rs.fns, arg) ? s:rs.fns[arg]() : execute(arg)},
@@ -1067,17 +1055,6 @@ function! s:rs.fns.clearUndo() dict
     setlocal undolevels=-1
     execute "normal! i\<Space>\<Esc>x"
     let &undolevels = l:ulbak
-endfunction
-" }}}
-
-" Function: s:rs.fns.copyConfig(filename) dict {{{ 复制配置文件到当前目录
-function! s:rs.fns.copyConfig(filename) dict
-    let l:srcfile = $DotVimMisc . '/' . a:filename
-    let l:dstfile = Expand('%', ':p:h') . '/' . a:filename
-    if !filereadable(l:dstfile)
-        call writefile(readfile(l:srcfile), l:dstfile)
-    endif
-    return l:dstfile
 endfunction
 " }}}
 " }}}

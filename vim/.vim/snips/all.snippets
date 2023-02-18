@@ -1,25 +1,53 @@
 
 #===============================================================================
+# configs 
+#===============================================================================
+snippet cfg-clang-format ".clang-format"
+`!v PkgLoadSnip('configs/.clang-format')`
+endsnippet
+
+snippet cfg-ycm ".ycm_extra_conf.py"
+`!v PkgLoadSnip('configs/.ycm_extra_conf.py')`
+endsnippet
+
+snippet cfg-sphinx "conf.py"
+`!v PkgLoadSnip('configs/sphinx-conf.py')`
+endsnippet
+
+snippet cfg-pyright "pyrightconfig.json"
+`!v PkgLoadSnip('configs/pyrightconfig.json')`
+endsnippet
+
+snippet cfg-black "pyproject.toml"
+`!v PkgLoadSnip('configs/pyproject.toml')`
+endsnippet
+
+snippet cfg-spector ".vimspector.json"
+`!v PkgLoadSnip('configs/.vimspector.json')`
+endsnippet
+
+
+#===============================================================================
 # build tools
 #===============================================================================
 snippet lt-mk "Makefile template"
-`!v PkgLoadSnip('Makefile')`
+`!v PkgLoadSnip('build/Makefile')`
 endsnippet
 
 snippet lt-cmk "CMake template"
-`!v PkgLoadSnip('CMakeLists.txt')`
+`!v PkgLoadSnip('build/CMakeLists.txt')`
 endsnippet
 
 snippet lt-cmsg "CMake cmsg macro"
-`!v PkgLoadSnip('CMsg.cmake')`
+`!v PkgLoadSnip('build/CMsg.cmake')`
 endsnippet
 
 snippet lt-qt "QMake for qt-console"
-`!v PkgLoadSnip('qcon.pro')`
+`!v PkgLoadSnip('build/qcon.pro')`
 endsnippet
 
 snippet lt-qtgui "QMake for qt-gui"
-`!v PkgLoadSnip('qgui.pro')`
+`!v PkgLoadSnip('build/qgui.pro')`
 endsnippet
 
 
