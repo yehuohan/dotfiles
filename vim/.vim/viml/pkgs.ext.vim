@@ -201,7 +201,7 @@ endfunction
 let g:startify_bookmarks = [
     \ {'c': '$DotVimDir/.init.vim'},
     \ {'d': '$NVimConfigDir/init.vim'},
-    \ {'o': '$DotVimCache/todo.md'} ]
+    \ {'o': '$DotVimLocal/todo.md'} ]
 let g:startify_lists = [
     \ {'type': 'bookmarks', 'header': ['   Bookmarks']},
     \ {'type': 'files',     'header': ['   Recent Files']},
@@ -211,8 +211,8 @@ let g:startify_custom_header = 'startify#pad(startify#fortune#cowsay(PkgTodo(), 
 nnoremap <leader>su :Startify<CR>
 
 function! PkgTodo()
-    if filereadable($DotVimCache.'/todo.md')
-        let l:todo = filter(readfile($DotVimCache.'/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
+    if filereadable($DotVimLocal.'/todo.md')
+        let l:todo = filter(readfile($DotVimLocal.'/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
         return empty(l:todo) ? '' : l:todo
     else
         return ''

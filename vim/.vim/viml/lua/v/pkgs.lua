@@ -164,9 +164,9 @@ local function pkg_alpha()
     local tmp = require('alpha.themes.startify')
     tmp.nvim_web_devicons.enabled = use.ui.patch
     tmp.section.header.val = function()
-        if vim.fn.filereadable(vim.env.DotVimCache .. '/todo.md') == 1 then
+        if vim.fn.filereadable(vim.env.DotVimLocal .. '/todo.md') == 1 then
             local todo = vim.fn.filter(
-                vim.fn.readfile(vim.env.DotVimCache .. '/todo.md'),
+                vim.fn.readfile(vim.env.DotVimLocal .. '/todo.md'),
                 'v:val !~ "\\m^[ \t]*$"'
             )
             if vim.tbl_isempty(todo) then
@@ -188,7 +188,7 @@ local function pkg_alpha()
                 val = {
                     tmp.file_button('$DotVimDir/.init.vim', 'c'),
                     tmp.file_button('$NVimConfigDir/init.vim', 'd'),
-                    tmp.file_button('$DotVimCache/todo.md', 'o'),
+                    tmp.file_button('$DotVimLocal/todo.md', 'o'),
                 },
             },
         },
@@ -409,7 +409,7 @@ local function pkg_telescope()
             borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
             color_devicons = true,
             history = {
-                path = vim.env.DotVimCache .. '/telescope_history',
+                path = vim.env.DotVimLocal .. '/telescope_history',
             },
             mappings = {
                 i = {
@@ -594,7 +594,7 @@ local function pkg_treesitter()
                 c.install_info.url = c.install_info.url:gsub('https://github.com', use.xgit)
             end
         end
-        local parser_dir = vim.env.DotVimCache .. '/.treesitter'
+        local parser_dir = vim.env.DotVimLocal .. '/.treesitter'
         require('nvim-treesitter.configs').setup({
             parser_install_dir = parser_dir,
             --ensure_installed = { 'c', 'cpp', 'rust', 'vim', 'lua', 'python', 'markdown', 'markdown_inline', },

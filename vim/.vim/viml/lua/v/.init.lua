@@ -25,7 +25,6 @@ end
 local function setup(dotvim)
     vim.env.DotVimDir = dotvim
     vim.env.DotVimMisc = vim.env.DotVimDir .. '/misc'
-    vim.env.DotVimCache = vim.env.DotVimDir .. '/.cache'
 
     if IsWin() then
         vim.g.python3_host_prog = vim.env.APPS_HOME .. '/Python/python.exe'

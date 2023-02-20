@@ -2,7 +2,6 @@ local fn = vim.fn
 
 local env = {
     ['local'] = {
-        vim.env.DotVimLocal,
         vim.env.DotVimLocal .. '/bin',
     },
     ['unix'] = {
@@ -28,7 +27,7 @@ local function env_init()
     vim.env.PATH = fn.join(env['local'], sep) .. sep .. vim.env.PATH
 
     -- Append {'path':[], 'vars':{}} from .env.json
-    local ex_file = vim.env.DotVimCache .. '/.env.json'
+    local ex_file = vim.env.DotVimLocal .. '/.env.json'
     if fn.filereadable(ex_file) == 1 then
         local ex = vim.json.decode(fn.join(fn.readfile(ex_file)))
         vim.env.PATH = vim.env.PATH .. sep .. fn.join(ex.path, sep)

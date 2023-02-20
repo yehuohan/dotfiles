@@ -8,7 +8,7 @@ local function __servers()
         url = use.xgit .. '/%s/releases/download/%s/%s'
     end
     require('mason').setup({
-        install_root_dir = vim.env.DotVimCache .. '/.mason',
+        install_root_dir = vim.env.DotVimLocal .. '/.mason',
         github = { download_url_template = url },
         ui = {
             check_outdated_packages_on_open = true,

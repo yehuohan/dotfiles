@@ -30,7 +30,6 @@ let $DotVimDir=resolve(expand('<sfile>:p:h'))
 let $DotVimVimL=$DotVimDir . '/viml'
 let $DotVimMisc=$DotVimDir . '/misc'
 let $DotVimLocal=$DotVimDir . '/local'
-let $DotVimCache=$DotVimDir . '/.cache'
 set rtp^=$DotVimDir
 
 if IsNVim()

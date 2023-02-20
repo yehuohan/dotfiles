@@ -1,6 +1,5 @@
 const s:env = {
     \ 'local': [
-        \ $DotVimLocal,
         \ $DotVimLocal . '/bin',
     \ ],
     \ 'unix': [
@@ -26,7 +25,7 @@ function! s:envInit()
     let $PATH = join(s:env.local, l:sep) . l:sep . $PATH
 
     " Append {'path':[], 'vars':{}} from .env.json
-    let l:ex_file = $DotVimCache . '/.env.json'
+    let l:ex_file = $DotVimLocal . '/.env.json'
     if filereadable(l:ex_file)
         let l:ex = json_decode(join(readfile(l:ex_file)))
         let $PATH .= l:sep . join(l:ex.path, l:sep)

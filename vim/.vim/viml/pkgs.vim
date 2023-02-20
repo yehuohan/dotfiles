@@ -279,7 +279,7 @@ nnoremap <leader>sp :PopSet popset<CR>
 " }}}
 
 " popc {{{
-let g:Popc_jsonPath = $DotVimCache
+let g:Popc_jsonPath = $DotVimLocal
 let g:Popc_useFloatingWin = 1
 let g:Popc_highlight = {
     \ 'text'     : 'Pmenu',
@@ -373,7 +373,7 @@ augroup END
 " LeaderF {{{ 模糊查找
 if s:use.has_py
 " autocmd VimEnter * call execute('autocmd! LeaderF_Mru')
-let g:Lf_CacheDirectory = $DotVimCache
+let g:Lf_CacheDirectory = $DotVimLocal
 let g:Lf_PreviewInPopup = 1
 let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0}
 let g:Lf_StlSeparator = s:use.ui.patch ? {'left': '', 'right': ''} : {'left': '', 'right': ''}
@@ -412,7 +412,7 @@ function! PkgSetupCoc(timer)
 endfunction
 call timer_start(700, 'PkgSetupCoc')
 let g:coc_config_home = $DotVimMisc
-let g:coc_data_home = $DotVimCache . '/.coc'
+let g:coc_data_home = $DotVimLocal . '/.coc'
 let g:coc_global_extensions = ['coc-marketplace']
 let g:coc_status_error_sign = '🗴'
 let g:coc_status_warning_sign = ''
@@ -602,7 +602,7 @@ endif
 " }}}
 
 " vimtex {{{ Latex
-let g:vimtex_cache_root = $DotVimCache . '/.vimtex'
+let g:vimtex_cache_root = $DotVimLocal . '/.vimtex'
 let g:vimtex_view_general_viewer = 'sioyek'
 let g:vimtex_complete_enabled = 1       " 使用vimtex#complete#omnifunc补全
 let g:vimtex_complete_close_braces = 1
