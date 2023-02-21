@@ -91,7 +91,7 @@ if IsNVim()
     Plug 'kevinhwang91/nvim-ufo'
     Plug 'kevinhwang91/promise-async'
 if s:use.nts
-    Plug 'nvim-treesitter/nvim-treesitter'
+    Plug 'nvim-treesitter/nvim-treesitter', { 'tag': 'v0.8.1' }
     Plug 'p00f/nvim-ts-rainbow'
 endif
 if s:use.nlsp

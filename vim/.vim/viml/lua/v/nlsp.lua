@@ -221,6 +221,13 @@ local function __completion()
         ['<M-m>'] = cmp.mapping.scroll_docs(-4),
         ['<M-f>'] = cmp.mapping.scroll_docs(4),
         ['<M-d>'] = cmp.mapping.scroll_docs(-4),
+        ['<M-y>'] = cmp.mapping(function()
+            cmp.complete({
+                config = {
+                    sources = { { name = 'cmdline_history' } },
+                },
+            })
+        end, { 'c' }),
         ['<Tab>'] = cmp.mapping(function()
             if cmp.visible() then
                 cmp.select_next_item()
@@ -308,7 +315,6 @@ local function __completion()
             { name = 'path' },
         }, {
             { name = 'cmdline' },
-            { name = 'cmdline_history', max_item_count = 5 },
         }),
     })
 end
@@ -351,6 +357,9 @@ local function __lsp()
         },
         lightbulb = {
             enable = true,
+        },
+        diagnostic = {
+            on_insert = false,
         },
         symbol_in_winbar = {
             enable = true,
