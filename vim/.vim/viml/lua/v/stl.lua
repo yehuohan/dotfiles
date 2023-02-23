@@ -72,24 +72,33 @@ function ctxs.relative_path()
     return vim.fn.substitute(filepath, pat, '', '')
 end
 
+local ctx_check_last = vim.fn.reltimefloat(vim.fn.reltime())
 function ctxs.check_lines()
     if vim.b.statusline_check_enabled == false then
-        return ''
+        return nil
     end
-    local res = ''
+    local check_this = vim.fn.reltimefloat(vim.fn.reltime())
+    if check_this - ctx_check_last < 1.0 then
+        return vim.b.statusline_check_res
+    end
+    ctx_check_last = check_this
+
+    local lst = {}
     local pos
     -- mixed indent
     pos = vim.fn.search([[\m\(\t \| \t\)]], 'nw')
     if pos ~= 0 then
-        res = 'M:' .. tostring(pos)
+        lst[#lst + 1] = 'M:' .. tostring(pos)
     end
     -- trailing whitespaces
     pos = vim.fn.search([[\m\s\+$]], 'nw')
     if pos ~= 0 then
-        if res ~= '' then
-            res = res .. '│'
-        end
-        res = res .. 'T:' .. tostring(pos)
+        lst[#lst + 1] = 'T:' .. tostring(pos)
+    end
+
+    local res = nil
+    if #lst > 0 then
+        vim.b.statusline_check_res = table.concat(lst, '│')
     end
     return res
 end
@@ -205,7 +214,7 @@ local ComCheck = pad('areaA', {
 }, {
     condition = function(self)
         self.check = ctxs.check_lines()
-        return self.check ~= ''
+        return self.check ~= nil
     end,
 })
 

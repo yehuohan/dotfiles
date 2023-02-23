@@ -623,9 +623,23 @@ local function pkg_treesitter()
             },
         })
         vim.opt.runtimepath:append(parser_dir)
-        m.nnore({ '<leader>sh', ':TSBufToggle highlight<CR>' })
-        m.nnore({ '<leader>si', ':TSBufToggle indent<CR>' })
-        m.nnore({ '<leader>ss', ':TSBufToggle incremental_selection<CR>' })
+        m.nnore({
+            '<leader>sh',
+            function()
+                vim.cmd([[TSBufToggle highlight]])
+                local buf = vim.api.nvim_get_current_buf()
+                local res = require('vim.treesitter.highlighter').active[buf]
+                vim.notify('Treesitter highlight is ' .. (res and 'enabled' or 'disabled'))
+            end,
+        })
+        m.nnore({
+            '<leader>si',
+            function()
+                vim.cmd([[TSBufToggle indent]])
+                local res = vim.bo.indentexpr == 'nvim_treesitter#indent()'
+                vim.notify('Treesitter indent is ' .. (res and 'enabled' or 'disabled'))
+            end,
+        })
     end
 end
 

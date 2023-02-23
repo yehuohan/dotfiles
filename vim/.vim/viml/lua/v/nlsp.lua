@@ -356,7 +356,7 @@ local function __lsp()
             },
         },
         lightbulb = {
-            enable = true,
+            enable = false,
         },
         diagnostic = {
             on_insert = false,
