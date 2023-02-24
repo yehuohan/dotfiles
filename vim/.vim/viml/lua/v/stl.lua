@@ -98,8 +98,9 @@ function ctxs.check_lines()
 
     local res = nil
     if #lst > 0 then
-        vim.b.statusline_check_res = table.concat(lst, '│')
+        res = table.concat(lst, '│')
     end
+    vim.b.statusline_check_res = res
     return res
 end
 

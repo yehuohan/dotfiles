@@ -188,6 +188,8 @@ augroup SetupCmd
     autocmd Filetype python                         setlocal foldmethod=indent foldignore=
     autocmd FileType txt,log                        setlocal foldmethod=manual
     autocmd BufReadPre * call s:onLargeFile()
+    autocmd BufLeave * if !&diff | let b:alter_view = winsaveview() | endif
+    autocmd BufEnter * if exists('b:alter_view') && !&diff | call winrestview(b:alter_view) | unlet! b:alter_view | endif
 if IsNVim()
     autocmd TextYankPost * silent! lua vim.highlight.on_yank{higroup='IncSearch', timeout=200}
 endif
@@ -426,12 +428,9 @@ function! WinMoveSpliter(dir, inc) range
 endfunction
 " }}}
 
-" tab切换(使用Popc的tab切换)
+" tab/buffer切换(使用Popc的tab切换)
 "nnoremap <M-u> gT
 "nnoremap <M-p> gt
-" buffer切换
-nnoremap <leader>bn :bnext<CR>
-nnoremap <leader>bp :bprevious<CR>
 nnoremap <leader>bl <C-^>
 " 分割窗口
 nnoremap <leader>ws <C-w>s
