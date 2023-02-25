@@ -17,6 +17,13 @@ AlignConsecutiveMacros: Consecutive
 AlignEscapedNewlines: Left
 AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: Empty
+AllowShortLoopsOnASingleLine: false
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 AlwaysBreakTemplateDeclarations: Yes
@@ -30,3 +37,10 @@ PenaltyBreakAssignment: 300
 PenaltyReturnTypeOnItsOwnLine: 300
 PointerAlignment: Left
 ReferenceAlignment: Left
+
+AttributeMacros:
+  - __ATTR
+  - __API
+# StatementAttributeLikeMacros:
+# StatementMacros:
+# WhitespaceSensitiveMacros:
