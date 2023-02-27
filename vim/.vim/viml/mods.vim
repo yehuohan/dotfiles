@@ -994,10 +994,10 @@ endfunction
 
 let FindWKill = function('execute', [s:fw.engine.sk])
 for key in s:fw_mappings_rg
-    execute printf('noremap <leader>%s :call FindW("%s")<CR>', key, key)
+    execute printf('noremap <leader>%s <Cmd>call FindW("%s")<CR>', key, key)
 endfor
 for key in s:fw_mappings_fuzzy
-    execute printf('noremap <leader>%s :call FindWFuzzy("%s")<CR>', key, key)
+    execute printf('noremap <leader>%s <Cmd>call FindWFuzzy("%s")<CR>', key, key)
 endfor
 nnoremap <leader>fk :call FindWKill()<CR>
 " }}}
