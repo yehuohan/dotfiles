@@ -1,15 +1,15 @@
-#===============================================================================
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # dirs
-#===============================================================================
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 DIR_ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 DIR_OUT := ./__VBuildOut
 DIR_OBJ := ${DIR_OUT}/obj
 DIR_INC := ./inc
 DIR_SRC := ./src
 
-#===============================================================================
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # settings
-#===============================================================================
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 define make_dir
 	$(foreach str, \
 		$(addprefix ${DIR_OBJ}/,${DIR_SRC}), \
@@ -51,9 +51,9 @@ CXXFLAGS   += $(addprefix -I, $(DIR_INC))
 CXXFLAGS   += ${PKGFLAGS}
 LDFLAGS    := ${LIBS}
 
-#===============================================================================
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # target
-#===============================================================================
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ${BIN}: ${OBJ}
 	${CC} $^ -o $@ ${CXXFLAGS} ${LDFLAGS}
 
@@ -86,8 +86,9 @@ NDK_PLATFORM := android-27
 
 
 .PHONY: all
-all:
+all: src src_android
 	cmake --build ${BUILD_DIR} ${BUILD_JOB}
+	cmake --install ${BUILD_DIR}
 
 .PHONY: src
 src:
@@ -95,8 +96,6 @@ src:
 		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
 		-DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
 		-S . -B ${BUILD_DIR}
-	cmake --build ${BUILD_DIR} ${BUILD_JOB}
-	cmake --install ${BUILD_DIR}
 
 .PHONY: src_android
 src_android:
@@ -108,12 +107,14 @@ src_android:
 		-DANDROID_ABI=${NDK_ABI} \
 		-DANDROID_PLATFORM=${NDK_PLATFORM} \
 		-S . -B ${BUILD_DIR}
-	cmake --build ${BUILD_DIR} ${BUILD_JOB}
-	cmake --install ${BUILD_DIR}
 
 .PHONY: cc
 cc: src
 	cp ${BUILD_DIR}/compile_commands.json ./
+
+.PHONY: clean
+clean:
+	-rm -r ${BUILD_DIR}
 
 .PHONY: tags
 tags:
@@ -122,3 +123,4 @@ tags:
 		-DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
 		-S . -B ${BUILD_DIR}
 	cmake --build ${BUILD_DIR} ${BUILD_JOB} --target tags
+	cmake --install ${BUILD_DIR}
