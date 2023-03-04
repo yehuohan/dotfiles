@@ -22,7 +22,7 @@ if IsNVim()
     Plug 'yehuohan/marks.nvim'
     Plug 'xiyaowong/nvim-cursorword'
     Plug 'booperlv/nvim-gomove'
-    Plug 'karb94/neoscroll.nvim'
+    Plug 'declancm/cinnamon.nvim'
     Plug 'gbrlsnchs/winpick.nvim'
     Plug 'sindrets/winshift.nvim'
 else
@@ -433,14 +433,10 @@ nnoremap <M-f> <Cmd>call coc#float#scroll(1)<CR>
 nnoremap <M-d> <Cmd>call coc#float#scroll(0)<CR>
 inoremap <M-f> <Cmd>call coc#float#scroll(1)<CR>
 inoremap <M-d> <Cmd>call coc#float#scroll(0)<CR>
-vnoremap <M-f> <Cmd>call coc#float#scroll(1)<CR>
-vnoremap <M-d> <Cmd>call coc#float#scroll(0)<CR>
 nnoremap <M-n> <Cmd>call coc#float#scroll(1)<CR>
 nnoremap <M-m> <Cmd>call coc#float#scroll(0)<CR>
 inoremap <M-n> <Cmd>call coc#float#scroll(1)<CR>
 inoremap <M-m> <Cmd>call coc#float#scroll(0)<CR>
-vnoremap <M-n> <Cmd>call coc#float#scroll(1)<CR>
-vnoremap <M-m> <Cmd>call coc#float#scroll(0)<CR>
 nmap         gd <Plug>(coc-definition)
 nmap         gD <Plug>(coc-declaration)
 nmap <leader>gd <Plug>(coc-definition)

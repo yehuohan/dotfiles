@@ -89,45 +89,39 @@ local function pkg_gomove()
 end
 
 -- 平滑滚动
-local function pkg_neoscroll()
-    local neoscroll = require('neoscroll')
-    neoscroll.setup({
-        mappings = {},
+local function pkg_cinnamon()
+    require('cinnamon').setup({
+        default_keymaps = false,
+        extra_keymaps = false,
+        extended_keymaps = false,
+        centered = true,
+        default_delay = 7,
         hide_cursor = false,
-        stop_eof = true,
     })
     m.nnore({
         '<M-n>',
         function()
             if use.coc and vim.fn['coc#float#has_scroll']() == 1 then
-                vim.fn['coc#float#scroll'](1)
+                return vim.fn['coc#float#scroll'](1)
             else
-                neoscroll.scroll(vim.wo.scroll, true, 200)
+                return [[<Cmd>lua Scroll('<C-d>', 1, 1)<CR>]]
             end
         end,
+        expr = true,
     })
     m.nnore({
         '<M-m>',
         function()
             if use.coc and vim.fn['coc#float#has_scroll']() == 1 then
-                vim.fn['coc#float#scroll'](0)
+                return vim.fn['coc#float#scroll'](0)
             else
-                neoscroll.scroll(-vim.wo.scroll, true, 200)
+                return [[<Cmd>lua Scroll('<C-u>', 1, 1)<CR>]]
             end
         end,
+        expr = true,
     })
-    m.nnore({
-        '<M-j>',
-        function()
-            neoscroll.scroll(vim.api.nvim_win_get_height(0), true, 300)
-        end,
-    })
-    m.nnore({
-        '<M-k>',
-        function()
-            neoscroll.scroll(-vim.api.nvim_win_get_height(0), true, 300)
-        end,
-    })
+    m.nore({ '<M-j>', [[<Cmd>lua Scroll('<C-f>', 1, 1)<CR>]] })
+    m.nore({ '<M-k>', [[<Cmd>lua Scroll('<C-b>', 1, 1)<CR>]] })
 end
 
 -- 窗口跳转
@@ -674,7 +668,7 @@ local function pkg_setup()
     pkg_marks()
     pkg_cursorword()
     pkg_gomove()
-    pkg_neoscroll()
+    pkg_cinnamon()
     pkg_winpick()
     pkg_winshift()
     -- Component
