@@ -640,26 +640,6 @@ end
 --------------------------------------------------------------------------------
 -- Utils
 --------------------------------------------------------------------------------
-local function pkg_peek()
-    -- Dependency: sudo pacman -S webkit2gtk
-    local peek = require('peek')
-    peek.setup({
-        auto_load = false,
-        syntax = true,
-        theme = 'light',
-    })
-    m.nnore({
-        '<leader>vm',
-        function()
-            if peek.is_open() then
-                peek.close()
-            else
-                peek.open()
-            end
-            vim.notify('Markdown preview is ' .. (peek.is_open() and 'enabled' or 'disabled'))
-        end,
-    })
-end
 
 local function pkg_setup()
     -- pkg_packer()
@@ -690,7 +670,6 @@ local function pkg_setup()
     pkg_ufo()
     pkg_treesitter()
     -- Utils
-    pkg_peek()
 end
 
 return {
