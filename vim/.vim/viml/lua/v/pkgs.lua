@@ -120,8 +120,8 @@ local function pkg_cinnamon()
         end,
         expr = true,
     })
-    m.nore({ '<M-j>', [[<Cmd>lua Scroll('<C-f>', 1, 1)<CR>]] })
-    m.nore({ '<M-k>', [[<Cmd>lua Scroll('<C-b>', 1, 1)<CR>]] })
+    m.nnore({ '<M-j>', [[<Cmd>lua Scroll('<C-f>', 1, 1)<CR>]] })
+    m.nnore({ '<M-k>', [[<Cmd>lua Scroll('<C-b>', 1, 1)<CR>]] })
 end
 
 -- 窗口跳转
