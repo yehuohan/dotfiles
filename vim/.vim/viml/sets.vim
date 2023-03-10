@@ -208,7 +208,7 @@ function! GuiSetFonts(inc)
     execute printf('set guifont=%s:h%d', escape(s:use.ui.font, ' '), s:use.ui.fontsize)
     execute printf('set guifontwide=%s:h%d', escape(s:use.ui.wide, ' '), s:use.ui.widesize)
 endfunction
-
+call GuiSetFonts(0)
 nnoremap <k0> :call GuiSetFonts(0)<CR>
 nnoremap <kPlus> :call GuiSetFonts(1)<CR>
 nnoremap <kMinus> :call GuiSetFonts(-1)<CR>
@@ -219,7 +219,6 @@ if IsVim() && has('gui_running')
     set lines=25
     set columns=90
     set linespace=0
-    call GuiSetFonts(0)
     if IsWin()
         nnoremap <leader>tf
             \ <Cmd>call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)<CR>
@@ -244,7 +243,6 @@ function! s:onUIEnter()
         GuiLinespace 0
         GuiTabline 0
         GuiPopupmenu 0
-        call GuiSetFonts(0)
         noremap <RightMouse> <Cmd>call GuiShowContextMenu()<CR>
         inoremap <RightMouse> <Cmd>call GuiShowContextMenu()<CR>
         nnoremap <leader>tf <Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
@@ -256,7 +254,6 @@ function! s:onUIEnter()
         let g:neovide_remember_window_size = v:true
         let g:neovide_cursor_antialiasing = v:false
         let g:neovide_cursor_vfx_mode = "railgun"
-        call GuiSetFonts(0)
         nnoremap <leader>tf <Cmd>let g:neovide_fullscreen=!g:neovide_fullscreen<CR>
     endif
 endfunction

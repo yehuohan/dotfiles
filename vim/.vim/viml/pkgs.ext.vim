@@ -222,6 +222,18 @@ endfunction
 " }}}
 
 " Coding {{{
+" coc {{{ 自动补全
+if s:use.coc
+function! PkgSetupCoc(timer)
+    call plug#load('coc.nvim')
+    for [sec, val] in items(Env_coc_settings())
+        call coc#config(sec, val)
+    endfor
+endfunction
+call timer_start(700, 'PkgSetupCoc')
+endif
+" }}}
+
 " colorizer {{{ 颜色预览
 let g:colorizer_nomap = 1
 let g:colorizer_startup = 0
@@ -269,4 +281,85 @@ let g:markdown_enable_folding = 0       " 感觉MarkDown折叠引起卡顿时，
 let g:markdown_enable_conceal = 0       " 在Vim中显示MarkDown预览
 let g:markdown_enable_input_abbreviations = 0
 " }}}
+" }}}
+
+" Plug {{{
+if !empty(s:use.xgit)
+    let g:plug_url_format = s:use.xgit . '/%s.git'
+endif
+call plug#begin($DotVimDir.'/bundle')  " 设置插件位置，且自动设置了syntax enable和filetype plugin indent on
+    " editor
+    Plug 'yehuohan/vim-easymotion'
+    Plug 'kshenoy/vim-signature'
+    Plug 'RRethy/vim-illuminate'
+    Plug 't9md/vim-textmanip'
+    Plug 'psliwka/vim-smoothie'
+    Plug 'tpope/vim-repeat'
+    Plug 'mg979/vim-visual-multi'
+    Plug 'markonm/traces.vim'
+    Plug 'junegunn/vim-easy-align'
+    Plug 'terryma/vim-expand-region'
+    Plug 'kana/vim-textobj-user'
+    Plug 'kana/vim-textobj-indent'
+    Plug 'glts/vim-textobj-comment'
+    Plug 'adriaanzon/vim-textobj-matchit'
+    Plug 'lucapette/vim-textobj-underscore'
+    Plug 'Konfekt/FastFold'
+    " component
+    Plug 'yehuohan/lightline.vim'
+    Plug 'mhinz/vim-startify'
+if s:use.ui.patch
+    Plug 'ryanoasis/vim-devicons'
+endif
+    Plug 'morhetz/gruvbox'
+    Plug 'rakr/vim-one'
+    Plug 'tanvirtin/monokai.nvim'
+    Plug 'luochen1990/rainbow'
+    Plug 'Yggdroot/indentLine'
+    Plug 'yehuohan/popc'
+    Plug 'yehuohan/popset'
+    Plug 'yehuohan/popc-floaterm'
+    Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTree']}
+    Plug 'itchyny/screensaver.vim'
+    Plug 'junegunn/fzf'
+    Plug 'junegunn/fzf.vim'
+if s:use.has_py
+    Plug 'Yggdroot/LeaderF', {'do': IsWin() ? './install.bat' : './install.sh'}
+endif
+    " coding
+    Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
+    Plug 'jiangmiao/auto-pairs'
+    Plug 'scrooloose/nerdcommenter'
+    Plug 'tpope/vim-surround'
+if s:use.coc
+    Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
+    Plug 'neoclide/jsonc.vim'
+endif
+if s:use.has_py
+    Plug 'SirVer/ultisnips'
+    Plug 'honza/vim-snippets'
+endif
+if s:use.ndap
+    Plug 'puremourning/vimspector'
+endif
+    Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
+    Plug 't9md/vim-quickhl'
+    Plug 'skywind3000/asyncrun.vim'
+    Plug 'voldikss/vim-floaterm'
+    Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
+    Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
+    Plug 'rust-lang/rust.vim'
+    Plug 'tikhomirov/vim-glsl'
+    Plug 'beyondmarc/hlsl.vim', {'for': 'hlsl'}
+    " utils
+    Plug 'gabrielelana/vim-markdown', {'for': 'markdown'}
+    Plug 'joker1007/vim-markdown-quote-syntax', {'for': 'markdown'}
+    Plug 'iamcco/markdown-preview.nvim', {'for': 'markdown', 'do': { -> mkdp#util#install()}}
+    Plug 'Rykka/riv.vim', {'for': 'rst'}
+    Plug 'Rykka/InstantRst', {'for': 'rst'}
+    Plug 'lervag/vimtex', {'for': 'tex'}
+    Plug 'tyru/open-browser.vim'
+    Plug 'voldikss/vim-translator'
+    Plug 'brglng/vim-im-select'
+call plug#end()
 " }}}

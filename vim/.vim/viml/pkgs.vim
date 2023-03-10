@@ -11,152 +11,6 @@ let g:loaded_netrwPlugin = 1
 "let g:loaded_matchparen = 1
 " }}}
 
-" Plug {{{
-if !empty(s:use.xgit)
-    let g:plug_url_format = s:use.xgit . '/%s.git'
-endif
-call plug#begin($DotVimDir.'/bundle')  " 设置插件位置，且自动设置了syntax enable和filetype plugin indent on
-    " editor
-if IsNVim()
-    Plug 'yehuohan/hop.nvim'
-    Plug 'yehuohan/marks.nvim'
-    Plug 'xiyaowong/nvim-cursorword'
-    Plug 'booperlv/nvim-gomove'
-    Plug 'declancm/cinnamon.nvim'
-    Plug 'gbrlsnchs/winpick.nvim'
-    Plug 'sindrets/winshift.nvim'
-else
-    Plug 'yehuohan/vim-easymotion'
-    Plug 'kshenoy/vim-signature'
-    Plug 'RRethy/vim-illuminate'
-    Plug 't9md/vim-textmanip'
-    Plug 'psliwka/vim-smoothie'
-    Plug 'tpope/vim-repeat'
-endif
-    Plug 'mg979/vim-visual-multi'
-    Plug 'markonm/traces.vim'
-    Plug 'junegunn/vim-easy-align'
-    Plug 'terryma/vim-expand-region'
-    Plug 'kana/vim-textobj-user'
-    Plug 'kana/vim-textobj-indent'
-    Plug 'glts/vim-textobj-comment'
-    Plug 'adriaanzon/vim-textobj-matchit'
-    Plug 'lucapette/vim-textobj-underscore'
-    Plug 'Konfekt/FastFold'
-    " component
-if IsNVim()
-    Plug 'rebelot/heirline.nvim'
-if s:use.ui.patch
-    Plug 'kyazdani42/nvim-web-devicons'
-endif
-    Plug 'goolord/alpha-nvim'
-    Plug 'rcarriga/nvim-notify'
-    Plug 'stevearc/dressing.nvim'
-    Plug 'ziontee113/icon-picker.nvim'
-    Plug 'lukas-reineke/virt-column.nvim'
-    Plug 'petertriho/nvim-scrollbar'
-    Plug 'kyazdani42/nvim-tree.lua'
-    Plug 'echasnovski/mini.nvim'
-    Plug 'nvim-lua/plenary.nvim'
-    Plug 'nvim-telescope/telescope.nvim'
-else
-    Plug 'yehuohan/lightline.vim'
-    Plug 'mhinz/vim-startify'
-endif
-if s:use.ui.patch
-    Plug 'ryanoasis/vim-devicons'
-endif
-    Plug 'morhetz/gruvbox'
-    Plug 'rakr/vim-one'
-    Plug 'tanvirtin/monokai.nvim'
-    Plug 'luochen1990/rainbow'
-    Plug 'Yggdroot/indentLine'
-    Plug 'yehuohan/popc'
-    Plug 'yehuohan/popset'
-    Plug 'yehuohan/popc-floaterm'
-    Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTree']}
-    Plug 'itchyny/screensaver.vim'
-    Plug 'junegunn/fzf'
-    Plug 'junegunn/fzf.vim'
-if s:use.has_py
-    Plug 'Yggdroot/LeaderF', {'do': IsWin() ? './install.bat' : './install.sh'}
-endif
-    " coding
-if IsNVim()
-    Plug 'folke/trouble.nvim'
-    Plug 'uga-rosa/ccc.nvim'
-    Plug 'windwp/nvim-autopairs'
-    Plug 'numToStr/Comment.nvim'
-    Plug 'kylechui/nvim-surround'
-    Plug 'kevinhwang91/nvim-ufo'
-    Plug 'kevinhwang91/promise-async'
-if s:use.nts
-    Plug 'nvim-treesitter/nvim-treesitter', { 'tag': 'v0.8.1' }
-    Plug 'p00f/nvim-ts-rainbow'
-endif
-if s:use.nlsp
-    Plug 'williamboman/mason.nvim'
-    Plug 'williamboman/mason-lspconfig.nvim'
-    Plug 'neovim/nvim-lspconfig'
-    Plug 'jose-elias-alvarez/null-ls.nvim'
-    Plug 'glepnir/lspsaga.nvim'
-    Plug 'ray-x/lsp_signature.nvim'
-    " Plug 'simrat39/rust-tools.nvim'
-    Plug 'hrsh7th/nvim-cmp'
-    Plug 'hrsh7th/cmp-nvim-lsp'
-    Plug 'hrsh7th/cmp-buffer'
-    Plug 'hrsh7th/cmp-nvim-lua'
-    Plug 'hrsh7th/cmp-calc'
-    Plug 'yehuohan/cmp-cmdline'
-    Plug 'yehuohan/cmp-path'
-    Plug 'yehuohan/cmp-im'
-    Plug 'yehuohan/cmp-im-zh'
-    Plug 'dmitmel/cmp-cmdline-history'
-    Plug 'quangnguyen30192/cmp-nvim-ultisnips'
-    Plug 'kdheepak/cmp-latex-symbols'
-    Plug 'f3fora/cmp-spell'
-endif
-else
-    Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
-    Plug 'jiangmiao/auto-pairs'
-    Plug 'scrooloose/nerdcommenter'
-    Plug 'tpope/vim-surround'
-endif
-if s:use.coc
-    Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
-    Plug 'neoclide/jsonc.vim'
-endif
-if s:use.has_py
-    Plug 'SirVer/ultisnips'
-    Plug 'honza/vim-snippets'
-endif
-if s:use.ndap
-    Plug 'puremourning/vimspector'
-endif
-    Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
-    Plug 't9md/vim-quickhl'
-    Plug 'skywind3000/asyncrun.vim'
-    Plug 'voldikss/vim-floaterm'
-    Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
-    Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
-    Plug 'rust-lang/rust.vim'
-    Plug 'tikhomirov/vim-glsl'
-    Plug 'beyondmarc/hlsl.vim', {'for': 'hlsl'}
-    " utils
-if IsVim()
-    Plug 'gabrielelana/vim-markdown', {'for': 'markdown'}
-    Plug 'joker1007/vim-markdown-quote-syntax', {'for': 'markdown'}
-endif
-    Plug 'iamcco/markdown-preview.nvim', {'for': 'markdown', 'do': { -> mkdp#util#install()}}
-    Plug 'Rykka/riv.vim', {'for': 'rst'}
-    Plug 'Rykka/InstantRst', {'for': 'rst'}
-    Plug 'lervag/vimtex', {'for': 'tex'}
-    Plug 'tyru/open-browser.vim'
-    Plug 'voldikss/vim-translator'
-    Plug 'brglng/vim-im-select'
-call plug#end()
-" }}}
-
 " Editor {{{
 " vim-visual-multi {{{ 多光标编辑
 " Tab: 切换cursor/extend模式
@@ -241,21 +95,10 @@ let g:gruvbox_contrast_dark = 'soft'    " 背景选项：dark, medium, soft
 let g:gruvbox_italic = 1
 let g:gruvbox_invert_selection = 0
 let g:one_allow_italics = 1
-try
-    set background=dark
-    colorscheme gruvbox
-catch /^Vim\%((\a\+)\)\=:E185/          " E185: 找不到主题
-    silent! colorscheme default
-endtry
 " }}}
 
 " rainbow {{{ 彩色括号
 let g:rainbow_active = 1
-let g:rainbow_conf = {
-    \ 'ctermfgs': g:rainbow_ctermfgs,
-    \ 'guifgs': g:rainbow_guifgs,
-    \ 'separately': { 'nerdtree': 0, 'cmake': 0 }
-    \ }                         " 使用gruvbox中的颜色设置
 nnoremap <leader>tr :RainbowToggle<CR>
 " }}}
 
@@ -402,13 +245,6 @@ endif
 " Coding {{{
 " coc {{{ 自动补全
 if s:use.coc
-function! PkgSetupCoc(timer)
-    call plug#load('coc.nvim')
-    for [sec, val] in items(Env_coc_settings())
-        call coc#config(sec, val)
-    endfor
-endfunction
-call timer_start(700, 'PkgSetupCoc')
 let g:coc_config_home = $DotVimMisc
 let g:coc_data_home = $DotVimLocal . '/.coc'
 let g:coc_global_extensions = ['coc-marketplace']
@@ -662,11 +498,14 @@ let g:ImSelectSetImCmd = {key -> ['im-select', key]}
 
 if IsNVim()
     set rtp^=$DotVimVimL
-lua << EOF
-    require('v.pkgs').setup()
-    require('v.stl').setup()
-    require('v.nlsp').setup()
-EOF
+    lua require('v.pkgs').setup()
 else
     source $DotVimVimL/pkgs.ext.vim
 endif
+
+try
+    set background=dark
+    colorscheme gruvbox
+catch /^Vim\%((\a\+)\)\=:E185/
+    silent! colorscheme default
+endtry

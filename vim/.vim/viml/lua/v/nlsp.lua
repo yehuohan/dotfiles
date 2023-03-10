@@ -434,16 +434,14 @@ local function __mappings()
     m.nnore({ '<leader>oh', '<Cmd>ClangdSwitchSourceHeader<CR>' })
 end
 
-local function setup()
-if use.nlsp then
-    __servers()
-    __hl()
-    __completion()
-    __lsp()
-    __mappings()
-end
-end
-
 return {
-    setup = setup,
+    setup = function()
+        if use.nlsp then
+            __servers()
+            __hl()
+            __completion()
+            __lsp()
+            __mappings()
+        end
+    end,
 }
