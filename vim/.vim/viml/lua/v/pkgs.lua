@@ -597,6 +597,34 @@ local function pkg_treesitter()
 end
 
 --------------------------------------------------------------------------------
+-- Utils
+--------------------------------------------------------------------------------
+local function pkg_peek()
+    -- Dependency: sudo pacman -S webkit2gtk
+    local peek = require('peek')
+    peek.setup({
+        auto_load = false,
+        syntax = true,
+        theme = 'light',
+        app = 'firefox',
+    })
+    m.nnore({
+        '<leader>vm',
+        function()
+            local s
+            if peek.is_open() then
+                s = 'disabled'
+                peek.close()
+            else
+                s = 'enabled'
+                peek.open()
+            end
+            vim.notify('Markdown preview is ' .. s)
+        end,
+    })
+end
+
+--------------------------------------------------------------------------------
 -- Lazy
 --------------------------------------------------------------------------------
 local function pkg_lazy()
@@ -770,7 +798,6 @@ local function pkg_lazy()
             'nvim-treesitter/nvim-treesitter',
             enabled = use.nts,
             config = pkg_treesitter,
-            tag = 'v0.8.1',
         },
         {
             'p00f/nvim-ts-rainbow',
@@ -834,9 +861,10 @@ local function pkg_lazy()
 
         -- Utils
         {
-            'iamcco/markdown-preview.nvim',
+            'toppair/peek.nvim',
             ft = 'markdown',
-            build = ':call mkdp#util#install()',
+            config = pkg_peek,
+            build = 'deno task --quiet build:fast',
         },
         { 'Rykka/riv.vim', ft = 'rst' },
         { 'Rykka/InstantRst', ft = 'rst' },
