@@ -180,22 +180,27 @@ let s:wsd = {
     \ 'fw': {'hl': 'IncSearch', 'str': []},
     \ }
 " FUNCTION: s:wsd.display() dict {{{ 设置结果显示
+function! s:wsd.setqf() dict
+    let l:mod = getline('.') =~# '\V\^|| [rg' ? 'fw' : 'rp'
+    if l:mod ==# 'fw'
+        setlocal modifiable
+        setlocal foldmethod=marker
+        setlocal foldmarker=[rg,[Finished
+        silent! normal! zO
+    endif
+    for str in self[l:mod].str
+        execute printf('syntax match %s %s', self[l:mod].hl, str)
+    endfor
+    syntax match wsdQuickfix /\m^|| / conceal
+    setlocal nonumber
+    setlocal norelativenumber
+    setlocal signcolumn=no
+endfunction
+
 function! s:wsd.display() dict
-    if &filetype ==# 'qf'
-        let l:mod = getline('.') =~# '\V\^|| [rg' ? 'fw' : 'rp'
-        if l:mod ==# 'fw'
-            setlocal modifiable
-            setlocal foldmethod=marker
-            setlocal foldmarker=[rg,[Finished
-            silent! normal! zO
-        endif
-        for str in self[l:mod].str
-            execute printf('syntax match %s %s', self[l:mod].hl, str)
-        endfor
-        syntax match wsdQuickfix /\m^|| / conceal
-        setlocal nonumber
-        setlocal norelativenumber
-        setlocal signcolumn=no
+    let l:winid = getqflist({'winid':0}).winid
+    if l:winid > 0
+        call win_execute(l:winid, 'call s:wsd.setqf()')
     endif
 endfunction
 " }}}
