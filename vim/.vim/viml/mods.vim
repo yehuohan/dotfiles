@@ -213,8 +213,8 @@ augroup ModWorkSpace
                                     \ if empty(s:ws.fw.path) |
                                     \   let s:ws.fw.path = s:ws.root |
                                     \ endif
-    autocmd User AsyncRunStop call s:wsd.display()
-    autocmd Filetype qf call s:wsd.display()
+    autocmd User AsyncRunStart call s:wsd.display()
+    autocmd BufWinEnter * call s:wsd.display()
 augroup END
 " }}}
 
