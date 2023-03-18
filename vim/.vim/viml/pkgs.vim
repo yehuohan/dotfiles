@@ -409,22 +409,6 @@ highlight default link FloatermBorder Constant
 " }}}
 
 " Utils {{{
-" MarkDown {{{
-let g:mkdp_auto_start = 0
-let g:mkdp_auto_close = 1
-let g:mkdp_refresh_slow = 0             " 即时预览MarkDown
-let g:mkdp_command_for_global = 0       " 只有markdown文件可以预览
-let g:mkdp_browser = 'firefox'
-nnoremap <leader>vm
-    \ <Cmd>
-    \ call Notify(get(b:, 'MarkdownPreviewToggleBool') ? 'Close markdown preview' : 'Open markdown preview') <Bar>
-    \ call mkdp#util#toggle_preview()<CR>
-nnoremap <leader>tb
-    \ <Cmd>
-    \ let g:mkdp_browser = (g:mkdp_browser ==# 'firefox') ? 'chrome' : 'firefox' <Bar>
-    \ call Notify('Browser: ' . g:mkdp_browser)<CR>
-" }}}
-
 " ReStructruedText {{{
 let g:riv_auto_format_table = 0
 let g:riv_i_tab_pum_next = 0

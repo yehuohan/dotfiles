@@ -280,6 +280,19 @@ let g:markdown_enable_spell_checking = 0
 let g:markdown_enable_folding = 0       " 感觉MarkDown折叠引起卡顿时，关闭此项
 let g:markdown_enable_conceal = 0       " 在Vim中显示MarkDown预览
 let g:markdown_enable_input_abbreviations = 0
+let g:mkdp_auto_start = 0
+let g:mkdp_auto_close = 1
+let g:mkdp_refresh_slow = 0             " 即时预览MarkDown
+let g:mkdp_command_for_global = 0       " 只有markdown文件可以预览
+let g:mkdp_browser = 'firefox'
+nnoremap <leader>vm
+    \ <Cmd>
+    \ call Notify(get(b:, 'MarkdownPreviewToggleBool') ? 'Close markdown preview' : 'Open markdown preview') <Bar>
+    \ call mkdp#util#toggle_preview()<CR>
+nnoremap <leader>tb
+    \ <Cmd>
+    \ let g:mkdp_browser = (g:mkdp_browser ==# 'firefox') ? 'chrome' : 'firefox' <Bar>
+    \ call Notify('Browser: ' . g:mkdp_browser)<CR>
 " }}}
 " }}}
 
