@@ -174,6 +174,23 @@ function! s:onLargeFile()
 endfunction
 " }}}
 
+" Function: s:onWinAlter(flag) {{{
+function! s:onWinAlter(flag)
+    if a:flag
+        " Alter enter
+        if exists('b:alter_view') && (!&diff) && (&filetype !=# 'qf')
+            call winrestview(b:alter_view)
+            unlet! b:alter_view
+        endif
+    else
+        " Alter leave
+        if (!&diff) && (&filetype!=# 'qf')
+            let b:alter_view = winsaveview()
+        endif
+    endif
+endfunction
+" }}}
+
 augroup SetupCmd
     autocmd!
     autocmd BufNewFile *                            set fileformat=unix
@@ -188,8 +205,8 @@ augroup SetupCmd
     autocmd Filetype python                         setlocal foldmethod=indent foldignore=
     autocmd FileType txt,log                        setlocal foldmethod=manual
     autocmd BufReadPre * call s:onLargeFile()
-    autocmd BufLeave * if !&diff | let b:alter_view = winsaveview() | endif
-    autocmd BufEnter * if exists('b:alter_view') && !&diff | call winrestview(b:alter_view) | unlet! b:alter_view | endif
+    autocmd BufEnter * call s:onWinAlter(v:true)
+    autocmd BufLeave * call s:onWinAlter(v:false)
 if IsNVim()
     autocmd TextYankPost * silent! lua vim.highlight.on_yank{higroup='IncSearch', timeout=200}
 endif
