@@ -45,13 +45,6 @@ local function pkg_cursorword()
     vim.g.cursorword_disable_at_startup = false
     vim.g.cursorword_min_width = 2
     vim.g.cursorword_max_width = 64
-    vim.api.nvim_create_augroup('PkgCursorword', { clear = true })
-    vim.api.nvim_create_autocmd('ColorScheme', {
-        callback = function()
-            vim.api.nvim_set_hl(0, 'CursorWord', { ctermbg = 60, bg = '#505060' })
-        end,
-        group = 'PkgCursorword',
-    })
     m.nnore({ '<leader>tg', ':CursorWordToggle<CR>' })
 end
 
@@ -625,13 +618,7 @@ end
 --------------------------------------------------------------------------------
 -- Lazy
 --------------------------------------------------------------------------------
-local function pkg_lazy()
-    local url = 'https://github.com'
-    if vim.fn.empty(use.xgit) == 0 then
-        url = use.xgit
-    end
-
-    local bundle = vim.env.DotVimDir .. '/bundle'
+local function clone_lazy(url, bundle)
     local lazygit = bundle .. '/lazy.nvim'
     if not vim.loop.fs_stat(lazygit) then
         vim.api.nvim_echo({ { 'Clone lazy.nvim ...', 'WarningMsg' } }, false, {})
@@ -645,7 +632,33 @@ local function pkg_lazy()
         })
     end
     vim.opt.rtp:prepend(lazygit)
+end
 
+local function pkg_lazy()
+    local url = 'https://github.com'
+    if vim.fn.empty(use.xgit) == 0 then
+        url = use.xgit
+    end
+    local bundle = vim.env.DotVimDir .. '/bundle'
+    clone_lazy(url, bundle)
+
+    local opts = {
+        root = bundle,
+        defaults = {
+            lazy = false,
+        },
+        lockfile = vim.env.DotVimLocal .. '/lazy/lazy-lock.json',
+        git = {
+            url_format = url .. '/%s.git',
+        },
+        install = {
+            missing = false,
+        },
+        readme = {
+            root = vim.env.DotVimLocal .. '/lazy/readme',
+        },
+        state = vim.env.DotVimLocal .. '/lazy/state.json',
+    }
     require('lazy').setup({
         { dir = vim.env.DotVimVimL },
 
@@ -870,22 +883,15 @@ local function pkg_lazy()
         { 'tyru/open-browser.vim' },
         { 'voldikss/vim-translator' },
         { 'brglng/vim-im-select' },
-    }, {
-        root = bundle,
-        defaults = {
-            lazy = false,
-        },
-        lockfile = vim.env.DotVimLocal .. '/lazy/lazy-lock.json',
-        git = {
-            url_format = url .. '/%s.git',
-        },
-        install = {
-            missing = false,
-        },
-        readme = {
-            root = vim.env.DotVimLocal .. '/lazy/readme',
-        },
-        state = vim.env.DotVimLocal .. '/lazy/state.json',
+    }, opts)
+
+    vim.api.nvim_create_augroup('PkgLazy', { clear = true })
+    vim.api.nvim_create_autocmd('ColorScheme', {
+        callback = function()
+            vim.api.nvim_set_hl(0, 'CursorWord', { ctermbg = 60, bg = '#505060' })
+            vim.api.nvim_set_hl(0, 'TranslatorBorder', { link = 'Constant' })
+        end,
+        group = 'PkgLazy',
     })
 end
 

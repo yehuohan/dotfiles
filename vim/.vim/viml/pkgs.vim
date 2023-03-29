@@ -404,7 +404,7 @@ tnoremap <M-m> <C-\><C-n>:FloatermUpdate --height=0.9 --width=0.9<CR>
 tnoremap <M-r> <C-\><C-n>:FloatermUpdate --position=topright<CR>
 tnoremap <M-c> <C-\><C-n>:FloatermUpdate --position=center<CR>
 nnoremap <leader>mf :FloatermNew lf<CR>
-highlight default link FloatermBorder Constant
+highlight! default link FloatermBorder Constant
 " }}}
 " }}}
 
@@ -468,7 +468,7 @@ vmap <Leader>tw <Plug>TranslateWV
 nnoremap <leader><leader>t :TranslateW<Space>
 vnoremap <leader><leader>t
     \ <Cmd>call feedkeys(':TranslateW ' . GetSelected(' '), 'n')<CR>
-highlight default link TranslatorBorder Constant
+highlight! default link TranslatorBorder Constant
 " }}}
 
 " im-select {{{ 输入法
