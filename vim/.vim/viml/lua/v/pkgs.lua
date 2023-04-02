@@ -597,7 +597,7 @@ local function pkg_peek()
         auto_load = false,
         syntax = true,
         theme = 'light',
-        app = 'firefox',
+        app = 'webview', -- 'firefox',
     })
     m.nnore({
         '<leader>vm',
