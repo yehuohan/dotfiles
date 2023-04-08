@@ -482,7 +482,7 @@ let g:ImSelectSetImCmd = {key -> ['im-select', key]}
 
 if IsNVim()
     set rtp^=$DotVimVimL
-    lua require('v.pkgs').setup()
+    lua require('v').setup()
 else
     source $DotVimVimL/pkgs.ext.vim
 endif
