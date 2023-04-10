@@ -343,10 +343,10 @@ nnoremap <leader><leader>S :sort fr //<Left>
 vnoremap <leader><leader>S
     \ :<C-u>sort fr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
 " lua测试代码
-nnoremap <leader><leader>u :lua vim.pretty_print()<Left>
+nnoremap <leader><leader>u :lua vim.print()<Left>
 nnoremap <leader><leader>U :lua print()<Left>
 vnoremap <leader><leader>u
-    \ <Cmd>call feedkeys(':lua vim.pretty_print(' . GetSelected('') . ')', 'n')<CR>
+    \ <Cmd>call feedkeys(':lua vim.print(' . GetSelected('') . ')', 'n')<CR>
 vnoremap <leader><leader>U
     \ <Cmd>call feedkeys(':lua print(' . GetSelected('') . ')', 'n')<CR>
 " 查看help文档

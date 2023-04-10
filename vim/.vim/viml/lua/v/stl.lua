@@ -16,9 +16,9 @@ if use.ui.patch then
     sym.col = ''
     sym.buf = ''
     sym.tab = ''
-    if vim.fn.IsLinux() == 1 then
+    if IsLinux() then
         sym.vos = ''
-    elseif vim.fn.IsMac() == 1 then
+    elseif IsMac() == 1 then
         sym.vos = ''
     else
         sym.vos = ''
@@ -323,60 +323,37 @@ local function tabs()
 end
 
 -- Winbars
-local function bars()
-    local conds = require('heirline.conditions')
-
+local function disabled_bars(args)
     local bar_excluded_filetypes = { 'alpha', 'vim%-plug', 'vista', 'NvimTree', 'nerdtree' }
     local bar_excluded_buftypes = { 'nofile', 'terminal', 'quickfix' }
+    local filetype = vim.tbl_contains(bar_excluded_filetypes, vim.bo[args.buf].filetype)
+    local buftype = vim.tbl_contains(bar_excluded_buftypes, vim.bo[args.buf].buftype)
+    return filetype or buftype or vim.o.laststatus ~= 3 or vim.api.nvim_win_get_config(0).relative ~= ''
+end
 
-    vim.api.nvim_create_autocmd('User', {
-        pattern = 'HeirlineInitWinbar',
-        callback = function(args)
-            local filetype = vim.tbl_contains(bar_excluded_filetypes, vim.bo[args.buf].filetype)
-            local buftype = vim.tbl_contains(bar_excluded_buftypes, vim.bo[args.buf].buftype)
-            if filetype or buftype or vim.api.nvim_win_get_config(0).relative ~= '' then
-                vim.opt_local.winbar = nil
-            end
-        end,
-    })
-
+local function bars()
     return wrap({
-        fallthrough = false,
         {
-            condition = function()
-                return vim.o.laststatus ~= 3
-                    or conds.buffer_matches({
-                        filetype = bar_excluded_filetypes,
-                        buftype = bar_excluded_buftypes,
-                    })
+            provider = function(self)
+                return self:nonlocal('fdir')
             end,
-            init = function()
-                vim.opt_local.winbar = nil
-            end,
+            hl = { fg = 'blue' },
         },
         {
-            {
-                provider = function(self)
-                    return self:nonlocal('fdir')
-                end,
-                hl = { fg = 'blue' },
-            },
-            {
-                provider = use.ui.patch and '  ' or ' > ',
-                hl = { fg = 'red' },
-            },
-            {
-                provider = function(self)
-                    return self:nonlocal('fname')
-                end,
-                hl = { fg = 'green' },
-            },
-            init = function(self)
-                local curfile = vim.fn.Expand('%')
-                self.fdir = vim.fn.fnamemodify(curfile, ':h')
-                self.fname = vim.fn.fnamemodify(curfile, ':t')
-            end,
+            provider = use.ui.patch and '  ' or ' > ',
+            hl = { fg = 'red' },
         },
+        {
+            provider = function(self)
+                return self:nonlocal('fname')
+            end,
+            hl = { fg = 'green' },
+        },
+        init = function(self)
+            local curfile = vim.fn.Expand('%')
+            self.fdir = vim.fn.fnamemodify(curfile, ':h')
+            self.fname = vim.fn.fnamemodify(curfile, ':t')
+        end,
     })
 end
 
@@ -413,8 +390,11 @@ local function setup()
         statusline = stls(),
         tabline = tabs(),
         winbar = bars(),
+        opts = {
+            disable_winbar_cb = disabled_bars,
+            colors = load_colors(),
+        },
     })
-    heirline.load_colors(load_colors())
     vim.api.nvim_create_augroup('PkgHeirline', { clear = true })
     vim.api.nvim_create_autocmd('ColorScheme', {
         callback = function()

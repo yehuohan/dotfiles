@@ -783,7 +783,7 @@ local function pkg_lazy()
         {
             'Yggdroot/LeaderF',
             enabled = use.has_py,
-            build = vim.fn.IsWin() == 1 and 'install.bat' or 'install.sh',
+            build = IsWin() and 'install.bat' or 'install.sh',
         },
 
         -- Coding
