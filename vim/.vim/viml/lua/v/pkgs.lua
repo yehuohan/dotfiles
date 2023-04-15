@@ -657,11 +657,15 @@ local function pkg_lazy()
         readme = {
             root = vim.env.DotVimLocal .. '/lazy/readme',
         },
+        performance = {
+            rtp = {
+                reset = false,
+                paths = { vim.env.DotVimVimL },
+            },
+        },
         state = vim.env.DotVimLocal .. '/lazy/state.json',
     }
     require('lazy').setup({
-        { dir = vim.env.DotVimVimL },
-
         -- Editor
         { 'yehuohan/hop.nvim', config = pkg_hop },
         { 'yehuohan/marks.nvim', config = pkg_marks },

@@ -5,6 +5,7 @@ let s:use = SvarUse()
 set synmaxcol=512                       " 最大高亮列数
 set number                              " 显示行号
 set relativenumber                      " 显示相对行号
+set numberwidth=1                       " 行号最小宽度
 set signcolumn=number                   " 共用number的区域用于显示sign
 set cursorline                          " 高亮当前行
 set cursorcolumn                        " 高亮当前列
