@@ -127,9 +127,9 @@ end
 --------------------------------------------------------------------------------
 -- 启动首页
 local function pkg_alpha()
-    local tmp = require('alpha.themes.startify')
-    tmp.nvim_web_devicons.enabled = use.ui.patch
-    tmp.section.header.val = function()
+    local tpl = require('alpha.themes.startify')
+    tpl.nvim_web_devicons.enabled = use.ui.patch
+    tpl.section.header.val = function()
         if vim.fn.filereadable(vim.env.DotVimLocal .. '/todo.md') == 1 then
             local todo = vim.fn.filter(
                 vim.fn.readfile(vim.env.DotVimLocal .. '/todo.md'),
@@ -143,7 +143,7 @@ local function pkg_alpha()
             return ''
         end
     end
-    tmp.section.bookmarks = {
+    tpl.section.bookmarks = {
         type = 'group',
         val = {
             { type = 'padding', val = 1 },
@@ -152,14 +152,14 @@ local function pkg_alpha()
             {
                 type = 'group',
                 val = {
-                    tmp.file_button('$DotVimDir/.init.vim', 'c'),
-                    tmp.file_button('$NVimConfigDir/init.vim', 'd'),
-                    tmp.file_button('$DotVimLocal/todo.md', 'o'),
+                    tpl.file_button('$DotVimDir/.init.vim', 'c'),
+                    tpl.file_button('$NVimConfigDir/init.vim', 'd'),
+                    tpl.file_button('$DotVimLocal/todo.md', 'o'),
                 },
             },
         },
     }
-    tmp.section.mru = {
+    tpl.section.mru = {
         type = 'group',
         val = {
             { type = 'padding', val = 1 },
@@ -168,13 +168,13 @@ local function pkg_alpha()
             {
                 type = 'group',
                 val = function()
-                    return { tmp.mru(0, false, 8) }
+                    return { tpl.mru(0, false, 8) }
                 end,
             },
         },
     }
-    tmp.section.bottom_buttons.val = {
-        tmp.button(
+    tpl.section.bottom_buttons.val = {
+        tpl.button(
             'q',
             'Quit',
             [[
@@ -185,17 +185,17 @@ local function pkg_alpha()
             endtry<CR>]]
         ),
     }
-    tmp.config.layout = {
+    tpl.config.layout = {
         { type = 'padding', val = 1 },
-        tmp.section.header,
+        tpl.section.header,
         { type = 'padding', val = 2 },
-        tmp.section.top_buttons,
-        tmp.section.bookmarks,
-        tmp.section.mru,
+        tpl.section.top_buttons,
+        tpl.section.bookmarks,
+        tpl.section.mru,
         { type = 'padding', val = 1 },
-        tmp.section.bottom_buttons,
+        tpl.section.bottom_buttons,
     }
-    require('alpha').setup(tmp.config)
+    require('alpha').setup(tpl.config)
     m.nnore({ '<leader>su', ':Alpha<CR>' })
 end
 
@@ -206,7 +206,6 @@ local function pkg_notify()
             return vim.api.nvim_get_option('columns') * 0.7
         end,
         minimum_width = 30,
-        top_down = false,
     })
     vim.notify = require('notify')
     m.nnore({
@@ -214,53 +213,6 @@ local function pkg_notify()
         function()
             vim.notify.dismiss()
         end,
-    })
-end
-
--- 滑动条
-local function pkg_scrollbar()
-    require('scrollbar').setup({
-        handle = {
-            text = '┃',
-            color = nil,
-            cterm = nil,
-            highlight = 'Normal',
-            hide_if_all_visible = true,
-        },
-        marks = {
-            Cursor = {
-                text = '⁞',
-                priority = 0,
-                color = nil,
-                cterm = nil,
-                highlight = 'Normal',
-            },
-        },
-        handlers = {
-            diagnostic = false,
-            gitsigns = false,
-            search = false,
-        },
-        excluded_buftypes = { 'nofile', 'terminal' },
-        excluded_filetypes = { 'prompt', 'TelescopePrompt', 'noice' },
-        autocmd = {
-            render = {
-                'BufWinEnter',
-                'TabEnter',
-                'TermEnter',
-                'WinEnter',
-                'CmdwinLeave',
-                'TextChanged',
-                'VimResized',
-                'WinScrolled',
-            },
-            clear = {
-                'BufWinLeave',
-                'TabLeave',
-                'TermLeave',
-                'WinLeave',
-            },
-        },
     })
 end
 
@@ -709,7 +661,7 @@ local function pkg_lazy()
         -- Component
         {
             'rebelot/heirline.nvim',
-            config = require('v.stl').setup,
+            config = require('v.nstl').setup,
             dependencies = { 'yehuohan/popc' },
         },
         { 'goolord/alpha-nvim', config = pkg_alpha },
@@ -743,7 +695,6 @@ local function pkg_lazy()
                 require('virt-column').setup({ char = '┊' })
             end,
         },
-        { 'petertriho/nvim-scrollbar', config = pkg_scrollbar },
         {
             'kyazdani42/nvim-tree.lua',
             config = pkg_tree,

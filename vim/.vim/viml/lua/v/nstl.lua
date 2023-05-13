@@ -328,7 +328,10 @@ local function disabled_bars(args)
     local bar_excluded_buftypes = { 'nofile', 'terminal', 'quickfix' }
     local filetype = vim.tbl_contains(bar_excluded_filetypes, vim.bo[args.buf].filetype)
     local buftype = vim.tbl_contains(bar_excluded_buftypes, vim.bo[args.buf].buftype)
-    return filetype or buftype or vim.o.laststatus ~= 3 or vim.api.nvim_win_get_config(0).relative ~= ''
+    return filetype
+        or buftype
+        or vim.o.laststatus ~= 3
+        or vim.api.nvim_win_get_config(0).relative ~= ''
 end
 
 local function bars()
