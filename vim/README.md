@@ -19,12 +19,6 @@ setup_link_msys64.bat
 
 ## `.vim`
 
-- `.vim/viml/env.vim`: 设置vim用的环境变量
-- `.vim/viml/use.vim`: 设置全局`使能`变量
-- `.vim/viml/pkgs.vim`: 插件加载和配置
-- `.vim/viml/mods.vim`: Workspace等模块功能配置
-- `.vim/viml/sets.vim`: 设置vim各种参数
-
 > *Workspace run project:*
 
 <div align="center">
@@ -86,17 +80,3 @@ neovide --remote-tcp=localhost:6666
 - [Bat](https://github.com/sharkdp/bat)
 - [Ctags](https://github.com/universal-ctags/ctags)
 - [Lf](https://github.com/gokcehan/lf)
-- [sioyek](https://github.com/ahrm/sioyek)
-
-
----
-
-## FAQ
-
-* Failed installations like vim plugins or coc extensions for permission operation on windows?
-
-Try with administrator.
-
-* Coc started normally but no completion?
-
-Check workspace folders.
