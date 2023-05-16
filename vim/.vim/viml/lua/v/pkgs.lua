@@ -628,10 +628,10 @@ local function pkg_lazy()
         {
             -- 窗口移动
             'sindrets/winshift.nvim',
-            config = function()
-                require('winshift').setup({})
+            init = function()
                 m.nnore({ '<C-m>', ':WinShift<CR>' })
             end,
+            opts = {},
         },
         { 'mg979/vim-visual-multi' },
         { 'markonm/traces.vim' },
@@ -669,12 +669,10 @@ local function pkg_lazy()
         {
             -- ui界面美化
             'stevearc/dressing.nvim',
-            config = function()
-                require('dressing').setup({
-                    input = { enabled = true },
-                    select = { enabled = true },
-                })
-            end,
+            opts = {
+                input = { enabled = true },
+                select = { enabled = true },
+            },
         },
         {
             -- 字体图标
@@ -683,17 +681,13 @@ local function pkg_lazy()
                 m.inore({ '<M-w>', '<Cmd>IconPickerInsert<CR>' })
                 m.nnore({ '<leader><leader>i', ':IconPickerInsert<Space>' })
             end,
-            config = function()
-                require('icon-picker').setup({ disable_legacy_commands = true })
-            end,
+            opts = { disable_legacy_commands = true },
             cmd = 'IconPickerInsert',
         },
         {
             -- 刻度线
             'lukas-reineke/virt-column.nvim',
-            config = function()
-                require('virt-column').setup({ char = '┊' })
-            end,
+            opts = { char = '┊' },
         },
         {
             'kyazdani42/nvim-tree.lua',
