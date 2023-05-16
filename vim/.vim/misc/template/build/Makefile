@@ -102,10 +102,12 @@ src_android:
 	cmake -G ${BUILD_GEN} -Wno-dev \
 		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
 		-DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
-		-DCMAKE_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake \
 		-DANDROID_NDK=${NDK_ROOT} \
 		-DANDROID_ABI=${NDK_ABI} \
 		-DANDROID_PLATFORM=${NDK_PLATFORM} \
+		-DANDROID_TOOLCHAIN=clang \
+		-DANDROID_STL=c++_static \
+		-DCMAKE_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake \
 		-S . -B ${BUILD_DIR}
 
 .PHONY: cc
