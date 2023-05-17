@@ -206,6 +206,7 @@ local function pkg_notify()
             return vim.api.nvim_get_option('columns') * 0.7
         end,
         minimum_width = 30,
+        top_down = false,
     })
     vim.notify = require('notify')
     m.nnore({
@@ -812,6 +813,23 @@ local function pkg_lazy()
         { 'liuchengxu/vista.vim', cmd = 'Vista' },
         { 't9md/vim-quickhl' },
         { 'skywind3000/asyncrun.vim' },
+        {
+            'stevearc/overseer.nvim',
+            opts = {
+                dap = true,
+                task_list = {
+                    direction = 'right',
+                    bindings = {
+                        ['i'] = 'Edit',
+                        ['p'] = 'TogglePreview',
+                        ['o'] = 'OpenQuickFix',
+                        ['O'] = function()
+                            require('overseer.task_list.sidebar').get():run_action('restart')
+                        end,
+                    },
+                },
+            },
+        },
         { 'voldikss/vim-floaterm' },
         { 'tpope/vim-fugitive', cmd = { 'G', 'Git' } },
         { 'bfrg/vim-cpp-modern', ft = { 'c', 'cpp' } },
