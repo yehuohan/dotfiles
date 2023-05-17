@@ -25,5 +25,6 @@ end
 return {
     setup = function()
         require('v.pkgs').setup()
+        require('v.task').setup()
     end,
 }
