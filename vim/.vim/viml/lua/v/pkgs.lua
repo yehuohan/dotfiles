@@ -826,6 +826,9 @@ local function pkg_lazy()
                         ['O'] = function()
                             require('overseer.task_list.sidebar').get():run_action('restart')
                         end,
+                        ['K'] = function()
+                            require('overseer.task_list.sidebar').get():run_action('stop')
+                        end,
                     },
                 },
             },

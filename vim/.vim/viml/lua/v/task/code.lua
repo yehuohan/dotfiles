@@ -3,10 +3,11 @@ local m = require('v.maps')
 local fn = vim.fn
 
 -- Single file tasks to build & execute
--- @barg Build command arguments
+-- @garg Generate arguments
+-- @barg Build arguments
+-- @earg Execution arguments
 -- @src Source file
 -- @out Output file
--- @earg Execution arguments
 local singles = {
     cmd = {
         c = 'gcc -g {barg} {src} -o "{out}" && "./{out}" {earg}',
@@ -16,19 +17,17 @@ local singles = {
     },
     emf = {},
 }
-local replace_default = {
-    __index = function()
-        return ''
-    end,
-}
 
 local function task_file(config)
-    local ft = vim.o.filetype
-    if not singles.cmd[ft] then
+    local ft = config.type or vim.o.filetype
+    if (not singles.cmd[ft]) or ('dosbatch' == ft and IsWin()) then
         error('Code task doesn\'t support "' .. ft .. '"', task.Err.Code)
     end
+    config.type = ft
 
-    local rep = setmetatable({}, replace_default)
+    local rep = {}
+    rep.barg = config.barg or ''
+    rep.earg = config.earg or ''
     rep.src = '"' .. fn.fnamemodify(config.file, ':t') .. '"'
     rep.out = fn.fnamemodify(config.file, ':t:r')
     local cmd = singles.cmd[ft]:gsub('{(%w+)}', rep)
@@ -49,21 +48,26 @@ local function code(keys)
     }
     config.cwd = fn.fnamemodify(config.file, ':h')
 
-    local opts = task_file(config)
-    opts.cwd = fn.fnameescape(config.cwd)
-    opts.components = {
-        {
-            'on_output_quickfix',
-            open = true,
-            -- errorformat = '',
-        },
-        'display_duration',
-        'on_output_summarize',
-        'on_exit_set_status',
-        'on_complete_dispose',
-        -- 'unique',
-    }
-    task.run(opts)
+    local tfn = task_file
+    local ok, opts = pcall(tfn, config)
+    if ok then
+        opts.cwd = fn.fnameescape(config.cwd)
+        opts.components = {
+            {
+                'on_output_quickfix',
+                open = true,
+                -- errorformat = '',
+            },
+            'display_duration',
+            'on_output_summarize',
+            'on_exit_set_status',
+            'on_complete_dispose',
+            -- 'unique',
+        }
+        task.run(opts)
+    else
+        vim.notify(tostring(opts))
+    end
 end
 
 local function setup()
