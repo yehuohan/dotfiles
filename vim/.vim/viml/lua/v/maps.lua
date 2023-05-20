@@ -14,14 +14,14 @@ local function setopts(opts, defaults)
     return map_opts
 end
 
---------------------------------------------------------------------------------
 -- map functions
--- - 'map' and 'mnore' works at normal and visual mode by default here
--- - example:
---  local m = require('v.maps')
---  m.nore{'<leader>', ':echo b:<CR>', silent = true, buffer = 9}
---  m.add({'n', 'v'}, {'<leader>', ':echo b:<CR>', buffer = true})
---------------------------------------------------------------------------------
+-- * 'map' and 'mnore' works at normal and visual mode by default here
+-- * example:
+--      local m = require('v.maps')
+--      m.nore{'<leader>', ':echo b:<CR>', silent = true, buffer = 9}
+--      m.add({'n', 'v'}, {'<leader>', ':echo b:<CR>', buffer = true})
+-- @mods Mapping mode
+-- @opts Mapping option with {lhs, rhs, **kwargs}
 function M.map(opts)   setmap({'n', 'v'}, opts[1], opts[2], setopts(opts, { remap = true })) end
 function M.nmap(opts)  setmap('n', opts[1], opts[2], setopts(opts, { remap = true })) end
 function M.vmap(opts)  setmap('v', opts[1], opts[2], setopts(opts, { remap = true })) end
