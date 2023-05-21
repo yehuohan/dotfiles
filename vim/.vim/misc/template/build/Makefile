@@ -14,6 +14,7 @@ define make_dir
 	$(foreach str, \
 		$(addprefix ${DIR_OBJ}/,${DIR_SRC}), \
 		$(shell mkdir -p ${str}))
+	$(shell mkdir -p ${DIR_OUT})
 endef
 $(call make_dir)
 
