@@ -1,18 +1,21 @@
 local M = {}
 
--- Task error type
-M.Err = {
-    Init = 1,
-    Code = 2,
-    Find = 3,
-}
-
 -- Task workspace config
 M.wsc = {
     root = '',
     code = {},
     find = {},
 }
+
+-- Repleace command's placeholders
+function M.replace(cmd, rep)
+    return string.gsub(cmd, '{(%w+)}', rep)
+end
+
+-- Sequence commands
+function M.sequence(cmdlist)
+    return table.concat(cmdlist, ' && ')
+end
 
 function M.run(opts)
     local overseer = require('overseer')
