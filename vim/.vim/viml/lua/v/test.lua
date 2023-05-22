@@ -1,4 +1,4 @@
--- nvim -l test.lua
+---@usage nvim -l test.lua
 
 local dir_this = vim.fn.getcwd()
 local dir_base = vim.fs.dirname(vim.fs.dirname(dir_this))
@@ -89,7 +89,7 @@ function tst.new_config()
     EQ({ cmd = 'gcc', file = 'test.c', args = { '-g', '-o' } }, cfg)
     NEQ({ cmd = 'gcc', file = 'test.c', args = { 'g', 'o' } }, cfg)
 
-    -- reinit config
+    -- Reinit config
     cfg:reinit()
     EQ({ file = 'test.cpp' }, cfg)
     EQ(nil, rawget(getmetatable(getmetatable(cfg)), 'type'))
