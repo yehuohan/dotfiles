@@ -10,17 +10,16 @@ local wsc_initialization = {
     garg = '',
     barg = '',
     earg = '',
-    deploy = 'run', -- 'build', 'run', 'clean', 'test'
-    -- lowest = false,
+    stage = 'run', -- 'build', 'run', 'clean', 'test'
 }
 
 -- Command placeholders
--- @garg Generate arguments
--- @gtar Generator target
--- @barg Build arguments
--- @bsrc Build source file
--- @bout Build output file
--- @earg Execution arguments
+-- @var garg Generate arguments
+-- @var gtar Generator target
+-- @var barg Build arguments
+-- @var bsrc Build source file
+-- @var bout Build output file
+-- @var earg Execution arguments
 local singles = {}
 local projects = {}
 
@@ -43,7 +42,7 @@ projects = {
     cargo = {},
     sphinx = {},
     _msvc = 'vcvars64.bat',
-    _exec = '"./{bout} {earg}',
+    _exec = '"./{bout}" {earg}',
 }
 
 -- Task functions
@@ -69,7 +68,7 @@ function task.file(cfg)
 end
 
 function task.make(cfg)
-    if cfg.deploy == 'clean' then
+    if cfg.stage == 'clean' then
         cfg.barg = 'clean'
     end
 
@@ -87,7 +86,15 @@ function task.make(cfg)
     }
 end
 
-function task.cmake(cfg) end
+function task.cmake(cfg)
+    local vdir = '__VBuildOut'
+    if cfg.stage == 'clean' then
+        error(string.format('%s was removed', vdir ), 0)
+    end
+
+    -- vim.fn.mkdir(cfg.wdir .. '/' .. vdir, 'p')
+    -- local rep = {}
+end
 
 function task.cargo(cfg) end
 
@@ -95,22 +102,48 @@ function task.sphinx(cfg) end
 
 function task.nvim(cfg) end
 
-task._ = {
-    l = task.nvim,
-    f = task.file,
-    m = task.make,
-    u = task.cmake,
-    n = task.cmake,
-    j = task.cmake,
-    a = task.cargo,
-    h = task.sphinx,
-}
+setmetatable(task, {
+    __call = function(self, cfg)
+        if not self._ then
+            self._ = {
+                l = { fn = task.nvim },
+                f = { fn = task.file },
+                m = { fn = task.make, pat = 'Makefile' },
+                u = { fn = task.cmake, pat = 'CMakeLists' },
+                n = { fn = task.cmake, pat = 'CMakeLists' },
+                j = { fn = task.cmake, pat = 'CMakeLists' },
+                a = { fn = task.cargo, pat = 'Cargo.toml' },
+                h = {
+                    fn = task.sphinx,
+                    pat = IsWin() and 'make.bat' or 'Makefile',
+                },
+            }
+        end
+
+        local t = self._[cfg.key]
+        local curfile = vim.api.nvim_buf_get_name(0)
+        if t.pat then
+            local files = vim.fs.find(function(name)
+                local re = vim.regex('\\c' .. t.pat)
+                return re:match_str(name)
+            end, {
+                upward = true,
+                path = vim.fs.dirname(curfile),
+            })
+            if #files == 0 then
+                error(string.format('None of %s was found!', t.pat), 0)
+            end
+            cfg.file = files[1]
+        else
+            cfg.file = curfile
+        end
+        cfg.wdir = vim.fn.fnamemodify(cfg.file, ':h')
+        return t.fn(cfg)
+    end,
+})
 
 local function run(cfg)
-    cfg.file = vim.api.nvim_buf_get_name(0)
-    cfg.wdir = vim.fn.fnamemodify(cfg.file, ':h')
-
-    local opts = task._[cfg.key](cfg)
+    local opts = task(cfg)
     opts.cwd = cfg.wdir
     opts.components = {
         {
@@ -154,9 +187,9 @@ local function setup()
     __wsc.code = wsc
 
     local mappings = {
-        'rl',
-        'Rp', 'Rm', 'Ru', 'Rn', 'Rj', 'Ra', 'Rh', 'Rf',
-        'rp', 'rm', 'ru', 'rn', 'rj', 'ra', 'rh', 'rf',
+        'rl' ,
+        'Rp' , 'Rm' , 'Ru' , 'Rn' , 'Rj' , 'Ra' , 'Rh' , 'Rf',
+        'rp' , 'rm' , 'ru' , 'rn' , 'rj' , 'ra' , 'rh' , 'rf',
         'rcp', 'rcm', 'rcu', 'rcn', 'rcj', 'rca', 'rch',
         'rbp', 'rbm', 'rbu', 'rbn', 'rbj', 'rba', 'rbh',
     }

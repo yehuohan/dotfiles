@@ -816,7 +816,7 @@ local function pkg_lazy()
         {
             'stevearc/overseer.nvim',
             opts = {
-                dap = true,
+                dap = false,
                 task_list = {
                     direction = 'right',
                     bindings = {
