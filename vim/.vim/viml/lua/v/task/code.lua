@@ -102,6 +102,19 @@ function task.sphinx(cfg) end
 
 function task.nvim(cfg) end
 
+local function up_iter(pat)
+    local names = function(name)
+        local re = vim.regex('\\c' .. pat)
+        return re:match_str(name)
+    end
+    return vim.fs.find(names, {
+        upward = true,
+        type = 'file',
+        path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
+        limit = math.huge,
+    })
+end
+
 setmetatable(task, {
     __call = function(self, cfg)
         if not self._ then
@@ -113,29 +126,19 @@ setmetatable(task, {
                 n = { fn = task.cmake, pat = 'CMakeLists' },
                 j = { fn = task.cmake, pat = 'CMakeLists' },
                 a = { fn = task.cargo, pat = 'Cargo.toml' },
-                h = {
-                    fn = task.sphinx,
-                    pat = IsWin() and 'make.bat' or 'Makefile',
-                },
+                h = { fn = task.sphinx, pat = IsWin() and 'make.bat' or 'Makefile' },
             }
         end
 
         local t = self._[cfg.key]
-        local curfile = vim.api.nvim_buf_get_name(0)
         if t.pat then
-            local files = vim.fs.find(function(name)
-                local re = vim.regex('\\c' .. t.pat)
-                return re:match_str(name)
-            end, {
-                upward = true,
-                path = vim.fs.dirname(curfile),
-            })
+            local files = up_iter(t.pat)
             if #files == 0 then
                 error(string.format('None of %s was found!', t.pat), 0)
             end
-            cfg.file = files[1]
+            cfg.file = files[#files]
         else
-            cfg.file = curfile
+            cfg.file = vim.api.nvim_buf_get_name(0)
         end
         cfg.wdir = vim.fn.fnamemodify(cfg.file, ':h')
         return t.fn(cfg)
