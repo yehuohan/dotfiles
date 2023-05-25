@@ -321,6 +321,7 @@ local function __completion()
 end
 
 local function __lsp()
+    vim.lsp.set_log_level(vim.lsp.log_levels.OFF)
     if use.ui.patch then
         for name, icon in pairs({
             DiagnosticSignError = '🗴',

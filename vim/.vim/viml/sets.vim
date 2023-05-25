@@ -336,7 +336,7 @@ cnoremap <M-i> <C-Left>
 cnoremap <M-u> <C-b>
 cnoremap <M-p> <C-e>
 " 替换
-nnoremap <leader><leader>s :%s/<C-r><C-w>/
+nnoremap <leader><leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
 vnoremap <leader><leader>s
     \ <Cmd>call feedkeys(':%s/' . GetSelected('') . '/', 'n')<CR>
 " 排序

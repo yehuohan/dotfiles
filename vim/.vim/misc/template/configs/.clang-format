@@ -34,6 +34,7 @@ IndentCaseBlocks: true
 IndentPPDirectives: BeforeHash
 PackConstructorInitializers: CurrentLine
 PenaltyBreakAssignment: 300
+PenaltyBreakBeforeFirstCallParameter: 0
 PenaltyReturnTypeOnItsOwnLine: 300
 PointerAlignment: Left
 ReferenceAlignment: Left
