@@ -28,7 +28,7 @@ function M.setup()
     require('v.task.find').setup()
 
     local m = require('v.maps')
-    m.nnore({ '<leader>to', '<Cmd>OverseerToggle<CR>' })
+    m.nnore({ '<leader>tk', '<Cmd>OverseerToggle<CR>' })
 
     -- vim.api.nvim_create_augroup('TaskWorkSpace', { clear = true })
     -- vim.api.nvim_create_autocmd('User', {

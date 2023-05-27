@@ -1,5 +1,6 @@
 local replace = require('v.task').replace
 local sequence = require('v.task').sequence
+local throw = error
 
 -- Workspace config for code
 local wsc = {}
@@ -10,21 +11,16 @@ local wsc_initialization = {
     garg = '',
     barg = '',
     earg = '',
-    stage = 'run', -- 'build', 'run', 'clean', 'test'
+    stage = 'run',
 }
 
--- Command placeholders
--- @var garg Generate arguments
--- @var gtar Generator target
+-- Single file tasks according to filetype
 -- @var barg Build arguments
 -- @var bsrc Build source file
 -- @var bout Build output file
 -- @var earg Execution arguments
-local singles = {}
-local projects = {}
-
--- Single file tasks according to filetype
-singles = {
+local singles = {
+    nvim = { cmd = 'nvim -l {bsrc} {earg}' },
     c = { cmd = 'gcc -g {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
     cpp = { cmd = 'g++ -g -std=c++20 {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
     python = { cmd = 'python {bsrc} {earg}' },
@@ -32,26 +28,45 @@ singles = {
 }
 
 -- Project tasks
-projects = {
+-- @var gtar Generator target
+-- @var garg Generate arguments
+-- @var stage Task stage from {'build', 'run', 'clean', 'test'}
+local projects = {
     make = 'make {barg}',
     cmake = {
         'cmake -DCMAKE_INSTALL_PREFIX=. {garg} -G "{gtar}" ..',
         'cmake --build . {barg}',
         'cmake --install .',
     },
-    cargo = {},
-    sphinx = {},
-    _msvc = 'vcvars64.bat',
+    cargo = 'cargo {stage} {barg} -- {earg}',
+    sphinx = {
+        'make clean',
+        'make html',
+    },
     _exec = '"./{bout}" {earg}',
+    _msvc = 'vcvars64.bat',
+    _vdir = '__VBuildOut',
 }
 
 -- Task functions
 local task = {}
 
+function task.nvim(cfg)
+    cfg.type = 'lua'
+
+    local rep = {}
+    rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
+    rep.earg = cfg.earg
+
+    return {
+        cmd = replace(singles.nvim.cmd, rep)
+    }
+end
+
 function task.file(cfg)
     local ft = (cfg.type ~= '') and cfg.type or vim.o.filetype
     if (not singles[ft]) or ('dosbatch' == ft and not IsWin()) then
-        error(string.format('Code task doesn\'t support "%s"', ft), 0)
+        throw(string.format('Code task doesn\'t support "%s"', ft), 0)
     end
     cfg.type = ft
 
@@ -68,14 +83,15 @@ function task.file(cfg)
 end
 
 function task.make(cfg)
-    if cfg.stage == 'clean' then
-        cfg.barg = 'clean'
-    end
-
     local rep = {}
     rep.barg = cfg.barg
     rep.bout = nil
     rep.earg = cfg.earg
+    if cfg.stage == 'clean' then
+        rep.barg = 'clean'
+        rep.bout = nil
+    end
+
     local cmds = {}
     cmds[#cmds + 1] = IsWin() and projects._msvc or nil
     cmds[#cmds + 1] = replace(projects.make, rep)
@@ -87,32 +103,65 @@ function task.make(cfg)
 end
 
 function task.cmake(cfg)
-    local vdir = '__VBuildOut'
+    local outdir = cfg.wdir .. '/' .. projects._vdir
     if cfg.stage == 'clean' then
-        error(string.format('%s was removed', vdir ), 0)
+        vim.fn.delete(outdir, 'rf')
+        throw(string.format('%s was removed', projects._vdir), 0)
     end
+    vim.fn.mkdir(outdir, 'p')
+    cfg.wdir = outdir
 
-    -- vim.fn.mkdir(cfg.wdir .. '/' .. vdir, 'p')
-    -- local rep = {}
+    local rep = {}
+    rep.gtar = {
+        u = 'Unix Makefiles',
+        n = 'NMake Makefiles',
+        j = 'Ninja',
+    }
+    rep.gtar = rep.gtar[cfg.key]
+    rep.garg = cfg.garg
+    rep.barg = cfg.barg
+    rep.bout = nil
+    rep.earg = cfg.earg
+    local cmds = {}
+    cmds[#cmds + 1] = (IsWin() and (cfg.key == 'n' or cfg.key == 'j')) and projects._msvc or nil
+    cmds[#cmds + 1] = replace(projects.cmake[1], rep)
+    cmds[#cmds + 1] = replace(projects.cmake[2], rep)
+    cmds[#cmds + 1] = replace(projects.cmake[3], rep)
+    cmds[#cmds + 1] = rep.bout and replace(projects._exec, rep) or nil
+
+    return {
+        cmd = sequence(cmds),
+    }
 end
 
-function task.cargo(cfg) end
+function task.cargo(cfg)
+    cfg.type = 'rust'
 
-function task.sphinx(cfg) end
+    local rep = {}
+    rep.stage = cfg.stage
+    rep.barg = cfg.barg
+    rep.earg = cfg.earg
+    local cmd = replace(projects.cargo, rep)
 
-function task.nvim(cfg) end
+    return {
+        cmd = cmd
+    }
+end
 
-local function up_iter(pat)
-    local names = function(name)
-        local re = vim.regex('\\c' .. pat)
-        return re:match_str(name)
+function task.sphinx(cfg)
+    local cmd
+    if cfg.stage == 'clean' then
+        cmd = projects.sphinx[1]
+    else
+        cmd = sequence({
+            projects.sphinx[2],
+            'firefox build/html/index.html',
+        })
     end
-    return vim.fs.find(names, {
-        upward = true,
-        type = 'file',
-        path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
-        limit = math.huge,
-    })
+
+    return {
+        cmd = cmd,
+    }
 end
 
 setmetatable(task, {
@@ -132,9 +181,17 @@ setmetatable(task, {
 
         local t = self._[cfg.key]
         if t.pat then
-            local files = up_iter(t.pat)
+            local files = vim.fs.find(function(name)
+                local re = vim.regex('\\c' .. t.pat)
+                return re:match_str(name)
+            end, {
+                upward = true,
+                type = 'file',
+                path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
+                limit = math.huge,
+            })
             if #files == 0 then
-                error(string.format('None of %s was found!', t.pat), 0)
+                throw(string.format('None of %s was found!', t.pat), 0)
             end
             cfg.file = files[#files]
         else
