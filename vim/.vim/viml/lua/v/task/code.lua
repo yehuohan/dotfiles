@@ -20,11 +20,28 @@ local wsc_initialization = {
 -- @var bout Build output file
 -- @var earg Execution arguments
 local codes = {
-    nvim = { cmd = 'nvim -l {bsrc} {earg}' },
-    c = { cmd = 'gcc -g {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
-    cpp = { cmd = 'g++ -g -std=c++20 {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
-    python = { cmd = 'python {bsrc} {earg}' },
-    lua = { cmd = 'lua {bsrc} {earg}' },
+    nvim       = { cmd = 'nvim -l {bsrc} {earg}' },
+    c          = { cmd = 'gcc -g {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
+    cpp        = { cmd = 'g++ -g -std=c++20 {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
+    rust       = { cmd = IsWin() and 'rustc {barg} {bsrc} -o "{bout}.exe" && "./{bout}" {earg}'
+                                  or 'rustc {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
+                   efm = [[\ %#-->\ %f:%l:%c,\%m\ %f:%l:%c']],
+    },
+    python     = { cmd = 'python {bsrc} {earg}' },
+    lua        = { cmd = 'lua {bsrc} {earg}', efm = [[lua:\ %f:%l:\ %m]] },
+    java       = { cmd = 'javac {barg} {bsrc} && java "{bout}" {earg}' },
+    julia      = { cmd = 'julia {bsrc} {earg}' },
+    go         = { cmd = 'go run {bsrc} {earg}' },
+    javascript = { cmd = 'node {bsrc} {earg}' },
+    typescript = { cmd = 'node {bsrc} {earg}' },
+    make       = { cmd = 'make -f {bsrc} {earg}' },
+    cmake      = { cmd = 'cmake {earg} -P {bsrc}', efm = [[%ECMake\ Error\ at\ %f:%l\ %#%m:]] },
+    sh         = { cmd = 'bash ./{bsrc} {earg}' },
+    dosbatch   = { cmd = '{bsrc} {earg}' },
+    glsl       = { cmd = 'glslangValidator {earg} {bsrc}' },
+    json       = { cmd = 'python -m json.tool {bsrc}' },
+    html       = { cmd = 'firefox {bsrc}' },
+    tex        = { cmd = 'xelatex -file-line-error {bsrc} && sioyek "{bout}.pdf"', efm = [[%f:%l:\ %m]] },
 }
 
 -- Project package tasks
@@ -67,12 +84,14 @@ local task = {}
 function task.nvim(cfg)
     local ft = vim.o.filetype
     if ft == 'vim' then
-        vim.cmd[[silent w]]
-        vim.cmd[[source %]]
+        vim.cmd.write()
+        vim.cmd.source('%')
         throw("Source completed", 0)
     else
         -- Take as lua forcefully
         cfg.type = 'lua'
+        cfg.efm = codes.lua.efm
+
         local rep = {}
         rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
         rep.earg = cfg.earg
@@ -89,6 +108,7 @@ function task.file(cfg)
         throw(string.format('Code task doesn\'t support "%s"', ft), 0)
     end
     cfg.type = ft
+    cfg.efm = codes[cfg.type].efm
 
     local rep = {}
     rep.barg = cfg.barg
@@ -157,6 +177,7 @@ end
 
 function task.cargo(cfg)
     cfg.type = 'rust'
+    cfg.efm = codes.rust.efm
 
     local rep = {}
     rep.stage = cfg.stage
@@ -229,7 +250,7 @@ local function run(cfg)
         {
             'on_output_quickfix',
             open = true,
-            -- errorformat = '',
+            errorformat = cfg.efm,
         },
         'display_duration',
         'on_output_summarize',
