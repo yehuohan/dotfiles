@@ -14,12 +14,12 @@ local wsc_initialization = {
     stage = 'run',
 }
 
--- Single file tasks according to filetype
+-- Single code file tasks according to filetype
 -- @var barg Build arguments
 -- @var bsrc Build source file
 -- @var bout Build output file
 -- @var earg Execution arguments
-local singles = {
+local codes = {
     nvim = { cmd = 'nvim -l {bsrc} {earg}' },
     c = { cmd = 'gcc -g {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
     cpp = { cmd = 'g++ -g -std=c++20 {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
@@ -27,11 +27,11 @@ local singles = {
     lua = { cmd = 'lua {bsrc} {earg}' },
 }
 
--- Project tasks
+-- Project package tasks
 -- @var gtar Generator target
 -- @var garg Generate arguments
 -- @var stage Task stage from {'build', 'run', 'clean', 'test'}
-local projects = {
+local packs = {
     make = 'make {barg}',
     cmake = {
         'cmake -DCMAKE_INSTALL_PREFIX=. {garg} -G "{gtar}" ..',
@@ -43,29 +43,49 @@ local projects = {
         'make clean',
         'make html',
     },
+    _pats = {
+        tar = [[^TARGET%s*:?=%s*([%w%-]+)%s*$]], -- TARGET := <bout>
+        pro = [[^project%s*%(%s*([%w%-]+).*%).*$]], -- project(<bout>)
+    },
     _exec = '"./{bout}" {earg}',
     _msvc = 'vcvars64.bat',
     _vdir = '__VBuildOut',
 }
 
+local function patout(file, pattern)
+    for line in io.lines(file) do
+        local res = string.match(line, pattern)
+        if res then
+            return res
+        end
+    end
+end
+
 -- Task functions
 local task = {}
 
 function task.nvim(cfg)
-    cfg.type = 'lua'
+    local ft = vim.o.filetype
+    if ft == 'vim' then
+        vim.cmd[[silent w]]
+        vim.cmd[[source %]]
+        throw("Source completed", 0)
+    else
+        -- Take as lua forcefully
+        cfg.type = 'lua'
+        local rep = {}
+        rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
+        rep.earg = cfg.earg
 
-    local rep = {}
-    rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
-    rep.earg = cfg.earg
-
-    return {
-        cmd = replace(singles.nvim.cmd, rep)
-    }
+        return {
+            cmd = replace(codes.nvim.cmd, rep)
+        }
+    end
 end
 
 function task.file(cfg)
     local ft = (cfg.type ~= '') and cfg.type or vim.o.filetype
-    if (not singles[ft]) or ('dosbatch' == ft and not IsWin()) then
+    if (not codes[ft]) or ('dosbatch' == ft and not IsWin()) then
         throw(string.format('Code task doesn\'t support "%s"', ft), 0)
     end
     cfg.type = ft
@@ -75,7 +95,7 @@ function task.file(cfg)
     rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
     rep.bout = vim.fn.fnamemodify(cfg.file, ':t:r')
     rep.earg = cfg.earg
-    local cmd = replace(singles[ft].cmd, rep)
+    local cmd = replace(codes[ft].cmd, rep)
 
     return {
         cmd = cmd,
@@ -85,7 +105,8 @@ end
 function task.make(cfg)
     local rep = {}
     rep.barg = cfg.barg
-    rep.bout = nil
+    rep.bout = (cfg.stage ~= 'build') and patout(cfg.file, packs._pats.tar) or nil
+    rep.bout = packs._vdir .. '/' .. rep.bout
     rep.earg = cfg.earg
     if cfg.stage == 'clean' then
         rep.barg = 'clean'
@@ -93,9 +114,9 @@ function task.make(cfg)
     end
 
     local cmds = {}
-    cmds[#cmds + 1] = IsWin() and projects._msvc or nil
-    cmds[#cmds + 1] = replace(projects.make, rep)
-    cmds[#cmds + 1] = rep.bout and replace(projects._exec, rep) or nil
+    cmds[#cmds + 1] = IsWin() and packs._msvc or nil
+    cmds[#cmds + 1] = replace(packs.make, rep)
+    cmds[#cmds + 1] = rep.bout and replace(packs._exec, rep) or nil
 
     return {
         cmd = sequence(cmds),
@@ -103,10 +124,10 @@ function task.make(cfg)
 end
 
 function task.cmake(cfg)
-    local outdir = cfg.wdir .. '/' .. projects._vdir
+    local outdir = cfg.wdir .. '/' .. packs._vdir
     if cfg.stage == 'clean' then
         vim.fn.delete(outdir, 'rf')
-        throw(string.format('%s was removed', projects._vdir), 0)
+        throw(string.format('%s was removed', packs._vdir), 0)
     end
     vim.fn.mkdir(outdir, 'p')
     cfg.wdir = outdir
@@ -120,14 +141,14 @@ function task.cmake(cfg)
     rep.gtar = rep.gtar[cfg.key]
     rep.garg = cfg.garg
     rep.barg = cfg.barg
-    rep.bout = nil
+    rep.bout = (cfg.stage ~= 'build') and patout(cfg.file, packs._pats.pro) or nil
     rep.earg = cfg.earg
     local cmds = {}
-    cmds[#cmds + 1] = (IsWin() and (cfg.key == 'n' or cfg.key == 'j')) and projects._msvc or nil
-    cmds[#cmds + 1] = replace(projects.cmake[1], rep)
-    cmds[#cmds + 1] = replace(projects.cmake[2], rep)
-    cmds[#cmds + 1] = replace(projects.cmake[3], rep)
-    cmds[#cmds + 1] = rep.bout and replace(projects._exec, rep) or nil
+    cmds[#cmds + 1] = (IsWin() and (cfg.key == 'n' or cfg.key == 'j')) and packs._msvc or nil
+    cmds[#cmds + 1] = replace(packs.cmake[1], rep)
+    cmds[#cmds + 1] = replace(packs.cmake[2], rep)
+    cmds[#cmds + 1] = replace(packs.cmake[3], rep)
+    cmds[#cmds + 1] = rep.bout and replace(packs._exec, rep) or nil
 
     return {
         cmd = sequence(cmds),
@@ -141,7 +162,7 @@ function task.cargo(cfg)
     rep.stage = cfg.stage
     rep.barg = cfg.barg
     rep.earg = cfg.earg
-    local cmd = replace(projects.cargo, rep)
+    local cmd = replace(packs.cargo, rep)
 
     return {
         cmd = cmd
@@ -151,10 +172,10 @@ end
 function task.sphinx(cfg)
     local cmd
     if cfg.stage == 'clean' then
-        cmd = projects.sphinx[1]
+        cmd = packs.sphinx[1]
     else
         cmd = sequence({
-            projects.sphinx[2],
+            packs.sphinx[2],
             'firefox build/html/index.html',
         })
     end
@@ -164,21 +185,19 @@ function task.sphinx(cfg)
     }
 end
 
+task._ = {
+    l = { fn = task.nvim },
+    f = { fn = task.file },
+    m = { fn = task.make, pat = 'Makefile' },
+    u = { fn = task.cmake, pat = 'CMakeLists' },
+    n = { fn = task.cmake, pat = 'CMakeLists' },
+    j = { fn = task.cmake, pat = 'CMakeLists' },
+    o = { fn = task.cargo, pat = 'Cargo.toml' },
+    h = { fn = task.sphinx, pat = IsWin() and 'make.bat' or 'Makefile' },
+}
+
 setmetatable(task, {
     __call = function(self, cfg)
-        if not self._ then
-            self._ = {
-                l = { fn = task.nvim },
-                f = { fn = task.file },
-                m = { fn = task.make, pat = 'Makefile' },
-                u = { fn = task.cmake, pat = 'CMakeLists' },
-                n = { fn = task.cmake, pat = 'CMakeLists' },
-                j = { fn = task.cmake, pat = 'CMakeLists' },
-                a = { fn = task.cargo, pat = 'Cargo.toml' },
-                h = { fn = task.sphinx, pat = IsWin() and 'make.bat' or 'Makefile' },
-            }
-        end
-
         local t = self._[cfg.key]
         if t.pat then
             local files = vim.fs.find(function(name)
@@ -202,6 +221,7 @@ setmetatable(task, {
     end,
 })
 
+-- Run code task
 local function run(cfg)
     local opts = task(cfg)
     opts.cwd = cfg.wdir
@@ -220,19 +240,21 @@ local function run(cfg)
     require('v.task').run(opts)
 end
 
-local function kt2config(kt)
+-- Parse code task config from keys table
+local function parse_config(kt)
     wsc:reinit()
     wsc.key = kt.E
+    wsc.stage = (kt.A == 'b' and 'build') or (kt.A == 'c' and 'clean') or wsc.stage
     return wsc
 end
 
-local function code(kt)
+local function entry(kt)
     if kt.S == 'R' then
         vim.notify('R')
-    elseif kt.A == 'p' then
+    elseif kt.E == 'p' then
         vim.notify('p')
     else
-        local config = kt2config(kt)
+        local config = parse_config(kt)
         local ok, msg = pcall(run, config)
         if not ok then
             vim.notify(tostring(msg))
@@ -246,27 +268,28 @@ local function setup()
     wsc:set(__wsc.code)
     __wsc.code = wsc
 
-    local mappings = {
-        'rl' ,
-        'Rp' , 'Rm' , 'Ru' , 'Rn' , 'Rj' , 'Ra' , 'Rh' , 'Rf',
-        'rp' , 'rm' , 'ru' , 'rn' , 'rj' , 'ra' , 'rh' , 'rf',
-        'rcp', 'rcm', 'rcu', 'rcn', 'rcj', 'rca', 'rch',
-        'rbp', 'rbm', 'rbu', 'rbn', 'rbj', 'rba', 'rbh',
-    }
     -- Convert mapping keys to table
-    local keys2kt = function(keys)
+    local keys2kt = function (keys)
         return {
             S = keys:sub(1, 1),
             A = keys:sub(2, -2),
             E = keys:sub(-1, -1),
         }
     end
+    -- Mapping keys
+    local mappings = {
+        'rl' ,
+        'Rp' , 'Rm' , 'Ru' , 'Rn' , 'Rj' , 'Ro' , 'Rh' , 'Rf',
+        'rp' , 'rm' , 'ru' , 'rn' , 'rj' , 'ro' , 'rh' , 'rf',
+        'rcp', 'rcm', 'rcu', 'rcn', 'rcj', 'rco', 'rch',
+        'rbp', 'rbm', 'rbu', 'rbn', 'rbj', 'rbo', 'rbh',
+    }
     local m = require('v.maps')
     for _, keys in ipairs(mappings) do
         m.nnore({
             '<leader>' .. keys,
             function()
-                code(keys2kt(keys))
+                entry(keys2kt(keys))
             end,
         })
     end
