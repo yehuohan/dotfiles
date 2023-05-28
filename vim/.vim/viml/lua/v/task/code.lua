@@ -248,7 +248,7 @@ local function run(cfg)
     opts.cwd = cfg.wdir
     opts.components = {
         {
-            'on_output_quickfix',
+            'on_quickfix',
             open = true,
             errorformat = cfg.efm,
         },
