@@ -126,7 +126,7 @@ function task.make(cfg)
     local rep = {}
     rep.barg = cfg.barg
     rep.bout = (cfg.stage ~= 'build') and patout(cfg.file, packs._pats.tar) or nil
-    rep.bout = packs._vdir .. '/' .. rep.bout
+    rep.bout = rep.bout and packs._vdir .. '/' .. rep.bout
     rep.earg = cfg.earg
     if cfg.stage == 'clean' then
         rep.barg = 'clean'

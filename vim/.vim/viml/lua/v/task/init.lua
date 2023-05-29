@@ -9,7 +9,7 @@ M.wsc = {
 
 -- Repleace command's placeholders
 function M.replace(cmd, rep)
-    return string.gsub(cmd, '{(%w+)}', rep)
+    return vim.trim(string.gsub(cmd, '{(%w+)}', rep))
 end
 
 -- Sequence commands

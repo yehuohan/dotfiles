@@ -55,6 +55,7 @@ return {
         comp.on_start = function(self, task)
             self.start_time = os.time()
             vim.cmd([[botright copen 8]])
+            vim.cmd.wincmd('p')
             vim.fn.setqflist({}, 'r', {
                 lines = { string.format('[%s]', task.name) },
             })

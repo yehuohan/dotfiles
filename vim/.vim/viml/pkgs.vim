@@ -196,7 +196,7 @@ nnoremap <leader>tE
 " }}}
 
 " screensaver {{{ 屏保
-nnoremap <leader>so <Cmd>ScreenSaver clock<CR>
+nnoremap <leader>ss <Cmd>ScreenSaver clock<CR>
 " }}}
 
 " fzf {{{ 模糊查找
