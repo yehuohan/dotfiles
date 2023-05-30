@@ -815,26 +815,7 @@ local function pkg_lazy()
         { 'skywind3000/asyncrun.vim' },
         {
             'stevearc/overseer.nvim',
-            opts = {
-                dap = false,
-                task_list = {
-                    direction = 'right',
-                    bindings = {
-                        ['i'] = 'Edit',
-                        ['p'] = 'TogglePreview',
-                        ['o'] = 'OpenQuickFix',
-                        ['O'] = function()
-                            require('overseer.task_list.sidebar').get():run_action('restart')
-                        end,
-                        ['K'] = function()
-                            require('overseer.task_list.sidebar').get():run_action('stop')
-                        end,
-                        ['D'] = function()
-                            require('overseer.task_list.sidebar').get():run_action('dispose')
-                        end,
-                    },
-                },
-            },
+            config = require('v.task').setup,
         },
         { 'voldikss/vim-floaterm' },
         { 'tpope/vim-fugitive', cmd = { 'G', 'Git' } },

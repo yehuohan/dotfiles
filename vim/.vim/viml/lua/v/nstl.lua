@@ -406,7 +406,7 @@ local function setup()
         end,
         group = 'PkgHeirline',
     })
-    m.nnore({ '<leader>tk', toggle_check })
+    m.nnore({ '<leader>tl', toggle_check })
     m.nnore({ '<leader>ty', toggle_layout })
 end
 

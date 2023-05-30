@@ -96,9 +96,7 @@ function task.nvim(cfg)
         rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
         rep.earg = cfg.earg
 
-        return {
-            cmd = replace(codes.nvim.cmd, rep)
-        }
+        return replace(codes.nvim.cmd, rep)
     end
 end
 
@@ -115,11 +113,7 @@ function task.file(cfg)
     rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
     rep.bout = vim.fn.fnamemodify(cfg.file, ':t:r')
     rep.earg = cfg.earg
-    local cmd = replace(codes[ft].cmd, rep)
-
-    return {
-        cmd = cmd,
-    }
+    return replace(codes[ft].cmd, rep)
 end
 
 function task.make(cfg)
@@ -138,9 +132,7 @@ function task.make(cfg)
     cmds[#cmds + 1] = replace(packs.make, rep)
     cmds[#cmds + 1] = rep.bout and replace(packs._exec, rep) or nil
 
-    return {
-        cmd = sequence(cmds),
-    }
+    return sequence(cmds)
 end
 
 function task.cmake(cfg)
@@ -170,9 +162,7 @@ function task.cmake(cfg)
     cmds[#cmds + 1] = replace(packs.cmake[3], rep)
     cmds[#cmds + 1] = rep.bout and replace(packs._exec, rep) or nil
 
-    return {
-        cmd = sequence(cmds),
-    }
+    return sequence(cmds)
 end
 
 function task.cargo(cfg)
@@ -183,11 +173,7 @@ function task.cargo(cfg)
     rep.stage = cfg.stage
     rep.barg = cfg.barg
     rep.earg = cfg.earg
-    local cmd = replace(packs.cargo, rep)
-
-    return {
-        cmd = cmd
-    }
+    return replace(packs.cargo, rep)
 end
 
 function task.sphinx(cfg)
@@ -200,10 +186,7 @@ function task.sphinx(cfg)
             'firefox build/html/index.html',
         })
     end
-
-    return {
-        cmd = cmd,
-    }
+    return cmd
 end
 
 task._ = {
@@ -244,7 +227,9 @@ setmetatable(task, {
 
 -- Run code task
 local function run(cfg)
-    local opts = task(cfg)
+    local cmd = task(cfg)
+    local opts = {}
+    opts.cmd = cmd
     opts.cwd = cfg.wdir
     opts.components = {
         {

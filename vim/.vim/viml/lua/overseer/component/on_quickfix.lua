@@ -22,6 +22,11 @@ return {
             optional = true,
             default_from_task = true,
         },
+        save = {
+            desc = 'Save all files before start task',
+            type = 'boolean',
+            default = true,
+        },
         open = {
             desc = 'Open the quickfix on output',
             type = 'boolean',
@@ -44,8 +49,10 @@ return {
         }
 
         comp.on_init = function(self, task)
-            -- Auto save current file before start task
-            vim.cmd.write()
+            -- Auto save all files before start task
+            if params.save then
+                vim.cmd.wall()
+            end
         end
 
         comp.on_reset = function(self, task)
