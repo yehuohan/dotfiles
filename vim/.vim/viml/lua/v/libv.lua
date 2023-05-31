@@ -79,4 +79,29 @@ function M.new_config(opt)
     return setmetatable(opt, C)
 end
 
+function M.new_async(func)
+    return function(...)
+        coroutine.wrap(func)(...)
+    end
+end
+
+function M.pop_selection(sel)
+    local caller = coroutine.running()
+
+    local old_evt = sel.evt
+    local new_evt = function(name, ...)
+        if old_evt then
+            old_evt(name, ...)
+        end
+        if 'onCR' == name then
+            coroutine.resume(caller, true)
+        elseif 'onQuit' == name then
+            coroutine.resume(caller, false)
+        end
+    end
+    sel.evt = new_evt
+
+    return coroutine.yield(vim.fn.PopSelection(sel))
+end
+
 return M

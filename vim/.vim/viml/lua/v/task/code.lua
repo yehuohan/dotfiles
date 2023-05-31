@@ -86,7 +86,7 @@ function task.nvim(cfg)
     if ft == 'vim' then
         vim.cmd.write()
         vim.cmd.source('%')
-        throw("Source completed", 0)
+        throw('Source completed', 0)
     else
         -- Take as lua forcefully
         cfg.type = 'lua'
@@ -254,9 +254,27 @@ local function parse_config(kt)
     return wsc
 end
 
-local function entry(kt)
+local entry = require('v.libv').new_async(function(kt)
     if kt.S == 'R' then
-        vim.notify('R')
+        local params = {
+            type = '',
+        }
+        local selection = {
+            lst = { 'type' },
+            dic = {
+                type = { lst = { 'c', 'cpp', 'rust' } },
+            },
+            sub = {
+                cmd = function(sopt, sel)
+                    params[sopt] = sel
+                end,
+                get = function(sopt)
+                    return params[sopt]
+                end,
+            },
+        }
+        local res = require('v.libv').pop_selection(selection)
+        vim.notify(vim.inspect(res) .. '\n' .. vim.inspect(params))
     elseif kt.E == 'p' then
         vim.notify('p')
     else
@@ -266,7 +284,7 @@ local function entry(kt)
             vim.notify(tostring(msg))
         end
     end
-end
+end)
 
 local function setup()
     local __wsc = require('v.task').wsc
@@ -275,7 +293,7 @@ local function setup()
     __wsc.code = wsc
 
     -- Convert mapping keys to table
-    local keys2kt = function (keys)
+    local keys2kt = function(keys)
         return {
             S = keys:sub(1, 1),
             A = keys:sub(2, -2),
