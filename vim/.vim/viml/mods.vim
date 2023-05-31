@@ -414,7 +414,10 @@ endfunction
 " }}}
 
 " FUNCTION: s:popR(km) {{{
-function! s:popRonCR(earg, sopt)
+function! s:popRonCR(earg, name, ...)
+    if a:name !=# 'onCR'
+        return
+    endif
     if a:earg.km.E ==# 'p'
         " save config of project
         let s:ws.rp = a:earg.cfg
@@ -430,7 +433,7 @@ endfunction
 
 function! s:popR(km)
     let l:cfg = s:parseProps(a:km)
-    " pop initial selections with km, and pass l:cfg to 'onCR' but not km.A
+    " pop initial selections with km, and pass l:cfg to 'evt' but not km.A
     let l:sel = {
         \ 'opt': 'config project',
         \ 'lst': ['term', 'agen', 'abld', 'arun', 'deploy', 'lowest'],
@@ -446,11 +449,11 @@ function! s:popR(km)
             \ 'deploy': {'lst': ['build', 'run', 'clean', 'test']},
             \ 'lowest': {'lst': [0, 1]},
             \ },
+        \ 'evt': funcref('s:popRonCR', [{'km': a:km, 'cfg': l:cfg}]),
         \ 'sub': {
             \ 'cmd': {sopt, sel -> extend(l:cfg, {sopt : sel})},
             \ 'get': {sopt -> l:cfg[sopt]},
             \ },
-        \ 'onCR': funcref('s:popRonCR', [{'km': a:km, 'cfg': l:cfg}]),
         \ }
     if a:km.E ==# 'p'
         call extend(l:cfg, {'key': '', 'file': '', 'type': ''})
@@ -840,7 +843,10 @@ endfunction
 " }}}
 
 " FUNCTION: s:popF(km, type) {{{
-function! s:popFonCR(earg, sopt)
+function! s:popFonCR(earg, name, ...)
+    if a:name !=# 'onCR'
+        return
+    endif
     let s:ws.fw = a:earg.cfg
     let s:ws.fw.path = s:unifyPath(s:ws.fw.path)
     if !empty(s:ws.fw.path)
@@ -873,11 +879,11 @@ function! s:popF(km, type)
             \             'cmd': {sopt, arg -> s:fw.setEngine('fuzzy', arg)},
             \             'get': {sopt -> s:fw.engine.fuzzy}},
             \ },
+        \ 'evt' : funcref('s:popFonCR', [{'km': a:km, 'cfg': l:cfg, 'type': a:type}]),
         \ 'sub' : {
             \ 'cmd': {sopt, sel -> extend(l:cfg, {sopt : sel})},
             \ 'get': {sopt -> l:cfg[sopt]},
             \ },
-        \ 'onCR': funcref('s:popFonCR', [{'km': a:km, 'cfg': l:cfg, 'type': a:type}]),
         \ }
     call PopSelection(l:sel)
 endfunction

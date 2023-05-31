@@ -79,12 +79,12 @@ function! s:useInit()
         \ 'opt' : 'use',
         \ 'lst' : sort(keys(s:use)),
         \ 'dic' : l:dic,
+        \ 'evt': funcref('s:useSave'),
         \ 'sub' : {
             \ 'lst' : [v:true, v:false],
             \ 'cmd' : {sopt, sel -> extend(s:use, {sopt : sel})},
             \ 'get' : {sopt -> s:use[sopt]},
             \ },
-        \ 'onCR': funcref('s:useSave'),
         \ })
 endfunction
 " }}}
