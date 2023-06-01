@@ -27,15 +27,17 @@ function! s:useLoad()
         let l:dic = json_decode(join(readfile(s:use_file)))
         call extend(s:use, l:dic)
     else
-        call s:useSave()
+        call s:useSave('onCR')
     endif
 endfunction
 " }}}
 
 " Function: s:useSave(...) {{{
-function! s:useSave(...)
-    call writefile([json_encode(s:use)], s:use_file)
-    echo 's:use save successful!'
+function! s:useSave(name, ...)
+    if a:name ==# 'onCR'
+        call writefile([json_encode(s:use)], s:use_file)
+        echo 's:use save successful!'
+    endif
 endfunction
 " }}}
 
