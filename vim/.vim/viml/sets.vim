@@ -295,9 +295,6 @@ vnoremap <leader>agj g<C-x>
 vnoremap <leader>agk g<C-a>
 " 大小写切换
 noremap <leader>u ~
-" 匹配符跳转
-packadd matchit
-map <S-m> %
 " 行移动
 noremap j gj
 noremap k gk

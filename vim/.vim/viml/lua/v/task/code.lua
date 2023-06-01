@@ -19,6 +19,7 @@ local wsc_initialization = {
 -- @var bsrc Build source file
 -- @var bout Build output file
 -- @var earg Execution arguments
+-- stylua: ignore start
 local codes = {
     nvim       = { cmd = 'nvim -l {bsrc} {earg}' },
     c          = { cmd = 'gcc -g {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
@@ -43,6 +44,7 @@ local codes = {
     html       = { cmd = 'firefox {bsrc}' },
     tex        = { cmd = 'xelatex -file-line-error {bsrc} && sioyek "{bout}.pdf"', efm = [[%f:%l:\ %m]] },
 }
+-- stylua: ignore end
 
 -- Project package tasks
 -- @var gtar Generator target
@@ -287,10 +289,7 @@ local entry = require('v.libv').new_async(function(kt)
 end)
 
 local function setup()
-    local __wsc = require('v.task').wsc
     wsc = require('v.libv').new_config(wsc_initialization)
-    wsc:set(__wsc.code)
-    __wsc.code = wsc
 
     -- Convert mapping keys to table
     local keys2kt = function(keys)
@@ -301,6 +300,7 @@ local function setup()
         }
     end
     -- Mapping keys
+    -- stylua: ignore start
     local mappings = {
         'rl' ,
         'Rp' , 'Rm' , 'Ru' , 'Rn' , 'Rj' , 'Ro' , 'Rh' , 'Rf',
@@ -308,7 +308,8 @@ local function setup()
         'rcp', 'rcm', 'rcu', 'rcn', 'rcj', 'rco', 'rch',
         'rbp', 'rbm', 'rbu', 'rbn', 'rbj', 'rbo', 'rbh',
     }
-    local m = require('v.maps')
+    -- stylua: ignore end
+    local m = require('v.libv').m
     for _, keys in ipairs(mappings) do
         m.nnore({
             '<leader>' .. keys,

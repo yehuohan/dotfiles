@@ -1,5 +1,5 @@
 local use = vim.fn.SvarUse()
-local m = require('v.maps')
+local m = require('v.libv').m
 
 --------------------------------------------------------------------------------
 -- Editor

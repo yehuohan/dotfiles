@@ -104,4 +104,57 @@ function M.pop_selection(sel)
     return coroutine.yield(vim.fn.PopSelection(sel))
 end
 
+--------------------------------------------------------------------------------
+-- map
+--------------------------------------------------------------------------------
+local _m = {}
+local setmap = vim.keymap.set
+local function setopts(opts, defaults)
+    local map_opts = {}
+    for k, v in pairs(opts) do
+        if type(k) == 'string' then
+            map_opts[k] = v
+        end
+    end
+    if defaults then
+        map_opts = vim.tbl_extend('keep', map_opts, defaults)
+    end
+    return map_opts
+end
+
+-- map functions
+-- * 'map' and 'mnore' works at normal and visual mode by default here
+-- * example:
+--      local m = require('v.libv').m
+--      m.nore{'<leader>', ':echo b:<CR>', silent = true, buffer = 9}
+--      m.add({'n', 'v'}, {'<leader>', ':echo b:<CR>', buffer = true})
+-- @mods Mapping mode
+-- @opts Mapping option with {lhs, rhs, **kwargs}
+-- stylua: ignore start
+function _m.map(opts)   setmap({'n', 'v'}, opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.nmap(opts)  setmap('n', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.vmap(opts)  setmap('v', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.xmap(opts)  setmap('x', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.smap(opts)  setmap('s', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.omap(opts)  setmap('o', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.imap(opts)  setmap('i', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.lmap(opts)  setmap('l', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.cmap(opts)  setmap('c', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.tmap(opts)  setmap('t', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.nore(opts)  setmap({'n', 'v'}, opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.nnore(opts) setmap('n', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.vnore(opts) setmap('v', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.xnore(opts) setmap('x', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.snore(opts) setmap('s', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.onore(opts) setmap('o', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.inore(opts) setmap('i', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.lnore(opts) setmap('l', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.cnore(opts) setmap('c', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.tnore(opts) setmap('t', opts[1], opts[2], setopts(opts, { noremap = true })) end
+
+function _m.add(mods, opts)     setmap(mods, opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.addnore(mods, opts) setmap(mods, opts[1], opts[2], setopts(opts, { noremap = true })) end
+-- stylua: ignore end
+
+M.m = _m
 return M

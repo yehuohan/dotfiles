@@ -1,6 +1,6 @@
 local api = vim.api
 local use = vim.fn.SvarUse()
-local m = require('v.maps')
+local m = require('v.libv').m
 
 local function __servers()
     local url = 'https://github.com/%s/releases/download/%s/%s'
@@ -89,6 +89,7 @@ local function __servers()
     })
 end
 
+-- stylua: ignore start
 local kind_icons = {
     Text          = { '', 'Txt'  },
     Method        = { '', 'Meth' },
@@ -130,6 +131,7 @@ local kind_sources = {
     latex_symbols   = 'Tex',
     spell           = 'Spl', -- It's enabling depends on 'spell' option
 }
+-- stylua: ignore end
 
 local function cmp_format(entry, vitem)
     local ico = kind_icons[vitem.kind]
@@ -147,6 +149,7 @@ local function cmp_format(entry, vitem)
 end
 
 local function __hl()
+    -- stylua: ignore start
     api.nvim_set_hl(0, 'CmpItemMenu'             , {ctermfg = 175, fg = '#d3869b', italic = true })
     api.nvim_set_hl(0, 'CmpItemAbbrMatch'        , {ctermfg = 208, fg = '#fe8019' })
     api.nvim_set_hl(0, 'CmpItemAbbrMatchFuzzy'   , {ctermfg = 208, fg = '#fe8019' })
@@ -182,6 +185,7 @@ local function __hl()
     api.nvim_set_hl(0, 'DiagnosticUnderlineWarn'    , {undercurl = true, sp = 'Orange' })
     api.nvim_set_hl(0, 'DiagnosticUnderlineInfo'    , {undercurl = true, sp = 'LightBlue' })
     api.nvim_set_hl(0, 'DiagnosticUnderlineHint'    , {link = 'Comment' })
+    -- stylua: ignore end
 end
 
 local function __completion()

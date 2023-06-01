@@ -8,7 +8,12 @@ let g:loaded_zipPlugin = 1
 let g:loaded_zip = 1
 let g:loaded_netrw = 1
 let g:loaded_netrwPlugin = 1
+"let g:loaded_matchit = 1
 "let g:loaded_matchparen = 1
+
+" 匹配符跳转
+packadd matchit
+map <S-m> %
 " }}}
 
 " Editor {{{

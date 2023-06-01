@@ -49,7 +49,7 @@ function M.setup()
     require('v.task.code').setup()
     require('v.task.find').setup()
 
-    local m = require('v.maps')
+    local m = require('v.libv').m
     m.nnore({ '<leader>tk', '<Cmd>OverseerToggle<CR>' })
     -- m.nnore({
     --     '<leader>rk',
