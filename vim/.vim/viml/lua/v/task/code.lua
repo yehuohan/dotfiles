@@ -1,3 +1,6 @@
+local a = require('v.libv').a
+local async = a._async
+local await = a._await
 local replace = require('v.task').replace
 local sequence = require('v.task').sequence
 local throw = error
@@ -256,7 +259,9 @@ local function parse_config(kt)
     return wsc
 end
 
-local entry = require('v.libv').new_async(function(kt)
+local entry = async(function(kt)
+    local res = true
+
     if kt.S == 'R' then
         local params = {
             type = '',
@@ -275,11 +280,13 @@ local entry = require('v.libv').new_async(function(kt)
                 end,
             },
         }
-        local res = require('v.libv').pop_selection(selection)
+        res = await(a.pop_selection(selection))
         vim.notify(vim.inspect(res) .. '\n' .. vim.inspect(params))
     elseif kt.E == 'p' then
         vim.notify('p')
-    else
+    end
+
+    if res then
         local config = parse_config(kt)
         local ok, msg = pcall(run, config)
         if not ok then

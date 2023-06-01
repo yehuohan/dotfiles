@@ -79,13 +79,33 @@ function M.new_config(opt)
     return setmetatable(opt, C)
 end
 
-function M.new_async(func)
+--------------------------------------------------------------------------------
+-- async
+--------------------------------------------------------------------------------
+local _a = {}
+
+_a._await = coroutine.yield
+
+function _a._async(func)
     return function(...)
         coroutine.wrap(func)(...)
     end
 end
 
-function M.pop_selection(sel)
+function _a._wrap(afunc)
+    return function(...)
+        local caller = coroutine.running()
+        local args = { ... }
+        -- Place async function's callback at the last by default
+        table.insert(args, function(...)
+            -- Callback args will passed to `res = await()` from resume
+            coroutine.resume(caller, ...)
+        end)
+        coroutine.wrap(afunc)(unpack(args))
+    end
+end
+
+function _a.pop_selection(sel)
     local caller = coroutine.running()
 
     local old_evt = sel.evt
@@ -101,7 +121,7 @@ function M.pop_selection(sel)
     end
     sel.evt = new_evt
 
-    return coroutine.yield(vim.fn.PopSelection(sel))
+    vim.fn.PopSelection(sel)
 end
 
 --------------------------------------------------------------------------------
@@ -109,6 +129,7 @@ end
 --------------------------------------------------------------------------------
 local _m = {}
 local setmap = vim.keymap.set
+
 local function setopts(opts, defaults)
     local map_opts = {}
     for k, v in pairs(opts) do
@@ -156,5 +177,6 @@ function _m.add(mods, opts)     setmap(mods, opts[1], opts[2], setopts(opts, { r
 function _m.addnore(mods, opts) setmap(mods, opts[1], opts[2], setopts(opts, { noremap = true })) end
 -- stylua: ignore end
 
+M.a = _a
 M.m = _m
 return M
