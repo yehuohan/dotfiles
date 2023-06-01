@@ -152,7 +152,7 @@ local function pkg_alpha()
             {
                 type = 'group',
                 val = {
-                    tpl.file_button('$DotVimDir/.init.vim', 'c'),
+                    tpl.file_button('$DotVimInit/lua/v/init.lua', 'c'),
                     tpl.file_button('$NVimConfigDir/init.vim', 'd'),
                     tpl.file_button('$DotVimLocal/todo.md', 'o'),
                 },
@@ -613,7 +613,7 @@ local function pkg_lazy()
         performance = {
             rtp = {
                 reset = false,
-                paths = { vim.env.DotVimVimL },
+                paths = { vim.env.DotVimInit },
             },
         },
         state = vim.env.DotVimLocal .. '/lazy/state.json',

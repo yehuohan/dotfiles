@@ -74,7 +74,7 @@ local function __servers()
                         runtime = { version = 'Lua 5.2' }, -- LuaJIT
                         workspace = {
                             library = {
-                                vim.env.DotVimVimL .. '/lua',
+                                vim.env.DotVimInit .. '/lua',
                                 vim.env.VIMRUNTIME .. '/lua',
                                 vim.env.VIMRUNTIME .. '/lua/vim',
                                 vim.env.VIMRUNTIME .. '/lua/vim/lsp',

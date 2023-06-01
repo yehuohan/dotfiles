@@ -5,6 +5,7 @@ else
     dotvim = '~/.vim'
 end
 dotvim = vim.fn.resolve(vim.fn.expand(dotvim))
-vim.opt.rtp:prepend(dotvim)
-vim.opt.packpath:prepend(dotvim)
+local dotvim_init = dotvim .. '/init'
+vim.opt.rtp:prepend(dotvim_init)
+vim.opt.packpath:prepend(dotvim_init)
 require('v').setup(dotvim)

@@ -1,4 +1,4 @@
-source $APPS_HOME/dotvim/.init.vim
+source $APPS_HOME/dotvim/init/viml/init.vim
 
 if IsWin()
     set pythonthreedll=python310.dll

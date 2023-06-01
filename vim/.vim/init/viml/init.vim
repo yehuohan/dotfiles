@@ -26,8 +26,9 @@ endfunction
 " }}}
 
 " Globals {{{
-let $DotVimDir=resolve(expand('<sfile>:p:h'))
-let $DotVimVimL=$DotVimDir . '/viml'
+let $DotVimDir=resolve(expand('<sfile>:p:h:h:h'))
+let $DotVimInit=$DotVimDir . '/init'
+let $DotVimVimL=$DotVimDir . '/init/viml'
 let $DotVimMisc=$DotVimDir . '/misc'
 let $DotVimLocal=$DotVimDir . '/local'
 set rtp^=$DotVimDir

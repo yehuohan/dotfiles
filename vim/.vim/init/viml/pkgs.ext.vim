@@ -199,8 +199,7 @@ endfunction
 
 " startify {{{ 启动首页
 let g:startify_bookmarks = [
-    \ {'c': '$DotVimDir/.init.vim'},
-    \ {'d': '$NVimConfigDir/init.vim'},
+    \ {'c': '$DotVimVimL/init.vim'},
     \ {'o': '$DotVimLocal/todo.md'} ]
 let g:startify_lists = [
     \ {'type': 'bookmarks', 'header': ['   Bookmarks']},
