@@ -59,12 +59,12 @@ function ctxs.hint()
 end
 
 function ctxs.root_path()
-    return vim.fn.Expand(vim.fn.SvarWs().fw.path)
+    return vim.fs.normalize(vim.fn.SvarWs().fw.path)
 end
 
 function ctxs.relative_path()
-    local filepath = vim.fn.Expand('%', ':p')
-    local rootpath = vim.fn.Expand(vim.fn.SvarWs().fw.path)
+    local filepath = vim.fs.normalize(vim.api.nvim_buf_get_name(0))
+    local rootpath = vim.fs.normalize(vim.fn.SvarWs().fw.path)
     local pat = '^' .. vim.fn.escape(rootpath, '\\')
     return vim.fn.substitute(filepath, pat, '', '')
 end
@@ -353,7 +353,7 @@ local function bars()
             hl = { fg = 'green' },
         },
         init = function(self)
-            local curfile = vim.fn.Expand('%')
+            local curfile = vim.api.nvim_buf_get_name(0)
             self.fdir = vim.fn.fnamemodify(curfile, ':h')
             self.fname = vim.fn.fnamemodify(curfile, ':t')
         end,

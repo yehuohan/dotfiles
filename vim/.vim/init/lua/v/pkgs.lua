@@ -284,7 +284,7 @@ local function pkg_tree()
         function()
             local tapi = require('nvim-tree.api')
             tapi.tree.close()
-            tapi.tree.open(vim.fn.Expand('%', ':p:h'))
+            tapi.tree.open(vim.fs.dirname(vim.api.nvim_buf_get_name(0)))
         end,
     })
 end
