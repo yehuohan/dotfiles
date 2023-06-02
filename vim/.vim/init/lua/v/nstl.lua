@@ -63,7 +63,7 @@ function ctxs.root_path()
 end
 
 function ctxs.relative_path()
-    local filepath = vim.fs.normalize(vim.api.nvim_buf_get_name(0))
+    local filepath = vim.fs.normalize(vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':p'))
     local rootpath = vim.fs.normalize(vim.fn.SvarWs().fw.path)
     local pat = '^' .. vim.fn.escape(rootpath, '\\')
     return vim.fn.substitute(filepath, pat, '', '')

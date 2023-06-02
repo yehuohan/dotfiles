@@ -177,8 +177,7 @@ local function pkg_alpha()
         tpl.button(
             'q',
             'Quit',
-            [[
-            <Cmd>try <Bar>
+            [[<Cmd>try <Bar>
                 normal! <C-^> <Bar>
             catch <Bar>
                 q <Bar>
@@ -219,46 +218,42 @@ end
 
 -- 目录树导航
 local function pkg_tree()
-    local tcb = require('nvim-tree.config').nvim_tree_callback
     require('nvim-tree').setup({
+        on_attach = function(bufnr)
+            local tapi = require('nvim-tree.api')
+            -- stylua: ignore start
+            m.nnore({'<CR>'         , tapi.node.open.edit             , buffer = bufnr, silent = true, nowait = true, desc = 'Open'                  })
+            m.nnore({'o'            , tapi.node.open.edit             , buffer = bufnr, silent = true, nowait = true, desc = 'Open'                  })
+            m.nnore({'<2-LeftMouse>', tapi.node.open.edit             , buffer = bufnr, silent = true, nowait = true, desc = 'Open'                  })
+            m.nnore({'i'            , tapi.node.open.vertical         , buffer = bufnr, silent = true, nowait = true, desc = 'Open: Vertical Split'  })
+            m.nnore({'gi'           , tapi.node.open.horizontal       , buffer = bufnr, silent = true, nowait = true, desc = 'Open: Horizontal Split'})
+            m.nnore({'t'            , tapi.node.open.tab              , buffer = bufnr, silent = true, nowait = true, desc = 'Open: New Tab'         })
+            m.nnore({'<Tab>'        , tapi.node.open.preview          , buffer = bufnr, silent = true, nowait = true, desc = 'Open Preview'          })
+            m.nnore({'cd'           , tapi.tree.change_root_to_node   , buffer = bufnr, silent = true, nowait = true, desc = 'CD'                    })
+            m.nnore({'u'            , tapi.tree.change_root_to_parent , buffer = bufnr, silent = true, nowait = true, desc = 'Up'                    })
+            m.nnore({'K'            , tapi.node.navigate.sibling.first, buffer = bufnr, silent = true, nowait = true, desc = 'First Sibling'         })
+            m.nnore({'J'            , tapi.node.navigate.sibling.last , buffer = bufnr, silent = true, nowait = true, desc = 'Last Sibling'          })
+            m.nnore({'<C-p>'        , tapi.node.navigate.sibling.prev , buffer = bufnr, silent = true, nowait = true, desc = 'Previous Sibling'      })
+            m.nnore({'<C-n>'        , tapi.node.navigate.sibling.next , buffer = bufnr, silent = true, nowait = true, desc = 'Next Sibling'          })
+            m.nnore({'p'            , tapi.node.navigate.parent       , buffer = bufnr, silent = true, nowait = true, desc = 'Parent Directory'      })
+            m.nnore({'.'            , tapi.tree.toggle_hidden_filter  , buffer = bufnr, silent = true, nowait = true, desc = 'Toggle Dotfiles'       })
+            m.nnore({'m'            , tapi.node.show_info_popup       , buffer = bufnr, silent = true, nowait = true, desc = 'Info'                  })
+            m.nnore({'r'            , tapi.tree.reload                , buffer = bufnr, silent = true, nowait = true, desc = 'Refresh'               })
+            m.nnore({'q'            , tapi.tree.close                 , buffer = bufnr, silent = true, nowait = true, desc = 'Close'                 })
+            m.nnore({'?'            , tapi.tree.toggle_help           , buffer = bufnr, silent = true, nowait = true, desc = 'Help'                  })
+            m.nnore({'O'            , tapi.node.run.system            , buffer = bufnr, silent = true, nowait = true, desc = 'Run System'            })
+            m.nnore({'A'            , tapi.fs.create                  , buffer = bufnr, silent = true, nowait = true, desc = 'Create'                })
+            m.nnore({'D'            , tapi.fs.remove                  , buffer = bufnr, silent = true, nowait = true, desc = 'Delete'                })
+            m.nnore({'R'            , tapi.fs.rename                  , buffer = bufnr, silent = true, nowait = true, desc = 'Rename'                })
+            m.nnore({'<C-r>'        , tapi.fs.rename_sub              , buffer = bufnr, silent = true, nowait = true, desc = 'Rename: Omit Filename' })
+            m.nnore({'X'            , tapi.fs.cut                     , buffer = bufnr, silent = true, nowait = true, desc = 'Cut'                   })
+            m.nnore({'C'            , tapi.fs.copy.node               , buffer = bufnr, silent = true, nowait = true, desc = 'Copy'                  })
+            m.nnore({'P'            , tapi.fs.paste                   , buffer = bufnr, silent = true, nowait = true, desc = 'Paste'                 })
+            m.nnore({'y'            , tapi.fs.copy.filename           , buffer = bufnr, silent = true, nowait = true, desc = 'Copy Name'             })
+            m.nnore({'Y'            , tapi.fs.copy.absolute_path      , buffer = bufnr, silent = true, nowait = true, desc = 'Copy Absolute Path'    })
+            -- stylua: ignore end
+        end,
         auto_reload_on_write = false,
-        view = {
-            mappings = {
-                custom_only = true,
-                list = {
-                    {
-                        key = { '<CR>', 'o', '<2-LeftMouse>' },
-                        cb = tcb('edit'),
-                    },
-                    { key = 'i', cb = tcb('vsplit') },
-                    { key = 'gi', cb = tcb('split') },
-                    { key = 't', cb = tcb('tabnew') },
-                    { key = '<Tab>', cb = tcb('preview') },
-                    { key = 'cd', cb = tcb('cd') },
-                    { key = 'u', cb = tcb('dir_up') },
-                    { key = 'K', cb = tcb('first_sibling') },
-                    { key = 'J', cb = tcb('last_sibling') },
-                    { key = '<C-p>', cb = tcb('prev_sibling') },
-                    { key = '<C-n>', cb = tcb('next_sibling') },
-                    { key = 'p', cb = tcb('parent_node') },
-                    { key = '.', cb = tcb('toggle_dotfiles') },
-                    { key = 'm', cb = tcb('toggle_file_info') },
-                    { key = 'r', cb = tcb('refresh') },
-                    { key = 'q', cb = tcb('close') },
-                    { key = '?', cb = tcb('toggle_help') },
-                    { key = 'O', cb = tcb('system_open') },
-                    { key = 'A', cb = tcb('create') },
-                    { key = 'D', cb = tcb('remove') },
-                    { key = 'R', cb = tcb('rename') },
-                    { key = '<C-r>', cb = tcb('full_rename') },
-                    { key = 'X', cb = tcb('cut') },
-                    { key = 'C', cb = tcb('copy') },
-                    { key = 'P', cb = tcb('paste') },
-                    { key = 'y', cb = tcb('copy_name') },
-                    { key = 'Y', cb = tcb('copy_absolute_path') },
-                },
-            },
-        },
         renderer = {
             indent_markers = {
                 enable = true,
@@ -609,6 +604,7 @@ local function pkg_lazy()
         },
         readme = {
             root = vim.env.DotVimLocal .. '/lazy/readme',
+            skip_if_doc_exists = false,
         },
         performance = {
             rtp = {
@@ -711,7 +707,6 @@ local function pkg_lazy()
             lazy = true,
             enabled = use.ui.patch,
         },
-        { 'nvim-lua/plenary.nvim', lazy = true },
         { 'morhetz/gruvbox' },
         { 'rakr/vim-one' },
         { 'tanvirtin/monokai.nvim' },
@@ -790,6 +785,7 @@ local function pkg_lazy()
                 'quangnguyen30192/cmp-nvim-ultisnips',
                 'kdheepak/cmp-latex-symbols',
                 'f3fora/cmp-spell',
+                'nvim-lua/plenary.nvim',
             },
         },
         {

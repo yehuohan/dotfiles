@@ -433,6 +433,7 @@ local function __mappings()
     -- TODO: list for workspace, sources, servers, commands
     -- m.nnore{'<leader>ow', vim.lsp.buf.manage_workspace_folder}
     -- m.nnore{'<leader>oc', vim.lsp.buf.execute_command}
+    m.nnore({ '<leader><leader>o', ':LspStart<Space>' })
     m.nnore({ '<leader>oR', ':LspRestart<CR>' })
     m.nnore({ '<leader>ol', ':LspInfo<CR>' })
     m.nnore({ '<leader>om', ':Mason<CR>' })
