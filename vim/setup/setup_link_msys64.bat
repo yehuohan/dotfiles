@@ -1,5 +1,10 @@
 @echo off
 
+for %%i in ("%~dp0\..\") do set DIR_VIM=%%~dpi
+
+echo DIR_VIM: %DIR_VIM%
+
+copy %DIR_VIM%\gvim\.vimrc %APPS_HOME%\msys64\home\%USERNAME%\
 mklink /D %APPS_HOME%\msys64\home\%USERNAME%\.vim\autoload      %APPS_HOME%\dotvim\autoload
 mklink /D %APPS_HOME%\msys64\home\%USERNAME%\.vim\bundle        %APPS_HOME%\dotvim\bundle
 mklink /D %APPS_HOME%\msys64\home\%USERNAME%\.vim\init          %APPS_HOME%\dotvim\init

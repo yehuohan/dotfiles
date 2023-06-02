@@ -26,7 +26,9 @@ endfunction
 " }}}
 
 " Globals {{{
+if !exists('$DotVimDir')
 let $DotVimDir=resolve(expand('<sfile>:p:h:h:h'))
+endif
 let $DotVimInit=$DotVimDir . '/init'
 let $DotVimVimL=$DotVimDir . '/init/viml'
 let $DotVimMisc=$DotVimDir . '/misc'
