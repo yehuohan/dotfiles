@@ -509,11 +509,7 @@ local function pkg_treesitter()
                 scope_incremental = '<M-v>',
             },
         },
-        rainbow = {
-            enable = true,
-            extended_mode = true,
-            max_file_lines = nil,
-        },
+        rainbow = { enable = true },
     })
     vim.opt.runtimepath:append(parser_dir)
     m.nnore({
@@ -644,6 +640,7 @@ local function pkg_lazy()
             end,
             opts = {},
         },
+        { 'andymass/vim-matchup' },
         { 'mg979/vim-visual-multi' },
         { 'markonm/traces.vim' },
         { 'junegunn/vim-easy-align' },
@@ -770,7 +767,7 @@ local function pkg_lazy()
             config = pkg_treesitter,
         },
         {
-            'p00f/nvim-ts-rainbow',
+            'HiPhish/nvim-ts-rainbow2',
             enabled = use.nts,
             dependencies = { 'nvim-treesitter/nvim-treesitter' },
         },
@@ -821,6 +818,13 @@ local function pkg_lazy()
             'SirVer/ultisnips',
             enabled = use.has_py,
             dependencies = { 'honza/vim-snippets' },
+        },
+        {
+            'rcarriga/nvim-dap-ui',
+            enabled = use.ndap,
+            dependencies = {
+                'mfussenegger/nvim-dap',
+            },
         },
         { 'puremourning/vimspector', enabled = use.ndap },
         { 'liuchengxu/vista.vim', cmd = 'Vista' },

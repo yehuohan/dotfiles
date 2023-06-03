@@ -301,6 +301,7 @@ if !empty(s:use.xgit)
 endif
 call plug#begin($DotVimDir.'/bundle')  " 设置插件位置，且自动设置了syntax enable和filetype plugin indent on
     " editor
+    Plug 'andymass/vim-matchup'
     Plug 'yehuohan/vim-easymotion'
     Plug 'kshenoy/vim-signature'
     Plug 'RRethy/vim-illuminate'

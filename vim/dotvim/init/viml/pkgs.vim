@@ -8,15 +8,17 @@ let g:loaded_zipPlugin = 1
 let g:loaded_zip = 1
 let g:loaded_netrw = 1
 let g:loaded_netrwPlugin = 1
-"let g:loaded_matchit = 1
-"let g:loaded_matchparen = 1
-
-" 匹配符跳转
-packadd matchit
-map <S-m> %
+let g:loaded_matchit = 1
+let g:loaded_matchparen = 1
 " }}}
 
 " Editor {{{
+" matchup {{{ 匹配符跳转
+" packadd matchit
+let g:matchup_matchparen_offscreen = { 'method' : 'popup' }
+map <S-m> %
+" }}}
+
 " vim-visual-multi {{{ 多光标编辑
 " Tab: 切换cursor/extend模式
 let g:VM_mouse_mappings = 0         " 禁用鼠标
