@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 DIR_VIM=$(readlink -f "$(dirname "$0")/../")
-DIR_DOT=~/.vim
+DIR_DOT=~/dotvim
 # InitFile=init.lua
 InitFile=init.vim
 
@@ -10,8 +10,8 @@ echo DIR_DOT: $DIR_DOT
 echo Init file: $InitFile
 
 # check DIR_VIM
-if [[ ! -d "$DIR_VIM/.vim" ]]; then
-    echo ERROR: "$DIR_VIM/.vim" is not existed
+if [[ ! -d "$DIR_VIM/dotvim" ]]; then
+    echo ERROR: "$DIR_VIM/dotvim" is not existed
     exit
 fi
 if [[ ! -f "$DIR_VIM/nvim/$InitFile" ]]; then
@@ -19,11 +19,11 @@ if [[ ! -f "$DIR_VIM/nvim/$InitFile" ]]; then
     exit
 fi
 
-# copy .vim
-cp -r $DIR_VIM/.vim/*         $DIR_DOT/
+# copy dotvim
+cp -r $DIR_VIM/dotvim/*         $DIR_DOT/
 
 # copy nvim
 mkdir -p ~/.config/nvim
-cp $DIR_VIM/nvim/$InitFile ~/.config/nvim/
+cp $DIR_VIM/nvim/$InitFile      ~/.config/nvim/
 
 echo "Dotvim setup was completed!"
