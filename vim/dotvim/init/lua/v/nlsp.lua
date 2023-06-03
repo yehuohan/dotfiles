@@ -82,6 +82,9 @@ local function __servers()
                             },
                         },
                         telemetry = { enable = false },
+                        format = {
+                            enable = false,
+                        },
                     },
                 },
             })
