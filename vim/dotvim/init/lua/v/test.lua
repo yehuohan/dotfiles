@@ -75,6 +75,11 @@ function tst.new_config()
     cfg2.args = 'args'
     EQ(nil, rawget(getmetatable(getmetatable(cfg)), 'args'))
 
+    -- Get config
+    local out = cfg:get()
+    EQ({ file = 'test.c' }, out)
+    EQ(nil, getmetatable(out))
+
     -- Setup config
     cfg:set({ cmd = 'gcc', args = { '-g', '-o' } })
     EQ('c', rawget(getmetatable(getmetatable(cfg)), 'type'))

@@ -47,13 +47,26 @@ function M.new_config(opt)
         initialization[k] = nil
     end
 
+    -- Get only savable options as a table
+    function C:get()
+        local t = {}
+        for k, v in pairs(self) do
+            if type(v) == 'table' then
+                t[k] = vim.deepcopy(v)
+            else
+                t[k] = v
+            end
+        end
+        return t
+    end
+
     -- Setup config's current options
     -- All savable options will be extend with new_opt;
     -- All non-savable options will be keeped.
     function C:set(new_opt)
         for k, v in pairs(new_opt) do
             if type(v) == 'table' then
-                rawset(self, k, vim.deepcopy(new_opt[k]))
+                rawset(self, k, vim.deepcopy(v))
             else
                 rawset(self, k, v)
             end
@@ -103,6 +116,9 @@ function _a._wrap(afunc)
     end
 end
 
+-- Async PopSelection
+-- @retval true Selection is confirmed
+-- @retval false Selected is canceled
 function _a.pop_selection(sel)
     local caller = coroutine.running()
 
