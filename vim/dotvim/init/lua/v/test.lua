@@ -51,18 +51,10 @@ function tst.new_config()
     EQ({ file = 'test.cpp' }, cfg)
 
     -- Methods
-    FAIL(function()
-        cfg.add = 'foo'
-    end)
-    FAIL(function()
-        cfg.del = 'foo'
-    end)
-    FAIL(function()
-        cfg.set = 'foo'
-    end)
-    FAIL(function()
-        cfg.reinit = 'foo'
-    end)
+    FAIL(function() cfg.add = 'foo' end)
+    FAIL(function() cfg.del = 'foo' end)
+    FAIL(function() cfg.set = 'foo' end)
+    FAIL(function() cfg.reinit = 'foo' end)
 
     -- Modify option and non-savable option
     cfg.file = 'test.c'

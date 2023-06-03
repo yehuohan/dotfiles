@@ -10,17 +10,11 @@ function IsLinux()
         and (vim.fn.has('win32unix') == 0)
 end
 
-function IsWin()
-    return (vim.fn.has('win32') == 1) or (vim.fn.has('win64') == 1)
-end
+function IsWin() return (vim.fn.has('win32') == 1) or (vim.fn.has('win64') == 1) end
 
-function IsGw()
-    return vim.fn.has('win32unix') == 1
-end
+function IsGw() return vim.fn.has('win32unix') == 1 end
 
-function IsMac()
-    return vim.fn.has('mac') == 1
-end
+function IsMac() return vim.fn.has('mac') == 1 end
 
 return {
     setup = function()

@@ -34,9 +34,7 @@ end
 
 local function use_init()
     -- Init with empty dict '{}' to indicate sub-selection
-    local udic = vim.tbl_map(function()
-        return vim.empty_dict()
-    end, use)
+    local udic = vim.tbl_map(function() return vim.empty_dict() end, use)
     -- Set xgit
     udic.xgit = { lst = { vim.v.null, 'https://kgithub.com' } }
     -- Set ui
@@ -64,12 +62,8 @@ local function use_init()
             widesize = { lst = fontsizelst },
         },
         sub = {
-            cmd = function(sopt, sel)
-                use.ui[sopt] = sel
-            end,
-            get = function(sopt)
-                return use.ui[sopt]
-            end,
+            cmd = function(sopt, sel) use.ui[sopt] = sel end,
+            get = function(sopt) return use.ui[sopt] end,
         },
     }
 
@@ -80,12 +74,8 @@ local function use_init()
         evt = use_save,
         sub = {
             lst = { true, false },
-            cmd = function(sopt, sel)
-                use[sopt] = sel
-            end,
-            get = function(sopt)
-                return use[sopt]
-            end,
+            cmd = function(sopt, sel) use[sopt] = sel end,
+            get = function(sopt) return use[sopt] end,
         },
     })
 end
@@ -95,8 +85,6 @@ return {
         vim.api.nvim_create_user_command('Use', 'lua require("v.use").cfg()', { nargs = 0 })
         use_load()
     end,
-    get = function()
-        return use
-    end,
+    get = function() return use end,
     cfg = use_init,
 }

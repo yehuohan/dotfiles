@@ -167,9 +167,7 @@ local function pkg_alpha()
             { type = 'padding', val = 1 },
             {
                 type = 'group',
-                val = function()
-                    return { tpl.mru(0, false, 8) }
-                end,
+                val = function() return { tpl.mru(0, false, 8) } end,
             },
         },
     }
@@ -201,19 +199,12 @@ end
 -- 消息提示
 local function pkg_notify()
     require('notify').setup({
-        max_width = function()
-            return vim.api.nvim_get_option('columns') * 0.7
-        end,
+        max_width = function() return vim.api.nvim_get_option('columns') * 0.7 end,
         minimum_width = 30,
         top_down = false,
     })
     vim.notify = require('notify')
-    m.nnore({
-        '<leader>dm',
-        function()
-            vim.notify.dismiss()
-        end,
-    })
+    m.nnore({ '<leader>dm', function() vim.notify.dismiss() end })
 end
 
 -- 目录树导航
@@ -387,25 +378,13 @@ local function pkg_comment()
         },
     })
     local comment = require('Comment.api')
-    m.nnore({
-        '<leader>ci',
-        function()
-            comment.toggle.linewise.count(vim.v.count1)
-        end,
-    })
-    m.nnore({
-        '<leader>cl',
-        function()
-            comment.comment.linewise.count(vim.v.count1)
-        end,
-    })
+    m.nnore({ '<leader>ci', function() comment.toggle.linewise.count(vim.v.count1) end })
+    m.nnore({ '<leader>cl', function() comment.comment.linewise.count(vim.v.count1) end })
     m.nnore({
         '<leader>cu',
         function()
             -- ignore errors when uncommenting a non-commented line
-            pcall(function()
-                comment.uncomment.linewise.count(vim.v.count1)
-            end)
+            pcall(function() comment.uncomment.linewise.count(vim.v.count1) end)
         end,
     })
 end
@@ -463,9 +442,7 @@ local function pkg_ufo()
             table.insert(res, { ('  %d '):format(endLnum - lnum), 'MoreMsg' })
             return res
         end,
-        provider_selector = function(bufnr, filetype, buftype)
-            return ''
-        end,
+        provider_selector = function(bufnr, filetype, buftype) return '' end,
     })
     m.nnore({
         '<leader>tu',
@@ -560,9 +537,7 @@ local function pkg_overseer()
                 ['O'] = function()
                     require('overseer.task_list.sidebar').get():run_action('restart')
                 end,
-                ['K'] = function()
-                    require('overseer.task_list.sidebar').get():run_action('stop')
-                end,
+                ['K'] = function() require('overseer.task_list.sidebar').get():run_action('stop') end,
                 ['D'] = function()
                     require('overseer.task_list.sidebar').get():run_action('dispose')
                 end,
@@ -678,9 +653,7 @@ local function pkg_lazy()
         {
             -- 窗口移动
             'sindrets/winshift.nvim',
-            init = function()
-                m.nnore({ '<C-m>', ':WinShift<CR>' })
-            end,
+            init = function() m.nnore({ '<C-m>', ':WinShift<CR>' }) end,
             opts = {},
         },
         { 'andymass/vim-matchup' },

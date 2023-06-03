@@ -58,9 +58,7 @@ function ctxs.hint()
     return sym.vos .. ' ' .. res
 end
 
-function ctxs.root_path()
-    return vim.fs.normalize(vim.fn.SvarWs().fw.path)
-end
+function ctxs.root_path() return vim.fs.normalize(vim.fn.SvarWs().fw.path) end
 
 function ctxs.relative_path()
     local filepath = vim.fs.normalize(vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':p'))
@@ -185,15 +183,11 @@ local function stls()
     })
     local ComFile = pad('areaC', {
         provider = '%F',
-        hl = function()
-            return { fg = conds.is_active() and 'textB' or 'textC' }
-        end,
+        hl = function() return { fg = conds.is_active() and 'textB' or 'textC' } end,
     })
     local ComType = pad('areaC', {
         provider = '%y',
-        hl = function()
-            return { fg = conds.is_active() and 'textB' or 'textC' }
-        end,
+        hl = function() return { fg = conds.is_active() and 'textB' or 'textC' } end,
     })
     local ComAttr = pad('areaC', {
         provider = ctxs.attr,
@@ -208,9 +202,7 @@ local function stls()
         hl = { fg = 'textC' },
     })
     local ComCheck = pad('areaA', {
-        provider = function(self)
-            return self:nonlocal('check')
-        end,
+        provider = function(self) return self:nonlocal('check') end,
         hl = { fg = 'blank', italic = true },
     }, {
         condition = function(self)
@@ -316,9 +308,7 @@ local function tabs()
             -- instantiate new child with overwriting the previous one
             self.child = self:new(children, 1)
         end,
-        provider = function(self)
-            return self.child:eval()
-        end,
+        provider = function(self) return self.child:eval() end,
     })
 end
 
@@ -337,9 +327,7 @@ end
 local function bars()
     return wrap({
         {
-            provider = function(self)
-                return self:nonlocal('fdir')
-            end,
+            provider = function(self) return self:nonlocal('fdir') end,
             hl = { fg = 'blue' },
         },
         {
@@ -347,9 +335,7 @@ local function bars()
             hl = { fg = 'red' },
         },
         {
-            provider = function(self)
-                return self:nonlocal('fname')
-            end,
+            provider = function(self) return self:nonlocal('fname') end,
             hl = { fg = 'green' },
         },
         init = function(self)

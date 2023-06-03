@@ -87,9 +87,7 @@ local _a = {}
 _a._await = coroutine.yield
 
 function _a._async(func)
-    return function(...)
-        coroutine.wrap(func)(...)
-    end
+    return function(...) coroutine.wrap(func)(...) end
 end
 
 function _a._wrap(afunc)

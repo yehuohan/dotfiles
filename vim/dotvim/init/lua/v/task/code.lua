@@ -150,12 +150,7 @@ function task.cmake(cfg)
     cfg.wdir = outdir
 
     local rep = {}
-    rep.gtar = {
-        u = 'Unix Makefiles',
-        n = 'NMake Makefiles',
-        j = 'Ninja',
-    }
-    rep.gtar = rep.gtar[cfg.key]
+    rep.gtar = cfg.target
     rep.garg = cfg.garg
     rep.barg = cfg.barg
     rep.bout = (cfg.stage ~= 'build') and patout(cfg.file, packs._pats.pro) or nil
@@ -194,20 +189,9 @@ function task.sphinx(cfg)
     return cmd
 end
 
-task._ = {
-    l = { fn = task.nvim },
-    f = { fn = task.file },
-    m = { fn = task.make, pat = 'Makefile' },
-    u = { fn = task.cmake, pat = 'CMakeLists' },
-    n = { fn = task.cmake, pat = 'CMakeLists' },
-    j = { fn = task.cmake, pat = 'CMakeLists' },
-    o = { fn = task.cargo, pat = 'Cargo.toml' },
-    h = { fn = task.sphinx, pat = IsWin() and 'make.bat' or 'Makefile' },
-}
-
 setmetatable(task, {
     __call = function(self, cfg)
-        local t = self._[cfg.key]
+        local t = self._maps[cfg.key]
         if t.pat then
             local files = vim.fs.find(function(name, path)
                 local re = vim.regex('\\c' .. t.pat)
@@ -224,6 +208,7 @@ setmetatable(task, {
                 throw(string.format('None of %s was found!', t.pat), 0)
             end
             cfg.file = files[#files]
+            cfg.target = t.target
         else
             cfg.file = vim.api.nvim_buf_get_name(0)
         end
@@ -231,6 +216,27 @@ setmetatable(task, {
         return t.fn(cfg)
     end,
 })
+
+-- stylua: ignore start
+task._maps = {
+    l = { fn = task.nvim },
+    f = { fn = task.file },
+    m = { fn = task.make,   pat = 'Makefile' },
+    u = { fn = task.cmake,  pat = 'CMakeLists', target = 'Unix Makefiles' },
+    n = { fn = task.cmake,  pat = 'CMakeLists', target = 'NMake Makefiles' },
+    j = { fn = task.cmake,  pat = 'CMakeLists', target = 'Ninja' },
+    o = { fn = task.cargo,  pat = 'Cargo.toml' },
+    h = { fn = task.sphinx, pat = IsWin() and 'make.bat' or 'Makefile' },
+}
+
+task._keys = {
+    'rl' ,
+    'Rp' , 'Rm' , 'Ru' , 'Rn' , 'Rj' , 'Ro' , 'Rh' , 'Rf',
+    'rp' , 'rm' , 'ru' , 'rn' , 'rj' , 'ro' , 'rh' , 'rf',
+    'rcp', 'rcm', 'rcu', 'rcn', 'rcj', 'rco', 'rch',
+    'rbp', 'rbm', 'rbu', 'rbn', 'rbj', 'rbo', 'rbh',
+}
+-- stylua: ignore end
 
 -- Run code task
 local function run(cfg)
@@ -261,6 +267,21 @@ local function parse_config(kt)
     return wsc
 end
 
+-- Entry of code task
+-- @param kt: [rR][cb][p...]
+--            [%1][%2][%3  ]
+-- %1 = km.S
+--      r : build and run task
+--      R : modify task parameters
+-- %2 = km.A
+--      c : clean task
+--      b : build without run
+-- %3 = km.E from codes and packs
+--      p : run task from task.wsc.code
+-- Forward:
+--      Rp  -> rp  -> r^p (r^p means r[km.E != p])
+--      R^p -> r^p
+--      r^p
 local entry = async(function(kt)
     local res = true
 
@@ -269,17 +290,14 @@ local entry = async(function(kt)
             type = '',
         }
         local selection = {
+            opt = 'config code task',
             lst = { 'type' },
             dic = {
                 type = { lst = { 'c', 'cpp', 'rust' } },
             },
             sub = {
-                cmd = function(sopt, sel)
-                    params[sopt] = sel
-                end,
-                get = function(sopt)
-                    return params[sopt]
-                end,
+                cmd = function(sopt, sel) params[sopt] = sel end,
+                get = function(sopt) return params[sopt] end,
             },
         }
         res = await(a.pop_selection(selection))
@@ -300,7 +318,7 @@ end)
 local function setup()
     wsc = require('v.libv').new_config(wsc_initialization)
 
-    -- Convert mapping keys to table
+    -- Keys mapping to table
     local keys2kt = function(keys)
         return {
             S = keys:sub(1, 1),
@@ -308,24 +326,10 @@ local function setup()
             E = keys:sub(-1, -1),
         }
     end
-    -- Mapping keys
-    -- stylua: ignore start
-    local mappings = {
-        'rl' ,
-        'Rp' , 'Rm' , 'Ru' , 'Rn' , 'Rj' , 'Ro' , 'Rh' , 'Rf',
-        'rp' , 'rm' , 'ru' , 'rn' , 'rj' , 'ro' , 'rh' , 'rf',
-        'rcp', 'rcm', 'rcu', 'rcn', 'rcj', 'rco', 'rch',
-        'rbp', 'rbm', 'rbu', 'rbn', 'rbj', 'rbo', 'rbh',
-    }
-    -- stylua: ignore end
     local m = require('v.libv').m
-    for _, keys in ipairs(mappings) do
-        m.nnore({
-            '<leader>' .. keys,
-            function()
-                entry(keys2kt(keys))
-            end,
-        })
+    for _, keys in ipairs(task._keys) do
+        local kt = keys2kt(keys)
+        m.nnore({ '<leader>' .. keys, function() entry(kt) end })
     end
 end
 

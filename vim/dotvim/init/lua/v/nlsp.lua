@@ -203,36 +203,34 @@ local function __completion()
 
     local cmp = require('cmp')
     local cmp_mappings = {
-        ['<M-i>'] = cmp.mapping(function()
-            cmp.complete()
-        end, { 'i' }),
-        ['<M-u>'] = cmp.mapping(function()
-            cmp.complete({
-                config = {
-                    sources = { { name = 'ultisnips' } },
-                },
-            })
-        end, { 'i' }),
-        ['<M-e>'] = cmp.mapping(function()
-            cmp.abort()
-        end, { 'i', 'c' }),
-        ['<M-j>'] = cmp.mapping(function()
-            cmp.select_next_item()
-        end, { 'i', 'c' }),
-        ['<M-k>'] = cmp.mapping(function()
-            cmp.select_prev_item()
-        end, { 'i', 'c' }),
+        ['<M-i>'] = cmp.mapping(function() cmp.complete() end, { 'i' }),
+        ['<M-u>'] = cmp.mapping(
+            function()
+                cmp.complete({
+                    config = {
+                        sources = { { name = 'ultisnips' } },
+                    },
+                })
+            end,
+            { 'i' }
+        ),
+        ['<M-e>'] = cmp.mapping(function() cmp.abort() end, { 'i', 'c' }),
+        ['<M-j>'] = cmp.mapping(function() cmp.select_next_item() end, { 'i', 'c' }),
+        ['<M-k>'] = cmp.mapping(function() cmp.select_prev_item() end, { 'i', 'c' }),
         ['<M-n>'] = cmp.mapping.scroll_docs(4),
         ['<M-m>'] = cmp.mapping.scroll_docs(-4),
         ['<M-f>'] = cmp.mapping.scroll_docs(4),
         ['<M-d>'] = cmp.mapping.scroll_docs(-4),
-        ['<M-y>'] = cmp.mapping(function()
-            cmp.complete({
-                config = {
-                    sources = { { name = 'cmdline_history' } },
-                },
-            })
-        end, { 'c' }),
+        ['<M-y>'] = cmp.mapping(
+            function()
+                cmp.complete({
+                    config = {
+                        sources = { { name = 'cmdline_history' } },
+                    },
+                })
+            end,
+            { 'c' }
+        ),
         ['<Tab>'] = cmp.mapping(function()
             if cmp.visible() then
                 cmp.select_next_item()
@@ -265,9 +263,7 @@ local function __completion()
     cmp.setup({
         mapping = cmp_mappings,
         snippet = {
-            expand = function(args)
-                vim.fn['UltiSnips#Anon'](args.body)
-            end,
+            expand = function(args) vim.fn['UltiSnips#Anon'](args.body) end,
         },
         sources = cmp.config.sources({
             { name = 'nvim_lsp' },
@@ -391,12 +387,7 @@ local function __mappings()
     m.nnore({ '<leader>gt', vim.lsp.buf.type_definition })
     m.nnore({ '<leader>gr', vim.lsp.buf.references })
     m.nnore({ '<leader>gn', vim.lsp.buf.rename })
-    m.nnore({
-        '<leader>gf',
-        function()
-            vim.lsp.buf.code_action({ apply = true })
-        end,
-    })
+    m.nnore({ '<leader>gf', function() vim.lsp.buf.code_action({ apply = true }) end })
     -- m.nnore{'<leader>ga', vim.lsp.buf.code_action}
     -- m.nnore{'<leader>gh', vim.lsp.buf.hover}
     m.nnore({ '<leader>ga', '<Cmd>Lspsaga code_action<CR>' })
@@ -408,18 +399,9 @@ local function __mappings()
     m.nore({ '<leader>of', vim.lsp.buf.format })
     m.nnore({ '<leader>od', vim.diagnostic.setloclist })
     m.nnore({ '<leader>oi', vim.diagnostic.open_float })
-    m.nnore({
-        '<leader>oj',
-        function()
-            vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
-        end,
-    })
-    m.nnore({
-        '<leader>ok',
-        function()
-            vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
-        end,
-    })
+    local opts = { severity = vim.diagnostic.severity.ERROR }
+    m.nnore({ '<leader>oj', function() vim.diagnostic.goto_next(opts) end })
+    m.nnore({ '<leader>ok', function() vim.diagnostic.goto_prev(opts) end })
     m.nnore({ '<leader>oJ', vim.diagnostic.goto_next })
     m.nnore({ '<leader>oK', vim.diagnostic.goto_prev })
     -- TODO: list for workspace, sources, servers, commands

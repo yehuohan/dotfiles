@@ -8,14 +8,10 @@ M.wsc = {
 }
 
 -- Repleace command's placeholders
-function M.replace(cmd, rep)
-    return vim.trim(string.gsub(cmd, '{(%w+)}', rep))
-end
+function M.replace(cmd, rep) return vim.trim(string.gsub(cmd, '{(%w+)}', rep)) end
 
 -- Sequence commands
-function M.sequence(cmdlist)
-    return table.concat(cmdlist, ' && ')
-end
+function M.sequence(cmdlist) return table.concat(cmdlist, ' && ') end
 
 function M.run(opts)
     local overseer = require('overseer')
