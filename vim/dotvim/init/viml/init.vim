@@ -63,8 +63,17 @@ map <CR> <CR>
 map <Tab> <Tab>
 " }}}
 
+if IsNVim()
+    function! SvarUse()
+        return v:lua.require('v.use').get()
+    endfunction
+    set rtp^=$DotVimInit
+    lua require('v').setup()
+else
 source $DotVimVimL/env.vim
 source $DotVimVimL/use.vim
 source $DotVimVimL/pkgs.vim
+source $DotVimVimL/pkgs.ext.vim
+endif
 source $DotVimVimL/mods.vim
 source $DotVimVimL/sets.vim

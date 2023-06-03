@@ -1,4 +1,4 @@
-local use = vim.fn.SvarUse()
+local use = require('v.use').get()
 local m = require('v.libv').m
 
 --------------------------------------------------------------------------------
@@ -545,6 +545,49 @@ local function pkg_formatter()
     m.nnore({ '<leader>fo', ':Format<CR>' })
 end
 
+-- 导步程序/任务
+local function pkg_overseer()
+    local overseer = require('overseer')
+    overseer.setup({
+        strategy = { 'jobstart', use_terminal = false },
+        dap = false,
+        task_list = {
+            direction = 'right',
+            bindings = {
+                ['i'] = 'Edit',
+                ['p'] = 'TogglePreview',
+                ['o'] = 'OpenQuickFix',
+                ['O'] = function()
+                    require('overseer.task_list.sidebar').get():run_action('restart')
+                end,
+                ['K'] = function()
+                    require('overseer.task_list.sidebar').get():run_action('stop')
+                end,
+                ['D'] = function()
+                    require('overseer.task_list.sidebar').get():run_action('dispose')
+                end,
+            },
+        },
+    })
+    m.nnore({ '<leader>tk', '<Cmd>OverseerToggle<CR>' })
+    -- m.nnore({
+    --     '<leader>rk',
+    --     function()
+    --         local list = overseer.list_tasks()
+    --         list[#list]:stop()
+    --     end,
+    -- })
+    -- m.nnore({
+    --     '<leader>rK',
+    --     function()
+    --         local list = overseer.list_tasks()
+    --         for _, t in ipairs(list) do
+    --             t:stop()
+    --         end
+    --     end,
+    -- })
+end
+
 --------------------------------------------------------------------------------
 -- Utils
 --------------------------------------------------------------------------------
@@ -803,9 +846,20 @@ local function pkg_lazy()
             enabled = use.coc,
             branch = 'release',
             config = function()
-                for sec, val in ipairs(vim.fn.Env_coc_settings()) do
-                    vim.fn['coc#config'](sec, val)
-                end
+                vim.fn['coc#config']('Lua', {
+                    workspace = {
+                        library = {
+                            vim.env.DotVimInit .. '/lua',
+                            vim.env.VIMRUNTIME .. '/lua',
+                            vim.env.VIMRUNTIME .. '/lua/vim',
+                            vim.env.VIMRUNTIME .. '/lua/vim/lsp',
+                            vim.env.VIMRUNTIME .. '/lua/vim/treesitter',
+                        },
+                    },
+                })
+                vim.fn['coc#config']('python', {
+                    pythonPath = vim.env.VPathPython .. '/python',
+                })
             end,
             event = 'InsertEnter',
             dependencies = { 'neoclide/jsonc.vim' },
@@ -813,6 +867,10 @@ local function pkg_lazy()
         {
             'mhartington/formatter.nvim',
             config = pkg_formatter,
+        },
+        {
+            'stevearc/overseer.nvim',
+            config = pkg_overseer,
         },
         {
             'SirVer/ultisnips',
@@ -830,10 +888,6 @@ local function pkg_lazy()
         { 'liuchengxu/vista.vim', cmd = 'Vista' },
         { 't9md/vim-quickhl' },
         { 'skywind3000/asyncrun.vim' },
-        {
-            'stevearc/overseer.nvim',
-            config = require('v.task').setup,
-        },
         { 'voldikss/vim-floaterm' },
         { 'tpope/vim-fugitive', cmd = { 'G', 'Git' } },
         { 'bfrg/vim-cpp-modern', ft = { 'c', 'cpp' } },
@@ -864,6 +918,14 @@ local function pkg_lazy()
         end,
         group = 'PkgLazy',
     })
+
+    local ok = pcall(function()
+        vim.o.background = 'dark'
+        vim.cmd.colorscheme('gruvbox')
+    end)
+    if not ok then
+        vim.cmd.colorscheme('default')
+    end
 end
 
 return {

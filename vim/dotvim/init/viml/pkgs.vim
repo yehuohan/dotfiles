@@ -486,17 +486,3 @@ endif
 let g:ImSelectSetImCmd = {key -> ['im-select', key]}
 " }}}
 " }}}
-
-if IsNVim()
-    set rtp^=$DotVimInit
-    lua require('v').setup()
-else
-    source $DotVimVimL/pkgs.ext.vim
-endif
-
-try
-    set background=dark
-    colorscheme gruvbox
-catch /^Vim\%((\a\+)\)\=:E185/
-    silent! colorscheme default
-endtry

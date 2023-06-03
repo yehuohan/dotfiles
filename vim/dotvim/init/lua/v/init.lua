@@ -24,6 +24,10 @@ end
 
 return {
     setup = function()
+        require('v.env').setup()
+        require('v.use').setup()
+        vim.cmd.source(vim.env.DotVimVimL .. '/pkgs.vim')
         require('v.pkgs').setup()
+        require('v.task').setup()
     end,
 }

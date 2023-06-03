@@ -209,9 +209,11 @@ setmetatable(task, {
     __call = function(self, cfg)
         local t = self._[cfg.key]
         if t.pat then
-            local files = vim.fs.find(function(name)
+            local files = vim.fs.find(function(name, path)
                 local re = vim.regex('\\c' .. t.pat)
-                return re:match_str(name)
+                -- Require checking file's existence, because vim.fs.normalize's bug:
+                -- vim.fs.normalize('C:/') will return 'C:', which is equal to '.' for vim.fs.find.
+                return re:match_str(name) and (vim.fn.filereadable(path .. '/' .. name) == 1)
             end, {
                 upward = true,
                 type = 'file',

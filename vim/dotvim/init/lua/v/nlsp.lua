@@ -1,5 +1,5 @@
 local api = vim.api
-local use = vim.fn.SvarUse()
+local use = require('v.use').get()
 local m = require('v.libv').m
 
 local function __servers()

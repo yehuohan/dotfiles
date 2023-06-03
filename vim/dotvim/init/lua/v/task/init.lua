@@ -24,49 +24,8 @@ function M.run(opts)
 end
 
 function M.setup()
-    local overseer = require('overseer')
-    overseer.setup({
-        strategy = { 'jobstart', use_terminal = false },
-        dap = false,
-        task_list = {
-            direction = 'right',
-            bindings = {
-                ['i'] = 'Edit',
-                ['p'] = 'TogglePreview',
-                ['o'] = 'OpenQuickFix',
-                ['O'] = function()
-                    require('overseer.task_list.sidebar').get():run_action('restart')
-                end,
-                ['K'] = function()
-                    require('overseer.task_list.sidebar').get():run_action('stop')
-                end,
-                ['D'] = function()
-                    require('overseer.task_list.sidebar').get():run_action('dispose')
-                end,
-            },
-        },
-    })
     require('v.task.code').setup()
     require('v.task.find').setup()
-
-    local m = require('v.libv').m
-    m.nnore({ '<leader>tk', '<Cmd>OverseerToggle<CR>' })
-    -- m.nnore({
-    --     '<leader>rk',
-    --     function()
-    --         local list = overseer.list_tasks()
-    --         list[#list]:stop()
-    --     end,
-    -- })
-    -- m.nnore({
-    --     '<leader>rK',
-    --     function()
-    --         local list = overseer.list_tasks()
-    --         for _, t in ipairs(list) do
-    --             t:stop()
-    --         end
-    --     end,
-    -- })
 
     -- vim.api.nvim_create_augroup('TaskWorkSpace', { clear = true })
     -- vim.api.nvim_create_autocmd('User', {

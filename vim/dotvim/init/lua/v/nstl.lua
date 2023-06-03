@@ -1,4 +1,4 @@
-local use = vim.fn.SvarUse()
+local use = require('v.use').get()
 local m = require('v.libv').m
 
 -- Symbols
@@ -120,7 +120,7 @@ end
 -- Colors
 local function load_colors()
     return {
-        blank = require('heirline.utils').get_highlight('Normal').bg,
+        blank = require('heirline.utils').get_highlight('Normal').bg or '#000000',
         red = '#fa461e',
         green = '#b8bb26',
         blue = '#83a598',

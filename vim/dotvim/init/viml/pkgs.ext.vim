@@ -376,3 +376,10 @@ endif
     Plug 'brglng/vim-im-select'
 call plug#end()
 " }}}
+
+try
+    set background=dark
+    colorscheme gruvbox
+catch /^Vim\%((\a\+)\)\=:E185/
+    silent! colorscheme default
+endtry
