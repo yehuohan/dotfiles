@@ -20,7 +20,6 @@ if [[ ! -f "$DIR_VIM/nvim/$InitFile" ]]; then
 fi
 
 # copy .vim
-cp    $DIR_VIM/.vim/.init.vim $DIR_DOT/
 cp -r $DIR_VIM/.vim/*         $DIR_DOT/
 
 # copy nvim
