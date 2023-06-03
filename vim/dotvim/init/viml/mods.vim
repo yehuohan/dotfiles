@@ -660,16 +660,16 @@ let s:fw = {
     \ }
 " s:fw_mappings {{{
 const s:fw_mappings_rg = [
-    \  'fi',  'fbi',  'fti',  'foi',  'fpi',  'Fi',  'fI',  'fbI',  'ftI',  'foI',  'fpI',  'FI',
-    \  'fw',  'fbw',  'ftw',  'fow',  'fpw',  'Fw',  'fW',  'fbW',  'ftW',  'foW',  'fpW',  'FW',
-    \  'fs',  'fbs',  'fts',  'fos',  'fps',  'Fs',  'fS',  'fbS',  'ftS',  'foS',  'fpS',  'FS',
-    \  'fy',  'fby',  'fty',  'foy',  'fpy',  'Fy',  'fY',  'fbY',  'ftY',  'foY',  'fpY',  'FY',
-    \  'fu',  'fbu',  'ftu',  'fou',  'fpu',  'Fu',  'fU',  'fbU',  'ftU',  'foU',  'fpU',  'FU',
-    \ 'fai', 'fabi', 'fati', 'faoi', 'fapi', 'Fai', 'faI', 'fabI', 'fatI', 'faoI', 'fapI', 'FaI',
-    \ 'faw', 'fabw', 'fatw', 'faow', 'fapw', 'Faw', 'faW', 'fabW', 'fatW', 'faoW', 'fapW', 'FaW',
-    \ 'fas', 'fabs', 'fats', 'faos', 'faps', 'Fas', 'faS', 'fabS', 'fatS', 'faoS', 'fapS', 'FaS',
-    \ 'fay', 'faby', 'faty', 'faoy', 'fapy', 'Fay', 'faY', 'fabY', 'fatY', 'faoY', 'fapY', 'FaY',
-    \ 'fau', 'fabu', 'fatu', 'faou', 'fapu', 'Fau', 'faU', 'fabU', 'fatU', 'faoU', 'fapU', 'FaU',
+    \  'fi',  'fbi',  'fpi',  'Fi',  'fI',  'fbI',  'fpI',  'FI',
+    \  'fw',  'fbw',  'fpw',  'Fw',  'fW',  'fbW',  'fpW',  'FW',
+    \  'fs',  'fbs',  'fps',  'Fs',  'fS',  'fbS',  'fpS',  'FS',
+    \  'fy',  'fby',  'fpy',  'Fy',  'fY',  'fbY',  'fpY',  'FY',
+    \  'fu',  'fbu',  'fpu',  'Fu',  'fU',  'fbU',  'fpU',  'FU',
+    \ 'fai', 'fabi', 'fapi', 'Fai', 'faI', 'fabI', 'fapI', 'FaI',
+    \ 'faw', 'fabw', 'fapw', 'Faw', 'faW', 'fabW', 'fapW', 'FaW',
+    \ 'fas', 'fabs', 'faps', 'Fas', 'faS', 'fabS', 'fapS', 'FaS',
+    \ 'fay', 'faby', 'fapy', 'Fay', 'faY', 'fabY', 'fapY', 'FaY',
+    \ 'fau', 'fabu', 'fapu', 'Fau', 'faU', 'fabU', 'fapU', 'FaU',
     \ 'fvi', 'fvpi',  'fvI', 'fvpI',
     \ 'fvw', 'fvpw',  'fvW', 'fvpW',
     \ 'fvs', 'fvps',  'fvS', 'fvpS',
@@ -763,10 +763,6 @@ function! s:parseLocation(km)
     let l:loc = ''
     if a:km.A0 ==# 'b'
         let l:loc = Expand('%', ':p')
-    elseif a:km.A0 ==# 't'
-        let l:loc = join(popc#layer#buf#GetFiles('sigtab'), '" "')
-    elseif a:km.A0 ==# 'o'
-        let l:loc = join(popc#layer#buf#GetFiles('alltab'), '" "')
     elseif a:km.A0 ==# 'p'
         let l:loc = join(s:getMultiDirs(), '" "')
     else
@@ -891,8 +887,8 @@ endfunction
 
 " Function: FindW(keys) {{{ 查找
 " {{{
-" @param keys: [fF][av][btop][IiWwSsYyUu]
-"              [%1][%2][%3  ][4%        ]
+" @param keys: [fF][av][bp][IiWwSsYyUu]
+"              [%1][%2][%3][4%        ]
 " Find: %1 = km.S
 "   F : find with inputing args
 " Command: %2 = km.A0
@@ -901,8 +897,6 @@ endfunction
 "   v : find with vimgrep
 " Location: %3 = km.A1
 "   b : find in current buffer(%)
-"   t : find in buffers of tab via popc
-"   o : find in buffers of all tabs via popc
 "   p : find with inputing path
 "  '' : find with s:ws.fw
 " Pattern: %4 = km.E

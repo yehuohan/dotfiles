@@ -535,6 +535,20 @@ local function pkg_treesitter()
     })
 end
 
+-- 代码格式化
+local function pkg_formatter()
+    require('formatter').setup({
+        logging = false,
+        filetype = {
+            c = { require('formatter.defaults.clangformat') },
+            cpp = { require('formatter.defaults.clangformat') },
+            lua = { require('formatter.filetypes.lua').stylua },
+            python = { require('formatter.filetypes.python').black },
+        },
+    })
+    m.nnore({ '<leader>fo', ':Format<CR>' })
+end
+
 --------------------------------------------------------------------------------
 -- Utils
 --------------------------------------------------------------------------------
@@ -769,7 +783,6 @@ local function pkg_lazy()
                 'williamboman/mason.nvim',
                 'williamboman/mason-lspconfig.nvim',
                 'neovim/nvim-lspconfig',
-                'jose-elias-alvarez/null-ls.nvim',
                 'glepnir/lspsaga.nvim',
                 'ray-x/lsp_signature.nvim',
                 -- Plug 'simrat39/rust-tools.nvim'
@@ -799,6 +812,10 @@ local function pkg_lazy()
             end,
             event = 'InsertEnter',
             dependencies = { 'neoclide/jsonc.vim' },
+        },
+        {
+            'mhartington/formatter.nvim',
+            config = pkg_formatter,
         },
         {
             'SirVer/ultisnips',
