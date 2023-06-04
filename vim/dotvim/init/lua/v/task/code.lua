@@ -8,7 +8,7 @@ local replace = require('v.task').replace
 local sequence = require('v.task').sequence
 local throw = error
 
--- Workspace config for code
+--- Workspace config for code
 M.wsc = {}
 local wsc_initialization = {
     key = '',
@@ -21,11 +21,11 @@ local wsc_initialization = {
     stage = 'run',
 }
 
--- Single code file tasks according to filetype
--- @var barg Build arguments
--- @var bsrc Build source file
--- @var bout Build output file
--- @var earg Execution arguments
+--- Single code file tasks according to filetype
+--- @var barg(string) Build arguments
+--- @var bsrc(string) Build source file
+--- @var bout(string) Build output file
+--- @var earg(string) Execution arguments
 -- stylua: ignore start
 local codes = {
     nvim       = { cmd = 'nvim -l {bsrc} {earg}' },
@@ -53,10 +53,10 @@ local codes = {
 }
 -- stylua: ignore end
 
--- Project package tasks
--- @var gtar Generator target
--- @var garg Generate arguments
--- @var stage Task stage from {'build', 'run', 'clean', 'test'}
+--- Project package tasks
+--- @var gtar(string) Generator target
+--- @var garg(string) Generate arguments
+--- @var stage(string) Task stage from {'build', 'run', 'clean', 'test'}
 local packs = {
     make = 'make {barg}',
     cmake = {
@@ -243,7 +243,7 @@ task._keys = {
 }
 -- stylua: ignore end
 
--- Selection to modify code task config
+--- Selection to modify code task config
 task._sels = {
     opt = 'config code task',
     lst = nil,
@@ -283,7 +283,6 @@ task._sels = {
     },
 }
 
--- Run code task
 local function run(cfg)
     local cmd = task(cfg)
     local opts = {}
@@ -305,20 +304,20 @@ local function run(cfg)
     require('v.task').run(opts)
 end
 
--- Entry of code task
--- @param kt: [rR][cb][p...]
---            [%1][%2][%3  ]
--- %1 = kt.S
---      r : build and run task
---      R : modify task parameters
--- %2 = kt.A
---      c : clean task
---      b : build without run
--- %3 = kt.E from codes and packs
---      p : run task from task.wsc.code
--- Forward:
---      R^p => r^p (r^p means r[kt.E != p])
---      Rp  => rp  => r^p
+--- Entry of code task
+--- @param kt(table) [rR][cb][p...]
+---                  [%1][%2][%3  ]
+--- %1 = kt.S
+---      r : build and run task
+---      R : modify task parameters
+--- %2 = kt.A
+---      c : clean task
+---      b : build without run
+--- %3 = kt.E from codes and packs
+---      p : run task from task.wsc.code
+--- Forward:
+---      R^p => r^p (r^p means r[kt.E != p])
+---      Rp  => rp  => r^p
 M.entry = async(function(kt, debug)
     M.wsc:reinit()
 

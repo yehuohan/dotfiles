@@ -1,4 +1,4 @@
--- Fuzzy finder tasks
+--- Fuzzy finder tasks
 local fzer = {
     rg = 'rg --vimgrep -F {opt} -e "{pat}" {loc}',
     fzf = {

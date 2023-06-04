@@ -1,7 +1,7 @@
 local use = require('v.use').get()
 local m = require('v.libv').m
 
--- Symbols
+--- Symbols
 local sym = {
     sep = { '(', ')' },
     row = '',
@@ -25,7 +25,7 @@ if use.ui.patch then
     end
 end
 
--- Contexts
+--- Contexts for statusline
 local ctxs = {}
 
 ctxs.attr = '%{&ft!=#""?&ft."│":""}%{&fenc!=#""?&fenc:&enc}│%{&ff}'
@@ -115,7 +115,7 @@ function ctxs.tabs_bufs(layout)
     return res
 end
 
--- Colors
+--- Colors
 local function load_colors()
     return {
         blank = require('heirline.utils').get_highlight('Normal').bg or '#000000',
@@ -133,7 +133,7 @@ local function load_colors()
     }
 end
 
--- Helpers
+--- Helpers
 local function pad(color, component, fileds)
     local utils = require('heirline.utils')
     local res = utils.surround(sym.sep, color, component)
@@ -147,7 +147,7 @@ local function wrap(component)
     return require('heirline.utils').surround({ '', '' }, 'blank', component)
 end
 
--- Statuslines
+--- Statuslines
 local function stls()
     local conds = require('heirline.conditions')
 
@@ -246,7 +246,7 @@ local function stls()
     return wrap({ ComHint, SecLeft, ComTrunc, SecRight })
 end
 
--- Tablines
+--- Tablines
 local function ele(e, fn)
     local fg = 'textB'
     local bg = 'areaC'
@@ -312,7 +312,7 @@ local function tabs()
     })
 end
 
--- Winbars
+--- Winbars
 local function disabled_bars(args)
     local bar_excluded_filetypes = { 'alpha', 'vim%-plug', 'vista', 'NvimTree', 'nerdtree' }
     local bar_excluded_buftypes = { 'nofile', 'terminal', 'quickfix' }
@@ -346,7 +346,7 @@ local function bars()
     })
 end
 
--- Setup
+--- Setup functions
 local function toggle_check()
     if vim.b.statusline_check_enabled == nil then
         vim.b.statusline_check_enabled = true
@@ -369,12 +369,12 @@ local function toggle_layout()
 end
 
 local function setup()
-    local heirline = require('heirline')
-
     vim.g.Popc_useTabline = 0
     vim.g.tabline_layout = { tab = true, buf = true }
     vim.o.termguicolors = 1
     vim.o.showtabline = 2
+
+    local heirline = require('heirline')
     heirline.setup({
         statusline = stls(),
         tabline = tabs(),
@@ -384,6 +384,7 @@ local function setup()
             colors = load_colors(),
         },
     })
+
     vim.api.nvim_create_augroup('PkgHeirline', { clear = true })
     vim.api.nvim_create_autocmd('ColorScheme', {
         callback = function()
@@ -394,6 +395,8 @@ local function setup()
     })
     m.nnore({ '<leader>tl', toggle_check })
     m.nnore({ '<leader>ty', toggle_layout })
+
+    vim.api.nvim_create_user_command('NStlSetup', require('v.nstl').setup, { nargs = 0 })
 end
 
 return {

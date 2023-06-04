@@ -1,4 +1,5 @@
----@usage nvim -l test.lua
+--- Simple testcases for neovim configration
+--- @usage nvim -l test.lua
 
 local dir_this = vim.fn.getcwd()
 local dir_base = vim.fs.dirname(vim.fs.dirname(dir_this))
@@ -72,7 +73,8 @@ function tst.new_config()
     EQ(nil, rawget(cfg, 'cmd'))
 
     -- Seperate non-savable option
-    local cfg2 = libv.new_config({})
+    local cfg2 = libv.new_config({ exec = 'true' })
+    cfg2:reinit({ exec = 'false' })
     cfg2.args = 'args'
     EQ(nil, rawget(getmetatable(getmetatable(cfg)), 'args'))
 
