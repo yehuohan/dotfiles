@@ -4,7 +4,7 @@ local M = {}
 M.wsc = {
     root = '',
     code = {},
-    find = {},
+    fzer = {},
 }
 
 --- Parse string to table of environment variables
@@ -36,7 +36,7 @@ end
 
 function M.setup()
     require('v.task.code').setup()
-    require('v.task.find').setup()
+    require('v.task.fzer').setup()
 
     -- vim.api.nvim_create_augroup('TaskWorkSpace', { clear = true })
     -- vim.api.nvim_create_autocmd('User', {

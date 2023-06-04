@@ -1,4 +1,30 @@
+local M = {}
+
+local a = require('v.libv').a
+local async = a._async
+local await = a._await
+local str2env = require('v.task').str2env
+local replace = require('v.task').replace
+local sequence = require('v.task').sequence
+local throw = error
+
+--- Workspace config for fzer
+M.wsc = {}
+local wsc_initialization = {
+    key = '',
+    file = '',
+    type = '',
+    envs = '',
+    garg = '',
+    barg = '',
+    earg = '',
+    stage = 'run',
+}
+
 --- Fuzzy finder tasks
+--- @var opt(string) Options
+--- @var pat(string) Pattern
+--- @var loc(string) Location
 local fzer = {
     rg = 'rg --vimgrep -F {opt} -e "{pat}" {loc}',
     fzf = {
@@ -18,8 +44,8 @@ local fzer = {
     },
 }
 
-local function setup() end
+M.entry = async(function(kt, debug) end)
 
-return {
-    setup = setup,
-}
+function M.setup() end
+
+return M
