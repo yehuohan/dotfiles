@@ -526,7 +526,6 @@ end
 local function pkg_overseer()
     local overseer = require('overseer')
     overseer.setup({
-        strategy = { 'jobstart', use_terminal = false },
         dap = false,
         task_list = {
             direction = 'right',

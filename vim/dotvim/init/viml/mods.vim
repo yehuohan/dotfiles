@@ -1016,7 +1016,7 @@ let s:rs = {
         \ 'lst' : [
             \ 'retab',
             \ '%s/\s\+$//ge',
-            \ '%s/\r//ge',
+            \ '%s/\r$//ge',
             \ 'edit ++enc=utf-8',
             \ 'edit ++enc=cp936',
             \ 'syntax match QC /\v^[^|]*\|[^|]*\| / conceal',
@@ -1028,7 +1028,7 @@ let s:rs = {
         \ 'dic' : {
             \ 'retab' : 'retab with expandtab',
             \ '%s/\s\+$//ge' : 'remove trailing space',
-            \ '%s/\r//ge' : 'remove ^M',
+            \ '%s/\r$//ge' : 'remove ^M',
             \ 'execAssembly' : {
                 \ 'dsr' : 'execute assembly command',
                 \ 'lst' : [

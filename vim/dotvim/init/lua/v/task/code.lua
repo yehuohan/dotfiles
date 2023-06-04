@@ -292,8 +292,9 @@ local function run(cfg)
     opts.components = {
         {
             'on_quickfix',
-            open = true,
             errorformat = cfg.efm,
+            open = true,
+            ansi_color = false,
         },
         'display_duration',
         'on_output_summarize',
