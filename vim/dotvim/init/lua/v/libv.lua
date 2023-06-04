@@ -149,6 +149,7 @@ function M.new_ansior(opts)
             repeat
                 cur_row = cur_row + 1
                 if row and cur_row < row then
+                    -- Append blank line to catch the lastest row
                     table.insert(lines, ' ')
                 end
             until (not row) or cur_row >= row

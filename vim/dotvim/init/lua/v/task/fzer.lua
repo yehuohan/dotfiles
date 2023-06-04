@@ -11,14 +11,10 @@ local throw = error
 --- Workspace config for fzer
 M.wsc = {}
 local wsc_initialization = {
-    key = '',
-    file = '',
-    type = '',
-    envs = '',
-    garg = '',
-    barg = '',
-    earg = '',
-    stage = 'run',
+    path = '',
+    filters = '',
+    globlst = '',
+    options = '',
 }
 
 --- Fuzzy finder tasks
@@ -46,6 +42,14 @@ local fzer = {
 
 M.entry = async(function(kt, debug) end)
 
-function M.setup() end
+function M.setup()
+    M.wsc = require('v.libv').new_config(wsc_initialization)
+
+    vim.api.nvim_create_user_command(
+        'TaskFzerWsc',
+        'lua vim.print(require("v.task.fzer").wsc)',
+        { nargs = 0 }
+    )
+end
 
 return M

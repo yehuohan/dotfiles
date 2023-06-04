@@ -544,22 +544,22 @@ local function pkg_overseer()
         },
     })
     m.nnore({ '<leader>tk', '<Cmd>OverseerToggle<CR>' })
-    -- m.nnore({
-    --     '<leader>rk',
-    --     function()
-    --         local list = overseer.list_tasks()
-    --         list[#list]:stop()
-    --     end,
-    -- })
-    -- m.nnore({
-    --     '<leader>rK',
-    --     function()
-    --         local list = overseer.list_tasks()
-    --         for _, t in ipairs(list) do
-    --             t:stop()
-    --         end
-    --     end,
-    -- })
+    m.nnore({
+        '<leader>rk',
+        function()
+            local list = overseer.list_tasks()
+            list[#list]:stop()
+        end,
+    })
+    m.nnore({
+        '<leader>rK',
+        function()
+            local list = overseer.list_tasks()
+            for _, t in ipairs(list) do
+                t:stop()
+            end
+        end,
+    })
 end
 
 --------------------------------------------------------------------------------

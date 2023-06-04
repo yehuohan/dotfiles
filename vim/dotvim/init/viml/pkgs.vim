@@ -384,8 +384,10 @@ let g:asyncrun_local = 1                " 使用setlocal的efm
 nnoremap <leader><leader>r :AsyncRun<Space>
 vnoremap <leader><leader>r
     \ <Cmd>call feedkeys(':AsyncRun ' . GetSelected(''), 'n')<CR>
+if IsVim()
 nnoremap <leader>rk :AsyncStop<CR>
 nnoremap <leader>rK :AsyncReset<CR>
+endif
 " }}}
 
 " floaterm {{{ 终端浮窗

@@ -218,6 +218,7 @@ augroup ModWorkSpace
 augroup END
 " }}}
 
+if IsVim()
 " Project {{{
 " Struct: s:rp {{{
 " @attribute proj: project类型
@@ -616,6 +617,7 @@ nnoremap <leader>rv
     \   execute 'source ' . Expand('%') <Bar>
     \ endif<CR>
 " }}}
+endif
 
 " Find {{{
 " Struct: s:fw {{{
