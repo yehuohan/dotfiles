@@ -3,6 +3,7 @@ local M = {}
 local a = require('v.libv').a
 local async = a._async
 local await = a._await
+local str2env = require('v.task').str2env
 local replace = require('v.task').replace
 local sequence = require('v.task').sequence
 local throw = error
@@ -13,6 +14,7 @@ local wsc_initialization = {
     key = '',
     file = '',
     type = '',
+    envs = '',
     garg = '',
     barg = '',
     earg = '',
@@ -84,8 +86,6 @@ local function patout(file, pattern)
         end
     end
 end
-
-local function patenv(args) end
 
 -- Task functions
 local task = {}
@@ -243,13 +243,14 @@ task._keys = {
 }
 -- stylua: ignore end
 
+-- Selection to modify code task config
 task._sels = {
     opt = 'config code task',
     lst = nil,
     -- lst for kt.E != p
-    lst_d = { 'garg', 'barg', 'earg', 'stage' },
+    lst_d = { 'envs', 'garg', 'barg', 'earg', 'stage' },
     -- lst for kt.E = p
-    lst_p = { 'key', 'file', 'type', 'garg', 'barg', 'earg', 'stage' },
+    lst_p = { 'key', 'file', 'type', 'envs', 'garg', 'barg', 'earg', 'stage' },
     dic = {
         key = {
             lst = vim.fn.sort(
@@ -260,7 +261,8 @@ task._sels = {
         },
         file = { cpl = 'file' },
         type = { cpl = 'filetype' },
-        garg = { lst = { '-DENABLE_TEST=' } },
+        envs = { lst = { 'PATH=' }, cpl = 'environment' },
+        garg = { lst = { '-DENABLE_TEST=' }, cpl = 'environment' },
         barg = { lst = { '-static', 'tags', '--target tags', '-j32' } },
         earg = { lst = { '--nocapture' } },
         stage = { lst = { 'build', 'run', 'clean', 'test' } },
@@ -287,6 +289,7 @@ local function run(cfg)
     local opts = {}
     opts.cmd = cmd
     opts.cwd = cfg.wdir
+    opts.env = str2env(cfg.envs)
     opts.components = {
         {
             'on_quickfix',
