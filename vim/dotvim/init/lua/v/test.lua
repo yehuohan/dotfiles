@@ -4,6 +4,7 @@ local dir_this = vim.fn.getcwd()
 local dir_base = vim.fs.dirname(vim.fs.dirname(dir_this))
 vim.opt.rtp:prepend(dir_base)
 local libv = require('v.libv')
+local task = require('v.task')
 
 local function EQ(expected, actual)
     assert(
@@ -98,6 +99,13 @@ function tst.new_config()
     vim.print(OK(vim.json.encode, cfg))
 
     vim.print(cfg)
+end
+
+function tst.str2env()
+    local str = ' VAR0=var0   VAR1=var1 '
+    local env = task.str2env(str)
+    EQ({ VAR0 = 'var0', VAR1 = 'var1' }, env)
+    vim.print(env)
 end
 
 print('Test work at', dir_this)
