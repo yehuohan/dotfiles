@@ -1,3 +1,5 @@
+local M = {}
+
 local a = require('v.libv').a
 local async = a._async
 local await = a._await
@@ -6,7 +8,7 @@ local sequence = require('v.task').sequence
 local throw = error
 
 -- Workspace config for code
-local wsc = {}
+M.wsc = {}
 local wsc_initialization = {
     key = '',
     file = '',
@@ -82,6 +84,8 @@ local function patout(file, pattern)
         end
     end
 end
+
+local function patenv(args) end
 
 -- Task functions
 local task = {}
@@ -192,26 +196,28 @@ end
 setmetatable(task, {
     __call = function(self, cfg)
         local t = self._maps[cfg.key]
-        if t.pat then
-            local files = vim.fs.find(function(name, path)
-                local re = vim.regex('\\c' .. t.pat)
-                -- Require checking file's existence, because vim.fs.normalize's bug:
-                -- vim.fs.normalize('C:/') will return 'C:', which is equal to '.' for vim.fs.find.
-                return re:match_str(name) and (vim.fn.filereadable(path .. '/' .. name) == 1)
-            end, {
-                upward = true,
-                type = 'file',
-                path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
-                limit = math.huge,
-            })
-            if #files == 0 then
-                throw(string.format('None of %s was found!', t.pat), 0)
+        if cfg.file == '' then
+            if t.pat then
+                local files = vim.fs.find(function(name, path)
+                    local re = vim.regex('\\c' .. t.pat)
+                    -- Require checking file's existence, because vim.fs.normalize's bug:
+                    -- vim.fs.normalize('C:/') will return 'C:', which is equal to '.' for vim.fs.find.
+                    return re:match_str(name) and (vim.fn.filereadable(path .. '/' .. name) == 1)
+                end, {
+                    upward = true,
+                    type = 'file',
+                    path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
+                    limit = math.huge,
+                })
+                if #files == 0 then
+                    throw(string.format('None of %s was found!', t.pat), 0)
+                end
+                cfg.file = files[#files]
+            else
+                cfg.file = vim.fs.normalize(vim.api.nvim_buf_get_name(0))
             end
-            cfg.file = files[#files]
-            cfg.target = t.target
-        else
-            cfg.file = vim.api.nvim_buf_get_name(0)
         end
+        cfg.target = t.target
         cfg.wdir = vim.fn.fnamemodify(cfg.file, ':h')
         return t.fn(cfg)
     end,
@@ -219,24 +225,61 @@ setmetatable(task, {
 
 -- stylua: ignore start
 task._maps = {
-    l = { fn = task.nvim },
-    f = { fn = task.file },
-    m = { fn = task.make,   pat = 'Makefile' },
-    u = { fn = task.cmake,  pat = 'CMakeLists', target = 'Unix Makefiles' },
-    n = { fn = task.cmake,  pat = 'CMakeLists', target = 'NMake Makefiles' },
-    j = { fn = task.cmake,  pat = 'CMakeLists', target = 'Ninja' },
-    o = { fn = task.cargo,  pat = 'Cargo.toml' },
-    h = { fn = task.sphinx, pat = IsWin() and 'make.bat' or 'Makefile' },
+    l = { fn = task.nvim,   desc = 'A nvim lua' },
+    f = { fn = task.file,   desc = 'A single file' },
+    m = { fn = task.make,   desc = 'Make',        pat = 'Makefile' },
+    u = { fn = task.cmake,  desc = 'CMake Unix',  pat = 'CMakeLists', target = 'Unix Makefiles' },
+    n = { fn = task.cmake,  desc = 'CMake NMake', pat = 'CMakeLists', target = 'NMake Makefiles' },
+    j = { fn = task.cmake,  desc = 'CMake Ninja', pat = 'CMakeLists', target = 'Ninja' },
+    o = { fn = task.cargo,  desc = 'Cargo rust',  pat = 'Cargo.toml' },
+    h = { fn = task.sphinx, desc = 'Sphinx doc',  pat = IsWin() and 'make.bat' or 'Makefile' },
 }
 
 task._keys = {
-    'rl' ,
     'Rp' , 'Rm' , 'Ru' , 'Rn' , 'Rj' , 'Ro' , 'Rh' , 'Rf',
-    'rp' , 'rm' , 'ru' , 'rn' , 'rj' , 'ro' , 'rh' , 'rf',
+    'rp' , 'rm' , 'ru' , 'rn' , 'rj' , 'ro' , 'rh' , 'rf', 'rl',
     'rcp', 'rcm', 'rcu', 'rcn', 'rcj', 'rco', 'rch',
     'rbp', 'rbm', 'rbu', 'rbn', 'rbj', 'rbo', 'rbh',
 }
 -- stylua: ignore end
+
+task._sels = {
+    opt = 'config code task',
+    lst = nil,
+    -- lst for kt.E != p
+    lst_d = { 'garg', 'barg', 'earg', 'stage' },
+    -- lst for kt.E = p
+    lst_p = { 'key', 'file', 'type', 'garg', 'barg', 'earg', 'stage' },
+    dic = {
+        key = {
+            lst = vim.fn.sort(
+                vim.tbl_keys(task._maps),
+                function(k0, k1) return vim.stricmp(task._maps[k0].desc, task._maps[k1].desc) end
+            ),
+            dic = vim.tbl_map(function(t) return t.desc end, task._maps),
+        },
+        file = { cpl = 'file' },
+        type = { cpl = 'filetype' },
+        garg = { lst = { '-DENABLE_TEST=' } },
+        barg = { lst = { '-static', 'tags', '--target tags', '-j32' } },
+        earg = { lst = { '--nocapture' } },
+        stage = { lst = { 'build', 'run', 'clean', 'test' } },
+    },
+    evt = function(name)
+        if name == 'onCR' then
+            if M.wsc.file ~= '' then
+                M.wsc.file = vim.fs.normalize(vim.fn.fnamemodify(M.wsc.file, ':p'))
+                if M.wsc.type == '' then
+                    M.wsc.type = vim.filetype.match({ filename = M.wsc.file }) or ''
+                end
+            end
+        end
+    end,
+    sub = {
+        cmd = function(sopt, sel) M.wsc[sopt] = sel end,
+        get = function(sopt) return M.wsc[sopt] end,
+    },
+}
 
 -- Run code task
 local function run(cfg)
@@ -259,64 +302,68 @@ local function run(cfg)
     require('v.task').run(opts)
 end
 
--- Parse code task config from keys table
-local function parse_config(kt)
-    wsc:reinit()
-    wsc.key = kt.E
-    wsc.stage = (kt.A == 'b' and 'build') or (kt.A == 'c' and 'clean') or wsc.stage
-    return wsc
-end
-
 -- Entry of code task
 -- @param kt: [rR][cb][p...]
 --            [%1][%2][%3  ]
--- %1 = km.S
+-- %1 = kt.S
 --      r : build and run task
 --      R : modify task parameters
--- %2 = km.A
+-- %2 = kt.A
 --      c : clean task
 --      b : build without run
--- %3 = km.E from codes and packs
+-- %3 = kt.E from codes and packs
 --      p : run task from task.wsc.code
 -- Forward:
---      Rp  -> rp  -> r^p (r^p means r[km.E != p])
---      R^p -> r^p
---      r^p
-local entry = async(function(kt)
-    local res = true
+--      R^p => r^p (r^p means r[kt.E != p])
+--      Rp  => rp  => r^p
+M.entry = async(function(kt, debug)
+    M.wsc:reinit()
 
+    local resovle = false
+    local restore = false
     if kt.S == 'R' then
-        local params = {
-            type = '',
-        }
-        local selection = {
-            opt = 'config code task',
-            lst = { 'type' },
-            dic = {
-                type = { lst = { 'c', 'cpp', 'rust' } },
-            },
-            sub = {
-                cmd = function(sopt, sel) params[sopt] = sel end,
-                get = function(sopt) return params[sopt] end,
-            },
-        }
-        res = await(a.pop_selection(selection))
-        vim.notify(vim.inspect(res) .. '\n' .. vim.inspect(params))
-    elseif kt.E == 'p' then
-        vim.notify('p')
+        -- Forward R* => r*
+        task._sels.lst = task._sels.lst_d
+        resovle = true
+    end
+    if kt.E == 'p' then
+        local __wsc = require('v.task').wsc.code
+        M.wsc:set(__wsc)
+        if __wsc.key and task._maps[__wsc.key] and not resovle then
+            -- Forward rp => r^p
+            kt.E = __wsc.key
+        else
+            -- Forward Rp => r^p
+            task._sels.lst = task._sels.lst_p
+            resovle = true
+            restore = true
+        end
     end
 
-    if res then
-        local config = parse_config(kt)
-        local ok, msg = pcall(run, config)
-        if not ok then
-            vim.notify(tostring(msg))
-        end
+    -- Need to resolve config
+    if resovle and (not await(a.pop_selection(task._sels))) then
+        return
+    end
+    -- Need to re-store config back
+    if restore then
+        kt.E = M.wsc.key
+        require('v.task').wsc.code = M.wsc:get()
+    end
+
+    -- Run code task
+    M.wsc.key = kt.E
+    M.wsc.stage = (kt.A == 'b' and 'build') or (kt.A == 'c' and 'clean') or M.wsc.stage
+    if debug then
+        vim.notify(('resovle = %s, restore = %s\n%s'):format(resovle, restore, vim.inspect(M.wsc)))
+    end
+    local ok, msg = pcall(run, M.wsc)
+    if not ok then
+        vim.notify(tostring(msg))
     end
 end)
 
-local function setup()
-    wsc = require('v.libv').new_config(wsc_initialization)
+function M.setup()
+    M.wsc = require('v.libv').new_config(wsc_initialization)
 
     -- Keys mapping to table
     local keys2kt = function(keys)
@@ -328,11 +375,19 @@ local function setup()
     end
     local m = require('v.libv').m
     for _, keys in ipairs(task._keys) do
-        local kt = keys2kt(keys)
-        m.nnore({ '<leader>' .. keys, function() entry(kt) end })
+        m.nnore({ '<leader>' .. keys, function() M.entry(keys2kt(keys)) end })
     end
+
+    vim.api.nvim_create_user_command(
+        'TaskCodeEntry',
+        function(opts) require('v.task.code').entry(keys2kt(opts.args), opts.bang) end,
+        { bang = true, nargs = 1 }
+    )
+    vim.api.nvim_create_user_command(
+        'TaskCodeWsc',
+        'lua vim.print(require("v.task.code").wsc)',
+        { nargs = 0 }
+    )
 end
 
-return {
-    setup = setup,
-}
+return M
