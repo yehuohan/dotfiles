@@ -9,6 +9,7 @@ local throw = error
 --- Workspace config for fzer
 local wsc = {}
 local wsc_initialization = {
+    envs = '',
     path = '',
     filters = '',
     globlst = '',

@@ -1,7 +1,6 @@
 local a = require('v.libv').a
 local async = a._async
 local await = a._await
-local str2env = require('v.task').str2env
 local replace = require('v.task').replace
 local sequence = require('v.task').sequence
 local throw = error
@@ -281,33 +280,6 @@ task._sels = {
     },
 }
 
-local function run(cfg)
-    local cmd = task(cfg)
-    local opts = {}
-    opts.cmd = cmd
-    opts.cwd = cfg.wdir
-    opts.env = str2env(cfg.envs)
-    -- opts.strategy = { 'jobstart', use_terminal = false }
-    opts.components = {
-        {
-            'on_quickfix',
-            errorformat = cfg.efm,
-            save = true,
-            open = true,
-            jump = false,
-            scroll = true,
-            ansi_color = true,
-            raw_output = false,
-        },
-        'display_duration',
-        'on_output_summarize',
-        'on_exit_set_status',
-        'on_complete_dispose',
-        'unique',
-    }
-    require('v.task').run(opts)
-end
-
 --- Entry of code task
 --- @param kt(table) [rR][cb][p...]
 ---                  [%1][%2][%3  ]
@@ -362,7 +334,20 @@ local entry = async(function(kt, debug)
     if debug then
         vim.notify(('resovle = %s, restore = %s\n%s'):format(resovle, restore, vim.inspect(wsc)))
     end
-    local ok, msg = pcall(run, wsc)
+    local ok, msg = pcall(function(cfg)
+        cfg.cmd = task(cfg)
+        cfg.qf = {
+            'on_quickfix',
+            errorformat = cfg.efm,
+            save = true,
+            open = true,
+            jump = false,
+            scroll = true,
+            ansi_color = true,
+            raw_output = false,
+        }
+        require('v.task').run(cfg)
+    end, wsc)
     if not ok then
         vim.notify(tostring(msg))
     end

@@ -28,7 +28,29 @@ function M.replace(cmd, rep) return vim.trim(string.gsub(cmd, '{(%w+)}', rep)) e
 --- @param cmdlist(table<string>) Command list to join with ' && '
 function M.sequence(cmdlist) return table.concat(cmdlist, ' && ') end
 
-function M.run(opts)
+--- Run task
+--- @param cfg(table) Task config
+---     - cmd(string) Task command that includes args
+---     - wdir(string) Wording directory
+---     - envs(string) Environment variables
+---     - qf(table) Quickfix output settings
+function M.run(cfg)
+    local opts = {}
+    opts.cmd = cfg.cmd
+    opts.cwd = cfg.wdir
+    opts.env = M.str2env(cfg.envs)
+    if not cfg.qf.ansi_color then
+        opts.strategy = { 'jobstart', use_terminal = false }
+    end
+    opts.components = {
+        cfg.qf,
+        'display_duration',
+        'on_output_summarize',
+        'on_exit_set_status',
+        'on_complete_dispose',
+        'unique',
+    }
+
     local overseer = require('overseer')
     local task = overseer.new_task(opts)
     task:start()
