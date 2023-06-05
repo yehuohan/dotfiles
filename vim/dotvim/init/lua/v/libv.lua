@@ -94,44 +94,40 @@ end
 
 --- A simple ANSI escape sequences processor for terminal's stdout
 --- @param opts(table)
---      - keep_ansi_color(boolean) Keep ANSI color code or not
+---     - keep_ansi_color(boolean) Keep ANSI color code or not
+---     - keep_raw(boolean) Keep raw output (^M is still cleaned)
 function M.new_ansior(opts)
     local keep_ansi_color = opts and opts.keep_ansi_color
-    local cur_row = 1 -- Current cursor row position
-    local pending = ''
+    local keep_raw = opts and opts.keep_raw
+
+    local cur_row = 1
+    local buf_idx = 1
+    local buffers = { '' }
 
     --- Trim all ANSI code and invalid chars
     local function trim_line(str)
-        local trimed = str
-            :gsub('\r', '') -- Remove ^M
-            :gsub('\x1b%].*\x07', '') -- Remove ']0;.*'
-        if keep_ansi_color then
-            trimed = trimed:gsub('\x1b%[[%d%?;]*[a-ln-zA-Z]', '') -- Keep ANSI color only
-        else
-            trimed = trimed:gsub('\x1b%[[%d%?;]*[a-zA-Z]', '') -- Remove all ANSI code
-        end
-        return trimed
+        return str
+            :gsub('\x1b%].*[\x07\x9c]', '') -- Remove OSC code
+            :gsub('\x1b%[[%d%?;]*[a-zA-Z]', '') -- Remove all ANSI code
     end
 
-    --- Generate next line with the lastest cursor row position
-    local function next_line(str)
-        local pat = '\x1b%[(%d*);%d*H'
-        -- local pats = {
-        --     '\x1b%[(%d*)B', -- Move cursor down by N
-        --     '\x1b%[(%d*)E', -- Move cursor N lines down
-        --     '\x1b%[(%d*);%d*H', -- Set cursor position
-        -- }
+    --- Generate next line that ends with a CSI(Control Sequence Introducer) code
+    local function next_csi(str)
+        -- K: erase in line
+        -- H: set cursor position
+        -- m: set SGR(Select Graphic Rendition) -- TODO highlight ANSI color
+        local pat = '\x1b%[([%d:;<=>%?]*)([KH])'
         local ci = 1
 
         return function()
             if ci < 0 then
                 return nil
             end
-            local si, ei, row = string.find(str, pat, ci)
+            local si, ei, args, byte = string.find(str, pat, ci)
             if si then
                 local line = string.sub(str, ci, ei)
                 ci = ei + 1
-                return line, row and tonumber(row)
+                return line, args, byte
             else
                 local line = string.sub(str, ci)
                 ci = -1
@@ -140,43 +136,67 @@ function M.new_ansior(opts)
         end
     end
 
-    --- Append processed lines
+    --- Process lines
     --- @param lines(table) Table to store processed lines
     --- @param str(string) String to be processed
-    local function append_lines(lines, str)
-        for line, row in next_line(str) do
-            table.insert(lines, line)
-            repeat
-                cur_row = cur_row + 1
-                if row and cur_row < row then
-                    -- Append blank line to catch the lastest row
-                    table.insert(lines, ' ')
+    local function process_lines(lines, str)
+        for line, args, byte in next_csi(str) do
+            lines[#lines + 1] = line
+            cur_row = cur_row + 1
+
+            -- Get lastest cursor row
+            local row = nil
+            if byte == 'H' then
+                row = string.match(args, '(%d*);*%d*')
+                row = (row ~= '') and tonumber(row) or 1
+            end
+
+            -- Update current cursor row
+            while row and cur_row ~= row do
+                if cur_row < row then
+                    lines[#lines + 1] = ' '
+                    cur_row = cur_row + 1
+                else
+                    lines[#lines] = nil
+                    cur_row = cur_row - 1
                 end
-            until (not row) or cur_row >= row
+            end
         end
     end
 
+    --- ANSI data stream to process
+    --- If data is nil, all buffers will be processed and returned
     return function(data)
         local lines = {}
 
-        for idx, chunk in ipairs(data) do
-            -- [''] means EOF
-            if idx == 1 then
-                if chunk == '' then
-                    append_lines(lines, pending)
-                    pending = ''
-                else
-                    pending = pending .. chunk
+        -- Append data to buffers
+        local ei = #buffers
+        if data then
+            -- local eof = (#data == 1 and data[1] == '')
+            buffers[#buffers] = buffers[#buffers] .. data[1]
+            vim.list_extend(buffers, data, 2)
+            ei = ei - 5 -- Delay for cursor computation
+        end
+        -- Process buffers to lines
+        for idx = buf_idx, ei, 1 do
+            local str = buffers[idx]:gsub('\r', '') -- Remove ^M
+            if keep_ansi_color then
+                if str ~= '' then
+                    process_lines(lines, str)
                 end
             else
-                if data[1] ~= '' then
-                    append_lines(lines, pending)
-                end
-                pending = chunk
+                lines[#lines + 1] = str
             end
+            buf_idx = buf_idx + 1
+        end
+        -- All buffers are processed and to be returned
+        if not data then
+            cur_row = 1
+            buf_idx = 1
+            buffers = { '' }
         end
 
-        return vim.tbl_map(trim_line, lines)
+        return keep_raw and lines or vim.tbl_map(trim_line, lines)
     end
 end
 

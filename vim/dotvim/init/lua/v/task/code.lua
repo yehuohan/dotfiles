@@ -287,12 +287,14 @@ local function run(cfg)
     opts.cmd = cmd
     opts.cwd = cfg.wdir
     opts.env = str2env(cfg.envs)
+    -- opts.strategy = { 'jobstart', use_terminal = false }
     opts.components = {
         {
             'on_quickfix',
             errorformat = cfg.efm,
             open = true,
-            ansi_color = false,
+            ansi_color = true,
+            raw_output = false,
         },
         'display_duration',
         'on_output_summarize',

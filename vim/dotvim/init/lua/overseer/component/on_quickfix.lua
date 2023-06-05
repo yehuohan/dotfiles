@@ -42,6 +42,11 @@ return {
             type = 'boolean',
             default = false,
         },
+        raw_output = {
+            desc = 'Keep raw output raw',
+            type = 'boolean',
+            default = false,
+        },
         items_only = {
             desc = 'Only show lines that match the errorformat',
             type = 'boolean',
@@ -55,16 +60,14 @@ return {
         }
 
         comp.on_init = function(self, task)
-            -- Auto save all files before start task
             if params.save then
+                -- Auto save all files before start task
                 vim.cmd.wall()
             end
-            self.ansior = require('v.libv').new_ansior({ keep_ansi_color = params.ansi_color })
-        end
-
-        comp.on_reset = function(self, task)
-            self.start_time = nil
-            self.ansior = require('v.libv').new_ansior({ keep_ansi_color = params.ansi_color })
+            self.ansior = require('v.libv').new_ansior({
+                keep_ansi_color = params.ansi_color,
+                keep_raw = params.raw_output,
+            })
         end
 
         comp.on_start = function(self, task)
@@ -80,8 +83,11 @@ return {
 
         comp.on_complete = function(self, task, status, result)
             local duration = os.time() - self.start_time
+            local lines = self.ansior()
+            lines[#lines + 1] = string.format('[Completed in %ss with %s]', duration, status)
             vim.fn.setqflist({}, 'a', {
-                lines = { string.format('[Completed in %ss with %s]', duration, status) },
+                lines = lines,
+                efm = params.errorformat,
             })
             try_scroll_to_bottom(get_qfwinid())
         end
@@ -94,15 +100,6 @@ return {
             })
             try_scroll_to_bottom(get_qfwinid())
         end
-
-        -- There's issue of displaying Chinese with strategy = { 'jobstart', use_terminal = false }
-        -- comp.on_output_lines = function(self, task, lines)
-        --     vim.fn.setqflist({}, 'a', {
-        --         lines = lines,
-        --         efm = params.errorformat,
-        --     })
-        --     try_scroll_to_bottom(get_qfwinid())
-        -- end
 
         return comp
     end,
