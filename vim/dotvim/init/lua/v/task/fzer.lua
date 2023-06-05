@@ -1,5 +1,3 @@
-local M = {}
-
 local a = require('v.libv').a
 local async = a._async
 local await = a._await
@@ -9,7 +7,7 @@ local sequence = require('v.task').sequence
 local throw = error
 
 --- Workspace config for fzer
-M.wsc = {}
+local wsc = {}
 local wsc_initialization = {
     path = '',
     filters = '',
@@ -40,16 +38,14 @@ local fzer = {
     },
 }
 
-M.entry = async(function(kt, debug) end)
+local entry = async(function(kt, debug) end)
 
-function M.setup()
-    M.wsc = require('v.libv').new_config(wsc_initialization)
+local function setup()
+    wsc = require('v.libv').new_config(wsc_initialization)
 
-    vim.api.nvim_create_user_command(
-        'TaskFzerWsc',
-        'lua vim.print(require("v.task.fzer").wsc)',
-        { nargs = 0 }
-    )
+    vim.api.nvim_create_user_command('TaskFzerWsc', function() vim.print(wsc) end, { nargs = 0 })
 end
 
-return M
+return {
+    setup = setup,
+}

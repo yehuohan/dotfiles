@@ -103,7 +103,7 @@ function M.new_ansior(opts)
     --- Trim all ANSI code and invalid chars
     local function trim_line(str)
         local trimed = str
-            :gsub('\r$', '') -- Remove ^M
+            :gsub('\r', '') -- Remove ^M
             :gsub('\x1b%].*\x07', '') -- Remove ']0;.*'
         if keep_ansi_color then
             trimed = trimed:gsub('\x1b%[[%d%?;]*[a-ln-zA-Z]', '') -- Keep ANSI color only

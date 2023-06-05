@@ -1,5 +1,3 @@
-local M = {}
-
 local a = require('v.libv').a
 local async = a._async
 local await = a._await
@@ -9,7 +7,7 @@ local sequence = require('v.task').sequence
 local throw = error
 
 --- Workspace config for code
-M.wsc = {}
+local wsc = {}
 local wsc_initialization = {
     key = '',
     file = '',
@@ -35,7 +33,7 @@ local codes = {
                                   or 'rustc {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
                    efm = [[\ %#-->\ %f:%l:%c,\%m\ %f:%l:%c']],
     },
-    python     = { cmd = 'python {bsrc} {earg}' },
+    python     = { cmd = 'python {bsrc} {earg}', efm = [[%*\\sFile\ \"%f\"\\,\ line\ %l\\,\ %m]] },
     lua        = { cmd = 'lua {bsrc} {earg}', efm = [[lua:\ %f:%l:\ %m]] },
     java       = { cmd = 'javac {barg} {bsrc} && java "{bout}" {earg}' },
     julia      = { cmd = 'julia {bsrc} {earg}' },
@@ -269,17 +267,17 @@ task._sels = {
     },
     evt = function(name)
         if name == 'onCR' then
-            if M.wsc.file ~= '' then
-                M.wsc.file = vim.fs.normalize(vim.fn.fnamemodify(M.wsc.file, ':p'))
-                if M.wsc.type == '' then
-                    M.wsc.type = vim.filetype.match({ filename = M.wsc.file }) or ''
+            if wsc.file ~= '' then
+                wsc.file = vim.fs.normalize(vim.fn.fnamemodify(wsc.file, ':p'))
+                if wsc.type == '' then
+                    wsc.type = vim.filetype.match({ filename = wsc.file }) or ''
                 end
             end
         end
     end,
     sub = {
-        cmd = function(sopt, sel) M.wsc[sopt] = sel end,
-        get = function(sopt) return M.wsc[sopt] end,
+        cmd = function(sopt, sel) wsc[sopt] = sel end,
+        get = function(sopt) return wsc[sopt] end,
     },
 }
 
@@ -319,8 +317,8 @@ end
 --- Forward:
 ---      R^p => r^p (r^p means r[kt.E != p])
 ---      Rp  => rp  => r^p
-M.entry = async(function(kt, debug)
-    M.wsc:reinit()
+local entry = async(function(kt, debug)
+    wsc:reinit()
 
     local resovle = false
     local restore = false
@@ -331,7 +329,7 @@ M.entry = async(function(kt, debug)
     end
     if kt.E == 'p' then
         local __wsc = require('v.task').wsc.code
-        M.wsc:set(__wsc)
+        wsc:set(__wsc)
         if __wsc.key and task._maps[__wsc.key] and not resovle then
             -- Forward rp => r^p
             kt.E = __wsc.key
@@ -349,24 +347,24 @@ M.entry = async(function(kt, debug)
     end
     -- Need to re-store config back
     if restore then
-        kt.E = M.wsc.key
-        require('v.task').wsc.code = M.wsc:get()
+        kt.E = wsc.key
+        require('v.task').wsc.code = wsc:get()
     end
 
     -- Run code task
-    M.wsc.key = kt.E
-    M.wsc.stage = (kt.A == 'b' and 'build') or (kt.A == 'c' and 'clean') or M.wsc.stage
+    wsc.key = kt.E
+    wsc.stage = (kt.A == 'b' and 'build') or (kt.A == 'c' and 'clean') or wsc.stage
     if debug then
-        vim.notify(('resovle = %s, restore = %s\n%s'):format(resovle, restore, vim.inspect(M.wsc)))
+        vim.notify(('resovle = %s, restore = %s\n%s'):format(resovle, restore, vim.inspect(wsc)))
     end
-    local ok, msg = pcall(run, M.wsc)
+    local ok, msg = pcall(run, wsc)
     if not ok then
         vim.notify(tostring(msg))
     end
 end)
 
-function M.setup()
-    M.wsc = require('v.libv').new_config(wsc_initialization)
+local function setup()
+    wsc = require('v.libv').new_config(wsc_initialization)
 
     -- Keys mapping to table
     local keys2kt = function(keys)
@@ -378,19 +376,17 @@ function M.setup()
     end
     local m = require('v.libv').m
     for _, keys in ipairs(task._keys) do
-        m.nnore({ '<leader>' .. keys, function() M.entry(keys2kt(keys)) end })
+        m.nnore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
     end
 
     vim.api.nvim_create_user_command(
         'TaskCodeEntry',
-        function(opts) require('v.task.code').entry(keys2kt(opts.args), opts.bang) end,
+        function(opts) entry(keys2kt(opts.args), opts.bang) end,
         { bang = true, nargs = 1 }
     )
-    vim.api.nvim_create_user_command(
-        'TaskCodeWsc',
-        'lua vim.print(require("v.task.code").wsc)',
-        { nargs = 0 }
-    )
+    vim.api.nvim_create_user_command('TaskCodeWsc', function() vim.print(wsc) end, { nargs = 0 })
 end
 
-return M
+return {
+    setup = setup,
+}
