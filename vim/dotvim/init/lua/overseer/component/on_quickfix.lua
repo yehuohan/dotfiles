@@ -7,13 +7,20 @@ local function get_qfwinid()
     end
 end
 
-local function try_scroll_to_bottom(hwin)
+local function try_scroll_to_bottom(hwin, auto_scroll, dnum)
     if hwin then
         local hbuf = vim.api.nvim_win_get_buf(hwin)
         local line_cur = vim.api.nvim_win_get_cursor(hwin)[1]
         local line_num = vim.api.nvim_buf_line_count(hbuf)
-        if line_cur + vim.api.nvim_win_get_height(hwin) >= line_num then
-            vim.api.nvim_win_set_cursor(hwin, { line_num, 0 })
+
+        if hwin == vim.api.nvim_get_current_win() then
+            if line_cur + 1 >= (line_num - dnum) then
+                vim.api.nvim_win_set_cursor(hwin, { line_cur + dnum, 0 })
+            end
+        else
+            if auto_scroll then
+                vim.api.nvim_win_set_cursor(hwin, { line_num, 0 })
+            end
         end
     end
 end
@@ -30,10 +37,20 @@ return {
         save = {
             desc = 'Save all files before start task',
             type = 'boolean',
-            default = true,
+            default = false,
         },
         open = {
             desc = 'Open the quickfix on output',
+            type = 'boolean',
+            default = false,
+        },
+        jump = {
+            desc = 'Jump to quickfix window',
+            type = 'boolean',
+            default = false,
+        },
+        scroll = {
+            desc = 'Auto scroll quickfix window to bottom when not focused',
             type = 'boolean',
             default = false,
         },
@@ -44,11 +61,6 @@ return {
         },
         raw_output = {
             desc = 'Keep raw output raw',
-            type = 'boolean',
-            default = false,
-        },
-        items_only = {
-            desc = 'Only show lines that match the errorformat',
             type = 'boolean',
             default = false,
         },
@@ -72,9 +84,18 @@ return {
 
         comp.on_start = function(self, task)
             self.start_time = os.time()
-            if params.open and (not get_qfwinid()) then
-                vim.cmd([[botright copen 8]])
-                vim.cmd.wincmd('p')
+            if params.open then
+                local hwin = get_qfwinid()
+                if hwin then
+                    if params.jump then
+                        vim.api.nvim_set_current_win(hwin)
+                    end
+                else
+                    vim.cmd([[botright copen 8]])
+                    if not params.jump then
+                        vim.cmd.wincmd('p')
+                    end
+                end
             end
             vim.fn.setqflist({}, 'r', {
                 lines = { string.format('[%s]', task.name) },
@@ -89,7 +110,7 @@ return {
                 lines = lines,
                 efm = params.errorformat,
             })
-            try_scroll_to_bottom(get_qfwinid())
+            try_scroll_to_bottom(get_qfwinid(), params.scroll, #lines)
         end
 
         comp.on_output = function(self, task, data)
@@ -98,7 +119,7 @@ return {
                 lines = lines,
                 efm = params.errorformat,
             })
-            try_scroll_to_bottom(get_qfwinid())
+            try_scroll_to_bottom(get_qfwinid(), params.scroll, #lines)
         end
 
         return comp

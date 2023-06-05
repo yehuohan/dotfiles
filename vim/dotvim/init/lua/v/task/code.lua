@@ -292,7 +292,10 @@ local function run(cfg)
         {
             'on_quickfix',
             errorformat = cfg.efm,
+            save = true,
             open = true,
+            jump = false,
+            scroll = true,
             ansi_color = true,
             raw_output = false,
         },
