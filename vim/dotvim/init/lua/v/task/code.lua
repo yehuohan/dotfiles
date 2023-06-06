@@ -343,8 +343,10 @@ local entry = async(function(kt, debug)
             open = true,
             jump = false,
             scroll = true,
-            ansi_color = true,
-            raw_output = false,
+            connect_pty = true,
+            out_rawdata = false,
+            out_rawline = false,
+            hl_ansi_sgr = false,
         }
         require('v.task').run(cfg)
     end, wsc)
@@ -354,7 +356,7 @@ local entry = async(function(kt, debug)
 end)
 
 local function setup()
-    wsc = require('v.libv').new_config(wsc_initialization)
+    wsc = require('v.libv').new_configer(wsc_initialization)
 
     -- Keys mapping to table
     local keys2kt = function(keys)
@@ -370,7 +372,7 @@ local function setup()
     end
 
     vim.api.nvim_create_user_command(
-        'TaskCodeEntry',
+        'TaskCode',
         function(opts) entry(keys2kt(opts.args), opts.bang) end,
         { bang = true, nargs = 1 }
     )

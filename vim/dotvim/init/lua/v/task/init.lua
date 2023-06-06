@@ -39,7 +39,7 @@ function M.run(cfg)
     opts.cmd = cfg.cmd
     opts.cwd = cfg.wdir
     opts.env = M.str2env(cfg.envs)
-    if not cfg.qf.ansi_color then
+    if not cfg.qf.connect_pty then
         opts.strategy = { 'jobstart', use_terminal = false }
     end
     opts.components = {
@@ -54,6 +54,7 @@ function M.run(cfg)
     local overseer = require('overseer')
     local task = overseer.new_task(opts)
     task:start()
+    -- vim.cmd(string.format(':AsyncRun -cwd=%s %s', opts.cwd, opts.cmd))
 end
 
 function M.setup()

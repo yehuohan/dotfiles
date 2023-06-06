@@ -216,7 +216,7 @@ local function stls()
         {
             condition = function()
                 return conds.buffer_matches({
-                    filetype = { 'vim%-plug', 'vista', 'NvimTree', 'nerdtree' },
+                    filetype = { 'vim%-plug', 'OverseerList', 'NvimTree', 'nerdtree', 'vista' },
                 })
             end,
             ComType,
@@ -314,7 +314,8 @@ end
 
 --- Winbars
 local function disabled_bars(args)
-    local bar_excluded_filetypes = { 'alpha', 'vim%-plug', 'vista', 'NvimTree', 'nerdtree' }
+    local bar_excluded_filetypes =
+        { 'alpha', 'vim%-plug', 'OverseerList', 'NvimTree', 'nerdtree', 'vista' }
     local bar_excluded_buftypes = { 'nofile', 'terminal', 'quickfix' }
     local filetype = vim.tbl_contains(bar_excluded_filetypes, vim.bo[args.buf].filetype)
     local buftype = vim.tbl_contains(bar_excluded_buftypes, vim.bo[args.buf].buftype)

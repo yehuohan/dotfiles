@@ -46,10 +46,10 @@ end
 
 local tst = {}
 
-function tst.new_config()
+function tst.new_configer()
     -- Create config
-    FAIL(libv.new_config)
-    local cfg = OK(libv.new_config, { file = 'test.cpp' })
+    FAIL(libv.new_configer)
+    local cfg = OK(libv.new_configer, { file = 'test.cpp' })
     EQ({ file = 'test.cpp' }, cfg)
 
     -- Methods
@@ -73,7 +73,7 @@ function tst.new_config()
     EQ(nil, rawget(cfg, 'cmd'))
 
     -- Seperate non-savable option
-    local cfg2 = libv.new_config({ exec = 'true' })
+    local cfg2 = libv.new_configer({ exec = 'true' })
     cfg2:reinit({ exec = 'false' })
     cfg2.args = 'args'
     EQ(nil, rawget(getmetatable(getmetatable(cfg)), 'args'))

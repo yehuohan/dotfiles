@@ -42,8 +42,13 @@ local fzer = {
 local entry = async(function(kt, debug) end)
 
 local function setup()
-    wsc = require('v.libv').new_config(wsc_initialization)
+    wsc = require('v.libv').new_configer(wsc_initialization)
 
+    vim.api.nvim_create_user_command(
+        'TaskFzer',
+        function(opts) entry(opts.args, opts.bang) end,
+        { bang = true, nargs = 1 }
+    )
     vim.api.nvim_create_user_command('TaskFzerWsc', function() vim.print(wsc) end, { nargs = 0 })
 end
 

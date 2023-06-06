@@ -25,6 +25,21 @@ local function try_scroll_to_bottom(hwin, auto_scroll, dnum)
     end
 end
 
+local function try_copen(hwin, open, jump)
+    if open then
+        if hwin then
+            if jump then
+                vim.api.nvim_set_current_win(hwin)
+            end
+        else
+            vim.cmd([[botright copen 8]])
+            if not jump then
+                vim.cmd.wincmd('p')
+            end
+        end
+    end
+end
+
 return {
     desc = 'Sync code task output into the quickfix',
     params = {
@@ -54,13 +69,23 @@ return {
             type = 'boolean',
             default = false,
         },
-        ansi_color = {
-            desc = 'Highlight with ansi colors',
+        connect_pty = {
+            desc = 'Connect to PTY when running task',
             type = 'boolean',
             default = false,
         },
-        raw_output = {
-            desc = 'Keep raw output raw',
+        out_rawdata = {
+            desc = 'Output raw data from stdout',
+            type = 'boolean',
+            default = false,
+        },
+        out_rawline = {
+            desc = 'Output raw lines processed from stdout data',
+            type = 'boolean',
+            default = false,
+        },
+        hl_ansi_sgr = {
+            desc = 'Highlight ANSI color with SGR when connect_pty is enabled',
             type = 'boolean',
             default = false,
         },
@@ -72,31 +97,19 @@ return {
         }
 
         comp.on_init = function(self, task)
-            if params.save then
-                -- Auto save all files before start task
-                vim.cmd.wall()
-            end
             self.ansior = require('v.libv').new_ansior({
-                keep_ansi_color = params.ansi_color,
-                keep_raw = params.raw_output,
+                connect_pty = params.connect_pty,
+                out_rawline = params.out_rawline,
+                hl_ansi_sgr = params.hl_ansi_sgr,
             })
         end
 
         comp.on_start = function(self, task)
-            self.start_time = os.time()
-            if params.open then
-                local hwin = get_qfwinid()
-                if hwin then
-                    if params.jump then
-                        vim.api.nvim_set_current_win(hwin)
-                    end
-                else
-                    vim.cmd([[botright copen 8]])
-                    if not params.jump then
-                        vim.cmd.wincmd('p')
-                    end
-                end
+            if params.save then
+                vim.cmd.wall() -- Auto save all files before start task
             end
+            self.start_time = os.time()
+            try_copen(get_qfwinid(), params.open, params.jump)
             vim.fn.setqflist({}, 'r', {
                 lines = { string.format('[%s]', task.name) },
             })
@@ -104,7 +117,7 @@ return {
 
         comp.on_complete = function(self, task, status, result)
             local duration = os.time() - self.start_time
-            local lines = self.ansior()
+            local lines = params.out_rawdata and {} or self.ansior()
             lines[#lines + 1] = string.format('[Completed in %ss with %s]', duration, status)
             vim.fn.setqflist({}, 'a', {
                 lines = lines,
@@ -114,7 +127,7 @@ return {
         end
 
         comp.on_output = function(self, task, data)
-            local lines = self.ansior(data)
+            local lines = params.out_rawdata and data or self.ansior(data)
             vim.fn.setqflist({}, 'a', {
                 lines = lines,
                 efm = params.errorformat,
