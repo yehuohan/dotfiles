@@ -1,43 +1,56 @@
 --- Quickfix output for task
 
-local function get_qfwinid()
-    local hwin = vim.fn.getqflist({ winid = 0 }).winid
-    if hwin > 0 and vim.api.nvim_win_is_valid(hwin) then
-        return hwin
+local function get_qf()
+    local qf = {}
+    local lst = vim.fn.getqflist({ winid = 0, qfbufnr = 0 })
+    if lst.winid > 0 and vim.api.nvim_win_is_valid(lst.winid) then
+        qf.hwin = lst.winid
     end
+    if lst.qfbufnr > 0 and vim.api.nvim_buf_is_valid(lst.qfbufnr) then
+        qf.hbuf = lst.qfbufnr
+    end
+    return qf
 end
 
-local function try_scroll_to_bottom(hwin, auto_scroll, dnum)
-    if hwin then
-        local hbuf = vim.api.nvim_win_get_buf(hwin)
-        local line_cur = vim.api.nvim_win_get_cursor(hwin)[1]
-        local line_num = vim.api.nvim_buf_line_count(hbuf)
-
-        if hwin == vim.api.nvim_get_current_win() then
-            if line_cur + 1 >= (line_num - dnum) then
-                vim.api.nvim_win_set_cursor(hwin, { line_cur + dnum, 0 })
-            end
-        else
-            if auto_scroll then
-                vim.api.nvim_win_set_cursor(hwin, { line_num, 0 })
-            end
-        end
-    end
-end
-
-local function try_copen(hwin, open, jump)
-    if open then
-        if hwin then
-            if jump then
-                vim.api.nvim_set_current_win(hwin)
+local function try_copen(qf, auto_open, auto_jump)
+    if auto_open then
+        if qf.hwin then
+            if auto_jump then
+                vim.api.nvim_set_current_win(qf.hwin)
             end
         else
             vim.cmd([[botright copen 8]])
-            if not jump then
+            if not auto_jump then
                 vim.cmd.wincmd('p')
             end
         end
     end
+end
+
+local function try_scroll_to_bottom(qf, auto_scroll, dnum)
+    if qf.hwin then
+        local line_cur = vim.api.nvim_win_get_cursor(qf.hwin)[1]
+        local line_num = vim.api.nvim_buf_line_count(qf.hbuf)
+
+        if qf.hwin == vim.api.nvim_get_current_win() then
+            if line_cur + 1 >= (line_num - dnum) then
+                vim.api.nvim_win_set_cursor(qf.hwin, { line_cur + dnum, 0 })
+            end
+        else
+            if auto_scroll then
+                vim.api.nvim_win_set_cursor(qf.hwin, { line_num, 0 })
+            end
+        end
+    end
+end
+
+local function setup_window(qf) end
+
+local function display_and_highlight(qf, lines, hls, efm)
+    vim.fn.setqflist({}, 'a', {
+        lines = lines,
+        efm = efm,
+    })
 end
 
 return {
@@ -109,7 +122,7 @@ return {
                 vim.cmd.wall() -- Auto save all files before start task
             end
             self.start_time = os.time()
-            try_copen(get_qfwinid(), params.open, params.jump)
+            try_copen(get_qf(), params.open, params.jump)
             vim.fn.setqflist({}, 'r', {
                 lines = { string.format('[%s]', task.name) },
             })
@@ -117,22 +130,28 @@ return {
 
         comp.on_complete = function(self, task, status, result)
             local duration = os.time() - self.start_time
-            local lines = params.out_rawdata and {} or self.ansior()
+            local lines, highlights = {}, {}
+            if params.out_rawdata then
+                lines = {}
+            else
+                lines, highlights = self.ansior()
+            end
             lines[#lines + 1] = string.format('[Completed in %ss with %s]', duration, status)
-            vim.fn.setqflist({}, 'a', {
-                lines = lines,
-                efm = params.errorformat,
-            })
-            try_scroll_to_bottom(get_qfwinid(), params.scroll, #lines)
+            local qf = get_qf()
+            display_and_highlight(qf, lines, highlights, params.errorformat)
+            try_scroll_to_bottom(qf, params.scroll, #lines)
         end
 
         comp.on_output = function(self, task, data)
-            local lines = params.out_rawdata and data or self.ansior(data)
-            vim.fn.setqflist({}, 'a', {
-                lines = lines,
-                efm = params.errorformat,
-            })
-            try_scroll_to_bottom(get_qfwinid(), params.scroll, #lines)
+            local lines, highlights = {}, {}
+            if params.out_rawdata then
+                lines = data
+            else
+                lines, highlights = self.ansior(data)
+            end
+            local qf = get_qf()
+            display_and_highlight(qf, lines, highlights, params.errorformat)
+            try_scroll_to_bottom(qf, params.scroll, #lines)
         end
 
         return comp
