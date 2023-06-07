@@ -548,7 +548,9 @@ local function pkg_overseer()
         '<leader>rk',
         function()
             local list = overseer.list_tasks()
-            list[#list]:stop()
+            if #list > 0 then
+                list[#list]:stop()
+            end
         end,
     })
     m.nnore({
@@ -650,8 +652,7 @@ local function pkg_lazy()
         { 'declancm/cinnamon.nvim', config = pkg_cinnamon },
         { 'gbrlsnchs/winpick.nvim', config = pkg_winpick },
         {
-            -- 窗口移动
-            'sindrets/winshift.nvim',
+            'sindrets/winshift.nvim', -- 窗口移动
             init = function() m.nnore({ '<C-m>', ':WinShift<CR>' }) end,
             opts = {},
         },
@@ -690,16 +691,14 @@ local function pkg_lazy()
         { 'goolord/alpha-nvim', config = pkg_alpha },
         { 'rcarriga/nvim-notify', config = pkg_notify },
         {
-            -- ui界面美化
-            'stevearc/dressing.nvim',
+            'stevearc/dressing.nvim', -- ui界面美化
             opts = {
                 input = { enabled = true },
                 select = { enabled = true },
             },
         },
         {
-            -- 字体图标
-            'ziontee113/icon-picker.nvim',
+            'ziontee113/icon-picker.nvim', -- 字体图标
             init = function()
                 m.inore({ '<M-w>', '<Cmd>IconPickerInsert<CR>' })
                 m.nnore({ '<leader><leader>i', ':IconPickerInsert<Space>' })
@@ -708,8 +707,7 @@ local function pkg_lazy()
             cmd = 'IconPickerInsert',
         },
         {
-            -- 刻度线
-            'lukas-reineke/virt-column.nvim',
+            'lukas-reineke/virt-column.nvim', -- 刻度线
             opts = { char = '┊' },
         },
         {

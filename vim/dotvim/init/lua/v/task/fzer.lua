@@ -14,6 +14,10 @@ local wsc_initialization = {
     filters = '',
     globlst = '',
     options = '',
+    connect_pty = true,
+    out_rawdata = false,
+    out_rawline = false,
+    hl_ansi_sgr = false,
 }
 
 --- Fuzzy finder tasks

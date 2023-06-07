@@ -33,17 +33,28 @@ function M.sequence(cmdlist) return table.concat(cmdlist, ' && ') end
 ---     - cmd(string) Task command that includes args
 ---     - wdir(string) Wording directory
 ---     - envs(string) Environment variables
----     - qf(table) Quickfix output settings
+---     - qf_xxx 'on_quickfix' params
 function M.run(cfg)
     local opts = {}
     opts.cmd = cfg.cmd
     opts.cwd = cfg.wdir
     opts.env = M.str2env(cfg.envs)
-    if not cfg.qf.connect_pty then
+    if not cfg.connect_pty then
         opts.strategy = { 'jobstart', use_terminal = false }
     end
     opts.components = {
-        cfg.qf,
+        {
+            'on_quickfix',
+            errorformat = cfg.efm,
+            save = cfg.qf_save,
+            open = cfg.qf_open,
+            jump = cfg.qf_jump,
+            scroll = cfg.qf_scroll,
+            connect_pty = cfg.connect_pty,
+            out_rawdata = cfg.out_rawdata,
+            out_rawline = cfg.out_rawline,
+            hl_ansi_sgr = cfg.hl_ansi_sgr,
+        },
         'display_duration',
         'on_output_summarize',
         'on_exit_set_status',

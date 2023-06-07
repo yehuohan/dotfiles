@@ -6,8 +6,7 @@ local sequence = require('v.task').sequence
 local throw = error
 
 --- Workspace config for code
-local wsc = {}
-local wsc_initialization = {
+local wsc = require('v.libv').new_configer({
     key = '',
     file = '',
     type = '',
@@ -16,7 +15,13 @@ local wsc_initialization = {
     barg = '',
     earg = '',
     stage = 'run',
-}
+    fs_find_one = false, -- Find the closest file relative to wdir
+    enable_msvc = true, -- Setup msvc environment
+    connect_pty = true,
+    out_rawdata = false,
+    out_rawline = false,
+    hl_ansi_sgr = false,
+})
 
 --- Single code file tasks according to filetype
 --- @var barg(string) Build arguments
@@ -134,7 +139,7 @@ function task.make(cfg)
     end
 
     local cmds = {}
-    cmds[#cmds + 1] = IsWin() and packs._msvc or nil
+    cmds[#cmds + 1] = (IsWin() and cfg.enable_msvc) and packs._msvc or nil
     cmds[#cmds + 1] = replace(packs.make, rep)
     cmds[#cmds + 1] = rep.bout and replace(packs._exec, rep) or nil
 
@@ -157,7 +162,7 @@ function task.cmake(cfg)
     rep.bout = (cfg.stage ~= 'build') and patout(cfg.file, packs._pats.pro) or nil
     rep.earg = cfg.earg
     local cmds = {}
-    cmds[#cmds + 1] = (IsWin() and (cfg.key == 'n' or cfg.key == 'j')) and packs._msvc or nil
+    cmds[#cmds + 1] = (IsWin() and cfg.enable_msvc) and packs._msvc or nil
     cmds[#cmds + 1] = replace(packs.cmake[1], rep)
     cmds[#cmds + 1] = replace(packs.cmake[2], rep)
     cmds[#cmds + 1] = replace(packs.cmake[3], rep)
@@ -204,7 +209,7 @@ setmetatable(task, {
                     upward = true,
                     type = 'file',
                     path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
-                    limit = math.huge,
+                    limit = cfg.fs_find_one and 1 or math.huge,
                 })
                 if #files == 0 then
                     throw(string.format('None of %s was found!', t.pat), 0)
@@ -248,6 +253,15 @@ task._sels = {
     lst_d = { 'envs', 'garg', 'barg', 'earg', 'stage' },
     -- lst for kt.E = p
     lst_p = { 'key', 'file', 'type', 'envs', 'garg', 'barg', 'earg', 'stage' },
+    -- lst for TaskCodeWsc
+    lst_i = {
+        'fs_find_one',
+        'enable_msvc',
+        'connect_pty',
+        'out_rawdata',
+        'out_rawline',
+        'hl_ansi_sgr',
+    },
     dic = {
         key = {
             lst = vim.fn.sort(
@@ -263,18 +277,31 @@ task._sels = {
         barg = { lst = { '-static', 'tags', '--target tags', '-j32' } },
         earg = { lst = { '--nocapture' } },
         stage = { lst = { 'build', 'run', 'clean', 'test' } },
+        fs_find_one = vim.empty_dict(),
+        enable_msvc = vim.empty_dict(),
+        connect_pty = vim.empty_dict(),
+        out_rawdata = vim.empty_dict(),
+        out_rawline = vim.empty_dict(),
+        hl_ansi_sgr = vim.empty_dict(),
     },
     evt = function(name)
         if name == 'onCR' then
-            if wsc.file ~= '' then
-                wsc.file = vim.fs.normalize(vim.fn.fnamemodify(wsc.file, ':p'))
-                if wsc.type == '' then
-                    wsc.type = vim.filetype.match({ filename = wsc.file }) or ''
+            local sel = task._sels
+            if sel.lst == sel.lst_p then
+                if wsc.file ~= '' then
+                    wsc.file = vim.fs.normalize(vim.fn.fnamemodify(wsc.file, ':p'))
+                    if wsc.type == '' then
+                        wsc.type = vim.filetype.match({ filename = wsc.file }) or ''
+                    end
                 end
+            elseif sel.lst == sel.lst_i then
+                wsc:reinit(wsc:get())
+                vim.notify('Code task wsc is reinited!')
             end
         end
     end,
     sub = {
+        lst = { true, false },
         cmd = function(sopt, sel) wsc[sopt] = sel end,
         get = function(sopt) return wsc[sopt] end,
     },
@@ -336,18 +363,10 @@ local entry = async(function(kt, debug)
     end
     local ok, msg = pcall(function(cfg)
         cfg.cmd = task(cfg)
-        cfg.qf = {
-            'on_quickfix',
-            errorformat = cfg.efm,
-            save = true,
-            open = true,
-            jump = false,
-            scroll = true,
-            connect_pty = true,
-            out_rawdata = false,
-            out_rawline = false,
-            hl_ansi_sgr = false,
-        }
+        cfg.qf_save = true
+        cfg.qf_open = true
+        cfg.qf_jump = false
+        cfg.qf_scroll = true
         require('v.task').run(cfg)
     end, wsc)
     if not ok then
@@ -356,8 +375,6 @@ local entry = async(function(kt, debug)
 end)
 
 local function setup()
-    wsc = require('v.libv').new_configer(wsc_initialization)
-
     -- Keys mapping to table
     local keys2kt = function(keys)
         return {
@@ -377,6 +394,11 @@ local function setup()
         { bang = true, nargs = 1 }
     )
     vim.api.nvim_create_user_command('TaskCodeWsc', function() vim.print(wsc) end, { nargs = 0 })
+    vim.api.nvim_create_user_command('TaskCodeWscInit', function()
+        wsc:reinit()
+        task._sels.lst = task._sels.lst_i
+        vim.fn.PopSelection(task._sels)
+    end, { nargs = 0 })
 end
 
 return {

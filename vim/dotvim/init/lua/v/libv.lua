@@ -190,7 +190,7 @@ function M.new_ansior(opts)
                 erased_rows = erased_rows + 1
             end
 
-            -- Update current cursor row
+            -- Update current cursor position
             if row then
                 row = row + erased_rows
                 while cur_row ~= row do
@@ -202,6 +202,9 @@ function M.new_ansior(opts)
                         cur_row = cur_row - 1
                     end
                 end
+            end
+            if col then
+                cur_col = col
             end
         end
     end
