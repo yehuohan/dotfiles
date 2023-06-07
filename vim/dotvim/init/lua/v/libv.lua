@@ -105,6 +105,7 @@ function M.new_ansior(opts)
     local raw_idx = 1
     local raw_lines = {}
     local pending = ''
+    local none = true
 
     local function trim_line(str)
         return str
@@ -213,10 +214,30 @@ function M.new_ansior(opts)
     local function process_colors(lines)
         local hls = {}
 
+        local bi = raw_idx - 1 - #lines
         for k, line in ipairs(lines) do
-            local trimed = 'Not implemented'
-            for last, part, args, byte in next_csi(line, CSI.Color) do
+            local hl = {}
+            local trimed = ''
+            for _, part, args, byte in next_csi(line, CSI.Color) do
+                local part_trimed = ''
+                -- Process highlights
+                if part ~= '' then
+                    part_trimed = trim_line(part)
+                    local cs = string.len(trimed) -- col_start
+                    local ce = cs + string.len(part_trimed) -- col_end
+                    if not none then
+                        hl[#hl + 1] = { 'Identifier', bi + k, cs, ce }
+                    end
+                    -- part_trimed = part_trimed .. ('(%d,%d,%d)'):format(bi + k, cs, ce)
+                end
+                -- Process current fg and bg
+                if byte == 'm' then
+                    -- vim.api.nvim_set_hl
+                    none = (args == '' or args == '0') and true or false
+                end
+                trimed = trimed .. part_trimed
             end
+            hls[k] = hl
             lines[k] = trimed
         end
 
@@ -271,6 +292,7 @@ function M.new_ansior(opts)
             raw_idx = 1
             raw_lines = {}
             pending = ''
+            none = true
         end
 
         return lines, highlights

@@ -46,11 +46,26 @@ end
 
 local function setup_window(qf) end
 
-local function display_and_highlight(qf, lines, hls, efm)
+local function display_and_highlight(qf, lines, highlights, efm)
     vim.fn.setqflist({}, 'a', {
         lines = lines,
         efm = efm,
     })
+    if qf.hbuf then
+        local ns = vim.api.nvim_create_namespace('v.task.onqf')
+        for _, hls in ipairs(highlights) do
+            for _, hl in ipairs(hls) do
+                vim.api.nvim_buf_add_highlight(
+                    qf.hbuf,
+                    ns,
+                    hl[1],
+                    hl[2], -- '+1' for on_start's command line, '-1' for zero-based line
+                    hl[3] + 3, -- '+3' for offset form '|| '
+                    hl[4] + 3
+                )
+            end
+        end
+    end
 end
 
 return {

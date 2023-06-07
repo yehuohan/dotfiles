@@ -20,7 +20,7 @@ local wsc = require('v.libv').new_configer({
     connect_pty = true,
     out_rawdata = false,
     out_rawline = false,
-    hl_ansi_sgr = false,
+    hl_ansi_sgr = true,
 })
 
 --- Single code file tasks according to filetype
