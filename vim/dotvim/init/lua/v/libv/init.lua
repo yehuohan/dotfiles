@@ -99,6 +99,7 @@ function M.new_ansior(opts)
     local out_rawline = opts and opts.out_rawline
     local hl_ansi_sgr = opts and opts.hl_ansi_sgr
 
+    local ansi = require('v.libv.ansi')
     local cur_row = 1
     local cur_col = 1
     local erased_rows = 0
@@ -106,48 +107,6 @@ function M.new_ansior(opts)
     local raw_lines = {}
     local pending = ''
     local none = true
-
-    local function trim_line(str)
-        return str
-            :gsub('\x1b%].*[\x07\x9c]', '') -- Remove all OSC code
-            :gsub('\x1b%[[%d:;<=>%?]*[a-zA-Z]', '') -- Remove all CSI code
-    end
-
-    local CSI = {
-        -- K: erase in line
-        -- H: set cursor position
-        Line = '\x1b%[([%d:;<=>%?]*)([KH])',
-        -- m: set SGR(Select Graphic Rendition)
-        Color = '\x1b%[([%d:;<=>%?]*)(m)',
-    }
-
-    --- Generate next line that ends with a CSI(Control Sequence Introducer) code
-    --- @param pat(string) One of the CSI pattern
-    --- @retval last(boolean) Indicate the last valid match
-    --- @retval line(string) The matched line ends with a CSI code
-    local function next_csi(str, pat)
-        local len = string.len(str)
-        local ci = 1
-
-        return function()
-            if ci < 0 then
-                return nil
-            end
-            local si, ei, args, byte = string.find(str, pat, ci)
-            local last = nil
-            if si then
-                local line = string.sub(str, ci, ei)
-                ci = ei + 1
-                last = (ci > len)
-                return last, line, args, byte
-            else
-                local line = string.sub(str, ci)
-                ci = -1
-                last = true
-                return last, line
-            end
-        end
-    end
 
     --- Process raw lines
     --- @param str(string) String to be processed
@@ -166,7 +125,7 @@ function M.new_ansior(opts)
         end
 
         -- Process CSI code
-        for last, line, args, byte in next_csi(str, CSI.Line) do
+        for last, line, args, byte in ansi.next_csi(str, ansi.CSI.Line) do
             -- The rest pending line shouldn't append into raw lines
             if is_pending and last then
                 return line
@@ -218,11 +177,11 @@ function M.new_ansior(opts)
         for k, line in ipairs(lines) do
             local hl = {}
             local trimed = ''
-            for _, part, args, byte in next_csi(line, CSI.Color) do
+            for _, part, args, byte in ansi.next_csi(line, ansi.CSI.Color) do
                 local part_trimed = ''
                 -- Process highlights
                 if part ~= '' then
-                    part_trimed = trim_line(part)
+                    part_trimed = ansi.trim(part)
                     local cs = string.len(trimed) -- col_start
                     local ce = cs + string.len(part_trimed) -- col_end
                     if not none then
@@ -279,7 +238,7 @@ function M.new_ansior(opts)
             if hl_ansi_sgr then
                 highlights = process_colors(lines)
             else
-                lines = vim.tbl_map(trim_line, lines)
+                lines = vim.tbl_map(ansi.trim, lines)
             end
         end
 
