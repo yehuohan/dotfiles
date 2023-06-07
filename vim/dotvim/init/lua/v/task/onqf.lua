@@ -46,13 +46,12 @@ end
 
 local function setup_window(qf) end
 
-local function display_and_highlight(qf, lines, highlights, efm)
+local function display_and_highlight(qf, lines, highlights, ns, efm)
     vim.fn.setqflist({}, 'a', {
         lines = lines,
         efm = efm,
     })
     if qf.hbuf then
-        local ns = vim.api.nvim_create_namespace('v.task.onqf')
         for _, hls in ipairs(highlights) do
             for _, hl in ipairs(hls) do
                 vim.api.nvim_buf_add_highlight(
@@ -122,9 +121,11 @@ return {
         local comp = {
             start_time = nil,
             ansior = nil,
+            ns = nil,
         }
 
         comp.on_init = function(self, task)
+            self.ns = vim.api.nvim_create_namespace('v.task.onqf')
             self.ansior = require('v.libv').new_ansior({
                 connect_pty = params.connect_pty,
                 out_rawline = params.out_rawline,
@@ -136,11 +137,15 @@ return {
             if params.save then
                 vim.cmd.wall() -- Auto save all files before start task
             end
-            self.start_time = os.time()
-            try_copen(get_qf(), params.open, params.jump)
+            local qf = get_qf()
+            if qf.hbuf and self.ns then
+                vim.api.nvim_buf_clear_namespace(qf.hbuf, self.ns, 0, -1)
+            end
+            try_copen(qf, params.open, params.jump)
             vim.fn.setqflist({}, 'r', {
                 lines = { string.format('[%s]', task.name) },
             })
+            self.start_time = os.time()
         end
 
         comp.on_complete = function(self, task, status, result)
@@ -153,7 +158,7 @@ return {
             end
             lines[#lines + 1] = string.format('[Completed in %ss with %s]', duration, status)
             local qf = get_qf()
-            display_and_highlight(qf, lines, highlights, params.errorformat)
+            display_and_highlight(qf, lines, highlights, self.ns, params.errorformat)
             try_scroll_to_bottom(qf, params.scroll, #lines)
         end
 
@@ -165,7 +170,7 @@ return {
                 lines, highlights = self.ansior(data)
             end
             local qf = get_qf()
-            display_and_highlight(qf, lines, highlights, params.errorformat)
+            display_and_highlight(qf, lines, highlights, self.ns, params.errorformat)
             try_scroll_to_bottom(qf, params.scroll, #lines)
         end
 
