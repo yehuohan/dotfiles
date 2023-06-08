@@ -46,7 +46,7 @@ local function sgr2hl(args)
     end
 
     -- TODO: vim.api.nvim_set_hl
-    local hl = { }
+    local hl = {}
     if args == '1' then
         hl.bold = true
     elseif args == '3' then
@@ -88,17 +88,19 @@ local function new()
 
             -- Process line with highlight
             if line ~= '' then
-                local s_line = bufs[srow] or ''
-                local s_hl = hlts[srow] or {}
                 local trimed = trim(line)
-                local cs = string.len(s_line) -- col_start
-                local ce = cs + string.len(trimed) -- col_end
-                if hlgrp then
-                    s_hl[#s_hl + 1] = { hlgrp, srow, cs, ce }
+                if trimed ~= '' then
+                    local s_line = bufs[srow] or ''
+                    local s_hl = hlts[srow] or {}
+                    local cs = string.len(s_line) -- col_start
+                    local ce = cs + string.len(trimed) -- col_end
+                    if hlgrp then
+                        s_hl[#s_hl + 1] = { hlgrp, srow, cs, ce }
+                    end
+                    -- trimed = trimed .. ('(%d,%d,%d)'):format(srow, cs, ce)
+                    bufs[srow] = s_line .. trimed
+                    hlts[srow] = s_hl
                 end
-                -- trimed = trimed .. ('(%d,%d,%d)'):format(srow, cs, ce)
-                bufs[srow] = s_line .. trimed
-                hlts[srow] = s_hl
             end
 
             -- Process CSI code

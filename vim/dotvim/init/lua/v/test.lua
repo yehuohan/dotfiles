@@ -103,6 +103,19 @@ function tst.new_configer()
     vim.print(cfg)
 end
 
+function tst.new_ansior()
+    local data = {
+        [[[2J[m[HH]0;C:\Windows\SYSTEM32\cmd.exe[?25hello ANSI]],
+    }
+    local ansior = libv.new_ansior({ connect_pty = true, hl_ansi_sgr = true })
+    local lines, highlights
+    lines, highlights = ansior(data)
+    EQ({}, lines)
+    lines, highlights = ansior()
+    EQ({ 'Hello ANSI\n' }, lines)
+    vim.print(lines)
+end
+
 function tst.str2env()
     local str = ' VAR0=var0   VAR1=var1 '
     local env = task.str2env(str)

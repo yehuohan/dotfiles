@@ -142,6 +142,9 @@ function M.new_ansior(opts)
                 pending = data[num]
             end
             end_idx = #bufs - 2
+        elseif pending ~= '' then
+            process_lines(pending)
+            end_idx = #bufs
         end
 
         -- Copy returned lines and highlights
