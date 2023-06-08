@@ -124,6 +124,8 @@ return {
             self.ansior = require('v.libv').new_ansior({
                 connect_pty = params.connect_pty,
                 hl_ansi_sgr = params.hl_ansi_sgr,
+                out_rawdata = params.out_rawdata,
+                verbose = task.metadata.verbose,
             })
         end
 
@@ -144,12 +146,7 @@ return {
 
         comp.on_complete = function(self, task, status, result)
             local duration = os.time() - self.start_time
-            local lines, highlights = {}, {}
-            if params.out_rawdata then
-                lines = {}
-            else
-                lines, highlights = self.ansior()
-            end
+            local lines, highlights = self.ansior()
             lines[#lines + 1] = string.format('[Completed in %ss with %s]', duration, status)
             local qf = get_qf()
             display_and_highlight(qf, lines, highlights, self.ns, params.errorformat)
@@ -157,12 +154,7 @@ return {
         end
 
         comp.on_output = function(self, task, data)
-            local lines, highlights = {}, {}
-            if params.out_rawdata then
-                lines = data
-            else
-                lines, highlights = self.ansior(data)
-            end
+            local lines, highlights = self.ansior(data)
             local qf = get_qf()
             display_and_highlight(qf, lines, highlights, self.ns, params.errorformat)
             try_scroll_to_bottom(qf, params.scroll, #lines)

@@ -97,6 +97,8 @@ end
 function M.new_ansior(opts)
     local connect_pty = opts and opts.connect_pty
     local hl_ansi_sgr = opts and opts.hl_ansi_sgr
+    local out_rawdata = opts and opts.out_rawdata
+    local verbose = opts and opts.verbose or ''
 
     local ansi = require('v.libv.ansi').new()
     local out_idx = 1
@@ -108,7 +110,7 @@ function M.new_ansior(opts)
     --- @return string|nil Pending string that can't be break into multi-lines
     local function process_lines(str, is_pending)
         str = str:gsub('\r', '') -- Remove ^M
-        if not connect_pty then
+        if (not connect_pty) or out_rawdata then
             local bufs = ansi.bufs()
             if not is_pending then
                 bufs[#bufs + 1] = str
@@ -116,7 +118,7 @@ function M.new_ansior(opts)
                 return str
             end
         else
-            return ansi.feed(str, is_pending)
+            return ansi.feed(str, is_pending, verbose)
         end
     end
 
@@ -129,8 +131,14 @@ function M.new_ansior(opts)
         local hlts = ansi.hlts()
 
         -- Process raw data into lines according to ':h channel-lines'
+        local eof = (not data) or (#data == 1 and data[1] == '')
         local end_idx = #bufs
-        if data then
+        if eof then
+            if pending ~= '' then
+                process_lines(pending)
+                end_idx = #bufs
+            end
+        elseif data then
             local num = #data
             pending = pending .. data[1]
             local rest = process_lines(pending, num == 1)
@@ -142,9 +150,6 @@ function M.new_ansior(opts)
                 pending = data[num]
             end
             end_idx = #bufs - 2
-        elseif pending ~= '' then
-            process_lines(pending)
-            end_idx = #bufs
         end
 
         -- Copy returned lines and highlights
@@ -154,7 +159,7 @@ function M.new_ansior(opts)
             if bufs[k] then
                 lines[#lines + 1] = bufs[k]
             end
-            if hl_ansi_sgr and hlts[k] then
+            if hl_ansi_sgr and not out_rawdata and connect_pty and hlts[k] then
                 highlights[#highlights + 1] = hlts[k]
             end
             out_idx = out_idx + 1
@@ -162,6 +167,9 @@ function M.new_ansior(opts)
 
         -- Reset locals
         if not data then
+            if verbose:match('[ab]') then
+                vim.notify(('num = %d\n%s'):format(#bufs, vim.inspect(bufs)))
+            end
             ansi.reset()
             out_idx = 1
             pending = ''

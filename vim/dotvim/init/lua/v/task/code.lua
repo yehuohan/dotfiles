@@ -20,6 +20,7 @@ local wsc = require('v.libv').new_configer({
     connect_pty = true,
     hl_ansi_sgr = true,
     out_rawdata = false,
+    verbose = '',
 })
 
 --- Single code file tasks according to filetype
@@ -259,6 +260,7 @@ task._sels = {
         'connect_pty',
         'hl_ansi_sgr',
         'out_rawdata',
+        'verbose',
     },
     dic = {
         key = {
@@ -280,6 +282,17 @@ task._sels = {
         connect_pty = vim.empty_dict(),
         hl_ansi_sgr = vim.empty_dict(),
         out_rawdata = vim.empty_dict(),
+        verbose = {
+            lst = { 'a', 'w', 'b', 't', 'h', 'n' },
+            dic = {
+                a = 'Show all',
+                w = 'Show code wsc',
+                b = 'Show bufs',
+                t = 'Show without trimed',
+                h = 'Show highlights',
+                n = 'Show line number',
+            },
+        },
     },
     evt = function(name)
         if name == 'onCR' then
@@ -318,7 +331,7 @@ task._sels = {
 --- Forward:
 ---      R^p => r^p (r^p means r[kt.E != p])
 ---      Rp  => rp  => r^p
-local entry = async(function(kt, debug)
+local entry = async(function(kt, bang)
     wsc:reinit()
 
     local resovle = false
@@ -355,7 +368,8 @@ local entry = async(function(kt, debug)
     -- Run code task
     wsc.key = kt.E
     wsc.stage = (kt.A == 'b' and 'build') or (kt.A == 'c' and 'clean') or wsc.stage
-    if debug then
+    wsc.verbose = bang and 'a' or wsc.verbose
+    if wsc.verbose:match('[aw]') then
         vim.notify(('resovle = %s, restore = %s\n%s'):format(resovle, restore, vim.inspect(wsc)))
     end
     local ok, msg = pcall(function(cfg)

@@ -79,7 +79,8 @@ local function new()
         hlgrp = nil
     end
 
-    ansi.feed = function(str, is_pending)
+    ansi.feed = function(str, is_pending, verbose)
+        local tag_line = verbose:match('[an]')
         for last, line, args, byte in next_csi(str, CSI_PAT) do
             -- The rest pending line shouldn't append into buffer lines
             if is_pending and last then
@@ -88,7 +89,7 @@ local function new()
 
             -- Process line with highlight
             if line ~= '' then
-                local trimed = trim(line)
+                local trimed = verbose:match('[at]') and line or trim(line)
                 if trimed ~= '' then
                     local s_line = bufs[srow] or ''
                     local s_hl = hlts[srow] or {}
@@ -97,7 +98,9 @@ local function new()
                     if hlgrp then
                         s_hl[#s_hl + 1] = { hlgrp, srow, cs, ce }
                     end
-                    -- trimed = trimed .. ('(%d,%d,%d)'):format(srow, cs, ce)
+                    if verbose:match('[ah]') then
+                        trimed = trimed .. ('<%d,%d,%d>'):format(srow, cs, ce)
+                    end
                     bufs[srow] = s_line .. trimed
                     hlts[srow] = s_hl
                 end

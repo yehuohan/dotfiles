@@ -42,6 +42,7 @@ function M.run(cfg)
     if not cfg.connect_pty then
         opts.strategy = { 'jobstart', use_terminal = false }
     end
+    opts.metadata = { verbose = cfg.verbose }
     opts.components = {
         {
             'on_quickfix',
@@ -64,7 +65,6 @@ function M.run(cfg)
     local overseer = require('overseer')
     local task = overseer.new_task(opts)
     task:start()
-    -- vim.cmd(string.format(':AsyncRun -cwd=%s %s', opts.cwd, opts.cmd))
 end
 
 function M.setup()
