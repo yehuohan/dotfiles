@@ -14,10 +14,10 @@ local wsc_initialization = {
     filters = '',
     globlst = '',
     options = '',
-    connect_pty = true,
-    out_rawdata = false,
-    out_rawline = false,
+    prefer_vimgrep = false,
+    connect_pty = false,
     hl_ansi_sgr = false,
+    out_rawdata = false,
 }
 
 --- Fuzzy finder tasks
@@ -42,6 +42,24 @@ local fzer = {
         tags = ':lua require("telescope.builtin").tags({placeholder="{pat}"})',
     },
 }
+
+-- Task functions
+local task = {}
+
+-- stylua: ignore start
+task._keys = {
+     'fi',  'fbi',  'fpi',  'Fi',  'fI',  'fbI',  'fpI',  'FI',
+     'fw',  'fbw',  'fpw',  'Fw',  'fW',  'fbW',  'fpW',  'FW',
+     'fs',  'fbs',  'fps',  'Fs',  'fS',  'fbS',  'fpS',  'FS',
+     'fy',  'fby',  'fpy',  'Fy',  'fY',  'fbY',  'fpY',  'FY',
+     'fu',  'fbu',  'fpu',  'Fu',  'fU',  'fbU',  'fpU',  'FU',
+    'fai', 'fabi', 'fapi', 'Fai', 'faI', 'fabI', 'fapI', 'FaI',
+    'faw', 'fabw', 'fapw', 'Faw', 'faW', 'fabW', 'fapW', 'FaW',
+    'fas', 'fabs', 'faps', 'Fas', 'faS', 'fabS', 'fapS', 'FaS',
+    'fay', 'faby', 'fapy', 'Fay', 'faY', 'fabY', 'fapY', 'FaY',
+    'fau', 'fabu', 'fapu', 'Fau', 'faU', 'fabU', 'fapU', 'FaU',
+}
+-- stylua: ignore end
 
 local entry = async(function(kt, debug) end)
 

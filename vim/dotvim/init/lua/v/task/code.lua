@@ -16,11 +16,10 @@ local wsc = require('v.libv').new_configer({
     earg = '',
     stage = 'run',
     fs_find_one = false, -- Find the closest file relative to wdir
-    enable_msvc = true, -- Setup msvc environment
+    enable_msvc = false, -- Setup msvc environment
     connect_pty = true,
-    out_rawdata = false,
-    out_rawline = false,
     hl_ansi_sgr = true,
+    out_rawdata = false,
 })
 
 --- Single code file tasks according to filetype
@@ -258,9 +257,8 @@ task._sels = {
         'fs_find_one',
         'enable_msvc',
         'connect_pty',
-        'out_rawdata',
-        'out_rawline',
         'hl_ansi_sgr',
+        'out_rawdata',
     },
     dic = {
         key = {
@@ -280,9 +278,8 @@ task._sels = {
         fs_find_one = vim.empty_dict(),
         enable_msvc = vim.empty_dict(),
         connect_pty = vim.empty_dict(),
-        out_rawdata = vim.empty_dict(),
-        out_rawline = vim.empty_dict(),
         hl_ansi_sgr = vim.empty_dict(),
+        out_rawdata = vim.empty_dict(),
     },
     evt = function(name)
         if name == 'onCR' then

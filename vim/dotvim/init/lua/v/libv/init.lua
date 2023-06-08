@@ -96,122 +96,41 @@ end
 --- @param opts(table) Passed from 'on_quickfix.params'
 function M.new_ansior(opts)
     local connect_pty = opts and opts.connect_pty
-    local out_rawline = opts and opts.out_rawline
     local hl_ansi_sgr = opts and opts.hl_ansi_sgr
 
-    local ansi = require('v.libv.ansi')
-    local cur_row = 1
-    local cur_col = 1
-    local erased_rows = 0
-    local raw_idx = 1
-    local raw_lines = {}
+    local ansi = require('v.libv.ansi').new()
+    local out_idx = 1
     local pending = ''
-    local none = true
 
-    --- Process raw lines
+    --- Process raw data stream
     --- @param str(string) String to be processed
     --- @param is_pending(boolean|nil) Is str a pending string or not
     --- @return string|nil Pending string that can't be break into multi-lines
     local function process_lines(str, is_pending)
         str = str:gsub('\r', '') -- Remove ^M
-
         if not connect_pty then
+            local bufs = ansi.bufs()
             if not is_pending then
-                raw_lines[#raw_lines + 1] = str
+                bufs[#bufs + 1] = str
             else
                 return str
             end
-            return
-        end
-
-        -- Process CSI code
-        for last, line, args, byte in ansi.next_csi(str, ansi.CSI.Line) do
-            -- The rest pending line shouldn't append into raw lines
-            if is_pending and last then
-                return line
-            end
-
-            -- Append a raw line at cursor position
-            if line ~= '' then
-                raw_lines[#raw_lines + 1] = string.rep(' ', cur_col) .. line
-                cur_row = cur_row + 1
-                cur_col = 1
-            end
-
-            -- Get lastest cursor position
-            local row, col = nil, nil
-            if byte == 'H' then
-                row, col = string.match(args, '(%d*);?(%d*)')
-                row = (row ~= '') and tonumber(row) or 1
-                col = (col ~= '') and tonumber(col) or 1
-            elseif byte == 'K' then
-                -- local n = string.match(args, '(%d)K')
-                -- n = (n ~= '') and tonumber(n) or 0
-                erased_rows = erased_rows + 1
-            end
-
-            -- Update current cursor position
-            if row then
-                row = row + erased_rows
-                while cur_row ~= row do
-                    if cur_row < row then
-                        raw_lines[#raw_lines + 1] = ''
-                        cur_row = cur_row + 1
-                    else
-                        raw_lines[#raw_lines] = nil
-                        cur_row = cur_row - 1
-                    end
-                end
-            end
-            if col then
-                cur_col = col
-            end
+        else
+            return ansi.feed(str, is_pending)
         end
     end
 
-    --- Process colors for each raw line
-    local function process_colors(lines)
-        local hls = {}
-
-        local bi = raw_idx - 1 - #lines
-        for k, line in ipairs(lines) do
-            local hl = {}
-            local trimed = ''
-            for _, part, args, byte in ansi.next_csi(line, ansi.CSI.Color) do
-                local part_trimed = ''
-                -- Process highlights
-                if part ~= '' then
-                    part_trimed = ansi.trim(part)
-                    local cs = string.len(trimed) -- col_start
-                    local ce = cs + string.len(part_trimed) -- col_end
-                    if not none then
-                        hl[#hl + 1] = { 'Identifier', bi + k, cs, ce }
-                    end
-                    -- part_trimed = part_trimed .. ('(%d,%d,%d)'):format(bi + k, cs, ce)
-                end
-                -- Process current fg and bg
-                if byte == 'm' then
-                    -- vim.api.nvim_set_hl
-                    none = (args == '' or args == '0') and true or false
-                end
-                trimed = trimed .. part_trimed
-            end
-            hls[k] = hl
-            lines[k] = trimed
-        end
-
-        return hls
-    end
-
-    --- Process data stream from terminal's stdout
-    --- @param data(table<string>|nil) nil means all processed raw lines should be returned
-    --- @retval lines(table<string>) Processed raw lines
-    --- @retval highlights(table) Processed colors
+    --- Process raw data stream from terminal's stdout
+    --- @param data(table<string>|nil) nil means all processed buffer lines should be displayed
+    --- @retval lines(table<string>) Processed lines
+    --- @retval highlights(table) Processed highlights for lines
     return function(data)
-        -- Process raw data into lines
-        local ei = #raw_lines
+        local bufs = ansi.bufs()
+        local hlts = ansi.hlts()
+
+        -- Process raw data into lines according to ':h channel-lines'
+        local end_idx = #bufs
         if data then
-            -- local eof = (#data == 1 and data[1] == '')
             local num = #data
             pending = pending .. data[1]
             local rest = process_lines(pending, num == 1)
@@ -222,36 +141,27 @@ function M.new_ansior(opts)
             if num >= 2 then
                 pending = data[num]
             end
-            ei = #raw_lines - 2
+            end_idx = #bufs - 2
         end
 
-        -- Copy returned lines
+        -- Copy returned lines and highlights
         local lines = {}
-        if ei >= raw_idx then
-            lines = vim.list_slice(raw_lines, raw_idx, ei)
-            raw_idx = ei + 1
-        end
-
-        -- Process colors
         local highlights = {}
-        if not out_rawline then
-            if hl_ansi_sgr then
-                highlights = process_colors(lines)
-            else
-                lines = vim.tbl_map(ansi.trim, lines)
+        for k = out_idx, end_idx, 1 do
+            if bufs[k] then
+                lines[#lines + 1] = bufs[k]
             end
+            if hl_ansi_sgr and hlts[k] then
+                highlights[#highlights + 1] = hlts[k]
+            end
+            out_idx = out_idx + 1
         end
 
-        -- Reset when all raw lines are returned
+        -- Reset locals
         if not data then
-            cur_row = 1
-            cur_col = 1
-            erased_rows = 0
-
-            raw_idx = 1
-            raw_lines = {}
+            ansi.reset()
+            out_idx = 1
             pending = ''
-            none = true
         end
 
         return lines, highlights

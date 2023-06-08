@@ -101,18 +101,13 @@ return {
             type = 'boolean',
             default = false,
         },
-        out_rawdata = {
-            desc = 'Output raw data from stdout',
-            type = 'boolean',
-            default = false,
-        },
-        out_rawline = {
-            desc = 'Output raw lines processed from stdout data',
-            type = 'boolean',
-            default = false,
-        },
         hl_ansi_sgr = {
             desc = 'Highlight ANSI color with SGR when connect_pty is enabled',
+            type = 'boolean',
+            default = false,
+        },
+        out_rawdata = {
+            desc = 'Output raw data from stdout',
             type = 'boolean',
             default = false,
         },
@@ -128,7 +123,6 @@ return {
             self.ns = vim.api.nvim_create_namespace('v.task.onqf')
             self.ansior = require('v.libv').new_ansior({
                 connect_pty = params.connect_pty,
-                out_rawline = params.out_rawline,
                 hl_ansi_sgr = params.hl_ansi_sgr,
             })
         end
