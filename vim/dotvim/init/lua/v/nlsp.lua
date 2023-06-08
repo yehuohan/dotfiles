@@ -399,9 +399,8 @@ local function __mappings()
     m.nnore({ '<leader>gs', '<Cmd>Lspsaga lsp_finder<CR>' })
     m.nnore({ '<leader>go', '<Cmd>Lspsaga outline<CR>' })
 
-    m.nnore({ '<leader>of', ':Format<CR>' })
+    m.nore({ '<leader>of', ':Format<CR>' })
     -- m.nore({ '<leader>of', vim.lsp.buf.format }) -- Terrible format experience form lsp
-    m.nore({ '<leader>of', vim.lsp.buf.format })
     m.nnore({ '<leader>od', vim.diagnostic.setloclist })
     m.nnore({ '<leader>oi', vim.diagnostic.open_float })
     local opts = { severity = vim.diagnostic.severity.ERROR }
@@ -421,7 +420,7 @@ local function __mappings()
 end
 
 return {
-    setup = function()
+    setup = vim.schedule_wrap(function()
         if use.nlsp then
             __servers()
             __hl()
@@ -429,5 +428,5 @@ return {
             __lsp()
             __mappings()
         end
-    end,
+    end),
 }

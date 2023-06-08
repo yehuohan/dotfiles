@@ -519,7 +519,7 @@ local function pkg_formatter()
             python = { require('formatter.filetypes.python').black },
         },
     })
-    m.nnore({ '<leader>fo', ':Format<CR>' })
+    m.nore({ '<leader>fo', ':Format<CR>' })
 end
 
 -- 导步程序/任务

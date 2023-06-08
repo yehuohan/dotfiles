@@ -1191,16 +1191,14 @@ endfunction
 
 let ScriptEval = function('popset#set#PopSelection', [s:rs.sel])
 nnoremap <leader>se :call ScriptEval()<CR>
-nnoremap <leader>ei
-    \ <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 'e')<CR>
+nnoremap <leader>ei <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 'e')<CR>
 nnoremap <leader>ec  :call FnEditFile('c'  , 'e')<CR>
 nnoremap <leader>ea  :call FnEditFile('cpp', 'e')<CR>
 nnoremap <leader>er  :call FnEditFile('rs' , 'e')<CR>
 nnoremap <leader>ep  :call FnEditFile('py' , 'e')<CR>
 nnoremap <leader>em  :call FnEditFile('md' , 'e')<CR>
 nnoremap <leader>el  :call FnEditFile('lua', 'e')<CR>
-nnoremap <leader>eti
-    \ <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 't')<CR>
+nnoremap <leader>eti <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 't')<CR>
 nnoremap <leader>etc :call FnEditFile('c'  , 't')<CR>
 nnoremap <leader>eta :call FnEditFile('cpp', 't')<CR>
 nnoremap <leader>etr :call FnEditFile('rs' , 't')<CR>
@@ -1208,8 +1206,7 @@ nnoremap <leader>etp :call FnEditFile('py' , 't')<CR>
 nnoremap <leader>etm :call FnEditFile('md' , 't')<CR>
 nnoremap <leader>etl :call FnEditFile('lua', 't')<CR>
 if IsNVim()
-nnoremap <leader>efi
-    \ <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 'f')<CR>
+nnoremap <leader>efi <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 'f')<CR>
 nnoremap <leader>efc :call FnEditFile('c'  , 'f')<CR>
 nnoremap <leader>efa :call FnEditFile('cpp', 'f')<CR>
 nnoremap <leader>efr :call FnEditFile('rs' , 'f')<CR>
@@ -1221,8 +1218,7 @@ nnoremap <silent> <leader>dh :call Input2Fn(['Divide Right: '] , 'FnInsertSpace'
 nnoremap <silent> <leader>db :call Input2Fn(['Divide Both: ']  , 'FnInsertSpace', 'b')<CR>
 nnoremap <silent> <leader>dl :call Input2Fn(['Divide Left: ']  , 'FnInsertSpace', 'l')<CR>
 nnoremap <silent> <leader>dd :call Input2Fn(['Divide Delete: '], 'FnInsertSpace', 'd')<CR>
-nnoremap <leader>sf
-    \ <Cmd>call FnSwitchFile({'lhs': ['c', 'cc', 'cpp', 'cxx'], 'rhs': ['h', 'hh', 'hpp', 'hxx']})<CR>
+nnoremap <leader>sf <Cmd>call FnSwitchFile({'lhs': ['c', 'cc', 'cpp', 'cxx'], 'rhs': ['h', 'hh', 'hpp', 'hxx']})<CR>
 noremap <leader>ae  <Cmd>call FnEvalStr('execute', 'i', 'n')<CR>
 noremap <leader>age <Cmd>call FnEvalStr('execute', 'i', 'c')<CR>
 noremap <leader>af  <Cmd>call FnEvalStr('eval', 'i', 'n')<CR>

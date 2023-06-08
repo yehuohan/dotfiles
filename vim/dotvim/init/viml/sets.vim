@@ -334,23 +334,18 @@ cnoremap <M-u> <C-b>
 cnoremap <M-p> <C-e>
 " 替换
 nnoremap <leader><leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
-vnoremap <leader><leader>s
-    \ <Cmd>call feedkeys(':%s/' . GetSelected('') . '/', 'n')<CR>
+vnoremap <leader><leader>s <Cmd>call feedkeys(':%s/' . GetSelected('') . '/', 'n')<CR>
 " 排序
 nnoremap <leader><leader>S :sort fr //<Left>
-vnoremap <leader><leader>S
-    \ :<C-u>sort fr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
+vnoremap <leader><leader>S :<C-u>sort fr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
 " lua测试代码
-nnoremap <leader><leader>u :lua vim.print()<Left>
-nnoremap <leader><leader>U :lua print()<Left>
-vnoremap <leader><leader>u
-    \ <Cmd>call feedkeys(':lua vim.print(' . GetSelected('') . ')', 'n')<CR>
-vnoremap <leader><leader>U
-    \ <Cmd>call feedkeys(':lua print(' . GetSelected('') . ')', 'n')<CR>
+nnoremap <leader><leader>u :lua=<Space>
+nnoremap <leader><leader>U :lua= vim.api.nvim_parse_cmd('', {})<Left><Left><Left><Left><Left><Left>
+vnoremap <leader><leader>u <Cmd>call feedkeys(':lua= ' . GetSelected(''), 'n')<CR>
+vnoremap <leader><leader>U <Cmd>call feedkeys(':lua= vim.api.nvim_parse_cmd(''' . GetSelected('') . ''', {})', 'n')<CR>
 " 查看help文档
 nnoremap <leader><leader>k :h <C-r><C-w>
-vnoremap <leader><leader>k
-    \ <Cmd>call feedkeys(':h ' . GetSelected(''), 'n')<CR>
+vnoremap <leader><leader>k <Cmd>call feedkeys(':h ' . GetSelected(''), 'n')<CR>
 " HEX编辑
 nnoremap <leader>xx :%!xxd<CR>
 nnoremap <leader>xr :%!xxd -r<CR>
@@ -580,18 +575,14 @@ nnoremap <leader>ql
 " }}}
 
 " Diff {{{
-nnoremap <leader>ds
-    \ <Cmd>call Input2Fn(['File: ', '', 'file', Expand('%', ':p:h')], {filename -> execute('diffsplit ' . filename)})<CR>
-nnoremap <leader>dv
-    \ <Cmd>call Input2Fn(['File: ', '', 'file', Expand('%', ':p:h')], {filename -> execute('vertical diffsplit ' . filename)})<CR>
+nnoremap <leader>ds <Cmd>call Input2Fn(['File: ', '', 'file', Expand('%', ':p:h')], {filename -> execute('diffsplit ' . filename)})<CR>
+nnoremap <leader>dv <Cmd>call Input2Fn(['File: ', '', 'file', Expand('%', ':p:h')], {filename -> execute('vertical diffsplit ' . filename)})<CR>
 " 比较当前文件（已经分屏）
 nnoremap <leader>dt :diffthis<CR>
 nnoremap <leader>do :diffoff<CR>
 nnoremap <leader>du :diffupdate<CR>
-nnoremap <leader>dp
-    \ <Cmd>execute '.,+' . string(v:count1-1) . 'diffput'<CR>
-nnoremap <leader>dg
-    \ <Cmd>execute '.,+' . string(v:count1-1) . 'diffget'<CR>
+nnoremap <leader>dp <Cmd>execute '.,+' . string(v:count1-1) . 'diffput'<CR>
+nnoremap <leader>dg <Cmd>execute '.,+' . string(v:count1-1) . 'diffget'<CR>
 nnoremap <leader>dj ]c
 nnoremap <leader>dk [c
 " }}}

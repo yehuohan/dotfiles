@@ -19,7 +19,7 @@ local function try_copen(qf, auto_open, auto_jump)
                 vim.api.nvim_set_current_win(qf.hwin)
             end
         else
-            vim.cmd([[botright copen 8]])
+            vim.cmd.copen({ count = 8, mods = { split = 'botright' } })
             if not auto_jump then
                 vim.cmd.wincmd('p')
             end
@@ -135,7 +135,7 @@ return {
 
         comp.on_start = function(self, task)
             if params.save then
-                vim.cmd.wall() -- Auto save all files before start task
+                vim.cmd.wall({ mods = { silent = true, emsg_silent = true } })
             end
             local qf = get_qf()
             if qf.hbuf and self.ns then
