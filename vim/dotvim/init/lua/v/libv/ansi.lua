@@ -40,14 +40,30 @@ local function next_csi(str, pat)
     end
 end
 
+local function sgr2hl(args)
+    if args == '' or args == '0' then
+        return nil
+    end
+
+    -- TODO: vim.api.nvim_set_hl
+    local hl = { }
+    if args == '1' then
+        hl.bold = true
+    elseif args == '3' then
+        hl.italic = true
+    end
+    return 'Identifier'
+end
+
 local function new()
     local bufs = {} -- Processed buffer lines
     local hlts = {} -- Processed highlights
     local srow = 1 -- Cursor position row
     -- local scol = 1 -- Cursor position col
-    local erased_lines = 0
-    local none = true
+    local erased_lines = 0 -- Erased lines should be displayed too
+    local hlgrp = nil -- Cursor highlight group from SGR
 
+    -- ANSI object
     local ansi = {}
 
     ansi.bufs = function() return bufs end
@@ -60,7 +76,7 @@ local function new()
         srow = 1
         -- scol = 1
         erased_lines = 0
-        none = true
+        hlgrp = nil
     end
 
     ansi.feed = function(str, is_pending)
@@ -77,8 +93,8 @@ local function new()
                 local trimed = trim(line)
                 local cs = string.len(s_line) -- col_start
                 local ce = cs + string.len(trimed) -- col_end
-                if not none then
-                    s_hl[#s_hl + 1] = { 'Identifier', srow, cs, ce }
+                if hlgrp then
+                    s_hl[#s_hl + 1] = { hlgrp, srow, cs, ce }
                 end
                 -- trimed = trimed .. ('(%d,%d,%d)'):format(srow, cs, ce)
                 bufs[srow] = s_line .. trimed
@@ -105,8 +121,7 @@ local function new()
                 end
                 bufs[srow] = string.rep(' ', cur_col - 1)
             elseif byte == 'm' then
-                -- TODO: vim.api.nvim_set_hl
-                none = (args == '' or args == '0') and true or false
+                hlgrp = sgr2hl(args)
             end
         end
 
