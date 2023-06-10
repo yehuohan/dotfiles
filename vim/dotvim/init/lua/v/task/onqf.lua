@@ -5,6 +5,17 @@ local PAUSE_PATS = {
     'Press any key to continue . . .',
 }
 
+local function buf_add_highlight(buf, ns, hl, line, cs, ce)
+    vim.api.nvim_buf_add_highlight(
+        buf,
+        ns,
+        hl,
+        line, -- '+1' for on_start's command line, '-1' for zero-based line
+        cs + 3, -- '+3' for offset form '|| '
+        ce + 3
+    )
+end
+
 local function get_qf()
     local qf = {}
     local lst = vim.fn.getqflist({ winid = 0, qfbufnr = 0 })
@@ -30,6 +41,7 @@ local function try_copen(qf, auto_open, auto_jump)
             end
         end
     end
+    return get_qf()
 end
 
 local function try_scroll_to_bottom(qf, auto_scroll, dnum)
@@ -59,14 +71,7 @@ local function display_and_highlight(qf, lines, highlights, ns, efm)
     if qf.hbuf then
         for _, hls in ipairs(highlights) do
             for _, hl in ipairs(hls) do
-                vim.api.nvim_buf_add_highlight(
-                    qf.hbuf,
-                    ns,
-                    hl[1],
-                    hl[2], -- '+1' for on_start's command line, '-1' for zero-based line
-                    hl[3] + 3, -- '+3' for offset form '|| '
-                    hl[4] + 3
-                )
+                buf_add_highlight(qf.hbuf, ns, hl[1], hl[2], hl[3], hl[4])
             end
         end
     end
@@ -135,32 +140,54 @@ return {
         end
 
         comp.on_start = function(self, task)
+            self.start_time = os.time()
+
             if params.save then
                 vim.cmd.wall({ mods = { silent = true, emsg_silent = true } })
             end
-            local qf = get_qf()
+            local qf = try_copen(get_qf(), params.open, params.jump)
             if qf.hbuf and self.ns then
                 vim.api.nvim_buf_clear_namespace(qf.hbuf, self.ns, 0, -1)
             end
-            try_copen(qf, params.open, params.jump)
+
+            -- Add head message
+            local msg = string.format('[%s] %s', os.date('%H:%M:%S'), task.name)
             vim.fn.setqflist({}, 'r', {
-                lines = { string.format('[%s]', task.name) },
+                lines = { msg },
+                efm = ' ', -- Avoid match time string
             })
-            self.start_time = os.time()
+            if qf.hbuf then
+                buf_add_highlight(qf.hbuf, self.ns, 'Constant', 0, 1, 9)
+                buf_add_highlight(qf.hbuf, self.ns, 'Identifier', 0, 11, 11 + string.len(task.name))
+            end
         end
 
         comp.on_complete = function(self, task, status, result)
-            local duration = os.time() - self.start_time
-            local lines, highlights = self.ansior()
-            lines[#lines + 1] = string.format('[Completed in %ss with %s]', duration, status)
+            local dt = os.time() - self.start_time
             local qf = get_qf()
+            local lines, highlights = self.ansior()
             display_and_highlight(qf, lines, highlights, self.ns, params.errorformat)
-            try_scroll_to_bottom(qf, params.scroll, #lines)
+
+            -- Add tail message
+            local msg = string.format('[%s] %s completed in %ds', os.date('%H:%M:%S'), status, dt)
+            vim.fn.setqflist({}, 'a', {
+                lines = { msg },
+                efm = ' ', -- Avoid match time string
+            })
+            if qf.hbuf then
+                local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
+                local hlgrp = (status == 'SUCCESS' and 'Title')
+                    or (status == 'CANCELED' and 'MoreMsg')
+                    or (status == 'FAILURE' and 'WarningMsg')
+                buf_add_highlight(qf.hbuf, self.ns, 'Constant', line, 1, 9)
+                buf_add_highlight(qf.hbuf, self.ns, hlgrp, line, 11, string.len(msg))
+            end
+            try_scroll_to_bottom(qf, params.scroll, #lines + 1)
         end
 
         comp.on_output = function(self, task, data)
-            local lines, highlights = self.ansior(data)
             local qf = get_qf()
+            local lines, highlights = self.ansior(data)
             display_and_highlight(qf, lines, highlights, self.ns, params.errorformat)
             try_scroll_to_bottom(qf, params.scroll, #lines)
 

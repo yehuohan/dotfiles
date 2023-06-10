@@ -35,9 +35,8 @@ local codes = {
     cpp        = { cmd = 'g++ -g -std=c++20 {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
     rust       = { cmd = IsWin() and 'rustc {barg} {bsrc} -o "{bout}.exe" && "./{bout}" {earg}'
                                   or 'rustc {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
-                   efm = [[\ %#-->\ %f:%l:%c,\%m\ %f:%l:%c']],
-    },
-    python     = { cmd = 'python {bsrc} {earg}', efm = [[%*\\sFile\ \"%f\"\\,\ line\ %l\\,\ %m]] },
+                   efm = [[\ %#-->\ %f:%l:%c,\%m\ %f:%l:%c]] },
+    python     = { cmd = 'python {bsrc} {earg}', efm = [[%*\sFile\ \"%f\"\,\ line\ %l\,\ %m]] },
     lua        = { cmd = 'lua {bsrc} {earg}', efm = [[lua:\ %f:%l:\ %m]] },
     java       = { cmd = 'javac {barg} {bsrc} && java "{bout}" {earg}' },
     julia      = { cmd = 'julia {bsrc} {earg}' },
