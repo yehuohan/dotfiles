@@ -1,5 +1,10 @@
 --- Quickfix output for task
 
+local PAUSE_PATS = {
+    '请按任意键继续. . .',
+    'Press any key to continue . . .',
+}
+
 local function get_qf()
     local qf = {}
     local lst = vim.fn.getqflist({ winid = 0, qfbufnr = 0 })
@@ -158,6 +163,17 @@ return {
             local qf = get_qf()
             display_and_highlight(qf, lines, highlights, self.ns, params.errorformat)
             try_scroll_to_bottom(qf, params.scroll, #lines)
+
+            -- React to pause command
+            if IsWin() then
+                for _, str in ipairs(data) do
+                    for _, pat in ipairs(PAUSE_PATS) do
+                        if str:match(pat) then
+                            vim.api.nvim_chan_send(task.strategy.chan_id, ' ')
+                        end
+                    end
+                end
+            end
         end
 
         return comp

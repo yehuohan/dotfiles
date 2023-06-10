@@ -80,7 +80,9 @@ local function new()
     end
 
     ansi.feed = function(str, is_pending, verbose)
-        local tag_line = verbose:match('[an]')
+        local verb_t = verbose:match('[at]')
+        local verb_h = verbose:match('[ah]')
+        local verb_n = verbose:match('[an]')
         for last, line, args, byte in next_csi(str, CSI_PAT) do
             -- The rest pending line shouldn't append into buffer lines
             if is_pending and last then
@@ -89,16 +91,16 @@ local function new()
 
             -- Process line with highlight
             if line ~= '' then
-                local trimed = verbose:match('[at]') and line or trim(line)
+                local trimed = verb_t and line or trim(line)
                 if trimed ~= '' then
-                    local s_line = bufs[srow] or ''
+                    local s_line = bufs[srow] or (verb_n and ('#%d>'):format(srow) or '')
                     local s_hl = hlts[srow] or {}
                     local cs = string.len(s_line) -- col_start
                     local ce = cs + string.len(trimed) -- col_end
                     if hlgrp then
                         s_hl[#s_hl + 1] = { hlgrp, srow, cs, ce }
                     end
-                    if verbose:match('[ah]') then
+                    if verb_h then
                         trimed = trimed .. ('<%d,%d,%d>'):format(srow, cs, ce)
                     end
                     bufs[srow] = s_line .. trimed
@@ -108,30 +110,52 @@ local function new()
 
             -- Process CSI code
             if byte == 'K' then
-                -- TODO: local n = string.match(args, '(%d)K')
+                -- n = 0: clear from cursor to end of line
+                -- n = 1: clear from cursor to begin of line
+                -- n = 2: clear entire line
+                -- local n = string.match(args, '(%d)K')
+                -- n = (n ~= '') and tonumber(n) or 0
                 erased_lines = erased_lines + 1
-                srow = srow + 1
+                if bufs[srow] then
+                    srow = srow + 1
+                    bufs[srow] = verb_n and ('K%d>'):format(srow)
+                end
             elseif byte == 'H' then
                 local cur_row, cur_col = string.match(args, '(%d*);?(%d*)')
                 cur_row = (cur_row ~= '') and tonumber(cur_row) or 1
                 cur_col = (cur_col ~= '') and tonumber(cur_col) or 1
+                cur_col = cur_col - 1 -- The cursor cell will also be filled with the inputs
                 cur_row = cur_row + erased_lines
+                -- Sync cursor row
                 while srow < cur_row do
+                    bufs[srow] = bufs[srow] or (verb_n and ('H%d>'):format(srow) or '')
                     srow = srow + 1
-                    bufs[srow] = ''
                 end
                 while srow > cur_row do
                     bufs[srow] = nil
                     srow = srow - 1
                 end
-                bufs[srow] = string.rep(' ', cur_col - 1)
+                -- Sync cursor col
+                if bufs[srow] then
+                    if verb_n then
+                        bufs[srow] = bufs[srow] .. '&' .. string.rep('%', cur_col)
+                    else
+                        local dlen = string.len(bufs[srow]) -- Displayed length
+                        bufs[srow] = bufs[srow]:sub(1, cur_col) .. string.rep(' ', cur_col - dlen)
+                    end
+                else
+                    bufs[srow] = string.rep(verb_n and '%' or ' ', cur_col)
+                end
             elseif byte == 'm' then
                 hlgrp = sgr2hl(args)
             end
         end
 
         -- For next new line
-        srow = srow + 1
+        if bufs[srow] then
+            srow = srow + 1
+            bufs[srow] = verb_n and ('$%d>'):format(srow)
+        end
     end
 
     return ansi
