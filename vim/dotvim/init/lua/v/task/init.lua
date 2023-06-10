@@ -71,6 +71,7 @@ end
 function M.setup()
     require('v.task.code').setup()
     require('v.task.fzer').setup()
+    vim.api.nvim_create_user_command('TaskWsc', function() vim.print(M.wsc) end, { nargs = 0 })
 
     -- vim.api.nvim_create_augroup('TaskWorkSpace', { clear = true })
     -- vim.api.nvim_create_autocmd('User', {

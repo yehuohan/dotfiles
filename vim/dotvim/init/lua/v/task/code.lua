@@ -400,12 +400,12 @@ local function setup()
     end
 
     vim.api.nvim_create_user_command(
-        'TaskCode',
+        'Code',
         function(opts) entry(keys2kt(opts.args), opts.bang) end,
         { bang = true, nargs = 1 }
     )
-    vim.api.nvim_create_user_command('TaskCodeWsc', function() vim.print(wsc) end, { nargs = 0 })
-    vim.api.nvim_create_user_command('TaskCodeWscInit', function()
+    vim.api.nvim_create_user_command('CodeWsc', function() vim.print(wsc) end, { nargs = 0 })
+    vim.api.nvim_create_user_command('CodeWscInit', function()
         wsc:reinit()
         task._sels.lst = task._sels.lst_i
         vim.fn.PopSelection(task._sels)

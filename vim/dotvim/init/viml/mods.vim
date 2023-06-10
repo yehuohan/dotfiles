@@ -788,12 +788,12 @@ function! s:parseOptions(km)
     let l:opt = ''
     if a:km.E ==? 's'       | let l:opt .= '-w ' | endif
     if a:km.E =~# '[iwsyu]' | let l:opt .= '-i ' | elseif a:km.E =~# '[IWSYU]' | let l:opt .= '-s ' | endif
-    if a:km.A1 !~# '[btop]'
+    if a:km.A1 !~# '[bp]'
         if !empty(s:ws.fw.filters)
             let l:opt .= '-g"*.{' . s:ws.fw.filters . '}" '
         endif
         if !empty(s:ws.fw.globlst)
-            let l:opt .= '-g' . join(split(s:ws.fw.globlst), ' -g') . ' '
+            let l:opt .= '-g' . join(split(s:ws.fw.globlst, '\s*,\s*'), ' -g') . ' '
         endif
         if !empty(s:ws.fw.exargs)
             let l:opt .= s:ws.fw.exargs
@@ -870,7 +870,7 @@ function! s:popF(km, type)
             \             'lst': get(s:ws.fw, 'pathlst', []),
             \             'cpl': 'file'},
             \ 'filters': {'dsr': {sopt -> '-g*.{' . l:cfg.filters . '}'}},
-            \ 'globlst': {'dsr': {sopt -> '-g' . join(split(l:cfg.globlst), ' -g')},
+            \ 'globlst': {'dsr': {sopt -> '-g' . join(split(l:cfg.globlst, '\s*,\s*'), ' -g')},
             \             'cpl': 'file'},
             \ 'exargs' : {'lst': ['--word-regexp', '--no-fixed-strings', '--hidden', '--no-ignore', '--encoding gbk']},
             \ 'fuzzy'  : {'lst': keys(s:fw.fuzzy),
