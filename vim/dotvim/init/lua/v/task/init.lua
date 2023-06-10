@@ -51,6 +51,7 @@ function M.run(cfg)
             open = cfg.qf_open,
             jump = cfg.qf_jump,
             scroll = cfg.qf_scroll,
+            append = cfg.qf_append,
             connect_pty = cfg.connect_pty,
             hl_ansi_sgr = cfg.hl_ansi_sgr,
             out_rawdata = cfg.out_rawdata,

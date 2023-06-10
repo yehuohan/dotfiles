@@ -92,7 +92,7 @@ return {
             default = false,
         },
         open = {
-            desc = 'Open the quickfix on output',
+            desc = 'Open the quickfix window',
             type = 'boolean',
             default = false,
         },
@@ -103,6 +103,11 @@ return {
         },
         scroll = {
             desc = 'Auto scroll quickfix window to bottom when not focused',
+            type = 'boolean',
+            default = false,
+        },
+        append = {
+            desc = 'Append result to quickfix list',
             type = 'boolean',
             default = false,
         },
@@ -146,19 +151,20 @@ return {
                 vim.cmd.wall({ mods = { silent = true, emsg_silent = true } })
             end
             local qf = try_copen(get_qf(), params.open, params.jump)
-            if qf.hbuf and self.ns then
+            if qf.hbuf and self.ns and not params.append then
                 vim.api.nvim_buf_clear_namespace(qf.hbuf, self.ns, 0, -1)
             end
 
             -- Add head message
             local msg = string.format('[%s] %s', os.date('%H:%M:%S'), task.name)
-            vim.fn.setqflist({}, 'r', {
+            vim.fn.setqflist({}, params.append and 'a' or 'r', {
                 lines = { msg },
                 efm = ' ', -- Avoid match time string
             })
             if qf.hbuf then
-                buf_add_highlight(qf.hbuf, self.ns, 'Constant', 0, 1, 9)
-                buf_add_highlight(qf.hbuf, self.ns, 'Identifier', 0, 11, 11 + string.len(task.name))
+                local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
+                buf_add_highlight(qf.hbuf, self.ns, 'Constant', line, 1, 9)
+                buf_add_highlight(qf.hbuf, self.ns, 'Identifier', line, 11, string.len(msg))
             end
         end
 

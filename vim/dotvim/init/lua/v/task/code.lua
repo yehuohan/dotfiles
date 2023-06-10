@@ -377,6 +377,7 @@ local entry = async(function(kt, bang)
         cfg.qf_open = true
         cfg.qf_jump = false
         cfg.qf_scroll = true
+        cfg.qf_append = false
         require('v.task').run(cfg)
     end, wsc)
     if not ok then
