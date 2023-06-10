@@ -44,7 +44,7 @@ local function try_copen(qf, auto_open, auto_jump)
     return get_qf()
 end
 
-local function try_scroll_to_bottom(qf, auto_scroll, dnum)
+local function try_scroll_to_bottom(qf, dnum)
     if qf.hwin then
         local line_cur = vim.api.nvim_win_get_cursor(qf.hwin)[1]
         local line_num = vim.api.nvim_buf_line_count(qf.hbuf)
@@ -54,9 +54,7 @@ local function try_scroll_to_bottom(qf, auto_scroll, dnum)
                 vim.api.nvim_win_set_cursor(qf.hwin, { line_cur + dnum, 0 })
             end
         else
-            if auto_scroll then
-                vim.api.nvim_win_set_cursor(qf.hwin, { line_num, 0 })
-            end
+            vim.api.nvim_win_set_cursor(qf.hwin, { line_num, 0 })
         end
     end
 end
@@ -102,7 +100,7 @@ return {
             default = false,
         },
         scroll = {
-            desc = 'Auto scroll quickfix window to bottom when not focused',
+            desc = 'Auto scroll quickfix window to bottom',
             type = 'boolean',
             default = false,
         },
@@ -188,15 +186,12 @@ return {
                 buf_add_highlight(qf.hbuf, self.ns, 'Constant', line, 1, 9)
                 buf_add_highlight(qf.hbuf, self.ns, hlgrp, line, 11, string.len(msg))
             end
-            try_scroll_to_bottom(qf, params.scroll, #lines + 1)
+            if params.scroll then
+                try_scroll_to_bottom(qf, #lines + 1)
+            end
         end
 
         comp.on_output = function(self, task, data)
-            local qf = get_qf()
-            local lines, highlights = self.chanor(data)
-            display_and_highlight(qf, lines, highlights, self.ns, params.errorformat)
-            try_scroll_to_bottom(qf, params.scroll, #lines)
-
             -- React to pause command
             if IsWin() then
                 for _, str in ipairs(data) do
@@ -206,6 +201,13 @@ return {
                         end
                     end
                 end
+            end
+
+            local qf = get_qf()
+            local lines, highlights = self.chanor(data)
+            display_and_highlight(qf, lines, highlights, self.ns, params.errorformat)
+            if params.scroll then
+                try_scroll_to_bottom(qf, #lines + 1)
             end
         end
 
