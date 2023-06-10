@@ -46,6 +46,13 @@ end
 
 local tst = {}
 
+function tst.str2env()
+    local str = ' VAR0=var0   VAR1=var1 '
+    local env = task.str2env(str)
+    EQ({ VAR0 = 'var0', VAR1 = 'var1' }, env)
+    vim.print(env)
+end
+
 function tst.new_configer()
     -- Create config
     FAIL(libv.new_configer)
@@ -103,24 +110,17 @@ function tst.new_configer()
     vim.print(cfg)
 end
 
-function tst.new_ansior()
+function tst.new_chanor()
     local data = {
         [[[2J[m[HH]0;C:\Windows\SYSTEM32\cmd.exe[?25hello ANSI]],
     }
-    local ansior = libv.new_ansior({ connect_pty = true, hl_ansi_sgr = true })
+    local chanor = libv.new_chanor({ connect_pty = true, hl_ansi_sgr = true })
     local lines, highlights
-    lines, highlights = ansior(data)
+    lines, highlights = chanor(data)
     EQ({}, lines)
-    lines, highlights = ansior()
+    lines, highlights = chanor()
     EQ({ 'Hello ANSI\n' }, lines)
     vim.print(lines)
-end
-
-function tst.str2env()
-    local str = ' VAR0=var0   VAR1=var1 '
-    local env = task.str2env(str)
-    EQ({ VAR0 = 'var0', VAR1 = 'var1' }, env)
-    vim.print(env)
 end
 
 print('Test work at', dir_this)

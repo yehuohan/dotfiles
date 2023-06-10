@@ -92,9 +92,9 @@ function M.new_configer(opt)
     return setmetatable(opt, C)
 end
 
---- A simple ANSI escape sequences processor for terminal's stdout
+--- A channel lines processor for terminal's stdout
 --- @param opts(table) Passed from 'on_quickfix.params'
-function M.new_ansior(opts)
+function M.new_chanor(opts)
     local connect_pty = opts and opts.connect_pty
     local hl_ansi_sgr = opts and opts.hl_ansi_sgr
     local out_rawdata = opts and opts.out_rawdata
@@ -136,6 +136,7 @@ function M.new_ansior(opts)
         if eof then
             if pending ~= '' then
                 process_lines(pending)
+                pending = ''
                 end_idx = #bufs
             end
         elseif data then

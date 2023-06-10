@@ -125,13 +125,13 @@ return {
     constructor = function(params)
         local comp = {
             start_time = nil,
-            ansior = nil,
+            chanor = nil,
             ns = nil,
         }
 
         comp.on_init = function(self, task)
             self.ns = vim.api.nvim_create_namespace('v.task.onqf')
-            self.ansior = require('v.libv').new_ansior({
+            self.chanor = require('v.libv').new_chanor({
                 connect_pty = params.connect_pty,
                 hl_ansi_sgr = params.hl_ansi_sgr,
                 out_rawdata = params.out_rawdata,
@@ -165,7 +165,7 @@ return {
         comp.on_complete = function(self, task, status, result)
             local dt = os.time() - self.start_time
             local qf = get_qf()
-            local lines, highlights = self.ansior()
+            local lines, highlights = self.chanor()
             display_and_highlight(qf, lines, highlights, self.ns, params.errorformat)
 
             -- Add tail message
@@ -187,7 +187,7 @@ return {
 
         comp.on_output = function(self, task, data)
             local qf = get_qf()
-            local lines, highlights = self.ansior(data)
+            local lines, highlights = self.chanor(data)
             display_and_highlight(qf, lines, highlights, self.ns, params.errorformat)
             try_scroll_to_bottom(qf, params.scroll, #lines)
 
