@@ -238,6 +238,10 @@ local entry = async(function(kt, bang)
 
     -- Run fzer task
     wsc.qf_append = (kt.A == 'a')
+    if not wsc.qf_append then
+        require('v.task').hlstr = {}
+    end
+    table.insert(require('v.task').hlstr, rep.pat)
     if bang then
         vim.notify(vim.inspect(wsc))
     end

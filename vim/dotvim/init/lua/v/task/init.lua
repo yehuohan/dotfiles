@@ -6,6 +6,7 @@ M.wsc = {
     fzer = {},
 }
 
+--- Task outputs to highlight at quickfix window
 M.hlstr = {}
 
 --- Parse string to table of environment variables
@@ -106,7 +107,12 @@ function M.setup()
                 ufo.detach(qf.qfbufnr)
             end
             if (qf.winid > 0) and vim.api.nvim_win_is_valid(qf.winid) then
-                -- TODO: highlight string from fzer
+                for _, str in ipairs(M.hlstr) do
+                    vim.fn.win_execute(
+                        qf.winid,
+                        ([[syntax match IncSearch /\V\c%s/]]):format(vim.fn.escape(str, '\\/'))
+                    )
+                end
                 vim.fn.win_execute(qf.winid, [[syntax match vTaskOnqf /\m^|| / conceal]])
                 vim.fn.win_execute(qf.winid, [[syntax match vTaskOnqf /\m^|| {{{ / conceal]])
                 vim.fn.win_execute(qf.winid, [[syntax match vTaskOnqf /\m^|| }}} / conceal]])
