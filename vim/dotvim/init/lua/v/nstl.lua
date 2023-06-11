@@ -388,11 +388,11 @@ local function setup()
 
     vim.api.nvim_create_augroup('PkgHeirline', { clear = true })
     vim.api.nvim_create_autocmd('ColorScheme', {
+        group = 'PkgHeirline',
         callback = function()
             local colors = load_colors()
             require('heirline.utils').on_colorscheme(colors)
         end,
-        group = 'PkgHeirline',
     })
     m.nnore({ '<leader>tl', toggle_check })
     m.nnore({ '<leader>ty', toggle_layout })

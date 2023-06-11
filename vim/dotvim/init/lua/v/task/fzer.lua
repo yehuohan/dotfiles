@@ -9,7 +9,7 @@ local wsc = require('v.libv').new_configer({
     path = '',
     pathlst = {},
     filters = '',
-    globlst = '',
+    globlst = '!__VBuildOut',
     options = '',
     vimgrep = false,
     fuzzier = 'leaderf',
@@ -245,6 +245,7 @@ local entry = async(function(kt, bang)
     wsc.qf_open = true
     wsc.qf_jump = true
     wsc.qf_scroll = false
+    wsc.qf_title = 'v.task.fzer'
     wsc.connect_pty = false
     wsc.hl_ansi_sgr = false
     wsc.out_rawdata = false
@@ -278,4 +279,8 @@ end
 
 return {
     setup = setup,
+    setwsc = function(__wsc)
+        wsc:set(__wsc)
+        wsc:reinit(wsc:get())
+    end,
 }

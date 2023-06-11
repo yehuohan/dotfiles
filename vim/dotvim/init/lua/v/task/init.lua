@@ -6,6 +6,8 @@ M.wsc = {
     fzer = {},
 }
 
+M.hlstr = {}
+
 --- Parse string to table of environment variables
 --- @param str(string) Input with format 'VAR0=var0 VAR1=var1'
 --- @return (table) Environment table with { VAR0 = 'var0', VAR1 = 'var1' }
@@ -51,6 +53,7 @@ function M.run(cfg)
             jump = cfg.qf_jump,
             scroll = cfg.qf_scroll,
             append = cfg.qf_append,
+            title = cfg.qf_title,
             connect_pty = cfg.connect_pty,
             hl_ansi_sgr = cfg.hl_ansi_sgr,
             out_rawdata = cfg.out_rawdata,
@@ -72,21 +75,47 @@ function M.setup()
     require('v.task.fzer').setup()
     vim.api.nvim_create_user_command('TaskWsc', function() vim.print(M.wsc) end, { nargs = 0 })
 
-    -- vim.api.nvim_create_augroup('TaskWorkSpace', { clear = true })
-    -- vim.api.nvim_create_autocmd('User', {
-    --     pattern = 'PopcLayerWksSavePre',
-    --     callback = function()
-    --         vim.fn['popc#layer#wks#SetSettings'](M.wsc)
-    --     end,
-    --     group = 'TaskWorkSpace',
-    -- })
-    -- vim.api.nvim_create_autocmd('User', {
-    --     pattern = 'PopcLayerWksLoaded',
-    --     callback = function()
-    --         M.wsc = vim.tbl_deep_extend('force', M.wsc, vim.fn['popc#layer#wks#GetSettings']())
-    --     end,
-    --     group = 'TaskWorkSpace',
-    -- })
+    vim.api.nvim_create_augroup('TaskWorkSpace', { clear = true })
+    vim.api.nvim_create_autocmd('User', {
+        group = 'TaskWorkSpace',
+        pattern = 'PopcLayerWksSavePre',
+        callback = function() vim.fn['popc#layer#wks#SetSettings'](M.wsc) end,
+    })
+    vim.api.nvim_create_autocmd('User', {
+        group = 'TaskWorkSpace',
+        pattern = 'PopcLayerWksLoaded',
+        callback = function()
+            M.wsc = vim.tbl_deep_extend('force', M.wsc, vim.fn['popc#layer#wks#GetSettings']())
+            local root = vim.fn['popc#layer#wks#GetCurrentWks']('root')
+            if root ~= '' then
+                M.wsc.fzer.path = root
+            end
+            require('v.task.fzer').setwsc(M.wsc.fzer)
+        end,
+    })
+    vim.api.nvim_create_autocmd('BufWinEnter', {
+        group = 'TaskWorkSpace',
+        callback = function(args)
+            local qf = vim.fn.getqflist({ winid = 0, qfbufnr = 0, title = 0 })
+            if qf.qfbufnr ~= args.buf then
+                return
+            end
+            -- BUG: ufo can't handle folds of qf
+            local ufo = require('ufo')
+            if ufo.hasAttached(qf.qfbufnr) then
+                ufo.detach(qf.qfbufnr)
+            end
+            if (qf.winid > 0) and vim.api.nvim_win_is_valid(qf.winid) then
+                -- TODO: highlight string from fzer
+                vim.fn.win_execute(qf.winid, [[syntax match vTaskOnqf /\m^|| / conceal]])
+                vim.fn.win_execute(qf.winid, [[syntax match vTaskOnqf /\m^|| {{{ / conceal]])
+                vim.fn.win_execute(qf.winid, [[syntax match vTaskOnqf /\m^|| }}} / conceal]])
+                vim.api.nvim_win_set_option(qf.winid, 'number', false)
+                vim.api.nvim_win_set_option(qf.winid, 'relativenumber', false)
+                vim.api.nvim_win_set_option(qf.winid, 'signcolumn', 'no')
+            end
+        end,
+    })
 end
 
 return M

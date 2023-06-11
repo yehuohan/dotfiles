@@ -378,6 +378,7 @@ local entry = async(function(kt, bang)
         cfg.qf_jump = false
         cfg.qf_scroll = true
         cfg.qf_append = false
+        cfg.qf_title = 'v.task.code'
         require('v.task').run(cfg)
     end, wsc)
     if not ok then

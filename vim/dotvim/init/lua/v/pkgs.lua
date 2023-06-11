@@ -882,11 +882,11 @@ local function pkg_lazy()
 
     vim.api.nvim_create_augroup('PkgLazy', { clear = true })
     vim.api.nvim_create_autocmd('ColorScheme', {
+        group = 'PkgLazy',
         callback = function()
             vim.api.nvim_set_hl(0, 'CursorWord', { ctermbg = 60, bg = '#505060' })
             vim.api.nvim_set_hl(0, 'TranslatorBorder', { link = 'Constant' })
         end,
-        group = 'PkgLazy',
     })
 
     local ok = pcall(function()

@@ -108,6 +108,11 @@ return {
             type = 'boolean',
             default = false,
         },
+        title = {
+            desc = 'Set quickfix title as a identifier',
+            type = 'string',
+            default = 'v.task.onqf',
+        },
         connect_pty = {
             desc = 'Connect to PTY when running task',
             type = 'boolean',
@@ -153,15 +158,16 @@ return {
             end
 
             -- Add head message
-            local msg = string.format('[%s] %s', os.date('%H:%M:%S'), task.name)
+            local msg = string.format('{{{ [%s] %s', os.date('%H:%M:%S'), task.name)
             vim.fn.setqflist({}, params.append and 'a' or 'r', {
                 lines = { msg },
                 efm = ' ', -- Avoid match time string
+                title = params.title,
             })
             if qf.hbuf then
                 local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
-                buf_add_highlight(qf.hbuf, self.ns, 'Constant', line, 1, 9)
-                buf_add_highlight(qf.hbuf, self.ns, 'Identifier', line, 11, string.len(msg))
+                buf_add_highlight(qf.hbuf, self.ns, 'Constant', line, 5, 13)
+                buf_add_highlight(qf.hbuf, self.ns, 'Identifier', line, 15, string.len(msg))
             end
         end
 
@@ -172,7 +178,7 @@ return {
             display_and_highlight(qf, lines, highlights, self.ns, params.errorformat)
 
             -- Add tail message
-            local msg = string.format('[%s] %s completed in %ds', os.date('%H:%M:%S'), status, dt)
+            local msg = string.format('}}} [%s] %s in %ds', os.date('%H:%M:%S'), status, dt)
             vim.fn.setqflist({}, 'a', {
                 lines = { msg },
                 efm = ' ', -- Avoid match time string
@@ -182,11 +188,18 @@ return {
                 local hlgrp = (status == 'SUCCESS' and 'Title')
                     or (status == 'CANCELED' and 'MoreMsg')
                     or (status == 'FAILURE' and 'WarningMsg')
-                buf_add_highlight(qf.hbuf, self.ns, 'Constant', line, 1, 9)
-                buf_add_highlight(qf.hbuf, self.ns, hlgrp, line, 11, string.len(msg))
+                buf_add_highlight(qf.hbuf, self.ns, 'Constant', line, 5, 13)
+                buf_add_highlight(qf.hbuf, self.ns, hlgrp, line, 15, string.len(msg))
             end
             if params.scroll then
                 try_scroll_to_bottom(qf, #lines + 1)
+            end
+
+            -- Setup fold
+            if qf.hwin then
+                vim.api.nvim_win_set_option(qf.hwin, 'foldmethod', 'marker')
+                vim.api.nvim_win_set_option(qf.hwin, 'foldmarker', '{{{,}}}')
+                vim.fn.win_execute(qf.hwin, 'silent! normal! zO')
             end
         end
 
