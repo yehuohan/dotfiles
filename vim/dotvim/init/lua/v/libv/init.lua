@@ -93,7 +93,7 @@ function M.new_configer(opt)
 end
 
 --- A channel lines processor for terminal's stdout
---- @param opts(table) Passed from 'on_quickfix.params'
+--- @param opts(table|nil) Passed from 'on_quickfix.params'
 function M.new_chanor(opts)
     local connect_pty = opts and opts.connect_pty
     local hl_ansi_sgr = opts and opts.hl_ansi_sgr
@@ -177,6 +177,27 @@ function M.new_chanor(opts)
         end
 
         return lines, highlights
+    end
+end
+
+--- Get selected text
+--- When used with 'vmap', '<Cmd>' is required and ':' will cause issue.
+--- @param sep(string|nil): Join with sep for multi-lines text
+function M.get_selected(sep)
+    local reg_var = vim.fn.getreg('9', 1)
+    local reg_mode = vim.fn.getregtype('9')
+    if vim.fn.mode() == 'n' then
+        vim.cmd.normal({ args = { 'gv"9y' }, bang = true, mods = { silent = true } })
+    else
+        vim.cmd.normal({ args = { '"9y' }, bang = true, mods = { silent = true } })
+    end
+    local selected = vim.fn.getreg('9')
+    vim.fn.setreg('9', reg_var, reg_mode)
+
+    if sep then
+        return vim.fn.join(vim.fn.split(selected, '\n'), sep)
+    else
+        return selected
     end
 end
 

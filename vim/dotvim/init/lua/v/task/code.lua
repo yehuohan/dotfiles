@@ -219,7 +219,7 @@ setmetatable(task, {
             end
         end
         cfg.target = t.target
-        cfg.wdir = vim.fn.fnamemodify(cfg.file, ':h')
+        cfg.wdir = vim.fs.dirname(cfg.file)
         return t.fn(cfg)
     end,
 })
@@ -386,6 +386,8 @@ local entry = async(function(kt, bang)
 end)
 
 local function setup()
+    require('v.task').wsc.code = wsc:get()
+
     -- Keys mapping to table
     local keys2kt = function(keys)
         return {

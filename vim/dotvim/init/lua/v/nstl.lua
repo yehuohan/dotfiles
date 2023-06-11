@@ -58,11 +58,11 @@ function ctxs.hint()
     return sym.vos .. ' ' .. res
 end
 
-function ctxs.root_path() return vim.fs.normalize(vim.fn.SvarWs().fw.path) end
+function ctxs.root_path() return vim.fs.normalize(require('v.task').wsc.fzer.path) end
 
 function ctxs.relative_path()
     local filepath = vim.fs.normalize(vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':p'))
-    local rootpath = vim.fs.normalize(vim.fn.SvarWs().fw.path)
+    local rootpath = vim.fs.normalize(require('v.task').wsc.fzer.path)
     local pat = '^' .. vim.fn.escape(rootpath, '\\')
     return vim.fn.substitute(filepath, pat, '', '')
 end

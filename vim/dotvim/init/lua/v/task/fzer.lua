@@ -111,7 +111,7 @@ local function parse_pat(kt)
             pat = vim.fn.expand('<cword>')
         end
     else
-        local selected = '' -- TODO: GetSelected('')
+        local selected = require('v.libv').get_selected()
         if kt.E:match('[iI]') then
             pat = vim.fn.input('Pattern: ', selected)
         elseif kt.E:match('[wWsS]') then
@@ -143,7 +143,13 @@ local function parse_loc(kt)
     else
         loc = wsc.path
         if loc == '' then
-            loc = vim.fn['popc#utils#FindRoot']() -- TODO: vim.fs.find()
+            local dirs = vim.fs.find({ '.git' }, {
+                upward = true,
+                type = 'directory',
+                path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
+                limit = math.huge,
+            })
+            loc = dirs[#dirs] and vim.fs.dirname(dirs[#dirs]) or ''
             if loc == '' then
                 loc = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
             else
@@ -207,20 +213,22 @@ end
 local entry = async(function(kt, bang)
     wsc:reinit()
 
-    if kt.S == 'F' then
-        _sels.lst = _sels.lst_r
-        if not await(a.pop_selection(_sels)) then
-            return
-        end
-        require('v.task').wsc.fzer = wsc:get()
-    end
-
     -- Parse rg command
     local rep = {}
     rep.pat = parse_pat(kt)
     if rep.pat == '' then
         return
     end
+
+    if kt.S == 'F' then
+        _sels.lst = _sels.lst_r
+        _sels.dic.path.lst = wsc.pathlst
+        if not await(a.pop_selection(_sels)) then
+            return
+        end
+        require('v.task').wsc.fzer = wsc:get()
+    end
+
     rep.loc = parse_loc(kt)
     if rep.loc == '' then
         return
@@ -244,6 +252,8 @@ local entry = async(function(kt, bang)
 end)
 
 local function setup()
+    require('v.task').wsc.fzer = wsc:get()
+
     -- Keys mapping to table
     local keys2kt = function(keys)
         return {
@@ -255,7 +265,7 @@ local function setup()
     end
     local m = require('v.libv').m
     for _, keys in ipairs(_keys) do
-        m.nnore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
+        m.nore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
     end
 
     vim.api.nvim_create_user_command(

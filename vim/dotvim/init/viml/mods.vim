@@ -173,6 +173,7 @@ vnoremap <leader><leader>;
 " }}}
 
 " Workspace {{{
+if IsVim()
 " Struct s:ws {{{
 let s:ws = {'root': '', 'rp': {}, 'fw': {}}
 let s:wsd = {
@@ -218,7 +219,6 @@ augroup ModWorkSpace
 augroup END
 " }}}
 
-if IsVim()
 " Project {{{
 " Struct: s:rp {{{
 " @attribute proj: project类型
@@ -617,7 +617,6 @@ nnoremap <leader>rv
     \   execute 'source ' . Expand('%') <Bar>
     \ endif<CR>
 " }}}
-endif
 
 " Find {{{
 " Struct: s:fw {{{
@@ -1008,6 +1007,7 @@ for key in s:fw_mappings_fuzzy
 endfor
 nnoremap <leader>fk :call FindWKill()<CR>
 " }}}
+endif
 " }}}
 
 " Scripts {{{

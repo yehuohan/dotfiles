@@ -45,21 +45,20 @@ local function try_copen(qf, auto_open, auto_jump)
 end
 
 local function try_scroll_to_bottom(qf, dnum)
-    if qf.hwin then
-        local line_cur = vim.api.nvim_win_get_cursor(qf.hwin)[1]
-        local line_num = vim.api.nvim_buf_line_count(qf.hbuf)
+    if not qf.hwin then
+        return
+    end
 
-        if qf.hwin == vim.api.nvim_get_current_win() then
-            if line_cur + 1 >= (line_num - dnum) then
-                vim.api.nvim_win_set_cursor(qf.hwin, { line_cur + dnum, 0 })
-            end
-        else
-            vim.api.nvim_win_set_cursor(qf.hwin, { line_num, 0 })
+    local line_cur = vim.api.nvim_win_get_cursor(qf.hwin)[1]
+    local line_num = vim.api.nvim_buf_line_count(qf.hbuf)
+    if qf.hwin == vim.api.nvim_get_current_win() then
+        if line_cur + 1 >= (line_num - dnum) then
+            vim.api.nvim_win_set_cursor(qf.hwin, { line_cur + dnum, 0 })
         end
+    else
+        vim.api.nvim_win_set_cursor(qf.hwin, { line_num, 0 })
     end
 end
-
-local function setup_window(qf) end
 
 local function display_and_highlight(qf, lines, highlights, ns, efm)
     vim.fn.setqflist({}, 'a', {

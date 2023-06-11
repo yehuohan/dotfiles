@@ -2,7 +2,6 @@ local M = {}
 
 --- Task workspace config
 M.wsc = {
-    root = '',
     code = {},
     fzer = {},
 }
