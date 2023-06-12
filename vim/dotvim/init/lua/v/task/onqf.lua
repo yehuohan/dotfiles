@@ -185,9 +185,7 @@ return {
             })
             if qf.hbuf then
                 local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
-                local hlgrp = (status == 'SUCCESS' and 'Title')
-                    or (status == 'CANCELED' and 'MoreMsg')
-                    or (status == 'FAILURE' and 'WarningMsg')
+                local hlgrp = 'Overseer' .. status
                 buf_add_highlight(qf.hbuf, self.ns, 'Constant', line, 5, 13)
                 buf_add_highlight(qf.hbuf, self.ns, hlgrp, line, 15, string.len(msg))
             end
@@ -219,7 +217,7 @@ return {
             local lines, highlights = self.chanor(data)
             display_and_highlight(qf, lines, highlights, self.ns, params.errorformat)
             if params.scroll then
-                try_scroll_to_bottom(qf, #lines + 1)
+                try_scroll_to_bottom(qf, #lines)
             end
         end
 

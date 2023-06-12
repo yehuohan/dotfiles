@@ -40,7 +40,7 @@ function M.run(cfg)
     local opts = {}
     opts.cmd = cfg.cmd
     opts.cwd = cfg.wdir
-    opts.env = M.str2env(cfg.envs)
+    opts.env = cfg.envs and M.str2env(cfg.envs)
     if not cfg.connect_pty then
         opts.strategy = { 'jobstart', use_terminal = false }
     end
@@ -72,10 +72,42 @@ function M.run(cfg)
 end
 
 function M.setup()
-    require('v.task.code').setup()
-    require('v.task.fzer').setup()
+    -- Setup task commands
     vim.api.nvim_create_user_command('TaskWsc', function() vim.print(M.wsc) end, { nargs = 0 })
+    vim.api.nvim_create_user_command('TaskRun', function(opts)
+        local cfg = {
+            cmd = opts.args,
+            wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
+            qf_save = false,
+            qf_open = true,
+            qf_jump = false,
+            qf_scroll = true,
+            qf_append = false,
+            qf_title = 'v.task',
+            connect_pty = true,
+            hl_ansi_sgr = true,
+            out_rawdata = false,
+            verbose = opts.bang and 'a',
+        }
+        M.run(cfg)
+    end, { bang = true, nargs = 1 })
+    local m = require('v.libv').m
+    m.nnore({ '<leader><leader>r', ':TaskRun<Space>' })
+    m.nnore({ '<leader><leader>R', ':TaskRun!<Space>' })
+    m.vnore({
+        '<leader><leader>r',
+        function()
+            vim.api.nvim_feedkeys(':TaskRun ' .. require('v.libv').get_selected(''), 'n', true)
+        end,
+    })
+    m.vnore({
+        '<leader><leader>R',
+        function()
+            vim.api.nvim_feedkeys(':TaskRun! ' .. require('v.libv').get_selected(''), 'n', true)
+        end,
+    })
 
+    -- Save and restore workspace config
     vim.api.nvim_create_augroup('TaskWorkSpace', { clear = true })
     vim.api.nvim_create_autocmd('User', {
         group = 'TaskWorkSpace',
@@ -87,13 +119,14 @@ function M.setup()
         pattern = 'PopcLayerWksLoaded',
         callback = function()
             M.wsc = vim.tbl_deep_extend('force', M.wsc, vim.fn['popc#layer#wks#GetSettings']())
-            local root = vim.fn['popc#layer#wks#GetCurrentWks']('root')
-            if root ~= '' then
-                M.wsc.fzer.path = root
+            if M.wsc.fzer.path == '' then
+                M.wsc.fzer.path = vim.fn['popc#layer#wks#GetCurrentWks']('root')
             end
             require('v.task.fzer').setwsc(M.wsc.fzer)
         end,
     })
+
+    -- Setup quickfix window
     vim.api.nvim_create_autocmd('BufWinEnter', {
         group = 'TaskWorkSpace',
         callback = function(args)
@@ -122,6 +155,9 @@ function M.setup()
             end
         end,
     })
+
+    require('v.task.code').setup()
+    require('v.task.fzer').setup()
 end
 
 return M

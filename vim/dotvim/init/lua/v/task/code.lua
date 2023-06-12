@@ -244,7 +244,6 @@ task._keys = {
 }
 -- stylua: ignore end
 
---- Selection to modify code task config
 task._sels = {
     opt = 'config code task',
     lst = nil,

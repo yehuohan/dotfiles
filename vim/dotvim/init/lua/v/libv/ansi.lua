@@ -52,7 +52,7 @@ local function sgr2hl(args)
     elseif args == '3' then
         hl.italic = true
     end
-    return 'Identifier'
+    return 'Special'
 end
 
 local function new()
@@ -79,11 +79,11 @@ local function new()
         hlgrp = nil
     end
 
-    ansi.feed = function(str, is_pending, verbose)
+    ansi.feed = function(linestr, is_pending, verbose)
         local verb_t = verbose:match('[at]')
         local verb_h = verbose:match('[ah]')
         local verb_n = verbose:match('[an]')
-        for last, line, args, byte in next_csi(str, CSI_PAT) do
+        for last, line, args, byte in next_csi(linestr, CSI_PAT) do
             -- The rest pending line shouldn't append into buffer lines
             if is_pending and last then
                 return line
@@ -132,7 +132,7 @@ local function new()
                     srow = srow + 1
                 end
                 while srow > cur_row do
-                    bufs[srow] = nil
+                    bufs[srow] = verb_n and ((bufs[srow] or '') .. ('H%d<'):format(srow))
                     srow = srow - 1
                 end
                 -- Sync cursor col

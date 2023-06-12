@@ -168,8 +168,8 @@ nnoremap <Plug>ExecLast    :call ExecLast(1)<CR>
 nnoremap <leader>.         :call ExecLast(1)<CR>
 nnoremap <leader><leader>. :call ExecLast(0)<CR>
 nnoremap <C-;> @:
-vnoremap <leader><leader>;
-    \ <Cmd>call feedkeys(':' . GetSelected(''), 'n')<CR>
+vnoremap <leader><leader>; <Cmd>call feedkeys(':' . GetSelected(''), 'n')<CR>
+vnoremap <leader><leader>: <Cmd>call feedkeys(':lua ' . GetSelected(''), 'n')<CR>
 " }}}
 
 " Workspace {{{
