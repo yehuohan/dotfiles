@@ -139,11 +139,7 @@ local kind_sources = {
 local function cmp_format(entry, vitem)
     local ico = kind_icons[vitem.kind]
     local src = kind_sources[entry.source.name] or entry.source.name
-    if use.ui.patch then
-        vitem.kind = string.format(' %s', ico[1])
-    else
-        vitem.kind = string.format(' %s', ico[2]:sub(1, 1))
-    end
+    vitem.kind = string.format(' %s', use.ui.patch and ico[1] or ico[2]:sub(1, 1))
     if string.len(vitem.abbr) > 80 then
         vitem.abbr = string.sub(vitem.abbr, 1, 78) .. ' …'
     end

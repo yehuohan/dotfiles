@@ -413,25 +413,17 @@ local function pkg_ufo()
     ufo.setup({
         fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
             local res = {}
-            local tag = '» '
-            if use.ui.patch then
-                tag = ' '
-            end
-            local tag_wid = vim.fn.strdisplaywidth(tag)
+            local tag = use.ui.patch and '' or '»'
 
             for k, chunk in ipairs(virtText) do
                 if k == 1 then
                     -- only match whitespace characters of first chunk
-                    local txt = chunk[1]
-                    local s, e = vim.regex([[^\s*]]):match_str(txt)
-                    if s and e then
-                        local wid = vim.fn.strdisplaywidth(txt:sub(s, e))
-                        if wid >= tag_wid then
-                            txt = txt:sub(e + 1)
-                            if wid > tag_wid then
-                                tag = tag .. ('·'):rep(wid - tag_wid - 1) .. ' '
-                            end
-                        end
+                    local txt = chunk[1]:match('|| {{{ (.*)') or chunk[1]
+                    local ta, tb = txt:match('(%s*)(.*)')
+                    if ta and tb then
+                        local dwid = vim.fn.strdisplaywidth(ta) - vim.fn.strdisplaywidth(tag)
+                        tag = tag .. ('·'):rep(dwid - 1) .. ' '
+                        txt = tb
                     end
                     table.insert(res, { tag, 'Comment' })
                     table.insert(res, { txt, chunk[2] })

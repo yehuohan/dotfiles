@@ -134,11 +134,6 @@ function M.setup()
             if qf.qfbufnr ~= args.buf then
                 return
             end
-            -- BUG: ufo can't handle folds of qf
-            local ufo = require('ufo')
-            if ufo.hasAttached(qf.qfbufnr) then
-                ufo.detach(qf.qfbufnr)
-            end
             if (qf.winid > 0) and vim.api.nvim_win_is_valid(qf.winid) then
                 for _, str in ipairs(M.hlstr) do
                     vim.fn.win_execute(
