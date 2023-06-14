@@ -375,16 +375,20 @@ local function setup()
     vim.o.termguicolors = 1
     vim.o.showtabline = 2
 
-    local heirline = require('heirline')
-    heirline.setup({
-        statusline = stls(),
-        tabline = tabs(),
-        winbar = bars(),
-        opts = {
-            disable_winbar_cb = disabled_bars,
-            colors = load_colors(),
-        },
-    })
+    local reset = function()
+        local heirline = require('heirline')
+        heirline.setup({
+            statusline = stls(),
+            tabline = tabs(),
+            winbar = bars(),
+            opts = {
+                disable_winbar_cb = disabled_bars,
+                colors = load_colors(),
+            },
+        })
+    end
+    reset()
+    vim.api.nvim_create_user_command('NStlReset', reset, { nargs = 0 })
 
     vim.api.nvim_create_augroup('PkgHeirline', { clear = true })
     vim.api.nvim_create_autocmd('ColorScheme', {
@@ -396,8 +400,6 @@ local function setup()
     })
     m.nnore({ '<leader>tl', toggle_check })
     m.nnore({ '<leader>ty', toggle_layout })
-
-    vim.api.nvim_create_user_command('NStlSetup', require('v.nstl').setup, { nargs = 0 })
 end
 
 return {

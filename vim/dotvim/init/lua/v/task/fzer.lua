@@ -89,9 +89,8 @@ local _sels = {
     evt = function(name)
         if name == 'onCR' then
             wsc.path = vim.fs.normalize(vim.fn.fnamemodify(wsc.path, ':p'))
-            if wsc.path ~= '' then
+            if wsc.path ~= '' and (not vim.tbl_contains(wsc.pathlst, wsc.path)) then
                 table.insert(wsc.pathlst, wsc.path)
-                vim.fn.uniq(vim.fn.sort(wsc.pathlst))
             end
             wsc:reinit(wsc:get())
         end
@@ -219,6 +218,7 @@ local entry = async(function(kt, bang)
     if rep.pat == '' then
         return
     end
+    rep.pat = vim.fn.escape(rep.pat, '"')
 
     if kt.S == 'F' then
         _sels.lst = _sels.lst_r

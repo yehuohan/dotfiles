@@ -1,7 +1,7 @@
 source $APPS_HOME/dotvim/init/viml/init.vim
 
 if IsWin()
-    set pythonthreedll=python310.dll
+    set pythonthreedll=python311.dll
     let s:use = SvarUse()
     let s:use.ui.font = 'Consolas For Powerline'
     let s:use.ui.wide = 'Microsoft YaHei Mono'

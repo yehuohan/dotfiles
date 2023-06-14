@@ -150,6 +150,7 @@ function M.setup()
             end
         end,
     })
+    vim.api.nvim_set_hl(0, 'QuickFixLine', { bg = '#505050' })
 
     require('v.task.code').setup()
     require('v.task.fzer').setup()

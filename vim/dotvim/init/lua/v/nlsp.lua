@@ -203,16 +203,10 @@ local function __completion()
     local cmp = require('cmp')
     local cmp_mappings = {
         ['<M-i>'] = cmp.mapping(function() cmp.complete() end, { 'i' }),
-        ['<M-u>'] = cmp.mapping(
-            function()
-                cmp.complete({
-                    config = {
-                        sources = { { name = 'ultisnips' } },
-                    },
-                })
-            end,
-            { 'i' }
-        ),
+        ['<M-u>'] = cmp.mapping(function()
+            local opts = { config = { sources = { { name = 'ultisnips' } } } }
+            cmp.complete(opts)
+        end, { 'i' }),
         ['<M-e>'] = cmp.mapping(function() cmp.abort() end, { 'i', 'c' }),
         ['<M-j>'] = cmp.mapping(function() cmp.select_next_item() end, { 'i', 'c' }),
         ['<M-k>'] = cmp.mapping(function() cmp.select_prev_item() end, { 'i', 'c' }),
@@ -220,16 +214,10 @@ local function __completion()
         ['<M-m>'] = cmp.mapping.scroll_docs(-4),
         ['<M-f>'] = cmp.mapping.scroll_docs(4),
         ['<M-d>'] = cmp.mapping.scroll_docs(-4),
-        ['<M-y>'] = cmp.mapping(
-            function()
-                cmp.complete({
-                    config = {
-                        sources = { { name = 'cmdline_history' } },
-                    },
-                })
-            end,
-            { 'c' }
-        ),
+        ['<M-y>'] = cmp.mapping(function()
+            local opts = { config = { sources = { { name = 'cmdline_history' } } } }
+            cmp.complete()
+        end, { 'c' }),
         ['<Tab>'] = cmp.mapping(function()
             if cmp.visible() then
                 cmp.select_next_item()
