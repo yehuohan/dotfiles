@@ -86,14 +86,6 @@ omap iu <Plug>(textobj-underscore-i)
 xmap au <Plug>(textobj-underscore-a)
 xmap iu <Plug>(textobj-underscore-i)
 " }}}
-
-" FastFold {{{ 更新折叠
-let g:fastfold_savehook = 0             " 只允许手动更新folds
-let g:fastfold_fold_command_suffixes = ['x','X','a','A','o','O','c','C']
-let g:fastfold_fold_movement_commands = ['z[', 'z]', 'zj', 'zk']
-                                        " 允许指定的命令更新folds
-nmap <leader>zu <Plug>(FastFoldUpdate)
-" }}}
 " }}}
 
 " Component {{{
@@ -102,11 +94,6 @@ let g:gruvbox_contrast_dark = 'soft'    " 背景选项：dark, medium, soft
 let g:gruvbox_italic = 1
 let g:gruvbox_invert_selection = 0
 let g:one_allow_italics = 1
-" }}}
-
-" rainbow {{{ 彩色括号
-let g:rainbow_active = 1
-nnoremap <leader>tr :RainbowToggle<CR>
 " }}}
 
 " indentLine {{{ 显示缩进标识

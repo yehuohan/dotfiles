@@ -155,6 +155,9 @@ local function new()
         if bufs[srow] then
             srow = srow + 1
             bufs[srow] = verb_n and ('$%d>'):format(srow)
+        elseif linestr ~= '' then
+            bufs[srow] = verb_n and ('$%d>'):format(srow) or ''
+            srow = srow + 1
         end
     end
 

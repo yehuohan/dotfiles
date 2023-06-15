@@ -70,6 +70,14 @@ nmap <M-m> <Plug>(SmoothieUpwards)
 nmap <M-j> <Plug>(SmoothieForwards)
 nmap <M-k> <Plug>(SmoothieBackwards)
 " }}}
+
+" FastFold {{{ 更新折叠
+let g:fastfold_savehook = 0             " 只允许手动更新folds
+let g:fastfold_fold_command_suffixes = ['x','X','a','A','o','O','c','C']
+let g:fastfold_fold_movement_commands = ['z[', 'z]', 'zj', 'zk']
+                                        " 允许指定的命令更新folds
+nmap <leader>zu <Plug>(FastFoldUpdate)
+" }}}
 " }}}
 
 " Component {{{
@@ -218,6 +226,11 @@ function! PkgTodo()
     endif
 endfunction
 " }}}
+
+" rainbow {{{ 彩色括号
+let g:rainbow_active = 1
+nnoremap <leader>tr :RainbowToggle<CR>
+" }}}
 " }}}
 
 " Coding {{{
@@ -359,7 +372,6 @@ endif
     Plug 't9md/vim-quickhl'
     Plug 'skywind3000/asyncrun.vim'
     Plug 'voldikss/vim-floaterm'
-    Plug 'tpope/vim-fugitive', {'on': ['G', 'Git']}
     Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
     Plug 'rust-lang/rust.vim'
     Plug 'tikhomirov/vim-glsl'

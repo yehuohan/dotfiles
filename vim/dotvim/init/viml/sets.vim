@@ -304,9 +304,11 @@ noremap <S-h> ^
 nnoremap <leader>za zA
 nnoremap <leader>zc zC
 nnoremap <leader>zo zO
+if IsVim()
 nnoremap <leader>zm zM
-nnoremap <leader>zn zN
 nnoremap <leader>zr zR
+endif
+nnoremap <leader>zn zN
 nnoremap <leader>zx zX
 nnoremap <leader>zf zF
 nnoremap <leader>zd zD

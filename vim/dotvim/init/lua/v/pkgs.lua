@@ -434,7 +434,7 @@ local function pkg_ufo()
             table.insert(res, { ('  %d '):format(endLnum - lnum), 'MoreMsg' })
             return res
         end,
-        provider_selector = function(bufnr, filetype, buftype) return '' end,
+        provider_selector = function(bufnr, filetype, buftype) return { 'treesitter', 'indent' } end,
     })
     m.nnore({
         '<leader>tu',
@@ -447,6 +447,8 @@ local function pkg_ufo()
             end
         end,
     })
+    m.nnore({ '<leader>zr', ufo.openAllFolds })
+    m.nnore({ '<leader>zm', ufo.closeAllFolds })
 end
 
 -- 语法树
@@ -457,6 +459,7 @@ local function pkg_treesitter()
         end
     end
     local parser_dir = vim.env.DotVimLocal .. '/.treesitter'
+    require('nvim-treesitter.install').compilers = { 'clang', 'gcc', 'cl' }
     require('nvim-treesitter.configs').setup({
         parser_install_dir = parser_dir,
         --ensure_installed = { 'c', 'cpp', 'rust', 'vim', 'lua', 'python', 'markdown', 'markdown_inline', },
@@ -498,6 +501,7 @@ local function pkg_treesitter()
             vim.notify('Treesitter indent is ' .. (res and 'enabled' or 'disabled'))
         end,
     })
+    m.nnore({ '<leader>tr', ':TSBufToggle rainbow<CR>' })
 end
 
 -- 代码格式化
@@ -672,7 +676,6 @@ local function pkg_lazy()
             },
             dependencies = { 'kana/vim-textobj-user' },
         },
-        { 'Konfekt/FastFold' },
 
         -- Component
         {
@@ -726,7 +729,6 @@ local function pkg_lazy()
         { 'morhetz/gruvbox' },
         { 'rakr/vim-one' },
         { 'tanvirtin/monokai.nvim' },
-        { 'luochen1990/rainbow' },
         { 'Yggdroot/indentLine' },
         { 'yehuohan/popc' },
         { 'yehuohan/popset', dependencies = { 'yehuohan/popc' } },
@@ -851,11 +853,7 @@ local function pkg_lazy()
         { 't9md/vim-quickhl' },
         { 'skywind3000/asyncrun.vim' },
         { 'voldikss/vim-floaterm' },
-        { 'tpope/vim-fugitive', cmd = { 'G', 'Git' } },
-        { 'bfrg/vim-cpp-modern', ft = { 'c', 'cpp' } },
         { 'rust-lang/rust.vim' },
-        { 'tikhomirov/vim-glsl' },
-        { 'beyondmarc/hlsl.vim', ft = 'hlsl' },
 
         -- Utils
         {
