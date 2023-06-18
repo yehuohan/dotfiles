@@ -84,19 +84,25 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     #cp $LOCALAPPDATA/nvim/init.lua                  ./vim/nvim/
 
     # gw
-    cp ~/.minttyrc                                  ./root/home-gw/
-    cp ~/.gitconfig                                 ./root/home-gw/
-    cp ~/.zshrc                                     ./root/home-gw/
-    cp ~/.tmux.conf                                 ./root/home-gw/
-    cp ~/.tmux-status.conf                          ./root/home-gw/
+    cp $APPS_HOME/msys64/ucrt64.ini                         ./disk/msys2/
+    cp $APPS_HOME/msys64/etc/pacman.conf                    ./disk/msys2/etc/
+    cp $APPS_HOME/msys64/etc/pacman.d/mirrorlist.msys       ./disk/msys2/etc/pacman.d
+    cp $APPS_HOME/msys64/etc/pacman.d/mirrorlist.mingw32    ./disk/msys2/etc/pacman.d
+    cp $APPS_HOME/msys64/etc/pacman.d/mirrorlist.mingw64    ./disk/msys2/etc/pacman.d
+    cp $APPS_HOME/msys64/etc/pacman.d/mirrorlist.ucrt64     ./disk/msys2/etc/pacman.d
+    cp ~/.minttyrc                                          ./disk/msys2/home/
+    cp ~/.gitconfig                                         ./disk/msys2/home/
+    cp ~/.zshrc                                             ./disk/msys2/home/
+    cp ~/.tmux.conf                                         ./disk/msys2/home/
+    cp ~/.tmux-status.conf                                  ./disk/msys2/home/
 
     # win
-    cp $APPDATA/Code/User/settings.json             ./root/home-win/AppData/Roaming/Code/User/
-    cp $USERPROFILE/.ideavimrc                      ./root/home-win/
-    cp $USERPROFILE/clink_inputrc                   ./root/home-win/
-    cp $USERPROFILE/pip/pip.ini                     ./root/home-win/pip/
-    cp $USERPROFILE/.cargo/config                   ./root/home-win/.cargo/
-    cp $LOCALAPPDATA/lf/lfrc                        ./root/home-win/AppData/Local/lf/
+    cp $USERPROFILE/.cargo/config                   ./disk/home-win/.cargo/
+    cp $USERPROFILE/pip/pip.ini                     ./disk/home-win/pip/
+    cp $USERPROFILE/clink_inputrc                   ./disk/home-win/
+    cp $USERPROFILE/.ideavimrc                      ./disk/home-win/
+    cp $APPDATA/Code/User/settings.json             ./disk/home-win/AppData/Roaming/Code/User/
+    cp $LOCALAPPDATA/lf/lfrc                        ./disk/home-win/AppData/Local/lf/
 
     echo "Gw: Copy was completed!"
 fi
