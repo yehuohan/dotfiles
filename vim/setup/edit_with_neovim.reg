@@ -2,7 +2,7 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\*\Shell\Neovim]
 @="Edit with &Neovim"
-"Icon"="\"C:\\apps\\Neovim\\bin\\nvim-qt.exe\""
+"Icon"="\"C:\\apps\\_packs\\apps\\neovim\\current\\bin\\nvim-qt.exe\""
 
 [HKEY_CLASSES_ROOT\*\Shell\Neovim\command]
-@="\"C:\\apps\\Neovim\\bin\\nvim-qt.exe\" \"%1\""
+@="\"C:\\apps\\_packs\\apps\\neovim\\current\\bin\\nvim-qt.exe\" \"%1\""

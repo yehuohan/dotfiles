@@ -1,1 +1,1 @@
-%APPS_HOME%\Neovim\bin\neovide.exe --neovim-bin %APPS_HOME%\Neovim\bin\nvim.exe -- --startuptime time.log
+%APPS_HOME%\_packs\apps\neovide\current\neovide.exe --geometry=90x25 -- --startuptime time.log

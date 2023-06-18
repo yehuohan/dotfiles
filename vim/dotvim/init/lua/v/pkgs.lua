@@ -821,9 +821,6 @@ local function pkg_lazy()
                         },
                     },
                 })
-                vim.fn['coc#config']('python', {
-                    pythonPath = vim.env.VPathPython .. '/python',
-                })
             end,
             event = 'InsertEnter',
             dependencies = { 'neoclide/jsonc.vim' },

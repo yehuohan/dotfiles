@@ -12,7 +12,7 @@ cd dotconfigs/vim/setup
 
 ```sh
 cd dotconfigs/vim/setup
-# 首先运行reg/add_env_path.reg，添加APPS_HOME等环境变量
+# 首先运行disk/setup/add_apps_path.reg，添加APPS_HOME等环境变量
 setup_dotvim.bat
 setup_link_msys64.bat
 ```
