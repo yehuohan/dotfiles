@@ -104,5 +104,8 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp $APPDATA/Code/User/settings.json             ./disk/home-win/AppData/Roaming/Code/User/
     cp $LOCALAPPDATA/lf/lfrc                        ./disk/home-win/AppData/Local/lf/
 
+    # scoop
+    cp -r $APPS_HOME/_packs/persist/conemu          ./disk/scoop/
+
     echo "Gw: Copy was completed!"
 fi
