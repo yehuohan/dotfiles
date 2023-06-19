@@ -22,6 +22,11 @@ if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
     sh -c "$(wget -O- https://raw.${ZSH_URL}.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
 
+# Install gcc
+# pacman -S mingw-w64-ucrt-x86_64-gcc
+# pacman -S mingw-w64-ucrt-x86_64-make
+# cp /ucrt64/bin/mingw32-make.exe /ucrt64/bin/make.exe
+
 cp -r $DIR_DISK/msys2/etc/*         /etc/
 cp -r $DIR_DISK/msys2/etc/.*        /etc/
 cp -r $DIR_DISK/msys2/home/*        ~/
