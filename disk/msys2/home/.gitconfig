@@ -7,6 +7,7 @@
 [core]
 	quotepath = false
 	fileMode = false
+	editor = vim
 [pull]
 	rebase = true
 [oh-my-zsh]
