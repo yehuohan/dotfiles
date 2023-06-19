@@ -36,11 +36,14 @@ scoop bucket add nerd-fonts https://kgithub.com/matthewjberger/scoop-nerd-fonts.
 # Add packs
 scoop install bat fd fzf ripgrep lf universal-ctags 7zip cmake ninja
 scoop install neovim neovide vim
-scoop install llvm lua python deno nodejs vulkan
+scoop install llvm lua python deno nodejs
 scoop install https://raw.githubusercontent.com/daipeihust/im-select/master/bucket/im-select.json
 scoop install conemu wox snipaste everything  screentogif rapidee
 scoop install notepadnext honeyview qttabbar-indiff-np
 scoop download clink -h
-scoop install renderdoc shadered draw.io wpsoffice
-# need vertions: scoop install cuda11.1
 scoop install Agave-NF-Mono CascadiaCode-NF-Mono FantasqueSansMono-NF-Mono -s
+
+# Add optional packs
+scoop install cuda11.1 # from bucket vertions
+scoop install vulkan renderdoc shadered portable-virtualbox 
+scoop install draw.io wpsoffice
