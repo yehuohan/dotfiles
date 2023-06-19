@@ -34,8 +34,9 @@ scoop bucket add nonportable https://kgithub.com/ScoopInstaller/Nonportable.git
 scoop bucket add nerd-fonts https://kgithub.com/matthewjberger/scoop-nerd-fonts.git
 
 # Add packs
-scoop install bat fd fzf ripgrep lf universal-ctags 7zip cmake ninja
-scoop install neovim neovide vim
+scoop install neovim neovide vim -a 64bit
+scoop install bat fd fzf ripgrep lf universal-ctags
+scoop install 7zip cmake ninja
 scoop install lua python deno nodejs
 scoop install https://raw.githubusercontent.com/daipeihust/im-select/master/bucket/im-select.json
 scoop install conemu wox snipaste everything  screentogif rapidee
@@ -44,6 +45,7 @@ scoop download clink -h
 scoop install Agave-NF-Mono CascadiaCode-NF-Mono FantasqueSansMono-NF-Mono -s
 
 # Add optional packs
+scoop install llvm portable-virtualbox
+scoop install vulkan renderdoc shadered
+scoop install draw.io wpsoffice sioyek
 scoop install cuda11.1 # from bucket vertions
-scoop install vulkan llvm renderdoc shadered portable-virtualbox
-scoop install draw.io wpsoffice
