@@ -17,18 +17,18 @@ setup_dotvim.bat
 setup_link_msys64.bat
 ```
 
-## `.vim`
+## dotvim
 
-> *Workspace run project:*
+> *Code task:*
 
 <div align="center">
-<img alt="workspace run project" src="README/ws-rp.gif"  width=75% height=75% />
+<img alt="Code task" src="README/code.gif"  width=75% height=75% />
 </div>
 
-> *Workspace find:*
+> *Fzer task:*
 
 <div align="center">
-<img alt="workspace find" src="README/ws-fw.gif"  width=75% height=75% />
+<img alt="Fzer" src="README/fzer.gif"  width=75% height=75% />
 </div>
 
 

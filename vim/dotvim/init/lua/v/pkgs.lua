@@ -459,7 +459,6 @@ local function pkg_treesitter()
         end
     end
     local parser_dir = vim.env.DotVimLocal .. '/.treesitter'
-    require('nvim-treesitter.install').compilers = { 'clang', 'gcc', 'cl' }
     require('nvim-treesitter.configs').setup({
         parser_install_dir = parser_dir,
         --ensure_installed = { 'c', 'cpp', 'rust', 'vim', 'lua', 'python', 'markdown', 'markdown_inline', },
