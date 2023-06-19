@@ -51,6 +51,14 @@ local _keys = {
     'fay', 'faby', 'fapy', 'Fay', 'faY', 'fabY', 'fapY', 'FaY',
     'fau', 'fabu', 'fapu', 'Fau', 'faU', 'fabU', 'fapU', 'FaU',
 }
+
+local _keys_fuzzier = {
+    'ff', 'fpf', 'Ff',
+    'fl', 'fpl', 'Fl',
+    'fh', 'fph', 'Fh',
+}
+
+local _maps_fuzzier = { f = 'file', l = 'live', h = 'tags' }
 -- stylua: ignore end
 
 local _sels = {
@@ -101,6 +109,21 @@ local _sels = {
     },
 }
 
+local function uproot()
+    local dirs = vim.fs.find({ '.git' }, {
+        upward = true,
+        type = 'directory',
+        path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
+        limit = math.huge,
+    })
+    local dir = dirs[#dirs] and vim.fs.dirname(dirs[#dirs]) or ''
+    if dir ~= '' then
+        wsc.path = dir
+        table.insert(wsc.pathlst, dir)
+    end
+    return dir
+end
+
 local function parse_pat(kt)
     local pat = ''
     if vim.fn.mode() == 'n' then
@@ -142,19 +165,10 @@ local function parse_loc(kt)
     else
         loc = wsc.path
         if loc == '' then
-            local dirs = vim.fs.find({ '.git' }, {
-                upward = true,
-                type = 'directory',
-                path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
-                limit = math.huge,
-            })
-            loc = dirs[#dirs] and vim.fs.dirname(dirs[#dirs]) or ''
-            if loc == '' then
-                loc = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
-            else
-                wsc.path = loc
-                table.insert(wsc.pathlst, loc)
-            end
+            loc = uproot()
+        end
+        if loc == '' then
+            loc = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
         end
     end
     return loc
@@ -187,16 +201,16 @@ end
 --- Entry of fzer task
 --- @param kt(table): [fF][av][bp][IiWwSsYyUu]
 ---                   [%1][%2][%3][4%        ]
---- %1 = km.S
----     F : find with modified task parameters
---- %2 = km.A
+--- %1 = kt.S
+---     F : find with modified fzer task config
+--- %2 = kt.A
 ---     '': find with wsc
 ---     a : append results
---- %3 = km.B
+--- %3 = kt.B
 ---     '': find with wsc
 ---     b : use current buffer
 ---     p : input paths
---- %4 = km.E
+--- %4 = kt.E
 ---     Normal Mode:
 ---         i : input
 ---         w : word
@@ -212,7 +226,7 @@ end
 local entry = async(function(kt, bang)
     wsc:reinit()
 
-    -- Parse rg command
+    -- Parse rg pattern
     local rep = {}
     rep.pat = parse_pat(kt)
     if rep.pat == '' then
@@ -220,6 +234,7 @@ local entry = async(function(kt, bang)
     end
     rep.pat = vim.fn.escape(rep.pat, '"')
 
+    -- Modify fzer config
     if kt.S == 'F' then
         _sels.lst = _sels.lst_r
         _sels.dic.path.lst = wsc.pathlst
@@ -229,14 +244,17 @@ local entry = async(function(kt, bang)
         require('v.task').wsc.fzer = wsc:get()
     end
 
+    -- Parse rg location and option
     rep.loc = parse_loc(kt)
     if rep.loc == '' then
         return
     end
     rep.opt = parse_opt(kt)
-    wsc.cmd = replace(fzer.rg, rep)
 
-    -- Run fzer task
+    wsc.cmd = replace(fzer.rg, rep)
+    wsc.wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+
+    -- Run fzer.rg task
     wsc.qf_append = (kt.A == 'a')
     if not wsc.qf_append then
         require('v.task').hlstr = {}
@@ -256,6 +274,63 @@ local entry = async(function(kt, bang)
     require('v.task').run(wsc)
 end)
 
+--- Entry of fzer.fuzzier task
+--- @param kt(table): [fF][p ][flh]
+---                   [%1][%2][%3 ]
+--- %1 = kt.S
+---     F : fuzzier with inputing args
+--- %2 = kt.A
+---     p : input temp path
+--- %3 = kt.E
+---     f : fuzzier.file
+---     l : fuzzier.live
+---     h : fuzzier.tags with <cword> by default
+local entry_fuzzier = async(function(kt)
+    wsc:reinit()
+
+    -- Parse fuzzier pattern
+    local rep = { pat = '' }
+    if vim.fn.mode() == 'n' then
+        if kt.E == 'h' then
+            rep.pat = vim.fn.expand('<cword>')
+        end
+    else
+        rep.pat = require('v.libv').get_selected()
+    end
+
+    -- Modify fzer config
+    if kt.S == 'F' then
+        _sels.lst = _sels.lst_f
+        _sels.dic.path.lst = wsc.pathlst
+        if not await(a.pop_selection(_sels)) then
+            return
+        end
+        require('v.task').wsc.fzer = wsc:get()
+    end
+
+    -- Parse fuzzier location
+    local loc = ''
+    if kt.A == 'p' then
+        loc = vim.fn.input('Fuzzier location: ', '', 'dir')
+    else
+        loc = wsc.path
+        if loc == '' then
+            loc = uproot()
+        end
+        if loc == '' then
+            loc = vim.fn.input('Fuzzier location: ', '', 'dir')
+        end
+    end
+    if loc == '' then
+        return
+    end
+
+    -- Run fzer.fuzzier task
+    local cmd = replace(fzer[wsc.fuzzier][_maps_fuzzier[kt.E]], rep)
+    local cmd_str = string.format(':lcd %s | %s', vim.fs.normalize(loc), cmd)
+    vim.cmd(cmd_str)
+end)
+
 local function setup()
     require('v.task').wsc.fzer = wsc:get()
 
@@ -271,6 +346,9 @@ local function setup()
     local m = require('v.libv').m
     for _, keys in ipairs(_keys) do
         m.nore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
+    end
+    for _, keys in ipairs(_keys_fuzzier) do
+        m.nore({ '<leader>' .. keys, function() entry_fuzzier(keys2kt(keys)) end })
     end
 
     vim.api.nvim_create_user_command(

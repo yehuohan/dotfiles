@@ -946,8 +946,8 @@ endfunction
 
 " Function: FindWFuzzy(keys) {{{ 模糊搜索
 " {{{
-" @param keys: [fF][p ][flhdg]
-"              [%1][%2][%3   ]
+" @param keys: [fF][p ][flh]
+"              [%1][%2][%3 ]
 " Find: %1 = km.S
 "   F : fuzzy with inputing args
 " Location: %2 = km.A

@@ -321,7 +321,7 @@ task._sels = {
 ---                  [%1][%2][%3  ]
 --- %1 = kt.S
 ---      r : build and run task
----      R : modify task parameters
+---      R : modify code task config
 --- %2 = kt.A
 ---      c : clean task
 ---      b : build without run

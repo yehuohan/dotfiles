@@ -32,6 +32,7 @@ set foldopen-=search                    " 查找时不自动展开折叠
 set foldcolumn=0                        " 0~12,折叠标识列，分别用“-”和“+”而表示打开和关闭的折叠
 set foldmethod=indent                   " 设置折叠，默认为缩进折叠
 set foldlevel=99                        " 折叠层数，高于level的会自动折叠
+set foldlevelstart=99                   " 编辑另一个buffer时设置的foldlevel值
 set scrolloff=3                         " 光标上下保留的行数
 set nostartofline                       " 执行滚屏等命令时，不改变光标列位置
 set laststatus=2                        " 一直显示状态栏
