@@ -216,7 +216,7 @@ local function __completion()
         ['<M-d>'] = cmp.mapping.scroll_docs(-4),
         ['<M-y>'] = cmp.mapping(function()
             local opts = { config = { sources = { { name = 'cmdline_history' } } } }
-            cmp.complete()
+            cmp.complete(opts)
         end, { 'c' }),
         ['<Tab>'] = cmp.mapping(function()
             if cmp.visible() then
