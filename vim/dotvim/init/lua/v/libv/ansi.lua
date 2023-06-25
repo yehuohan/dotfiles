@@ -83,6 +83,7 @@ local function new()
         local verb_t = verbose:match('[at]')
         local verb_h = verbose:match('[ah]')
         local verb_n = verbose:match('[an]')
+        local has_csi = false
         for last, line, args, byte in next_csi(linestr, CSI_PAT) do
             -- The rest pending line shouldn't append into buffer lines
             if is_pending and last then
@@ -106,6 +107,10 @@ local function new()
                     bufs[srow] = s_line .. trimed
                     hlts[srow] = s_hl
                 end
+            end
+
+            if byte then
+                has_csi = true
             end
 
             -- Process CSI code
@@ -155,7 +160,7 @@ local function new()
         if bufs[srow] then
             srow = srow + 1
             bufs[srow] = verb_n and ('$%d>'):format(srow)
-        elseif linestr ~= '' then
+        elseif linestr ~= '' and not has_csi then
             bufs[srow] = verb_n and ('$%d>'):format(srow) or ''
             srow = srow + 1
         end
