@@ -30,11 +30,12 @@ scoop config aria2-enabled false
 # cd $APPS_HOME/_packs/buckets
 # git clone --depth 1 https://kgithub.com/ScoopInstaller/Extras.git
 scoop bucket add extras https://kgithub.com/ScoopInstaller/Extras.git
+scoop bucket add versions https://kgithub.com/ScoopInstaller/Versions.git
 scoop bucket add nonportable https://kgithub.com/ScoopInstaller/Nonportable.git
 scoop bucket add nerd-fonts https://kgithub.com/matthewjberger/scoop-nerd-fonts.git
 
 # Add packs
-scoop install neovim neovide vim -a 64bit
+scoop install neovim neovide vim-nightly -a 64bit
 scoop install bat fd fzf ripgrep lf universal-ctags
 scoop install 7zip cmake ninja
 scoop install lua python deno nodejs
@@ -48,4 +49,4 @@ scoop install Agave-NF-Mono CascadiaCode-NF-Mono FantasqueSansMono-NF-Mono -s
 scoop install llvm portable-virtualbox
 scoop install vulkan renderdoc shadered
 scoop install draw.io wpsoffice sioyek
-scoop install cuda11.1 # from bucket vertions
+scoop install cuda11.1
