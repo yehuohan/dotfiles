@@ -21,22 +21,33 @@ local wsc = require('v.libv').new_configer({
 --- @var loc(string) Location
 local fzer = {
     rg = 'rg --vimgrep -F {opt} -e "{pat}" "{loc}"',
-    fzf = {
-        file = ':FzfFiles {pat}',
-        live = ':FzfRg {pat}',
-        tags = ':FzfTags {pat}',
-    },
-    leaderf = {
-        file = ':Leaderf file --input "{pat}"',
-        live = ':Leaderf rg --nowrap --input "{pat}"',
-        tags = ':Leaderf tag --nowrap --input "{pat}"',
-    },
-    telescope = {
-        file = ':lua require("telescope.builtin").find_files({search_file="{pat}"})',
-        live = ':lua require("telescope.builtin").live_grep({placeholder="{pat}"})',
-        tags = ':lua require("telescope.builtin").tags({placeholder="{pat}"})',
+    fuzzier = {
+        fzf = {
+            file = ':FzfFiles {pat}',
+            live = ':FzfRg {pat}',
+            tags = ':FzfTags {pat}',
+        },
+        leaderf = {
+            file = ':Leaderf file --input "{pat}" "{loc}"',
+            live = ':Leaderf rg --nowrap -e "{pat}" "{loc}"',
+            tags = ':Leaderf tag --nowrap --input "{pat}"',
+        },
+        telescope = {
+            file = ':lua require("telescope.builtin").find_files({search_file="{pat}"})',
+            live = ':lua require("telescope.builtin").live_grep({placeholder="{pat}"})',
+            tags = ':lua require("telescope.builtin").tags({placeholder="{pat}"})',
+        },
     },
 }
+
+function fzer.fzf(ty, rep) end
+
+function fzer.leaderf(ty, rep)
+    local cmd = replace(fzer.fuzzier.leaderf[ty], rep)
+    vim.cmd(cmd)
+end
+
+function fzer.telescope(ty, rep) end
 
 -- stylua: ignore start
 local _keys = {
@@ -254,7 +265,7 @@ local entry = async(function(kt, bang)
     wsc.cmd = replace(fzer.rg, rep)
     wsc.wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
 
-    -- Run fzer.rg task
+    -- Run fzer task
     wsc.qf_append = (kt.A == 'a')
     if not wsc.qf_append then
         require('v.task').hlstr = {}
@@ -298,7 +309,7 @@ local entry_fuzzier = async(function(kt)
         rep.pat = require('v.libv').get_selected()
     end
 
-    -- Modify fzer config
+    -- Modify fzer.fuzzier config
     if kt.S == 'F' then
         _sels.lst = _sels.lst_f
         _sels.dic.path.lst = wsc.pathlst
@@ -324,11 +335,12 @@ local entry_fuzzier = async(function(kt)
     if loc == '' then
         return
     end
+    rep.loc = vim.fs.normalize(loc)
 
     -- Run fzer.fuzzier task
-    local cmd = replace(fzer[wsc.fuzzier][_maps_fuzzier[kt.E]], rep)
-    local cmd_str = string.format(':lcd %s | %s', vim.fs.normalize(loc), cmd)
-    vim.cmd(cmd_str)
+    local tfn = fzer[wsc.fuzzier]
+    local ty = _maps_fuzzier[kt.E]
+    tfn(ty, rep)
 end)
 
 local function setup()

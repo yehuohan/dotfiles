@@ -275,8 +275,17 @@ local function pkg_tree()
     })
 end
 
--- 缩进显示
+-- 对齐，文本对象, 缩进显示
 local function pkg_mini()
+    require('mini.align').setup({
+        mappings = {
+            start = '',
+            start_with_preview = '<leader>al',
+        },
+    })
+
+    require('mini.ai').setup({})
+
     local indentscope = require('mini.indentscope')
     indentscope.setup({
         draw = {
@@ -646,35 +655,22 @@ local function pkg_lazy()
         { 'booperlv/nvim-gomove', config = pkg_gomove },
         { 'declancm/cinnamon.nvim', config = pkg_cinnamon },
         { 'gbrlsnchs/winpick.nvim', config = pkg_winpick },
-        {
-            'sindrets/winshift.nvim', -- 窗口移动
+        { -- 窗口移动
+            'sindrets/winshift.nvim',
             init = function() m.nnore({ '<C-m>', ':WinShift<CR>' }) end,
             opts = {},
+        },
+        { -- 快速扩展块
+            'olambo/vi-viz',
+            config = function()
+                m.nnore({ '<M-r>', '<Cmd>lua require("vi-viz").vizInit()<CR>' })
+                m.xnore({ '<M-r>', '<Cmd>lua require("vi-viz").vizExpand()<CR>' })
+                m.xnore({ '<M-w>', '<Cmd>lua require("vi-viz").vizContract()<CR>' })
+            end,
         },
         { 'andymass/vim-matchup' },
         { 'mg979/vim-visual-multi' },
         { 'markonm/traces.vim' },
-        { 'junegunn/vim-easy-align' },
-        { 'terryma/vim-expand-region' },
-        { 'kana/vim-textobj-user' },
-        { 'glts/vim-textobj-comment', dependencies = { 'kana/vim-textobj-user' } },
-        { 'adriaanzon/vim-textobj-matchit', dependencies = { 'kana/vim-textobj-user' } },
-        {
-            'kana/vim-textobj-indent',
-            dependencies = { 'kana/vim-textobj-user' },
-            keys = {
-                { 'ai', '<Plug>(textobj-indent-a)', mode = { 'x', 'o' } },
-                { 'ii', '<Plug>(textobj-indent-i)', mode = { 'x', 'o' } },
-            },
-        },
-        {
-            'lucapette/vim-textobj-underscore',
-            keys = {
-                { 'au', '<Plug>(textobj-underscore-a)', mode = { 'x', 'o' } },
-                { 'iu', '<Plug>(textobj-underscore-i)', mode = { 'x', 'o' } },
-            },
-            dependencies = { 'kana/vim-textobj-user' },
-        },
 
         -- Component
         {
@@ -684,15 +680,15 @@ local function pkg_lazy()
         },
         { 'goolord/alpha-nvim', config = pkg_alpha },
         { 'rcarriga/nvim-notify', config = pkg_notify },
-        {
-            'stevearc/dressing.nvim', -- ui界面美化
+        { -- vim.ui界面美化
+            'stevearc/dressing.nvim',
             opts = {
                 input = { enabled = true },
                 select = { enabled = true },
             },
         },
-        {
-            'ziontee113/icon-picker.nvim', -- 字体图标
+        { -- 字体图标选择器
+            'ziontee113/icon-picker.nvim',
             init = function()
                 m.inore({ '<M-w>', '<Cmd>IconPickerInsert<CR>' })
                 m.nnore({ '<leader><leader>i', ':IconPickerInsert<Space>' })
@@ -700,8 +696,8 @@ local function pkg_lazy()
             opts = { disable_legacy_commands = true },
             cmd = 'IconPickerInsert',
         },
-        {
-            'lukas-reineke/virt-column.nvim', -- 刻度线
+        { -- 刻度线
+            'lukas-reineke/virt-column.nvim',
             opts = { char = '┊' },
         },
         {
