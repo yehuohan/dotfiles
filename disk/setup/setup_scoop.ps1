@@ -38,7 +38,7 @@ scoop bucket add nerd-fonts https://kgithub.com/matthewjberger/scoop-nerd-fonts.
 scoop install neovim neovide vim-nightly -a 64bit
 scoop install bat fd fzf ripgrep lf universal-ctags
 scoop install 7zip cmake ninja
-scoop install lua python deno nodejs
+scoop install lua python deno nodejs # Then run apps/python/current/install-pep-514.reg
 scoop install https://raw.githubusercontent.com/daipeihust/im-select/master/bucket/im-select.json
 scoop install conemu wox snipaste everything  screentogif rapidee
 scoop install notepadnext honeyview qttabbar-indiff-np
