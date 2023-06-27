@@ -483,10 +483,10 @@ local function pkg_treesitter()
         incremental_selection = {
             enable = true,
             keymaps = {
-                init_selection = '<M-g>',
-                node_incremental = '<M-g>',
-                node_decremental = '<M-a>',
-                scope_incremental = '<M-v>',
+                init_selection = '<M-r>',
+                node_incremental = '<M-r>',
+                node_decremental = '<M-w>',
+                scope_incremental = '<M-q>',
             },
         },
         rainbow = { enable = true },
@@ -663,9 +663,9 @@ local function pkg_lazy()
         { -- 快速扩展块
             'olambo/vi-viz',
             config = function()
-                m.nnore({ '<M-r>', '<Cmd>lua require("vi-viz").vizInit()<CR>' })
-                m.xnore({ '<M-r>', '<Cmd>lua require("vi-viz").vizExpand()<CR>' })
-                m.xnore({ '<M-w>', '<Cmd>lua require("vi-viz").vizContract()<CR>' })
+                m.nnore({ '<M-g>', '<Cmd>lua require("vi-viz").vizInit()<CR>' })
+                m.xnore({ '<M-g>', '<Cmd>lua require("vi-viz").vizExpand()<CR>' })
+                m.xnore({ '<M-a>', '<Cmd>lua require("vi-viz").vizContract()<CR>' })
             end,
         },
         { 'andymass/vim-matchup' },
@@ -696,10 +696,7 @@ local function pkg_lazy()
             opts = { disable_legacy_commands = true },
             cmd = 'IconPickerInsert',
         },
-        { -- 刻度线
-            'lukas-reineke/virt-column.nvim',
-            opts = { char = '┊' },
-        },
+        { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' } },
         {
             'kyazdani42/nvim-tree.lua',
             config = pkg_tree,
@@ -716,11 +713,7 @@ local function pkg_lazy()
                 '<leader>nm',
             },
         },
-        {
-            'kyazdani42/nvim-web-devicons',
-            lazy = true,
-            enabled = use.ui.patch,
-        },
+        { 'kyazdani42/nvim-web-devicons', lazy = true, enabled = use.ui.patch },
         { 'morhetz/gruvbox' },
         { 'rakr/vim-one' },
         { 'tanvirtin/monokai.nvim' },
@@ -738,11 +731,7 @@ local function pkg_lazy()
         { 'itchyny/screensaver.vim' },
         { 'junegunn/fzf' },
         { 'junegunn/fzf.vim' },
-        {
-            'Yggdroot/LeaderF',
-            enabled = use.has_py,
-            build = IsWin() and 'install.bat' or 'install.sh',
-        },
+        { 'Yggdroot/LeaderF', enabled = use.has_py, build = ':LeaderfInstallCExtension' },
 
         -- Coding
         {
@@ -763,11 +752,7 @@ local function pkg_lazy()
             config = pkg_ufo,
             dependencies = { 'kevinhwang91/promise-async' },
         },
-        {
-            'nvim-treesitter/nvim-treesitter',
-            enabled = use.nts,
-            config = pkg_treesitter,
-        },
+        { 'nvim-treesitter/nvim-treesitter', enabled = use.nts, config = pkg_treesitter },
         {
             'HiPhish/nvim-ts-rainbow2',
             enabled = use.nts,
@@ -820,19 +805,9 @@ local function pkg_lazy()
             event = 'InsertEnter',
             dependencies = { 'neoclide/jsonc.vim' },
         },
-        {
-            'mhartington/formatter.nvim',
-            config = pkg_formatter,
-        },
-        {
-            'stevearc/overseer.nvim',
-            config = pkg_overseer,
-        },
-        {
-            'SirVer/ultisnips',
-            enabled = use.has_py,
-            dependencies = { 'honza/vim-snippets' },
-        },
+        { 'mhartington/formatter.nvim', config = pkg_formatter },
+        { 'stevearc/overseer.nvim', config = pkg_overseer },
+        { 'SirVer/ultisnips', enabled = use.has_py, dependencies = { 'honza/vim-snippets' } },
         {
             'rcarriga/nvim-dap-ui',
             enabled = use.ndap,
