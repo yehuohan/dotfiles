@@ -442,6 +442,7 @@ endfunction
 "nnoremap <M-u> gT
 "nnoremap <M-p> gt
 nnoremap <leader>bl <C-^>
+nnoremap <leader>ba <Cmd>execute ':tabnext ' . tabpagenr('#')<CR>
 " 分割窗口
 nnoremap <leader>ws <C-w>s
 nnoremap <leader>wv <C-W>v
@@ -467,8 +468,8 @@ nnoremap <leader>wT <C-w>T
 nnoremap <leader>w= <C-w>=
 nnoremap <silent> <M-e> <Cmd>call WinMoveSpliter('e', 5)<CR>
 nnoremap <silent> <M-s> <Cmd>call WinMoveSpliter('s', 5)<CR>
-nnoremap <silent><nowait><expr> <M-f> (SvarUse().coc && coc#float#has_scroll()) ? coc#float#scroll(1) : "<Cmd>call WinMoveSpliter('f', 5)\<CR>"
-nnoremap <silent><nowait><expr> <M-d> (SvarUse().coc && coc#float#has_scroll()) ? coc#float#scroll(0) : "<Cmd>call WinMoveSpliter('d', 5)\<CR>"
+nnoremap <silent> <M-f> <Cmd>call WinMoveSpliter('f', 5)<CR>
+nnoremap <silent> <M-d> <Cmd>call WinMoveSpliter('d', 5)<CR>
 nnoremap <M-Up> :call WinMoveSpliter('e', 1)<CR>
 nnoremap <M-Down> :call WinMoveSpliter('d', 1)<CR>
 nnoremap <M-Left> :call WinMoveSpliter('s', 1)<CR>

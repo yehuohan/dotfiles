@@ -90,7 +90,7 @@ function M.setup()
             verbose = opts.bang and 'a',
         }
         M.run(cfg)
-    end, { bang = true, nargs = 1 })
+    end, { bang = true, nargs = 1, complete = 'shellcmd' })
     local m = require('v.libv').m
     m.nnore({ '<leader><leader>r', ':TaskRun<Space>' })
     m.nnore({ '<leader><leader>R', ':TaskRun!<Space>' })

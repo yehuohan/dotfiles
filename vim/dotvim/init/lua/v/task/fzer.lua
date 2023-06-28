@@ -21,33 +21,44 @@ local wsc = require('v.libv').new_configer({
 --- @var loc(string) Location
 local fzer = {
     rg = 'rg --vimgrep -F {opt} -e "{pat}" "{loc}"',
-    fuzzier = {
-        fzf = {
-            file = ':FzfFiles {pat}',
-            live = ':FzfRg {pat}',
-            tags = ':FzfTags {pat}',
-        },
-        leaderf = {
-            file = ':Leaderf file --input "{pat}" "{loc}"',
-            live = ':Leaderf rg --nowrap -e "{pat}" "{loc}"',
-            tags = ':Leaderf tag --nowrap --input "{pat}"',
-        },
-        telescope = {
-            file = ':lua require("telescope.builtin").find_files({search_file="{pat}"})',
-            live = ':lua require("telescope.builtin").live_grep({placeholder="{pat}"})',
-            tags = ':lua require("telescope.builtin").tags({placeholder="{pat}"})',
-        },
+    _fzf = {
+        file = ':FzfFiles {pat}',
+        live = ':FzfRg {pat}',
+        tags = ':FzfTags {pat}',
+    },
+    _leaderf = {
+        file = ':Leaderf file --input "{pat}" "{loc}"',
+        live = ':Leaderf rg --nowrap -e "{pat}" "{loc}"',
+        tags = ':Leaderf tag --nowrap --input "{pat}"',
+    },
+    _telescope = {
+        file = 'find_files',
+        live = 'live_grep',
+        tags = 'tags',
     },
 }
 
-function fzer.fzf(ty, rep) end
-
-function fzer.leaderf(ty, rep)
-    local cmd = replace(fzer.fuzzier.leaderf[ty], rep)
+function fzer.fzf(ty, rep)
+    -- fzf#vim#files(dir)
+    -- fzf#vim#grep(replace(fzer.rg, rep))
+    -- fzf#vim#tags(query)
+    local cmd = replace(fzer._fzf[ty], rep)
     vim.cmd(cmd)
 end
 
-function fzer.telescope(ty, rep) end
+function fzer.leaderf(ty, rep)
+    local cmd = replace(fzer._leaderf[ty], rep)
+    vim.cmd(cmd)
+end
+
+function fzer.telescope(ty, rep)
+    local picker = fzer._telescope[ty]
+    require('telescope.builtin')[picker]({
+        cwd = rep.loc,
+        search_file = rep.pat,
+        search_dirs = { rep.loc },
+    })
+end
 
 -- stylua: ignore start
 local _keys = {
@@ -335,12 +346,11 @@ local entry_fuzzier = async(function(kt)
     if loc == '' then
         return
     end
-    rep.loc = vim.fs.normalize(loc)
+    rep.loc = vim.fs.normalize(vim.fn.fnamemodify(loc, ':p'))
 
     -- Run fzer.fuzzier task
-    local tfn = fzer[wsc.fuzzier]
     local ty = _maps_fuzzier[kt.E]
-    tfn(ty, rep)
+    fzer[wsc.fuzzier](ty, rep)
 end)
 
 local function setup()
