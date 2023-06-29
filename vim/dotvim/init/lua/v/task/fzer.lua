@@ -8,12 +8,17 @@ local wsc = require('v.libv').new_configer({
     envs = '',
     path = '',
     pathlst = {},
-    filters = '',
     globlst = '!__VBuildOut',
     options = '',
     vimgrep = false,
     fuzzier = 'leaderf',
 })
+
+local function rg_globs()
+    if wsc.globlst ~= '' then
+        return '-g' .. vim.fn.join(vim.fn.split(wsc.globlst, [[\s*,\s*]]), ' -g')
+    end
+end
 
 --- Fuzzy finder tasks
 --- @var opt(string) Options
@@ -87,9 +92,9 @@ local _sels = {
     opt = 'config fzer task',
     lst = nil,
     -- lst for rg
-    lst_r = { 'envs', 'path', 'filters', 'globlst', 'options', 'vimgrep' },
+    lst_r = { 'envs', 'path', 'globlst', 'options', 'vimgrep' },
     -- lst for fuzzier
-    lst_f = { 'envs', 'path', 'fuzzier' },
+    lst_f = { 'envs', 'path', 'globlst', 'options', 'fuzzier' },
     dic = {
         envs = { lst = { 'PATH=' }, cpl = 'environment' },
         path = {
@@ -97,13 +102,7 @@ local _sels = {
             lst = wsc.pathlst,
             cpl = 'file',
         },
-        filters = { dsr = function() return '-g*.{' .. wsc.filters .. '}' end },
-        globlst = {
-            dsr = function()
-                return '-g' .. vim.fn.join(vim.fn.split(wsc.globlst, [[\s*,\s*]]), ' -g')
-            end,
-            cpl = 'file',
-        },
+        globlst = { dsr = function() return rg_globs() or '' end },
         options = {
             lst = {
                 '--word-regexp',
@@ -207,12 +206,7 @@ local function parse_opt(kt)
         opt[#opt + 1] = '-s'
     end
     if not kt.A:match('[bp]') then
-        if wsc.filters ~= '' then
-            opt[#opt + 1] = '-g"*.{' .. wsc.filters .. '}"'
-        end
-        if wsc.globlst ~= '' then
-            opt[#opt + 1] = '-g' .. vim.fn.join(vim.fn.split(wsc.globlst, [[\s*,\s*]]), ' -g')
-        end
+        opt[#opt + 1] = rg_globs()
         if wsc.options ~= '' then
             opt[#opt + 1] = wsc.options
         end

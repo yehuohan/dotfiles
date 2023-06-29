@@ -818,7 +818,6 @@ local function pkg_lazy()
         { 'puremourning/vimspector', enabled = use.ndap },
         { 'liuchengxu/vista.vim', cmd = 'Vista' },
         { 't9md/vim-quickhl' },
-        { 'skywind3000/asyncrun.vim' },
         { 'voldikss/vim-floaterm' },
         { 'rust-lang/rust.vim' },
 

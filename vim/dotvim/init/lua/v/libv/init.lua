@@ -150,7 +150,7 @@ function M.new_chanor(opts)
             if num >= 2 then
                 pending = data[num]
             end
-            end_idx = #bufs - 2
+            end_idx = #bufs - 1
         end
 
         -- Copy returned lines and highlights

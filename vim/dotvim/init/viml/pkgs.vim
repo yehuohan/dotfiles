@@ -330,18 +330,6 @@ nmap <leader>hr <Plug>(quickhl-manual-reset)
 nmap <leader>th <Plug>(quickhl-manual-toggle)
 " }}}
 
-" asyncrun {{{ 导步运行程序
-let g:asyncrun_open = 8                 " 自动打开quickfix window
-let g:asyncrun_save = 1                 " 自动保存当前文件
-let g:asyncrun_local = 1                " 使用setlocal的efm
-if IsVim()
-nnoremap <leader><leader>r :AsyncRun<Space>
-vnoremap <leader><leader>r <Cmd>call feedkeys(':AsyncRun ' . GetSelected(''), 'n')<CR>
-nnoremap <leader>rk :AsyncStop<CR>
-nnoremap <leader>rK :AsyncReset<CR>
-endif
-" }}}
-
 " floaterm {{{ 终端浮窗
 if IsNVim()
 tnoremap <C-l> <C-\><C-n><C-w>
@@ -350,7 +338,6 @@ else
 set termwinkey=<C-l>
 tnoremap <Esc> <C-l>N
 endif
-nnoremap <leader>tZ :terminal<CR>
 nnoremap <leader>tz :FloatermToggle<CR>
 nnoremap <leader><leader>m :Popc Floaterm<CR>
 nnoremap <leader><leader>z :FloatermNew --cwd=.<Space>
@@ -364,6 +351,7 @@ tnoremap <M-n> <C-\><C-n>:FloatermUpdate --height=0.6 --width=0.6<CR>
 tnoremap <M-m> <C-\><C-n>:FloatermUpdate --height=0.9 --width=0.9<CR>
 tnoremap <M-r> <C-\><C-n>:FloatermUpdate --position=topright<CR>
 tnoremap <M-c> <C-\><C-n>:FloatermUpdate --position=center<CR>
+nnoremap <leader>mz :FloatermNew --cwd=. zsh<CR>
 nnoremap <leader>mf :FloatermNew lf<CR>
 highlight! default link FloatermBorder Constant
 " }}}
