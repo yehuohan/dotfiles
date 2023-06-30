@@ -14,9 +14,39 @@ local wsc = require('v.libv').new_configer({
     fuzzier = 'leaderf',
 })
 
+local function rg_paths()
+    -- rg supports multi-paths
+    local locstr = vim.fn.input('Location: ', '', 'file')
+    if locstr ~= '' then
+        -- Input multi-paths with '|' separated
+        local loclst = vim.tbl_map(
+            function(ps) return vim.fs.normalize(vim.fn.fnamemodify(ps, ':p')) end,
+            vim.fn.split(locstr, '|')
+        )
+        -- The return paths should be double-quoted
+        return vim.fn.join(loclst, '" "')
+    end
+end
+
 local function rg_globs()
     if wsc.globlst ~= '' then
         return '-g' .. vim.fn.join(vim.fn.split(wsc.globlst, [[\s*,\s*]]), ' -g')
+    end
+end
+
+local function uproot()
+    local dirlst = vim.fs.find({ '.git' }, {
+        upward = true,
+        type = 'directory',
+        path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
+        limit = math.huge,
+    })
+    local dir = dirlst[#dirlst]
+    if dir then
+        dir = vim.fs.dirname(dir)
+        wsc.path = dir
+        table.insert(wsc.pathlst, dir)
+        return dir
     end
 end
 
@@ -130,21 +160,6 @@ local _sels = {
     },
 }
 
-local function uproot()
-    local dirs = vim.fs.find({ '.git' }, {
-        upward = true,
-        type = 'directory',
-        path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
-        limit = math.huge,
-    })
-    local dir = dirs[#dirs] and vim.fs.dirname(dirs[#dirs]) or ''
-    if dir ~= '' then
-        wsc.path = dir
-        table.insert(wsc.pathlst, dir)
-    end
-    return dir
-end
-
 local function parse_pat(kt)
     local pat = ''
     if vim.fn.mode() == 'n' then
@@ -172,21 +187,13 @@ end
 local function parse_loc(kt)
     local loc = ''
     if kt.B == 'b' then
-        loc = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+        loc = vim.fs.normalize(vim.api.nvim_buf_get_name(0))
     elseif kt.B == 'p' then
-        loc = vim.fn.input('Location: ', '', 'file')
-        if loc ~= '' then
-            -- Input multi-paths with '|' separated
-            local loclst = vim.tbl_map(
-                function(ps) return vim.fs.normalize(vim.fn.fnamemodify(ps, ':p')) end,
-                vim.fn.split(loc, '|')
-            )
-            loc = vim.fn.join(loclst, '" "')
-        end
+        loc = rg_paths() or ''
     else
         loc = wsc.path
         if loc == '' then
-            loc = uproot()
+            loc = uproot() or ''
         end
         if loc == '' then
             loc = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
@@ -295,7 +302,7 @@ end)
 ---                   [%1][%2][%3 ]
 --- %1 = kt.S
 ---     F : fuzzier with inputing args
---- %2 = kt.A
+--- %2 = kt.A/B
 ---     p : input temp path
 --- %3 = kt.E
 ---     f : fuzzier.file
@@ -325,22 +332,10 @@ local entry_fuzzier = async(function(kt)
     end
 
     -- Parse fuzzier location
-    local loc = ''
-    if kt.A == 'p' then
-        loc = vim.fn.input('Fuzzier location: ', '', 'dir')
-    else
-        loc = wsc.path
-        if loc == '' then
-            loc = uproot()
-        end
-        if loc == '' then
-            loc = vim.fn.input('Fuzzier location: ', '', 'dir')
-        end
-    end
-    if loc == '' then
+    rep.loc = parse_loc(kt)
+    if rep.loc == '' then
         return
     end
-    rep.loc = vim.fs.normalize(vim.fn.fnamemodify(loc, ':p'))
 
     -- Run fzer.fuzzier task
     local ty = _maps_fuzzier[kt.E]
