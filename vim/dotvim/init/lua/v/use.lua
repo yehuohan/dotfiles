@@ -1,5 +1,3 @@
-local fn = vim.fn
-
 local use_file = vim.env.DotVimLocal .. '/.use.json'
 local use = {
     xgit = vim.v.null,
@@ -19,14 +17,18 @@ local use = {
 
 local function use_save(name)
     if name == 'onCR' then
-        fn.writefile({ vim.json.encode(use) }, use_file)
+        vim.fn.writefile({ vim.json.encode(use) }, use_file)
         vim.notify('v.use save successful!')
     end
 end
 
 local function use_load()
-    if fn.filereadable(use_file) == 1 then
-        use = vim.tbl_deep_extend('force', use, vim.json.decode(fn.join(fn.readfile(use_file))))
+    if vim.fn.filereadable(use_file) == 1 then
+        use = vim.tbl_deep_extend(
+            'force',
+            use,
+            vim.json.decode(vim.fn.join(vim.fn.readfile(use_file)))
+        )
     else
         use_save('onCR')
     end
@@ -53,7 +55,7 @@ local function use_init()
     local fontsizelst = { 9, 10, 11, 12, 13, 14, 15 }
     udic.ui = {
         dsr = 'set ui',
-        lst = fn.sort(vim.tbl_keys(use.ui)),
+        lst = vim.fn.sort(vim.tbl_keys(use.ui)),
         dic = {
             patch = { lst = { true, false } },
             font = { dsr = 'set guifont', lst = fontlst },
@@ -67,9 +69,9 @@ local function use_init()
         },
     }
 
-    fn.PopSelection({
+    vim.fn.PopSelection({
         opt = 'use',
-        lst = fn.sort(vim.tbl_keys(use)),
+        lst = vim.fn.sort(vim.tbl_keys(use)),
         dic = udic,
         evt = use_save,
         sub = {

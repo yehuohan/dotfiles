@@ -1,4 +1,3 @@
-local api = vim.api
 local use = require('v.use').get()
 local m = require('v.libv').m
 
@@ -149,6 +148,7 @@ end
 
 local function __hl()
     -- stylua: ignore start
+    local api = vim.api
     api.nvim_set_hl(0, 'CmpItemMenu'             , {ctermfg = 175, fg = '#d3869b', italic = true })
     api.nvim_set_hl(0, 'CmpItemAbbrMatch'        , {ctermfg = 208, fg = '#fe8019' })
     api.nvim_set_hl(0, 'CmpItemAbbrMatchFuzzy'   , {ctermfg = 208, fg = '#fe8019' })

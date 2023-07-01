@@ -205,6 +205,7 @@ end
 -- async
 --------------------------------------------------------------------------------
 local _a = {}
+M.a = _a
 
 _a._await = coroutine.yield
 
@@ -248,9 +249,34 @@ function _a.pop_selection(sel)
 end
 
 --------------------------------------------------------------------------------
+-- utils
+--------------------------------------------------------------------------------
+local _u = {}
+M.u = _u
+
+--- Split string arguments with blanks
+--- Currently each arg can't contain any blanks.
+--- @return table List of arguments
+function _u.str2arg(str) return vim.split(str, '%s+', { trimempty = true }) end
+
+--- Parse string to table of environment variables
+--- @param str(string) Input with format 'VAR0=var0 VAR1=var1'
+--- @return (table) Environment table with { VAR0 = 'var0', VAR1 = 'var1' }
+function _u.str2env(str)
+    local env = {}
+    for _, seg in ipairs(_u.str2arg(str)) do
+        local var = vim.split(seg, '=', { trimempty = true })
+        env[var[1]] = var[2]
+    end
+    return env
+end
+
+--------------------------------------------------------------------------------
 -- map
 --------------------------------------------------------------------------------
 local _m = {}
+M.m = _m
+
 local setmap = vim.keymap.set
 
 local function setopts(opts, defaults)
@@ -301,6 +327,4 @@ function _m.cnore(opts) setmap('c', opts[1], opts[2], setopts(opts, { noremap = 
 function _m.tnore(opts) setmap('t', opts[1], opts[2], setopts(opts, { noremap = true })) end
 -- stylua: ignore end
 
-M.a = _a
-M.m = _m
 return M

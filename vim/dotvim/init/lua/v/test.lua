@@ -5,7 +5,6 @@ local dir_this = vim.fn.getcwd()
 local dir_base = vim.fs.dirname(vim.fs.dirname(dir_this))
 vim.opt.rtp:prepend(dir_base)
 local libv = require('v.libv')
-local task = require('v.task')
 
 local function EQ(expected, actual)
     assert(
@@ -48,7 +47,7 @@ local tst = {}
 
 function tst.str2env()
     local str = ' VAR0=var0   VAR1=var1 '
-    local env = task.str2env(str)
+    local env = libv.u.str2env(str)
     EQ({ VAR0 = 'var0', VAR1 = 'var1' }, env)
     vim.print(env)
 end

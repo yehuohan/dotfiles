@@ -1,4 +1,5 @@
-local a = require('v.libv').a
+local libv = require('v.libv')
+local a = libv.a
 local async = a._async
 local await = a._await
 local replace = require('v.task').replace
@@ -6,7 +7,7 @@ local sequence = require('v.task').sequence
 local throw = error
 
 --- Workspace config for code
-local wsc = require('v.libv').new_configer({
+local wsc = libv.new_configer({
     key = '',
     file = '',
     type = '',
@@ -397,9 +398,8 @@ local function setup()
             E = keys:sub(-1, -1),
         }
     end
-    local m = require('v.libv').m
     for _, keys in ipairs(task._keys) do
-        m.nnore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
+        libv.m.nnore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
     end
 
     vim.api.nvim_create_user_command(

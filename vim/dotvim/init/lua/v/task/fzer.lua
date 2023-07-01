@@ -1,10 +1,11 @@
-local a = require('v.libv').a
+local libv = require('v.libv')
+local a = libv.a
 local async = a._async
 local await = a._await
 local replace = require('v.task').replace
 
 --- Workspace config for fzer
-local wsc = require('v.libv').new_configer({
+local wsc = libv.new_configer({
     envs = '',
     path = '',
     pathlst = {},
@@ -15,23 +16,26 @@ local wsc = require('v.libv').new_configer({
 })
 
 local function rg_paths()
-    -- rg supports multi-paths
+    -- rg supports multi-paths via cmp-path
     local locstr = vim.fn.input('Location: ', '', 'file')
     if locstr ~= '' then
-        -- Input multi-paths with '|' separated
-        local loclst = vim.tbl_map(
-            function(ps) return vim.fs.normalize(vim.fn.fnamemodify(ps, ':p')) end,
-            vim.fn.split(locstr, '|')
-        )
         -- The return paths should be double-quoted
-        return vim.fn.join(loclst, '" "')
+        return vim.tbl_map(
+            function(path) return vim.fs.normalize(vim.fn.fnamemodify(path, ':p')) end,
+            libv.u.str2arg(locstr)
+        )
     end
+    return {}
 end
 
 local function rg_globs()
     if wsc.globlst ~= '' then
-        return '-g' .. vim.fn.join(vim.fn.split(wsc.globlst, [[\s*,\s*]]), ' -g')
+        return vim.tbl_map(
+            function(glob) return ('-g%s'):format(glob) end,
+            libv.u.str2arg(wsc.globlst)
+        )
     end
+    return {}
 end
 
 local function uproot()
@@ -55,7 +59,7 @@ end
 --- @var pat(string) Pattern
 --- @var loc(string) Location
 local fzer = {
-    rg = 'rg --vimgrep -F {opt} -e "{pat}" "{loc}"',
+    rg = 'rg --vimgrep -F {opt} -e "{pat}" {loc}',
     _fzf = {
         file = ':FzfFiles {pat}',
         live = ':FzfRg {pat}',
@@ -63,12 +67,12 @@ local fzer = {
     },
     _leaderf = {
         file = ':Leaderf file --input "{pat}" "{loc}"',
-        live = ':Leaderf rg --nowrap -e "{pat}" "{loc}"',
+        live = ':Leaderf rg --nowrap {opt} -e "{pat}" {loc}',
         tags = ':Leaderf tag --nowrap --input "{pat}"',
     },
     _telescope = {
         file = 'find_files',
-        live = 'live_grep',
+        live = 'grep_string',
         tags = 'tags',
     },
 }
@@ -82,6 +86,8 @@ function fzer.fzf(ty, rep)
 end
 
 function fzer.leaderf(ty, rep)
+    rep.loc = table.concat(rep.loc, ' ')
+    rep.opt = table.concat(rep.opt, ' ')
     local cmd = replace(fzer._leaderf[ty], rep)
     vim.cmd(cmd)
 end
@@ -89,9 +95,11 @@ end
 function fzer.telescope(ty, rep)
     local picker = fzer._telescope[ty]
     require('telescope.builtin')[picker]({
-        cwd = rep.loc,
+        cwd = rep.loc[1],
+        search = rep.pat,
         search_file = rep.pat,
-        search_dirs = { rep.loc },
+        search_dirs = rep.loc,
+        additional_args = rep.opt,
     })
 end
 
@@ -132,7 +140,7 @@ local _sels = {
             lst = wsc.pathlst,
             cpl = 'file',
         },
-        globlst = { dsr = function() return rg_globs() or '' end },
+        globlst = { dsr = function() return table.concat(rg_globs(), ' ') end },
         options = {
             lst = {
                 '--word-regexp',
@@ -169,7 +177,7 @@ local function parse_pat(kt)
             pat = vim.fn.expand('<cword>')
         end
     else
-        local selected = require('v.libv').get_selected()
+        local selected = libv.get_selected()
         if kt.E:match('[iI]') then
             pat = vim.fn.input('Pattern: ', selected)
         elseif kt.E:match('[wWsS]') then
@@ -185,21 +193,17 @@ local function parse_pat(kt)
 end
 
 local function parse_loc(kt)
-    local loc = ''
     if kt.B == 'b' then
-        loc = vim.fs.normalize(vim.api.nvim_buf_get_name(0))
+        return { vim.fs.normalize(vim.api.nvim_buf_get_name(0)) }
     elseif kt.B == 'p' then
-        loc = rg_paths() or ''
+        return rg_paths()
     else
-        loc = wsc.path
+        local loc = wsc.path
         if loc == '' then
-            loc = uproot() or ''
+            loc = uproot() or vim.fs.dirname(vim.api.nvim_buf_get_name(0))
         end
-        if loc == '' then
-            loc = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
-        end
+        return { loc }
     end
-    return loc
 end
 
 local function parse_opt(kt)
@@ -212,13 +216,13 @@ local function parse_opt(kt)
     elseif kt.E:match('[IWSYU]') then
         opt[#opt + 1] = '-s'
     end
-    if not kt.A:match('[bp]') then
-        opt[#opt + 1] = rg_globs()
-        if wsc.options ~= '' then
-            opt[#opt + 1] = wsc.options
-        end
+    if not kt.A:match('[p]') then
+        vim.list_extend(opt, rg_globs()) -- Custom paths may conflict with rg's globs
     end
-    return table.concat(opt, ' ')
+    if wsc.options ~= '' then
+        vim.list_extend(opt, libv.u.str2arg(wsc.options))
+    end
+    return opt
 end
 
 --- Entry of fzer task
@@ -267,17 +271,16 @@ local entry = async(function(kt, bang)
         require('v.task').wsc.fzer = wsc:get()
     end
 
-    -- Parse rg location and option
-    rep.loc = parse_loc(kt)
+    -- Parse rg location and options
+    rep.loc = table.concat(parse_loc(kt), ' ')
     if rep.loc == '' then
         return
     end
-    rep.opt = parse_opt(kt)
-
-    wsc.cmd = replace(fzer.rg, rep)
-    wsc.wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+    rep.opt = table.concat(parse_opt(kt), ' ')
 
     -- Run fzer task
+    wsc.cmd = replace(fzer.rg, rep)
+    wsc.wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
     wsc.qf_append = (kt.A == 'a')
     if not wsc.qf_append then
         require('v.task').hlstr = {}
@@ -318,7 +321,7 @@ local entry_fuzzier = async(function(kt)
             rep.pat = vim.fn.expand('<cword>')
         end
     else
-        rep.pat = require('v.libv').get_selected()
+        rep.pat = libv.get_selected()
     end
 
     -- Modify fzer.fuzzier config
@@ -331,11 +334,12 @@ local entry_fuzzier = async(function(kt)
         require('v.task').wsc.fzer = wsc:get()
     end
 
-    -- Parse fuzzier location
+    -- Parse location for fuzzier and options for fuzzier.live
     rep.loc = parse_loc(kt)
-    if rep.loc == '' then
+    if #rep.loc == 0 then
         return
     end
+    rep.opt = parse_opt(kt)
 
     -- Run fzer.fuzzier task
     local ty = _maps_fuzzier[kt.E]
@@ -354,12 +358,11 @@ local function setup()
             E = keys:sub(-1, -1),
         }
     end
-    local m = require('v.libv').m
     for _, keys in ipairs(_keys) do
-        m.nore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
+        libv.m.nore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
     end
     for _, keys in ipairs(_keys_fuzzier) do
-        m.nore({ '<leader>' .. keys, function() entry_fuzzier(keys2kt(keys)) end })
+        libv.m.nore({ '<leader>' .. keys, function() entry_fuzzier(keys2kt(keys)) end })
     end
 
     vim.api.nvim_create_user_command(

@@ -1,3 +1,5 @@
+local libv = require('v.libv')
+
 local M = {}
 
 --- Task workspace config
@@ -8,18 +10,6 @@ M.wsc = {
 
 --- Task outputs to highlight at quickfix window
 M.hlstr = {}
-
---- Parse string to table of environment variables
---- @param str(string) Input with format 'VAR0=var0 VAR1=var1'
---- @return (table) Environment table with { VAR0 = 'var0', VAR1 = 'var1' }
-function M.str2env(str)
-    local env = {}
-    for _, seg in ipairs(vim.split(str, '%s+', { trimempty = true })) do
-        local var = vim.split(seg, '=', { trimempty = true })
-        env[var[1]] = var[2]
-    end
-    return env
-end
 
 --- Repleace command's placeholders
 --- @param cmd(string) String command with format 'cmd {arg}'
@@ -40,7 +30,7 @@ function M.run(cfg)
     local opts = {}
     opts.cmd = cfg.cmd
     opts.cwd = cfg.wdir
-    opts.env = cfg.envs and M.str2env(cfg.envs)
+    opts.env = cfg.envs and libv.u.str2env(cfg.envs)
     if not cfg.connect_pty then
         opts.strategy = { 'jobstart', use_terminal = false }
     end
@@ -91,20 +81,15 @@ function M.setup()
         }
         M.run(cfg)
     end, { bang = true, nargs = 1, complete = 'shellcmd' })
-    local m = require('v.libv').m
-    m.nnore({ '<leader><leader>r', ':TaskRun<Space>' })
-    m.nnore({ '<leader><leader>R', ':TaskRun!<Space>' })
-    m.vnore({
+    libv.m.nnore({ '<leader><leader>r', ':TaskRun<Space>' })
+    libv.m.nnore({ '<leader><leader>R', ':TaskRun!<Space>' })
+    libv.m.vnore({
         '<leader><leader>r',
-        function()
-            vim.api.nvim_feedkeys(':TaskRun ' .. require('v.libv').get_selected(''), 'n', true)
-        end,
+        function() vim.api.nvim_feedkeys(':TaskRun ' .. libv.get_selected(''), 'n', true) end,
     })
-    m.vnore({
+    libv.m.vnore({
         '<leader><leader>R',
-        function()
-            vim.api.nvim_feedkeys(':TaskRun! ' .. require('v.libv').get_selected(''), 'n', true)
-        end,
+        function() vim.api.nvim_feedkeys(':TaskRun! ' .. libv.get_selected(''), 'n', true) end,
     })
 
     -- Save and restore workspace config
