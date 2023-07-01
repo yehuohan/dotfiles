@@ -319,6 +319,7 @@ local entry = async(function(kt, bang)
     wsc.hl_ansi_sgr = false
     wsc.out_rawdata = false
     require('v.task').run(wsc)
+    libv.recall(function() require('v.task').run(wsc) end)
 end)
 
 --- Entry of fzer.fuzzier task
@@ -365,6 +366,7 @@ local entry_fuzzier = async(function(kt)
     -- Run fzer.fuzzier task
     local ty = _maps_fuzzier[kt.E]
     fzer[wsc.fuzzier](ty, rep)
+    libv.recall(function() fzer[wsc.fuzzier](ty, rep) end)
 end)
 
 local function setup()

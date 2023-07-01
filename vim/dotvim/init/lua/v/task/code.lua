@@ -380,6 +380,7 @@ local entry = async(function(kt, bang)
         cfg.qf_append = false
         cfg.qf_title = 'v.task.code'
         require('v.task').run(cfg)
+        libv.recall(function() require('v.task').run(cfg) end)
     end, wsc)
     if not ok then
         vim.notify(tostring(msg))

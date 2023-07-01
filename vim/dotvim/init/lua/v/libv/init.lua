@@ -2,13 +2,13 @@
 local M = {}
 
 --- An useful configer
-function M.new_configer(opt)
-    if type(opt) ~= 'table' then
+function M.new_configer(configer)
+    if type(configer) ~= 'table' then
         error('Initial config shoule be a table')
     end
 
     -- Create initial values
-    local initialization = vim.deepcopy(opt)
+    local initialization = vim.deepcopy(configer)
 
     -- Config's non-savable options
     local non_savable_config = function()
@@ -89,7 +89,7 @@ function M.new_configer(opt)
         setmetatable(C, non_savable_config())
     end
 
-    return setmetatable(opt, C)
+    return setmetatable(configer, C)
 end
 
 --- A channel lines processor for terminal's stdout
@@ -201,6 +201,30 @@ function M.get_selected(sep)
     end
 end
 
+local __cmdfn
+--- Store/recall command or function
+--- @param cmdfn(string|function) Vim command string or function
+--- @param opts(table|nil) Vim command string or function
+---     - feedcmd(boolean) Feed command into command line
+function M.recall(cmdfn, opts)
+    if cmdfn then
+        -- Store
+        __cmdfn = cmdfn
+    else
+        -- Recall
+        local feedcmd = opts and opts.feedcmd
+        if type(__cmdfn) == 'function' then
+            __cmdfn()
+        elseif type(__cmdfn) == 'string' then
+            if feedcmd then
+                vim.api.nvim_feedkeys(__cmdfn, 'n', false)
+            else
+                vim.cmd(__cmdfn)
+            end
+        end
+    end
+end
+
 --------------------------------------------------------------------------------
 -- async
 --------------------------------------------------------------------------------
@@ -255,7 +279,7 @@ local _u = {}
 M.u = _u
 
 --- Split string arguments with blanks
---- Currently each arg can't contain any blanks.
+--- Attention: currently each arg can't contain any blanks.
 --- @return table List of arguments
 function _u.str2arg(str) return vim.split(str, '%s+', { trimempty = true }) end
 
