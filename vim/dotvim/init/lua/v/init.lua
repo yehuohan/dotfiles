@@ -29,12 +29,52 @@ local function init_env()
     end
 end
 
+local function setup(dotvim)
+    vim.env.DotVimDir = dotvim
+    vim.env.DotVimInit = dotvim .. '/init'
+    vim.env.DotVimVimL = dotvim .. '/init/viml'
+    vim.env.DotVimMisc = dotvim .. '/misc'
+    vim.env.DotVimLocal = dotvim .. '/local'
+    vim.env.NVimConfigDir = vim.fn.stdpath('config')
+    init_env()
+
+    if IsWin() then
+        vim.g.python3_host_prog = vim.env.APPS_HOME .. '/_packs/apps/python/current/python.exe'
+        vim.g.node_host_prog = vim.env.DotVimLocal .. '/node_modules/neovim/bin/cli.js'
+    else
+        vim.g.python3_host_prog = '/usr/bin/python3'
+        vim.g.node_host_prog = vim.env.DotVimLocal .. '/node_modules/neovim/bin/cli.js'
+    end
+    vim.o.encoding = 'utf-8'
+    vim.g.mapleader = ' '
+    vim.keymap.set('n', ';', ':', { noremap = true })
+    vim.keymap.set('v', ';', ':', { noremap = true })
+    vim.keymap.set('n', ':', ';', { noremap = true })
+    vim.keymap.set('', '<CR>', '<CR>', { remap = true })
+    vim.keymap.set('', '<Tab>', '<Tab>', { remap = true })
+
+    vim.cmd([[
+function! IsVim()
+    return !(has('nvim'))
+endfunction
+function! IsWin()
+    return (has('win32') || has('win64'))
+endfunction
+function! IsNVim()
+    return has('nvim')
+endfunction
+function! SvarUse()
+    return v:lua.require('v.use').get()
+endfunction
+]])
+    require('v.use').setup()
+    vim.cmd.source(vim.env.DotVimVimL .. '/pkgs.vim')
+    require('v.pkgs').setup()
+    require('v.task').setup()
+    vim.cmd.source(vim.env.DotVimVimL .. '/mods.vim')
+    vim.cmd.source(vim.env.DotVimVimL .. '/sets.vim')
+end
+
 return {
-    setup = function()
-        init_env()
-        require('v.use').setup()
-        vim.cmd.source(vim.env.DotVimVimL .. '/pkgs.vim')
-        require('v.pkgs').setup()
-        require('v.task').setup()
-    end,
+    setup = setup,
 }

@@ -15,8 +15,8 @@ if [[ `uname` == "Linux" ]]; then
     cp -r ~/dotvim/init                             ./vim/dotvim/
     cp -r ~/dotvim/snips                            ./vim/dotvim/
     cp -r ~/dotvim/misc                             ./vim/dotvim/
-    cp ~/.config/nvim/init.vim                      ./vim/nvim/
-    #cp ~/.config/nvim/init.lua                      ./vim/nvim/
+    cp ~/.config/nvim/init.lua                      ./vim/nvim/
+    #cp ~/.config/nvim/init.vim                      ./vim/nvim/
     # zsh
     cp ~/.zshrc                                     ./root/home/
     cp ~/.zprofile                                  ./root/home/
@@ -80,8 +80,8 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp -r $APPS_HOME/dotvim/init                    ./vim/dotvim/
     cp -r $APPS_HOME/dotvim/snips                   ./vim/dotvim/
     cp -r $APPS_HOME/dotvim/misc                    ./vim/dotvim/
-    cp $LOCALAPPDATA/nvim/init.vim                  ./vim/nvim/
-    #cp $LOCALAPPDATA/nvim/init.lua                  ./vim/nvim/
+    cp $LOCALAPPDATA/nvim/init.lua                  ./vim/nvim/
+    #cp $LOCALAPPDATA/nvim/init.vim                  ./vim/nvim/
 
     # gw
     cp $APPS_HOME/msys64/ucrt64.ini                         ./disk/msys2/

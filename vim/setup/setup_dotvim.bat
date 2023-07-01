@@ -2,21 +2,21 @@
 
 for %%i in ("%~dp0\..\") do set DIR_VIM=%%~dpi
 set DIR_DOT=%APPS_HOME%\dotvim
-:: set InitFile=init.lua
-set InitFile=init.vim
+set InitFile=init.lua
+REM set InitFile=init.vim
 
 echo DIR_VIM: %DIR_VIM%
 echo DIR_DOT: %DIR_DOT%
 echo Init file: %InitFile%
 
-:: check APPS_HOME
+REM check APPS_HOME
 if not defined APPS_HOME (
     echo ERROR: "APPS_HOME" is not set
     pause
     exit
 )
 
-:: check DIR_VIM
+REM check DIR_VIM
 if not exist %DIR_VIM%\dotvim (
     echo ERROR: "%DIR_VIM%\dotvim" is not existed
     pause
@@ -28,13 +28,13 @@ if not exist %DIR_VIM%\nvim\%InitFile% (
     exit
 )
 
-:: copy dotvim
+REM copy dotvim
 if not exist %DIR_DOT% (
     md %DIR_DOT%
 )
 xcopy %DIR_VIM%\dotvim              %DIR_DOT%\ /E /R /Y
 
-:: copy nvim
+REM copy nvim
 if not exist %LOCALAPPDATA%\nvim (
     md %LOCALAPPDATA%\nvim
 )

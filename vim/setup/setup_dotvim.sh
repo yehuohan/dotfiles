@@ -2,8 +2,8 @@
 
 DIR_VIM=$(readlink -f "$(dirname "$0")/../")
 DIR_DOT=~/dotvim
-# InitFile=init.lua
-InitFile=init.vim
+InitFile=init.lua
+# InitFile=init.vim
 
 echo DIR_VIM: $DIR_VIM
 echo DIR_DOT: $DIR_DOT
