@@ -675,7 +675,7 @@ local function pkg_lazy()
         -- Component
         {
             'rebelot/heirline.nvim',
-            config = require('v.nstl').setup,
+            config = require('v.pkgs.nstl').setup,
             dependencies = { 'yehuohan/popc' },
         },
         { 'goolord/alpha-nvim', config = pkg_alpha },
@@ -761,7 +761,7 @@ local function pkg_lazy()
         {
             'hrsh7th/nvim-cmp',
             enabled = use.nlsp,
-            config = require('v.nlsp').setup,
+            config = require('v.pkgs.nlsp').setup,
             event = { 'InsertEnter', 'CmdlineEnter' },
             dependencies = {
                 'williamboman/mason.nvim',
