@@ -61,8 +61,17 @@ end
 local fzer = {
     rg = 'rg --vimgrep -F {opt} -e "{pat}" {loc}',
     _fzf = {
-        file = ':FzfFiles {pat}',
-        live = ':FzfRg {pat}',
+        file = ':FzfFiles {loc}',
+        live = function(rep)
+            if IsWin() then
+                rep.loc = string.gsub(rep.loc, '/', '\\') -- Fzf preview need '\' path
+            end
+            local grep_cmd = replace(
+                'rg --column --line-number --no-heading --color=always --smart-case {opt} -e "{pat}" {loc}',
+                rep
+            )
+            vim.fn['fzf#vim#grep'](grep_cmd, vim.fn['fzf#vim#with_preview'](), 0)
+        end,
         tags = ':FzfTags {pat}',
     },
     _leaderf = {
@@ -77,17 +86,27 @@ local fzer = {
     },
 }
 
-function fzer.fzf(ty, rep)
-    -- fzf#vim#files(dir)
-    -- fzf#vim#grep(replace(fzer.rg, rep))
-    -- fzf#vim#tags(query)
-    local cmd = replace(fzer._fzf[ty], rep)
-    vim.cmd(cmd)
+function fzer.fzf(ty, args)
+    local rep = {
+        pat = args.pat,
+        loc = table.concat(args.loc, ' '),
+        opt = table.concat(args.opt, ' '),
+    }
+    local strfn = fzer._fzf[ty]
+    if type(strfn) == 'function' then
+        fzer._fzf[ty](rep)
+    elseif type(strfn) == 'string' then
+        local cmd = replace(strfn, rep)
+        vim.cmd(cmd)
+    end
 end
 
-function fzer.leaderf(ty, rep)
-    rep.loc = table.concat(rep.loc, ' ')
-    rep.opt = table.concat(rep.opt, ' ')
+function fzer.leaderf(ty, args)
+    local rep = {
+        pat = args.pat,
+        loc = table.concat(args.loc, ' '),
+        opt = table.concat(args.opt, ' '),
+    }
     local cmd = replace(fzer._leaderf[ty], rep)
     vim.cmd(cmd)
 end
@@ -155,9 +174,11 @@ local _sels = {
     },
     evt = function(name)
         if name == 'onCR' then
-            wsc.path = vim.fs.normalize(vim.fn.fnamemodify(wsc.path, ':p'))
-            if wsc.path ~= '' and (not vim.tbl_contains(wsc.pathlst, wsc.path)) then
-                table.insert(wsc.pathlst, wsc.path)
+            if wsc.path ~= '' then
+                wsc.path = vim.fs.normalize(vim.fn.fnamemodify(wsc.path, ':p'))
+                if not vim.tbl_contains(wsc.pathlst, wsc.path) then
+                    table.insert(wsc.pathlst, wsc.path)
+                end
             end
             wsc:reinit(wsc:get())
         end

@@ -90,7 +90,7 @@ local function patout(file, pattern)
     end
 end
 
--- Task functions
+--- All task functions
 local task = {}
 
 function task.nvim(cfg)
@@ -100,7 +100,6 @@ function task.nvim(cfg)
         vim.cmd.source('%')
         throw('Source completed', 0)
     else
-        -- Take as lua forcefully
         cfg.type = 'lua'
         cfg.efm = codes.lua.efm
 
