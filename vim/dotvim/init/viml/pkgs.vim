@@ -49,6 +49,20 @@ let g:VM_custom_remaps = {
     \ }
 " }}}
 
+" easy-align {{{ 字符对齐
+let g:easy_align_bypass_fold = 1
+let g:easy_align_ignore_groups = []     " 默认任何group都进行对齐
+" 默认对齐内含段落（Text Object: vip）
+nmap <leader>al <Plug>(LiveEasyAlign)ip
+xmap <leader>al <Plug>(LiveEasyAlign)
+":EasyAlign[!] [N-th] DELIMITER_KEY [OPTIONS]
+":EasyAlign[!] [N-th]/REGEXP/[OPTIONS]
+nnoremap <leader><leader>a vip:EasyAlign<Space>*//l0><Left><Left><Left><Left>
+vnoremap <leader><leader>a :EasyAlign<Space>*//l0><Left><Left><Left><Left>
+nnoremap <leader><leader>A vip:EasyAlign<Space>
+vnoremap <leader><leader>A :EasyAlign<Space>
+" }}}
+
 " traces {{{ 预览增强
 " 支持:s, :g, :v, :sort, :range预览
 let g:traces_num_range_preview = 1      " 支持范围:N,M预览

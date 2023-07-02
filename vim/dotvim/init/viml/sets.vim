@@ -48,7 +48,7 @@ set nowritebackup                       " 覆盖文件前，不生成备份文�
 set autochdir                           " 自动切换当前目录为当前文件所在的目录
 set noautowrite                         " 禁止自动保存文件
 set noautowriteall                      " 禁止自动保存文件
-set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
+set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,latin1
                                         " 解码尝试序列
 set fileformat=unix                     " 以unix格式保存文本文件，即CR作为换行符
 set magic                               " 默认使用magic匹配
@@ -63,7 +63,6 @@ set spelllang=en_us                     " 设置拼写语言
 set visualbell                          " 使用可视响铃代替鸣声
 set noerrorbells                        " 关闭错误信息响铃
 set belloff=all                         " 关闭所有事件的响铃
-set helplang=en,cn                      " help-doc顺序
 set timeout                             " 打开映射超时检测
 set ttimeout                            " 打开键码超时检测
 set timeoutlen=1000                     " 映射超时时间为1000ms
@@ -282,6 +281,12 @@ endif
 
 " Mappings {{{
 " Misc {{{
+nnoremap <leader>.         :call ExecLast(1)<CR>
+nnoremap <leader><leader>. :call ExecLast(0)<CR>
+nnoremap <C-;> @:
+vnoremap <leader><leader>; <Cmd>call feedkeys(':' . GetSelected(''), 'n')<CR>
+vnoremap <leader><leader>: <Cmd>call feedkeys(':lua ' . GetSelected(''), 'n')<CR>
+nnoremap <leader><leader>q :lua os.exit(0)
 nnoremap ' `
 nnoremap ` '
 " 回退操作

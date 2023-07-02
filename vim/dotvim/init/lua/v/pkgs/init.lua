@@ -280,7 +280,7 @@ local function pkg_mini()
     require('mini.align').setup({
         mappings = {
             start = '',
-            start_with_preview = '<leader>al',
+            start_with_preview = 'ga',
         },
     })
 
@@ -670,6 +670,7 @@ local function pkg_lazy()
         },
         { 'andymass/vim-matchup' },
         { 'mg979/vim-visual-multi' },
+        { 'junegunn/vim-easy-align' },
         { 'markonm/traces.vim' },
 
         -- Component
