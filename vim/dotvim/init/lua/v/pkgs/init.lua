@@ -623,18 +623,15 @@ local function pkg_lazy()
     local bundle = vim.env.DotVimDir .. '/bundle'
     clone_lazy(url, bundle)
 
+    -- Autocmd group for pkgs
+    vim.api.nvim_create_augroup('Pkgs', { clear = true })
+
     local opts = {
         root = bundle,
-        defaults = {
-            lazy = false,
-        },
+        defaults = { lazy = false },
         lockfile = vim.env.DotVimLocal .. '/lazy/lazy-lock.json',
-        git = {
-            url_format = url .. '/%s.git',
-        },
-        install = {
-            missing = false,
-        },
+        git = { url_format = url .. '/%s.git' },
+        install = { missing = false },
         readme = {
             root = vim.env.DotVimLocal .. '/lazy/readme',
             skip_if_doc_exists = false,
@@ -837,9 +834,8 @@ local function pkg_lazy()
         { 'brglng/vim-im-select' },
     }, opts)
 
-    vim.api.nvim_create_augroup('PkgLazy', { clear = true })
     vim.api.nvim_create_autocmd('ColorScheme', {
-        group = 'PkgLazy',
+        group = 'Pkgs',
         callback = function()
             vim.api.nvim_set_hl(0, 'CursorWord', { ctermbg = 60, bg = '#505060' })
             vim.api.nvim_set_hl(0, 'TranslatorBorder', { link = 'Constant' })
