@@ -61,26 +61,33 @@ function M.run(cfg)
     task:start()
 end
 
+--- Run task command
+function M.run_cmd(cmd, bang)
+    local cfg = {
+        cmd = cmd,
+        wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
+        qf_save = false,
+        qf_open = true,
+        qf_jump = false,
+        qf_scroll = true,
+        qf_append = false,
+        qf_title = 'v.task',
+        connect_pty = true,
+        hl_ansi_sgr = true,
+        out_rawdata = false,
+        verbose = bang and 'a',
+    }
+    M.run(cfg)
+end
+
 function M.setup()
     -- Setup task commands
     vim.api.nvim_create_user_command('TaskWsc', function() vim.print(M.wsc) end, { nargs = 0 })
-    vim.api.nvim_create_user_command('TaskRun', function(opts)
-        local cfg = {
-            cmd = opts.args,
-            wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
-            qf_save = false,
-            qf_open = true,
-            qf_jump = false,
-            qf_scroll = true,
-            qf_append = false,
-            qf_title = 'v.task',
-            connect_pty = true,
-            hl_ansi_sgr = true,
-            out_rawdata = false,
-            verbose = opts.bang and 'a',
-        }
-        M.run(cfg)
-    end, { bang = true, nargs = 1, complete = 'shellcmd' })
+    vim.api.nvim_create_user_command(
+        'TaskRun',
+        function(opts) M.run_cmd(opts.args, opts.bang) end,
+        { bang = true, nargs = 1, complete = 'shellcmd' }
+    )
     libv.m.nnore({ '<leader><leader>r', ':TaskRun<Space>' })
     libv.m.nnore({ '<leader><leader>R', ':TaskRun!<Space>' })
     libv.m.vnore({

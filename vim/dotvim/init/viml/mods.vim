@@ -171,8 +171,8 @@ vnoremap <leader><leader>; <Cmd>call feedkeys(':' . GetSelected(''), 'n')<CR>
 vnoremap <leader><leader>: <Cmd>call feedkeys(':lua ' . GetSelected(''), 'n')<CR>
 " }}}
 
-" Workspace {{{
 if IsVim()
+" Workspace {{{
 " Struct s:ws {{{
 let s:ws = {'root': '', 'rp': {}, 'fw': {}}
 let s:wsd = {
@@ -1006,7 +1006,6 @@ for key in s:fw_mappings_fuzzy
 endfor
 nnoremap <leader>fk :call FindWKill()<CR>
 " }}}
-endif
 " }}}
 
 " Scripts {{{
@@ -1015,7 +1014,7 @@ let s:rs = {
     \ 'sel' : {
         \ 'opt' : 'select scripts to run',
         \ 'lst' : [
-            \ 'retab',
+            \ 'retab!',
             \ '%s/\s\+$//ge',
             \ '%s/\r//ge',
             \ 'edit ++enc=utf-8',
@@ -1027,7 +1026,7 @@ let s:rs = {
             \ 'clearUndo',
             \ ],
         \ 'dic' : {
-            \ 'retab' : 'retab with expandtab',
+            \ 'retab!' : 'retab with expandtab',
             \ '%s/\s\+$//ge' : 'remove trailing space',
             \ '%s/\r//ge' : 'remove ^M',
             \ 'execAssembly' : {
@@ -1227,3 +1226,4 @@ noremap <leader>egv <Cmd>call FnEvalStr('eval', 'l', 'c')<CR>
 noremap <leader>eu  <Cmd>call FnEvalStr('luaeval', 'l', 'a')<CR>
 noremap <leader>egu <Cmd>call FnEvalStr('luaeval', 'l', 'c')<CR>
 " }}}
+endif

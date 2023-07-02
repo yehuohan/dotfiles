@@ -71,6 +71,7 @@ endfunction
     vim.cmd.source(vim.env.DotVimVimL .. '/pkgs.vim')
     require('v.pkgs').setup()
     require('v.task').setup()
+    require('v.misc').setup()
     vim.cmd.source(vim.env.DotVimVimL .. '/mods.vim')
     vim.cmd.source(vim.env.DotVimVimL .. '/sets.vim')
 end
