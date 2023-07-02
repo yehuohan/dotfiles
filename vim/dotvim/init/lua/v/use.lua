@@ -38,7 +38,16 @@ local function use_init()
     -- Init with empty dict '{}' to indicate sub-selection
     local udic = vim.tbl_map(function() return vim.empty_dict() end, use)
     -- Set xgit
-    udic.xgit = { lst = { vim.v.null, 'https://kgithub.com' } }
+    udic.xgit = {
+        lst = {
+            vim.v.null,
+            'https://kgithub.com',
+            'https://hub.fgit.ml',
+            'https://hub.njuu.cf',
+            'https://hub.nuaa.cf',
+            'https://hub.yzuu.cf',
+        },
+    }
     -- Set ui
     local fontlst = {
         'Consolas',
