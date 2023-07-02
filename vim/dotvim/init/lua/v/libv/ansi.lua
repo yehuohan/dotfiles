@@ -169,6 +169,4 @@ local function new()
     return ansi
 end
 
-return {
-    new = new,
-}
+return { new = new }

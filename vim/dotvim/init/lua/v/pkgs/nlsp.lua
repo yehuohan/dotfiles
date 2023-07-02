@@ -1,4 +1,4 @@
-local use = require('v.use').get()
+local use = require('v.use')
 local m = require('v.libv').m
 
 local function __servers()

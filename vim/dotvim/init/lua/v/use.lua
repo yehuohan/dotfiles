@@ -82,11 +82,12 @@ local function use_init()
     })
 end
 
-return {
+local M = setmetatable({
     setup = function()
-        vim.api.nvim_create_user_command('Use', 'lua require("v.use").cfg()', { nargs = 0 })
+        vim.api.nvim_create_user_command('Use', use_init, { nargs = 0 })
         use_load()
     end,
     get = function() return use end,
-    cfg = use_init,
-}
+}, { __index = function(t, k) return use[k] end })
+
+return M

@@ -415,6 +415,4 @@ local function setup()
     end, { nargs = 0 })
 end
 
-return {
-    setup = setup,
-}
+return { setup = setup }

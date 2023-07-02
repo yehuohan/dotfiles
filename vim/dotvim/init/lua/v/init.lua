@@ -76,6 +76,4 @@ endfunction
     vim.cmd.source(vim.env.DotVimVimL .. '/sets.vim')
 end
 
-return {
-    setup = setup,
-}
+return { setup = setup }

@@ -1,4 +1,4 @@
-local use = require('v.use').get()
+local use = require('v.use')
 local m = require('v.libv').m
 
 --- Symbols
@@ -402,6 +402,4 @@ local function setup()
     m.nnore({ '<leader>ty', toggle_layout })
 end
 
-return {
-    setup = setup,
-}
+return { setup = setup }

@@ -190,6 +190,4 @@ local function setup()
     m.nore({ '<leader>egu', function() eval_math('luaeval', true) end })
 end
 
-return {
-    setup = setup,
-}
+return { setup = setup }
