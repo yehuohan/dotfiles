@@ -210,6 +210,7 @@ augroup SetupCmd
     autocmd BufLeave * call s:onWinAlter(v:false)
 if IsNVim()
     autocmd TextYankPost * silent! lua vim.highlight.on_yank{higroup='IncSearch', timeout=200}
+    autocmd BufNewFile,BufRead *.vert,*.tesc,*.tese,*.glsl,*.geom,*.frag,*.comp,*.rgen,*.rmiss,*.rchit,*.rahit,*.rint,*.rcall set filetype=glsl
 endif
 augroup END
 " }}}

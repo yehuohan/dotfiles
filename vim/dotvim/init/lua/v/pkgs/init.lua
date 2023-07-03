@@ -153,7 +153,7 @@ local function pkg_alpha()
                 type = 'group',
                 val = {
                     tpl.file_button('$DotVimInit/lua/v/init.lua', 'c'),
-                    tpl.file_button('$NVimConfigDir/init.vim', 'd'),
+                    tpl.file_button('$NVimConfigDir/init.lua', 'd'),
                     tpl.file_button('$DotVimLocal/todo.md', 'o'),
                 },
             },

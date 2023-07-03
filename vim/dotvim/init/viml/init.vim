@@ -35,6 +35,18 @@ let $DotVimMisc=$DotVimDir . '/misc'
 let $DotVimLocal=$DotVimDir . '/local'
 set rtp^=$DotVimDir
 
+if IsNVim()
+    let $NVimConfigDir=stdpath('config')
+if IsWin()
+    let g:python3_host_prog = $APPS_HOME . '/_packs/apps/python/current/python.exe'
+    let g:node_host_prog = $DotVimLocal . '/node_modules/neovim/bin/cli.js'
+else
+    let g:python3_host_prog = '/usr/bin/python3'
+    let g:node_host_prog = $DotVimLocal . '/node_modules/neovim/bin/cli.js'
+endif
+    let &packpath = &rtp
+endif
+
 set encoding=utf-8                      " 内部使用utf-8编码
 set nocompatible                        " 不兼容vi
 let mapleader="\<Space>"                " Space leader
