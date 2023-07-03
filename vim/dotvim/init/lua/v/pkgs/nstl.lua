@@ -391,7 +391,7 @@ local function setup()
     vim.api.nvim_create_user_command('NStlReset', reset, { nargs = 0 })
 
     vim.api.nvim_create_autocmd('ColorScheme', {
-        group = 'Pkgs',
+        group = 'v.Pkgs',
         callback = function()
             local colors = load_colors()
             require('heirline.utils').on_colorscheme(colors)

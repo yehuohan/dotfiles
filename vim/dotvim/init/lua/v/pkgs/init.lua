@@ -495,7 +495,7 @@ local function pkg_treesitter()
     m.nnore({
         '<leader>sh',
         function()
-            vim.cmd([[TSBufToggle highlight]])
+            vim.cmd.TSBufToggle('highlight')
             local buf = vim.api.nvim_get_current_buf()
             local res = require('vim.treesitter.highlighter').active[buf]
             vim.notify('Treesitter highlight is ' .. (res and 'enabled' or 'disabled'))
@@ -504,7 +504,7 @@ local function pkg_treesitter()
     m.nnore({
         '<leader>si',
         function()
-            vim.cmd([[TSBufToggle indent]])
+            vim.cmd.TSBufToggle('indent')
             local res = vim.bo.indentexpr == 'nvim_treesitter#indent()'
             vim.notify('Treesitter indent is ' .. (res and 'enabled' or 'disabled'))
         end,
@@ -624,7 +624,7 @@ local function pkg_lazy()
     clone_lazy(url, bundle)
 
     -- Autocmd group for pkgs
-    vim.api.nvim_create_augroup('Pkgs', { clear = true })
+    vim.api.nvim_create_augroup('v.Pkgs', { clear = true })
 
     local opts = {
         root = bundle,
@@ -835,7 +835,7 @@ local function pkg_lazy()
     }, opts)
 
     vim.api.nvim_create_autocmd('ColorScheme', {
-        group = 'Pkgs',
+        group = 'v.Pkgs',
         callback = function()
             vim.api.nvim_set_hl(0, 'CursorWord', { ctermbg = 60, bg = '#505060' })
             vim.api.nvim_set_hl(0, 'TranslatorBorder', { link = 'Constant' })

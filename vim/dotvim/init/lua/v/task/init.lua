@@ -100,14 +100,14 @@ function M.setup()
     })
 
     -- Save and restore workspace config
-    vim.api.nvim_create_augroup('TaskWorkSpace', { clear = true })
+    vim.api.nvim_create_augroup('v.Task', { clear = true })
     vim.api.nvim_create_autocmd('User', {
-        group = 'TaskWorkSpace',
+        group = 'v.Task',
         pattern = 'PopcLayerWksSavePre',
         callback = function() vim.fn['popc#layer#wks#SetSettings'](M.wsc) end,
     })
     vim.api.nvim_create_autocmd('User', {
-        group = 'TaskWorkSpace',
+        group = 'v.Task',
         pattern = 'PopcLayerWksLoaded',
         callback = function()
             M.wsc = vim.tbl_deep_extend('force', M.wsc, vim.fn['popc#layer#wks#GetSettings']())
@@ -120,7 +120,7 @@ function M.setup()
 
     -- Setup quickfix window
     vim.api.nvim_create_autocmd('BufWinEnter', {
-        group = 'TaskWorkSpace',
+        group = 'v.Task',
         callback = function(args)
             local qf = vim.fn.getqflist({ winid = 0, qfbufnr = 0, title = 0 })
             if qf.qfbufnr ~= args.buf then

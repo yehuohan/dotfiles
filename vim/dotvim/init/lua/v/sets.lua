@@ -89,7 +89,7 @@ end
 
 local opts = {
     conceallevel = { 2, 0 },
-    virtualedit = { 'all', '' },
+    virtualedit = { { 'all' }, { '' } },
     laststatus = { 2, 3 },
     number = function()
         if vim.o.number and vim.o.relativenumber then
@@ -104,26 +104,27 @@ local opts = {
         end
     end,
     syntax = function()
-        if fn.exists('g:syntax_on') then
-            vim.cmd.syntax({ args = 'off' })
+        if fn.exists('g:syntax_on') == 1 then
+            vim.cmd.syntax({ args = { 'off' } })
             vim.notify('syntax off')
         else
-            vim.cmd.syntax({ args = 'on' })
+            vim.cmd.syntax({ args = { 'on' } })
             vim.notify('syntax on')
         end
     end,
 }
 
 local function opt_inv(opt)
-    vim.bo[opt] = not vim.bo[opt]
-    vim.notify(('%s = %s'):format(opt, vim.bo[opt]))
+    vim.opt_local[opt] = not vim.opt_local[opt]:get()
+    vim.notify(('%s = %s'):format(opt, vim.opt_local[opt]:get()))
 end
 
 local function opt_lst(opt)
-    local values = opts[opt]
-    local idx = fn.index(values, vim.bo[opt])
-    vim.bo[opt] = values[(idx + 1) % #values]
-    vim.notify(('%s = %s'):format(opt, vim.bo[opt]))
+    local vals = opts[opt]
+    local idx = fn.index(vals, vim.opt_local[opt]:get())
+    idx = (idx + 1) % #vals
+    vim.opt_local[opt] = vals[idx + 1]
+    vim.notify(('%s = %s'):format(opt, vim.inspect(vals[idx + 1])))
 end
 
 --------------------------------------------------------------------------------
@@ -139,6 +140,45 @@ local function on_large_file()
     else
         vim.opt.eventignore:remove('FileType')
     end
+end
+
+local function on_alter_enter()
+    if vim.b.alter_view and (vim.bo.filetype ~= 'qf') and not vim.wo.diff then
+        vim.fn.winrestview(vim.b.alter_view)
+        vim.b.alter_view = nil
+    end
+end
+
+local function on_alter_leave()
+    if (vim.bo.filetype ~= 'qf') and not vim.wo.diff then
+        vim.b.alter_view = vim.fn.winsaveview()
+    end
+end
+
+local function set_default_autocmds()
+    -- stylua: ignore start
+    api.nvim_create_autocmd('BufNewFile', { group = 'v.Sets', command = 'setlocal fileformat=unix' })
+    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.nvim' }, command = 'setlocal filetype=vim' })
+    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.usf', '*.ush' }, command = 'setlocal filetype=hlsl' })
+    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.uproject', '*.uplugin' }, command = 'setlocal filetype=jsonc' })
+    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = {
+            '*.vert', '*.tesc', '*.tese', '*.glsl', '*.geom', '*.frag', '*.comp',
+            '*.rgen', '*.rmiss', '*.rchit', '*.rahit', '*.rint', '*.rcall',
+        },
+        command = 'setlocal filetype=glsl',
+    })
+    api.nvim_create_autocmd('Filetype', { group = 'v.Sets', pattern = { 'vim', 'tex' }, command = 'setlocal foldmethod=marker' })
+    api.nvim_create_autocmd('Filetype', { group = 'v.Sets', pattern = { 'c', 'cpp', 'rust', 'glsl', 'hlsl' }, command = 'setlocal foldmethod=syntax' })
+    api.nvim_create_autocmd('Filetype', { group = 'v.Sets', pattern = { 'python' }, command = 'setlocal foldmethod=indent foldignore=' })
+    api.nvim_create_autocmd('Filetype', { group = 'v.Sets', pattern = { 'txt', 'log' }, command = 'setlocal foldmethod=manual' })
+    api.nvim_create_autocmd('TextYankPost', {
+        group = 'v.Sets',
+        callback = function() vim.highlight.on_yank({ higroup = 'IncSearch', timeout = 200 }) end,
+    })
+    api.nvim_create_autocmd('BufReadPre', { group = 'v.Sets', callback = on_large_file })
+    api.nvim_create_autocmd('BufEnter', { group = 'v.Sets', callback = on_alter_enter })
+    api.nvim_create_autocmd('BufLeave', { group = 'v.Sets', callback = on_alter_leave })
+    -- stylua: ignore end
 end
 
 --------------------------------------------------------------------------------
@@ -167,7 +207,7 @@ local function on_UIEnter()
         m.nnore({ '<leader>tm', [[<Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>]] })
     end
 
-    if fn.exists('g:neovide') then
+    if fn.exists('g:neovide') == 1 then
         vim.g.neovide_remember_window_size = true
         vim.g.neovide_cursor_antialiasing = false
         vim.g.neovide_cursor_vfx_mode = 'railgun'
@@ -180,6 +220,20 @@ end
 
 local function setup()
     set_default_opts()
+    m.nnore({ '<leader>iw', function() opt_inv('wrap') end })
+    m.nnore({ '<leader>il', function() opt_inv('list') end })
+    m.nnore({ '<leader>ii', function() opt_inv('ignorecase') end })
+    m.nnore({ '<leader>ie', function() opt_inv('expandtab') end })
+    m.nnore({ '<leader>ib', function() opt_inv('scrollbind') end })
+    m.nnore({ '<leader>ip', function() opt_inv('spell') end })
+    m.nnore({ '<leader>ic', function() opt_lst('conceallevel') end })
+    m.nnore({ '<leader>iv', function() opt_lst('virtualedit') end })
+    m.nnore({ '<leader>is', function() opt_lst('laststatus') end })
+    m.nnore({ '<leader>in', opts.number })
+    m.nnore({ '<leader>ih', opts.syntax })
+
+    api.nvim_create_augroup('v.Sets', { clear = true })
+    set_default_autocmds()
 
     vim.o.guioptions = 'M' -- 完全禁用Gui界面元素
     vim.g.did_install_default_menus = 1 -- 禁止加载缺省菜单
@@ -188,8 +242,7 @@ local function setup()
     m.nnore({ '<k0>', function() set_fonts(0) end })
     m.nnore({ '<kPlus>', function() set_fonts(1) end })
     m.nnore({ '<kMinus>', function() set_fonts(-1) end })
-    vim.api.nvim_create_augroup('Sets', { clear = true })
-    vim.api.nvim_create_autocmd('UIEnter', { group = 'Sets', callback = on_UIEnter })
+    api.nvim_create_autocmd('UIEnter', { group = 'v.Sets', callback = on_UIEnter })
 end
 
 return { setup = setup }

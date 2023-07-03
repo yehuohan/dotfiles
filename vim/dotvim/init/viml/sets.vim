@@ -194,12 +194,12 @@ endfunction
 
 augroup SetupCmd
     autocmd!
-    autocmd BufNewFile *                            set fileformat=unix
-    autocmd BufRead,BufNewFile *.nvim               set filetype=vim
-    autocmd BufRead,BufNewFile *.tex                set filetype=tex
-    autocmd BufRead,BufNewFile *.log                set filetype=log
-    autocmd BufRead,BufNewFile *.usf,*.ush          set filetype=hlsl
-    autocmd BufRead,BufNewFile *.uproject,*.uplugin set filetype=jsonc
+    autocmd BufNewFile *                            setlocal fileformat=unix
+    autocmd BufRead,BufNewFile *.nvim               setlocal filetype=vim
+    autocmd BufRead,BufNewFile *.tex                setlocal filetype=tex
+    autocmd BufRead,BufNewFile *.log                setlocal filetype=log
+    autocmd BufRead,BufNewFile *.usf,*.ush          setlocal filetype=hlsl
+    autocmd BufRead,BufNewFile *.uproject,*.uplugin setlocal filetype=jsonc
     autocmd Filetype vim,tex                        setlocal foldmethod=marker
     autocmd Filetype c,cpp,rust                     setlocal foldmethod=syntax
     autocmd Filetype glsl,hlsl                      setlocal foldmethod=syntax
@@ -209,8 +209,8 @@ augroup SetupCmd
     autocmd BufEnter * call s:onWinAlter(v:true)
     autocmd BufLeave * call s:onWinAlter(v:false)
 if IsNVim()
-    autocmd TextYankPost * silent! lua vim.highlight.on_yank{higroup='IncSearch', timeout=200}
     autocmd BufNewFile,BufRead *.vert,*.tesc,*.tese,*.glsl,*.geom,*.frag,*.comp,*.rgen,*.rmiss,*.rchit,*.rahit,*.rint,*.rcall set filetype=glsl
+    autocmd TextYankPost * silent! lua vim.highlight.on_yank{higroup='IncSearch', timeout=200}
 endif
 augroup END
 " }}}
