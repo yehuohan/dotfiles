@@ -243,6 +243,8 @@ local function setup()
     m.nnore({ '<kPlus>', function() set_fonts(1) end })
     m.nnore({ '<kMinus>', function() set_fonts(-1) end })
     api.nvim_create_autocmd('UIEnter', { group = 'v.Sets', callback = on_UIEnter })
+
+    vim.cmd.source(vim.env.DotVimInit .. '/lua/v/maps.vim')
 end
 
 return { setup = setup }

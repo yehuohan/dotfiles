@@ -1,4 +1,16 @@
-let s:use = SvarUse()
+let s:use = exists('*SvarUse') ? SvarUse() : v:lua.require('v.use').get()
+
+if !exists('*IsWin')
+function! IsWin()
+    return (has('win32') || has('win64'))
+endfunction
+endif
+
+if !exists('*IsGw')
+function! IsGw()
+    return has('win32unix')
+endfunction
+endif
 
 " Built-in {{{
 let g:loaded_gzip = 1
@@ -345,7 +357,7 @@ nmap <leader>th <Plug>(quickhl-manual-toggle)
 " }}}
 
 " floaterm {{{ 终端浮窗
-if IsNVim()
+if has('nvim')
 tnoremap <C-l> <C-\><C-n><C-w>
 tnoremap <Esc> <C-\><C-n>
 else

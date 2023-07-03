@@ -165,7 +165,6 @@ endfunction
 " }}}
 " }}}
 
-if IsVim()
 " Workspace {{{
 " Struct s:ws {{{
 let s:ws = {'root': '', 'rp': {}, 'fw': {}}
@@ -1220,4 +1219,3 @@ noremap <leader>egv <Cmd>call FnEvalStr('eval', 'l', 'c')<CR>
 noremap <leader>eu  <Cmd>call FnEvalStr('luaeval', 'l', 'a')<CR>
 noremap <leader>egu <Cmd>call FnEvalStr('luaeval', 'l', 'c')<CR>
 " }}}
-endif

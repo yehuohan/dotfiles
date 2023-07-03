@@ -53,27 +53,12 @@ local function setup(dotvim)
     vim.keymap.set('', '<CR>', '<CR>', { remap = true })
     vim.keymap.set('', '<Tab>', '<Tab>', { remap = true })
 
-    vim.cmd([[
-function! IsVim()
-    return !(has('nvim'))
-endfunction
-function! IsWin()
-    return (has('win32') || has('win64'))
-endfunction
-function! IsNVim()
-    return has('nvim')
-endfunction
-function! SvarUse()
-    return v:lua.require('v.use').get()
-endfunction
-]])
     require('v.use').setup()
     vim.cmd.source(vim.env.DotVimVimL .. '/pkgs.vim')
     require('v.pkgs').setup()
+    require('v.sets').setup()
     require('v.task').setup()
     require('v.misc').setup()
-    vim.cmd.source(vim.env.DotVimVimL .. '/mods.vim')
-    vim.cmd.source(vim.env.DotVimVimL .. '/sets.vim')
 end
 
 return { setup = setup }
