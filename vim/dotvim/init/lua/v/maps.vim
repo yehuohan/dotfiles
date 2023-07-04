@@ -1,9 +1,3 @@
-function ExecMacro(key)
-    let l:mstr = ':normal! @' . a:key
-    execute l:mstr
-    call v:lua.require('v.libv').recall(l:mstr)
-endfunction
-
 " Basic {{{
 nnoremap <leader><leader>q :lua os.exit(0)
 nnoremap <leader>.         :lua require('v.libv').recall()<CR>
@@ -11,6 +5,7 @@ nnoremap <leader><leader>. :lua require('v.libv').recall(nil, { feedcmd = true }
 nnoremap <C-;> @:
 vnoremap <leader><leader>; <Cmd>call feedkeys(':' . v:lua.require('v.libv').get_selected(''), 'n')<CR>
 vnoremap <leader><leader>: <Cmd>call feedkeys(':lua ' . v:lua.require('v.libv').get_selected(''), 'n')<CR>
+" Mark跳转
 nnoremap ' `
 nnoremap ` '
 " 回退操作
@@ -119,48 +114,13 @@ for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m 0 1 2 3 4 5 
     execute printf('nnoremap <leader>''%s "%sp', t, t)
     execute printf('nnoremap <leader>''%s "%sP', toupper(t), t)
     " 快速执行宏
-    execute printf('nnoremap <leader>2%s :call ExecMacro("%s")<CR>', t, t)
+    " execute printf('nnoremap <leader>2%s :call ExecMacro("%s")<CR>', t, t)
+    let s:mstr = ':normal! @' . t
+    execute printf('nnoremap <leader>2%s <Cmd>execute "%s" <Bar> call v:lua.require("v.libv").recall("%s")<CR>', t, s:mstr, s:mstr)
 endfor
 " }}}
 
-" Tab, Buffer, Window {{{
-" FUNCTION: WinGotoNextFloating() {{{ 跳转到下一个floating窗口
-function! WinGotoNextFloating()
-    for l:wid in nvim_list_wins()
-        if l:wid != nvim_get_current_win()
-            let l:cfg = nvim_win_get_config(wid)
-            if get(l:cfg, 'relative', '') != '' && get(l:cfg, 'focusable', v:true) == v:true
-                call win_gotoid(wid)
-            endif
-        endif
-    endfor
-endfunction
-" }}}
-
-" FUNCTION: WinMoveSpliter(dir, inc) range {{{ 移动窗口的分界，改变窗口大小
-" 只有最bottom-right的窗口是移动其top-left的分界，其余窗口移动其bottom-right分界
-function! WinMoveSpliter(dir, inc) range
-    let l:wnr = winnr()
-    let l:pos = win_screenpos(l:wnr)
-    let l:hei = winheight(l:wnr) + l:pos[0] + &cmdheight
-    let l:hei += (empty(&winbar) ? 0 : 1)
-    let l:wid = winwidth(l:wnr) - 1 + l:pos[1]
-    let l:all_hei = &lines
-    let l:all_wid = &columns
-
-    let l:inc = a:inc * v:count1
-    if a:dir ==# 'e'
-        execute printf('resize%s%d', (l:hei >= l:all_hei && l:pos[0] >= 3) ? '+' : '-', l:inc)
-    elseif a:dir ==# 'd'
-        execute printf('resize%s%d', (l:hei >= l:all_hei && l:pos[0] >= 3) ? '-' : '+', l:inc)
-    elseif a:dir ==# 's'
-        execute printf('vertical resize%s%d', l:wid >= l:all_wid ? '+' : '-', l:inc)
-    elseif a:dir ==# 'f'
-        execute printf('vertical resize%s%d', l:wid >= l:all_wid ? '-' : '+', l:inc)
-    endif
-endfunction
-" }}}
-
+" Tab, Window, Buffer {{{
 " tab/buffer切换(使用Popc的tab切换)
 "nnoremap <M-u> gT
 "nnoremap <M-p> gt
@@ -178,7 +138,7 @@ nnoremap <leader>wl <C-w>l
 nnoremap <leader>wp <C-w>p
 nnoremap <leader>wP <C-w>P
 nnoremap <leader>ww <C-w>w
-nnoremap <leader>wf :call WinGotoNextFloating()<CR>
+nnoremap <leader>wf <Cmd>call v:lua.require('v.sets').win_goto_next_floating()<CR>
 " 移动窗口
 nnoremap <leader>wH <C-w>H
 nnoremap <leader>wJ <C-w>J
@@ -187,45 +147,17 @@ nnoremap <leader>wL <C-w>L
 nnoremap <leader>wT <C-w>T
 " 改变窗口大小
 nnoremap <leader>w= <C-w>=
-nnoremap <silent> <M-e> <Cmd>call WinMoveSpliter('e', 5)<CR>
-nnoremap <silent> <M-s> <Cmd>call WinMoveSpliter('s', 5)<CR>
-nnoremap <silent> <M-f> <Cmd>call WinMoveSpliter('f', 5)<CR>
-nnoremap <silent> <M-d> <Cmd>call WinMoveSpliter('d', 5)<CR>
-nnoremap <M-Up> :call WinMoveSpliter('e', 1)<CR>
-nnoremap <M-Down> :call WinMoveSpliter('d', 1)<CR>
-nnoremap <M-Left> :call WinMoveSpliter('s', 1)<CR>
-nnoremap <M-Right> :call WinMoveSpliter('f', 1)<CR>
+nnoremap <silent> <M-e> <Cmd>call v:lua.require('v.sets').win_move_spliter('e', 5)<CR>
+nnoremap <silent> <M-s> <Cmd>call v:lua.require('v.sets').win_move_spliter('s', 5)<CR>
+nnoremap <silent> <M-f> <Cmd>call v:lua.require('v.sets').win_move_spliter('f', 5)<CR>
+nnoremap <silent> <M-d> <Cmd>call v:lua.require('v.sets').win_move_spliter('d', 5)<CR>
+nnoremap <M-Up> <Cmd>call v:lua.require('v.sets').win_move_spliter('e', 1)<CR>
+nnoremap <M-Down> <Cmd>call v:lua.require('v.sets').win_move_spliter('d', 1)<CR>
+nnoremap <M-Left> <Cmd>call v:lua.require('v.sets').win_move_spliter('s', 1)<CR>
+nnoremap <M-Right> <Cmd>call v:lua.require('v.sets').win_move_spliter('f', 1)<CR>
 " }}}
 
 " Quickfix {{{
-" Function: QuickfixType() {{{ quickfix类型
-function! QuickfixType()
-    let l:type = ''
-    if &filetype ==# 'qf'
-        let l:dict = getwininfo(win_getid())
-        if l:dict[0].quickfix && !l:dict[0].loclist
-            let l:type = 'c'
-        elseif l:dict[0].quickfix && l:dict[0].loclist
-            let l:type = 'l'
-        endif
-    endif
-    return l:type
-endfunction
-" }}}
-
-" Function: QuickfixTabEdit() {{{ 新建Tab打开窗口
-function! QuickfixTabEdit()
-    let l:type = QuickfixType()
-    if !empty(l:type)
-        let l:enr = line('.')
-        tabedit
-        execute l:type . 'rewind ' . l:enr
-        silent! normal! zOzz
-        execute 'botright ' . l:type . 'open'
-    endif
-endfunction
-" }}}
-
 nnoremap <leader>qo <Cmd>botright copen<CR>
 nnoremap <leader>qO <Cmd>cclose <Bar> vertical botright copen 55<CR>
 nnoremap <leader>qc
@@ -246,7 +178,7 @@ nnoremap <leader>lj <Cmd>lnext <Bar> silent! normal! zOzz<CR>
 nnoremap <leader>lJ <Cmd>llast <Bar> silent! normal! zOzz<CR>
 nnoremap <leader>lk <Cmd>lprevious <Bar> silent! normal! zOzz<CR>
 nnoremap <leader>lK <Cmd>lfirst <Bar> silent! normal! zOzz<CR>
-nnoremap <leader>qt :call QuickfixTabEdit()<CR>
+nnoremap <leader>qt <Cmd>call v:lua.require('v.sets').qf_tabedit()<CR>
 " 将quickfix中的内容复制location-list
 nnoremap <leader>ql
     \ <Cmd>

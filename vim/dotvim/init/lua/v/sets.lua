@@ -87,7 +87,7 @@ local function set_default_opts()
     -- stylua: ignore end
 end
 
-local opts = {
+local options = {
     conceallevel = { 2, 0 },
     virtualedit = { { 'all' }, { '' } },
     laststatus = { 2, 3 },
@@ -120,7 +120,7 @@ local function opt_inv(opt)
 end
 
 local function opt_lst(opt)
-    local vals = opts[opt]
+    local vals = options[opt]
     local idx = fn.index(vals, vim.opt_local[opt]:get())
     idx = (idx + 1) % #vals
     vim.opt_local[opt] = vals[idx + 1]
@@ -218,7 +218,64 @@ local function on_UIEnter()
     end
 end
 
-local function setup()
+--------------------------------------------------------------------------------
+-- Sets model
+--------------------------------------------------------------------------------
+local M = {}
+
+function M.win_goto_next_floating()
+    for _, wid in ipairs(api.nvim_list_wins()) do
+        if wid ~= api.nvim_get_current_win() then
+            local cfg = api.nvim_win_get_config(wid)
+            if cfg.relative ~= '' and cfg.focusable then
+                fn.win_gotoid(wid)
+            end
+        end
+    end
+end
+
+--- 移动窗口的分界，改变窗口大小
+--- 只有最bottom-right的窗口是移动其top-left的分界，其余窗口移动其bottom-right分界
+function M.win_move_spliter(dir, inc)
+    local pos = api.nvim_win_get_position(0)
+    local hei = pos[1] + 1 + api.nvim_win_get_height(0) + vim.o.cmdheight
+    local wid = pos[2] + api.nvim_win_get_width(0)
+    local max_hei = vim.o.lines
+    local max_wid = vim.o.columns
+
+    inc = inc * vim.v.count1
+    local opts = { args = { '' }, mods = { vertical = false } }
+    if dir == 'e' then
+        opts.args[1] = ('%s%d'):format((hei >= max_hei and pos[1] >= 3) and '+' or '-', inc)
+    elseif dir == 'd' then
+        opts.args[1] = ('%s%d'):format((hei >= max_hei and pos[1] >= 3) and '-' or '+', inc)
+    elseif dir == 's' then
+        opts.args[1] = ('%s%d'):format((wid >= max_wid) and '+' or '-', inc)
+        opts.mods.vertical = true
+    elseif dir == 'f' then
+        opts.args[1] = ('%s%d'):format((wid >= max_wid) and '-' or '+', inc)
+        opts.mods.vertical = true
+    end
+    vim.cmd.resize(opts)
+end
+
+function M.qf_tabedit()
+    if vim.bo.filetype == 'qf' then
+        local wi = vim.fn.getwininfo(vim.fn.win_getid())[1]
+        local ty = (wi.loclist == 0) and 'c' or 'l'
+        local enr = vim.fn.line('.')
+        vim.cmd.tabedit()
+        vim.cmd[ty .. 'rewind']({ count = enr })
+        vim.cmd.normal({
+            args = { 'zOzz' },
+            bang = true,
+            mods = { emsg_silent = true, silent = true },
+        })
+        vim.cmd[ty .. 'open']({ mods = { split = 'botright' } })
+    end
+end
+
+function M.setup()
     set_default_opts()
     m.nnore({ '<leader>iw', function() opt_inv('wrap') end })
     m.nnore({ '<leader>il', function() opt_inv('list') end })
@@ -229,8 +286,8 @@ local function setup()
     m.nnore({ '<leader>ic', function() opt_lst('conceallevel') end })
     m.nnore({ '<leader>iv', function() opt_lst('virtualedit') end })
     m.nnore({ '<leader>is', function() opt_lst('laststatus') end })
-    m.nnore({ '<leader>in', opts.number })
-    m.nnore({ '<leader>ih', opts.syntax })
+    m.nnore({ '<leader>in', options.number })
+    m.nnore({ '<leader>ih', options.syntax })
 
     api.nvim_create_augroup('v.Sets', { clear = true })
     set_default_autocmds()
@@ -247,4 +304,4 @@ local function setup()
     vim.cmd.source(vim.env.DotVimInit .. '/lua/v/maps.vim')
 end
 
-return { setup = setup }
+return M
