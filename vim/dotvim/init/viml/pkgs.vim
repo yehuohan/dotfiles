@@ -75,6 +75,11 @@ nnoremap <leader><leader>A vip:EasyAlign<Space>
 vnoremap <leader><leader>A :EasyAlign<Space>
 " }}}
 
+" expand-region {{{ 快速块选择
+map <M-r> <Plug>(expand_region_expand)
+map <M-w> <Plug>(expand_region_shrink)
+" }}}
+
 " traces {{{ 预览增强
 " 支持:s, :g, :v, :sort, :range预览
 let g:traces_num_range_preview = 1      " 支持范围:N,M预览

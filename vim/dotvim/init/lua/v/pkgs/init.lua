@@ -122,6 +122,12 @@ local function pkg_winpick()
     })
 end
 
+-- 窗口移动
+local function pkg_winshift()
+    require('winshift').setup({})
+    m.nnore({ '<C-m>', ':WinShift<CR>' })
+end
+
 --------------------------------------------------------------------------------
 -- Component
 --------------------------------------------------------------------------------
@@ -207,6 +213,71 @@ local function pkg_notify()
     m.nnore({ '<leader>dm', function() vim.notify.dismiss() end })
 end
 
+-- 代码折叠
+local function pkg_ufo()
+    local ufo = require('ufo')
+    ufo.setup({
+        fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
+            local res = {}
+            local tag = use.ui.patch and '' or '»'
+
+            for k, chunk in ipairs(virtText) do
+                if k == 1 then
+                    -- only match whitespace characters of first chunk
+                    local txt = chunk[1]:match('|| {{{ (.*)') or chunk[1]
+                    local ta, tb = txt:match('(%s*)(.*)')
+                    if ta and tb then
+                        local dwid = vim.fn.strdisplaywidth(ta) - vim.fn.strdisplaywidth(tag)
+                        tag = tag .. ('·'):rep(dwid - 1) .. ' '
+                        txt = tb
+                    end
+                    table.insert(res, { tag, 'Comment' })
+                    table.insert(res, { txt, chunk[2] })
+                else
+                    table.insert(res, chunk)
+                end
+            end
+            table.insert(res, { ('  %d '):format(endLnum - lnum), 'MoreMsg' })
+            return res
+        end,
+        provider_selector = function(bufnr, filetype, buftype) return { 'treesitter', 'indent' } end,
+    })
+    m.nnore({
+        '<leader>tu',
+        function()
+            local bufnr = vim.api.nvim_get_current_buf()
+            if ufo.hasAttached(bufnr) then
+                ufo.detach(bufnr)
+            else
+                ufo.attach(bufnr)
+            end
+        end,
+    })
+    m.nnore({ '<leader>zr', ufo.openAllFolds })
+    m.nnore({ '<leader>zm', ufo.closeAllFolds })
+end
+
+-- QF增强
+local function pkg_bqf()
+    require('bqf').setup({
+        auto_enable = true,
+        preview = { auto_preview = false },
+        func_map = {
+            pscrollup = '<M-m>',
+            pscrolldown = '<M-n>',
+        },
+    })
+end
+
+-- 字体图标选择器
+local function pkg_icon_picker()
+    require('icon-picker').setup({
+        disable_legacy_commands = true,
+    })
+    m.inore({ '<M-w>', '<Cmd>IconPickerInsert<CR>' })
+    m.nnore({ '<leader><leader>i', ':IconPickerInsert<Space>' })
+end
+
 -- 目录树导航
 local function pkg_tree()
     require('nvim-tree').setup({
@@ -275,27 +346,6 @@ local function pkg_tree()
     })
 end
 
--- 对齐，文本对象, 缩进显示
-local function pkg_mini()
-    require('mini.align').setup({
-        mappings = {
-            start = '',
-            start_with_preview = 'ga',
-        },
-    })
-
-    require('mini.ai').setup({})
-
-    local indentscope = require('mini.indentscope')
-    indentscope.setup({
-        draw = {
-            delay = 0,
-            animation = indentscope.gen_animation.none(),
-        },
-        symbol = '⁞',
-    })
-end
-
 -- 模糊查找
 local function pkg_telescope()
     require('telescope').setup({
@@ -319,147 +369,30 @@ local function pkg_telescope()
     m.nnore({ '<leader>nm', ':Telescope oldfiles<CR>' })
 end
 
+-- Mini插件库
+local function pkg_mini()
+    require('mini.align').setup({
+        mappings = {
+            start = '',
+            start_with_preview = 'ga',
+        },
+    })
+
+    require('mini.ai').setup({})
+
+    local indentscope = require('mini.indentscope')
+    indentscope.setup({
+        draw = {
+            delay = 0,
+            animation = indentscope.gen_animation.none(),
+        },
+        symbol = '⁞',
+    })
+end
+
 --------------------------------------------------------------------------------
 -- Coding
 --------------------------------------------------------------------------------
--- 列表视图
-local function pkg_trouble()
-    require('trouble').setup({
-        mode = 'quickfix',
-        icons = true,
-        action_keys = {
-            jump_close = { 'O' },
-            toggle_fold = { 'zA', 'za', 'o' },
-        },
-        auto_preview = false,
-    })
-    m.nnore({ '<leader>vq', ':TroubleToggle quickfix<CR>' })
-    m.nnore({ '<leader>vl', ':TroubleToggle loclist<CR>' })
-end
-
--- 颜色预览
-local function pkg_ccc()
-    m.nnore({ '<leader>tc', ':CccHighlighterToggle<CR>' })
-    m.nnore({ '<leader>lp', ':CccPick<CR>' })
-    local ccc = require('ccc')
-    ccc.setup({
-        disable_default_mappings = true,
-        mappings = {
-            ['<CR>'] = ccc.mapping.complete,
-            ['q'] = ccc.mapping.quit,
-            ['m'] = ccc.mapping.toggle_input_mode,
-            ['f'] = ccc.mapping.toggle_output_mode,
-            ['a'] = ccc.mapping.toggle_alpha,
-            ['l'] = ccc.mapping.increase1,
-            ['o'] = ccc.mapping.increase5,
-            ['L'] = ccc.mapping.increase10,
-            ['h'] = ccc.mapping.decrease1,
-            ['i'] = ccc.mapping.decrease5,
-            ['H'] = ccc.mapping.decrease10,
-        },
-    })
-end
-
--- 自动括号
-local function pkg_autopairs()
-    require('nvim-autopairs').setup({
-        map_cr = false,
-    })
-    m.nnore({
-        '<leader>tp',
-        function()
-            local ap = require('nvim-autopairs').state.disabled
-            print('Auto pairs:', ap)
-            require('nvim-autopairs').state.disabled = not ap
-        end,
-    })
-end
-
--- 批量注释
-local function pkg_comment()
-    require('Comment').setup({
-        toggler = { line = 'gcc', block = 'gbc' },
-        opleader = { line = 'gc', block = 'gb' },
-        mappings = {
-            basic = true,
-            extra = false,
-            extended = false,
-        },
-    })
-    local comment = require('Comment.api')
-    m.nnore({ '<leader>ci', function() comment.toggle.linewise.count(vim.v.count1) end })
-    m.nnore({ '<leader>cl', function() comment.comment.linewise.count(vim.v.count1) end })
-    m.nnore({
-        '<leader>cu',
-        function()
-            -- ignore errors when uncommenting a non-commented line
-            pcall(function() comment.uncomment.linewise.count(vim.v.count1) end)
-        end,
-    })
-end
-
--- 添加包围符
-local function pkg_surround()
-    require('nvim-surround').setup({
-        keymaps = {
-            visual = 'vs',
-            visual_line = 'vS',
-            normal = 'ys',
-            normal_line = 'yS',
-            normal_cur = 'ysl',
-            normal_cur_line = 'ysL',
-            delete = 'ds',
-            change = 'cs',
-        },
-    })
-    m.nmap({ '<leader>sw', 'ysiw' })
-    m.nmap({ '<leader>sW', 'ySiw' })
-end
-
--- 代码折叠
-local function pkg_ufo()
-    local ufo = require('ufo')
-    ufo.setup({
-        fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
-            local res = {}
-            local tag = use.ui.patch and '' or '»'
-
-            for k, chunk in ipairs(virtText) do
-                if k == 1 then
-                    -- only match whitespace characters of first chunk
-                    local txt = chunk[1]:match('|| {{{ (.*)') or chunk[1]
-                    local ta, tb = txt:match('(%s*)(.*)')
-                    if ta and tb then
-                        local dwid = vim.fn.strdisplaywidth(ta) - vim.fn.strdisplaywidth(tag)
-                        tag = tag .. ('·'):rep(dwid - 1) .. ' '
-                        txt = tb
-                    end
-                    table.insert(res, { tag, 'Comment' })
-                    table.insert(res, { txt, chunk[2] })
-                else
-                    table.insert(res, chunk)
-                end
-            end
-            table.insert(res, { ('  %d '):format(endLnum - lnum), 'MoreMsg' })
-            return res
-        end,
-        provider_selector = function(bufnr, filetype, buftype) return { 'treesitter', 'indent' } end,
-    })
-    m.nnore({
-        '<leader>tu',
-        function()
-            local bufnr = vim.api.nvim_get_current_buf()
-            if ufo.hasAttached(bufnr) then
-                ufo.detach(bufnr)
-            else
-                ufo.attach(bufnr)
-            end
-        end,
-    })
-    m.nnore({ '<leader>zr', ufo.openAllFolds })
-    m.nnore({ '<leader>zm', ufo.closeAllFolds })
-end
-
 -- 语法树
 local function pkg_treesitter()
     if vim.fn.empty(use.xgit) == 0 then
@@ -483,9 +416,9 @@ local function pkg_treesitter()
         incremental_selection = {
             enable = true,
             keymaps = {
-                init_selection = '<M-r>',
-                node_incremental = '<M-r>',
-                node_decremental = '<M-w>',
+                init_selection = '<M-g>',
+                node_incremental = '<M-g>',
+                node_decremental = '<M-a>',
                 scope_incremental = '<M-q>',
             },
         },
@@ -510,20 +443,6 @@ local function pkg_treesitter()
         end,
     })
     m.nnore({ '<leader>tr', ':TSBufToggle rainbow<CR>' })
-end
-
--- 代码格式化
-local function pkg_formatter()
-    require('formatter').setup({
-        logging = false,
-        filetype = {
-            c = { require('formatter.defaults.clangformat') },
-            cpp = { require('formatter.defaults.clangformat') },
-            lua = { require('formatter.filetypes.lua').stylua },
-            python = { require('formatter.filetypes.python').black },
-        },
-    })
-    m.nore({ '<leader>fo', ':Format<CR>' })
 end
 
 -- 导步程序/任务
@@ -568,9 +487,132 @@ local function pkg_overseer()
     })
 end
 
+-- 列表视图
+local function pkg_trouble()
+    require('trouble').setup({
+        mode = 'quickfix',
+        icons = true,
+        action_keys = {
+            jump_close = { 'O' },
+            toggle_fold = { 'zA', 'za', 'o' },
+        },
+        auto_preview = false,
+    })
+    m.nnore({ '<leader>vq', ':TroubleToggle quickfix<CR>' })
+    m.nnore({ '<leader>vl', ':TroubleToggle loclist<CR>' })
+end
+
+-- 代码格式化
+local function pkg_formatter()
+    require('formatter').setup({
+        logging = false,
+        filetype = {
+            c = { require('formatter.defaults.clangformat') },
+            cpp = { require('formatter.defaults.clangformat') },
+            lua = { require('formatter.filetypes.lua').stylua },
+            python = { require('formatter.filetypes.python').black },
+        },
+    })
+    m.nore({ '<leader>fo', ':Format<CR>' })
+end
+
+-- 自动括号
+local function pkg_autopairs()
+    require('nvim-autopairs').setup({
+        map_cr = false,
+    })
+    m.nnore({
+        '<leader>tp',
+        function()
+            local ap = require('nvim-autopairs').state.disabled
+            print('Auto pairs:', ap)
+            require('nvim-autopairs').state.disabled = not ap
+        end,
+    })
+end
+
+-- 添加包围符
+local function pkg_surround()
+    require('nvim-surround').setup({
+        keymaps = {
+            visual = 'vs',
+            visual_line = 'vS',
+            normal = 'ys',
+            normal_line = 'yS',
+            normal_cur = 'ysl',
+            normal_cur_line = 'ysL',
+            delete = 'ds',
+            change = 'cs',
+        },
+    })
+    m.nmap({ '<leader>sw', 'ysiw' })
+    m.nmap({ '<leader>sW', 'ySiw' })
+end
+
+-- 批量注释
+local function pkg_comment()
+    require('Comment').setup({
+        toggler = { line = 'gcc', block = 'gbc' },
+        opleader = { line = 'gc', block = 'gb' },
+        mappings = {
+            basic = true,
+            extra = false,
+            extended = false,
+        },
+    })
+    local comment = require('Comment.api')
+    m.nnore({ '<leader>ci', function() comment.toggle.linewise.count(vim.v.count1) end })
+    m.nnore({ '<leader>cl', function() comment.comment.linewise.count(vim.v.count1) end })
+    m.nnore({
+        '<leader>cu',
+        function()
+            -- ignore errors when uncommenting a non-commented line
+            pcall(function() comment.uncomment.linewise.count(vim.v.count1) end)
+        end,
+    })
+end
+
+-- 颜色预览
+local function pkg_ccc()
+    m.nnore({ '<leader>tc', ':CccHighlighterToggle<CR>' })
+    m.nnore({ '<leader>lp', ':CccPick<CR>' })
+    local ccc = require('ccc')
+    ccc.setup({
+        disable_default_mappings = true,
+        mappings = {
+            ['<CR>'] = ccc.mapping.complete,
+            ['q'] = ccc.mapping.quit,
+            ['m'] = ccc.mapping.toggle_input_mode,
+            ['f'] = ccc.mapping.toggle_output_mode,
+            ['a'] = ccc.mapping.toggle_alpha,
+            ['l'] = ccc.mapping.increase1,
+            ['o'] = ccc.mapping.increase5,
+            ['L'] = ccc.mapping.increase10,
+            ['h'] = ccc.mapping.decrease1,
+            ['i'] = ccc.mapping.decrease5,
+            ['H'] = ccc.mapping.decrease10,
+        },
+    })
+end
+
+local function pkg_coc()
+    vim.fn['coc#config']('Lua', {
+        workspace = {
+            library = {
+                vim.env.DotVimInit .. '/lua',
+                vim.env.VIMRUNTIME .. '/lua',
+                vim.env.VIMRUNTIME .. '/lua/vim',
+                vim.env.VIMRUNTIME .. '/lua/vim/lsp',
+                vim.env.VIMRUNTIME .. '/lua/vim/treesitter',
+            },
+        },
+    })
+end
+
 --------------------------------------------------------------------------------
 -- Utils
 --------------------------------------------------------------------------------
+-- Markdown预览
 local function pkg_peek()
     -- Dependency: sudo pacman -S webkit2gtk
     local peek = require('peek')
@@ -599,6 +641,136 @@ end
 --------------------------------------------------------------------------------
 -- Lazy
 --------------------------------------------------------------------------------
+local pkgs = {
+    -- Editor
+    { 'yehuohan/hop.nvim', config = pkg_hop },
+    { 'yehuohan/marks.nvim', config = pkg_marks },
+    { 'xiyaowong/nvim-cursorword', config = pkg_cursorword },
+    { 'booperlv/nvim-gomove', config = pkg_gomove },
+    { 'declancm/cinnamon.nvim', config = pkg_cinnamon },
+    { 'gbrlsnchs/winpick.nvim', config = pkg_winpick },
+    { 'sindrets/winshift.nvim', config = pkg_winshift },
+    { 'andymass/vim-matchup' },
+    { 'mg979/vim-visual-multi' },
+    { 'junegunn/vim-easy-align' },
+    { 'terryma/vim-expand-region' },
+    { 'markonm/traces.vim' },
+
+    -- Component
+    {
+        'rebelot/heirline.nvim',
+        config = require('v.pkgs.nstl').setup,
+        dependencies = { 'yehuohan/popc' },
+    },
+    { 'goolord/alpha-nvim', config = pkg_alpha },
+    { 'rcarriga/nvim-notify', config = pkg_notify },
+    { 'stevearc/dressing.nvim', opts = {} },
+    { 'kevinhwang91/nvim-ufo', config = pkg_ufo, dependencies = { 'kevinhwang91/promise-async' } },
+    { 'kevinhwang91/nvim-bqf', config = pkg_bqf, ft = 'qf' },
+    { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, cmd = 'IconPickerInsert' },
+    { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' } },
+    { 'kyazdani42/nvim-tree.lua', config = pkg_tree, keys = { '<leader>tt', '<leader>tT' } },
+    {
+        'nvim-telescope/telescope.nvim',
+        config = pkg_telescope,
+        keys = {
+            '<leader><leader>n',
+            '<leader>nf',
+            '<leader>nl',
+            '<leader>nm',
+        },
+    },
+    { 'kyazdani42/nvim-web-devicons', lazy = true, enabled = use.ui.patch },
+    { 'echasnovski/mini.nvim', config = pkg_mini },
+    { 'morhetz/gruvbox' },
+    { 'rakr/vim-one' },
+    { 'tanvirtin/monokai.nvim' },
+    { 'Yggdroot/indentLine' },
+    { 'yehuohan/popc' },
+    { 'yehuohan/popset', dependencies = { 'yehuohan/popc' } },
+    { 'yehuohan/popc-floaterm', dependencies = { 'yehuohan/popc' } },
+    {
+        'scrooloose/nerdtree',
+        dependencies = { { 'ryanoasis/vim-devicons', enabled = use.ui.patch } },
+        cmd = { 'NERDTreeToggle', 'NERDTree' },
+    },
+    { 'itchyny/screensaver.vim' },
+    { 'junegunn/fzf' },
+    { 'junegunn/fzf.vim' },
+    { 'Yggdroot/LeaderF', enabled = use.has_py, build = ':LeaderfInstallCExtension' },
+
+    -- Coding
+    {
+        'hrsh7th/nvim-cmp',
+        enabled = use.nlsp,
+        config = require('v.pkgs.nlsp').setup,
+        event = { 'InsertEnter', 'CmdlineEnter' },
+        dependencies = {
+            'williamboman/mason.nvim',
+            'williamboman/mason-lspconfig.nvim',
+            'neovim/nvim-lspconfig',
+            'glepnir/lspsaga.nvim',
+            'ray-x/lsp_signature.nvim',
+            -- Plug 'simrat39/rust-tools.nvim'
+            'hrsh7th/cmp-nvim-lsp',
+            'hrsh7th/cmp-buffer',
+            'hrsh7th/cmp-nvim-lua',
+            'hrsh7th/cmp-calc',
+            'yehuohan/cmp-cmdline',
+            'yehuohan/cmp-path',
+            'yehuohan/cmp-im',
+            'yehuohan/cmp-im-zh',
+            'dmitmel/cmp-cmdline-history',
+            'quangnguyen30192/cmp-nvim-ultisnips',
+            'kdheepak/cmp-latex-symbols',
+            'f3fora/cmp-spell',
+            'nvim-lua/plenary.nvim',
+        },
+    },
+    { 'nvim-treesitter/nvim-treesitter', enabled = use.nts, config = pkg_treesitter },
+    {
+        'HiPhish/nvim-ts-rainbow2',
+        enabled = use.nts,
+        dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    },
+    { 'stevearc/overseer.nvim', config = pkg_overseer },
+    { 'folke/trouble.nvim', config = pkg_trouble, keys = { '<leader>vq', '<leader>vl' } },
+    { 'mhartington/formatter.nvim', config = pkg_formatter },
+    { 'windwp/nvim-autopairs', config = pkg_autopairs },
+    { 'kylechui/nvim-surround', config = pkg_surround },
+    { 'numToStr/Comment.nvim', config = pkg_comment },
+    { 'uga-rosa/ccc.nvim', config = pkg_ccc, keys = { '<leader>tc', '<leader>lp' } },
+    {
+        'neoclide/coc.nvim',
+        enabled = use.coc,
+        branch = 'release',
+        config = pkg_coc,
+        event = 'InsertEnter',
+        dependencies = { 'neoclide/jsonc.vim' },
+    },
+    { 'SirVer/ultisnips', enabled = use.has_py, dependencies = { 'honza/vim-snippets' } },
+    { 'rcarriga/nvim-dap-ui', enabled = use.ndap, dependencies = { 'mfussenegger/nvim-dap' } },
+    { 'puremourning/vimspector', enabled = use.ndap },
+    { 'liuchengxu/vista.vim', cmd = 'Vista' },
+    { 't9md/vim-quickhl' },
+    { 'voldikss/vim-floaterm' },
+    { 'rust-lang/rust.vim' },
+
+    -- Utils
+    {
+        'toppair/peek.nvim',
+        ft = 'markdown',
+        config = pkg_peek,
+        build = 'deno task --quiet build:fast',
+    },
+    { 'Rykka/riv.vim', ft = 'rst' },
+    { 'Rykka/InstantRst', ft = 'rst' },
+    { 'lervag/vimtex', ft = 'tex' },
+    { 'tyru/open-browser.vim' },
+    { 'voldikss/vim-translator' },
+    { 'brglng/vim-im-select' },
+}
+
 local function clone_lazy(url, bundle)
     local lazygit = bundle .. '/lazy.nvim'
     if not vim.loop.fs_stat(lazygit) then
@@ -623,216 +795,19 @@ local function pkg_lazy()
     local bundle = vim.env.DotVimDir .. '/bundle'
     clone_lazy(url, bundle)
 
-    -- Autocmd group for pkgs
     vim.api.nvim_create_augroup('v.Pkgs', { clear = true })
 
-    local opts = {
+    vim.cmd.source(vim.env.DotVimVimL .. '/pkgs.vim')
+    require('lazy').setup(pkgs, {
         root = bundle,
         defaults = { lazy = false },
         lockfile = vim.env.DotVimLocal .. '/lazy/lazy-lock.json',
         git = { url_format = url .. '/%s.git' },
         install = { missing = false },
-        readme = {
-            root = vim.env.DotVimLocal .. '/lazy/readme',
-            skip_if_doc_exists = false,
-        },
-        performance = {
-            rtp = {
-                reset = false,
-                paths = { vim.env.DotVimInit },
-            },
-        },
+        readme = { root = vim.env.DotVimLocal .. '/lazy/readme' },
+        performance = { rtp = { reset = false, paths = { vim.env.DotVimInit } } },
         state = vim.env.DotVimLocal .. '/lazy/state.json',
-    }
-    require('lazy').setup({
-        -- Editor
-        { 'yehuohan/hop.nvim', config = pkg_hop },
-        { 'yehuohan/marks.nvim', config = pkg_marks },
-        { 'xiyaowong/nvim-cursorword', config = pkg_cursorword },
-        { 'booperlv/nvim-gomove', config = pkg_gomove },
-        { 'declancm/cinnamon.nvim', config = pkg_cinnamon },
-        { 'gbrlsnchs/winpick.nvim', config = pkg_winpick },
-        { -- 窗口移动
-            'sindrets/winshift.nvim',
-            init = function() m.nnore({ '<C-m>', ':WinShift<CR>' }) end,
-            opts = {},
-        },
-        { -- 快速扩展块
-            'olambo/vi-viz',
-            config = function()
-                m.nnore({ '<M-g>', '<Cmd>lua require("vi-viz").vizInit()<CR>' })
-                m.xnore({ '<M-g>', '<Cmd>lua require("vi-viz").vizExpand()<CR>' })
-                m.xnore({ '<M-a>', '<Cmd>lua require("vi-viz").vizContract()<CR>' })
-            end,
-        },
-        { 'andymass/vim-matchup' },
-        { 'mg979/vim-visual-multi' },
-        { 'junegunn/vim-easy-align' },
-        { 'markonm/traces.vim' },
-
-        -- Component
-        {
-            'rebelot/heirline.nvim',
-            config = require('v.pkgs.nstl').setup,
-            dependencies = { 'yehuohan/popc' },
-        },
-        { 'goolord/alpha-nvim', config = pkg_alpha },
-        { 'rcarriga/nvim-notify', config = pkg_notify },
-        { -- vim.ui界面美化
-            'stevearc/dressing.nvim',
-            opts = {
-                input = { enabled = true },
-                select = { enabled = true },
-            },
-        },
-        { -- 字体图标选择器
-            'ziontee113/icon-picker.nvim',
-            init = function()
-                m.inore({ '<M-w>', '<Cmd>IconPickerInsert<CR>' })
-                m.nnore({ '<leader><leader>i', ':IconPickerInsert<Space>' })
-            end,
-            opts = { disable_legacy_commands = true },
-            cmd = 'IconPickerInsert',
-        },
-        { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' } },
-        {
-            'kyazdani42/nvim-tree.lua',
-            config = pkg_tree,
-            keys = { '<leader>tt', '<leader>tT' },
-        },
-        { 'echasnovski/mini.nvim', config = pkg_mini },
-        {
-            'nvim-telescope/telescope.nvim',
-            config = pkg_telescope,
-            keys = {
-                '<leader><leader>n',
-                '<leader>nf',
-                '<leader>nl',
-                '<leader>nm',
-            },
-        },
-        { 'kyazdani42/nvim-web-devicons', lazy = true, enabled = use.ui.patch },
-        { 'morhetz/gruvbox' },
-        { 'rakr/vim-one' },
-        { 'tanvirtin/monokai.nvim' },
-        { 'Yggdroot/indentLine' },
-        { 'yehuohan/popc' },
-        { 'yehuohan/popset', dependencies = { 'yehuohan/popc' } },
-        { 'yehuohan/popc-floaterm', dependencies = { 'yehuohan/popc' } },
-        {
-            'scrooloose/nerdtree',
-            dependencies = {
-                { 'ryanoasis/vim-devicons', enabled = use.ui.patch },
-            },
-            cmd = { 'NERDTreeToggle', 'NERDTree' },
-        },
-        { 'itchyny/screensaver.vim' },
-        { 'junegunn/fzf' },
-        { 'junegunn/fzf.vim' },
-        { 'Yggdroot/LeaderF', enabled = use.has_py, build = ':LeaderfInstallCExtension' },
-
-        -- Coding
-        {
-            'folke/trouble.nvim',
-            config = pkg_trouble,
-            keys = { '<leader>vq', '<leader>vl' },
-        },
-        {
-            'uga-rosa/ccc.nvim',
-            config = pkg_ccc,
-            keys = { '<leader>tc', '<leader>lp' },
-        },
-        { 'windwp/nvim-autopairs', config = pkg_autopairs },
-        { 'numToStr/Comment.nvim', config = pkg_comment },
-        { 'kylechui/nvim-surround', config = pkg_surround },
-        {
-            'kevinhwang91/nvim-ufo',
-            config = pkg_ufo,
-            dependencies = { 'kevinhwang91/promise-async' },
-        },
-        { 'nvim-treesitter/nvim-treesitter', enabled = use.nts, config = pkg_treesitter },
-        {
-            'HiPhish/nvim-ts-rainbow2',
-            enabled = use.nts,
-            dependencies = { 'nvim-treesitter/nvim-treesitter' },
-        },
-        {
-            'hrsh7th/nvim-cmp',
-            enabled = use.nlsp,
-            config = require('v.pkgs.nlsp').setup,
-            event = { 'InsertEnter', 'CmdlineEnter' },
-            dependencies = {
-                'williamboman/mason.nvim',
-                'williamboman/mason-lspconfig.nvim',
-                'neovim/nvim-lspconfig',
-                'glepnir/lspsaga.nvim',
-                'ray-x/lsp_signature.nvim',
-                -- Plug 'simrat39/rust-tools.nvim'
-                'hrsh7th/cmp-nvim-lsp',
-                'hrsh7th/cmp-buffer',
-                'hrsh7th/cmp-nvim-lua',
-                'hrsh7th/cmp-calc',
-                'yehuohan/cmp-cmdline',
-                'yehuohan/cmp-path',
-                'yehuohan/cmp-im',
-                'yehuohan/cmp-im-zh',
-                'dmitmel/cmp-cmdline-history',
-                'quangnguyen30192/cmp-nvim-ultisnips',
-                'kdheepak/cmp-latex-symbols',
-                'f3fora/cmp-spell',
-                'nvim-lua/plenary.nvim',
-            },
-        },
-        {
-            'neoclide/coc.nvim',
-            enabled = use.coc,
-            branch = 'release',
-            config = function()
-                vim.fn['coc#config']('Lua', {
-                    workspace = {
-                        library = {
-                            vim.env.DotVimInit .. '/lua',
-                            vim.env.VIMRUNTIME .. '/lua',
-                            vim.env.VIMRUNTIME .. '/lua/vim',
-                            vim.env.VIMRUNTIME .. '/lua/vim/lsp',
-                            vim.env.VIMRUNTIME .. '/lua/vim/treesitter',
-                        },
-                    },
-                })
-            end,
-            event = 'InsertEnter',
-            dependencies = { 'neoclide/jsonc.vim' },
-        },
-        { 'mhartington/formatter.nvim', config = pkg_formatter },
-        { 'stevearc/overseer.nvim', config = pkg_overseer },
-        { 'SirVer/ultisnips', enabled = use.has_py, dependencies = { 'honza/vim-snippets' } },
-        {
-            'rcarriga/nvim-dap-ui',
-            enabled = use.ndap,
-            dependencies = {
-                'mfussenegger/nvim-dap',
-            },
-        },
-        { 'puremourning/vimspector', enabled = use.ndap },
-        { 'liuchengxu/vista.vim', cmd = 'Vista' },
-        { 't9md/vim-quickhl' },
-        { 'voldikss/vim-floaterm' },
-        { 'rust-lang/rust.vim' },
-
-        -- Utils
-        {
-            'toppair/peek.nvim',
-            ft = 'markdown',
-            config = pkg_peek,
-            build = 'deno task --quiet build:fast',
-        },
-        { 'Rykka/riv.vim', ft = 'rst' },
-        { 'Rykka/InstantRst', ft = 'rst' },
-        { 'lervag/vimtex', ft = 'tex' },
-        { 'tyru/open-browser.vim' },
-        { 'voldikss/vim-translator' },
-        { 'brglng/vim-im-select' },
-    }, opts)
+    })
 
     vim.api.nvim_create_autocmd('ColorScheme', {
         group = 'v.Pkgs',

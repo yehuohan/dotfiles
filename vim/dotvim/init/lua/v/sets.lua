@@ -197,7 +197,7 @@ local function on_UIEnter()
         .. [[,sm:block-blinkwait175-blinkoff150-blinkon175]]
 
     -- g:GuiLoaded work after UIEnter
-    if fn.exists('g:GuiLoaded') == 1 then
+    if vim.g.GuiLoaded then
         vim.cmd.GuiLinespace(0)
         vim.cmd.GuiTabline(0)
         vim.cmd.GuiPopupmenu(0)
@@ -207,7 +207,7 @@ local function on_UIEnter()
         m.nnore({ '<leader>tm', [[<Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>]] })
     end
 
-    if fn.exists('g:neovide') == 1 then
+    if vim.g.neovide then
         vim.g.neovide_remember_window_size = true
         vim.g.neovide_cursor_antialiasing = false
         vim.g.neovide_cursor_vfx_mode = 'railgun'
@@ -257,22 +257,6 @@ function M.win_move_spliter(dir, inc)
         opts.mods.vertical = true
     end
     vim.cmd.resize(opts)
-end
-
-function M.qf_tabedit()
-    if vim.bo.filetype == 'qf' then
-        local wi = vim.fn.getwininfo(vim.fn.win_getid())[1]
-        local ty = (wi.loclist == 0) and 'c' or 'l'
-        local enr = vim.fn.line('.')
-        vim.cmd.tabedit()
-        vim.cmd[ty .. 'rewind']({ count = enr })
-        vim.cmd.normal({
-            args = { 'zOzz' },
-            bang = true,
-            mods = { emsg_silent = true, silent = true },
-        })
-        vim.cmd[ty .. 'open']({ mods = { split = 'botright' } })
-    end
 end
 
 function M.setup()

@@ -114,7 +114,6 @@ for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m 0 1 2 3 4 5 
     execute printf('nnoremap <leader>''%s "%sp', t, t)
     execute printf('nnoremap <leader>''%s "%sP', toupper(t), t)
     " 快速执行宏
-    " execute printf('nnoremap <leader>2%s :call ExecMacro("%s")<CR>', t, t)
     let s:mstr = ':normal! @' . t
     execute printf('nnoremap <leader>2%s <Cmd>execute "%s" <Bar> call v:lua.require("v.libv").recall("%s")<CR>', t, s:mstr, s:mstr)
 endfor
@@ -178,8 +177,6 @@ nnoremap <leader>lj <Cmd>lnext <Bar> silent! normal! zOzz<CR>
 nnoremap <leader>lJ <Cmd>llast <Bar> silent! normal! zOzz<CR>
 nnoremap <leader>lk <Cmd>lprevious <Bar> silent! normal! zOzz<CR>
 nnoremap <leader>lK <Cmd>lfirst <Bar> silent! normal! zOzz<CR>
-nnoremap <leader>qt <Cmd>call v:lua.require('v.sets').qf_tabedit()<CR>
-" 将quickfix中的内容复制location-list
 nnoremap <leader>ql
     \ <Cmd>
     \ call setloclist(0, getqflist()) <Bar>

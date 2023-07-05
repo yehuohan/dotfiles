@@ -54,7 +54,6 @@ local function setup(dotvim)
     vim.keymap.set('', '<Tab>', '<Tab>', { remap = true })
 
     require('v.use').setup()
-    vim.cmd.source(vim.env.DotVimVimL .. '/pkgs.vim')
     require('v.pkgs').setup()
     require('v.sets').setup()
     require('v.task').setup()

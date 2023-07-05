@@ -71,11 +71,6 @@ nmap <M-j> <Plug>(SmoothieForwards)
 nmap <M-k> <Plug>(SmoothieBackwards)
 " }}}
 
-" expand-region {{{ 快速块选择
-map <M-r> <Plug>(expand_region_expand)
-map <M-w> <Plug>(expand_region_shrink)
-" }}}
-
 " textobj-user {{{ 文本对象
 " v-ai-wWsp(b[<t{B"'`
 " v-ai-ifcmu
