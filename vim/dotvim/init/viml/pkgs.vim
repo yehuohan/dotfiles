@@ -1,17 +1,5 @@
 let s:use = exists('*SvarUse') ? SvarUse() : v:lua.require('v.use').get()
 
-if !exists('*IsWin')
-function! IsWin()
-    return (has('win32') || has('win64'))
-endfunction
-endif
-
-if !exists('*IsGw')
-function! IsGw()
-    return has('win32unix')
-endfunction
-endif
-
 " Built-in {{{
 let g:loaded_gzip = 1
 let g:loaded_tarPlugin = 1
@@ -216,7 +204,6 @@ let g:Lf_ReverseOrder = 1
 let g:Lf_ShowHidden = 1                 " 搜索隐藏文件和目录
 let g:Lf_DefaultExternalTool = 'rg'
 let g:Lf_UseVersionControlTool = 1
-"let g:Lf_ExternalCommand = 'rg --files --no-ignore "%s"'
 let g:Lf_WildIgnore = {
     \ 'dir': ['.git', '.svn', '.hg'],
     \ 'file': []
@@ -389,28 +376,6 @@ highlight! default link FloatermBorder Constant
 " }}}
 
 " Utils {{{
-" ReStructruedText {{{
-let g:riv_auto_format_table = 0
-let g:riv_i_tab_pum_next = 0
-let g:riv_ignored_imaps = '<Tab>,<S-Tab>,<CR>'
-let g:riv_ignored_nmaps = '<Tab>,<S-Tab>,<CR>'
-let g:riv_ignored_vmaps = '<Tab>,<S-Tab>,<CR>'
-let g:instant_rst_browser = 'firefox'
-if IsWin()
-" 需要安装 https://github.com/mgedmin/restview
-nnoremap <leader>vr
-    \ <Cmd>
-    \ execute ':AsyncRun restview ' . Expand('%', ':p:t') <Bar>
-    \ cclose<CR>
-else
-" 需要安装 https://github.com/Rykka/instant-rst.py
-nnoremap <leader>vr
-    \ <Cmd>
-    \ cal Notify(g:_instant_rst_daemon_started ? 'Close rst' : 'Open rst') <Bar>
-    \ execute g:_instant_rst_daemon_started ? 'StopInstantRst' : 'InstantRst'<CR>
-endif
-" }}}
-
 " vimtex {{{ Latex
 let g:vimtex_cache_root = $DotVimLocal . '/.vimtex'
 let g:vimtex_view_general_viewer = 'sioyek'
@@ -424,37 +389,5 @@ nmap <leader>as <Plug>(vimtex-stop)
 nmap <leader>ac <Plug>(vimtex-clean)
 nmap <leader>am <Plug>(vimtex-toggle-main)
 nmap <leader>av <Plug>(vimtex-view)
-" }}}
-
-" open-browser {{{ 在线搜索
-let g:openbrowser_default_search = 'bing'
-let g:openbrowser_search_engines = {'bing' : 'https://cn.bing.com/search?q={query}'}
-map <leader>bs <Plug>(openbrowser-smart-search)
-nnoremap <leader>big :OpenBrowserSearch -google<Space>
-nnoremap <leader>bib :OpenBrowserSearch -bing<Space>
-nnoremap <leader>bih :OpenBrowserSearch -github<Space>
-nnoremap <leader>bb  <Cmd>call openbrowser#search(Expand('<cword>'), 'bing')<CR>
-nnoremap <leader>bg  <Cmd>call openbrowser#search(Expand('<cword>'), 'google')<CR>
-nnoremap <leader>bh  <Cmd>call openbrowser#search(Expand('<cword>'), 'github')<CR>
-vnoremap <leader>bb  <Cmd>call openbrowser#search(GetSelected(' '), 'bing')<CR>
-vnoremap <leader>bg  <Cmd>call openbrowser#search(GetSelected(' '), 'google')<CR>
-vnoremap <leader>bh  <Cmd>call openbrowser#search(GetSelected(' '), 'github')<CR>
-" }}}
-
-" translator {{{ 翻译
-let g:translator_default_engines = ['haici', 'bing', 'youdao']
-nmap <Leader>tw <Plug>TranslateW
-vmap <Leader>tw <Plug>TranslateWV
-nnoremap <leader><leader>t :TranslateW<Space>
-vnoremap <leader><leader>t <Cmd>call feedkeys(':TranslateW ' . GetSelected(' '), 'n')<CR>
-highlight! default link TranslatorBorder Constant
-" }}}
-
-" im-select {{{ 输入法
-if IsWin() || IsGw()
-let g:im_select_get_im_cmd = 'im-select'
-let g:im_select_default = '1033'        " 输入法代码：切换到期望的默认输入法，运行im-select
-endif
-let g:ImSelectSetImCmd = {key -> ['im-select', key]}
 " }}}
 " }}}

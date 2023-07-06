@@ -1,5 +1,6 @@
 local use = require('v.use')
-local m = require('v.libv').m
+local libv = require('v.libv')
+local m = libv.m
 
 --------------------------------------------------------------------------------
 -- Editor
@@ -638,6 +639,65 @@ local function pkg_peek()
     })
 end
 
+local function pkg_rst()
+    vim.g.riv_auto_format_table = 0
+    vim.g.riv_i_tab_pum_next = 0
+    vim.g.riv_ignored_imaps = '<Tab>,<S-Tab>,<CR>'
+    vim.g.riv_ignored_nmaps = '<Tab>,<S-Tab>,<CR>'
+    vim.g.riv_ignored_vmaps = '<Tab>,<S-Tab>,<CR>'
+    vim.g.instant_rst_browser = 'firefox'
+    if IsWin() then
+        -- 需要安装 https://github.com/mgedmin/restview
+        m.nnore({
+            '<leader>vr',
+            function() require('v.task').run_cmd('restview ' .. vim.fn.expand('%', ':p:t')) end,
+        })
+    else
+        -- 需要安装 https://github.com/Rykka/instant-rst.py
+        m.nnore({
+            '<leader>vr',
+            function()
+                if vim.g._instant_rst_daemon_started == 1 then
+                    vim.notify('Close rst')
+                    vim.cmd.StopInstantRst()
+                else
+                    vim.notify('Open rst')
+                    vim.cmd.InstantRst()
+                end
+            end,
+        })
+    end
+end
+
+-- 在线搜索
+local function pkg_open_browser()
+    vim.g.openbrowser_default_search = 'bing'
+    vim.g.openbrowser_search_engines = { bing = 'https://cn.bing.com/search?q={query}' }
+    m.map({ '<leader>bs', '<Plug>(openbrowser-smart-search)' })
+    m.nnore({ '<leader>big', ':OpenBrowserSearch -google<Space>' })
+    m.nnore({ '<leader>bib', ':OpenBrowserSearch -bing<Space>' })
+    m.nnore({ '<leader>bih', ':OpenBrowserSearch -github<Space>' })
+    local browser = vim.fn['openbrowser#search']
+    m.nnore({ '<leader>bb', function() browser(vim.fn.expand('<cword>'), 'bing') end })
+    m.nnore({ '<leader>bg', function() browser(vim.fn.expand('<cword>'), 'google') end })
+    m.nnore({ '<leader>bh', function() browser(vim.fn.expand('<cword>'), 'github') end })
+    m.vnore({ '<leader>bb', function() browser(libv.get_selected(' '), 'bing') end })
+    m.vnore({ '<leader>bg', function() browser(libv.get_selected(' '), 'google') end })
+    m.vnore({ '<leader>bh', function() browser(libv.get_selected(' '), 'github') end })
+end
+
+-- 翻译
+local function pkg_translator()
+    vim.g.translator_default_engines = { 'haici', 'bing', 'youdao' }
+    m.nmap({ '<Leader>tw', '<Plug>TranslateW' })
+    m.vmap({ '<Leader>tw', '<Plug>TranslateWV' })
+    m.nnore({ '<leader><leader>t', ':TranslateW<Space>' })
+    m.vnore({
+        '<leader><leader>t',
+        function() vim.api.nvim_feedkeys(':TranslateW ' .. libv.get_selected(' '), 'n', true) end,
+    })
+end
+
 --------------------------------------------------------------------------------
 -- Lazy
 --------------------------------------------------------------------------------
@@ -759,15 +819,14 @@ local pkgs = {
     -- Utils
     {
         'toppair/peek.nvim',
-        ft = 'markdown',
         config = pkg_peek,
+        ft = 'markdown',
         build = 'deno task --quiet build:fast',
     },
-    { 'Rykka/riv.vim', ft = 'rst' },
-    { 'Rykka/InstantRst', ft = 'rst' },
+    { 'Rykka/InstantRst', config = pkg_rst, ft = 'rst', dependencies = { 'Rykka/riv.vim' } },
+    { 'tyru/open-browser.vim', config = pkg_open_browser },
+    { 'voldikss/vim-translator', config = pkg_translator },
     { 'lervag/vimtex', ft = 'tex' },
-    { 'tyru/open-browser.vim' },
-    { 'voldikss/vim-translator' },
     { 'brglng/vim-im-select' },
 }
 
