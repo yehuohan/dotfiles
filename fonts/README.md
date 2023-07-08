@@ -18,6 +18,7 @@ git clone --filter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts
 cd nerd-fonts
 git sparse-checkout add font-patcher # Ignore this line if font-patcher has been existed
 git sparse-checkout add src/glyphs
+git sparse-checkout add bin/scripts
 ```
 
 - Usage
