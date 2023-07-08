@@ -74,7 +74,10 @@ local function display_and_highlight(qf, lines, highlights, ns, efm)
     end
 end
 
-return {
+--- Context of onqf for multi-tasks
+local ctx = { ns = nil, next = nil }
+
+local M = {
     desc = 'Sync code task output into the quickfix',
     params = {
         errorformat = {
@@ -129,98 +132,103 @@ return {
             default = false,
         },
     },
-    constructor = function(params)
-        local comp = {
-            start_time = nil,
-            chanor = nil,
-            ns = nil,
-        }
+}
 
-        comp.on_init = function(self, task)
-            self.ns = vim.api.nvim_create_namespace('v.task.onqf')
-            self.chanor = require('v.libv').new_chanor({
-                connect_pty = params.connect_pty,
-                hl_ansi_sgr = params.hl_ansi_sgr,
-                out_rawdata = params.out_rawdata,
-                verbose = task.metadata.verbose,
-            })
+function M.constructor(params)
+    if not ctx.ns then
+        ctx.ns = vim.api.nvim_create_namespace('v.task.onqf')
+    end
+
+    local onqf = {
+        start_time = nil,
+        chanor = nil,
+    }
+
+    onqf.on_init = function(self, task)
+        self.chanor = require('v.libv').new_chanor({
+            connect_pty = params.connect_pty,
+            hl_ansi_sgr = params.hl_ansi_sgr,
+            out_rawdata = params.out_rawdata,
+            verbose = task.metadata.verbose,
+        })
+    end
+
+    onqf.on_start = function(self, task)
+        self.start_time = os.time()
+
+        if params.save then
+            vim.cmd.wall({ mods = { silent = true, emsg_silent = true } })
+        end
+        local qf = try_copen(get_qf(), params.open, params.jump)
+        if qf.hbuf and ctx.ns and not params.append then
+            vim.api.nvim_buf_clear_namespace(qf.hbuf, ctx.ns, 0, -1)
         end
 
-        comp.on_start = function(self, task)
-            self.start_time = os.time()
+        -- Add head message
+        local msg = string.format('{{{ [%s] %s', os.date('%H:%M:%S'), task.name)
+        vim.fn.setqflist({}, params.append and 'a' or 'r', {
+            lines = { msg },
+            efm = ' ', -- Avoid match time string
+            title = params.title,
+        })
+        if qf.hbuf then
+            local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
+            buf_add_highlight(qf.hbuf, ctx.ns, 'Constant', line, 5, 13)
+            buf_add_highlight(qf.hbuf, ctx.ns, 'Identifier', line, 15, string.len(msg))
+        end
+    end
 
-            if params.save then
-                vim.cmd.wall({ mods = { silent = true, emsg_silent = true } })
-            end
-            local qf = try_copen(get_qf(), params.open, params.jump)
-            if qf.hbuf and self.ns and not params.append then
-                vim.api.nvim_buf_clear_namespace(qf.hbuf, self.ns, 0, -1)
-            end
+    onqf.on_complete = function(self, task, status, result)
+        local dt = os.time() - self.start_time
+        local qf = get_qf()
+        local lines, highlights = self.chanor()
+        display_and_highlight(qf, lines, highlights, ctx.ns, params.errorformat)
 
-            -- Add head message
-            local msg = string.format('{{{ [%s] %s', os.date('%H:%M:%S'), task.name)
-            vim.fn.setqflist({}, params.append and 'a' or 'r', {
-                lines = { msg },
-                efm = ' ', -- Avoid match time string
-                title = params.title,
-            })
-            if qf.hbuf then
-                local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
-                buf_add_highlight(qf.hbuf, self.ns, 'Constant', line, 5, 13)
-                buf_add_highlight(qf.hbuf, self.ns, 'Identifier', line, 15, string.len(msg))
-            end
+        -- Add tail message
+        local msg = string.format('}}} [%s] %s in %ds', os.date('%H:%M:%S'), status, dt)
+        vim.fn.setqflist({}, 'a', {
+            lines = { msg },
+            efm = ' ', -- Avoid match time string
+        })
+        if qf.hbuf then
+            local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
+            local hlgrp = 'Overseer' .. status
+            buf_add_highlight(qf.hbuf, ctx.ns, 'Constant', line, 5, 13)
+            buf_add_highlight(qf.hbuf, ctx.ns, hlgrp, line, 15, string.len(msg))
+        end
+        if params.scroll then
+            try_scroll_to_bottom(qf, #lines + 1)
         end
 
-        comp.on_complete = function(self, task, status, result)
-            local dt = os.time() - self.start_time
-            local qf = get_qf()
-            local lines, highlights = self.chanor()
-            display_and_highlight(qf, lines, highlights, self.ns, params.errorformat)
-
-            -- Add tail message
-            local msg = string.format('}}} [%s] %s in %ds', os.date('%H:%M:%S'), status, dt)
-            vim.fn.setqflist({}, 'a', {
-                lines = { msg },
-                efm = ' ', -- Avoid match time string
-            })
-            if qf.hbuf then
-                local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
-                local hlgrp = 'Overseer' .. status
-                buf_add_highlight(qf.hbuf, self.ns, 'Constant', line, 5, 13)
-                buf_add_highlight(qf.hbuf, self.ns, hlgrp, line, 15, string.len(msg))
-            end
-            if params.scroll then
-                try_scroll_to_bottom(qf, #lines + 1)
-            end
-
-            -- Setup fold
-            if qf.hwin then
-                vim.api.nvim_win_set_option(qf.hwin, 'foldmethod', 'marker')
-                vim.api.nvim_win_set_option(qf.hwin, 'foldmarker', '{{{,}}}')
-                vim.fn.win_execute(qf.hwin, 'silent! normal! zO')
-            end
+        -- Setup fold
+        if qf.hwin then
+            vim.api.nvim_win_set_option(qf.hwin, 'foldmethod', 'marker')
+            vim.api.nvim_win_set_option(qf.hwin, 'foldmarker', '{{{,}}}')
+            vim.fn.win_execute(qf.hwin, 'silent! normal! zO')
         end
+    end
 
-        comp.on_output = function(self, task, data)
-            -- React to pause command
-            if IsWin() then
-                for _, str in ipairs(data) do
-                    for _, pat in ipairs(PAUSE_PATS) do
-                        if str:match(pat) then
-                            vim.api.nvim_chan_send(task.strategy.chan_id, ' ')
-                        end
+    onqf.on_output = function(self, task, data)
+        -- React to pause command
+        if IsWin() then
+            for _, str in ipairs(data) do
+                for _, pat in ipairs(PAUSE_PATS) do
+                    if str:match(pat) then
+                        vim.api.nvim_chan_send(task.strategy.chan_id, ' ')
                     end
                 end
             end
-
-            local qf = get_qf()
-            local lines, highlights = self.chanor(data)
-            display_and_highlight(qf, lines, highlights, self.ns, params.errorformat)
-            if params.scroll then
-                try_scroll_to_bottom(qf, #lines)
-            end
         end
 
-        return comp
-    end,
-}
+        local qf = get_qf()
+        local lines, highlights = self.chanor(data)
+        display_and_highlight(qf, lines, highlights, ctx.ns, params.errorformat)
+        if params.scroll then
+            try_scroll_to_bottom(qf, #lines)
+        end
+    end
+
+    return onqf
+end
+
+return M
