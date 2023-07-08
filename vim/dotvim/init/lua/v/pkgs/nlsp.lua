@@ -1,6 +1,7 @@
 local use = require('v.use')
 local m = require('v.libv').m
 
+--- Setup langauge servers
 local function __servers()
     local url = 'https://github.com/%s/releases/download/%s/%s'
     if vim.fn.empty(use.xgit) == 0 then
@@ -22,73 +23,68 @@ local function __servers()
     require('mason-lspconfig').setup({})
     local lspconfig = require('lspconfig')
     local capabilities = require('cmp_nvim_lsp').default_capabilities()
-    require('mason-lspconfig').setup_handlers({
+    local opts = {
         function(server_name)
             lspconfig[server_name].setup({
                 capabilities = capabilities,
             })
         end,
-        ['cmake'] = function()
-            lspconfig.cmake.setup({
-                capabilities = capabilities,
-                init_options = {
-                    buildDirectory = '__VBuildOut',
-                },
-            })
-        end,
-        ['rust_analyzer'] = function()
-            lspconfig.rust_analyzer.setup({
-                capabilities = capabilities,
-                settings = {
-                    ['rust-analyzer'] = {
-                        updates = {
-                            checkOnStartup = false,
-                            channel = 'nightly',
-                        },
-                        cargo = { allFeatures = true },
-                        notifications = { cargoTomlNotFound = false },
-                        diagnostics = { disabled = { 'inactive-code' } },
-                        procMacro = { enable = true },
+    }
+    opts['cmake'] = function()
+        lspconfig.cmake.setup({
+            capabilities = capabilities,
+            init_options = { buildDirectory = '__VBuildOut' },
+        })
+    end
+    opts['rust_analyzer'] = function()
+        lspconfig.rust_analyzer.setup({
+            capabilities = capabilities,
+            settings = {
+                ['rust-analyzer'] = {
+                    updates = {
+                        checkOnStartup = false,
+                        channel = 'nightly',
                     },
+                    cargo = { allFeatures = true },
+                    notifications = { cargoTomlNotFound = false },
+                    diagnostics = { disabled = { 'inactive-code' } },
+                    procMacro = { enable = true },
                 },
-            })
-        end,
-        ['pyright'] = function()
-            lspconfig.pyright.setup({
-                capabilities = capabilities,
-                settings = {
-                    python = {
-                        analysis = {
-                            stubPath = 'typings',
-                        },
-                    },
+            },
+        })
+    end
+    opts['pyright'] = function()
+        lspconfig.pyright.setup({
+            capabilities = capabilities,
+            settings = {
+                python = {
+                    analysis = { stubPath = 'typings' },
                 },
-            })
-        end,
-        ['lua_ls'] = function()
-            lspconfig.lua_ls.setup({
-                capabilities = capabilities,
-                settings = {
-                    Lua = {
-                        runtime = { version = 'Lua 5.2' }, -- LuaJIT
-                        workspace = {
-                            library = {
-                                vim.env.DotVimInit .. '/lua',
-                                vim.env.VIMRUNTIME .. '/lua',
-                                vim.env.VIMRUNTIME .. '/lua/vim',
-                                vim.env.VIMRUNTIME .. '/lua/vim/lsp',
-                                vim.env.VIMRUNTIME .. '/lua/vim/treesitter',
-                            },
-                        },
-                        telemetry = { enable = false },
-                        format = {
-                            enable = false,
+            },
+        })
+    end
+    opts['lua_ls'] = function()
+        lspconfig.lua_ls.setup({
+            capabilities = capabilities,
+            settings = {
+                Lua = {
+                    runtime = { version = 'Lua 5.2' }, -- LuaJIT
+                    workspace = {
+                        library = {
+                            vim.env.DotVimInit .. '/lua',
+                            vim.env.VIMRUNTIME .. '/lua',
+                            vim.env.VIMRUNTIME .. '/lua/vim',
+                            vim.env.VIMRUNTIME .. '/lua/vim/lsp',
+                            vim.env.VIMRUNTIME .. '/lua/vim/treesitter',
                         },
                     },
+                    telemetry = { enable = false },
+                    format = { enable = false },
                 },
-            })
-        end,
-    })
+            },
+        })
+    end
+    require('mason-lspconfig').setup_handlers(opts)
 end
 
 -- stylua: ignore start
@@ -135,6 +131,7 @@ local kind_sources = {
 }
 -- stylua: ignore end
 
+--- Format completion menu
 local function cmp_format(entry, vitem)
     local ico = kind_icons[vitem.kind]
     local src = kind_sources[entry.source.name] or entry.source.name
@@ -146,47 +143,7 @@ local function cmp_format(entry, vitem)
     return vitem
 end
 
-local function __hl()
-    -- stylua: ignore start
-    local api = vim.api
-    api.nvim_set_hl(0, 'CmpItemMenu'             , {ctermfg = 175, fg = '#d3869b', italic = true })
-    api.nvim_set_hl(0, 'CmpItemAbbrMatch'        , {ctermfg = 208, fg = '#fe8019' })
-    api.nvim_set_hl(0, 'CmpItemAbbrMatchFuzzy'   , {ctermfg = 208, fg = '#fe8019' })
-    api.nvim_set_hl(0, 'CmpItemKind'             , {ctermfg = 142, fg = '#b8bb26' })
-    api.nvim_set_hl(0, 'CmpItemKindText'         , {fg = '#458588' })
-    api.nvim_set_hl(0, 'CmpItemKindMethod'       , {fg = '#b8bb26' })
-    api.nvim_set_hl(0, 'CmpItemKindFunction'     , {fg = '#b8bb26' })
-    api.nvim_set_hl(0, 'CmpItemKindConstructor'  , {fg = '#e95678' })
-    api.nvim_set_hl(0, 'CmpItemKindField'        , {fg = '#e95678' })
-    api.nvim_set_hl(0, 'CmpItemKindVariable'     , {fg = '#458588' })
-    api.nvim_set_hl(0, 'CmpItemKindClass'        , {fg = '#cc5155' })
-    api.nvim_set_hl(0, 'CmpItemKindInterface'    , {fg = '#cc5155' })
-    api.nvim_set_hl(0, 'CmpItemKindModule'       , {fg = '#689d6a' })
-    api.nvim_set_hl(0, 'CmpItemKindProperty'     , {fg = '#689d6a' })
-    api.nvim_set_hl(0, 'CmpItemKindUnit'         , {fg = '#afd700' })
-    api.nvim_set_hl(0, 'CmpItemKindValue'        , {fg = '#afd700' })
-    api.nvim_set_hl(0, 'CmpItemKindEnum'         , {fg = '#61afef' })
-    api.nvim_set_hl(0, 'CmpItemKindKeyword'      , {fg = '#61afef' })
-    api.nvim_set_hl(0, 'CmpItemKindSnippet'      , {fg = '#cba6f7' })
-    api.nvim_set_hl(0, 'CmpItemKindColor'        , {fg = '#cba6f7' })
-    api.nvim_set_hl(0, 'CmpItemKindFile'         , {fg = '#e18932' })
-    api.nvim_set_hl(0, 'CmpItemKindReference'    , {fg = '#1abc9c' })
-    api.nvim_set_hl(0, 'CmpItemKindFolder'       , {fg = '#e18932' })
-    api.nvim_set_hl(0, 'CmpItemKindEnumMember'   , {fg = '#61afef' })
-    api.nvim_set_hl(0, 'CmpItemKindConstant'     , {fg = '#1abc9c' })
-    api.nvim_set_hl(0, 'CmpItemKindStruct'       , {fg = '#f7bb3b' })
-    api.nvim_set_hl(0, 'CmpItemKindEvent'        , {fg = '#f7bb3b' })
-    api.nvim_set_hl(0, 'CmpItemKindOperator'     , {fg = '#d3869b' })
-    api.nvim_set_hl(0, 'CmpItemKindTypeParameter', {fg = '#d3869b' })
-
-    api.nvim_set_hl(0, 'LspSignatureActiveParameter', {link = 'Tag' })
-    api.nvim_set_hl(0, 'DiagnosticUnderlineError'   , {undercurl = true, sp = 'Red' })
-    api.nvim_set_hl(0, 'DiagnosticUnderlineWarn'    , {undercurl = true, sp = 'Orange' })
-    api.nvim_set_hl(0, 'DiagnosticUnderlineInfo'    , {undercurl = true, sp = 'LightBlue' })
-    api.nvim_set_hl(0, 'DiagnosticUnderlineHint'    , {link = 'Comment' })
-    -- stylua: ignore end
-end
-
+--- Setup completion framework
 local function __completion()
     local cmp_im = require('cmp_im')
     cmp_im.setup({
@@ -269,9 +226,7 @@ local function __completion()
                 col_offset = -2,
                 side_padding = 0,
             },
-            documentation = {
-                max_width = 80,
-            },
+            documentation = { max_width = 80 },
         },
         formatting = {
             fields = { 'kind', 'abbr', 'menu' },
@@ -307,7 +262,50 @@ local function __completion()
     })
 end
 
-local function __lsp()
+--- Setup lsp highlights
+local function __lsp_highlights()
+    local api = vim.api
+    -- stylua: ignore start
+    api.nvim_set_hl(0, 'LspSignatureActiveParameter', {link = 'Tag' })
+    api.nvim_set_hl(0, 'DiagnosticUnderlineError'   , {undercurl = true, sp = 'Red' })
+    api.nvim_set_hl(0, 'DiagnosticUnderlineWarn'    , {undercurl = true, sp = 'Orange' })
+    api.nvim_set_hl(0, 'DiagnosticUnderlineInfo'    , {undercurl = true, sp = 'LightBlue' })
+    api.nvim_set_hl(0, 'DiagnosticUnderlineHint'    , {link = 'Comment' })
+
+    api.nvim_set_hl(0, 'CmpItemMenu'             , {ctermfg = 175, fg = '#d3869b', italic = true })
+    api.nvim_set_hl(0, 'CmpItemAbbrMatch'        , {ctermfg = 208, fg = '#fe8019' })
+    api.nvim_set_hl(0, 'CmpItemAbbrMatchFuzzy'   , {ctermfg = 208, fg = '#fe8019' })
+    api.nvim_set_hl(0, 'CmpItemKind'             , {ctermfg = 142, fg = '#b8bb26' })
+    api.nvim_set_hl(0, 'CmpItemKindText'         , {fg = '#458588' })
+    api.nvim_set_hl(0, 'CmpItemKindMethod'       , {fg = '#b8bb26' })
+    api.nvim_set_hl(0, 'CmpItemKindFunction'     , {fg = '#b8bb26' })
+    api.nvim_set_hl(0, 'CmpItemKindConstructor'  , {fg = '#e95678' })
+    api.nvim_set_hl(0, 'CmpItemKindField'        , {fg = '#e95678' })
+    api.nvim_set_hl(0, 'CmpItemKindVariable'     , {fg = '#458588' })
+    api.nvim_set_hl(0, 'CmpItemKindClass'        , {fg = '#cc5155' })
+    api.nvim_set_hl(0, 'CmpItemKindInterface'    , {fg = '#cc5155' })
+    api.nvim_set_hl(0, 'CmpItemKindModule'       , {fg = '#689d6a' })
+    api.nvim_set_hl(0, 'CmpItemKindProperty'     , {fg = '#689d6a' })
+    api.nvim_set_hl(0, 'CmpItemKindUnit'         , {fg = '#afd700' })
+    api.nvim_set_hl(0, 'CmpItemKindValue'        , {fg = '#afd700' })
+    api.nvim_set_hl(0, 'CmpItemKindEnum'         , {fg = '#61afef' })
+    api.nvim_set_hl(0, 'CmpItemKindKeyword'      , {fg = '#61afef' })
+    api.nvim_set_hl(0, 'CmpItemKindSnippet'      , {fg = '#cba6f7' })
+    api.nvim_set_hl(0, 'CmpItemKindColor'        , {fg = '#cba6f7' })
+    api.nvim_set_hl(0, 'CmpItemKindFile'         , {fg = '#e18932' })
+    api.nvim_set_hl(0, 'CmpItemKindReference'    , {fg = '#1abc9c' })
+    api.nvim_set_hl(0, 'CmpItemKindFolder'       , {fg = '#e18932' })
+    api.nvim_set_hl(0, 'CmpItemKindEnumMember'   , {fg = '#61afef' })
+    api.nvim_set_hl(0, 'CmpItemKindConstant'     , {fg = '#1abc9c' })
+    api.nvim_set_hl(0, 'CmpItemKindStruct'       , {fg = '#f7bb3b' })
+    api.nvim_set_hl(0, 'CmpItemKindEvent'        , {fg = '#f7bb3b' })
+    api.nvim_set_hl(0, 'CmpItemKindOperator'     , {fg = '#d3869b' })
+    api.nvim_set_hl(0, 'CmpItemKindTypeParameter', {fg = '#d3869b' })
+    -- stylua: ignore end
+end
+
+--- Setup lsp settings
+local function __lsp_settings()
     vim.lsp.set_log_level(vim.lsp.log_levels.OFF)
     if use.ui.patch then
         for name, icon in pairs({
@@ -319,29 +317,19 @@ local function __lsp()
             vim.fn.sign_define(name, { text = icon, texthl = name, numhl = name })
         end
     end
-    vim.diagnostic.config({
-        virtual_text = { prefix = '▪' },
-    })
+    vim.diagnostic.config({ virtual_text = { prefix = '▪' } })
 
     require('lspsaga').setup({
-        ui = {
-            border = 'single',
-        },
+        ui = { border = 'single' },
         scroll_preview = {
             scroll_down = '<M-f>',
             scroll_up = '<M-d>',
         },
         code_action = {
-            keys = {
-                quit = { 'q', '<Esc>' },
-            },
+            keys = { quit = { 'q', '<Esc>' } },
         },
-        lightbulb = {
-            enable = false,
-        },
-        diagnostic = {
-            on_insert = false,
-        },
+        lightbulb = { enable = false },
+        diagnostic = { on_insert = false },
         symbol_in_winbar = {
             enable = true,
             separator = use.ui.patch and '  ' or ' > ',
@@ -355,16 +343,15 @@ local function __lsp()
         max_width = 80,
         hint_enable = true,
         hint_prefix = '» ',
-        handler_opts = {
-            border = 'none',
-        },
+        handler_opts = { border = 'none' },
         padding = ' ',
         toggle_key = '<M-o>',
         select_signature_key = '<M-l>',
     })
 end
 
-local function __mappings()
+--- Setup lsp mappings
+local function __lsp_mappings()
     m.inore({ '<M-o>', vim.lsp.buf.signature_help })
     m.nnore({ 'gd', vim.lsp.buf.definition })
     m.nnore({ 'gD', vim.lsp.buf.declaration })
@@ -407,10 +394,10 @@ return {
     setup = vim.schedule_wrap(function()
         if use.nlsp then
             __servers()
-            __hl()
             __completion()
-            __lsp()
-            __mappings()
+            __lsp_highlights()
+            __lsp_settings()
+            __lsp_mappings()
         end
     end),
 }

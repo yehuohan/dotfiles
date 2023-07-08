@@ -133,7 +133,10 @@ local function load_colors()
     }
 end
 
---- Helpers
+--- Pad component as a block
+--- @param color(string|function) Block background color
+--- @param component(table) Component contained within block
+--- @param fileds(table|nil) Extra fileds for the whole block
 local function pad(color, component, fileds)
     local utils = require('heirline.utils')
     local res = utils.surround(sym.sep, color, component)
@@ -143,6 +146,7 @@ local function pad(color, component, fileds)
     return res
 end
 
+--- Wrap component as a block with blank background
 local function wrap(component)
     return require('heirline.utils').surround({ '', '' }, 'blank', component)
 end
@@ -155,31 +159,24 @@ local function stls()
         provider = '%=%<',
         hl = { fg = 'gray', strikethrough = true },
     }
-    local ComHint = pad(function()
-        local mch = ctxs.mode()
-        if mch == 'V' or mch == 'S' or mch == '^V' or mch == '^S' then
-            return 'red'
-        elseif mch == 'I' or mch == 'T' then
-            return 'green'
-        elseif mch == 'R' then
-            return 'blue'
-        end
-        return 'areaB'
-    end, {
-        provider = ctxs.hint,
-        hl = { fg = 'blank', bold = true },
-    }, {
-        condition = conds.is_active,
-    })
+    local ComHint = pad(
+        function()
+            local mch = ctxs.mode()
+            if mch == 'V' or mch == 'S' or mch == '^V' or mch == '^S' then
+                return 'red'
+            elseif mch == 'I' or mch == 'T' then
+                return 'green'
+            elseif mch == 'R' then
+                return 'blue'
+            end
+            return 'areaB'
+        end,
+        { provider = ctxs.hint, hl = { fg = 'blank', bold = true } },
+        { condition = conds.is_active }
+    )
     local ComPath = pad('areaC', {
-        {
-            provider = ctxs.root_path,
-            hl = { fg = 'textA', bold = true },
-        },
-        {
-            provider = ctxs.relative_path,
-            hl = { fg = 'textB' },
-        },
+        { provider = ctxs.root_path, hl = { fg = 'textA', bold = true } },
+        { provider = ctxs.relative_path, hl = { fg = 'textB' } },
     })
     local ComFile = pad('areaC', {
         provider = '%F',
@@ -189,18 +186,9 @@ local function stls()
         provider = '%y',
         hl = function() return { fg = conds.is_active() and 'textB' or 'textC' } end,
     })
-    local ComAttr = pad('areaC', {
-        provider = ctxs.attr,
-        hl = { fg = 'textB' },
-    })
-    local ComInfo = pad('areaB', {
-        provider = ctxs.info,
-        hl = { fg = 'blank' },
-    })
-    local ComLite = pad('areaC', {
-        provider = ctxs.lite,
-        hl = { fg = 'textC' },
-    })
+    local ComAttr = pad('areaC', { provider = ctxs.attr, hl = { fg = 'textB' } })
+    local ComInfo = pad('areaB', { provider = ctxs.info, hl = { fg = 'blank' } })
+    local ComLite = pad('areaC', { provider = ctxs.lite, hl = { fg = 'textC' } })
     local ComCheck = pad('areaA', {
         provider = function(self) return self:nonlocal('check') end,
         hl = { fg = 'blank', italic = true },
@@ -262,15 +250,11 @@ local function ele(e, fn)
         txt = txt .. '+'
         fg = 'green'
     end
-    return pad(bg, {
-        provider = txt,
-        hl = { fg = fg },
-    }, {
-        on_click = {
-            callback = fn,
-            minwid = e.index,
-        },
-    })
+    return pad(
+        bg,
+        { provider = txt, hl = { fg = fg } },
+        { on_click = { callback = fn, minwid = e.index } }
+    )
 end
 
 local function tabs()

@@ -729,7 +729,7 @@ local pkgs = {
     { 'kevinhwang91/nvim-bqf', config = pkg_bqf, ft = 'qf' },
     { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, cmd = 'IconPickerInsert' },
     { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' } },
-    { 'kyazdani42/nvim-tree.lua', config = pkg_tree, keys = { '<leader>tt', '<leader>tT' } },
+    { 'nvim-tree/nvim-tree.lua', config = pkg_tree, keys = { '<leader>tt', '<leader>tT' } },
     {
         'nvim-telescope/telescope.nvim',
         config = pkg_telescope,
@@ -740,7 +740,7 @@ local pkgs = {
             '<leader>nm',
         },
     },
-    { 'kyazdani42/nvim-web-devicons', lazy = true, enabled = use.ui.patch },
+    { 'nvim-tree/nvim-web-devicons', lazy = true, enabled = use.ui.patch },
     { 'echasnovski/mini.nvim', config = pkg_mini },
     { 'morhetz/gruvbox' },
     { 'rakr/vim-one' },
@@ -769,7 +769,7 @@ local pkgs = {
             'williamboman/mason.nvim',
             'williamboman/mason-lspconfig.nvim',
             'neovim/nvim-lspconfig',
-            'glepnir/lspsaga.nvim',
+            'nvimdev/lspsaga.nvim',
             'ray-x/lsp_signature.nvim',
             -- Plug 'simrat39/rust-tools.nvim'
             'hrsh7th/cmp-nvim-lsp',
