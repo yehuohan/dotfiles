@@ -37,14 +37,16 @@ local codes = {
     rust       = { cmd = IsWin() and 'rustc {barg} {bsrc} -o "{bout}.exe" && "./{bout}" {earg}'
                                   or 'rustc {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
                    efm = [[\ %#-->\ %f:%l:%c,\%m\ %f:%l:%c]] },
-    python     = { cmd = 'python {bsrc} {earg}', efm = [[%*\sFile\ \"%f\"\,\ line\ %l\,\ %m]] },
-    lua        = { cmd = 'lua {bsrc} {earg}', efm = [[lua:\ %f:%l:\ %m]] },
+    python     = { cmd = 'python {bsrc} {earg}', efm = [[%*\sFile\ \"%f\"\,\ line\ %l\,\ %m]]
+                                                    .. [[,%*\sFile\ \"%f\"\,\ line\ %l]] },
+    lua        = { cmd = 'lua {bsrc} {earg}', efm = [[%.%#:\ %f:%l:\ %m]]
+                                                 .. [[,\ %#%f:%l:\ %m]] },
     java       = { cmd = 'javac {barg} {bsrc} && java "{bout}" {earg}' },
     julia      = { cmd = 'julia {bsrc} {earg}' },
     go         = { cmd = 'go run {bsrc} {earg}' },
     javascript = { cmd = 'node {bsrc} {earg}' },
     typescript = { cmd = 'node {bsrc} {earg}' },
-    make       = { cmd = 'make -f {bsrc} {earg}' },
+    make       = { cmd = 'make -f {bsrc} {earg}', efm = [[make:\ ***\ [%f:%l:\ %m]] },
     cmake      = { cmd = 'cmake {earg} -P {bsrc}', efm = [[%ECMake\ Error\ at\ %f:%l\ %#%m:]] },
     sh         = { cmd = 'bash ./{bsrc} {earg}' },
     ps1        = { cmd = 'Powershell -ExecutionPolicy Bypass -File {bsrc} {earg}' },
@@ -128,6 +130,8 @@ function task.file(cfg)
 end
 
 function task.make(cfg)
+    cfg.efm = codes.make.efm .. ',' .. codes.cmake.efm .. ',' .. vim.o.errorformat
+
     local rep = {}
     rep.barg = cfg.barg
     rep.bout = (cfg.stage ~= 'build') and patout(cfg.file, packs._pats.tar) or nil
@@ -154,6 +158,7 @@ function task.cmake(cfg)
     end
     vim.fn.mkdir(outdir, 'p')
     cfg.wdir = outdir
+    cfg.efm = codes.cmake.efm .. ',' .. vim.o.errorformat
 
     local rep = {}
     rep.gtar = cfg.target
@@ -172,7 +177,6 @@ function task.cmake(cfg)
 end
 
 function task.cargo(cfg)
-    cfg.type = 'rust'
     cfg.efm = codes.rust.efm
 
     local rep = {}

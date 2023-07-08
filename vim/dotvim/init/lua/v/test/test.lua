@@ -2,7 +2,7 @@
 --- @usage nvim -l test.lua
 
 local dir_this = vim.fn.getcwd()
-local dir_base = vim.fs.dirname(vim.fs.dirname(dir_this))
+local dir_base = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(dir_this)))
 vim.opt.rtp:prepend(dir_base)
 local libv = require('v.libv')
 
@@ -11,8 +11,8 @@ local function EQ(expected, actual)
         -- Tables are compared recursively unless they both provide the `eq` metamethod
         vim.deep_equal(expected, actual),
         string.format(
-            '%s\nexpected:\n%s\nis not equal to actual:\n%s',
-            debug.traceback(),
+            '%s\nExpect left:\n    %s\nEqual to right:\n    %s',
+            string.gsub(debug.traceback(), '\t', '    '),
             vim.inspect(expected),
             vim.inspect(actual)
         )
@@ -23,8 +23,8 @@ local function NEQ(expected, actual)
     assert(
         not vim.deep_equal(expected, actual),
         string.format(
-            '%s\nexpected:\n%s\nis equal to actual:\n%s',
-            debug.traceback(),
+            '%s\nExpect left:\n    %s\nNOT equal to right:\n    %s',
+            string.gsub(debug.traceback(), '\t', '    '),
             vim.inspect(expected),
             vim.inspect(actual)
         )
@@ -37,7 +37,7 @@ local function OK(f, ...)
     return ret
 end
 
-local function FAIL(f, ...)
+local function NOK(f, ...)
     local status, ret = pcall(f, ...)
     assert(not status, string.format('%s:\n%s', debug.traceback(), vim.inspect(ret)))
     return ret
@@ -54,15 +54,15 @@ end
 
 function tst.new_configer()
     -- Create config
-    FAIL(libv.new_configer)
+    NOK(libv.new_configer)
     local cfg = OK(libv.new_configer, { file = 'test.cpp' })
     EQ({ file = 'test.cpp' }, cfg)
 
     -- Methods
-    FAIL(function() cfg.add = 'foo' end)
-    FAIL(function() cfg.del = 'foo' end)
-    FAIL(function() cfg.set = 'foo' end)
-    FAIL(function() cfg.reinit = 'foo' end)
+    NOK(function() cfg.add = 'foo' end)
+    NOK(function() cfg.del = 'foo' end)
+    NOK(function() cfg.set = 'foo' end)
+    NOK(function() cfg.reinit = 'foo' end)
 
     -- Modify option and non-savable option
     cfg.file = 'test.c'
@@ -110,24 +110,31 @@ function tst.new_configer()
 end
 
 function tst.new_chanor()
-    local data = {
-        [[[2J[m[HH]0;C:\Windows\SYSTEM32\cmd.exe[?25hello ANSI]],
-    }
+    local data = require('v.test.data')
+
     local chanor = libv.new_chanor({ connect_pty = true, hl_ansi_sgr = true })
-    local lines, highlights
-    lines, highlights = chanor(data)
-    EQ({}, lines)
-    lines, highlights = chanor()
-    EQ({ 'Hello ANSI\n' }, lines)
-    vim.print(lines)
+    local chunk
+    local lines = {}
+    for _, d in ipairs(data[1]) do
+        chunk, __ = chanor(d)
+        vim.list_extend(lines, chunk)
+    end
+    EQ('', lines[8])
+    EQ('', lines[10])
+    EQ('Hello Rust', lines[#lines])
+
+    for _, line in ipairs(lines) do
+        vim.print(vim.inspect(line))
+    end
 end
 
 print('Test work at', dir_this)
-for t, f in pairs(tst) do
+for t, f in vim.spairs(tst) do
+    print(' ')
     print(string.format('--- Run testcase %s ------------------------------', t))
     local status, ret = pcall(f)
     if status then
-        print(string.format('--- End testcase %s ------------------------------', t))
+        print(string.format('--- Pass testcase %s ------------------------------', t))
     else
         print(ret)
         print(string.format('--- Failed testcase %s ------------------------------', t))
