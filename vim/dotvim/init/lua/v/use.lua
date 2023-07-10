@@ -51,11 +51,10 @@ local function use_init()
     -- Set ui
     local fontlst = {
         'Consolas',
-        'Consolas,CaskaydiaCove Nerd Font Mono',
+        'Consolas,CaskaydiaCove NFM',
         'Consolas Nerd Font Mono',
-        'CaskaydiaCove Nerd Font Mono',
-        'agave Nerd Font Mono',
-        'FantasqueSansMono Nerd Font Mono',
+        'CaskaydiaCove NFM',
+        'FantasqueSansM Nerd Font Mono',
         'UbuntuMono Nerd Font Mono',
         'Microsoft YaHei UI',
         'Microsoft YaHei Mono',

@@ -16,7 +16,7 @@ local function set_default_opts()
     o.signcolumn = 'number'                          -- 共用number的区域用于显示sign
     o.cursorline = true                              -- 高亮当前行
     o.cursorcolumn = true                            -- 高亮当前列
-    o.colorcolumn = 80                               -- 设置宽度参考线
+    o.colorcolumn = '80'                             -- 设置宽度参考线
     o.hlsearch = true                                -- 设置高亮显示查找到的文本
     o.incsearch = true                               -- 预览当前的搜索内容
     o.termguicolors = true                           -- 在终端中使用24位彩色

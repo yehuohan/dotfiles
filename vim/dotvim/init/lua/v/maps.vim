@@ -146,14 +146,14 @@ nnoremap <leader>wL <C-w>L
 nnoremap <leader>wT <C-w>T
 " 改变窗口大小
 nnoremap <leader>w= <C-w>=
-nnoremap <silent> <M-e> <Cmd>call v:lua.require('v.sets').win_move_spliter('e', 5)<CR>
-nnoremap <silent> <M-s> <Cmd>call v:lua.require('v.sets').win_move_spliter('s', 5)<CR>
-nnoremap <silent> <M-f> <Cmd>call v:lua.require('v.sets').win_move_spliter('f', 5)<CR>
-nnoremap <silent> <M-d> <Cmd>call v:lua.require('v.sets').win_move_spliter('d', 5)<CR>
-nnoremap <M-Up> <Cmd>call v:lua.require('v.sets').win_move_spliter('e', 1)<CR>
-nnoremap <M-Down> <Cmd>call v:lua.require('v.sets').win_move_spliter('d', 1)<CR>
-nnoremap <M-Left> <Cmd>call v:lua.require('v.sets').win_move_spliter('s', 1)<CR>
-nnoremap <M-Right> <Cmd>call v:lua.require('v.sets').win_move_spliter('f', 1)<CR>
+nnoremap <M-e> <Cmd>call v:lua.require('v.sets').win_move_spliter('e', 5)<CR>
+nnoremap <M-s> <Cmd>call v:lua.require('v.sets').win_move_spliter('s', 5)<CR>
+nnoremap <M-f> <Cmd>call v:lua.require('v.sets').win_move_spliter('f', 5)<CR>
+nnoremap <M-d> <Cmd>call v:lua.require('v.sets').win_move_spliter('d', 5)<CR>
+nnoremap <M-E> <Cmd>call v:lua.require('v.sets').win_move_spliter('e', 1)<CR>
+nnoremap <M-D> <Cmd>call v:lua.require('v.sets').win_move_spliter('d', 1)<CR>
+nnoremap <M-S> <Cmd>call v:lua.require('v.sets').win_move_spliter('s', 1)<CR>
+nnoremap <M-F> <Cmd>call v:lua.require('v.sets').win_move_spliter('f', 1)<CR>
 " }}}
 
 " Quickfix {{{

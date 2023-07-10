@@ -51,7 +51,7 @@ local codes = {
     sh         = { cmd = 'bash ./{bsrc} {earg}' },
     ps1        = { cmd = 'Powershell -ExecutionPolicy Bypass -File {bsrc} {earg}' },
     dosbatch   = { cmd = '{bsrc} {earg}' },
-    glsl       = { cmd = 'glslangValidator {earg} {bsrc}' },
+    glsl       = { cmd = 'glslangValidator {earg} {bsrc}', efm = [[%+P%f,ERROR:\ %c:%l:\ %m,%-Q]] },
     json       = { cmd = 'python -m json.tool {bsrc}' },
     html       = { cmd = 'firefox {bsrc}' },
     tex        = { cmd = 'xelatex -file-line-error {bsrc} && sioyek "{bout}.pdf"', efm = [[%f:%l:\ %m]] },
