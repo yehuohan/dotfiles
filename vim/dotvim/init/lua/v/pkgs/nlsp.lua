@@ -90,29 +90,29 @@ end
 -- stylua: ignore start
 local kind_icons = {
     Text          = { '', 'Txt'  },
-    Method        = { '', 'Meth' },
-    Function      = { '', 'Fun'  },
+    Method        = { '󰆧', 'Meth' },
+    Function      = { '󰊕', 'Fun'  },
     Constructor   = { '', 'CnSt' },
-    Field         = { '', 'Fied' },
+    Field         = { '󰇽', 'Fied' },
     Variable      = { 'ω', 'Var'  },
-    Class         = { 'ﴯ', 'Cla'  },
+    Class         = { '󰠱', 'Cla'  },
     Interface     = { '', 'InF'  },
     Module        = { '', 'Mod'  },
-    Property      = { 'ﰠ', 'Prop' },
+    Property      = { '󰜢', 'Prop' },
     Unit          = { '', 'Unit' },
-    Value         = { '', 'Val'  },
+    Value         = { '󰎠', 'Val'  },
     Enum          = { '', 'Enum' },
-    Keyword       = { '', 'Key'  },
+    Keyword       = { '󰌋', 'Key'  },
     Snippet       = { '', 'Snip' },
-    Color         = { '', 'Clr'  },
-    File          = { '', 'File' },
+    Color         = { '󰏘', 'Clr'  },
+    File          = { '󰈙', 'File' },
     Reference     = { '', 'Ref'  },
-    Folder        = { '', 'Dir'  },
+    Folder        = { '󰉋', 'Dir'  },
     EnumMember    = { '', 'EnuM' },
-    Constant      = { '', 'Cons' },
-    Struct        = { '', 'Stru' },
-    Event         = { '', 'Evnt' },
-    Operator      = { '', 'Oprt' },
+    Constant      = { '', 'Cons' },
+    Struct        = { '', 'Stru' },
+    Event         = { '', 'Evnt' },
+    Operator      = { '󰆕', 'Oprt' },
     TypeParameter = { '', 'TyPa' },
 }
 
@@ -310,9 +310,9 @@ local function __lsp_settings()
     if use.ui.patch then
         for name, icon in pairs({
             DiagnosticSignError = '🗴',
-            DiagnosticSignWarn = '',
+            DiagnosticSignWarn = '',
             DiagnosticSignInfo = '►',
-            DiagnosticSignHint = '',
+            DiagnosticSignHint = '󰌶',
         }) do
             vim.fn.sign_define(name, { text = icon, texthl = name, numhl = name })
         end
