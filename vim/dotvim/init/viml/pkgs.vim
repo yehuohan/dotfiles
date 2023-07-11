@@ -171,7 +171,11 @@ let g:NERDTreeMapToggleFiles = 'F'
 let g:NERDTreeMapMenu = 'M'
 let g:NERDTreeMapToggleBookmarks = ''
 nnoremap <leader>te :NERDTreeToggle<CR>
+if has('nvim')
+nnoremap <leader>tE <Cmd>execute ':NERDTree ' . fnamemodify(nvim_buf_get_name(0), ':p:h')<CR>
+else
 nnoremap <leader>tE <Cmd>execute ':NERDTree ' . Expand('%', ':p:h')<CR>
+endif
 " }}}
 
 " screensaver {{{ 屏保

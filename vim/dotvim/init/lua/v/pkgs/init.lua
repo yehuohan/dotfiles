@@ -265,8 +265,6 @@ local function pkg_bqf()
         preview = { auto_preview = false },
         func_map = {
             open = '', -- bqf's open doesn't trigger popc.buf's insertion
-            pscrollup = '<M-m>',
-            pscrolldown = '<M-n>',
         },
     })
 end
