@@ -43,7 +43,7 @@ scoop install https://raw.githubusercontent.com/daipeihust/im-select/master/buck
 scoop install conemu wox snipaste everything  screentogif rapidee
 scoop install notepadnext honeyview qttabbar-indiff-np
 scoop download clink -h
-scoop install CascadiaCode-NF-Mono FantasqueSansMono-NF-Mono -s
+scoop install CodeNewRoman-NF-Mono FantasqueSansMono-NF-Mono -s
 
 # Add optional packs
 scoop install llvm portable-virtualbox
