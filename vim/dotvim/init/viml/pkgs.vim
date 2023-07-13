@@ -45,7 +45,7 @@ let g:VM_maps = {
     \ 'Toggle Single Region' : ',<CR>',
     \ }
 let g:VM_custom_remaps = {
-    \ 's'     : '<Cmd>HopChar1<CR>',
+    \ 's' : '<Cmd>HopChar1<CR>',
     \ }
 " }}}
 
@@ -116,18 +116,18 @@ let g:Popc_subSeparator = {'left' : '', 'right': ''}
 endif
 let g:Popc_wksSaveUnderRoot = 0
 let g:Popc_wksRootPatterns = ['.popc', '.git', '.svn', '.hg', 'tags']
-nnoremap <leader><leader>h :PopcBuffer<CR>
-nnoremap <M-u> :PopcBufferSwitchTabLeft!<CR>
-nnoremap <M-p> :PopcBufferSwitchTabRight!<CR>
-nnoremap <M-i> :PopcBufferSwitchLeft!<CR>
-nnoremap <M-o> :PopcBufferSwitchRight!<CR>
-nnoremap <C-i> :PopcBufferJumpPrev<CR>
-nnoremap <C-o> :PopcBufferJumpNext<CR>
+nnoremap <leader><leader>h <Cmd>PopcBuffer<CR>
+nnoremap <M-u> <Cmd>PopcBufferSwitchTabLeft!<CR>
+nnoremap <M-p> <Cmd>PopcBufferSwitchTabRight!<CR>
+nnoremap <M-i> <Cmd>PopcBufferSwitchLeft!<CR>
+nnoremap <M-o> <Cmd>PopcBufferSwitchRight!<CR>
+nnoremap <C-i> <Cmd>PopcBufferJumpPrev<CR>
+nnoremap <C-o> <Cmd>PopcBufferJumpNext<CR>
 nnoremap <C-u> <C-o>
 nnoremap <C-p> <C-i>
-nnoremap <leader>wq :PopcBufferClose!<CR>
-nnoremap <leader><leader>b :PopcBookmark<CR>
-nnoremap <leader><leader>w :PopcWorkspace<CR>
+nnoremap <leader>wq <Cmd>PopcBufferClose!<CR>
+nnoremap <leader><leader>b <Cmd>PopcBookmark<CR>
+nnoremap <leader><leader>w <Cmd>PopcWorkspace<CR>
 nnoremap <leader>ty
     \ <Cmd>
     \ let g:Popc_tablineLayout = (get(g:, 'Popc_tablineLayout', 0) + 1) % 3 <Bar>
