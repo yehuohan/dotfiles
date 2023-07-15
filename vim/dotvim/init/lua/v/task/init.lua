@@ -118,7 +118,7 @@ function M.setup()
         end,
     })
 
-    -- Setup quickfix window
+    -- Setup quickfix
     vim.api.nvim_create_autocmd('BufWinEnter', {
         group = 'v.Task',
         callback = function(args)
@@ -126,6 +126,21 @@ function M.setup()
             if qf.qfbufnr ~= args.buf then
                 return
             end
+            -- Setup key mappings
+            libv.m.nnore({
+                '<CR>',
+                function()
+                    local row = vim.fn.line('.', qf.winid)
+                    local hbuf = vim.fn.getqflist()[row].bufnr
+                    if hbuf > 0 then
+                        vim.api.nvim_set_current_win(vim.fn.win_getid(vim.fn.winnr('#')))
+                        vim.cmd.edit({ args = { vim.api.nvim_buf_get_name(hbuf) } })
+                    end
+                    vim.fn.setqflist({}, 'a', { idx = row })
+                end,
+                buffer = qf.qfbufnr,
+            })
+            -- Setup window display
             if (qf.winid > 0) and vim.api.nvim_win_is_valid(qf.winid) then
                 for _, str in ipairs(M.hlstr) do
                     vim.fn.win_execute(

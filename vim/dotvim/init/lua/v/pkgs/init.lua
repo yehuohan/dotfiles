@@ -238,7 +238,7 @@ local function pkg_ufo()
                     table.insert(res, chunk)
                 end
             end
-            table.insert(res, { ('  %d '):format(endLnum - lnum), 'MoreMsg' })
+            table.insert(res, { ('  %s%d '):format(use.ui.patch and '󰁂' or '~', endLnum - lnum), 'MoreMsg' })
             return res
         end,
         provider_selector = function(bufnr, filetype, buftype) return { 'treesitter', 'indent' } end,
