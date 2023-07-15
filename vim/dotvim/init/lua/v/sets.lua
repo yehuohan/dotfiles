@@ -144,14 +144,14 @@ end
 
 local function on_alter_enter()
     if vim.b.alter_view and (vim.bo.filetype ~= 'qf') and not vim.wo.diff then
-        vim.fn.winrestview(vim.b.alter_view)
+        fn.winrestview(vim.b.alter_view)
         vim.b.alter_view = nil
     end
 end
 
 local function on_alter_leave()
     if (vim.bo.filetype ~= 'qf') and not vim.wo.diff then
-        vim.b.alter_view = vim.fn.winsaveview()
+        vim.b.alter_view = fn.winsaveview()
     end
 end
 
@@ -201,8 +201,8 @@ local function on_UIEnter()
         vim.cmd.GuiLinespace(0)
         vim.cmd.GuiTabline(0)
         vim.cmd.GuiPopupmenu(0)
-        m.nore({ '<RightMouse>', vim.fn.GuiShowContextMenu })
-        m.inore({ '<RightMouse>', vim.fn.GuiShowContextMenu })
+        m.nore({ '<RightMouse>', fn.GuiShowContextMenu })
+        m.inore({ '<RightMouse>', fn.GuiShowContextMenu })
         m.nnore({ '<leader>tf', [[<Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>]] })
         m.nnore({ '<leader>tm', [[<Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>]] })
     end
@@ -224,39 +224,49 @@ end
 local M = {}
 
 function M.win_goto_next_floating()
-    for _, wid in ipairs(api.nvim_list_wins()) do
-        if wid ~= api.nvim_get_current_win() then
-            local cfg = api.nvim_win_get_config(wid)
-            if cfg.relative ~= '' and cfg.focusable then
-                fn.win_gotoid(wid)
-            end
+    local wins = {}
+    for _, wid in ipairs(api.nvim_tabpage_list_wins(0)) do
+        if fn.win_gettype(wid) == 'popup' then
+            wins[#wins + 1] = wid
         end
+    end
+    if #wins > 0 then
+        local idx = fn.index(wins, api.nvim_get_current_win())
+        if idx == -1 or (idx + 1 == #wins) then
+            idx = 0
+        else
+            idx = idx + 1
+        end
+        vim.api.nvim_set_current_win(wins[idx + 1])
     end
 end
 
---- 移动窗口的分界，改变窗口大小
---- 只有最bottom-right的窗口是移动其top-left的分界，其余窗口移动其bottom-right分界
-function M.win_move_spliter(dir, inc)
+function M.win_move_bottom_spliter(inc)
     local pos = api.nvim_win_get_position(0)
-    local hei = pos[1] + 1 + api.nvim_win_get_height(0) + vim.o.cmdheight
-    local wid = pos[2] + api.nvim_win_get_width(0)
-    local max_hei = vim.o.lines
-    local max_wid = vim.o.columns
+    local cur = pos[1] + 1 + api.nvim_win_get_height(0) + vim.o.cmdheight
+    local max = vim.o.lines
+    local offset = inc * vim.v.count1
 
-    inc = inc * vim.v.count1
-    local opts = { args = { '' }, mods = { vertical = false } }
-    if dir == 'e' then
-        opts.args[1] = ('%s%d'):format((hei >= max_hei and pos[1] >= 3) and '+' or '-', inc)
-    elseif dir == 'd' then
-        opts.args[1] = ('%s%d'):format((hei >= max_hei and pos[1] >= 3) and '-' or '+', inc)
-    elseif dir == 's' then
-        opts.args[1] = ('%s%d'):format((wid >= max_wid) and '+' or '-', inc)
-        opts.mods.vertical = true
-    elseif dir == 'f' then
-        opts.args[1] = ('%s%d'):format((wid >= max_wid) and '-' or '+', inc)
-        opts.mods.vertical = true
+    if cur >= max then
+        if pos[1] >= 2 then
+            vim.cmd.resize({ args = { ('%+d'):format(-offset) } })
+        end
+    else
+        fn.win_move_statusline(fn.winnr(), offset)
     end
-    vim.cmd.resize(opts)
+end
+
+function M.win_move_right_spliter(inc)
+    local pos = api.nvim_win_get_position(0)
+    local cur = pos[2] + api.nvim_win_get_width(0)
+    local max = vim.o.columns
+    local offset = inc * vim.v.count1
+
+    if cur >= max then
+        vim.cmd.resize({ args = { ('%+d'):format(-offset) }, mods = { vertical = true } })
+    else
+        fn.win_move_separator(fn.winnr(), offset)
+    end
 end
 
 function M.setup()
