@@ -1,7 +1,7 @@
 " Basic {{{
 nnoremap <leader><leader>q :lua os.exit(0)
-nnoremap <leader>.         :lua require('v.libv').recall()<CR>
-nnoremap <leader><leader>. :lua require('v.libv').recall(nil, { feedcmd = true })<CR>
+nnoremap <leader>.         <Cmd>lua require('v.libv').recall()<CR>
+nnoremap <leader><leader>. <Cmd>lua require('v.libv').recall(nil, { feedcmd = true })<CR>
 nnoremap <C-;> @:
 vnoremap <leader><leader>; <Cmd>call feedkeys(':' . v:lua.require('v.libv').get_selected(''), 'n')<CR>
 vnoremap <leader><leader>: <Cmd>call feedkeys(':lua ' . v:lua.require('v.libv').get_selected(''), 'n')<CR>
@@ -184,9 +184,9 @@ nnoremap <leader>ql
 " }}}
 
 " Diff {{{
-nnoremap <leader>dt :diffthis<CR>
-nnoremap <leader>do :diffoff<CR>
-nnoremap <leader>du :diffupdate<CR>
+nnoremap <leader>dt <Cmd>diffthis<CR>
+nnoremap <leader>do <Cmd>diffoff<CR>
+nnoremap <leader>du <Cmd>diffupdate<CR>
 nnoremap <leader>dp <Cmd>execute '.,+' . string(v:count1-1) . 'diffput'<CR>
 nnoremap <leader>dg <Cmd>execute '.,+' . string(v:count1-1) . 'diffget'<CR>
 nnoremap <leader>dj ]c
@@ -194,7 +194,7 @@ nnoremap <leader>dk [c
 " }}}
 
 " Search {{{
-nnoremap <leader><Esc> :nohlsearch<CR>
+nnoremap <leader><Esc> <Cmd>nohlsearch<CR>
 nnoremap i <Cmd>nohlsearch<CR>i
 nnoremap <leader>8 *
 nnoremap <leader>3 #

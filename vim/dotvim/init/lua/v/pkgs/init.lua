@@ -274,7 +274,7 @@ local function pkg_icon_picker()
     require('icon-picker').setup({
         disable_legacy_commands = true,
     })
-    m.inore({ '<M-w>', '<Cmd>IconPickerInsert<CR>' })
+    m.inore({ '<M-w>', '<Cmd>IconPickerInsert alt_font emoji html_colors nerd_font_v3 symbols<CR>' })
     m.nnore({ '<leader><leader>i', ':IconPickerInsert<Space>' })
 end
 

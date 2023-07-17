@@ -159,7 +159,7 @@ local function set_default_autocmds()
     -- stylua: ignore start
     api.nvim_create_autocmd('BufNewFile', { group = 'v.Sets', command = 'setlocal fileformat=unix' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.nvim' }, command = 'setlocal filetype=vim' })
-    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.usf', '*.ush' }, command = 'setlocal filetype=hlsl' })
+    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.hlsl', '*.usf', '*.ush' }, command = 'setlocal filetype=hlsl' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.uproject', '*.uplugin' }, command = 'setlocal filetype=jsonc' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = {
             '*.vert', '*.tesc', '*.tese', '*.glsl', '*.geom', '*.frag', '*.comp',
@@ -192,6 +192,11 @@ local function set_fonts(inc)
 end
 
 local function on_UIEnter()
+    set_fonts(0)
+    m.nnore({ '<k0>', function() set_fonts(0) end })
+    m.nnore({ '<kPlus>', function() set_fonts(1) end })
+    m.nnore({ '<kMinus>', function() set_fonts(-1) end })
+
     vim.o.guicursor = [[n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50]]
         .. [[,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor]]
         .. [[,sm:block-blinkwait175-blinkoff150-blinkon175]]
@@ -289,10 +294,6 @@ function M.setup()
     vim.o.guioptions = 'M' -- 完全禁用Gui界面元素
     vim.g.did_install_default_menus = 1 -- 禁止加载缺省菜单
     vim.g.did_install_syntax_menu = 1 -- 禁止加载Syntax菜单
-    set_fonts(0)
-    m.nnore({ '<k0>', function() set_fonts(0) end })
-    m.nnore({ '<kPlus>', function() set_fonts(1) end })
-    m.nnore({ '<kMinus>', function() set_fonts(-1) end })
     api.nvim_create_autocmd('UIEnter', { group = 'v.Sets', callback = on_UIEnter })
 
     vim.cmd.source(vim.env.DotVimInit .. '/lua/v/maps.vim')
