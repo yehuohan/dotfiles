@@ -47,7 +47,8 @@ local codes = {
     javascript = { cmd = 'node {bsrc} {earg}' },
     typescript = { cmd = 'node {bsrc} {earg}' },
     make       = { cmd = 'make -f {bsrc} {earg}', efm = [[make:\ ***\ [%f:%l:\ %m]] },
-    cmake      = { cmd = 'cmake {earg} -P {bsrc}', efm = [[%ECMake\ Error\ at\ %f:%l\ %#%m:]] },
+    cmake      = { cmd = 'cmake {earg} -P {bsrc}', efm = [[CMake\ Error\ at\ %f:%l\ %#%m:]]
+                                                      .. [[,\ \ %f:%l\ (%m)]] },
     sh         = { cmd = 'bash ./{bsrc} {earg}' },
     ps1        = { cmd = 'Powershell -ExecutionPolicy Bypass -File {bsrc} {earg}' },
     dosbatch   = { cmd = '{bsrc} {earg}' },
