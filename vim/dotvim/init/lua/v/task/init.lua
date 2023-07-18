@@ -143,15 +143,15 @@ function M.setup()
             })
             -- Setup window display
             if (qf.winid > 0) and vim.api.nvim_win_is_valid(qf.winid) then
-                for _, str in ipairs(M.hlstr) do
-                    vim.fn.win_execute(
-                        qf.winid,
-                        ([[syntax match IncSearch /\V\c%s/]]):format(vim.fn.escape(str, '\\/'))
-                    )
-                end
-                vim.fn.win_execute(qf.winid, [[syntax match vTaskOnqf /\m^|| / conceal]])
-                vim.fn.win_execute(qf.winid, [[syntax match vTaskOnqf /\m^|| {{{ / conceal]])
-                vim.fn.win_execute(qf.winid, [[syntax match vTaskOnqf /\m^|| }}} / conceal]])
+                vim.api.nvim_win_call(qf.winid, function()
+                    for _, str in ipairs(M.hlstr) do
+                        local estr = vim.fn.escape(str, '\\/')
+                        vim.cmd.syntax({ args = { ([[match IncSearch /\V\c%s/]]):format(estr) } })
+                    end
+                    vim.cmd.syntax({ args = { [[match vTaskOnqf /\m^|| / conceal]] } })
+                    vim.cmd.syntax({ args = { [[match vTaskOnqf /\m^|| {{{ / conceal]] } })
+                    vim.cmd.syntax({ args = { [[match vTaskOnqf /\m^|| }}} / conceal]] } })
+                end)
                 vim.api.nvim_win_set_option(qf.winid, 'number', false)
                 vim.api.nvim_win_set_option(qf.winid, 'relativenumber', false)
                 vim.api.nvim_win_set_option(qf.winid, 'signcolumn', 'no')
