@@ -135,7 +135,8 @@ function M.setup()
                     if item.bufnr > 0 then
                         vim.api.nvim_set_current_win(vim.fn.win_getid(vim.fn.winnr('#')))
                         vim.cmd.edit({ args = { vim.api.nvim_buf_get_name(item.bufnr) } })
-                        vim.api.nvim_win_set_cursor(0, { item.lnum, item.col - 1 })
+                        local pos = { item.lnum, item.col > 0 and (item.col - 1) or 0 }
+                        vim.api.nvim_win_set_cursor(0, pos)
                     end
                     vim.fn.setqflist({}, 'a', { idx = row })
                 end,
