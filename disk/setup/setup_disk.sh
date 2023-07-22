@@ -33,7 +33,7 @@ if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
 fi
 
 # Install gcc
-# pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make
+# pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-make
 # cp /ucrt64/bin/mingw32-make.exe /ucrt64/bin/make.exe
 
 echo "Disk setup was completed!"
