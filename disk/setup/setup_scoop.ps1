@@ -35,7 +35,7 @@ scoop bucket add nonportable https://kgithub.com/ScoopInstaller/Nonportable.git
 scoop bucket add nerd-fonts https://kgithub.com/matthewjberger/scoop-nerd-fonts.git
 
 # Add packs
-scoop install neovim neovide vim-nightly -a 64bit
+scoop install neovim neovide nvy vim-nightly -a 64bit
 scoop install bat fd fzf ripgrep lf universal-ctags
 scoop install 7zip cmake ninja
 scoop install lua python deno nodejs # Then run apps/python/current/install-pep-514.reg

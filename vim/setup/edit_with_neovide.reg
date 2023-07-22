@@ -5,4 +5,4 @@ Windows Registry Editor Version 5.00
 "Icon"="\"C:\\apps\\_packs\\apps\\neovide\\current\\neovide.exe\""
 
 [HKEY_CLASSES_ROOT\*\Shell\Neovide\command]
-@="\"C:\\apps\\_packs\\apps\\neovide\\current\\neovide.exe\" \"--geometry=90x25\" \"%1\""
+@="\"C:\\apps\\_packs\\apps\\neovide\\current\\neovide.exe\" --geometry=70x20 \"%1\""
