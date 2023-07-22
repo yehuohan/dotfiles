@@ -766,7 +766,7 @@ local pkgs = {
             'neovim/nvim-lspconfig',
             'nvimdev/lspsaga.nvim',
             'ray-x/lsp_signature.nvim',
-            -- Plug 'simrat39/rust-tools.nvim'
+            -- 'simrat39/rust-tools.nvim'
             'hrsh7th/cmp-nvim-lsp',
             'hrsh7th/cmp-buffer',
             'hrsh7th/cmp-nvim-lua',

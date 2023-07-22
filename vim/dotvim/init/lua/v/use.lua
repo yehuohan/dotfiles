@@ -9,10 +9,32 @@ local use = {
     ui = {
         patch = false,
         font = 'Consolas',
+        fontback = 'Consolas',
         fontsize = 12,
         wide = 'Microsoft YaHei UI',
         widesize = 11,
     },
+}
+
+local lst = {
+    git = {
+        vim.v.null,
+        'https://kgithub.com',
+        'https://hub.fgit.ml',
+        'https://hub.njuu.cf',
+        'https://hub.nuaa.cf',
+        'https://hub.yzuu.cf',
+    },
+    fonts = {
+        'Consolas',
+        'Consolas,CodeNewRoman Nerd Font Mono',
+        'Consolas Nerd Font Mono',
+        'FantasqueSansM Nerd Font Mono',
+        'Microsoft YaHei UI',
+        'Microsoft YaHei Mono',
+        'WenQuanYi Micro Hei Mono',
+    },
+    fontsize = { 9, 10, 11, 12, 13, 14, 15, 16 },
 }
 
 local function use_save(name)
@@ -37,44 +59,23 @@ end
 local function use_init()
     -- Init with empty dict '{}' to indicate sub-selection
     local udic = vim.tbl_map(function() return vim.empty_dict() end, use)
-    -- Set xgit
-    udic.xgit = {
-        lst = {
-            vim.v.null,
-            'https://kgithub.com',
-            'https://hub.fgit.ml',
-            'https://hub.njuu.cf',
-            'https://hub.nuaa.cf',
-            'https://hub.yzuu.cf',
-        },
-    }
-    -- Set ui
-    local fontlst = {
-        'Consolas',
-        'Consolas,CodeNewRoman Nerd Font Mono',
-        'Consolas Nerd Font Mono',
-        'FantasqueSansM Nerd Font Mono',
-        'Microsoft YaHei UI',
-        'Microsoft YaHei Mono',
-        'WenQuanYi Micro Hei Mono',
-    }
-    local fontsizelst = { 9, 10, 11, 12, 13, 14, 15 }
+    udic.xgit = { lst = lst.git }
     udic.ui = {
         dsr = 'set ui',
         lst = vim.fn.sort(vim.tbl_keys(use.ui)),
         dic = {
             patch = { lst = { true, false } },
-            font = { dsr = 'set guifont', lst = fontlst },
-            wide = { dsr = 'set guifontwide', lst = fontlst },
-            fontsize = { lst = fontsizelst },
-            widesize = { lst = fontsizelst },
+            font = { dsr = 'as guifont', lst = lst.fonts },
+            fontback = { dsr = 'as guifont fallback', lst = lst.fonts },
+            fontsize = { lst = lst.fontsize },
+            wide = { dsr = 'as guifontwide', lst = lst.fonts },
+            widesize = { lst = lst.fontsize },
         },
         sub = {
             cmd = function(sopt, sel) use.ui[sopt] = sel end,
             get = function(sopt) return use.ui[sopt] end,
         },
     }
-
     vim.fn.PopSelection({
         opt = 'use',
         lst = vim.fn.sort(vim.tbl_keys(use)),

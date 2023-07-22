@@ -197,9 +197,9 @@ local function on_UIEnter()
     m.nnore({ '<kPlus>', function() set_fonts(1) end })
     m.nnore({ '<kMinus>', function() set_fonts(-1) end })
 
-    vim.o.guicursor = [[n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50]]
-        .. [[,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor]]
-        .. [[,sm:block-blinkwait175-blinkoff150-blinkon175]]
+    vim.o.guicursor = 'n-v-c:block,i-ci-ve:ver25,r-cr-o:hor20'
+        .. ',a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor'
+        .. ',sm:block-blinkwait175-blinkoff150-blinkon175'
 
     -- g:GuiLoaded work after UIEnter
     if vim.g.GuiLoaded then
@@ -220,6 +220,11 @@ local function on_UIEnter()
             '<leader>tf',
             function() vim.g.neovide_fullscreen = not vim.g.neovide_fullscreen end,
         })
+    end
+
+    if vim.g.nvy then
+        vim.o.guicursor = 'n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20'
+        vim.o.guifont = use.ui.fontback .. ':h' .. tostring(use.ui.fontsize)
     end
 end
 
