@@ -39,7 +39,7 @@ local function __servers()
     opts['cmake'] = function()
         lspconfig.cmake.setup({
             capabilities = capabilities,
-            init_options = { buildDirectory = '__VBuildOut' },
+            init_options = { buildDirectory = '_VOut' },
         })
     end
     opts['rust_analyzer'] = function()

@@ -348,9 +348,9 @@ endfunction
 " }}}
 
 " Function: s:vout(cfg) {{{
-" 设置__VBuildOut输出和运行（用于FnMake和FnCMake）
+" 设置_VOut输出和运行（用于FnMake和FnCMake）
 function! s:vout(cfg)
-    let l:dir = '__VBuildOut'
+    let l:dir = '_VOut'
     let l:outdir = a:cfg.wdir . '/' . l:dir
 
     if a:cfg.deploy ==# 'clean'

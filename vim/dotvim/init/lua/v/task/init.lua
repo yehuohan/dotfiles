@@ -80,45 +80,8 @@ function M.run_cmd(cmd, bang)
     M.run(cfg)
 end
 
-function M.setup()
-    -- Setup task commands
-    vim.api.nvim_create_user_command('TaskWsc', function() vim.print(M.wsc) end, { nargs = 0 })
-    vim.api.nvim_create_user_command(
-        'TaskRun',
-        function(opts) M.run_cmd(opts.args, opts.bang) end,
-        { bang = true, nargs = 1, complete = 'shellcmd' }
-    )
-    libv.m.nnore({ '<leader><leader>r', ':TaskRun<Space>' })
-    libv.m.nnore({ '<leader><leader>R', ':TaskRun!<Space>' })
-    libv.m.vnore({
-        '<leader><leader>r',
-        function() vim.api.nvim_feedkeys(':TaskRun ' .. libv.get_selected(''), 'n', true) end,
-    })
-    libv.m.vnore({
-        '<leader><leader>R',
-        function() vim.api.nvim_feedkeys(':TaskRun! ' .. libv.get_selected(''), 'n', true) end,
-    })
-
-    -- Save and restore workspace config
-    vim.api.nvim_create_augroup('v.Task', { clear = true })
-    vim.api.nvim_create_autocmd('User', {
-        group = 'v.Task',
-        pattern = 'PopcLayerWksSavePre',
-        callback = function() vim.fn['popc#layer#wks#SetSettings'](M.wsc) end,
-    })
-    vim.api.nvim_create_autocmd('User', {
-        group = 'v.Task',
-        pattern = 'PopcLayerWksLoaded',
-        callback = function()
-            M.wsc = vim.tbl_deep_extend('force', M.wsc, vim.fn['popc#layer#wks#GetSettings']())
-            if M.wsc.fzer.path == '' then
-                M.wsc.fzer.path = vim.fn['popc#layer#wks#GetCurrentWks']('root')
-            end
-            require('v.task.fzer').setwsc(M.wsc.fzer)
-        end,
-    })
-
-    -- Setup quickfix
+--- Setup quickfix window for task result
+local function setup_qf()
     vim.api.nvim_create_autocmd('BufWinEnter', {
         group = 'v.Task',
         callback = function(args)
@@ -160,7 +123,47 @@ function M.setup()
         end,
     })
     vim.api.nvim_set_hl(0, 'QuickFixLine', { bg = '#505050' })
+end
 
+function M.setup()
+    -- Setup task commands
+    vim.api.nvim_create_user_command('TaskWsc', function() vim.print(M.wsc) end, { nargs = 0 })
+    vim.api.nvim_create_user_command(
+        'TaskRun',
+        function(opts) M.run_cmd(opts.args, opts.bang) end,
+        { bang = true, nargs = 1, complete = 'shellcmd' }
+    )
+    libv.m.nnore({ '<leader><leader>r', ':TaskRun<Space>' })
+    libv.m.nnore({ '<leader><leader>R', ':TaskRun!<Space>' })
+    libv.m.vnore({
+        '<leader><leader>r',
+        function() vim.api.nvim_feedkeys(':TaskRun ' .. libv.get_selected(''), 'n', true) end,
+    })
+    libv.m.vnore({
+        '<leader><leader>R',
+        function() vim.api.nvim_feedkeys(':TaskRun! ' .. libv.get_selected(''), 'n', true) end,
+    })
+
+    -- Save and restore workspace config
+    vim.api.nvim_create_augroup('v.Task', { clear = true })
+    vim.api.nvim_create_autocmd('User', {
+        group = 'v.Task',
+        pattern = 'PopcLayerWksSavePre',
+        callback = function() vim.fn['popc#layer#wks#SetSettings'](M.wsc) end,
+    })
+    vim.api.nvim_create_autocmd('User', {
+        group = 'v.Task',
+        pattern = 'PopcLayerWksLoaded',
+        callback = function()
+            M.wsc = vim.tbl_deep_extend('force', M.wsc, vim.fn['popc#layer#wks#GetSettings']())
+            if M.wsc.fzer.path == '' then
+                M.wsc.fzer.path = vim.fn['popc#layer#wks#GetCurrentWks']('root')
+            end
+            require('v.task.fzer').setwsc(M.wsc.fzer)
+        end,
+    })
+
+    setup_qf()
     require('v.task.code').setup()
     require('v.task.fzer').setup()
 end

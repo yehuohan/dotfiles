@@ -160,6 +160,9 @@ function M.constructor(params)
             vim.cmd.wall({ mods = { silent = true, emsg_silent = true } })
         end
         local qf = try_copen(get_qf(), params.open, params.jump)
+        if qf.hwin then
+            vim.api.nvim_win_call(qf.hwin, function() vim.cmd.lcd({ args = { task.cwd } }) end)
+        end
         if qf.hbuf and ctx.ns and not params.append then
             vim.api.nvim_buf_clear_namespace(qf.hbuf, ctx.ns, 0, -1)
         end

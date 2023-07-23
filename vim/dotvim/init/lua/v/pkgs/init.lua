@@ -221,6 +221,7 @@ local function pkg_ufo()
         fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
             local res = {}
             local tag = use.ui.patch and '' or '»'
+            local tag_num = use.ui.patch and '󰁂' or '~'
 
             for k, chunk in ipairs(virtText) do
                 if k == 1 then
@@ -238,7 +239,7 @@ local function pkg_ufo()
                     table.insert(res, chunk)
                 end
             end
-            table.insert(res, { ('  %s%d '):format(use.ui.patch and '󰁂' or '~', endLnum - lnum), 'MoreMsg' })
+            table.insert(res, { ('  %s%d '):format(tag_num, endLnum - lnum), 'MoreMsg' })
             return res
         end,
         provider_selector = function(bufnr, filetype, buftype) return { 'treesitter', 'indent' } end,
@@ -265,6 +266,7 @@ local function pkg_bqf()
         preview = { auto_preview = false },
         func_map = {
             open = '', -- bqf's open doesn't trigger popc.buf's insertion
+            pscrollorig = 'zP', -- bqf's pscrollorig breaks zo to open current fold
         },
     })
 end

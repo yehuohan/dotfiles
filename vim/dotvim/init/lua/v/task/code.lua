@@ -66,9 +66,9 @@ local codes = {
 local packs = {
     make = 'make {barg}',
     cmake = {
-        'cmake -DCMAKE_INSTALL_PREFIX=. {garg} -G "{gtar}" ..',
-        'cmake --build . {barg}',
-        'cmake --install .',
+        'cmake -G "{gtar}" -DCMAKE_INSTALL_PREFIX=_VOut {garg} -S . -B _VOut',
+        'cmake --build _VOut {barg}',
+        'cmake --install _VOut',
     },
     cargo = 'cargo {stage} {barg} -- {earg}',
     sphinx = {
@@ -81,7 +81,7 @@ local packs = {
     },
     _exec = '"./{bout}" {earg}',
     _msvc = 'vcvars64.bat',
-    _vdir = '__VBuildOut',
+    _vout = '_VOut',
 }
 
 local function patout(file, pattern)
@@ -136,7 +136,7 @@ function task.make(cfg)
     local rep = {}
     rep.barg = cfg.barg
     rep.bout = (cfg.stage ~= 'build') and patout(cfg.file, packs._pats.tar) or nil
-    rep.bout = rep.bout and packs._vdir .. '/' .. rep.bout
+    rep.bout = rep.bout and packs._vout .. '/' .. rep.bout
     rep.earg = cfg.earg
     if cfg.stage == 'clean' then
         rep.barg = 'clean'
@@ -152,13 +152,12 @@ function task.make(cfg)
 end
 
 function task.cmake(cfg)
-    local outdir = cfg.wdir .. '/' .. packs._vdir
+    local outdir = cfg.wdir .. '/' .. packs._vout
     if cfg.stage == 'clean' then
         vim.fn.delete(outdir, 'rf')
-        throw(string.format('%s was removed', packs._vdir), 0)
+        throw(string.format('%s was removed', outdir), 0)
     end
     vim.fn.mkdir(outdir, 'p')
-    cfg.wdir = outdir
     cfg.efm = codes.cmake.efm .. ',' .. vim.o.errorformat
 
     local rep = {}
@@ -166,6 +165,7 @@ function task.cmake(cfg)
     rep.garg = cfg.garg
     rep.barg = cfg.barg
     rep.bout = (cfg.stage ~= 'build') and patout(cfg.file, packs._pats.pro) or nil
+    rep.bout = rep.bout and packs._vout .. '/' .. rep.bout
     rep.earg = cfg.earg
     local cmds = {}
     cmds[#cmds + 1] = (IsWin() and cfg.enable_msvc) and packs._msvc or nil

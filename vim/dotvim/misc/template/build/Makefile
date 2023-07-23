@@ -2,7 +2,7 @@
 # dirs
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 DIR_ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-DIR_OUT := ./__VBuildOut
+DIR_OUT := ./_VOut
 DIR_OBJ := ${DIR_OUT}/obj
 DIR_INC := ./inc
 DIR_SRC := ./src
@@ -74,7 +74,7 @@ tags:
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # CMake targets
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-BUILD_DIR := __VBuildOut
+BUILD_DIR := _VOut
 BUILD_TYPE := Debug
 #BUILD_TYPE := Release
 #BUILD_GEN := "Unix Makefiles"
