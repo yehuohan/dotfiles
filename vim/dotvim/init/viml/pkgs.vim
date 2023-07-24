@@ -122,6 +122,7 @@ nnoremap <M-p> <Cmd>PopcBufferSwitchTabRight!<CR>
 nnoremap <M-i> <Cmd>PopcBufferSwitchLeft!<CR>
 nnoremap <M-o> <Cmd>PopcBufferSwitchRight!<CR>
 nnoremap <C-i> <Cmd>PopcBufferJumpPrev<CR>
+nnoremap <Tab> <Cmd>PopcBufferJumpPrev<CR>
 nnoremap <C-o> <Cmd>PopcBufferJumpNext<CR>
 nnoremap <C-u> <C-o>
 nnoremap <C-p> <C-i>

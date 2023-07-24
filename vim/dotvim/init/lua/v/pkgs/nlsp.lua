@@ -351,6 +351,7 @@ local function __lsp_settings()
         hint_prefix = '» ',
         handler_opts = { border = 'none' },
         padding = ' ',
+        floating_window = false,
         toggle_key = '<M-o>',
         select_signature_key = '<M-l>',
     })

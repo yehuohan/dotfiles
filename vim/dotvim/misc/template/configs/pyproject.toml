@@ -2,4 +2,4 @@
 
 [tool.black]
 line-length = 88
-skip-string-normalization = 1
+skip-string-normalization = 0
