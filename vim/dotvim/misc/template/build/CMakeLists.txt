@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+install(FILES ${PROJECT_BUILD}/compile_commands.json DESTINATION ${PROJECT_ROOT})
+
 set(CMAKE_C_COMPILER "clang")
 set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -g")
@@ -12,10 +14,6 @@ set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set(PROJECT_BUILD ${PROJECT_ROOT}/_VOut)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BUILD}/${CMAKE_BUILD_TYPE})
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BUILD}/${CMAKE_BUILD_TYPE})
-
-# install(FILES ${PROJECT_BUILD}/compile_commands.json DESTINATION ${PROJECT_ROOT})
-
-project(main LANGUAGES CXX)
 
 # Args for COMMAND should be list(print from message() is a;b;c),
 # or use separate_arguments()
@@ -38,11 +36,11 @@ add_custom_target(tags # 定义目标（类似于Makefile中的target）
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Build library
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-project(libname)
+project(main LANGUAGES CXX)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc)
 file(GLOB_RECURSE SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/*.*)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/src SRC)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc)
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 add_compile_options(-g -Wall -DMYVAR=1)
 if(MSVC)
@@ -51,7 +49,6 @@ endif()
 
 add_executable(${PROJECT_NAME} ${SRC})
 add_library(${PROJECT_NAME} SHARED|STATIC ${SRC})
-
 target_include_directories() # target_xxx命令：其它Target链接此Target需要的include_directories
 target_compile_options(${PROJECT_NAME} INTERFACE|PUBLIC|PRIVATE -g -Wall -DMYVAR=1)
 target_link_libraries(${PROJECT_NAME} INTERFACE|PUBLIC|PRIVATE lib)

@@ -31,26 +31,26 @@ $(1)/$(basename $(2)).o: $(2)
 endef
 create_obj_target = $(foreach line,$(2),$(eval $(call do_create_obj_target,$(1),$(line),$(3))))
 
-CC         := g++
-CTAGS      := ctags
-TARGET     := main
+CC          := g++
+CTAGS       := ctags
+TARGET      := main
 ifeq (${CC}, g++)
-CC_SUF     := c cc cpp cxx
+CC_SUF      := c cc cpp cxx
 else
-CC_SUF     := c cc
+CC_SUF      := c cc
 endif
-BIN        := ${DIR_OUT}/${TARGET}
-SRC        := $(call get_src,${DIR_SRC},${CC_SUF})
-OBJ        := $(call get_suf,${DIR_OBJ},o,${SRC})
-DEP        := $(call get_suf,${DIR_OBJ},d,${SRC})
-LIBS       :=
+BIN         := ${DIR_OUT}/${TARGET}
+SRC         := $(call get_src,${DIR_SRC},${CC_SUF})
+OBJ         := $(call get_suf,${DIR_OBJ},o,${SRC})
+DEP         := $(call get_suf,${DIR_OBJ},d,${SRC})
+LIBS        :=
 #-lpthread \`pkg-config opencv --libs\`
-PKGFLAGS   :=
+PKGFLAGS    :=
 #\`pkg-config opencv --cflags\`
-CXXFLAGS   := -g -Wall
-CXXFLAGS   += $(addprefix -I, $(DIR_INC))
-CXXFLAGS   += ${PKGFLAGS}
-LDFLAGS    := ${LIBS}
+CXXFLAGS    := -g -Wall
+CXXFLAGS    += $(addprefix -I, $(DIR_INC))
+CXXFLAGS    += ${PKGFLAGS}
+LDFLAGS     := ${LIBS}
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # target
