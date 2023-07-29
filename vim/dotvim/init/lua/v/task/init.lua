@@ -2,6 +2,13 @@ local libv = require('v.libv')
 
 local M = {}
 
+--- Task titles
+M.title = {
+    Task = 'v.task',
+    Code = 'v.task.code',
+    Fzer = 'v.task.fzer',
+}
+
 --- Task workspace config
 M.wsc = {
     code = {},
@@ -25,7 +32,7 @@ function M.sequence(cmdlist) return table.concat(cmdlist, ' && ') end
 ---     - cmd(string) Task command that includes args
 ---     - wdir(string) Wording directory
 ---     - envs(string) Environment variables
----     - qf_xxx 'on_quickfix' params
+---     - qf_xxx 'on_task_output' params
 function M.run(cfg)
     local opts = {}
     opts.cmd = cfg.cmd
@@ -37,7 +44,7 @@ function M.run(cfg)
     opts.metadata = { verbose = cfg.verbose }
     opts.components = {
         {
-            'on_quickfix',
+            'on_task_output',
             errorformat = cfg.efm,
             save = cfg.qf_save,
             open = cfg.qf_open,
@@ -71,7 +78,7 @@ function M.run_cmd(cmd, bang)
         qf_jump = false,
         qf_scroll = true,
         qf_append = false,
-        qf_title = 'v.task',
+        qf_title = M.title.Task,
         connect_pty = true,
         hl_ansi_sgr = true,
         out_rawdata = false,

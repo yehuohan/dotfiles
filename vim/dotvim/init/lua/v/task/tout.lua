@@ -1,4 +1,4 @@
---- Quickfix output for task
+--- Display task output into quickfix or terminal
 
 local PAUSE_PATS = {
     '请按任意键继续. . .',
@@ -28,7 +28,7 @@ local function get_qf()
     return qf
 end
 
-local function try_copen(qf, auto_open, auto_jump)
+local function qf_open(qf, auto_open, auto_jump)
     if auto_open then
         if qf.hwin then
             if auto_jump then
@@ -44,7 +44,7 @@ local function try_copen(qf, auto_open, auto_jump)
     return get_qf()
 end
 
-local function try_scroll_to_bottom(qf, dnum)
+local function qf_scroll(qf, dnum)
     if not qf.hwin then
         return
     end
@@ -60,7 +60,7 @@ local function try_scroll_to_bottom(qf, dnum)
     end
 end
 
-local function display_and_highlight(qf, lines, highlights, ns, efm)
+local function qf_display(qf, lines, highlights, ns, efm)
     vim.fn.setqflist({}, 'a', {
         lines = lines,
         efm = efm,
@@ -74,11 +74,26 @@ local function display_and_highlight(qf, lines, highlights, ns, efm)
     end
 end
 
---- Context of onqf for multi-tasks
-local ctx = { ns = nil, next = nil }
+--- Redir task output into terminal
+local function redir_term(task)
+    vim.cmd.split({ range = { 8 } })
+    local hwin = vim.api.nvim_get_current_win()
+    vim.cmd.wincmd('p')
+    vim.api.nvim_win_set_buf(hwin, task:get_bufnr())
+    vim.api.nvim_win_set_option(hwin, 'number', false)
+    vim.api.nvim_win_set_option(hwin, 'relativenumber', false)
+    vim.api.nvim_win_set_option(hwin, 'signcolumn', 'no')
+end
+
+--- Context of task output
+local ctx = {
+    ns = vim.api.nvim_create_namespace('v.task.tout'),
+    qf_task = nil,
+    qf_title = nil,
+}
 
 local M = {
-    desc = 'Sync code task output into the quickfix',
+    desc = 'Sync task output into the quickfix(default) or terminal',
     params = {
         errorformat = {
             desc = 'See :help errorformat',
@@ -114,7 +129,7 @@ local M = {
         title = {
             desc = 'Set quickfix title as a identifier',
             type = 'string',
-            default = 'v.task.onqf',
+            default = 'v.task.tout',
         },
         connect_pty = {
             desc = 'Connect to PTY when running task',
@@ -135,31 +150,20 @@ local M = {
 }
 
 function M.constructor(params)
-    if not ctx.ns then
-        ctx.ns = vim.api.nvim_create_namespace('v.task.onqf')
-    end
-
-    local onqf = {
+    local cpt = {
         start_time = nil,
         chanor = nil,
     }
 
-    onqf.on_init = function(self, task)
-        self.chanor = require('v.libv').new_chanor({
-            connect_pty = params.connect_pty,
-            hl_ansi_sgr = params.hl_ansi_sgr,
-            out_rawdata = params.out_rawdata,
-            verbose = task.metadata.verbose,
-        })
-    end
-
-    onqf.on_start = function(self, task)
-        self.start_time = os.time()
+    local function default_start(task)
+        ctx.qf_task = task
+        ctx.qf_title = params.title
+        cpt.start_time = os.time()
 
         if params.save then
             vim.cmd.wall({ mods = { silent = true, emsg_silent = true } })
         end
-        local qf = try_copen(get_qf(), params.open, params.jump)
+        local qf = qf_open(get_qf(), params.open, params.jump)
         if qf.hwin then
             vim.api.nvim_win_call(qf.hwin, function() vim.cmd.lcd({ args = { task.cwd } }) end)
         end
@@ -181,11 +185,11 @@ function M.constructor(params)
         end
     end
 
-    onqf.on_complete = function(self, task, status, result)
-        local dt = os.time() - self.start_time
+    local function default_complete(task, status, result)
+        local dt = os.time() - cpt.start_time
         local qf = get_qf()
-        local lines, highlights = self.chanor()
-        display_and_highlight(qf, lines, highlights, ctx.ns, params.errorformat)
+        local lines, highlights = cpt.chanor()
+        qf_display(qf, lines, highlights, ctx.ns, params.errorformat)
 
         -- Add tail message
         local msg = string.format('}}} [%s] %s in %ds', os.date('%H:%M:%S'), status, dt)
@@ -200,7 +204,7 @@ function M.constructor(params)
             buf_add_highlight(qf.hbuf, ctx.ns, hlgrp, line, 15, string.len(msg))
         end
         if params.scroll then
-            try_scroll_to_bottom(qf, #lines + 1)
+            qf_scroll(qf, #lines + 1)
         end
 
         -- Setup fold
@@ -209,9 +213,10 @@ function M.constructor(params)
             vim.api.nvim_win_set_option(qf.hwin, 'foldmarker', '{{{,}}}')
             vim.fn.win_execute(qf.hwin, 'silent! normal! zO')
         end
+        ctx.qf_task = nil
     end
 
-    onqf.on_output = function(self, task, data)
+    local function default_output(task, data)
         -- React to pause command
         if IsWin() then
             for _, str in ipairs(data) do
@@ -224,14 +229,49 @@ function M.constructor(params)
         end
 
         local qf = get_qf()
-        local lines, highlights = self.chanor(data)
-        display_and_highlight(qf, lines, highlights, ctx.ns, params.errorformat)
+        local lines, highlights = cpt.chanor(data)
+        qf_display(qf, lines, highlights, ctx.ns, params.errorformat)
         if params.scroll then
-            try_scroll_to_bottom(qf, #lines)
+            qf_scroll(qf, #lines)
         end
     end
 
-    return onqf
+    cpt.on_init = function(self, task)
+        self.chanor = require('v.libv').new_chanor({
+            connect_pty = params.connect_pty,
+            hl_ansi_sgr = params.hl_ansi_sgr,
+            out_rawdata = params.out_rawdata,
+            verbose = task.metadata.verbose,
+        })
+    end
+
+    cpt.on_start = function(self, task)
+        if ctx.qf_task then
+            local fzer = require('v.task').title.Fzer
+            if ctx.qf_title ~= fzer and params.title == fzer then
+                redir_term(ctx.qf_task)
+                default_start(task)
+            else
+                redir_term(task)
+            end
+        else
+            default_start(task)
+        end
+    end
+
+    cpt.on_complete = function(self, task, status, result)
+        if ctx.qf_task and ctx.qf_task.id == task.id then
+            default_complete(task, status, result)
+        end
+    end
+
+    cpt.on_output = function(self, task, data)
+        if ctx.qf_task and ctx.qf_task.id == task.id then
+            default_output(task, data)
+        end
+    end
+
+    return cpt
 end
 
 return M

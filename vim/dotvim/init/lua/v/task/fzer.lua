@@ -2,7 +2,8 @@ local libv = require('v.libv')
 local a = libv.a
 local async = a._async
 local await = a._await
-local replace = require('v.task').replace
+local task = require('v.task')
+local replace = task.replace
 
 --- Workspace config for fzer
 local wsc = libv.new_configer({
@@ -289,7 +290,7 @@ local entry = async(function(kt, bang)
         if not await(a.pop_selection(_sels)) then
             return
         end
-        require('v.task').wsc.fzer = wsc:get()
+        task.wsc.fzer = wsc:get()
     end
 
     -- Parse rg location and options
@@ -304,9 +305,9 @@ local entry = async(function(kt, bang)
     wsc.wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
     wsc.qf_append = (kt.A == 'a')
     if not wsc.qf_append then
-        require('v.task').hlstr = {}
+        task.hlstr = {}
     end
-    table.insert(require('v.task').hlstr, rep.pat)
+    table.insert(task.hlstr, rep.pat)
     if bang then
         vim.notify(vim.inspect(wsc))
     end
@@ -314,12 +315,12 @@ local entry = async(function(kt, bang)
     wsc.qf_open = true
     wsc.qf_jump = true
     wsc.qf_scroll = false
-    wsc.qf_title = 'v.task.fzer'
+    wsc.qf_title = task.title.Fzer
     wsc.connect_pty = false
     wsc.hl_ansi_sgr = false
     wsc.out_rawdata = false
-    require('v.task').run(wsc)
-    libv.recall(function() require('v.task').run(wsc) end)
+    task.run(wsc)
+    libv.recall(function() task.run(wsc) end)
 end)
 
 --- Entry of fzer.fuzzier task
@@ -353,7 +354,7 @@ local entry_fuzzier = async(function(kt)
         if not await(a.pop_selection(_sels)) then
             return
         end
-        require('v.task').wsc.fzer = wsc:get()
+        task.wsc.fzer = wsc:get()
     end
 
     -- Parse location for fuzzier and options for fuzzier.live
@@ -370,7 +371,7 @@ local entry_fuzzier = async(function(kt)
 end)
 
 local function setup()
-    require('v.task').wsc.fzer = wsc:get()
+    task.wsc.fzer = wsc:get()
 
     -- Keys mapping to table
     local keys2kt = function(keys)

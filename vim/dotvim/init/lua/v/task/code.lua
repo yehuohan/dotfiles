@@ -2,8 +2,9 @@ local libv = require('v.libv')
 local a = libv.a
 local async = a._async
 local await = a._await
-local replace = require('v.task').replace
-local sequence = require('v.task').sequence
+local task = require('v.task')
+local replace = task.replace
+local sequence = task.sequence
 local throw = error
 
 --- Workspace config for code
@@ -93,10 +94,10 @@ local function patout(file, pattern)
     end
 end
 
---- All task functions
-local task = {}
+--- All task dispatcher functions
+local dispatcher = {}
 
-function task.nvim(cfg)
+function dispatcher.nvim(cfg)
     local ft = vim.o.filetype
     if ft == 'vim' then
         vim.cmd.write()
@@ -114,7 +115,7 @@ function task.nvim(cfg)
     end
 end
 
-function task.file(cfg)
+function dispatcher.file(cfg)
     local ft = (cfg.type ~= '') and cfg.type or vim.o.filetype
     if (not codes[ft]) or ('dosbatch' == ft and not IsWin()) then
         throw(string.format('Code task doesn\'t support "%s"', ft), 0)
@@ -130,7 +131,7 @@ function task.file(cfg)
     return replace(codes[ft].cmd, rep)
 end
 
-function task.make(cfg)
+function dispatcher.make(cfg)
     cfg.efm = codes.make.efm .. ',' .. codes.cmake.efm .. ',' .. vim.o.errorformat
 
     local rep = {}
@@ -151,7 +152,7 @@ function task.make(cfg)
     return sequence(cmds)
 end
 
-function task.cmake(cfg)
+function dispatcher.cmake(cfg)
     local outdir = cfg.wdir .. '/' .. packs._vout
     if cfg.stage == 'clean' then
         vim.fn.delete(outdir, 'rf')
@@ -177,7 +178,7 @@ function task.cmake(cfg)
     return sequence(cmds)
 end
 
-function task.cargo(cfg)
+function dispatcher.cargo(cfg)
     cfg.efm = codes.rust.efm
 
     local rep = {}
@@ -187,7 +188,7 @@ function task.cargo(cfg)
     return replace(packs.cargo, rep)
 end
 
-function task.sphinx(cfg)
+function dispatcher.sphinx(cfg)
     local cmd
     if cfg.stage == 'clean' then
         cmd = packs.sphinx[1]
@@ -200,13 +201,13 @@ function task.sphinx(cfg)
     return cmd
 end
 
-setmetatable(task, {
+setmetatable(dispatcher, {
     __call = function(self, cfg)
-        local t = self._maps[cfg.key]
+        local d = self._maps[cfg.key]
         if cfg.file == '' then
-            if t.pat then
+            if d.pat then
                 local files = vim.fs.find(function(name, path)
-                    local re = vim.regex('\\c' .. t.pat)
+                    local re = vim.regex('\\c' .. d.pat)
                     -- Require checking file's existence, because vim.fs.normalize's bug:
                     -- vim.fs.normalize('C:/') will return 'C:', which is equal to '.' for vim.fs.find.
                     return re:match_str(name) and (vim.fn.filereadable(path .. '/' .. name) == 1)
@@ -217,32 +218,32 @@ setmetatable(task, {
                     limit = cfg.fs_find_one and 1 or math.huge,
                 })
                 if #files == 0 then
-                    throw(string.format('None of %s was found!', t.pat), 0)
+                    throw(string.format('None of %s was found!', d.pat), 0)
                 end
                 cfg.file = files[#files]
             else
                 cfg.file = vim.fs.normalize(vim.api.nvim_buf_get_name(0))
             end
         end
-        cfg.target = t.target
+        cfg.target = d.target
         cfg.wdir = vim.fs.dirname(cfg.file)
-        return t.fn(cfg)
+        return d.fn(cfg)
     end,
 })
 
 -- stylua: ignore start
-task._maps = {
-    l = { fn = task.nvim,   desc = 'A nvim lua' },
-    f = { fn = task.file,   desc = 'A single file' },
-    m = { fn = task.make,   desc = 'Make',        pat = 'Makefile' },
-    u = { fn = task.cmake,  desc = 'CMake Unix',  pat = 'CMakeLists', target = 'Unix Makefiles' },
-    n = { fn = task.cmake,  desc = 'CMake NMake', pat = 'CMakeLists', target = 'NMake Makefiles' },
-    j = { fn = task.cmake,  desc = 'CMake Ninja', pat = 'CMakeLists', target = 'Ninja' },
-    o = { fn = task.cargo,  desc = 'Cargo rust',  pat = 'Cargo.toml' },
-    h = { fn = task.sphinx, desc = 'Sphinx doc',  pat = IsWin() and 'make.bat' or 'Makefile' },
+dispatcher._maps = {
+    l = { fn = dispatcher.nvim,   desc = 'A nvim lua' },
+    f = { fn = dispatcher.file,   desc = 'A single file' },
+    m = { fn = dispatcher.make,   desc = 'Make',        pat = 'Makefile' },
+    u = { fn = dispatcher.cmake,  desc = 'CMake Unix',  pat = 'CMakeLists', target = 'Unix Makefiles' },
+    n = { fn = dispatcher.cmake,  desc = 'CMake NMake', pat = 'CMakeLists', target = 'NMake Makefiles' },
+    j = { fn = dispatcher.cmake,  desc = 'CMake Ninja', pat = 'CMakeLists', target = 'Ninja' },
+    o = { fn = dispatcher.cargo,  desc = 'Cargo rust',  pat = 'Cargo.toml' },
+    h = { fn = dispatcher.sphinx, desc = 'Sphinx doc',  pat = IsWin() and 'make.bat' or 'Makefile' },
 }
 
-task._keys = {
+dispatcher._keys = {
     'Rp' , 'Rm' , 'Ru' , 'Rn' , 'Rj' , 'Ro' , 'Rh' , 'Rf',
     'rp' , 'rm' , 'ru' , 'rn' , 'rj' , 'ro' , 'rh' , 'rf', 'rl',
     'rcp', 'rcm', 'rcu', 'rcn', 'rcj', 'rco', 'rch',
@@ -250,7 +251,7 @@ task._keys = {
 }
 -- stylua: ignore end
 
-task._sels = {
+dispatcher._sels = {
     opt = 'config code task',
     lst = nil,
     -- lst for kt.E != p
@@ -269,10 +270,12 @@ task._sels = {
     dic = {
         key = {
             lst = vim.fn.sort(
-                vim.tbl_keys(task._maps),
-                function(k0, k1) return vim.stricmp(task._maps[k0].desc, task._maps[k1].desc) end
+                vim.tbl_keys(dispatcher._maps),
+                function(k0, k1)
+                    return vim.stricmp(dispatcher._maps[k0].desc, dispatcher._maps[k1].desc)
+                end
             ),
-            dic = vim.tbl_map(function(t) return t.desc end, task._maps),
+            dic = vim.tbl_map(function(d) return d.desc end, dispatcher._maps),
         },
         file = { cpl = 'file' },
         type = { cpl = 'filetype' },
@@ -300,7 +303,7 @@ task._sels = {
     },
     evt = function(name)
         if name == 'onCR' then
-            local sel = task._sels
+            local sel = dispatcher._sels
             if sel.lst == sel.lst_p then
                 if wsc.file ~= '' then
                     wsc.file = vim.fs.normalize(vim.fn.fnamemodify(wsc.file, ':p'))
@@ -342,31 +345,31 @@ local entry = async(function(kt, bang)
     local restore = false
     if kt.S == 'R' then
         -- Forward R* => r*
-        task._sels.lst = task._sels.lst_d
+        dispatcher._sels.lst = dispatcher._sels.lst_d
         resovle = true
     end
     if kt.E == 'p' then
-        local __wsc = require('v.task').wsc.code
+        local __wsc = task.wsc.code
         wsc:set(__wsc)
-        if __wsc.key and task._maps[__wsc.key] and not resovle then
+        if __wsc.key and dispatcher._maps[__wsc.key] and not resovle then
             -- Forward rp => r^p
             kt.E = __wsc.key
         else
             -- Forward Rp => r^p
-            task._sels.lst = task._sels.lst_p
+            dispatcher._sels.lst = dispatcher._sels.lst_p
             resovle = true
             restore = true
         end
     end
 
     -- Need to resolve config
-    if resovle and (not await(a.pop_selection(task._sels))) then
+    if resovle and (not await(a.pop_selection(dispatcher._sels))) then
         return
     end
     -- Need to re-store config back
     if restore then
         kt.E = wsc.key
-        require('v.task').wsc.code = wsc:get()
+        task.wsc.code = wsc:get()
     end
 
     -- Run code task
@@ -377,15 +380,15 @@ local entry = async(function(kt, bang)
         vim.notify(('resovle = %s, restore = %s\n%s'):format(resovle, restore, vim.inspect(wsc)))
     end
     local ok, msg = pcall(function(cfg)
-        cfg.cmd = task(cfg)
+        cfg.cmd = dispatcher(cfg)
         cfg.qf_save = true
         cfg.qf_open = true
         cfg.qf_jump = false
         cfg.qf_scroll = true
         cfg.qf_append = false
-        cfg.qf_title = 'v.task.code'
-        require('v.task').run(cfg)
-        libv.recall(function() require('v.task').run(cfg) end)
+        cfg.qf_title = task.title.Code
+        task.run(cfg)
+        libv.recall(function() task.run(cfg) end)
     end, wsc)
     if not ok then
         vim.notify(tostring(msg))
@@ -393,7 +396,7 @@ local entry = async(function(kt, bang)
 end)
 
 local function setup()
-    require('v.task').wsc.code = wsc:get()
+    task.wsc.code = wsc:get()
 
     -- Keys mapping to table
     local keys2kt = function(keys)
@@ -403,7 +406,7 @@ local function setup()
             E = keys:sub(-1, -1),
         }
     end
-    for _, keys in ipairs(task._keys) do
+    for _, keys in ipairs(dispatcher._keys) do
         libv.m.nnore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
     end
 
@@ -415,8 +418,8 @@ local function setup()
     vim.api.nvim_create_user_command('CodeWsc', function() vim.print(wsc) end, { nargs = 0 })
     vim.api.nvim_create_user_command('CodeWscInit', function()
         wsc:reinit()
-        task._sels.lst = task._sels.lst_i
-        vim.fn.PopSelection(task._sels)
+        dispatcher._sels.lst = dispatcher._sels.lst_i
+        vim.fn.PopSelection(dispatcher._sels)
     end, { nargs = 0 })
 end
 
