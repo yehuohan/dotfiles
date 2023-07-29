@@ -98,6 +98,8 @@ src:
 		-DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
 		-S . -B ${BUILD_DIR}
 
+# Release for android need to remove '-g' from android-legacy.toolchain.cmake
+# See https://github.com/android/ndk/issues/243
 .PHONY: src_android
 src_android:
 	cmake -G ${BUILD_GEN} -Wno-dev \
