@@ -53,7 +53,7 @@ CXXFLAGS    += ${PKGFLAGS}
 LDFLAGS     := ${LIBS}
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# target
+# targets
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ${BIN}: ${OBJ}
 	${CC} $^ -o $@ ${CXXFLAGS} ${LDFLAGS}
@@ -72,39 +72,47 @@ tags:
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# CMake targets
+# cmake targets
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-BUILD_DIR := _VOut
-BUILD_TYPE := Debug
-#BUILD_TYPE := Release
-#BUILD_GEN := "Unix Makefiles"
-#BUILD_GEN := "NMake Makefiles"
-BUILD_GEN := "Ninja"
-BUILD_JOB := -j4
-NDK_ROOT := ${Android_SDK}/ndk-bundle
-NDK_ABI := arm64-v8a
-NDK_PLATFORM := android-27
+BUILD_TYPE ?= Debug
+#BUILD_TYPE ?= RelWithDebInfo
+#BUILD_TYPE ?= Release
+#BUILD_GEN ?= "Unix Makefiles"
+#BUILD_GEN ?= "NMake Makefiles"
+BUILD_GEN ?= "Ninja"
+BUILD_JOB ?= -j4
+BUILD_DIR ?= ${DIR_ROOT}/_VOut/${BUILD_TYPE}
+INSTALL_DIR ?= ${DIR_ROOT}/install/${BUILD_TYPE}
+NDK_ROOT ?= ${Android_SDK}/ndk-bundle
+NDK_ABI ?= arm64-v8a
+NDK_PLATFORM ?= android-27
 
 
 .PHONY: all
 all: src src_android
 	cmake --build ${BUILD_DIR} ${BUILD_JOB}
+	# cmake --install ${BUILD_DIR} --component <comp>
 	cmake --install ${BUILD_DIR}
 
 .PHONY: src
 src:
 	cmake -G ${BUILD_GEN} -Wno-dev \
 		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-		-DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
+		-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
+		-DPROJECT_BUILD_DIR=${BUILD_DIR} \
 		-S . -B ${BUILD_DIR}
 
 # Release for android need to remove '-g' from android-legacy.toolchain.cmake
 # See https://github.com/android/ndk/issues/243
+# Or strip manually:
+# 	objcopy --only-keep-debug <target> <target.sym>
+# 	objcopy --strip-unneeded <target>
 .PHONY: src_android
 src_android:
 	cmake -G ${BUILD_GEN} -Wno-dev \
 		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-		-DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
+		-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
+		-DPROJECT_BUILD_DIR=${BUILD_DIR} \
 		-DANDROID_NDK=${NDK_ROOT} \
 		-DANDROID_ABI=${NDK_ABI} \
 		-DANDROID_PLATFORM=${NDK_PLATFORM} \
@@ -121,11 +129,7 @@ cc: src
 clean:
 	-rm -r ${BUILD_DIR}
 
-.PHONY: tags
+.PHONY: src
 tags:
-	cmake -G ${BUILD_GEN} -Wno-dev \
-		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-		-DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
-		-S . -B ${BUILD_DIR}
 	cmake --build ${BUILD_DIR} ${BUILD_JOB} --target tags
 	cmake --install ${BUILD_DIR}
