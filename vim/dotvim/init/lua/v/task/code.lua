@@ -77,8 +77,9 @@ local packs = {
         'make html',
     },
     _pats = {
-        tar = [[^TARGET%s*:?=%s*([%w%-]+)%s*$]], -- TARGET := <bout>
-        pro = [[^project%s*%(%s*([%w%-]+).*%).*$]], -- project(<bout>)
+        tar = [[^TARGET%s*:?=%s*([%w%-_]+)%s*$]], -- TARGET := <bout>
+        pro = [[^project%s*%(%s*([%w%-_]+).*%).*$]], -- project(<bout>)
+        pho = [[^%.PHONY:%s*([%w%-_]+)%s*$]], -- .PHONY: <barg>
     },
     _exec = '"./{bout}" {earg}',
     _msvc = 'vcvars64.bat',
@@ -281,7 +282,7 @@ dispatcher._sels = {
         type = { cpl = 'filetype' },
         envs = { lst = { 'PATH=' }, cpl = 'environment' },
         garg = { lst = { '-DENABLE_TEST=' }, cpl = 'environment' },
-        barg = { lst = { '-static', 'tags', '--target tags', '-j32' } },
+        barg = { lst = { '-static', 'tags', '--target tags', '-j4' } },
         earg = { lst = { '--nocapture' } },
         stage = { lst = { 'build', 'run', 'clean', 'test' } },
         fs_find_one = vim.empty_dict(),
