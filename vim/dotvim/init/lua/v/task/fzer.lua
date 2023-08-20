@@ -87,33 +87,33 @@ local fzer = {
     },
 }
 
-function fzer.fzf(ty, args)
+function fzer.fzf(rhs, args)
     local rep = {
         pat = args.pat,
         loc = table.concat(args.loc, ' '),
         opt = table.concat(args.opt, ' '),
     }
-    local strfn = fzer._fzf[ty]
+    local strfn = fzer._fzf[rhs]
     if type(strfn) == 'function' then
-        fzer._fzf[ty](rep)
+        fzer._fzf[rhs](rep)
     elseif type(strfn) == 'string' then
         local cmd = replace(strfn, rep)
         vim.cmd(cmd)
     end
 end
 
-function fzer.leaderf(ty, args)
+function fzer.leaderf(rhs, args)
     local rep = {
         pat = args.pat,
         loc = table.concat(args.loc, ' '),
         opt = table.concat(args.opt, ' '),
     }
-    local cmd = replace(fzer._leaderf[ty], rep)
+    local cmd = replace(fzer._leaderf[rhs], rep)
     vim.cmd(cmd)
 end
 
-function fzer.telescope(ty, rep)
-    local picker = fzer._telescope[ty]
+function fzer.telescope(rhs, rep)
+    local picker = fzer._telescope[rhs]
     require('telescope.builtin')[picker]({
         cwd = rep.loc[1],
         search = rep.pat,
@@ -365,9 +365,9 @@ local entry_fuzzier = async(function(kt)
     rep.opt = parse_opt(kt)
 
     -- Run fzer.fuzzier task
-    local ty = _maps_fuzzier[kt.E]
-    fzer[wsc.fuzzier](ty, rep)
-    libv.recall(function() fzer[wsc.fuzzier](ty, rep) end)
+    local rhs = _maps_fuzzier[kt.E]
+    fzer[wsc.fuzzier](rhs, rep)
+    libv.recall(function() fzer[wsc.fuzzier](rhs, rep) end)
 end)
 
 local function setup()
