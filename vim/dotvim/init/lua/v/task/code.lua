@@ -450,11 +450,11 @@ local entry = async(function(kt, bang)
     wsc.qf_scroll = true
     wsc.qf_append = false
     wsc.qf_title = task.title.Code
-    local ok, msg = pcall(function(cfg)
-        cfg.cmd = dispatch(_maps[cfg.key], cfg)
-        task.run(cfg)
-        libv.recall(function() task.run(cfg) end)
-    end, wsc)
+    local ok, msg = pcall(function()
+        wsc.cmd = dispatch(_maps[wsc.key], wsc)
+        task.run(wsc)
+        libv.recall(function() task.run(wsc) end)
+    end)
     if not ok then
         vim.notify(tostring(msg))
     end
