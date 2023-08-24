@@ -138,7 +138,7 @@ function M.setup()
     vim.api.nvim_create_user_command(
         'TaskRun',
         function(opts) M.run_cmd(opts.args, opts.bang) end,
-        { bang = true, nargs = 1, complete = 'shellcmd' }
+        { bang = true, nargs = 1 }
     )
     libv.m.nnore({ '<leader><leader>r', ':TaskRun<Space>' })
     libv.m.nnore({ '<leader><leader>R', ':TaskRun!<Space>' })
