@@ -34,6 +34,7 @@ scoop bucket add versions https://kgithub.com/ScoopInstaller/Versions.git
 scoop bucket add nonportable https://kgithub.com/ScoopInstaller/Nonportable.git
 scoop bucket add nerd-fonts https://kgithub.com/matthewjberger/scoop-nerd-fonts.git
 
+
 # Add packs
 scoop install neovim neovide nvy vim-nightly -a 64bit
 scoop install bat fd fzf ripgrep lf universal-ctags
@@ -46,7 +47,8 @@ scoop download clink -h
 scoop install CodeNewRoman-NF-Mono FantasqueSansMono-NF-Mono -s
 
 # Add optional packs
-scoop install llvm portable-virtualbox
-scoop install vulkan renderdoc shadered
+scoop install vulkan renderdoc shadered # Then run apps/vulkan/current/install-vk-layers.ps1
+scoop install cuda11.1 # Prefer conda install cudatoolkit cudnn
+scoop install llvm install portable-virtualbox
 scoop install draw.io wpsoffice sioyek
-scoop install cuda11.1
+
