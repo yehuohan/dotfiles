@@ -505,17 +505,17 @@ local function pkg_trouble()
 end
 
 -- 代码格式化
-local function pkg_formatter()
-    require('formatter').setup({
-        logging = false,
-        filetype = {
-            c = { require('formatter.defaults.clangformat') },
-            cpp = { require('formatter.defaults.clangformat') },
-            lua = { require('formatter.filetypes.lua').stylua },
-            python = { require('formatter.filetypes.python').black },
+local function pkg_conform()
+    local conform = require('conform')
+    conform.setup({
+        formatters_by_ft = {
+            lua = { 'stylua' },
+            c = { 'clang_format' },
+            cpp = { 'clang_format' },
+            python = { 'black' },
         },
     })
-    m.nore({ '<leader>fo', ':Format<CR>' })
+    m.nore({ '<leader>fo', conform.format })
 end
 
 -- 自动括号
@@ -792,7 +792,7 @@ local pkgs = {
     },
     { 'stevearc/overseer.nvim', config = pkg_overseer },
     { 'folke/trouble.nvim', config = pkg_trouble, keys = { '<leader>vq', '<leader>vl' } },
-    { 'mhartington/formatter.nvim', config = pkg_formatter },
+    { 'stevearc/conform.nvim', config = pkg_conform },
     { 'windwp/nvim-autopairs', config = pkg_autopairs },
     { 'kylechui/nvim-surround', config = pkg_surround },
     { 'numToStr/Comment.nvim', config = pkg_comment },
