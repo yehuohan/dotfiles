@@ -30,12 +30,6 @@ local function __servers()
             })
         end,
     }
-    opts['clangd'] = function()
-        lspconfig.clangd.setup({
-            cmd = { 'clangd', '--query-driver=**' }, -- Why sometime this have negative effect?
-            capabilities = capabilities,
-        })
-    end
     opts['cmake'] = function()
         lspconfig.cmake.setup({
             capabilities = capabilities,
