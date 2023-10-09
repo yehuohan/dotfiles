@@ -392,6 +392,12 @@ local function pkg_mini()
     })
 end
 
+-- 括号
+local function pkg_rainbow()
+    local rainbow = require('rainbow-delimiters')
+    m.nnore({ '<leader>tr', function() rainbow.toggle(0) end })
+end
+
 --------------------------------------------------------------------------------
 -- Coding
 --------------------------------------------------------------------------------
@@ -424,7 +430,6 @@ local function pkg_treesitter()
                 scope_incremental = '<M-q>',
             },
         },
-        rainbow = { enable = true },
     })
     vim.opt.runtimepath:append(parser_dir)
     m.nnore({
@@ -444,7 +449,6 @@ local function pkg_treesitter()
             vim.notify('Treesitter indent is ' .. (res and 'enabled' or 'disabled'))
         end,
     })
-    m.nnore({ '<leader>tr', ':TSBufToggle rainbow<CR>' })
 end
 
 -- 导步程序/任务
@@ -739,6 +743,7 @@ local pkgs = {
     },
     { 'nvim-tree/nvim-web-devicons', lazy = true, enabled = use.ui.patch },
     { 'echasnovski/mini.nvim', config = pkg_mini },
+    { 'HiPhish/rainbow-delimiters.nvim', config = pkg_rainbow },
     { 'morhetz/gruvbox' },
     { 'rakr/vim-one' },
     { 'tanvirtin/monokai.nvim' },
@@ -785,11 +790,6 @@ local pkgs = {
         },
     },
     { 'nvim-treesitter/nvim-treesitter', enabled = use.nts, config = pkg_treesitter },
-    {
-        'HiPhish/nvim-ts-rainbow2',
-        enabled = use.nts,
-        dependencies = { 'nvim-treesitter/nvim-treesitter' },
-    },
     { 'stevearc/overseer.nvim', config = pkg_overseer },
     { 'folke/trouble.nvim', config = pkg_trouble, keys = { '<leader>vq', '<leader>vl' } },
     { 'stevearc/conform.nvim', config = pkg_conform },
