@@ -10,10 +10,10 @@ irm get.scoop.sh -outfile 'install.ps1'
 .\install.ps1 -ScoopDir "$env:APPS_HOME\_packs" -ScoopGlobalDir "$env:APPS_HOME\_packs" -NoProxy
 
 #.Patch
-$SCOOP_PACKAGE_REPO = "https://kgithub.com/ScoopInstaller/Scoop/archive/master.zip"
-$SCOOP_MAIN_BUCKET_REPO = "https://kgithub.com/ScoopInstaller/Main/archive/master.zip"
-$SCOOP_PACKAGE_GIT_REPO = "https://kgithub.com/ScoopInstaller/Scoop.git"
-$SCOOP_MAIN_BUCKET_GIT_REPO = "https://kgithub.com/ScoopInstaller/Main.git"
+$SCOOP_PACKAGE_REPO = "https://kkgithub.com/ScoopInstaller/Scoop/archive/master.zip"
+$SCOOP_MAIN_BUCKET_REPO = "https://kkgithub.com/ScoopInstaller/Main/archive/master.zip"
+$SCOOP_PACKAGE_GIT_REPO = "https://kkgithub.com/ScoopInstaller/Scoop.git"
+$SCOOP_MAIN_BUCKET_GIT_REPO = "https://kkgithub.com/ScoopInstaller/Main.git"
 .\install.ps1 -ScoopDir "$env:APPS_HOME\_packs" -ScoopGlobalDir "$env:APPS_HOME\_packs" -NoProxy
 <#
 Patch scoop source code after install:
@@ -22,11 +22,11 @@ Patch scoop source code after install:
     $APPS_HOME/_packs/apps/scoop/current/libexec/scoop-update.ps1
         => before invoking Invoke-CachedDownload
 #>
-+$url_patch = "$url".Replace("https://github.com", "https://kgithub.com").Replace("https://raw.githubusercontent.com", "https://raw.kgithub.com")
++$url_patch = "$url".Replace("https://github.com", "https://kkgithub.com").Replace("https://raw.githubusercontent.com", "https://raw.kkgithub.com")
 -Invoke-CachedDownload $app $version $url ...
 +Invoke-CachedDownload $app $version $url_patch ...
 <# Code patch is not compatible with aria2 #>
-scoop config scoop_repo http://kgithub.com/ScoopInstaller/Scoop
+scoop config scoop_repo http://kkgithub.com/ScoopInstaller/Scoop
 scoop config aria2-enabled false
 
 #.Bucket
