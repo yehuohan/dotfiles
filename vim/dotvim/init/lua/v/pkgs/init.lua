@@ -431,7 +431,7 @@ local function pkg_treesitter()
             },
         },
     })
-    vim.opt.runtimepath:append(parser_dir)
+    vim.opt.runtimepath:prepend(parser_dir)
     m.nnore({
         '<leader>sh',
         function()
@@ -840,7 +840,7 @@ local function clone_lazy(url, bundle)
             lazygit,
         })
     end
-    vim.opt.rtp:prepend(lazygit)
+    vim.opt.runtimepath:prepend(lazygit)
 end
 
 local function pkg_lazy()
