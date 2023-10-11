@@ -89,7 +89,7 @@ end
 
 local options = {
     conceallevel = { 2, 0 },
-    virtualedit = { { 'all' }, { '' } },
+    virtualedit = { { 'all' }, { 'none' } },
     laststatus = { 2, 3 },
     number = function()
         if vim.o.number and vim.o.relativenumber then
