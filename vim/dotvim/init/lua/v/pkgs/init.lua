@@ -516,6 +516,7 @@ local function pkg_conform()
             lua = { 'stylua' },
             c = { 'clang_format' },
             cpp = { 'clang_format' },
+            rust = { 'rustfmt' },
             python = { 'black' },
         },
     })
