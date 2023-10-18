@@ -27,9 +27,7 @@ local function __servers()
         function(server_name)
             lspconfig[server_name].setup({
                 capabilities = capabilities,
-                on_attach = function(client, bufnr)
-                    client.server_capabilities.semanticTokensProvider = nil
-                end,
+                on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
             })
         end,
     }
