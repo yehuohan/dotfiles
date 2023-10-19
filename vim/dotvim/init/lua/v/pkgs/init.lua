@@ -7,16 +7,13 @@ local m = libv.m
 --------------------------------------------------------------------------------
 -- 快速跳转
 local function pkg_hop()
-    require('hop').setup({
-        match_mappings = { 'zh', 'zh_sc' },
-        create_hl_autocmd = true,
-    })
+    require('hop').setup({ match_mappings = { 'zh', 'zh_sc' } })
     m.nore({ 's', '<Cmd>HopChar1MW<CR>' })
     m.nore({ 'S', '<Cmd>HopChar1<CR>' })
     m.nore({ 'f', '<Cmd>HopChar1CurrentLine<CR>' })
     m.nore({ 'F', '<Cmd>HopAnywhereCurrentLine<CR>' })
     m.nore({ '<leader>ms', '<Cmd>HopPatternMW<CR>' })
-    m.nore({ '<leader>j', '<Cmd>HopLineCursor<CR>' })
+    m.nore({ '<leader>j', '<Cmd>HopVertical<CR>' })
     m.nore({ '<leader><leader>j', '<Cmd>HopLine<CR>' })
     m.nore({ '<leader>mj', '<Cmd>HopLineStart<CR>' })
     m.nore({ '<leader>mw', '<Cmd>HopWord<CR>' })
@@ -869,7 +866,8 @@ local function pkg_lazy()
     vim.api.nvim_create_autocmd('ColorScheme', {
         group = 'v.Pkgs',
         callback = function()
-            vim.api.nvim_set_hl(0, 'CursorWord', { ctermbg = 60, bg = '#505060' })
+            vim.api.nvim_set_hl(0, 'HopPreview', { fg = '#b8bb26', bold = true, ctermfg = 142 })
+            vim.api.nvim_set_hl(0, 'CursorWord', { bg = '#505060', ctermbg = 60 })
             vim.api.nvim_set_hl(0, 'TranslatorBorder', { link = 'Constant' })
         end,
     })
