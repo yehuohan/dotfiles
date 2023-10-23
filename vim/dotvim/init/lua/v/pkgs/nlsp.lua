@@ -69,7 +69,7 @@ local function __servers()
             capabilities = capabilities,
             settings = {
                 Lua = {
-                    runtime = { version = 'Lua 5.2' }, -- LuaJIT
+                    runtime = { version = 'LuaJIT' },
                     workspace = {
                         library = {
                             vim.env.DotVimInit .. '/lua',
@@ -132,16 +132,16 @@ local kind_sources = {
 }
 -- stylua: ignore end
 
---- Format completion menu
-local function cmp_format(entry, vitem)
-    local ico = kind_icons[vitem.kind]
+--- Format completion menu with (cmp.Entry, vim.CompletedItem)
+local function cmp_format(entry, citem)
+    local ico = kind_icons[citem.kind]
     local src = kind_sources[entry.source.name] or entry.source.name
-    vitem.kind = string.format(' %s', use.ui.patch and ico[1] or ico[2]:sub(1, 1))
-    if string.len(vitem.abbr) > 80 then
-        vitem.abbr = string.sub(vitem.abbr, 1, 78) .. ' …'
+    citem.kind = string.format(' %s', use.ui.patch and ico[1] or ico[2]:sub(1, 1))
+    if string.len(citem.abbr) > 80 then
+        citem.abbr = string.sub(citem.abbr, 1, 78) .. ' …'
     end
-    vitem.menu = string.format('%3s.%s', src, ico[2])
-    return vitem
+    citem.menu = string.format('%3s.%s', src, ico[2])
+    return citem
 end
 
 --- Setup completion framework
@@ -153,9 +153,7 @@ local function __completion()
     })
     m.add({ 'n', 'v', 'c', 'i' }, {
         '<M-;>',
-        function()
-            vim.notify(string.format('IM is %s', cmp_im.toggle() and 'enabled' or 'disabled'))
-        end,
+        function() vim.notify('IM is ' .. (cmp_im.toggle() and 'enabled' or 'disabled')) end,
     })
 
     local cmp = require('cmp')

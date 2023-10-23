@@ -599,6 +599,7 @@ local function pkg_ccc()
     })
 end
 
+-- Coc补全
 local function pkg_coc()
     vim.fn['coc#config']('Lua', {
         workspace = {
@@ -642,7 +643,7 @@ local function pkg_peek()
     })
 end
 
---  reStructuredText预览
+-- reStructuredText预览
 local function pkg_rst()
     vim.g.riv_auto_format_table = 0
     vim.g.riv_i_tab_pum_next = 0

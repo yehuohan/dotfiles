@@ -1,29 +1,72 @@
---- Neovim lua library
+--- @class LibvModule
 local M = {}
 
---- An useful configer
-function M.new_configer(configer)
-    if type(configer) ~= 'table' then
-        error('Initial config shoule be a table')
+--- Configer {
+---     opt0 = xxx,
+---     opt1 = {xxx},
+---     ...,
+---     <metatable> = ConfigerMethod {
+---         fn0 = xxx,
+---         fn1 = xxx,
+---         ...,
+---         <metatable> = ConfigerExtra {
+---             eopt0 = xxx,
+---             eopt1 = {xxx},
+---             ...,
+---         },
+---     },
+--- }
+--- @alias Configer table An useful configer
+--- @alias ConfigerMethod table Configer's methods
+--- @alias ConfigerExtra table Configer's extra non-saveable options
+
+--- Create a configer
+--- @param opts(table) Savable options of configer
+--- @return Configer
+function M.new_configer(opts)
+    if type(opts) ~= 'table' then
+        error('Initial saveable options shoule be a table')
+    end
+    local copy_opts = vim.deepcopy(opts)
+
+    --- Create non-saveable options for each sub-tables
+    --- @param nsc(ConfigerExtra)
+    local function sub_non_savable_config(nsc, init_opts)
+        for ik, iv in pairs(init_opts) do
+            if type(iv) == 'table' then
+                nsc[ik] = {}
+                sub_non_savable_config(nsc[ik], iv)
+
+                local B = {}
+                B.__index = function(t, k) return rawget(t, k) or nsc[ik][k] end
+                B.__newindex = function(t, k, v)
+                    if (type(k) == 'number') and (1 <= k) and (k <= #t + 1) then
+                        rawset(t, k, v)
+                    else
+                        nsc[ik][k] = v
+                    end
+                end
+                setmetatable(init_opts[ik], B)
+            end
+        end
     end
 
-    -- Create initial values
-    local initialization = vim.deepcopy(configer)
-
-    -- Config's non-savable options
-    local non_savable_config = function()
+    --- Create non-saveable options
+    --- @return ConfigerExtra
+    local function non_savable_config(init_opts)
         local nsc = {}
         nsc.__index = nsc
+        sub_non_savable_config(nsc, init_opts)
         return nsc
     end
 
-    -- Config's methods
+    --- @type ConfigerMethod
     local C = {}
-    setmetatable(C, non_savable_config())
+    setmetatable(C, non_savable_config(opts))
     C.__index = C
     C.__newindex = function(t, k, v)
         if rawget(t, k) then
-            -- New savable option
+            -- New savable option(actually this won't happen with __newindex)
             rawset(t, k, v)
         elseif rawget(C, k) then
             error(string.format('The key "%s" is a config method that should not be modified', k))
@@ -38,13 +81,13 @@ function M.new_configer(configer)
     --- Add an option to config
     function C:add(k, v)
         rawset(self, k, v)
-        initialization[k] = v
+        copy_opts[k] = v
     end
 
     --- Delete an option from config
     function C:del(k)
         rawset(self, k, nil)
-        initialization[k] = nil
+        copy_opts[k] = nil
     end
 
     --- Get only savable options as a table
@@ -61,10 +104,10 @@ function M.new_configer(configer)
     end
 
     --- Setup config's current options
-    --- * All savable options will be extend with new_opt;
+    --- * All savable options will be extend with new_opts;
     --- * All non-savable options will be keeped.
-    function C:set(new_opt)
-        for k, v in pairs(new_opt) do
+    function C:set(new_opts)
+        for k, v in pairs(new_opts) do
             if type(v) == 'table' then
                 rawset(self, k, vim.deepcopy(v))
             else
@@ -74,30 +117,38 @@ function M.new_configer(configer)
     end
 
     --- Reinit config's options
-    --- * The initial options will be repleaced with init_opt;
-    --- * All savable options will be cleared first, then reinited with init_opt;
+    --- * The initial options will be repleaced with reinit_opts;
+    --- * All savable options will be cleared first, then reinited with reinit_opts;
     --- * All non-savable options will be cleared.
-    function C:reinit(init_opt)
-        if init_opt then
-            initialization = vim.deepcopy(init_opt)
+    function C:reinit(reinit_opts)
+        if reinit_opts then
+            copy_opts = vim.deepcopy(reinit_opts)
         end
         for k, _ in pairs(self) do
             rawset(self, k, nil)
         end
-        self:set(initialization)
+        self:set(copy_opts)
         -- C == getmetatable(self)
-        setmetatable(C, non_savable_config())
+        setmetatable(C, non_savable_config(self))
     end
 
-    return setmetatable(configer, C)
+    return setmetatable(opts, C)
 end
 
---- A channel lines processor for terminal's stdout
---- @param opts(table|nil) Passed from 'on_quickfix.params'
+--- @alias Chanor function A channel lines processor for terminal's stdout
+--- @class ChanorOptions Chanor options according to OnTaskOutput.params
+--- @field PTY(boolean|nil)
+--- @field SGR(boolean|nil)
+--- @field RAW(boolean|nil)
+--- @field verbose(string|nil)
+
+--- Create a chanor
+--- @param opts(ChanorOptions|nil)
+--- @return Chanor
 function M.new_chanor(opts)
-    local connect_pty = opts and opts.connect_pty
-    local hl_ansi_sgr = opts and opts.hl_ansi_sgr
-    local out_rawdata = opts and opts.out_rawdata
+    local PTY = opts and opts.PTY
+    local SGR = opts and opts.SGR
+    local RAW = opts and opts.RAW
     local verbose = opts and opts.verbose or ''
 
     local ansi = require('v.libv.ansi').new()
@@ -110,7 +161,7 @@ function M.new_chanor(opts)
     --- @return string|nil Pending string that can't be break into multi-lines
     local function process_lines(str, is_pending)
         str = str:gsub('\r', '') -- Remove ^M
-        if (not connect_pty) or out_rawdata then
+        if (not PTY) or RAW then
             local bufs = ansi.bufs()
             if not is_pending then
                 bufs[#bufs + 1] = str
@@ -124,8 +175,8 @@ function M.new_chanor(opts)
 
     --- Process raw data stream from terminal's stdout
     --- @param data(table<string>|nil) nil means all processed buffer lines should be displayed
-    --- @retval lines(table<string>) Processed lines
-    --- @retval highlights(table) Processed highlights for lines
+    --- @return table<string> lines Processed lines
+    --- @return table highlights Processed highlights for lines
     return function(data)
         local bufs = ansi.bufs()
         local hlts = ansi.hlts()
@@ -160,7 +211,7 @@ function M.new_chanor(opts)
             if bufs[k] then
                 lines[#lines + 1] = bufs[k]
             end
-            if hl_ansi_sgr and not out_rawdata and connect_pty and hlts[k] then
+            if SGR and not RAW and PTY and hlts[k] then
                 highlights[#highlights + 1] = hlts[k]
             end
             out_idx = out_idx + 1
@@ -201,11 +252,14 @@ function M.get_selected(sep)
     end
 end
 
+--- @class RecallOptions
+--- @field feedcmd(boolean|nil) Feed command into command line
+
+--- @type string|function
 local __cmdfn
 --- Store/recall command or function
 --- @param cmdfn(string|function) Vim command string or function
---- @param opts(table|nil) Vim command string or function
----     - feedcmd(boolean) Feed command into command line
+--- @param opts(RecallOptions|nil)
 function M.recall(cmdfn, opts)
     if cmdfn then
         -- Store
@@ -228,6 +282,7 @@ end
 --------------------------------------------------------------------------------
 -- async
 --------------------------------------------------------------------------------
+--- @class AsyncSubModule
 local _a = {}
 M.a = _a
 
@@ -250,9 +305,12 @@ function _a._wrap(afunc)
     end
 end
 
+--- @alias PopSelection table Selection of plugin popset
+--- @alias PopSelectionEvent function
+
 --- Async PopSelection
---- @retval true Selection is confirmed
---- @retval false Selected is canceled
+--- @param sel(PopSelection)
+--- @yield boolean Selection is confirmed(true) or canceled(false)
 function _a.pop_selection(sel)
     local caller = coroutine.running()
 
@@ -275,6 +333,7 @@ end
 --------------------------------------------------------------------------------
 -- utils
 --------------------------------------------------------------------------------
+--- @class UtilsSubModule
 local _u = {}
 M.u = _u
 
@@ -285,7 +344,7 @@ function _u.str2arg(str) return vim.split(str, '%s+', { trimempty = true }) end
 
 --- Parse string to table of environment variables
 --- @param str(string) Input with format 'VAR0=var0 VAR1=var1'
---- @return (table) Environment table with { VAR0 = 'var0', VAR1 = 'var1' }
+--- @return table Environment table with { VAR0 = 'var0', VAR1 = 'var1' }
 function _u.str2env(str)
     local env = {}
     for _, seg in ipairs(_u.str2arg(str)) do
@@ -298,6 +357,7 @@ end
 --------------------------------------------------------------------------------
 -- map
 --------------------------------------------------------------------------------
+--- @class MapSubModule
 local _m = {}
 M.m = _m
 

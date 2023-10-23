@@ -7,7 +7,7 @@ local replace = task.replace
 local sequence = task.sequence
 local throw = error
 
---- Workspace config for code
+--- @type Configer Workspace config for code
 local wsc = libv.new_configer({
     key = '',
     file = '',
@@ -19,13 +19,15 @@ local wsc = libv.new_configer({
     stage = 'run',
     fs_find_one = false, -- Find the closest file relative to wdir
     enable_msvc = false, -- Setup msvc environment
-    connect_pty = true,
-    hl_ansi_sgr = true,
-    out_rawdata = false,
-    verbose = '',
+    tout = {
+        PTY = true,
+        SGR = true,
+        RAW = false,
+        verbose = '',
+    },
 })
 
---- Single code file tasks according to filetype
+--- @class CodeTable Single code file tasks according to filetype
 --- @var barg(string) Build arguments
 --- @var bsrc(string) Build source file
 --- @var bout(string) Build output file
@@ -60,7 +62,7 @@ local codes = {
 }
 -- stylua: ignore end
 
---- Project package tasks
+--- @class PackTable Project package tasks
 --- @var gtar(string) Generator target
 --- @var garg(string) Generate arguments
 --- @var stage(string) Task stage from {'build', 'run', 'clean', 'test'}
@@ -111,7 +113,7 @@ local function pat_file(pattern)
 
     local files = vim.fs.find(function(name, path)
         local re = vim.regex('\\c' .. pattern)
-        -- Require checking file's existence, because vim.fs.normalize's bug:
+        -- Require checking file's existence, because vim.fs.normalize's bug(old version):
         -- vim.fs.normalize('C:/') will return 'C:', which is equal to '.' for vim.fs.find.
         return re:match_str(name) and (vim.fn.filereadable(path .. '/' .. name) == 1)
     end, {
@@ -123,7 +125,7 @@ local function pat_file(pattern)
     return files[#files]
 end
 
---- All task handle functions
+--- @class CodeHandles All task handles to produce commands
 local _hdls = {}
 
 function _hdls.nvim(cfg)
@@ -231,6 +233,8 @@ function _hdls.sphinx(cfg)
 end
 
 --- Dispatch task handle and return task command
+--- @param rhs(CodeHandleMap)
+--- @param cfg(TaskConfig)
 local function dispatch(rhs, cfg)
     if cfg.file == '' then
         cfg.file = pat_file(rhs.pat)
@@ -242,6 +246,12 @@ local function dispatch(rhs, cfg)
     cfg.target = rhs.target
     return _hdls[rhs.fn](cfg)
 end
+
+--- @class CodeHandleMap
+--- @field fn(string) Function name for CodeHandles
+--- @field desc(string)
+--- @field pat(string) File pattern to get item from CodeTable or PackTable
+--- @field target(string)
 
 -- stylua: ignore start
 local _maps = {
@@ -264,7 +274,7 @@ local _keys = {
 }
 -- stylua: ignore end
 
---- Selections for code task
+--- @type PopSelection Selection for code task
 local _sels = {
     opt = 'config code task',
     lst = nil,
@@ -273,19 +283,9 @@ local _sels = {
     -- lst for kt.E = p
     lst_p = { 'key', 'file', 'type', 'envs', 'garg', 'barg', 'earg', 'stage' },
     -- lst for CodeWscInit
-    lst_i = {
-        'fs_find_one',
-        'enable_msvc',
-        'connect_pty',
-        'hl_ansi_sgr',
-        'out_rawdata',
-        'verbose',
-    },
+    lst_i = { 'fs_find_one', 'enable_msvc', 'PTY', 'SGR', 'RAW', 'verbose' },
     dic = {
-        key = {
-            lst = _maps[1],
-            dic = vim.tbl_map(function(h) return h.desc end, _maps),
-        },
+        key = { lst = _maps[1], dic = vim.tbl_map(function(h) return h.desc end, _maps) },
         file = { cpl = 'file' },
         type = { cpl = 'filetype' },
         envs = { lst = { 'PATH=' }, cpl = 'environment' },
@@ -295,9 +295,9 @@ local _sels = {
         stage = { lst = { 'build', 'run', 'clean', 'test' } },
         fs_find_one = vim.empty_dict(),
         enable_msvc = vim.empty_dict(),
-        connect_pty = vim.empty_dict(),
-        hl_ansi_sgr = vim.empty_dict(),
-        out_rawdata = vim.empty_dict(),
+        PTY = vim.empty_dict(),
+        SGR = vim.empty_dict(),
+        RAW = vim.empty_dict(),
         verbose = {
             lst = { 'a', 'w', 'b', 't', 'h', 'n' },
             dic = {
@@ -312,11 +312,18 @@ local _sels = {
     },
     sub = {
         lst = { true, false },
-        cmd = function(sopt, sel) wsc[sopt] = sel end,
-        get = function(sopt) return wsc[sopt] end,
+        cmd = function(sopt, sel)
+            if wsc[sopt] then
+                wsc[sopt] = sel
+            else
+                wsc.tout[sopt] = sel
+            end
+        end,
+        get = function(sopt) return wsc[sopt] or wsc.tout[sopt] end,
     },
 }
 
+--- @type PopSelectionEvent
 local function evt_p(name)
     if name == 'onCR' then
         if wsc.file ~= '' then
@@ -328,6 +335,7 @@ local function evt_p(name)
     end
 end
 
+--- @type PopSelectionEvent
 local function evt_i(name)
     if name == 'onCR' then
         wsc:reinit(wsc:get())
@@ -335,7 +343,7 @@ local function evt_i(name)
     end
 end
 
---- Arguments for _sels
+--- @class CodeHandleArgs Provide more args for _sels
 local _args = {}
 
 function _args.nvim(cfg) end
@@ -364,6 +372,8 @@ end
 function _args.sphinx(cfg) end
 
 --- Update _sels with _args
+--- @param rhs(CodeHandleMap)
+--- @param cfg(TaskConfig)
 local function update_sels(rhs, cfg)
     local dic = _sels.dic
     dic.garg = { lst = {} }
@@ -440,16 +450,16 @@ local entry = async(function(kt, bang)
     -- Run code task
     wsc.key = kt.E
     wsc.stage = (kt.A == 'b' and 'build') or (kt.A == 'c' and 'clean') or wsc.stage
-    wsc.verbose = bang and 'a' or wsc.verbose
-    if wsc.verbose:match('[aw]') then
+    wsc.tout.verbose = bang and 'a' or wsc.tout.verbose
+    if wsc.tout.verbose:match('[aw]') then
         vim.notify(('resovle = %s, restore = %s\n%s'):format(resovle, restore, vim.inspect(wsc)))
     end
-    wsc.qf_save = true
-    wsc.qf_open = true
-    wsc.qf_jump = false
-    wsc.qf_scroll = true
-    wsc.qf_append = false
-    wsc.qf_title = task.title.Code
+    wsc.tout.save = true
+    wsc.tout.open = true
+    wsc.tout.jump = false
+    wsc.tout.scroll = true
+    wsc.tout.append = false
+    wsc.tout.title = task.title.Code
     local ok, msg = pcall(function()
         wsc.cmd = dispatch(_maps[wsc.key], wsc)
         task.run(wsc)

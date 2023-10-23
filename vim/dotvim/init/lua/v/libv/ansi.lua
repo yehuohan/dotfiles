@@ -12,10 +12,10 @@ end
 
 --- Generate next line that ends with a CSI code
 --- @param pat(string) One of the CSI pattern
---- @retval last(boolean) Indicate the last valid match
---- @retval line(string) The matched line ends with a CSI code
---- @retval args(string) CSI args
---- @retval byte(string) CSI final byte
+--- @yield last(boolean) Indicate the last valid match
+--- @yield line(string) The matched line ends with a CSI code
+--- @yield args(string) CSI args
+--- @yield byte(string) CSI final byte
 local function next_csi(str, pat)
     local len = string.len(str)
     local ci = 1

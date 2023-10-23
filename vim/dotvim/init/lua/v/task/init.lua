@@ -2,20 +2,43 @@ local libv = require('v.libv')
 
 local M = {}
 
---- Task titles
+--- @class TaskWorkspace Task workspace config
+--- @field code(Configer)
+--- @field fzer(Configer)
+
+--- @class TaskConfig Task config
+--- @field cmd(string) Task command that includes args
+--- @field wdir(string) Wording directory
+--- @field envs(string) Environment variables
+--- @field tout(TaskOutputConfig)
+
+--- @class TaskOutputConfig
+--- @field efm(string)
+--- @field save(boolean)
+--- @field open(boolean)
+--- @field jump(boolean)
+--- @field scroll(boolean)
+--- @field append(boolean)
+--- @field title(string)
+--- @field PTY(boolean)
+--- @field SGR(boolean)
+--- @field RAW(boolean)
+--- @field verbose(string|nil)
+
+--- @type TaskWorkspace
+M.wsc = {
+    code = {},
+    fzer = {},
+}
+
+--- @enum TaskTitle Task title for different task type
 M.title = {
     Task = 'v.task',
     Code = 'v.task.code',
     Fzer = 'v.task.fzer',
 }
 
---- Task workspace config
-M.wsc = {
-    code = {},
-    fzer = {},
-}
-
---- Task outputs to highlight at quickfix window
+--- @type table<string> String to highlight from task outputs at quickfix window
 M.hlstr = {}
 
 --- Repleace command's placeholders
@@ -28,33 +51,29 @@ function M.replace(cmd, rep) return vim.trim(string.gsub(cmd, '{(%w+)}', rep)) e
 function M.sequence(cmdlist) return table.concat(cmdlist, ' && ') end
 
 --- Run task
---- @param cfg(table) Task config
----     - cmd(string) Task command that includes args
----     - wdir(string) Wording directory
----     - envs(string) Environment variables
----     - qf_xxx 'on_task_output' params
+--- @param cfg(TaskConfig)
 function M.run(cfg)
     local opts = {}
     opts.cmd = cfg.cmd
     opts.cwd = cfg.wdir
     opts.env = cfg.envs and libv.u.str2env(cfg.envs)
-    if not cfg.connect_pty then
+    if not cfg.tout.PTY then
         opts.strategy = { 'jobstart', use_terminal = false }
     end
-    opts.metadata = { verbose = cfg.verbose }
     opts.components = {
         {
             'on_task_output',
-            errorformat = cfg.efm,
-            save = cfg.qf_save,
-            open = cfg.qf_open,
-            jump = cfg.qf_jump,
-            scroll = cfg.qf_scroll,
-            append = cfg.qf_append,
-            title = cfg.qf_title,
-            connect_pty = cfg.connect_pty,
-            hl_ansi_sgr = cfg.hl_ansi_sgr,
-            out_rawdata = cfg.out_rawdata,
+            errorformat = cfg.tout.efm,
+            save = cfg.tout.save,
+            open = cfg.tout.open,
+            jump = cfg.tout.jump,
+            scroll = cfg.tout.scroll,
+            append = cfg.tout.append,
+            title = cfg.tout.title,
+            PTY = cfg.tout.PTY,
+            SGR = cfg.tout.SGR,
+            RAW = cfg.tout.RAW,
+            verbose = cfg.tout.verbose,
         },
         'display_duration',
         'on_output_summarize',
@@ -73,16 +92,18 @@ function M.run_cmd(cmd, bang)
     local cfg = {
         cmd = cmd,
         wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
-        qf_save = false,
-        qf_open = true,
-        qf_jump = false,
-        qf_scroll = true,
-        qf_append = false,
-        qf_title = M.title.Task,
-        connect_pty = true,
-        hl_ansi_sgr = true,
-        out_rawdata = false,
-        verbose = bang and 'a',
+        tout = {
+            save = false,
+            open = true,
+            jump = false,
+            scroll = true,
+            append = false,
+            title = M.title.Task,
+            PTY = true,
+            SGR = true,
+            RAW = false,
+            verbose = bang and 'a',
+        },
     }
     M.run(cfg)
 end

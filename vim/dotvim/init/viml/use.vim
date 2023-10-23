@@ -46,7 +46,7 @@ function! s:useInit()
     " Init with empty dict '{}' to indicate sub-selection
     let l:dic = map(copy(s:use), '{}')
     " Set xgit
-    let l:dic.xgit = { 'lst': [v:null, 'https://kgithub.com'] }
+    let l:dic.xgit = { 'lst': [v:null, 'https://kkgithub.com'] }
     " Set ui
     let l:fontlst = [
         \ 'Consolas',

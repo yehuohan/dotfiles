@@ -5,7 +5,7 @@ local await = a._await
 local task = require('v.task')
 local replace = task.replace
 
---- Workspace config for fzer
+--- @type Configer Workspace config for fzer
 local wsc = libv.new_configer({
     envs = '',
     path = '',
@@ -55,7 +55,13 @@ local function uproot()
     end
 end
 
---- Fuzzy finder tasks
+--- @alias FuzzierHandle string|function
+--- @class Fuzzier
+--- @field file(FuzzierHandle)
+--- @field live(FuzzierHandle)
+--- @field tags(FuzzierHandle)
+
+--- @class FzerTable Fuzzy finder tasks
 --- @var opt(string) Options
 --- @var pat(string) Pattern
 --- @var loc(string) Location
@@ -146,6 +152,7 @@ local _keys_fuzzier = {
 local _maps_fuzzier = { f = 'file', l = 'live', h = 'tags' }
 -- stylua: ignore end
 
+--- @type PopSelection Selection for fzer task
 local _sels = {
     opt = 'config fzer task',
     lst = nil,
@@ -303,22 +310,25 @@ local entry = async(function(kt, bang)
     -- Run fzer task
     wsc.cmd = replace(fzer.rg, rep)
     wsc.wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
-    wsc.qf_append = (kt.A == 'a')
-    if not wsc.qf_append then
+    wsc.tout = {
+        save = false,
+        open = true,
+        jump = true,
+        scroll = false,
+        append = kt.A == 'a',
+        title = task.title.Fzer,
+        PTY = false,
+        SGR = false,
+        RAW = false,
+        verbose = bang and 'a',
+    }
+    if not wsc.tout.append then
         task.hlstr = {}
     end
     table.insert(task.hlstr, rep.pat)
     if bang then
         vim.notify(vim.inspect(wsc))
     end
-    wsc.qf_save = false
-    wsc.qf_open = true
-    wsc.qf_jump = true
-    wsc.qf_scroll = false
-    wsc.qf_title = task.title.Fzer
-    wsc.connect_pty = false
-    wsc.hl_ansi_sgr = false
-    wsc.out_rawdata = false
     task.run(wsc)
     libv.recall(function() task.run(wsc) end)
 end)

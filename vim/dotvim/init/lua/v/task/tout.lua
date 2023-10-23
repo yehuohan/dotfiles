@@ -85,13 +85,18 @@ local function redir_term(task)
     vim.api.nvim_win_set_option(hwin, 'signcolumn', 'no')
 end
 
---- Context of task output
+--- @class ToutContext of task output
+--- @field ns(number) Namespace for highlight
+--- @field title(TaskTitle|nil)
+--- @field qf_task(table|nil) Task output on quickfix window
 local ctx = {
     ns = vim.api.nvim_create_namespace('v.task.tout'),
+    title = nil,
     qf_task = nil,
-    qf_title = nil,
 }
 
+--- @class OnTaskOutput
+--- @field params(table) Parameters to sync task output
 local M = {
     desc = 'Sync task output into the quickfix(default) or terminal',
     params = {
@@ -131,19 +136,24 @@ local M = {
             type = 'string',
             default = 'v.task.tout',
         },
-        connect_pty = {
+        PTY = {
             desc = 'Connect to PTY when running task',
             type = 'boolean',
             default = false,
         },
-        hl_ansi_sgr = {
-            desc = 'Highlight ANSI color with SGR when connect_pty is enabled',
+        SGR = {
+            desc = 'Highlight ANSI color with SGR when PTY is enabled',
             type = 'boolean',
             default = false,
         },
-        out_rawdata = {
+        RAW = {
             desc = 'Output raw data from stdout',
             type = 'boolean',
+            default = false,
+        },
+        verbose = {
+            desc = 'Output verbose for debug',
+            type = 'string',
             default = false,
         },
     },
@@ -152,12 +162,13 @@ local M = {
 function M.constructor(params)
     local cpt = {
         start_time = nil,
+        --- @type Chanor|nil
         chanor = nil,
     }
 
     local function default_start(task)
         ctx.qf_task = task
-        ctx.qf_title = params.title
+        ctx.title = params.title
         cpt.start_time = os.time()
 
         if params.save then
@@ -238,17 +249,17 @@ function M.constructor(params)
 
     cpt.on_init = function(self, task)
         self.chanor = require('v.libv').new_chanor({
-            connect_pty = params.connect_pty,
-            hl_ansi_sgr = params.hl_ansi_sgr,
-            out_rawdata = params.out_rawdata,
-            verbose = task.metadata.verbose,
+            PTY = params.PTY,
+            SGR = params.SGR,
+            RAW = params.RAW,
+            verbose = params.verbose,
         })
     end
 
     cpt.on_start = function(self, task)
         if ctx.qf_task then
             local fzer = require('v.task').title.Fzer
-            if ctx.qf_title ~= fzer and params.title == fzer then
+            if ctx.title ~= fzer and params.title == fzer then
                 redir_term(ctx.qf_task)
                 default_start(task)
             else
