@@ -82,11 +82,25 @@ local packs = {
         tar = [[^TARGET%s*:?=%s*([%w%-_]+)%s*$]], -- TARGET := <bout>
         pro = [[^project%s*%(%s*([%w%-_]+).*%).*$]], -- project(<bout>)
         pho = [[^%.PHONY:%s*([%w%-_]+)%s*$]], -- .PHONY: <barg>
+        cdl = [[^.*vim@code:%s*(.*)$]], -- @vim@code: <cmd>
     },
     _exec = '"./{bout}" {earg}',
     _msvc = 'vcvars64.bat',
     _vout = '_VOut',
 }
+
+local function codeline(file)
+    local num = 0
+    for line in io.lines(file) do
+        num = num + 1
+        if num <= vim.o.modelines then
+            local res = string.match(line, packs._pats.cdl)
+            if res then
+                return res
+            end
+        end
+    end
+end
 
 local function pat_text(pattern, file)
     for line in io.lines(file) do
@@ -131,7 +145,6 @@ local _hdls = {}
 function _hdls.nvim(cfg)
     local ft = vim.o.filetype
     if ft == 'vim' then
-        vim.cmd.write()
         vim.cmd.source('%')
         throw('Source completed', 0)
     else
@@ -141,8 +154,12 @@ function _hdls.nvim(cfg)
         local rep = {}
         rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
         rep.earg = cfg.earg
-
-        return replace(codes.nvim.cmd, rep)
+        local cmd = codeline(cfg.file) or codes.nvim.cmd
+        if cmd:sub(1, 1) == ':' then
+            vim.cmd(cmd)
+            throw('Executed ' .. cmd, 0)
+        end
+        return replace(cmd, rep)
     end
 end
 
@@ -159,7 +176,8 @@ function _hdls.file(cfg)
     rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
     rep.bout = vim.fn.fnamemodify(cfg.file, ':t:r')
     rep.earg = cfg.earg
-    return replace(codes[ft].cmd, rep)
+    local cmd = codeline(cfg.file) or codes[ft].cmd
+    return replace(cmd, rep)
 end
 
 function _hdls.make(cfg)
@@ -267,7 +285,7 @@ local _maps = {
 }
 
 local _keys = {
-    'Rp' , 'Rm' , 'Ru' , 'Rn' , 'Rj' , 'Ro' , 'Rh' , 'Rf',
+    'Rp' , 'Rm' , 'Ru' , 'Rn' , 'Rj' , 'Ro' , 'Rh' , 'Rf', 'Rl',
     'rp' , 'rm' , 'ru' , 'rn' , 'rj' , 'ro' , 'rh' , 'rf', 'rl',
     'rcp', 'rcm', 'rcu', 'rcn', 'rcj', 'rco', 'rch',
     'rbp', 'rbm', 'rbu', 'rbn', 'rbj', 'rbo', 'rbh',
@@ -448,13 +466,13 @@ local entry = async(function(kt, bang)
     end
 
     -- Run code task
+    vim.cmd.wall({ mods = { silent = true, emsg_silent = true } })
     wsc.key = kt.E
     wsc.stage = (kt.A == 'b' and 'build') or (kt.A == 'c' and 'clean') or wsc.stage
     wsc.tout.verbose = bang and 'a' or wsc.tout.verbose
     if wsc.tout.verbose:match('[aw]') then
         vim.notify(('resovle = %s, restore = %s\n%s'):format(resovle, restore, vim.inspect(wsc)))
     end
-    wsc.tout.save = true
     wsc.tout.open = true
     wsc.tout.jump = false
     wsc.tout.scroll = true

@@ -203,7 +203,7 @@ end
 -- 消息提示
 local function pkg_notify()
     require('notify').setup({
-        max_width = function() return vim.api.nvim_get_option('columns') * 0.7 end,
+        max_width = function() return math.floor(vim.api.nvim_get_option('columns') * 0.7) end,
         minimum_width = 30,
         top_down = false,
     })

@@ -106,11 +106,6 @@ local M = {
             optional = true,
             default_from_task = true,
         },
-        save = {
-            desc = 'Save all files before start task',
-            type = 'boolean',
-            default = false,
-        },
         open = {
             desc = 'Open the quickfix window',
             type = 'boolean',
@@ -171,9 +166,6 @@ function M.constructor(params)
         ctx.title = params.title
         cpt.start_time = os.time()
 
-        if params.save then
-            vim.cmd.wall({ mods = { silent = true, emsg_silent = true } })
-        end
         local qf = qf_open(get_qf(), params.open, params.jump)
         if qf.hwin then
             vim.api.nvim_win_call(qf.hwin, function() vim.cmd.lcd({ args = { task.cwd } }) end)

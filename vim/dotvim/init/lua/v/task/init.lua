@@ -14,7 +14,6 @@ local M = {}
 
 --- @class TaskOutputConfig
 --- @field efm(string)
---- @field save(boolean)
 --- @field open(boolean)
 --- @field jump(boolean)
 --- @field scroll(boolean)
@@ -64,7 +63,6 @@ function M.run(cfg)
         {
             'on_task_output',
             errorformat = cfg.tout.efm,
-            save = cfg.tout.save,
             open = cfg.tout.open,
             jump = cfg.tout.jump,
             scroll = cfg.tout.scroll,
@@ -93,7 +91,6 @@ function M.run_cmd(cmd, bang)
         cmd = cmd,
         wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
         tout = {
-            save = false,
             open = true,
             jump = false,
             scroll = true,

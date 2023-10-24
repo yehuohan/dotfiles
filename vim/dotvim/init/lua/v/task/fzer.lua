@@ -311,7 +311,6 @@ local entry = async(function(kt, bang)
     wsc.cmd = replace(fzer.rg, rep)
     wsc.wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
     wsc.tout = {
-        save = false,
         open = true,
         jump = true,
         scroll = false,
