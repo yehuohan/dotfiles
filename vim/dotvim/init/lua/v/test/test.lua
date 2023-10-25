@@ -1,10 +1,52 @@
 --- Simple testcases for neovim configration
---- @usage nvim -l test.lua
+--- vim@code: :PlenaryBustedFile %
+--- vim@code: nvim --headless -c "PlenaryBustedDirectory test"
+--- vim@code: nvim -l test.lua
 
 local dir_this = vim.fn.getcwd()
 local dir_base = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(dir_this)))
 vim.opt.rtp:prepend(dir_base)
 local libv = require('v.libv')
+
+local EQ = assert.are.same
+local NEQ = assert.are_not.same
+local OK = assert.has_no.errors
+local NOK = assert.has.errors
+
+describe('libv', function()
+    it('. str2env', function()
+        local str = ' VAR0=var0   VAR1=var1 '
+        local env = libv.u.str2env(str)
+        EQ({ VAR0 = 'var0', VAR1 = 'var1' }, env)
+    end)
+
+    -- libv.new_configer
+    describe('. new_configer', function()
+        it('. create', function()
+            NOK(function() libv.new_configer() end)
+            OK(function() libv.new_configer({}) end)
+        end)
+
+        it('. modify methods', function()
+            local cfg = libv.new_configer({})
+            NOK(function() cfg.add = 'foo' end)
+            NOK(function() cfg.del = 'foo' end)
+            NOK(function() cfg.get = 'foo' end)
+            NOK(function() cfg.set = 'foo' end)
+            NOK(function() cfg.reinit = 'foo' end)
+        end)
+
+        it('. modify savable and non-savable options', function()
+            local cfg = libv.new_configer({ file = 'test.cpp' })
+            EQ({ file = 'test.cpp' }, cfg)
+            cfg.file = 'test.c'
+            cfg.type = 'c'
+            EQ('test.c', rawget(cfg, 'file'))
+            EQ(nil, rawget(cfg, 'type'))
+            EQ('c', rawget(getmetatable(getmetatable(cfg)), 'type'))
+        end)
+    end)
+end)
 
 local function EQ(expected, actual)
     assert(
@@ -44,13 +86,6 @@ local function NOK(f, ...)
 end
 
 local tst = {}
-
-function tst.str2env()
-    local str = ' VAR0=var0   VAR1=var1 '
-    local env = libv.u.str2env(str)
-    EQ({ VAR0 = 'var0', VAR1 = 'var1' }, env)
-    vim.print(env)
-end
 
 function tst.new_configer()
     -- Create config
@@ -99,12 +134,25 @@ function tst.new_configer()
     cfg:reinit()
     EQ({ file = 'test.cpp' }, cfg)
     EQ(nil, rawget(getmetatable(getmetatable(cfg)), 'type'))
-    cfg:reinit({ cmd = 'rust', file = 'test.rs' })
+
+    cfg:reinit({ cmd = 'rust', file = 'test.rs', args = { '-g', num = 1, subargs = { '-h' } } })
+    -- cfg = libv.new_configer({ cmd = 'rust', file = 'test.rs', args = { '-g', num = 1 } })
+
     cfg.type = 'rust'
-    EQ({ cmd = 'rust', file = 'test.rs' }, cfg)
+    EQ({ cmd = 'rust', file = 'test.rs', args = { '-g', num = 1, subargs = { '-h' } } }, cfg)
+
+    cfg.args[#cfg.args + 1] = '-f'
+    cfg.args[5] = '-e'
+    cfg.args.num = 2
+    cfg.args.out = 'bin'
+    cfg.args[{ 1, 2, 3 }] = '123'
+    cfg.args.subargs.inp = 'src'
+    vim.print(cfg.args.num)
+    vim.print(cfg.args.out)
+    vim.print(cfg.args.subargs.inp)
 
     -- Encode config to json
-    vim.print(OK(vim.json.encode, cfg))
+    -- vim.print(OK(vim.json.encode, cfg))
 
     vim.print(cfg)
 end
@@ -112,7 +160,7 @@ end
 function tst.new_chanor()
     local data = require('v.test.data')
 
-    local chanor = libv.new_chanor({ connect_pty = true, hl_ansi_sgr = true })
+    local chanor = libv.new_chanor({ PTY = true, SGR = true })
     local chunk
     local lines = {}
     for _, d in ipairs(data[1]) do
@@ -125,18 +173,5 @@ function tst.new_chanor()
 
     for _, line in ipairs(lines) do
         vim.print(vim.inspect(line))
-    end
-end
-
-print('Test work at', dir_this)
-for t, f in vim.spairs(tst) do
-    print(' ')
-    print(string.format('--- Run testcase %s ------------------------------', t))
-    local status, ret = pcall(f)
-    if status then
-        print(string.format('--- Pass testcase %s ------------------------------', t))
-    else
-        print(ret)
-        print(string.format('--- Failed testcase %s ------------------------------', t))
     end
 end

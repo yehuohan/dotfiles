@@ -77,6 +77,7 @@ local function __servers()
                             vim.env.VIMRUNTIME .. '/lua/vim',
                             vim.env.VIMRUNTIME .. '/lua/vim/lsp',
                             vim.env.VIMRUNTIME .. '/lua/vim/treesitter',
+                            vim.env.DotVimDir .. '/bundle/plenary.nvim/lua',
                         },
                     },
                     telemetry = { enable = false },

@@ -16,7 +16,7 @@ local M = {}
 ---         },
 ---     },
 --- }
---- @alias Configer table An useful configer
+--- @alias Configer table An useful configer with saveable options
 --- @alias ConfigerMethod table Configer's methods
 --- @alias ConfigerExtra table Configer's extra non-saveable options
 
@@ -76,18 +76,6 @@ function M.new_configer(opts)
             -- nsc == getmetatable(C)
             getmetatable(getmetatable(t))[k] = v
         end
-    end
-
-    --- Add an option to config
-    function C:add(k, v)
-        rawset(self, k, v)
-        copy_opts[k] = v
-    end
-
-    --- Delete an option from config
-    function C:del(k)
-        rawset(self, k, nil)
-        copy_opts[k] = nil
     end
 
     --- Get only savable options as a table
