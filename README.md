@@ -8,4 +8,4 @@
     - msys2
     - win: Windows
 - [vim](./vim)
-- misc
+- [misc](./misc)
