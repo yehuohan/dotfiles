@@ -6,6 +6,6 @@
     - ubuntu: Ubuntu linux
 - [disk](./disk): Windows configs
     - msys2
-    - win: Windows
+    - scoop
 - [vim](./vim)
 - [misc](./misc)

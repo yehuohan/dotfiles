@@ -97,12 +97,12 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp ~/.tmux-status.conf                                  ./disk/msys2/home/
 
     # win
-    cp $USERPROFILE/.cargo/config                   ./disk/home-win/.cargo/
-    cp $USERPROFILE/pip/pip.ini                     ./disk/home-win/pip/
-    cp $USERPROFILE/clink_inputrc                   ./disk/home-win/
-    cp $USERPROFILE/.ideavimrc                      ./disk/home-win/
-    cp $APPDATA/Code/User/settings.json             ./disk/home-win/AppData/Roaming/Code/User/
-    cp $LOCALAPPDATA/lf/lfrc                        ./disk/home-win/AppData/Local/lf/
+    cp $USERPROFILE/.cargo/config                   ./disk/home/.cargo/
+    cp $USERPROFILE/pip/pip.ini                     ./disk/home/pip/
+    cp $USERPROFILE/clink_inputrc                   ./disk/home/
+    cp $USERPROFILE/.ideavimrc                      ./disk/home/
+    cp $APPDATA/Code/User/settings.json             ./disk/home/AppData/Roaming/Code/User/
+    cp $LOCALAPPDATA/lf/lfrc                        ./disk/home/AppData/Local/lf/
 
     # scoop
     cp -r $APPS_HOME/_packs/persist/conemu          ./disk/scoop/
