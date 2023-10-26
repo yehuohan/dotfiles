@@ -19,9 +19,7 @@ local M = {}
 --- @field scroll(boolean)
 --- @field append(boolean)
 --- @field title(string)
---- @field PTY(boolean)
---- @field SGR(boolean)
---- @field RAW(boolean)
+--- @field style(string)
 --- @field verbose(string|nil)
 
 --- @type TaskWorkspace
@@ -56,7 +54,7 @@ function M.run(cfg)
     opts.cmd = cfg.cmd
     opts.cwd = cfg.wdir
     opts.env = cfg.envs and libv.u.str2env(cfg.envs)
-    if not cfg.tout.PTY then
+    if cfg.tout.style == 'job' then
         opts.strategy = { 'jobstart', use_terminal = false }
     end
     opts.components = {
@@ -68,9 +66,7 @@ function M.run(cfg)
             scroll = cfg.tout.scroll,
             append = cfg.tout.append,
             title = cfg.tout.title,
-            PTY = cfg.tout.PTY,
-            SGR = cfg.tout.SGR,
-            RAW = cfg.tout.RAW,
+            style = cfg.tout.style,
             verbose = cfg.tout.verbose,
         },
         'display_duration',
@@ -96,9 +92,7 @@ function M.run_cmd(cmd, bang)
             scroll = true,
             append = false,
             title = M.title.Task,
-            PTY = true,
-            SGR = true,
-            RAW = false,
+            style = 'term',
             verbose = bang and 'a',
         },
     }

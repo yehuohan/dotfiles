@@ -125,7 +125,7 @@ describe('libv', function()
     -- libv.new_chanor
     it('. new_chanor', function()
         local data = require('v.test.data')
-        local chanor = libv.new_chanor({ PTY = true, SGR = true })
+        local chanor = libv.new_chanor({ style = 'ansi' })
         local chunk
         local lines = {}
         for _, d in ipairs(data[1]) do

@@ -342,7 +342,6 @@ let g:vista_echo_cursor = 0
 let g:vista_stay_on_open = 0
 let g:vista_disable_statusline = 1
 nnoremap <leader>tv :Vista!!<CR>
-nnoremap <leader>vc :Vista coc<CR>
 " }}}
 
 " quickhl {{{ 单词高亮

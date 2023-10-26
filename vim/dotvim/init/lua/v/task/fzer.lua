@@ -316,9 +316,7 @@ local entry = async(function(kt, bang)
         scroll = false,
         append = kt.A == 'a',
         title = task.title.Fzer,
-        PTY = false,
-        SGR = false,
-        RAW = false,
+        style = 'job',
         verbose = bang and 'a',
     }
     if not wsc.tout.append then

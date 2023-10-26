@@ -125,18 +125,14 @@ end
 
 --- @alias Chanor function A channel lines processor for terminal's stdout
 --- @class ChanorOptions Chanor options according to OnTaskOutput.params
---- @field PTY(boolean|nil)
---- @field SGR(boolean|nil)
---- @field RAW(boolean|nil)
+--- @field style(string|nil)
 --- @field verbose(string|nil)
 
 --- Create a chanor
 --- @param opts(ChanorOptions|nil)
 --- @return Chanor
 function M.new_chanor(opts)
-    local PTY = opts and opts.PTY
-    local SGR = opts and opts.SGR
-    local RAW = opts and opts.RAW
+    local style = opts and opts.style
     local verbose = opts and opts.verbose or ''
 
     local ansi = require('v.libv.ansi').new()
@@ -149,15 +145,15 @@ function M.new_chanor(opts)
     --- @return string|nil Pending string that can't be break into multi-lines
     local function process_lines(str, is_pending)
         str = str:gsub('\r', '') -- Remove ^M
-        if (not PTY) or RAW then
+        if style == 'ansi' then
+            return ansi.feed(str, is_pending, verbose)
+        else
             local bufs = ansi.bufs()
             if not is_pending then
                 bufs[#bufs + 1] = str
             else
                 return str
             end
-        else
-            return ansi.feed(str, is_pending, verbose)
         end
     end
 
@@ -199,7 +195,7 @@ function M.new_chanor(opts)
             if bufs[k] then
                 lines[#lines + 1] = bufs[k]
             end
-            if SGR and not RAW and PTY and hlts[k] then
+            if hlts[k] and style == 'ansi' then
                 highlights[#highlights + 1] = hlts[k]
             end
             out_idx = out_idx + 1

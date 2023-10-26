@@ -19,12 +19,9 @@ local wsc = libv.new_configer({
     stage = 'run',
     fs_find_one = false, -- Find the closest file relative to wdir
     enable_msvc = false, -- Setup msvc environment
-    tout = {
-        PTY = true,
-        SGR = true,
-        RAW = false,
-        verbose = '',
-    },
+    style = 'ansi',
+    verbose = '',
+    tout = {},
 })
 
 --- @class CodeTable Single code file tasks according to filetype
@@ -149,7 +146,7 @@ function _hdls.nvim(cfg)
         throw('Source completed', 0)
     else
         cfg.type = 'lua'
-        cfg.efm = codes.lua.efm
+        cfg.tout.efm = codes.lua.efm
 
         local rep = {}
         rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
@@ -169,7 +166,7 @@ function _hdls.file(cfg)
         throw(string.format('Code task doesn\'t support "%s"', ft), 0)
     end
     cfg.type = ft
-    cfg.efm = codes[cfg.type].efm
+    cfg.tout.efm = codes[cfg.type].efm
 
     local rep = {}
     rep.barg = cfg.barg
@@ -181,7 +178,7 @@ function _hdls.file(cfg)
 end
 
 function _hdls.make(cfg)
-    cfg.efm = codes.make.efm .. ',' .. codes.cmake.efm .. ',' .. vim.o.errorformat
+    cfg.tout.efm = codes.make.efm .. ',' .. codes.cmake.efm .. ',' .. vim.o.errorformat
 
     local rep = {}
     rep.barg = cfg.barg
@@ -208,7 +205,7 @@ function _hdls.cmake(cfg)
         throw(string.format('%s was removed', outdir), 0)
     end
     vim.fn.mkdir(outdir, 'p')
-    cfg.efm = codes.cmake.efm .. ',' .. vim.o.errorformat
+    cfg.tout.efm = codes.cmake.efm .. ',' .. vim.o.errorformat
 
     local rep = {}
     rep.gtar = cfg.target
@@ -228,7 +225,7 @@ function _hdls.cmake(cfg)
 end
 
 function _hdls.cargo(cfg)
-    cfg.efm = codes.rust.efm
+    cfg.tout.efm = codes.rust.efm
 
     local rep = {}
     rep.stage = cfg.stage
@@ -301,7 +298,7 @@ local _sels = {
     -- lst for kt.E = p
     lst_p = { 'key', 'file', 'type', 'envs', 'garg', 'barg', 'earg', 'stage' },
     -- lst for CodeWscInit
-    lst_i = { 'fs_find_one', 'enable_msvc', 'PTY', 'SGR', 'RAW', 'verbose' },
+    lst_i = { 'fs_find_one', 'enable_msvc', 'style', 'verbose' },
     dic = {
         key = { lst = _maps[1], dic = vim.tbl_map(function(h) return h.desc end, _maps) },
         file = { cpl = 'file' },
@@ -313,9 +310,7 @@ local _sels = {
         stage = { lst = { 'build', 'run', 'clean', 'test' } },
         fs_find_one = vim.empty_dict(),
         enable_msvc = vim.empty_dict(),
-        PTY = vim.empty_dict(),
-        SGR = vim.empty_dict(),
-        RAW = vim.empty_dict(),
+        style = { lst = { 'term', 'ansi', 'raw', 'job' } },
         verbose = {
             lst = { 'a', 'w', 'b', 't', 'h', 'n' },
             dic = {
@@ -330,14 +325,8 @@ local _sels = {
     },
     sub = {
         lst = { true, false },
-        cmd = function(sopt, sel)
-            if wsc[sopt] then
-                wsc[sopt] = sel
-            else
-                wsc.tout[sopt] = sel
-            end
-        end,
-        get = function(sopt) return wsc[sopt] or wsc.tout[sopt] end,
+        cmd = function(sopt, sel) wsc[sopt] = sel end,
+        get = function(sopt) return wsc[sopt] end,
     },
 }
 
@@ -469,15 +458,16 @@ local entry = async(function(kt, bang)
     vim.cmd.wall({ mods = { silent = true, emsg_silent = true } })
     wsc.key = kt.E
     wsc.stage = (kt.A == 'b' and 'build') or (kt.A == 'c' and 'clean') or wsc.stage
-    wsc.tout.verbose = bang and 'a' or wsc.tout.verbose
-    if wsc.tout.verbose:match('[aw]') then
-        vim.notify(('resovle = %s, restore = %s\n%s'):format(resovle, restore, vim.inspect(wsc)))
-    end
     wsc.tout.open = true
     wsc.tout.jump = false
     wsc.tout.scroll = true
     wsc.tout.append = false
     wsc.tout.title = task.title.Code
+    wsc.tout.style = wsc.style
+    wsc.tout.verbose = bang and 'a' or wsc.verbose
+    if wsc.tout.verbose:match('[aw]') then
+        vim.notify(('resovle = %s, restore = %s\n%s'):format(resovle, restore, vim.inspect(wsc)))
+    end
     local ok, msg = pcall(function()
         wsc.cmd = dispatch(_maps[wsc.key], wsc)
         task.run(wsc)
