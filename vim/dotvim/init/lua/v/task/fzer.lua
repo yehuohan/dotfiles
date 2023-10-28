@@ -55,6 +55,11 @@ local function uproot()
     end
 end
 
+--- @class FzerVars
+--- @field opt(string) Options
+--- @field pat(string) Pattern
+--- @field loc(string) Location
+
 --- @alias FuzzierHandle string|function
 --- @class Fuzzier
 --- @field file(FuzzierHandle)
@@ -62,9 +67,6 @@ end
 --- @field tags(FuzzierHandle)
 
 --- @class FzerTable Fuzzy finder tasks
---- @var opt(string) Options
---- @var pat(string) Pattern
---- @var loc(string) Location
 local fzer = {
     rg = 'rg --vimgrep -F {opt} -e "{pat}" {loc}',
     _fzf = {
@@ -118,14 +120,14 @@ function fzer.leaderf(rhs, args)
     vim.cmd(cmd)
 end
 
-function fzer.telescope(rhs, rep)
+function fzer.telescope(rhs, args)
     local picker = fzer._telescope[rhs]
     require('telescope.builtin')[picker]({
-        cwd = rep.loc[1],
-        search = rep.pat,
-        search_file = rep.pat,
-        search_dirs = rep.loc,
-        additional_args = rep.opt,
+        cwd = args.loc[1],
+        search = args.pat,
+        search_file = args.pat,
+        search_dirs = args.loc,
+        additional_args = args.opt,
     })
 end
 
@@ -256,17 +258,19 @@ end
 
 --- Entry of fzer task
 --- @param kt(table): [fF][av][bp][IiWwSsYyUu]
----                   [%1][%2][%3][4%        ]
---- %1 = kt.S
+---                   [%S][%A][%B][%E        ]
+--- kt.S
 ---     F : find with modified fzer task config
---- %2 = kt.A
+--- kt.A
 ---     '': find with wsc
 ---     a : append results
---- %3 = kt.B
+--- kt.B
 ---     '': find with wsc
 ---     b : use current buffer
 ---     p : input paths
---- %4 = kt.E
+--- kt.E
+---     y : text from register "0
+---     u : text from register "+ (clipboard of system)
 ---     Normal Mode:
 ---         i : input
 ---         w : word
@@ -277,8 +281,6 @@ end
 ---         s : selected with boundaries
 ---     LowerCase: [iwsyu] ignorecase
 ---     UpperCase: [IWSYU] case insensitive
----         y : text from register "0
----         u : text from register "+ (clipboard of system)
 local entry = async(function(kt, bang)
     wsc:reinit()
 
@@ -331,13 +333,13 @@ local entry = async(function(kt, bang)
 end)
 
 --- Entry of fzer.fuzzier task
---- @param kt(table): [fF][p ][flh]
----                   [%1][%2][%3 ]
---- %1 = kt.S
+--- @param kt(table): [fF][p   ][flh]
+---                   [%S][%A/B][%E ]
+--- kt.S
 ---     F : fuzzier with inputing args
---- %2 = kt.A/B
+--- kt.A/B
 ---     p : input temp path
---- %3 = kt.E
+--- kt.E
 ---     f : fuzzier.file
 ---     l : fuzzier.live
 ---     h : fuzzier.tags with <cword> by default

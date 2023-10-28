@@ -24,14 +24,19 @@ local wsc = libv.new_configer({
     tout = {},
 })
 
+--- @class CodeVars
+--- @field barg(string) Build arguments
+--- @field bsrc(string) Build source file
+--- @field bout(string) Build output file
+--- @field earg(string) Execution arguments
+--- @field gtar(string) Generator target
+--- @field garg(string) Generate arguments
+--- @field stage(string) Task stage from {'build', 'run', 'clean', 'test'}
+
 --- @class CodeTable Single code file tasks according to filetype
---- @var barg(string) Build arguments
---- @var bsrc(string) Build source file
---- @var bout(string) Build output file
---- @var earg(string) Execution arguments
 -- stylua: ignore start
 local codes = {
-    nvim       = { cmd = 'nvim -l {bsrc} {earg}' },
+    nvim       = { cmd = 'nvim {barg} -l {bsrc} {earg}' },
     c          = { cmd = 'gcc -g {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
     cpp        = { cmd = 'g++ -g -std=c++20 {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
     rust       = { cmd = IsWin() and 'rustc {barg} {bsrc} -o "{bout}.exe" && "./{bout}" {earg}'
@@ -60,9 +65,6 @@ local codes = {
 -- stylua: ignore end
 
 --- @class PackTable Project package tasks
---- @var gtar(string) Generator target
---- @var garg(string) Generate arguments
---- @var stage(string) Task stage from {'build', 'run', 'clean', 'test'}
 local packs = {
     make = 'make {barg}',
     cmake = {
@@ -149,6 +151,7 @@ function _hdls.nvim(cfg)
         cfg.tout.efm = codes.lua.efm
 
         local rep = {}
+        rep.barg = cfg.barg
         rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
         rep.earg = cfg.earg
         local cmd = codeline(cfg.file) or codes.nvim.cmd
@@ -262,6 +265,43 @@ local function dispatch(rhs, cfg)
     return _hdls[rhs.fn](cfg)
 end
 
+--- @class CodeHandleArgs Provide more args for _sels
+local _args = {}
+
+function _args.nvim(dic, cfg) dic.barg.lst = { '--headless', '--noplugin' } end
+
+function _args.file(dic, cfg) dic.barg.lst = { '-static' } end
+
+function _args.make(dic, cfg) dic.barg.lst = pat_list(packs._pats.pho, cfg.file) end
+
+function _args.cmake(dic, cfg)
+    dic.garg.lst = { '-DCMAKE_BUILD_TYPE=Release' }
+    dic.barg.lst = { '--target tags', '-j4' }
+end
+
+function _args.cargo(dic, cfg) dic.earg.lst = { '--nocapture' } end
+
+--- Update _sels.dic
+--- @param rhs(CodeHandleMap)
+--- @param dic(table) What to update
+--- @param cfg(TaskConfig)
+local function update_sels(rhs, dic, cfg)
+    dic.garg = { lst = {} }
+    dic.barg = { lst = {} }
+    dic.earg = { lst = {} }
+    if rhs then
+        cfg.file = pat_file(rhs.pat)
+        if not cfg.file then
+            vim.notify(string.format('None of %s was found!', rhs.pat))
+            return false
+        end
+        if _args[rhs.fn] then
+            _args[rhs.fn](dic, cfg)
+        end
+    end
+    return true
+end
+
 --- @class CodeHandleMap
 --- @field fn(string) Function name for CodeHandles
 --- @field desc(string)
@@ -350,69 +390,21 @@ local function evt_i(name)
     end
 end
 
---- @class CodeHandleArgs Provide more args for _sels
-local _args = {}
-
-function _args.nvim(cfg) end
-
-function _args.file()
-    local dic = _sels.dic
-    dic.barg.lst = { '-static' }
-end
-
-function _args.make(cfg)
-    local dic = _sels.dic
-    dic.barg.lst = pat_list(packs._pats.pho, cfg.file)
-end
-
-function _args.cmake(cfg)
-    local dic = _sels.dic
-    dic.garg.lst = { '-DCMAKE_BUILD_TYPE=Release' }
-    dic.barg.lst = { '--target tags', '-j4' }
-end
-
-function _args.cargo(cfg)
-    local dic = _sels.dic
-    dic.earg.lst = { '--nocapture' }
-end
-
-function _args.sphinx(cfg) end
-
---- Update _sels with _args
---- @param rhs(CodeHandleMap)
---- @param cfg(TaskConfig)
-local function update_sels(rhs, cfg)
-    local dic = _sels.dic
-    dic.garg = { lst = {} }
-    dic.barg = { lst = {} }
-    dic.earg = { lst = {} }
-
-    if rhs then
-        cfg.file = pat_file(rhs.pat)
-        if not cfg.file then
-            vim.notify(string.format('None of %s was found!', rhs.pat))
-            return false
-        end
-        _args[rhs.fn](cfg)
-    end
-
-    return true
-end
-
 --- Entry of code task
 --- @param kt(table) [rR][cb][p...]
----                  [%1][%2][%3  ]
---- %1 = kt.S
----      r : build and run task
----      R : modify code task config
---- %2 = kt.A
----      c : clean task
----      b : build without run
---- %3 = kt.E from codes and packs
----      p : run task from task.wsc.code
---- Forward:
----      R^p => r^p (r^p means r[kt.E != p])
----      Rp  => rp  => r^p
+---                  [%S][%A][%E  ]
+--- kt.S
+---     r : build and run task
+---     R : modify code task config
+--- kt.A
+---     c : clean task
+---     b : build without run
+--- kt.E
+--      ? : from _maps
+---     p : run task from task.wsc.code
+--- Forward
+---     R^p => r^p (r^p means r[kt.E != p])
+---     Rp  => rp  => r^p
 local entry = async(function(kt, bang)
     wsc:reinit()
 
@@ -441,7 +433,7 @@ local entry = async(function(kt, bang)
 
     -- Need to resolve config
     if resovle then
-        if not update_sels(_maps[kt.E], wsc) then
+        if not update_sels(_maps[kt.E], _sels.dic, wsc) then
             return
         end
         if not await(a.pop_selection(_sels)) then
