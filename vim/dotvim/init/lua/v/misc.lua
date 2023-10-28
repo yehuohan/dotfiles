@@ -44,7 +44,7 @@ local fast_cmds = {
             },
             cmd = function(_, sel)
                 local task = require('v.task')
-                task.run_cmd(task.replace(sel, { src = vim.api.nvim_buf_get_name(0) }))
+                task.cmd(libv.u.replace(sel, { src = vim.api.nvim_buf_get_name(0) }))
             end,
         },
     },

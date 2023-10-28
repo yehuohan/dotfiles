@@ -2,9 +2,9 @@ local libv = require('v.libv')
 local a = libv.a
 local async = a._async
 local await = a._await
+local replace = libv.u.replace
+local sequence = libv.u.sequence
 local task = require('v.task')
-local replace = task.replace
-local sequence = task.sequence
 local throw = error
 
 --- @type Configer Workspace config for code

@@ -38,15 +38,6 @@ M.title = {
 --- @type table<string> String to highlight from task outputs at quickfix window
 M.hlstr = {}
 
---- Repleace command's placeholders
---- @param cmd(string) String command with format 'cmd {arg}'
---- @param rep(table) Replacement with { arg = 'val' }
-function M.replace(cmd, rep) return vim.trim(string.gsub(cmd, '{(%w+)}', rep)) end
-
---- Sequence commands
---- @param cmdlist(table<string>) Command list to join with ' && '
-function M.sequence(cmdlist) return table.concat(cmdlist, ' && ') end
-
 --- Run task
 --- @param cfg(TaskConfig)
 function M.run(cfg)
@@ -82,7 +73,7 @@ function M.run(cfg)
 end
 
 --- Run task command
-function M.run_cmd(cmd, bang)
+function M.cmd(cmd, bang)
     local cfg = {
         cmd = cmd,
         wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
@@ -149,7 +140,7 @@ function M.setup()
     vim.api.nvim_create_user_command('TaskWsc', function() vim.print(M.wsc) end, { nargs = 0 })
     vim.api.nvim_create_user_command(
         'TaskRun',
-        function(opts) M.run_cmd(opts.args, opts.bang) end,
+        function(opts) M.cmd(opts.args, opts.bang) end,
         { bang = true, nargs = 1 }
     )
     libv.m.nnore({ '<leader><leader>r', ':TaskRun<Space>' })

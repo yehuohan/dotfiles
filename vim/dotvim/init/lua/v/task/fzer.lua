@@ -2,8 +2,8 @@ local libv = require('v.libv')
 local a = libv.a
 local async = a._async
 local await = a._await
+local replace = libv.u.replace
 local task = require('v.task')
-local replace = task.replace
 
 --- @type Configer Workspace config for fzer
 local wsc = libv.new_configer({

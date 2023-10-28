@@ -338,6 +338,15 @@ function _u.str2env(str)
     return env
 end
 
+--- Repleace command's placeholders
+--- @param cmd(string) String command with format 'cmd {arg}'
+--- @param rep(table) Replacement with { arg = 'val' }
+function _u.replace(cmd, rep) return vim.trim(string.gsub(cmd, '{(%w+)}', rep)) end
+
+--- Sequence commands
+--- @param cmdlist(table<string>) Command list to join with ' && '
+function _u.sequence(cmdlist) return table.concat(cmdlist, ' && ') end
+
 --------------------------------------------------------------------------------
 -- map
 --------------------------------------------------------------------------------

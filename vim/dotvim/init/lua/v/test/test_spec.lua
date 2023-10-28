@@ -12,11 +12,21 @@ local OK = assert.has_no.errors
 local NOK = assert.has.errors
 
 describe('libv', function()
-    -- libv.str2env
-    it('. str2env', function()
-        local str = ' VAR0=var0   VAR1=var1 '
-        local env = libv.u.str2env(str)
-        EQ({ VAR0 = 'var0', VAR1 = 'var1' }, env)
+    describe('. utils', function()
+        -- libv.u.str2env
+        it('. str2env', function()
+            local str = ' VAR0=var0   VAR1=var1 '
+            local env = libv.u.str2env(str)
+            EQ({ VAR0 = 'var0', VAR1 = 'var1' }, env)
+        end)
+
+        -- libv.u.replace
+        it('. replace', function()
+            local cmd = 'nvim {arg} -l {src}'
+            local rep = { arg = '--headless', src = 'test.lua' }
+            local out = libv.u.replace(cmd, rep)
+            EQ('nvim --headless -l test.lua', out)
+        end)
     end)
 
     -- libv.new_configer

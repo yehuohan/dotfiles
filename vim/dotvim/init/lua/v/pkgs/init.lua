@@ -655,7 +655,7 @@ local function pkg_rst()
         -- 需要安装 https://github.com/mgedmin/restview
         m.nnore({
             '<leader>vr',
-            function() require('v.task').run_cmd('restview ' .. vim.fn.expand('%', ':p:t')) end,
+            function() require('v.task').cmd('restview ' .. vim.fn.expand('%', ':p:t')) end,
         })
     else
         -- 需要安装 https://github.com/Rykka/instant-rst.py
