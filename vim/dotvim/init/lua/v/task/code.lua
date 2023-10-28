@@ -142,25 +142,19 @@ end
 local _hdls = {}
 
 function _hdls.nvim(cfg)
-    local ft = vim.o.filetype
-    if ft == 'vim' then
-        vim.cmd.source('%')
-        throw('Source completed', 0)
-    else
-        cfg.type = 'lua'
-        cfg.tout.efm = codes.lua.efm
+    cfg.type = 'lua'
+    cfg.tout.efm = codes.lua.efm
 
-        local rep = {}
-        rep.barg = cfg.barg
-        rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
-        rep.earg = cfg.earg
-        local cmd = codeline(cfg.file) or codes.nvim.cmd
-        if cmd:sub(1, 1) == ':' then
-            vim.cmd(cmd)
-            throw('Executed ' .. cmd, 0)
-        end
-        return replace(cmd, rep)
+    local rep = {}
+    rep.barg = cfg.barg
+    rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
+    rep.earg = cfg.earg
+    local cmd = codeline(cfg.file) or codes.nvim.cmd
+    if cmd:sub(1, 1) == ':' then
+        vim.cmd(cmd)
+        throw('Executed ' .. cmd, 0)
     end
+    return replace(cmd, rep)
 end
 
 function _hdls.file(cfg)
@@ -484,6 +478,17 @@ local function setup()
     for _, keys in ipairs(_keys) do
         libv.m.nnore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
     end
+    libv.m.nnore({
+        '<leader>rv',
+        function()
+            local ft = vim.o.filetype
+            if ft == 'lua' or ft == 'vim' then
+                vim.cmd.write()
+                vim.cmd.source('%')
+                vim.notify('Source completed')
+            end
+        end,
+    })
 
     vim.api.nvim_create_user_command(
         'Code',
