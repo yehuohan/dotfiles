@@ -16,9 +16,9 @@ local wsc = libv.new_configer({
     garg = '',
     barg = '',
     earg = '',
+    msvc = false, -- Setup msvc environment
     stage = 'run',
-    fs_find_one = false, -- Find the closest file relative to wdir
-    enable_msvc = false, -- Setup msvc environment
+    closest = false, -- Find the closest file relative to wdir
     style = 'ansi',
     verbose = '',
     tout = {},
@@ -133,7 +133,7 @@ local function pat_file(pattern)
         upward = true,
         type = 'file',
         path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
-        limit = wsc.fs_find_one and 1 or math.huge,
+        limit = wsc.closest and 1 or math.huge,
     })
     return files[#files]
 end
@@ -188,7 +188,7 @@ function _hdls.make(cfg)
     end
 
     local cmds = {}
-    cmds[#cmds + 1] = (IsWin() and cfg.enable_msvc) and packs._msvc or nil
+    cmds[#cmds + 1] = (IsWin() and cfg.msvc) and packs._msvc or nil
     cmds[#cmds + 1] = replace(packs.make, rep)
     cmds[#cmds + 1] = rep.bout and replace(packs._exec, rep) or nil
 
@@ -212,7 +212,7 @@ function _hdls.cmake(cfg)
     rep.bout = rep.bout and packs._vout .. '/' .. rep.bout
     rep.earg = cfg.earg
     local cmds = {}
-    cmds[#cmds + 1] = (IsWin() and cfg.enable_msvc) and packs._msvc or nil
+    cmds[#cmds + 1] = (IsWin() and cfg.msvc) and packs._msvc or nil
     cmds[#cmds + 1] = replace(packs.cmake[1], rep)
     cmds[#cmds + 1] = replace(packs.cmake[2], rep)
     cmds[#cmds + 1] = replace(packs.cmake[3], rep)
@@ -328,11 +328,11 @@ local _sels = {
     opt = 'config code task',
     lst = nil,
     -- lst for kt.E != p
-    lst_d = { 'envs', 'garg', 'barg', 'earg', 'stage' },
+    lst_d = { 'envs', 'garg', 'barg', 'earg', 'msvc', 'stage' },
     -- lst for kt.E = p
-    lst_p = { 'key', 'file', 'type', 'envs', 'garg', 'barg', 'earg', 'stage' },
+    lst_p = { 'key', 'file', 'type', 'envs', 'garg', 'barg', 'earg', 'msvc', 'stage', 'style' },
     -- lst for CodeWscInit
-    lst_i = { 'fs_find_one', 'enable_msvc', 'style', 'verbose' },
+    lst_i = { 'envs', 'msvc', 'closest', 'style', 'verbose' },
     dic = {
         key = { lst = _maps[1], dic = vim.tbl_map(function(h) return h.desc end, _maps) },
         file = { cpl = 'file' },
@@ -341,9 +341,9 @@ local _sels = {
         garg = vim.empty_dict(),
         barg = vim.empty_dict(),
         earg = vim.empty_dict(),
+        msvc = vim.empty_dict(),
         stage = { lst = { 'build', 'run', 'clean', 'test' } },
-        fs_find_one = vim.empty_dict(),
-        enable_msvc = vim.empty_dict(),
+        closest = vim.empty_dict(),
         style = { lst = { 'term', 'ansi', 'raw', 'job' } },
         verbose = {
             lst = { 'a', 'w', 'b', 't', 'h', 'n' },
@@ -412,7 +412,7 @@ local entry = async(function(kt, bang)
     end
     if kt.E == 'p' then
         local __wsc = task.wsc.code
-        wsc:set(__wsc)
+        wsc:set(__wsc, _sels.lst_p)
         if __wsc.key and _maps[__wsc.key] and not resovle then
             -- Forward rp => r^p
             kt.E = __wsc.key
@@ -495,7 +495,12 @@ local function setup()
         function(opts) entry(keys2kt(opts.args), opts.bang) end,
         { bang = true, nargs = 1 }
     )
-    vim.api.nvim_create_user_command('CodeWsc', function() vim.print(wsc) end, { nargs = 0 })
+    vim.api.nvim_create_user_command('CodeWsc', function(opts)
+        if opts.bang then
+            wsc:reinit()
+        end
+        vim.print(wsc)
+    end, { bang = true, nargs = 0 })
     vim.api.nvim_create_user_command('CodeWscInit', function()
         wsc:reinit()
         _sels.lst = _sels.lst_i

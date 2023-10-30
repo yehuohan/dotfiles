@@ -403,7 +403,12 @@ local function setup()
         function(opts) entry(keys2kt(opts.args), opts.bang) end,
         { bang = true, nargs = 1 }
     )
-    vim.api.nvim_create_user_command('FzerWsc', function() vim.print(wsc) end, { nargs = 0 })
+    vim.api.nvim_create_user_command('FzerWsc', function(opts)
+        if opts.bang then
+            wsc:reinit()
+        end
+        vim.print(wsc)
+    end, { bang = true, nargs = 0 })
 end
 
 return {

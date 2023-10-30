@@ -708,7 +708,7 @@ end
 --------------------------------------------------------------------------------
 local pkgs = {
     -- Editor
-    { 'yehuohan/hop.nvim', config = pkg_hop },
+    { 'smoka7/hop.nvim', config = pkg_hop },
     { 'yehuohan/marks.nvim', config = pkg_marks },
     { 'xiyaowong/nvim-cursorword', config = pkg_cursorword },
     { 'booperlv/nvim-gomove', config = pkg_gomove },

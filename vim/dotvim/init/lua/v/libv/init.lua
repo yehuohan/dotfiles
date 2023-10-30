@@ -21,13 +21,14 @@ local M = {}
 --- @alias ConfigerExtra table Configer's extra non-saveable options
 
 --- Create a configer
+--- Configer need metatable for internal usage, so metatable from `opts` will be droped
 --- @param opts(table) Savable options of configer
 --- @return Configer
 function M.new_configer(opts)
     if type(opts) ~= 'table' then
         error('Initial saveable options shoule be a table')
     end
-    local copy_opts = vim.deepcopy(opts)
+    local copy_opts = M.u.deepcopy(opts)
 
     --- Create non-saveable options for each sub-tables
     --- @param nsc(ConfigerExtra)
@@ -79,27 +80,20 @@ function M.new_configer(opts)
     end
 
     --- Get only savable options as a table
-    function C:get()
-        local t = {}
-        for k, v in pairs(self) do
-            if type(v) == 'table' then
-                t[k] = vim.deepcopy(v)
-            else
-                t[k] = v
-            end
-        end
-        return t
-    end
+    function C:get() return M.u.deepcopy(self) end
 
     --- Setup config's current options
-    --- * All savable options will be extend with new_opts;
+    --- @param mask(table|nil) Key list as mask, nil means all masked
+    --- * All savable options in mask will be extend with new_opts;
     --- * All non-savable options will be keeped.
-    function C:set(new_opts)
+    function C:set(new_opts, mask)
         for k, v in pairs(new_opts) do
-            if type(v) == 'table' then
-                rawset(self, k, vim.deepcopy(v))
-            else
-                rawset(self, k, v)
+            if (not mask) or vim.tbl_contains(mask, k) then
+                if type(v) == 'table' then
+                    rawset(self, k, M.u.deepcopy(v))
+                else
+                    rawset(self, k, v)
+                end
             end
         end
     end
@@ -110,12 +104,18 @@ function M.new_configer(opts)
     --- * All non-savable options will be cleared.
     function C:reinit(reinit_opts)
         if reinit_opts then
-            copy_opts = vim.deepcopy(reinit_opts)
+            copy_opts = M.u.deepcopy(reinit_opts)
         end
         for k, _ in pairs(self) do
             rawset(self, k, nil)
         end
-        self:set(copy_opts)
+        for k, v in pairs(copy_opts) do
+            if type(v) == 'table' then
+                rawset(self, k, M.u.deepcopy(v))
+            else
+                rawset(self, k, v)
+            end
+        end
         -- C == getmetatable(self)
         setmetatable(C, non_savable_config(self))
     end
@@ -346,6 +346,24 @@ function _u.replace(cmd, rep) return vim.trim(string.gsub(cmd, '{(%w+)}', rep)) 
 --- Sequence commands
 --- @param cmdlist(table<string>) Command list to join with ' && '
 function _u.sequence(cmdlist) return table.concat(cmdlist, ' && ') end
+
+--- Deepcopy variable
+--- @param mt(boolean|nil) Copy metatable or not
+function _u.deepcopy(orig, mt)
+    local copy
+    if type(orig) == 'table' then
+        copy = {}
+        for k, v in pairs(orig) do
+            copy[_u.deepcopy(k, mt)] = _u.deepcopy(v, mt)
+        end
+        if mt then
+            setmetatable(copy, _u.deepcopy(getmetatable(orig), mt))
+        end
+    else
+        copy = orig
+    end
+    return copy
+end
 
 --------------------------------------------------------------------------------
 -- map

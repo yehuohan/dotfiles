@@ -7,7 +7,7 @@ local dir_base = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(dir_this)))
 vim.opt.rtp:prepend(dir_base)
 local libv = require('v.libv')
 
-local EQ = assert.are.same
+local EQ = assert.are.same -- The table's metatable won't be compared
 local OK = assert.has_no.errors
 local NOK = assert.has.errors
 
@@ -26,6 +26,56 @@ describe('libv', function()
             local rep = { arg = '--headless', src = 'test.lua' }
             local out = libv.u.replace(cmd, rep)
             EQ('nvim --headless -l test.lua', out)
+        end)
+
+        -- libv.u.deepcopy
+        it('. deepcopy', function()
+            local function check(orig)
+                local copy
+
+                -- Without table as key
+                copy = libv.u.deepcopy(orig, true)
+                EQ({ foo = { 'bar' }, null = vim.NIL }, copy)
+                EQ({ sub = { 'tbl' } }, getmetatable(copy))
+
+                copy = libv.u.deepcopy(orig, false)
+                EQ({ foo = { 'bar' }, null = vim.NIL }, copy)
+                EQ(nil, getmetatable(copy))
+
+                -- With table as key
+                local mkey = { abc = 'abc' }
+                setmetatable(mkey, { cba = 'cba' })
+                orig[mkey] = 'mkey'
+
+                copy = libv.u.deepcopy(orig, true)
+                EQ({ sub = { 'tbl' } }, getmetatable(copy))
+                for k, v in pairs(copy) do
+                    if type(k) == 'table' then
+                        EQ({ abc = 'abc' }, k)
+                        EQ({ cba = 'cba' }, getmetatable(k))
+                        EQ('mkey', v)
+                    end
+                end
+
+                copy = libv.u.deepcopy(orig, false)
+                EQ(nil, getmetatable(copy))
+                for k, v in pairs(copy) do
+                    if type(k) == 'table' then
+                        EQ({ abc = 'abc' }, k)
+                        EQ(nil, getmetatable(k))
+                        EQ('mkey', v)
+                    end
+                end
+            end
+
+            local orig
+            orig = { foo = { 'bar' }, null = vim.NIL }
+            setmetatable(orig, { sub = { 'tbl' } })
+            check(orig)
+            vim.cmd("let g:Orig = { 'foo' : ['bar'], 'null' : v:null }")
+            orig = vim.g.Orig
+            setmetatable(orig, { sub = { 'tbl' } })
+            check(orig)
         end)
     end)
 
@@ -67,6 +117,8 @@ describe('libv', function()
             EQ(nil, getmetatable(out))
             -- .set
             cfg.type = 'c'
+            cfg:set({ cmd = 'gcc', args = { '-f' } }, { 'cmd' })
+            EQ({ cmd = 'gcc', file = 'foo.c', args = { '-g' } }, cfg)
             cfg:set({ cmd = 'gcc', args = { '-f' } })
             EQ({ cmd = 'gcc', file = 'foo.c', args = { '-f' } }, cfg)
             EQ('c', rawget(getmetatable(getmetatable(cfg)), 'type'))
