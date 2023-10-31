@@ -328,7 +328,7 @@ local _sels = {
     opt = 'config code task',
     lst = nil,
     -- lst for kt.E != p
-    lst_d = { 'envs', 'garg', 'barg', 'earg', 'msvc', 'stage' },
+    lst_d = { 'envs', 'garg', 'barg', 'earg', 'msvc', 'stage', 'closest', 'style' },
     -- lst for kt.E = p
     lst_p = { 'key', 'file', 'type', 'envs', 'garg', 'barg', 'earg', 'msvc', 'stage', 'style' },
     -- lst for CodeWscInit
