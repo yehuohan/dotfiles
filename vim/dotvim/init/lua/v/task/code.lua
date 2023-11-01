@@ -81,25 +81,11 @@ local packs = {
         tar = [[^TARGET%s*:?=%s*([%w%-_]+)%s*$]], -- TARGET := <bout>
         pro = [[^project%s*%(%s*([%w%-_]+).*%).*$]], -- project(<bout>)
         pho = [[^%.PHONY:%s*([%w%-_]+)%s*$]], -- .PHONY: <barg>
-        cdl = [[^.*vim@code:%s*(.*)$]], -- @vim@code: <cmd>
     },
     _exec = '"./{bout}" {earg}',
     _msvc = 'vcvars64.bat',
     _vout = '_VOut',
 }
-
-local function codeline(file)
-    local num = 0
-    for line in io.lines(file) do
-        num = num + 1
-        if num <= vim.o.modelines then
-            local res = string.match(line, packs._pats.cdl)
-            if res then
-                return res
-            end
-        end
-    end
-end
 
 local function pat_text(pattern, file)
     for line in io.lines(file) do
@@ -149,7 +135,9 @@ function _hdls.nvim(cfg)
     rep.barg = cfg.barg
     rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
     rep.earg = cfg.earg
-    local cmd = codeline(cfg.file) or codes.nvim.cmd
+    local tbl, cmd = libv.modeline('code', cfg.file)
+    cfg:set(tbl or {})
+    cmd = cmd or codes.nvim.cmd
     if cmd:sub(1, 1) == ':' then
         vim.cmd(cmd)
         throw('Executed ' .. cmd, 0)
@@ -170,7 +158,9 @@ function _hdls.file(cfg)
     rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
     rep.bout = vim.fn.fnamemodify(cfg.file, ':t:r')
     rep.earg = cfg.earg
-    local cmd = codeline(cfg.file) or codes[ft].cmd
+    local tbl, cmd = libv.modeline('code', cfg.file)
+    cfg:set(tbl or {})
+    cmd = cmd or codes[ft].cmd
     return replace(cmd, rep)
 end
 

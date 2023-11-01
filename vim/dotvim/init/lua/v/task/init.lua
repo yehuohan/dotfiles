@@ -44,7 +44,7 @@ function M.run(cfg)
     local opts = {}
     opts.cmd = cfg.cmd
     opts.cwd = cfg.wdir
-    opts.env = cfg.envs and libv.u.str2env(cfg.envs)
+    opts.env = type(cfg.envs) == 'string' and libv.u.str2env(cfg.envs) or cfg.envs
     if cfg.tout.style == 'job' then
         opts.strategy = { 'jobstart', use_terminal = false }
     end

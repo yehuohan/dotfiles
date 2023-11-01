@@ -222,4 +222,57 @@ describe('libv', function()
         --     vim.print(vim.inspect(line))
         -- end
     end)
+
+    -- libv.modeline
+    it('. modeline', function()
+        local mocked1 = io.lines
+        local mocked2 = vim.notify
+        io.lines = function(data)
+            local idx = 0
+            return function()
+                idx = idx + 1
+                return idx <= #data and data[idx]
+            end
+        end
+        local msg
+        vim.notify = function(data) EQ(msg, data) end
+
+        local tbl, cmd
+        local lines = {
+            { [[-- vim@code: nvim -l test.lua]] },
+            { [[-- vim@code { }: nvim -l test.lua]] },
+            { [[-- vim@code{ }: nvim -l test.lua]] },
+            { [[-- vim@code{ foo - BAR }: nvim -l test.lua]] },
+            { [[-- vim@code{ envs = { TEST = 'test'}, args = '--headless' }: 	]] },
+            { [[-- vim@code{ envs = { TEST = 'test'}, args = '--headless' }: nvim -l test.lua]] },
+        }
+
+        tbl, cmd = libv.modeline('code', lines[1])
+        EQ(nil, tbl)
+        EQ('nvim -l test.lua', cmd)
+
+        tbl, cmd = libv.modeline('code', lines[2])
+        EQ(nil, tbl)
+        EQ('nvim -l test.lua', cmd)
+
+        tbl, cmd = libv.modeline('code', lines[3])
+        EQ({}, tbl)
+        EQ('nvim -l test.lua', cmd)
+
+        msg = 'Wrong table from modeline: { foo - BAR }'
+        tbl, cmd = libv.modeline('code', lines[4])
+        EQ(nil, tbl)
+        EQ('nvim -l test.lua', cmd)
+
+        tbl, cmd = libv.modeline('code', lines[5])
+        EQ({ envs = { TEST = 'test' }, args = '--headless' }, tbl)
+        EQ(nil, cmd)
+
+        tbl, cmd = libv.modeline('code', lines[6])
+        EQ({ envs = { TEST = 'test' }, args = '--headless' }, tbl)
+        EQ('nvim -l test.lua', cmd)
+
+        io.lines = mocked1
+        vim.notify = mocked2
+    end)
 end)

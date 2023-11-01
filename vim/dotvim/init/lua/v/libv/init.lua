@@ -83,20 +83,9 @@ function M.new_configer(opts)
     function C:get() return M.u.deepcopy(self) end
 
     --- Setup config's current options
-    --- @param mask(table|nil) Key list as mask, nil means all masked
-    --- * All savable options in mask will be extend with new_opts;
+    --- * All savable options in mask will be merged from new_opts;
     --- * All non-savable options will be keeped.
-    function C:set(new_opts, mask)
-        for k, v in pairs(new_opts) do
-            if (not mask) or vim.tbl_contains(mask, k) then
-                if type(v) == 'table' then
-                    rawset(self, k, M.u.deepcopy(v))
-                else
-                    rawset(self, k, v)
-                end
-            end
-        end
-    end
+    function C:set(new_opts, mask) M.u.deepmerge(self, new_opts, mask) end
 
     --- Reinit config's options
     --- * The initial options will be repleaced with reinit_opts;
@@ -233,6 +222,35 @@ function M.get_selected(sep)
         return vim.fn.join(vim.fn.split(selected, '\n'), sep)
     else
         return selected
+    end
+end
+
+--- Get extended modeline
+--- @param tag(string) Tag for extended modeline
+function M.modeline(tag, file)
+    local pat = [[^.*vim@]] .. tag .. [[(.*):%s*(.*)$]] -- vim@<tag>{<tbl>}: <cmd>
+    local num = 0
+    for line in io.lines(file) do
+        num = num + 1
+        if num <= vim.o.modelines then
+            local tbl, cmd = line:match(pat)
+            if tbl and cmd then
+                if cmd:match('^%s*$') then
+                    cmd = nil
+                end
+                local res = tbl:match('^{.*}$') and loadstring('return ' .. tbl)
+                if res then
+                    local ok, opts = pcall(res)
+                    if not ok then
+                        vim.notify('Wrong table from modeline: ' .. tbl)
+                    end
+                    tbl = ok and opts or nil
+                else
+                    tbl = nil
+                end
+                return tbl, cmd
+            end
+        end
     end
 end
 
