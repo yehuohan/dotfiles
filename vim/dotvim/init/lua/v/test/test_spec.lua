@@ -77,6 +77,26 @@ describe('libv', function()
             setmetatable(orig, { sub = { 'tbl' } })
             check(orig)
         end)
+
+        -- lib.v.deepmerge
+        it('. deepmerge', function()
+            local dst = { foo = { 'bar' } }
+            setmetatable(dst, { m1 = { 'aaa' } })
+            setmetatable(dst.foo, { m2 = { 'bbb' } })
+            local src = { foo = { 'BAR', bar = { 'FOO' }, abc = 'cba' } }
+            setmetatable(src, { M1 = { 'AAA' } })
+            setmetatable(src.foo, { M2 = { 'BBB' } })
+
+            libv.u.deepmerge(dst, src, { 'foo', foo = { 1, 'bar' } })
+            EQ({ foo = { 'BAR', bar = { 'FOO' } } }, dst)
+            EQ({ m1 = { 'aaa' } }, getmetatable(dst))
+            EQ({ m2 = { 'bbb' } }, getmetatable(dst.foo))
+
+            libv.u.deepmerge(dst, src)
+            EQ({ foo = { 'BAR', bar = { 'FOO' }, abc = 'cba' } }, dst)
+            EQ({ m1 = { 'aaa' } }, getmetatable(dst))
+            EQ({ m2 = { 'bbb' } }, getmetatable(dst.foo))
+        end)
     end)
 
     -- libv.new_configer

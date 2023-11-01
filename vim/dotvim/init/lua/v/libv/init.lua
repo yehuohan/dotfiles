@@ -347,7 +347,7 @@ function _u.replace(cmd, rep) return vim.trim(string.gsub(cmd, '{(%w+)}', rep)) 
 --- @param cmdlist(table<string>) Command list to join with ' && '
 function _u.sequence(cmdlist) return table.concat(cmdlist, ' && ') end
 
---- Deepcopy variable
+--- Deep copy variable
 --- @param mt(boolean|nil) Copy metatable or not
 function _u.deepcopy(orig, mt)
     local copy
@@ -363,6 +363,25 @@ function _u.deepcopy(orig, mt)
         copy = orig
     end
     return copy
+end
+
+--- Deep merge table
+--- @param dst(table) The table to merge into, and metable will be keeped
+--- @param src(table) The table to merge from
+--- @param mask(table|nil) Mask what will be merged from `src`, nil means all masked
+function _u.deepmerge(dst, src, mask)
+    for k, v in pairs(src) do
+        if (not mask) or vim.tbl_contains(mask, k) then
+            if type(v) == 'table' then
+                if type(dst[k]) ~= 'table' then
+                    dst[k] = {}
+                end
+                _u.deepmerge(dst[k], v, mask and mask[k])
+            else
+                rawset(dst, k, v)
+            end
+        end
+    end
 end
 
 --------------------------------------------------------------------------------

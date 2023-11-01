@@ -6,7 +6,7 @@ local M = {}
 --- @field code(Configer)
 --- @field fzer(Configer)
 
---- @class TaskConfig Task config
+--- @class TaskConfig Task config from a 'Configer'
 --- @field cmd(string) Task command that includes args
 --- @field wdir(string) Wording directory
 --- @field envs(string) Environment variables
