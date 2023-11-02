@@ -3,12 +3,18 @@
 
 local dir_this = vim.fn.getcwd()
 local dir_init = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(dir_this)))
+local dir_bundle = vim.fs.dirname(dir_init) .. '/bundle'
 vim.opt.rtp:prepend(dir_init)
 local nlib = require('v.nlib')
 
 local EQ = assert.are.same -- The table's metatable won't be compared
 local OK = assert.has_no.errors
 local NOK = assert.has.errors
+
+local function feedkeys(keys)
+    local codes = vim.api.nvim_replace_termcodes(keys, true, false, true)
+    return vim.api.nvim_feedkeys(codes, 'x', false)
+end
 
 describe('nlib', function()
     -- nlib.new_configer
@@ -197,6 +203,48 @@ describe('nlib', function()
 
         io.lines = mocked1
         vim.notify = mocked2
+    end)
+
+    -- nlib.a.pop_selection
+    it('. async . pop_selection', function()
+        vim.opt.rtp:prepend(dir_bundle .. '/popc')
+        vim.opt.rtp:prepend(dir_bundle .. '/popset')
+        vim.cmd.runtime('plugin/popc.vim')
+        vim.cmd.runtime('plugin/popset.vim')
+
+        local tst = { opt = '', lst = { 1, 2, 3 }, num = 0 }
+        tst.cmd = function(sopt, sel) tst.num = tst.num + 1 + sel end
+        tst.evt = function(name)
+            if 'onCR' == name then
+                tst.opt = 'foo'
+            elseif 'onQuit' == name then
+                tst.opt = 'bar'
+            end
+        end
+        local res
+        local entry = nlib.a._async(function(sel, val)
+            sel.opt = val
+            res = nlib.a._await(nlib.a.pop_selection(sel))
+        end)
+
+        entry(tst, 'FOO')
+        EQ('FOO', tst.opt)
+        EQ(0, tst.num)
+        feedkeys('<Space>')
+        EQ(0 + 1 + 1, tst.num)
+        feedkeys('j<CR>')
+        EQ(2 + 1 + 2, tst.num)
+        EQ('foo', tst.opt)
+        EQ(true, res)
+
+        entry(tst)
+        EQ(nil, tst.opt)
+        feedkeys('jj<Space>')
+        EQ(5 + 1 + 3, tst.num)
+        feedkeys('<ESC>')
+        EQ(9, tst.num)
+        EQ('bar', tst.opt)
+        EQ(false, res)
     end)
 
     describe('. utils', function()
