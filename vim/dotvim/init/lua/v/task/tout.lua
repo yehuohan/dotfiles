@@ -106,7 +106,7 @@ function term.redir(task, pin)
             vim.cmd.split({ range = { 8 }, mods = { split = 'botright' } })
             term.hwin = vim.api.nvim_get_current_win()
             vim.cmd.wincmd('p')
-            require('v.libv').m.nnore({
+            require('v.nlib').m.nnore({
                 '<leader>vc',
                 function()
                     if vim.api.nvim_win_is_valid(term.hwin) then
@@ -262,7 +262,7 @@ function M.constructor(params)
     end
 
     cpt.on_init = function(self, task)
-        self.chanor = require('v.libv').new_chanor({
+        self.chanor = require('v.nlib').new_chanor({
             style = params.style,
             verbose = params.verbose,
         })

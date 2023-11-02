@@ -1,6 +1,6 @@
 local use = require('v.use')
-local libv = require('v.libv')
-local m = libv.m
+local nlib = require('v.nlib')
+local m = nlib.m
 
 --------------------------------------------------------------------------------
 -- Editor
@@ -686,9 +686,9 @@ local function pkg_open_browser()
     m.nnore({ '<leader>bb', function() browser(vim.fn.expand('<cword>'), 'bing') end })
     m.nnore({ '<leader>bg', function() browser(vim.fn.expand('<cword>'), 'google') end })
     m.nnore({ '<leader>bh', function() browser(vim.fn.expand('<cword>'), 'github') end })
-    m.vnore({ '<leader>bb', function() browser(libv.get_selected(' '), 'bing') end })
-    m.vnore({ '<leader>bg', function() browser(libv.get_selected(' '), 'google') end })
-    m.vnore({ '<leader>bh', function() browser(libv.get_selected(' '), 'github') end })
+    m.vnore({ '<leader>bb', function() browser(nlib.get_selected(' '), 'bing') end })
+    m.vnore({ '<leader>bg', function() browser(nlib.get_selected(' '), 'google') end })
+    m.vnore({ '<leader>bh', function() browser(nlib.get_selected(' '), 'github') end })
 end
 
 -- 翻译
@@ -699,7 +699,7 @@ local function pkg_translator()
     m.nnore({ '<leader><leader>t', ':TranslateW<Space>' })
     m.vnore({
         '<leader><leader>t',
-        function() vim.api.nvim_feedkeys(':TranslateW ' .. libv.get_selected(' '), 'n', true) end,
+        function() vim.api.nvim_feedkeys(':TranslateW ' .. nlib.get_selected(' '), 'n', true) end,
     })
 end
 

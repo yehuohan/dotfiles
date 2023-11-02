@@ -1,14 +1,14 @@
-local libv = require('v.libv')
-local a = libv.a
+local nlib = require('v.nlib')
+local a = nlib.a
 local async = a._async
 local await = a._await
-local replace = libv.u.replace
-local sequence = libv.u.sequence
+local replace = nlib.u.replace
+local sequence = nlib.u.sequence
 local task = require('v.task')
 local throw = error
 
 --- @type Configer Workspace config for code
-local wsc = libv.new_configer({
+local wsc = nlib.new_configer({
     key = '',
     file = '',
     type = '',
@@ -135,7 +135,7 @@ function _hdls.nvim(cfg)
     rep.barg = cfg.barg
     rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
     rep.earg = cfg.earg
-    local tbl, cmd = libv.modeline('code', cfg.file)
+    local tbl, cmd = nlib.modeline('code', cfg.file)
     cfg:set(tbl or {})
     cmd = cmd or codes.nvim.cmd
     if cmd:sub(1, 1) == ':' then
@@ -158,7 +158,7 @@ function _hdls.file(cfg)
     rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
     rep.bout = vim.fn.fnamemodify(cfg.file, ':t:r')
     rep.earg = cfg.earg
-    local tbl, cmd = libv.modeline('code', cfg.file)
+    local tbl, cmd = nlib.modeline('code', cfg.file)
     cfg:set(tbl or {})
     cmd = cmd or codes[ft].cmd
     return replace(cmd, rep)
@@ -447,7 +447,7 @@ local entry = async(function(kt, bang)
     local ok, msg = pcall(function()
         wsc.cmd = dispatch(_maps[wsc.key], wsc)
         task.run(wsc)
-        libv.recall(function() task.run(wsc) end)
+        nlib.recall(function() task.run(wsc) end)
     end)
     if not ok then
         vim.notify(tostring(msg))
@@ -466,9 +466,9 @@ local function setup()
         }
     end
     for _, keys in ipairs(_keys) do
-        libv.m.nnore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
+        nlib.m.nnore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
     end
-    libv.m.nnore({
+    nlib.m.nnore({
         '<leader>rv',
         function()
             local ft = vim.o.filetype

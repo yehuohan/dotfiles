@@ -5,109 +5,22 @@
 local dir_this = vim.fn.getcwd()
 local dir_base = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(dir_this)))
 vim.opt.rtp:prepend(dir_base)
-local libv = require('v.libv')
+local nlib = require('v.nlib')
 
 local EQ = assert.are.same -- The table's metatable won't be compared
 local OK = assert.has_no.errors
 local NOK = assert.has.errors
 
-describe('libv', function()
-    describe('. utils', function()
-        -- libv.u.str2env
-        it('. str2env', function()
-            local str = ' VAR0=var0   VAR1=var1 '
-            local env = libv.u.str2env(str)
-            EQ({ VAR0 = 'var0', VAR1 = 'var1' }, env)
-        end)
-
-        -- libv.u.replace
-        it('. replace', function()
-            local cmd = 'nvim {arg} -l {src}'
-            local rep = { arg = '--headless', src = 'test.lua' }
-            local out = libv.u.replace(cmd, rep)
-            EQ('nvim --headless -l test.lua', out)
-        end)
-
-        -- libv.u.deepcopy
-        it('. deepcopy', function()
-            local function check(orig)
-                local copy
-
-                -- Without table as key
-                copy = libv.u.deepcopy(orig, true)
-                EQ({ foo = { 'bar' }, null = vim.NIL }, copy)
-                EQ({ sub = { 'tbl' } }, getmetatable(copy))
-
-                copy = libv.u.deepcopy(orig, false)
-                EQ({ foo = { 'bar' }, null = vim.NIL }, copy)
-                EQ(nil, getmetatable(copy))
-
-                -- With table as key
-                local mkey = { abc = 'abc' }
-                setmetatable(mkey, { cba = 'cba' })
-                orig[mkey] = 'mkey'
-
-                copy = libv.u.deepcopy(orig, true)
-                EQ({ sub = { 'tbl' } }, getmetatable(copy))
-                for k, v in pairs(copy) do
-                    if type(k) == 'table' then
-                        EQ({ abc = 'abc' }, k)
-                        EQ({ cba = 'cba' }, getmetatable(k))
-                        EQ('mkey', v)
-                    end
-                end
-
-                copy = libv.u.deepcopy(orig, false)
-                EQ(nil, getmetatable(copy))
-                for k, v in pairs(copy) do
-                    if type(k) == 'table' then
-                        EQ({ abc = 'abc' }, k)
-                        EQ(nil, getmetatable(k))
-                        EQ('mkey', v)
-                    end
-                end
-            end
-
-            local orig
-            orig = { foo = { 'bar' }, null = vim.NIL }
-            setmetatable(orig, { sub = { 'tbl' } })
-            check(orig)
-            vim.cmd("let g:Orig = { 'foo' : ['bar'], 'null' : v:null }")
-            orig = vim.g.Orig
-            setmetatable(orig, { sub = { 'tbl' } })
-            check(orig)
-        end)
-
-        -- lib.v.deepmerge
-        it('. deepmerge', function()
-            local dst = { foo = { 'bar' } }
-            setmetatable(dst, { m1 = { 'aaa' } })
-            setmetatable(dst.foo, { m2 = { 'bbb' } })
-            local src = { foo = { 'BAR', bar = { 'FOO' }, abc = 'cba' } }
-            setmetatable(src, { M1 = { 'AAA' } })
-            setmetatable(src.foo, { M2 = { 'BBB' } })
-
-            libv.u.deepmerge(dst, src, { 'foo', foo = { 1, 'bar' } })
-            EQ({ foo = { 'BAR', bar = { 'FOO' } } }, dst)
-            EQ({ m1 = { 'aaa' } }, getmetatable(dst))
-            EQ({ m2 = { 'bbb' } }, getmetatable(dst.foo))
-
-            libv.u.deepmerge(dst, src)
-            EQ({ foo = { 'BAR', bar = { 'FOO' }, abc = 'cba' } }, dst)
-            EQ({ m1 = { 'aaa' } }, getmetatable(dst))
-            EQ({ m2 = { 'bbb' } }, getmetatable(dst.foo))
-        end)
-    end)
-
-    -- libv.new_configer
+describe('nlib', function()
+    -- nlib.new_configer
     describe('. new_configer', function()
         it('. new', function()
-            NOK(function() libv.new_configer() end)
-            OK(function() libv.new_configer({}) end)
+            NOK(function() nlib.new_configer() end)
+            OK(function() nlib.new_configer({}) end)
         end)
 
         it('. modify methods', function()
-            local cfg = libv.new_configer({})
+            local cfg = nlib.new_configer({})
             NOK(function() cfg.get = 'foo' end)
             NOK(function() cfg.set = 'foo' end)
             NOK(function() cfg.reinit = 'foo' end)
@@ -115,7 +28,7 @@ describe('libv', function()
 
         it('. modify savable and non-savable options', function()
             -- Seperate savable and non-savable option of one configer
-            local cfg = libv.new_configer({ file = 'foo.c' })
+            local cfg = nlib.new_configer({ file = 'foo.c' })
             EQ({ file = 'foo.c' }, cfg)
             cfg.file = 'foo.cpp'
             cfg.type = 'cpp'
@@ -123,14 +36,14 @@ describe('libv', function()
             EQ(nil, rawget(cfg, 'type'))
             EQ('cpp', rawget(getmetatable(getmetatable(cfg)), 'type'))
             -- Seperate non-savable option between configers
-            local cfg2 = libv.new_configer({ file = 'bar.c' })
+            local cfg2 = nlib.new_configer({ file = 'bar.c' })
             cfg2.type = 'c'
             EQ('cpp', rawget(getmetatable(getmetatable(cfg)), 'type'))
             EQ('c', rawget(getmetatable(getmetatable(cfg2)), 'type'))
         end)
 
         it('. get/set/reinit', function()
-            local cfg = libv.new_configer({ file = 'foo.c', args = { '-g' } })
+            local cfg = nlib.new_configer({ file = 'foo.c', args = { '-g' } })
             -- .get
             local out = cfg:get()
             EQ({ file = 'foo.c', args = { '-g' } }, out)
@@ -179,13 +92,13 @@ describe('libv', function()
                 }, getmetatable(getmetatable(cfg)).args)
             end
 
-            local cfg1 = libv.new_configer({
+            local cfg1 = nlib.new_configer({
                 cmd = 'gcc',
                 file = 'foo.c',
                 args = { '-a', num = 1, ARGS = { '-A', CNT = 1 } },
             })
             check(cfg1)
-            local cfg2 = libv.new_configer({ file = 'bar.c' })
+            local cfg2 = nlib.new_configer({ file = 'bar.c' })
             cfg2:reinit({
                 cmd = 'gcc',
                 file = 'foo.c',
@@ -196,7 +109,7 @@ describe('libv', function()
 
         it('. encode/decode to/from json', function()
             local opts = { cmd = 'g++', file = 'test.cpp', args = { '-g' } }
-            local cfg = libv.new_configer(opts)
+            local cfg = nlib.new_configer(opts)
             cfg.type = 'cpp'
             local str = vim.json.encode(cfg)
             local tbl = vim.json.decode(str)
@@ -204,10 +117,10 @@ describe('libv', function()
         end)
     end)
 
-    -- libv.new_chanor
+    -- nlib.new_chanor
     it('. new_chanor', function()
         local data = require('v.test.data')
-        local chanor = libv.new_chanor({ style = 'ansi' })
+        local chanor = nlib.new_chanor({ style = 'ansi' })
         local chunk
         local lines = {}
         for _, d in ipairs(data[1]) do
@@ -223,7 +136,7 @@ describe('libv', function()
         -- end
     end)
 
-    -- libv.modeline
+    -- nlib.modeline
     it('. modeline', function()
         local mocked1 = io.lines
         local mocked2 = vim.notify
@@ -247,32 +160,119 @@ describe('libv', function()
             { [[-- vim@code{ envs = { TEST = 'test'}, args = '--headless' }: nvim -l test.lua]] },
         }
 
-        tbl, cmd = libv.modeline('code', lines[1])
+        tbl, cmd = nlib.modeline('code', lines[1])
         EQ(nil, tbl)
         EQ('nvim -l test.lua', cmd)
 
-        tbl, cmd = libv.modeline('code', lines[2])
+        tbl, cmd = nlib.modeline('code', lines[2])
         EQ(nil, tbl)
         EQ('nvim -l test.lua', cmd)
 
-        tbl, cmd = libv.modeline('code', lines[3])
+        tbl, cmd = nlib.modeline('code', lines[3])
         EQ({}, tbl)
         EQ('nvim -l test.lua', cmd)
 
         msg = 'Wrong table from modeline: { foo - BAR }'
-        tbl, cmd = libv.modeline('code', lines[4])
+        tbl, cmd = nlib.modeline('code', lines[4])
         EQ(nil, tbl)
         EQ('nvim -l test.lua', cmd)
 
-        tbl, cmd = libv.modeline('code', lines[5])
+        tbl, cmd = nlib.modeline('code', lines[5])
         EQ({ envs = { TEST = 'test' }, args = '--headless' }, tbl)
         EQ(nil, cmd)
 
-        tbl, cmd = libv.modeline('code', lines[6])
+        tbl, cmd = nlib.modeline('code', lines[6])
         EQ({ envs = { TEST = 'test' }, args = '--headless' }, tbl)
         EQ('nvim -l test.lua', cmd)
 
         io.lines = mocked1
         vim.notify = mocked2
+    end)
+
+    describe('. utils', function()
+        -- nlib.u.str2env
+        it('. str2env', function()
+            local str = ' VAR0=var0   VAR1=var1 '
+            local env = nlib.u.str2env(str)
+            EQ({ VAR0 = 'var0', VAR1 = 'var1' }, env)
+        end)
+
+        -- nlib.u.replace
+        it('. replace', function()
+            local cmd = 'nvim {arg} -l {src}'
+            local rep = { arg = '--headless', src = 'test.lua' }
+            local out = nlib.u.replace(cmd, rep)
+            EQ('nvim --headless -l test.lua', out)
+        end)
+
+        -- nlib.u.deepcopy
+        it('. deepcopy', function()
+            local function check(orig)
+                local copy
+
+                -- Without table as key
+                copy = nlib.u.deepcopy(orig, true)
+                EQ({ foo = { 'bar' }, null = vim.NIL }, copy)
+                EQ({ sub = { 'tbl' } }, getmetatable(copy))
+
+                copy = nlib.u.deepcopy(orig, false)
+                EQ({ foo = { 'bar' }, null = vim.NIL }, copy)
+                EQ(nil, getmetatable(copy))
+
+                -- With table as key
+                local mkey = { abc = 'abc' }
+                setmetatable(mkey, { cba = 'cba' })
+                orig[mkey] = 'mkey'
+
+                copy = nlib.u.deepcopy(orig, true)
+                EQ({ sub = { 'tbl' } }, getmetatable(copy))
+                for k, v in pairs(copy) do
+                    if type(k) == 'table' then
+                        EQ({ abc = 'abc' }, k)
+                        EQ({ cba = 'cba' }, getmetatable(k))
+                        EQ('mkey', v)
+                    end
+                end
+
+                copy = nlib.u.deepcopy(orig, false)
+                EQ(nil, getmetatable(copy))
+                for k, v in pairs(copy) do
+                    if type(k) == 'table' then
+                        EQ({ abc = 'abc' }, k)
+                        EQ(nil, getmetatable(k))
+                        EQ('mkey', v)
+                    end
+                end
+            end
+
+            local orig
+            orig = { foo = { 'bar' }, null = vim.NIL }
+            setmetatable(orig, { sub = { 'tbl' } })
+            check(orig)
+            vim.cmd("let g:Orig = { 'foo' : ['bar'], 'null' : v:null }")
+            orig = vim.g.Orig
+            setmetatable(orig, { sub = { 'tbl' } })
+            check(orig)
+        end)
+
+        -- lib.v.deepmerge
+        it('. deepmerge', function()
+            local dst = { foo = { 'bar' } }
+            setmetatable(dst, { m1 = { 'aaa' } })
+            setmetatable(dst.foo, { m2 = { 'bbb' } })
+            local src = { foo = { 'BAR', bar = { 'FOO' }, abc = 'cba' } }
+            setmetatable(src, { M1 = { 'AAA' } })
+            setmetatable(src.foo, { M2 = { 'BBB' } })
+
+            nlib.u.deepmerge(dst, src, { 'foo', foo = { 1, 'bar' } })
+            EQ({ foo = { 'BAR', bar = { 'FOO' } } }, dst)
+            EQ({ m1 = { 'aaa' } }, getmetatable(dst))
+            EQ({ m2 = { 'bbb' } }, getmetatable(dst.foo))
+
+            nlib.u.deepmerge(dst, src)
+            EQ({ foo = { 'BAR', bar = { 'FOO' }, abc = 'cba' } }, dst)
+            EQ({ m1 = { 'aaa' } }, getmetatable(dst))
+            EQ({ m2 = { 'bbb' } }, getmetatable(dst.foo))
+        end)
     end)
 end)

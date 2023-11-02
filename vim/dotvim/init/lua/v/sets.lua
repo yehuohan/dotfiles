@@ -1,7 +1,7 @@
 local fn = vim.fn
 local api = vim.api
 local use = require('v.use')
-local m = require('v.libv').m
+local m = require('v.nlib').m
 
 --------------------------------------------------------------------------------
 -- Options

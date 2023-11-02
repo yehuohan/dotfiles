@@ -1,5 +1,5 @@
-local libv = require('v.libv')
-local m = libv.m
+local nlib = require('v.nlib')
+local m = nlib.m
 
 --- Some special commands for fast_cmds
 local special_cmds = {
@@ -44,7 +44,7 @@ local fast_cmds = {
             },
             cmd = function(_, sel)
                 local task = require('v.task')
-                task.cmd(libv.u.replace(sel, { src = vim.api.nvim_buf_get_name(0) }))
+                task.cmd(nlib.u.replace(sel, { src = vim.api.nvim_buf_get_name(0) }))
             end,
         },
     },
@@ -89,7 +89,7 @@ local function eval_str(strfn, copy_result)
         local cpl = ({ execute = 'command', eval = 'function' })[strfn]
         str = vim.fn.input(('Eval %s:'):format(strfn), '', cpl)
     else
-        str = libv.get_selected('')
+        str = nlib.get_selected('')
     end
 
     if str ~= '' then
@@ -120,7 +120,7 @@ local function eval_math(strfn, copy_result)
         expr = expr:gsub('([^=]+)=[^=]*$', '%1'):gsub('%s*$', '')
         lstr = expr
     else
-        expr = require('v.libv').get_selected('')
+        expr = nlib.get_selected('')
         local col = vim.fn.getpos("'>")[3]
         local txt = vim.fn.getline('.')
         lstr = txt:sub(1, col)

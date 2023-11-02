@@ -1,12 +1,12 @@
-local libv = require('v.libv')
-local a = libv.a
+local nlib = require('v.nlib')
+local a = nlib.a
 local async = a._async
 local await = a._await
-local replace = libv.u.replace
+local replace = nlib.u.replace
 local task = require('v.task')
 
 --- @type Configer Workspace config for fzer
-local wsc = libv.new_configer({
+local wsc = nlib.new_configer({
     envs = '',
     path = '',
     pathlst = {},
@@ -23,7 +23,7 @@ local function rg_paths()
         -- The return paths should be double-quoted
         return vim.tbl_map(
             function(path) return vim.fs.normalize(vim.fn.fnamemodify(path, ':p')) end,
-            libv.u.str2arg(locstr)
+            nlib.u.str2arg(locstr)
         )
     end
     return {}
@@ -33,7 +33,7 @@ local function rg_globs()
     if wsc.globlst ~= '' then
         return vim.tbl_map(
             function(glob) return ('-g%s'):format(glob) end,
-            libv.u.str2arg(wsc.globlst)
+            nlib.u.str2arg(wsc.globlst)
         )
     end
     return {}
@@ -208,7 +208,7 @@ local function parse_pat(kt)
             pat = vim.fn.expand('<cword>')
         end
     else
-        local selected = libv.get_selected()
+        local selected = nlib.get_selected()
         if kt.E:match('[iI]') then
             pat = vim.fn.input('Pattern: ', selected)
         elseif kt.E:match('[wWsS]') then
@@ -251,7 +251,7 @@ local function parse_opt(kt)
         vim.list_extend(opt, rg_globs()) -- Custom paths may conflict with rg's globs
     end
     if wsc.options ~= '' then
-        vim.list_extend(opt, libv.u.str2arg(wsc.options))
+        vim.list_extend(opt, nlib.u.str2arg(wsc.options))
     end
     return opt
 end
@@ -329,7 +329,7 @@ local entry = async(function(kt, bang)
         vim.notify(vim.inspect(wsc))
     end
     task.run(wsc)
-    libv.recall(function() task.run(wsc) end)
+    nlib.recall(function() task.run(wsc) end)
 end)
 
 --- Entry of fzer.fuzzier task
@@ -353,7 +353,7 @@ local entry_fuzzier = async(function(kt)
             rep.pat = vim.fn.expand('<cword>')
         end
     else
-        rep.pat = libv.get_selected()
+        rep.pat = nlib.get_selected()
     end
 
     -- Modify fzer.fuzzier config
@@ -376,7 +376,7 @@ local entry_fuzzier = async(function(kt)
     -- Run fzer.fuzzier task
     local rhs = _maps_fuzzier[kt.E]
     fzer[wsc.fuzzier](rhs, rep)
-    libv.recall(function() fzer[wsc.fuzzier](rhs, rep) end)
+    nlib.recall(function() fzer[wsc.fuzzier](rhs, rep) end)
 end)
 
 local function setup()
@@ -392,10 +392,10 @@ local function setup()
         }
     end
     for _, keys in ipairs(_keys) do
-        libv.m.nore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
+        nlib.m.nore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
     end
     for _, keys in ipairs(_keys_fuzzier) do
-        libv.m.nore({ '<leader>' .. keys, function() entry_fuzzier(keys2kt(keys)) end })
+        nlib.m.nore({ '<leader>' .. keys, function() entry_fuzzier(keys2kt(keys)) end })
     end
 
     vim.api.nvim_create_user_command(

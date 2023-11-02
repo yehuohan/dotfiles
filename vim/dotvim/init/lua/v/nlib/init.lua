@@ -1,4 +1,4 @@
---- @class LibvModule
+--- @class NLib Neovim Library
 local M = {}
 
 --- Configer {
@@ -124,7 +124,7 @@ function M.new_chanor(opts)
     local style = opts and opts.style
     local verbose = opts and opts.verbose or ''
 
-    local ansi = require('v.libv.ansi').new()
+    local ansi = require('v.nlib.ansi').new()
     local out_idx = 1
     local pending = ''
 
@@ -282,9 +282,8 @@ function M.recall(cmdfn, opts)
 end
 
 --------------------------------------------------------------------------------
--- async
+--- @class NLib.Async
 --------------------------------------------------------------------------------
---- @class AsyncSubModule
 local _a = {}
 M.a = _a
 
@@ -333,9 +332,8 @@ function _a.pop_selection(sel)
 end
 
 --------------------------------------------------------------------------------
--- utils
+--- @class NLib.Utils
 --------------------------------------------------------------------------------
---- @class UtilsSubModule
 local _u = {}
 M.u = _u
 
@@ -403,9 +401,8 @@ function _u.deepmerge(dst, src, mask)
 end
 
 --------------------------------------------------------------------------------
--- map
+--- @class NLib.Map
 --------------------------------------------------------------------------------
---- @class MapSubModule
 local _m = {}
 M.m = _m
 
@@ -427,7 +424,7 @@ end
 --- Map functions
 --- 'map' and 'mnore' works at normal and visual mode by default here
 --- ```lua
----      local m = require('v.libv').m
+---      local m = require('v.nlib').m
 ---      m.add({'n', 'v'}, {'<leader>', ':echo b:<CR>', buffer = true})
 ---      m.nore{'<leader>', ':echo b:<CR>', silent = true, buffer = 9}
 --- ```

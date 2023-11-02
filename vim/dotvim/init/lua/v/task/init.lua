@@ -1,4 +1,4 @@
-local libv = require('v.libv')
+local nlib = require('v.nlib')
 
 local M = {}
 
@@ -44,7 +44,7 @@ function M.run(cfg)
     local opts = {}
     opts.cmd = cfg.cmd
     opts.cwd = cfg.wdir
-    opts.env = type(cfg.envs) == 'string' and libv.u.str2env(cfg.envs) or cfg.envs
+    opts.env = type(cfg.envs) == 'string' and nlib.u.str2env(cfg.envs) or cfg.envs
     if cfg.tout.style == 'job' then
         opts.strategy = { 'jobstart', use_terminal = false }
     end
@@ -100,7 +100,7 @@ local function setup_qf()
                 return
             end
             -- Setup key mappings
-            libv.m.nnore({
+            nlib.m.nnore({
                 '<CR>',
                 function()
                     local row = vim.fn.line('.', qf.winid)
@@ -143,15 +143,15 @@ function M.setup()
         function(opts) M.cmd(opts.args, opts.bang) end,
         { bang = true, nargs = 1 }
     )
-    libv.m.nnore({ '<leader><leader>r', ':TaskRun<Space>' })
-    libv.m.nnore({ '<leader><leader>R', ':TaskRun!<Space>' })
-    libv.m.vnore({
+    nlib.m.nnore({ '<leader><leader>r', ':TaskRun<Space>' })
+    nlib.m.nnore({ '<leader><leader>R', ':TaskRun!<Space>' })
+    nlib.m.vnore({
         '<leader><leader>r',
-        function() vim.api.nvim_feedkeys(':TaskRun ' .. libv.get_selected(''), 'n', true) end,
+        function() vim.api.nvim_feedkeys(':TaskRun ' .. nlib.get_selected(''), 'n', true) end,
     })
-    libv.m.vnore({
+    nlib.m.vnore({
         '<leader><leader>R',
-        function() vim.api.nvim_feedkeys(':TaskRun! ' .. libv.get_selected(''), 'n', true) end,
+        function() vim.api.nvim_feedkeys(':TaskRun! ' .. nlib.get_selected(''), 'n', true) end,
     })
 
     -- Save and restore workspace config

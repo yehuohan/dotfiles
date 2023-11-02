@@ -1,10 +1,10 @@
 " Basic {{{
 nnoremap <leader><leader>q :lua os.exit(0)
-nnoremap <leader>.         <Cmd>lua require('v.libv').recall()<CR>
-nnoremap <leader><leader>. <Cmd>lua require('v.libv').recall(nil, { feedcmd = true })<CR>
+nnoremap <leader>.         <Cmd>lua require('v.nlib').recall()<CR>
+nnoremap <leader><leader>. <Cmd>lua require('v.nlib').recall(nil, { feedcmd = true })<CR>
 nnoremap <C-;> @:
-vnoremap <leader><leader>; <Cmd>call feedkeys(':' . v:lua.require('v.libv').get_selected(''), 'n')<CR>
-vnoremap <leader><leader>: <Cmd>call feedkeys(':lua ' . v:lua.require('v.libv').get_selected(''), 'n')<CR>
+vnoremap <leader><leader>; <Cmd>call feedkeys(':' . v:lua.require('v.nlib').get_selected(''), 'n')<CR>
+vnoremap <leader><leader>: <Cmd>call feedkeys(':lua ' . v:lua.require('v.nlib').get_selected(''), 'n')<CR>
 " Mark跳转
 nnoremap ' `
 nnoremap ` '
@@ -59,18 +59,18 @@ cnoremap <M-u> <C-b>
 cnoremap <M-p> <C-e>
 " 替换
 nnoremap <leader><leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
-vnoremap <leader><leader>s <Cmd>call feedkeys(':%s/' . v:lua.require('v.libv').get_selected('') . '/', 'n')<CR>
+vnoremap <leader><leader>s <Cmd>call feedkeys(':%s/' . v:lua.require('v.nlib').get_selected('') . '/', 'n')<CR>
 " 排序
 nnoremap <leader><leader>S :sort fr //<Left>
 vnoremap <leader><leader>S :<C-u>sort fr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
 " lua测试代码
 nnoremap <leader><leader>u :lua=<Space>
 nnoremap <leader><leader>U :lua= vim.api.nvim_parse_cmd('', {})<Left><Left><Left><Left><Left><Left>
-vnoremap <leader><leader>u <Cmd>call feedkeys(':lua= ' . v:lua.require('v.libv').get_selected(''), 'n')<CR>
-vnoremap <leader><leader>U <Cmd>call feedkeys(':lua= vim.api.nvim_parse_cmd(''' . v:lua.require('v.libv').get_selected('') . ''', {})', 'n')<CR>
+vnoremap <leader><leader>u <Cmd>call feedkeys(':lua= ' . v:lua.require('v.nlib').get_selected(''), 'n')<CR>
+vnoremap <leader><leader>U <Cmd>call feedkeys(':lua= vim.api.nvim_parse_cmd(''' . v:lua.require('v.nlib').get_selected('') . ''', {})', 'n')<CR>
 " 查看help文档
 nnoremap <leader><leader>k :h <C-r><C-w>
-vnoremap <leader><leader>k <Cmd>call feedkeys(':h ' . v:lua.require('v.libv').get_selected(''), 'n')<CR>
+vnoremap <leader><leader>k <Cmd>call feedkeys(':h ' . v:lua.require('v.nlib').get_selected(''), 'n')<CR>
 " HEX编辑
 nnoremap <leader>xx :%!xxd<CR>
 nnoremap <leader>xr :%!xxd -r<CR>
@@ -115,7 +115,7 @@ for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m 0 1 2 3 4 5 
     execute printf('nnoremap <leader>''%s "%sP', toupper(t), t)
     " 快速执行宏
     let s:mstr = ':normal! @' . t
-    execute printf('nnoremap <leader>2%s <Cmd>execute "%s" <Bar> call v:lua.require("v.libv").recall("%s")<CR>', t, s:mstr, s:mstr)
+    execute printf('nnoremap <leader>2%s <Cmd>execute "%s" <Bar> call v:lua.require("v.nlib").recall("%s")<CR>', t, s:mstr, s:mstr)
 endfor
 " }}}
 
@@ -198,10 +198,10 @@ nnoremap <leader><Esc> <Cmd>nohlsearch<CR>
 nnoremap i <Cmd>nohlsearch<CR>i
 nnoremap <leader>8 *
 nnoremap <leader>3 #
-vnoremap <leader>8 /\V\c\<<C-r>=escape(v:lua.require('v.libv').get_selected(''), '\/')<CR>\><CR>
-vnoremap <leader>3 ?\V\c\<<C-r>=escape(v:lua.require('v.libv').get_selected(''), '\/')<CR>\><CR>
+vnoremap <leader>8 /\V\c\<<C-r>=escape(v:lua.require('v.nlib').get_selected(''), '\/')<CR>\><CR>
+vnoremap <leader>3 ?\V\c\<<C-r>=escape(v:lua.require('v.nlib').get_selected(''), '\/')<CR>\><CR>
 nnoremap <leader>/ /\V\c<C-r><C-w><CR>
-vnoremap <leader>/ /\V\c<C-r>=escape(v:lua.require('v.libv').get_selected(''), '\/')<CR><CR>
+vnoremap <leader>/ /\V\c<C-r>=escape(v:lua.require('v.nlib').get_selected(''), '\/')<CR><CR>
 nnoremap <leader><leader>/ /<C-r><C-w>
-vnoremap <leader><leader>/ /<C-r>=v:lua.require('v.libv').get_selected('')<CR>
+vnoremap <leader><leader>/ /<C-r>=v:lua.require('v.nlib').get_selected('')<CR>
 " }}}
