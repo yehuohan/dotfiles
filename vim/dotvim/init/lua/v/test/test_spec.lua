@@ -1,10 +1,9 @@
 --- Simple testcases for neovim configration
---- vim@code: nvim --headless --noplugin -u NONE -i NONE -n -c "set rtp+=../../../../bundle/plenary.nvim | runtime plugin/plenary.vim | PlenaryBustedDirectory ."
---- vim@code: :PlenaryBustedFile %
+--- vim@code{ tout = { style = 'term'}}: nvim --headless --noplugin -u NONE -i NONE -n -c "set rtp+=../../../../bundle/plenary.nvim | runtime plugin/plenary.vim | PlenaryBustedDirectory . {minimal_init='NONE'}"
 
 local dir_this = vim.fn.getcwd()
-local dir_base = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(dir_this)))
-vim.opt.rtp:prepend(dir_base)
+local dir_init = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(dir_this)))
+vim.opt.rtp:prepend(dir_init)
 local nlib = require('v.nlib')
 
 local EQ = assert.are.same -- The table's metatable won't be compared
@@ -144,46 +143,57 @@ describe('nlib', function()
             local idx = 0
             return function()
                 idx = idx + 1
-                return idx <= #data and data[idx]
+                return idx <= #data and data[idx] or nil
             end
         end
         local msg
         vim.notify = function(data) EQ(msg, data) end
 
-        local tbl, cmd
-        local lines = {
-            { [[-- vim@code: nvim -l test.lua]] },
-            { [[-- vim@code { }: nvim -l test.lua]] },
-            { [[-- vim@code{ }: nvim -l test.lua]] },
-            { [[-- vim@code{ foo - BAR }: nvim -l test.lua]] },
-            { [[-- vim@code{ envs = { TEST = 'test'}, args = '--headless' }: 	]] },
-            { [[-- vim@code{ envs = { TEST = 'test'}, args = '--headless' }: nvim -l test.lua]] },
-        }
+        local lines, tbl, cmd
 
-        tbl, cmd = nlib.modeline('code', lines[1])
+        lines = { [[head-foo]], [[-- vim@code: nvim -l lua]], [[tail-bar]] }
+        tbl, cmd = nlib.modeline('code', lines)
         EQ(nil, tbl)
-        EQ('nvim -l test.lua', cmd)
+        EQ('nvim -l lua', cmd)
 
-        tbl, cmd = nlib.modeline('code', lines[2])
+        lines = { [[head-foo]], [[-- vim@code { }: nvim -l lua]], [[tail-bar]] }
+        tbl, cmd = nlib.modeline('code', lines)
         EQ(nil, tbl)
-        EQ('nvim -l test.lua', cmd)
-
-        tbl, cmd = nlib.modeline('code', lines[3])
-        EQ({}, tbl)
-        EQ('nvim -l test.lua', cmd)
-
-        msg = 'Wrong table from modeline: { foo - BAR }'
-        tbl, cmd = nlib.modeline('code', lines[4])
-        EQ(nil, tbl)
-        EQ('nvim -l test.lua', cmd)
-
-        tbl, cmd = nlib.modeline('code', lines[5])
-        EQ({ envs = { TEST = 'test' }, args = '--headless' }, tbl)
         EQ(nil, cmd)
 
-        tbl, cmd = nlib.modeline('code', lines[6])
-        EQ({ envs = { TEST = 'test' }, args = '--headless' }, tbl)
-        EQ('nvim -l test.lua', cmd)
+        lines = { [[head-foo]], [[-- vim@code{ }: nvim -l lua]], [[tail-bar]] }
+        tbl, cmd = nlib.modeline('code', lines)
+        EQ({}, tbl)
+        EQ('nvim -l lua', cmd)
+
+        lines = { [[head-foo]], [[-- vim@code{ foo - BAR }: nvim -l lua]], [[tail-bar]] }
+        msg = 'Wrong table from modeline: { foo - BAR }'
+        tbl, cmd = nlib.modeline('code', lines)
+        EQ(nil, tbl)
+        EQ('nvim -l lua', cmd)
+
+        lines = {
+            [[head-foo]],
+            [[-- vim@code{ envs = { FOO = 'bar'}, args = '-l' }: 	]],
+            [[tail-bar]],
+        }
+        tbl, cmd = nlib.modeline('code', lines)
+        EQ({ envs = { FOO = 'bar' }, args = '-l' }, tbl)
+        EQ(nil, cmd)
+
+        lines = {
+            [[head-foo]],
+            [[-- vim@code{ envs = { FOO = 'bar'}, args = '-l' }: nvim -l lua]],
+            [[tail-bar]],
+        }
+        tbl, cmd = nlib.modeline('code', lines)
+        EQ({ envs = { FOO = 'bar' }, args = '-l' }, tbl)
+        EQ('nvim -l lua', cmd)
+
+        lines = { [[head-foo]], [[-- vim@code: :Test]], [[tail-bar]] }
+        tbl, cmd = nlib.modeline('code', lines)
+        EQ(nil, tbl)
+        EQ(':Test', cmd)
 
         io.lines = mocked1
         vim.notify = mocked2

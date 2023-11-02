@@ -227,31 +227,38 @@ end
 
 --- Get extended modeline
 --- @param tag(string) Tag for extended modeline
+--- @return table|nil(tbl)
+--- @return string|nil(cmd)
 function M.modeline(tag, file)
-    local pat = [[^.*vim@]] .. tag .. [[(.*):%s*(.*)$]] -- vim@<tag>{<tbl>}: <cmd>
+    -- TODO: refactor with vim.re later
+    local pat1 = [[^.*vim@]] .. tag .. [[:%s*(.*)$]] -- vim@<tag>: <cmd>
+    local pat2 = [[^.*vim@]] .. tag .. [[({.*}):%s*(.*)$]] -- vim@<tag>{<tbl>}: <cmd>
+    local tbl, cmd
     local num = 0
+
     for line in io.lines(file) do
         num = num + 1
         if num <= vim.o.modelines then
-            local tbl, cmd = line:match(pat)
+            cmd = line:match(pat1)
+            if cmd then
+                break
+            end
+            tbl, cmd = line:match(pat2)
             if tbl and cmd then
-                if cmd:match('^%s*$') then
-                    cmd = nil
+                local ok, opts = pcall(function() return loadstring('return ' .. tbl)() end)
+                if not ok then
+                    vim.notify('Wrong table from modeline: ' .. tbl)
                 end
-                local res = tbl:match('^{.*}$') and loadstring('return ' .. tbl)
-                if res then
-                    local ok, opts = pcall(res)
-                    if not ok then
-                        vim.notify('Wrong table from modeline: ' .. tbl)
-                    end
-                    tbl = ok and opts or nil
-                else
-                    tbl = nil
-                end
-                return tbl, cmd
+                tbl = ok and opts or nil
+                break
             end
         end
     end
+
+    if cmd == '' then
+        cmd = nil
+    end
+    return tbl, cmd
 end
 
 --- @class RecallOptions
