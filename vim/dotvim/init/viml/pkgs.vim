@@ -200,13 +200,13 @@ if s:use.has_py
 " autocmd VimEnter * call execute('autocmd! LeaderF_Mru')
 let g:Lf_CacheDirectory = $DotVimLocal
 let g:Lf_PreviewInPopup = 1
-let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0}
+let g:Lf_PreviewResult = {'File': 0, 'Buffer': 0, 'Mru': 0, 'Tag': 0, 'Rg': 0}
 let g:Lf_StlSeparator = s:use.ui.patch ? {'left': '', 'right': ''} : {'left': '', 'right': ''}
 let g:Lf_ShowDevIcons = 0
 let g:Lf_ShortcutF = ''
 let g:Lf_ShortcutB = ''
 let g:Lf_ReverseOrder = 1
-let g:Lf_ShowHidden = 1                 " 搜索隐藏文件和目录
+let g:Lf_ShowHidden = 1
 let g:Lf_DefaultExternalTool = 'rg'
 let g:Lf_UseVersionControlTool = 1
 let g:Lf_WildIgnore = {

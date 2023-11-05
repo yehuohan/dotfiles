@@ -103,6 +103,7 @@ local function setup_qf()
             nlib.m.nnore({
                 '<CR>',
                 function()
+                    -- Open with absolute file path
                     local row = vim.fn.line('.', qf.winid)
                     local item = vim.fn.getqflist()[row]
                     if item.bufnr > 0 then
@@ -122,9 +123,9 @@ local function setup_qf()
                         local estr = vim.fn.escape(str, '\\/')
                         vim.cmd.syntax({ args = { ([[match IncSearch /\V\c%s/]]):format(estr) } })
                     end
-                    vim.cmd.syntax({ args = { [[match vTaskOnqf /\m^|| / conceal]] } })
-                    vim.cmd.syntax({ args = { [[match vTaskOnqf /\m^|| {{{ / conceal]] } })
-                    vim.cmd.syntax({ args = { [[match vTaskOnqf /\m^|| }}} / conceal]] } })
+                    vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| / conceal]] } })
+                    vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| {{{ / conceal]] } })
+                    vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| }}} / conceal]] } })
                 end)
                 vim.api.nvim_win_set_option(qf.winid, 'number', false)
                 vim.api.nvim_win_set_option(qf.winid, 'relativenumber', false)

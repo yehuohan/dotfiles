@@ -27,10 +27,15 @@ local function __servers()
         function(server_name)
             lspconfig[server_name].setup({
                 capabilities = capabilities,
-                on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
             })
         end,
     }
+    opts['clangd'] = function()
+        lspconfig.clangd.setup({
+            capabilities = capabilities,
+            on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
+        })
+    end
     opts['cmake'] = function()
         lspconfig.cmake.setup({
             capabilities = capabilities,

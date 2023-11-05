@@ -314,7 +314,7 @@ function _a._wrap(afunc)
 end
 
 --- @alias PopSelection table Selection of plugin popset
---- @alias PopSelectionEvent function
+--- @alias PopSelectionEvent fun(name:string, ...)
 
 --- Async PopSelection
 --- @param sel(PopSelection)

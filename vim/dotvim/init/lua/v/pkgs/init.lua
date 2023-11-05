@@ -7,7 +7,7 @@ local m = nlib.m
 --------------------------------------------------------------------------------
 -- 快速跳转
 local function pkg_hop()
-    require('hop').setup({ match_mappings = { 'zh', 'zh_sc' } })
+    require('hop').setup({ match_mappings = { 'zh', 'zh_sc' }, extensions = {} })
     m.nore({ 's', '<Cmd>HopChar1MW<CR>' })
     m.nore({ 'S', '<Cmd>HopChar1<CR>' })
     m.nore({ 'f', '<Cmd>HopChar1CurrentLine<CR>' })
@@ -708,7 +708,7 @@ end
 --------------------------------------------------------------------------------
 local pkgs = {
     -- Editor
-    { 'smoka7/hop.nvim', config = pkg_hop },
+    { 'yehuohan/hop.nvim', config = pkg_hop },
     { 'yehuohan/marks.nvim', config = pkg_marks },
     { 'xiyaowong/nvim-cursorword', config = pkg_cursorword },
     { 'booperlv/nvim-gomove', config = pkg_gomove },
@@ -733,7 +733,7 @@ local pkgs = {
     { 'kevinhwang91/nvim-ufo', config = pkg_ufo, dependencies = { 'kevinhwang91/promise-async' } },
     { 'kevinhwang91/nvim-bqf', config = pkg_bqf, ft = 'qf' },
     { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, keys = { { '<M-w>', mode = 'i' } } },
-    { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' } },
+    { 'yehuohan/virt-column.nvim', opts = { char = '┊' } },
     { 'nvim-tree/nvim-tree.lua', config = pkg_tree, keys = { '<leader>tt', '<leader>tT' } },
     {
         'nvim-telescope/telescope.nvim',
