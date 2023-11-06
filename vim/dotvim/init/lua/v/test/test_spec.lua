@@ -5,6 +5,11 @@ local dir_this = vim.fn.getcwd()
 local dir_init = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(dir_this)))
 local dir_bundle = vim.fs.dirname(dir_init) .. '/bundle'
 vim.opt.rtp:prepend(dir_init)
+vim.opt.rtp:prepend(dir_bundle .. '/popc')
+vim.opt.rtp:prepend(dir_bundle .. '/popset')
+vim.cmd.runtime('plugin/popc.vim')
+vim.cmd.runtime('plugin/popset.vim')
+
 local nlib = require('v.nlib')
 
 local EQ = assert.are.same -- The table's metatable won't be compared
@@ -207,11 +212,6 @@ describe('nlib', function()
 
     -- nlib.a.pop_selection
     it('. async . pop_selection', function()
-        vim.opt.rtp:prepend(dir_bundle .. '/popc')
-        vim.opt.rtp:prepend(dir_bundle .. '/popset')
-        vim.cmd.runtime('plugin/popc.vim')
-        vim.cmd.runtime('plugin/popset.vim')
-
         local tst = { opt = '', lst = { 1, 2, 3 }, num = 0 }
         tst.cmd = function(sopt, sel) tst.num = tst.num + 1 + sel end
         tst.evt = function(name)

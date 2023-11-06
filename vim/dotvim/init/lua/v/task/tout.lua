@@ -95,13 +95,98 @@ function qf.display(lines, highlights, efm)
     end
 end
 
+---@param cpt Tout.Component
+---@param params Tout.Params
+function qf.on_start(task, cpt, params)
+    cpt.start_time = os.time()
+    qf.title = params.title
+    qf.task = task
+    qf.get()
+    qf.open(params.open, params.jump, params.append)
+
+    -- Add head message
+    local msg = string.format('{{{ [%s] %s', os.date('%H:%M:%S'), task.name)
+    vim.fn.setqflist({}, params.append and 'a' or 'r', {
+        lines = { msg },
+        efm = ' ', -- Avoid match time string
+        title = params.title,
+    })
+    if qf.hbuf then
+        local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
+        qf.highlight('Constant', line, 5, 13)
+        qf.highlight('Identifier', line, 15, string.len(msg))
+    end
+end
+
+---@param cpt Tout.Component
+---@param params Tout.Params
+function qf.on_complete(task, status, result, cpt, params)
+    local dt = os.time() - cpt.start_time
+    local lines, highlights = cpt.chanor()
+
+    qf.get()
+    qf.display(lines, highlights, params.errorformat)
+
+    -- Add tail message
+    local msg = string.format('}}} [%s] %s in %ds', os.date('%H:%M:%S'), status, dt)
+    vim.fn.setqflist({}, 'a', {
+        lines = { msg },
+        efm = ' ', -- Avoid match time string
+    })
+    if qf.hbuf then
+        local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
+        local hlgrp = 'Overseer' .. status
+        qf.highlight('Constant', line, 5, 13)
+        qf.highlight(hlgrp, line, 15, string.len(msg))
+    end
+    if params.scroll then
+        qf.scroll(#lines + 1)
+    end
+
+    -- Setup fold
+    if qf.hwin then
+        vim.api.nvim_win_set_option(qf.hwin, 'foldmethod', 'marker')
+        vim.api.nvim_win_set_option(qf.hwin, 'foldmarker', '{{{,}}}')
+        vim.fn.win_execute(qf.hwin, 'silent! normal! zO')
+    end
+    qf.task = nil
+end
+
+---@param cpt Tout.Component
+---@param params Tout.Params
+function qf.on_output(task, data, cpt, params)
+    -- React to pause command
+    if IsWin() then
+        for _, str in ipairs(data) do
+            for _, pat in ipairs(PAUSE_PATS) do
+                if str:match(pat) then
+                    vim.api.nvim_chan_send(task.strategy.chan_id, ' ')
+                end
+            end
+        end
+    end
+
+    local lines, highlights = cpt.chanor(data)
+    qf.get()
+    qf.display(lines, highlights, params.errorformat)
+    if params.scroll then
+        qf.scroll(#lines)
+    end
+end
+
 --- @class ToutTerminal
 --- @field hwin(number|nil) Terminal(vterm) window handle
-local term = { hwin = nil }
+--- @field task(table|nil) The task output to terminal
+local term = {
+    hwin = nil,
+    task = nil,
+}
 
+---@param pin(boolean|nil) Pin task output to the terminal or not
 function term.redir(task, pin)
     local hwin
     if pin then
+        term.task = task
         if (not term.hwin) or (not vim.api.nvim_win_is_valid(term.hwin)) then
             vim.cmd.split({ range = { 8 }, mods = { split = 'botright' } })
             term.hwin = vim.api.nvim_get_current_win()
@@ -127,8 +212,18 @@ function term.redir(task, pin)
     vim.api.nvim_win_set_option(hwin, 'signcolumn', 'no')
 end
 
---- @class OnTaskOutput
---- @field params(table) Parameters to sync task output
+function term.on_complete(task, status, result)
+    if term.hwin and vim.api.nvim_win_is_valid(term.hwin) then
+        local cursor = vim.api.nvim_win_get_cursor(term.hwin)
+        vim.api.nvim_win_set_cursor(term.hwin, { cursor[1], 0 })
+    end
+    term.task = nil
+end
+
+--- @alias Tout.Params table
+--- @alias Tout.Component table
+--- @class Tout
+--- @field params(Tout.Params) Parameters to sync task output
 --- For params.style:
 ---     'term' : termopen + terminal
 ---     'ansi' : termopen + quickfix with highlighted ANSI
@@ -182,84 +277,12 @@ local M = {
 }
 
 function M.constructor(params)
+    --- @type Tout.Component
     local cpt = {
         start_time = nil,
         --- @type Chanor|nil
         chanor = nil,
     }
-
-    local function qf_start(task)
-        cpt.start_time = os.time()
-        qf.title = params.title
-        qf.task = task
-        qf.get()
-        qf.open(params.open, params.jump, params.append)
-
-        -- Add head message
-        local msg = string.format('{{{ [%s] %s', os.date('%H:%M:%S'), task.name)
-        vim.fn.setqflist({}, params.append and 'a' or 'r', {
-            lines = { msg },
-            efm = ' ', -- Avoid match time string
-            title = params.title,
-        })
-        if qf.hbuf then
-            local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
-            qf.highlight('Constant', line, 5, 13)
-            qf.highlight('Identifier', line, 15, string.len(msg))
-        end
-    end
-
-    local function qf_complete(task, status, result)
-        local dt = os.time() - cpt.start_time
-        local lines, highlights = cpt.chanor()
-
-        qf.get()
-        qf.display(lines, highlights, params.errorformat)
-
-        -- Add tail message
-        local msg = string.format('}}} [%s] %s in %ds', os.date('%H:%M:%S'), status, dt)
-        vim.fn.setqflist({}, 'a', {
-            lines = { msg },
-            efm = ' ', -- Avoid match time string
-        })
-        if qf.hbuf then
-            local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
-            local hlgrp = 'Overseer' .. status
-            qf.highlight('Constant', line, 5, 13)
-            qf.highlight(hlgrp, line, 15, string.len(msg))
-        end
-        if params.scroll then
-            qf.scroll(#lines + 1)
-        end
-
-        -- Setup fold
-        if qf.hwin then
-            vim.api.nvim_win_set_option(qf.hwin, 'foldmethod', 'marker')
-            vim.api.nvim_win_set_option(qf.hwin, 'foldmarker', '{{{,}}}')
-            vim.fn.win_execute(qf.hwin, 'silent! normal! zO')
-        end
-        qf.task = nil
-    end
-
-    local function qf_output(task, data)
-        -- React to pause command
-        if IsWin() then
-            for _, str in ipairs(data) do
-                for _, pat in ipairs(PAUSE_PATS) do
-                    if str:match(pat) then
-                        vim.api.nvim_chan_send(task.strategy.chan_id, ' ')
-                    end
-                end
-            end
-        end
-
-        local lines, highlights = cpt.chanor(data)
-        qf.get()
-        qf.display(lines, highlights, params.errorformat)
-        if params.scroll then
-            qf.scroll(#lines)
-        end
-    end
 
     cpt.on_init = function(self, task)
         self.chanor = require('v.nlib').new_chanor({
@@ -276,25 +299,27 @@ function M.constructor(params)
                 local fzer = require('v.task').title.Fzer
                 if qf.title ~= fzer and params.title == fzer then
                     term.redir(qf.task)
-                    qf_start(task)
+                    qf.on_start(task, cpt, params)
                 else
                     term.redir(task)
                 end
             else
-                qf_start(task)
+                qf.on_start(task, cpt, params)
             end
         end
     end
 
     cpt.on_complete = function(self, task, status, result)
         if qf.task and qf.task.id == task.id then
-            qf_complete(task, status, result)
+            qf.on_complete(task, status, result, cpt, params)
+        elseif term.task and term.task.id == task.id then
+            term.on_complete(task, status, result)
         end
     end
 
     cpt.on_output = function(self, task, data)
         if qf.task and qf.task.id == task.id then
-            qf_output(task, data)
+            qf.on_output(task, data, cpt, params)
         end
     end
 
