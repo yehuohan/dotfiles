@@ -77,7 +77,7 @@ local function edit_tmpfile(ft, wt)
             border = 'single',
         })
     end
-    vim.cmd[wt .. 'edit']({ args = { vim.fn.tempname() .. '.' .. ft } })
+    vim.cmd[wt .. 'edit'](vim.fn.tempname() .. '.' .. ft)
 end
 
 --- Evaluate string of command, function and expression

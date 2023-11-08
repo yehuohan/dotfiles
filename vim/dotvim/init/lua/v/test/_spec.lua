@@ -10,11 +10,27 @@ vim.opt.rtp:prepend(dir_bundle .. '/popset')
 vim.cmd.runtime('plugin/popc.vim')
 vim.cmd.runtime('plugin/popset.vim')
 
-local nlib = require('v.nlib')
-
 local EQ = assert.are.same -- The table's metatable won't be compared
 local OK = assert.has_no.errors
 local NOK = assert.has.errors
+
+local function mock(fns)
+    local mocked = {}
+    for _, fn in ipairs(fns) do
+        for k = 2, #fn do
+            mocked[fn[k]] = fn[1][fn[k]]
+        end
+    end
+    return mocked
+end
+
+local function unmock(mocked, fns)
+    for _, fn in ipairs(fns) do
+        for k = 2, #fn do
+            fn[1][fn[k]] = mocked[fn[k]]
+        end
+    end
+end
 
 local function feedkeys(keys)
     local codes = vim.api.nvim_replace_termcodes(keys, true, false, true)
@@ -22,6 +38,8 @@ local function feedkeys(keys)
 end
 
 describe('nlib', function()
+    local nlib = require('v.nlib')
+
     -- nlib.new_configer
     describe('. new_configer', function()
         it('. new', function()
@@ -148,8 +166,9 @@ describe('nlib', function()
 
     -- nlib.modeline
     it('. modeline', function()
-        local mocked1 = io.lines
-        local mocked2 = vim.notify
+        local fns = { { io, 'lines' }, { vim, 'notify' } }
+        local mocked = mock(fns)
+
         io.lines = function(data)
             local idx = 0
             return function()
@@ -158,7 +177,7 @@ describe('nlib', function()
             end
         end
         local msg
-        vim.notify = function(data) EQ(msg, data) end
+        vim.notify = function(_msg) msg = _msg end
 
         local lines, tbl, cmd
 
@@ -178,10 +197,10 @@ describe('nlib', function()
         EQ('nvim -l lua', cmd)
 
         lines = { [[head-foo]], [[-- vim@code{ foo - BAR }: nvim -l lua]], [[tail-bar]] }
-        msg = 'Wrong table from modeline: { foo - BAR }'
         tbl, cmd = nlib.modeline('code', lines)
         EQ(nil, tbl)
         EQ('nvim -l lua', cmd)
+        EQ('Wrong table from modeline: { foo - BAR }', msg)
 
         lines = {
             [[head-foo]],
@@ -206,8 +225,7 @@ describe('nlib', function()
         EQ(nil, tbl)
         EQ(':Test', cmd)
 
-        io.lines = mocked1
-        vim.notify = mocked2
+        unmock(mocked, fns)
     end)
 
     -- nlib.a.pop_selection
@@ -333,4 +351,71 @@ describe('nlib', function()
             EQ({ m2 = { 'bbb' } }, getmetatable(dst.foo))
         end)
     end)
+end)
+
+describe('task', function()
+    require('v')
+    local task = require('v.task')
+    task.setup()
+    local fns = { { task, 'run' }, { vim, 'notify', 'print' } }
+    local mocked = mock(fns)
+
+    local cfg
+    local msg
+    local txt
+    task.run = function(_cfg) cfg = _cfg end
+    vim.notify = function(_msg) msg = _msg end
+    vim.print = function(_txt) txt = _txt end
+
+    local tmp
+    before_each(function()
+        tmp = vim.fn.tempname() .. '.lua'
+        vim.cmd.edit(tmp)
+        vim.cmd.write()
+    end)
+
+    it('. code . :CodeWscInit', function()
+        vim.cmd.CodeWsc({ bang = true })
+        EQ('ansi', txt.style)
+
+        vim.cmd.CodeWscInit()
+        feedkeys('kkmjob<CR>')
+        feedkeys('<CR>')
+        vim.cmd.CodeWsc({ bang = true })
+        EQ('job', txt.style)
+
+        -- Change back code.wsc, or has effect on other test items
+        vim.cmd.CodeWscInit()
+        feedkeys('kkmansi<CR>')
+        feedkeys('<CR>')
+        vim.cmd.CodeWsc({ bang = true })
+        EQ('ansi', txt.style)
+    end)
+
+    it('. code . :Code! Rp', function()
+        vim.cmd.Code({ args = { 'Rp' }, bang = true })
+        feedkeys('mf<CR>')
+        feedkeys('jm' .. tmp .. '<CR>')
+        feedkeys('kkmterm<CR>')
+        feedkeys('<CR>')
+        EQ('f', cfg.key)
+        EQ(vim.fn.expand(tmp), vim.fn.expand(cfg.file))
+        EQ('lua', cfg.type)
+        EQ('term', cfg.tout.style)
+        EQ(true, vim.startswith(msg, 'resovle = true, restore = true'))
+
+        vim.cmd.TaskWsc()
+        EQ('f', txt.code.key)
+        EQ(vim.fn.expand(tmp), vim.fn.expand(txt.code.file))
+        EQ('lua', txt.code.type)
+        EQ('term', txt.code.style)
+
+        vim.cmd.CodeWsc({ bang = true })
+        EQ('', cfg.key)
+        EQ('', cfg.file)
+        EQ('', cfg.type)
+        EQ('ansi', cfg.style)
+    end)
+
+    unmock(mocked, fns)
 end)
