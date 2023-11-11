@@ -25,6 +25,7 @@ local function set_default_opts()
     o.softtabstop = 4                                -- 设置按<Tab>或<BS>移动的空格数
     o.shiftwidth = 4                                 -- 设置>和<命令移动宽度为4
     o.wrap = false                                   -- 默认关闭折行
+    o.virtualedit = 'block'                          -- 在Visual Block下使能virtualedit
     o.equalalways = false                            -- 禁止自动调窗口大小
     o.textwidth = 0                                  -- 关闭自动换行
     vim.opt.listchars = {
@@ -89,7 +90,7 @@ end
 
 local options = {
     conceallevel = { 2, 0 },
-    virtualedit = { { 'all' }, { 'none' } },
+    virtualedit = { { 'block' }, { 'all' }, { 'none' } },
     laststatus = { 2, 3 },
     number = function()
         if vim.o.number and vim.o.relativenumber then
