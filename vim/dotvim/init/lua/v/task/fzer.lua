@@ -16,6 +16,7 @@ local wsc = nlib.new_configer({
     fuzzier = 'leaderf',
 })
 
+--- @return table<string>
 local function rg_paths()
     -- rg supports multi-paths via cmp-path
     local locstr = vim.fn.input('Location: ', '', 'file')
@@ -29,6 +30,7 @@ local function rg_paths()
     return {}
 end
 
+--- @return table<string>
 local function rg_globs()
     if wsc.globlst ~= '' then
         return vim.tbl_map(
@@ -39,6 +41,7 @@ local function rg_globs()
     return {}
 end
 
+--- @return string|nil
 local function uproot()
     local dirlst = vim.fs.find({ '.git' }, {
         upward = true,
@@ -164,11 +167,7 @@ local _sels = {
     lst_f = { 'envs', 'path', 'globlst', 'options', 'fuzzier' },
     dic = {
         envs = { lst = { 'PATH=' }, cpl = 'environment' },
-        path = {
-            dsr = 'cached fzer path list',
-            lst = wsc.pathlst,
-            cpl = 'file',
-        },
+        path = { dsr = 'cached fzer path list', lst = wsc.pathlst, cpl = 'file' },
         globlst = { dsr = function() return table.concat(rg_globs(), ' ') end },
         options = {
             lst = {
@@ -199,6 +198,7 @@ local _sels = {
     },
 }
 
+--- @return string
 local function parse_pat(kt)
     local pat = ''
     if vim.fn.mode() == 'n' then
@@ -223,6 +223,7 @@ local function parse_pat(kt)
     return pat
 end
 
+--- @return table<string>
 local function parse_loc(kt)
     if kt.B == 'b' then
         return { vim.fs.normalize(vim.api.nvim_buf_get_name(0)) }
@@ -237,6 +238,7 @@ local function parse_loc(kt)
     end
 end
 
+--- @return table<string>
 local function parse_opt(kt)
     local opt = {}
     if kt.E:match('[sS]') then

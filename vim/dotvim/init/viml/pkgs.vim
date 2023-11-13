@@ -259,7 +259,7 @@ nmap         gD <Plug>(coc-declaration)
 nmap <leader>gd <Plug>(coc-definition)
 nmap <leader>gD <Plug>(coc-declaration)
 nmap <leader>gi <Plug>(coc-implementation)
-nmap <leader>gt <Plug>(coc-type-definition)
+nmap <leader>gy <Plug>(coc-type-definition)
 nmap <leader>gr <Plug>(coc-references)
 nmap <leader>gR <Plug>(coc-references-used)
 nmap <leader>gf <Plug>(coc-fix-current)
@@ -270,7 +270,8 @@ nmap <leader>ga <Plug>(coc-codeaction-cursor)
 nnoremap <leader>gh <Cmd>call CocActionAsync('doHover')<CR>
 vmap <leader>of <Plug>(coc-format-selected)
 nmap <leader>of <Plug>(coc-format)
-nnoremap <leader>od <Cmd>call CocAction('diagnosticToggle')<CR>
+nnoremap <leader>od <Cmd>call CocAction('diagnosticList')<CR>
+nnoremap <leader>oD <Cmd>call CocAction('diagnosticToggleBuffer')<CR>
 nmap <leader>oi <Plug>(coc-diagnostic-info)
 nmap <leader>oj <Plug>(coc-diagnostic-next-error)
 nmap <leader>ok <Plug>(coc-diagnostic-prev-error)

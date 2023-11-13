@@ -87,6 +87,7 @@ local packs = {
     _vout = '_VOut',
 }
 
+--- @return string|nil
 local function pat_text(pattern, file)
     for line in io.lines(file) do
         local res = string.match(line, pattern)
@@ -96,6 +97,7 @@ local function pat_text(pattern, file)
     end
 end
 
+--- @return table<string>
 local function pat_list(pattern, file)
     local lst = {}
     for line in io.lines(file) do
@@ -105,6 +107,7 @@ local function pat_list(pattern, file)
     return lst
 end
 
+--- @return string
 local function pat_file(pattern)
     if not pattern then
         return vim.fs.normalize(vim.api.nvim_buf_get_name(0))
@@ -237,6 +240,7 @@ end
 --- Dispatch task handle and return task command
 --- @param rhs(CodeHandleMap)
 --- @param cfg(TaskConfig)
+--- @return string
 local function dispatch(rhs, cfg)
     if cfg.file == '' then
         cfg.file = pat_file(rhs.pat)
@@ -289,10 +293,11 @@ end
 --- @class CodeHandleMap
 --- @field fn(string) Function name for CodeHandles
 --- @field desc(string)
---- @field pat(string) File pattern to get item from CodeTable or PackTable
---- @field target(string)
+--- @field pat(string|nil) File pattern to get item from CodeTable or PackTable
+--- @field target(string|nil)
 
 -- stylua: ignore start
+--- @type table<string,CodeHandleMap>
 local _maps = {
     { 'l', 'f', 'm', 'u', 'n', 'j', 'o', 'h' },
     l = { fn = 'nvim',   desc = 'Nvim lua' },

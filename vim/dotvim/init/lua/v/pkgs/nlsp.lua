@@ -380,6 +380,18 @@ local function __lsp_mappings()
     m.nore({ '<leader>of', ':Format<CR>' })
     -- m.nore({ '<leader>of', vim.lsp.buf.format }) -- Terrible format experience form lsp
     m.nnore({ '<leader>od', vim.diagnostic.setloclist })
+    m.nnore({
+        '<leader>oD',
+        function()
+            if vim.diagnostic.is_disabled(0) then
+                vim.diagnostic.enable(0)
+                vim.notify("Diagnostic enabled")
+            else
+                vim.diagnostic.disable(0)
+                vim.notify("Diagnostic disabled")
+            end
+        end,
+    })
     m.nnore({ '<leader>oi', vim.diagnostic.open_float })
     local opts = { severity = vim.diagnostic.severity.ERROR }
     m.nnore({ '<leader>oj', function() vim.diagnostic.goto_next(opts) end })

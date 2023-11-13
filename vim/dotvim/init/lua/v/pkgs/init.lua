@@ -733,7 +733,7 @@ local pkgs = {
     { 'kevinhwang91/nvim-ufo', config = pkg_ufo, dependencies = { 'kevinhwang91/promise-async' } },
     { 'kevinhwang91/nvim-bqf', config = pkg_bqf, ft = 'qf' },
     { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, keys = { { '<M-w>', mode = 'i' } } },
-    { 'yehuohan/virt-column.nvim', opts = { char = '┊' } },
+    { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' } },
     { 'nvim-tree/nvim-tree.lua', config = pkg_tree, keys = { '<leader>tt', '<leader>tT' } },
     {
         'nvim-telescope/telescope.nvim',
