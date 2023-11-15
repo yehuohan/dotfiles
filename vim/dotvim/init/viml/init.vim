@@ -31,7 +31,7 @@ let $DotVimDir=resolve(expand('<sfile>:p:h:h:h'))
 endif
 let $DotVimInit=$DotVimDir . '/init'
 let $DotVimVimL=$DotVimDir . '/init/viml'
-let $DotVimMisc=$DotVimDir . '/misc'
+let $DotVimWork=$DotVimDir . '/work'
 let $DotVimLocal=$DotVimDir . '/local'
 set rtp^=$DotVimDir
 

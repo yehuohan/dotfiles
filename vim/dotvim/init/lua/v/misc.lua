@@ -2,6 +2,7 @@ local nlib = require('v.nlib')
 local m = nlib.m
 
 --- Some special commands for fast_cmds
+--- @type table<string,string|function>
 local special_cmds = {
     t = [[%s/\s\+$//ge]],
     m = [[%s/\r//ge]],
@@ -18,6 +19,7 @@ local special_cmds = {
 }
 
 --- Some fast commands to execute conveniently
+--- @type PopSelection
 local fast_cmds = {
     opt = 'execute fast command',
     lst = {

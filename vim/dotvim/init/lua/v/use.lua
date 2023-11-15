@@ -36,6 +36,7 @@ local lst = {
     fontsize = { 9, 10, 11, 12, 13, 14, 15, 16 },
 }
 
+--- @type PopSelectionEvent
 local function use_save(name)
     if name == 'onCR' then
         vim.fn.writefile({ vim.json.encode(use) }, use_file)

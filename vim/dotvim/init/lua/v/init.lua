@@ -16,13 +16,13 @@ function IsGw() return vim.fn.has('win32unix') == 1 end
 
 function IsMac() return vim.fn.has('mac') == 1 end
 
-local function init_env()
-    -- Append {'path':[], 'vars':{}} from .env.json
-    local sep = IsWin() and ';' or ':'
-    local env_file = vim.env.DotVimLocal .. '/.env.json'
-    if vim.fn.filereadable(env_file) == 1 then
-        local ex = vim.json.decode(vim.fn.join(vim.fn.readfile(env_file)))
-        vim.env.PATH = vim.env.PATH .. sep .. vim.fn.join(ex.path, sep)
+local function setup_env()
+    local fp = io.open(vim.env.DotVimLocal .. '/.env.json')
+    if fp then
+        -- Load extra {'path':[], 'vars':{}} from .env.json
+        local ex = vim.json.decode(fp:read('*a'))
+        local sep = IsWin() and ';' or ':'
+        vim.env.PATH = vim.env.PATH .. sep .. table.concat(ex.path, sep)
         for name, val in pairs(ex.vars) do
             vim.env[name] = val
         end
@@ -33,10 +33,10 @@ local function setup(dotvim)
     vim.env.DotVimDir = dotvim
     vim.env.DotVimInit = dotvim .. '/init'
     vim.env.DotVimVimL = dotvim .. '/init/viml'
-    vim.env.DotVimMisc = dotvim .. '/misc'
+    vim.env.DotVimWork = dotvim .. '/work'
     vim.env.DotVimLocal = dotvim .. '/local'
     vim.env.NVimConfigDir = vim.fn.stdpath('config')
-    init_env()
+    setup_env()
 
     if IsWin() then
         vim.g.python3_host_prog = vim.env.APPS_HOME .. '/_packs/apps/python/current/python.exe'

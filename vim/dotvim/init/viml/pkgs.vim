@@ -228,7 +228,7 @@ endif
 " Coding {{{
 " coc {{{ 自动补全
 if s:use.coc
-let g:coc_config_home = $DotVimMisc
+let g:coc_config_home = $DotVimWork
 let g:coc_data_home = $DotVimLocal . '/.coc'
 let g:coc_global_extensions = ['coc-marketplace']
 let g:coc_status_error_sign = '🗴'
@@ -301,10 +301,10 @@ endif
 " ultisnips {{{ 代码片段
 if s:use.has_py
 function! PkgLoadSnip(filename)
-    return join(readfile($DotVimMisc . '/template/' . a:filename), "\n")
+    return join(readfile($DotVimWork . '/template/' . a:filename), "\n")
 endfunction
 let g:UltiSnipsEditSplit = 'vertical'
-let g:UltiSnipsSnippetDirectories = [$DotVimDir . '/snips', 'UltiSnips']
+let g:UltiSnipsSnippetDirectories = [$DotVimWork . '/snips', 'UltiSnips']
 let g:UltiSnipsExpandTrigger = '<Tab>'
 let g:UltiSnipsJumpForwardTrigger = '<M-l>'
 let g:UltiSnipsJumpBackwardTrigger = '<M-h>'

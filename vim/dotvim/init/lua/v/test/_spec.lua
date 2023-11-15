@@ -14,6 +14,7 @@ local EQ = assert.are.same -- The table's metatable won't be compared
 local OK = assert.has_no.errors
 local NOK = assert.has.errors
 
+--- @param fns(table<table<table, string>>) All function need to mock
 local function mock(fns)
     local mocked = {}
     for _, fn in ipairs(fns) do
@@ -24,6 +25,7 @@ local function mock(fns)
     return mocked
 end
 
+--- @param fns(table<table<table, string>>) All function need to unmock
 local function unmock(mocked, fns)
     for _, fn in ipairs(fns) do
         for k = 2, #fn do
@@ -32,6 +34,7 @@ local function unmock(mocked, fns)
     end
 end
 
+--- @param keys(string)
 local function feedkeys(keys)
     local codes = vim.api.nvim_replace_termcodes(keys, true, false, true)
     return vim.api.nvim_feedkeys(codes, 'x', false)

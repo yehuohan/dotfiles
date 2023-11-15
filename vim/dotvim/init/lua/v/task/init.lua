@@ -3,8 +3,8 @@ local nlib = require('v.nlib')
 local M = {}
 
 --- @class TaskWorkspace Task workspace config
---- @field code(Configer)
---- @field fzer(Configer)
+--- @field code(ConfigerSaveable)
+--- @field fzer(ConfigerSaveable)
 
 --- @class TaskConfig Task config from a 'Configer'
 --- @field cmd(string) Task command that includes args

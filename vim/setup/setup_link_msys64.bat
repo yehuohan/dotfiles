@@ -9,8 +9,7 @@ md %APPS_HOME%\msys64\home\%USERNAME%\dotvim
 mklink /D %APPS_HOME%\msys64\home\%USERNAME%\dotvim\autoload    %APPS_HOME%\dotvim\autoload
 mklink /D %APPS_HOME%\msys64\home\%USERNAME%\dotvim\bundle      %APPS_HOME%\dotvim\bundle
 mklink /D %APPS_HOME%\msys64\home\%USERNAME%\dotvim\init        %APPS_HOME%\dotvim\init
-mklink /D %APPS_HOME%\msys64\home\%USERNAME%\dotvim\snips       %APPS_HOME%\dotvim\snips
-mklink /D %APPS_HOME%\msys64\home\%USERNAME%\dotvim\misc        %APPS_HOME%\dotvim\misc
+mklink /D %APPS_HOME%\msys64\home\%USERNAME%\dotvim\work        %APPS_HOME%\dotvim\work
 
 echo Dotvim link was made successful!
 pause

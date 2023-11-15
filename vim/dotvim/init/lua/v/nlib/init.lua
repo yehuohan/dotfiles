@@ -9,7 +9,7 @@ local M = {}
 ---         fn0 = xxx,
 ---         fn1 = xxx,
 ---         ...,
----         <metatable> = ConfigerExtra {
+---         <metatable> = ConfigerNonSaveable {
 ---             eopt0 = xxx,
 ---             eopt1 = {xxx},
 ---             ...,
@@ -18,7 +18,8 @@ local M = {}
 --- }
 --- @alias Configer table An useful configer with saveable options
 --- @alias ConfigerMethod table Configer's methods
---- @alias ConfigerExtra table Configer's extra non-saveable options
+--- @alias ConfigerSaveable table Configer's saveable options
+--- @alias ConfigerNonSaveable table Configer's non-saveable options
 
 --- Create a configer
 --- Configer need metatable for internal usage, so metatable from `opts` will be droped
@@ -31,7 +32,7 @@ function M.new_configer(opts)
     local copy_opts = M.u.deepcopy(opts)
 
     --- Create non-saveable options for each sub-tables
-    --- @param nsc(ConfigerExtra)
+    --- @param nsc(ConfigerNonSaveable)
     local function sub_non_savable_config(nsc, init_opts)
         for ik, iv in pairs(init_opts) do
             if type(iv) == 'table' then
@@ -53,7 +54,7 @@ function M.new_configer(opts)
     end
 
     --- Create non-saveable options
-    --- @return ConfigerExtra
+    --- @return ConfigerNonSaveable
     local function non_savable_config(init_opts)
         local nsc = {}
         nsc.__index = nsc
@@ -80,6 +81,7 @@ function M.new_configer(opts)
     end
 
     --- Get only savable options as a table
+    --- @return ConfigerSaveable
     function C:get() return M.u.deepcopy(self) end
 
     --- Setup config's current options
@@ -115,7 +117,7 @@ end
 --- @alias Chanor function A channel lines processor for terminal's stdout
 --- @class ChanorOptions Chanor options according to OnTaskOutput.params
 --- @field style(string|nil)
---- @field verbose(string|nil)
+--- @field verbose(string|nil) Works with style='ansi'
 
 --- Create a chanor
 --- @param opts(ChanorOptions|nil)
