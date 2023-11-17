@@ -66,16 +66,16 @@ function ctxs.relative_path()
     return vim.fn.substitute(filepath, pat, '', '')
 end
 
-local ctx_check_last = vim.fn.reltimefloat(vim.fn.reltime())
 function ctxs.check_lines()
     if vim.b.statusline_check_enabled == false then
         return nil
     end
+    local check_last = vim.b.statusline_check_last or 0
     local check_this = vim.fn.reltimefloat(vim.fn.reltime())
-    if check_this - ctx_check_last < 1.0 then
+    if check_this - check_last < 1.0 then
         return vim.b.statusline_check_res
     end
-    ctx_check_last = check_this
+    vim.b.statusline_check_last = check_this
 
     local lst = {}
     local pos
