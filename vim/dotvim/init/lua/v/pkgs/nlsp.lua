@@ -377,18 +377,17 @@ local function __lsp_mappings()
     m.nnore({ '<leader>gs', '<Cmd>Lspsaga lsp_finder<CR>' })
     m.nnore({ '<leader>go', '<Cmd>Lspsaga outline<CR>' })
 
-    m.nore({ '<leader>of', ':Format<CR>' })
-    -- m.nore({ '<leader>of', vim.lsp.buf.format }) -- Terrible format experience form lsp
+    m.nore({ '<leader>of', vim.lsp.buf.format }) -- Terrible format experience form lsp
     m.nnore({ '<leader>od', vim.diagnostic.setloclist })
     m.nnore({
         '<leader>oD',
         function()
             if vim.diagnostic.is_disabled(0) then
                 vim.diagnostic.enable(0)
-                vim.notify("Diagnostic enabled")
+                vim.notify('Diagnostic enabled')
             else
                 vim.diagnostic.disable(0)
-                vim.notify("Diagnostic disabled")
+                vim.notify('Diagnostic disabled')
             end
         end,
     })

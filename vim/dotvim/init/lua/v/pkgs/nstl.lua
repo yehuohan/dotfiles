@@ -344,9 +344,9 @@ local function toggle_layout()
     if layout.tab and layout.buf then
         layout.tab = false
     elseif not layout.tab and layout.buf then
-        layout.buf = false
-    elseif not layout.tab and not layout.buf then
         layout.tab = true
+        layout.buf = false
+    elseif layout.tab and not layout.buf then
         layout.buf = true
     end
     vim.g.tabline_layout = layout
