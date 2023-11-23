@@ -60,8 +60,8 @@ local fast_cmds = {
 }
 
 --- Edit a temporary file
---- @param ft(string): File type
---- @param wt(string|nil): Window type with 'tab' or 'floating'
+--- @param ft(string) File type
+--- @param wt(string|nil) Window type with 'tab' or 'floating'
 local function edit_tmpfile(ft, wt)
     if not ft then
         return

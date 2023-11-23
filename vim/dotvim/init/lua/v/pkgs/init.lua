@@ -239,7 +239,9 @@ local function pkg_ufo()
             table.insert(res, { ('  %s%d '):format(tag_num, endLnum - lnum), 'MoreMsg' })
             return res
         end,
-        provider_selector = function(bufnr, filetype, buftype) return { 'treesitter', 'indent' } end,
+        provider_selector = function()
+            return use.nts and { 'treesitter', 'indent' } or { 'indent' }
+        end,
     })
     m.nnore({
         '<leader>tu',
@@ -770,12 +772,12 @@ local pkgs = {
             'williamboman/mason.nvim',
             'williamboman/mason-lspconfig.nvim',
             'neovim/nvim-lspconfig',
+            'folke/neodev.nvim',
             'nvimdev/lspsaga.nvim',
             'ray-x/lsp_signature.nvim',
             -- 'simrat39/rust-tools.nvim'
             'hrsh7th/cmp-nvim-lsp',
             'hrsh7th/cmp-buffer',
-            'hrsh7th/cmp-nvim-lua',
             'hrsh7th/cmp-calc',
             'yehuohan/cmp-cmdline',
             'yehuohan/cmp-path',

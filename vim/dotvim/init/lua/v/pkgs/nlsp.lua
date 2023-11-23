@@ -21,6 +21,7 @@ local function __servers()
         },
     })
     require('mason-lspconfig').setup({})
+    require('neodev').setup({})
     local lspconfig = require('lspconfig')
     local capabilities = require('cmp_nvim_lsp').default_capabilities()
     local opts = {
@@ -93,6 +94,7 @@ local function __servers()
         })
     end
     require('mason-lspconfig').setup_handlers(opts)
+    lspconfig.glsl_analyzer.setup({})
 end
 
 -- stylua: ignore start
@@ -127,7 +129,6 @@ local kind_icons = {
 local kind_sources = {
     buffer          = 'Buf',
     nvim_lsp        = 'Lsp',
-    nvim_lua        = 'Lua',
     ultisnips       = 'Snp',
     cmdline         = 'Cmd',
     cmdline_history = 'Cmh',
@@ -217,7 +218,6 @@ local function __completion()
         },
         sources = cmp.config.sources({
             { name = 'nvim_lsp' },
-            { name = 'nvim_lua' },
             { name = 'ultisnips' },
             { name = 'path' },
             { name = 'calc' },

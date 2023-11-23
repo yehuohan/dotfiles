@@ -229,8 +229,8 @@ end
 
 --- Get extended modeline
 --- @param tag(string) Tag for extended modeline
---- @return table|nil(tbl)
---- @return string|nil(cmd)
+--- @return table|nil tbl
+--- @return string|nil cmd
 function M.modeline(tag, file)
     -- TODO: refactor with vim.re later
     local pat1 = [[^.*vim@]] .. tag .. [[:%s*(.*)$]] -- vim@<tag>: <cmd>
