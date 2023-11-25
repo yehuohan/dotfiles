@@ -16,15 +16,10 @@ $SCOOP_PACKAGE_GIT_REPO = "https://kkgithub.com/ScoopInstaller/Scoop.git"
 $SCOOP_MAIN_BUCKET_GIT_REPO = "https://kkgithub.com/ScoopInstaller/Main.git"
 .\install.ps1 -ScoopDir "$env:APPS_HOME\_packs" -ScoopGlobalDir "$env:APPS_HOME\_packs" -NoProxy
 <#
-Patch scoop source code after install:
-    $APPS_HOME/_packs/apps/scoop/current/lib/install.ps1
-    $APPS_HOME/_packs/apps/scoop/current/libexec/scoop-download.ps1
-    $APPS_HOME/_packs/apps/scoop/current/libexec/scoop-update.ps1
-        => before invoking Invoke-CachedDownload
+Patch source code: $APPS_HOME/_packs/apps/scoop/current/lib/install.ps1
+function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
++    $url = "$url".Replace("https://github.com", "https://kkgithub.com").Replace("https://raw.githubusercontent.com", "https://raw.kkgithub.com")
 #>
-+$url_patch = "$url".Replace("https://github.com", "https://kkgithub.com").Replace("https://raw.githubusercontent.com", "https://raw.kkgithub.com")
--Invoke-CachedDownload $app $version $url ...
-+Invoke-CachedDownload $app $version $url_patch ...
 <# Code patch is not compatible with aria2 #>
 scoop config scoop_repo http://kkgithub.com/ScoopInstaller/Scoop
 scoop config aria2-enabled false
