@@ -86,6 +86,9 @@ INSTALL_DIR ?= ${DIR_ROOT}/install/${BUILD_TYPE}
 NDK_ROOT ?= ${Android_SDK}/ndk-bundle
 NDK_ABI ?= arm64-v8a
 NDK_PLATFORM ?= android-27
+VCPKG_ROOT ?= ${APPS_HOME}/_packs/apps/vcpkg/current
+VCPKG_TRIPLET ?= arm64-android # x64-windows, x64-windows-static, x64-mingw-dynamic, x64-mingw-static
+VCPKG_INSTALLED ?= ${VCPKG_ROOT}/installed
 
 
 .PHONY: all
@@ -100,15 +103,16 @@ src:
 		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
 		-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
 		-DPROJECT_BUILD_DIR=${BUILD_DIR} \
+		# -DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
 		-S . -B ${BUILD_DIR}
 
 # Release for android need to remove '-g' from android-legacy.toolchain.cmake
 # See https://github.com/android/ndk/issues/243
 # Or strip manually:
-# 	objcopy --only-keep-debug <target> <target.sym>
-# 	objcopy --strip-unneeded <target>
-.PHONY: src_android
-src_android:
+#   objcopy --only-keep-debug <target> <target.sym>
+#   objcopy --strip-unneeded <target>
+.PHONY: src-android
+src-android:
 	cmake -G ${BUILD_GEN} -Wno-dev \
 		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
 		-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
@@ -119,6 +123,22 @@ src_android:
 		-DANDROID_TOOLCHAIN=clang \
 		-DANDROID_STL=c++_static \
 		-DCMAKE_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake \
+		-S . -B ${BUILD_DIR}
+
+.PHONY: src-android-vcpkg
+src-android-vcpkg:
+	cmake -G ${BUILD_GEN} -Wno-dev \
+		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+		-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
+		-DPROJECT_BUILD_DIR=${BUILD_DIR} \
+		-DANDROID_NDK=${NDK_ROOT} \
+		-DANDROID_ABI=${NDK_ABI} \
+		-DANDROID_PLATFORM=${NDK_PLATFORM} \
+		-DANDROID_TOOLCHAIN=clang \
+		-DANDROID_STL=c++_static \
+		-DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake \
+		-DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake \
+		-DVCPKG_TARGET_TRIPLET=${VCPKG_TRIPLET} \
 		-S . -B ${BUILD_DIR}
 
 .PHONY: cc
