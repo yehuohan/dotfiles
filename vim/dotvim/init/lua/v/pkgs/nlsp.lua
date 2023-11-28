@@ -165,6 +165,7 @@ local function __completion()
     })
 
     local cmp = require('cmp')
+    local compare = cmp.config.compare
     local cmp_mappings = {
         ['<M-i>'] = cmp.mapping(function() cmp.complete() end, { 'i' }),
         ['<M-u>'] = cmp.mapping(function()
@@ -237,6 +238,27 @@ local function __completion()
         formatting = {
             fields = { 'kind', 'abbr', 'menu' },
             format = cmp_format,
+        },
+        sorting = {
+            comparators = {
+                compare.offset,
+                compare.exact,
+                function(entry1, entry2)
+                    local ea = entry1.completion_item.label
+                    local eb = entry2.completion_item.label
+                    local la = ea:gsub('%(.*%)', ''):gsub('<.*>', ''):gsub('_', ''):len()
+                    local lb = eb:gsub('%(.*%)', ''):gsub('<.*>', ''):gsub('_', ''):len()
+                    if la ~= lb then
+                        return la - lb < 0
+                    end
+                end,
+                compare.score,
+                compare.recently_used,
+                compare.locality,
+                compare.kind,
+                compare.length,
+                compare.order,
+            },
         },
     })
     cmp.setup.filetype({ 'tex', 'latex', 'markdown', 'restructuredtext', 'text', 'help' }, {
