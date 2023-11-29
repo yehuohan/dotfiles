@@ -10,7 +10,7 @@ local sym = {
     buf = 'B',
     tab = 'T',
 }
-if use.ui.patch then
+if use.ui.icon then
     sym.sep = { '', '' }
     sym.row = ''
     sym.col = ''
@@ -315,7 +315,7 @@ local function bars()
             hl = { fg = 'blue' },
         },
         {
-            provider = use.ui.patch and '  ' or ' > ',
+            provider = use.ui.icon and '  ' or ' > ',
             hl = { fg = 'red' },
         },
         {

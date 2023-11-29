@@ -7,7 +7,7 @@ local use = {
     ndap = false,
     has_py = false,
     ui = {
-        patch = false,
+        icon = false,
         font = 'Consolas',
         fontback = 'Consolas',
         fontsize = 12,
@@ -64,7 +64,7 @@ local function use_init()
         dsr = 'set ui',
         lst = vim.fn.sort(vim.tbl_keys(use.ui)),
         dic = {
-            patch = { lst = { true, false } },
+            icon = { lst = { true, false } },
             font = { dsr = 'as guifont', lst = lst.fonts },
             fontback = { dsr = 'as guifont fallback', lst = lst.fonts },
             fontsize = { lst = lst.fontsize },

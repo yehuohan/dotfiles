@@ -82,14 +82,6 @@ let g:gruvbox_invert_selection = 0
 let g:one_allow_italics = 1
 " }}}
 
-" indentLine {{{ 显示缩进标识
-let g:indentLine_char = '⁞'             " 设置标识符样式
-let g:indentLinet_color_term = 200      " 设置标识符颜色
-let g:indentLine_concealcursor = 'nvic'
-let g:indentLine_fileTypeExclude = ['startify', 'alpha']
-nnoremap <leader>ti :IndentLinesToggle<CR>
-" }}}
-
 " popset {{{
 let g:Popset_SelectionData = [{
         \ 'opt' : ['colorscheme', 'colo'],
@@ -108,8 +100,8 @@ let g:Popc_highlight = {
     \ }
 let g:Popc_useTabline = 1
 let g:Popc_useStatusline = 1
-let g:Popc_usePowerFont = s:use.ui.patch
-if s:use.ui.patch
+let g:Popc_usePowerFont = s:use.ui.icon
+if s:use.ui.icon
 let g:Popc_selectPointer = ''
 let g:Popc_separator = {'left' : '', 'right': ''}
 let g:Popc_subSeparator = {'left' : '', 'right': ''}
@@ -201,7 +193,7 @@ if s:use.has_py
 let g:Lf_CacheDirectory = $DotVimLocal
 let g:Lf_PreviewInPopup = 1
 let g:Lf_PreviewResult = {'File': 0, 'Buffer': 0, 'Mru': 0, 'Tag': 0, 'Rg': 0}
-let g:Lf_StlSeparator = s:use.ui.patch ? {'left': '', 'right': ''} : {'left': '', 'right': ''}
+let g:Lf_StlSeparator = s:use.ui.icon ? {'left': '', 'right': ''} : {'left': '', 'right': ''}
 let g:Lf_ShowDevIcons = 0
 let g:Lf_ShortcutF = ''
 let g:Lf_ShortcutB = ''

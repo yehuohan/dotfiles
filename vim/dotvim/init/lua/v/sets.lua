@@ -40,7 +40,7 @@ local function set_default_opts()
     o.showbreak = '↪ '                               -- wrap标志符
     o.autoindent = true                              -- 使用autoindent缩进
     o.breakindent = false                            -- 折行时不缩进
-    o.conceallevel = 0                               -- 显示高样样式中的隐藏字符
+    o.conceallevel = 2                               -- 显示高样样式中的隐藏字符
     o.concealcursor = 'nvic'                         -- 设置nvic模式下不显示conceal掉的字符
     o.foldenable = true                              -- 充许折叠
     vim.opt.foldopen:remove('search')                -- 查找时不自动展开折叠
@@ -160,6 +160,7 @@ local function set_default_autocmds()
     -- stylua: ignore start
     api.nvim_create_autocmd('BufNewFile', { group = 'v.Sets', command = 'setlocal fileformat=unix' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.nvim' }, command = 'setlocal filetype=vim' })
+    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.log' }, command = 'setlocal filetype=log' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.hlsl', '*.usf', '*.ush' }, command = 'setlocal filetype=hlsl' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.uproject', '*.uplugin' }, command = 'setlocal filetype=jsonc' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = {

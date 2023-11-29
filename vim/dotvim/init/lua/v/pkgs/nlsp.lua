@@ -144,7 +144,7 @@ local kind_sources = {
 local function cmp_format(entry, citem)
     local ico = kind_icons[citem.kind]
     local src = kind_sources[entry.source.name] or entry.source.name
-    citem.kind = string.format(' %s', use.ui.patch and ico[1] or ico[2]:sub(1, 1))
+    citem.kind = string.format(' %s', use.ui.icon and ico[1] or ico[2]:sub(1, 1))
     if string.len(citem.abbr) > 80 then
         citem.abbr = string.sub(citem.abbr, 1, 78) .. ' …'
     end
@@ -335,7 +335,7 @@ end
 --- Setup lsp settings
 local function __lsp_settings()
     vim.lsp.set_log_level(vim.lsp.log_levels.OFF)
-    if use.ui.patch then
+    if use.ui.icon then
         for name, icon in pairs({
             DiagnosticSignError = '🗴',
             DiagnosticSignWarn = '',
@@ -360,7 +360,7 @@ local function __lsp_settings()
         diagnostic = { on_insert = false },
         symbol_in_winbar = {
             enable = true,
-            separator = use.ui.patch and '  ' or ' > ',
+            separator = use.ui.icon and '  ' or ' > ',
         },
     })
 

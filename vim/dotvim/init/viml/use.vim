@@ -12,7 +12,7 @@ let s:use = {
     \ 'ndap'   : v:false,
     \ 'has_py' : v:false,
     \ 'ui'     : {
-        \ 'patch'    : v:false,
+        \ 'icon'     : v:false,
         \ 'font'     : 'Consolas',
         \ 'fontsize' : 12,
         \ 'wide'     : 'Microsoft YaHei UI',
@@ -65,7 +65,7 @@ function! s:useInit()
         \ 'dsr' : 'set ui',
         \ 'lst' : sort(keys(s:use.ui)),
         \ 'dic' : {
-            \ 'patch'    : {'lst' : [v:true, v:false]},
+            \ 'icon'     : {'lst' : [v:true, v:false]},
             \ 'font'     : {'dsr' : 'set guifont', 'lst' : l:fontlst},
             \ 'wide'     : {'dsr' : 'set guifontwide', 'lst' : l:fontlst},
             \ 'fontsize' : {'lst' : l:fontsizelst},

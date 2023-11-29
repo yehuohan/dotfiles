@@ -134,7 +134,7 @@ let g:lightline = {
             \ },
     \ 'fallback' : {'Popc': 0, 'vista': 'Vista', 'nerdtree': 'NerdTree', 'NvimTree': 'NvimTree'},
     \ }
-if s:use.ui.patch
+if s:use.ui.icon
 let g:lightline.separator            = {'left': '', 'right': ''}
 let g:lightline.subseparator         = {'left': '', 'right': ''}
 let g:lightline.tabline_separator    = {'left': '', 'right': ''}
@@ -244,6 +244,14 @@ endfunction
 " rainbow {{{ 彩色括号
 let g:rainbow_active = 1
 nnoremap <leader>tr :RainbowToggle<CR>
+" }}}
+
+" indentLine {{{ 显示缩进标识
+let g:indentLine_char = '⁞'             " 设置标识符样式
+let g:indentLinet_color_term = 200      " 设置标识符颜色
+let g:indentLine_concealcursor = 'nvic'
+let g:indentLine_fileTypeExclude = ['startify', 'alpha']
+nnoremap <leader>ti :IndentLinesToggle<CR>
 " }}}
 " }}}
 
@@ -412,7 +420,7 @@ call plug#begin($DotVimDir.'/bundle')  " 设置插件位置，且自动设置了
     " component
     Plug 'yehuohan/lightline.vim'
     Plug 'mhinz/vim-startify'
-if s:use.ui.patch
+if s:use.ui.icon
     Plug 'ryanoasis/vim-devicons'
 endif
     Plug 'morhetz/gruvbox'

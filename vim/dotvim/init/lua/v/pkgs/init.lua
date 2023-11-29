@@ -132,7 +132,7 @@ end
 -- 启动首页
 local function pkg_alpha()
     local tpl = require('alpha.themes.startify')
-    tpl.nvim_web_devicons.enabled = use.ui.patch
+    tpl.nvim_web_devicons.enabled = use.ui.icon
     tpl.section.header.val = function()
         if vim.fn.filereadable(vim.env.DotVimLocal .. '/todo.md') == 1 then
             local todo = vim.fn.filter(
@@ -217,8 +217,8 @@ local function pkg_ufo()
     ufo.setup({
         fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
             local res = {}
-            local tag = use.ui.patch and '' or '»'
-            local tag_num = use.ui.patch and '󰁂' or '~'
+            local tag = use.ui.icon and '' or '»'
+            local tag_num = use.ui.icon and '󰁂' or '~'
 
             for k, chunk in ipairs(virtText) do
                 if k == 1 then
@@ -370,6 +370,33 @@ local function pkg_telescope()
     m.nnore({ '<leader>nm', ':Telescope oldfiles<CR>' })
 end
 
+-- 彩虹括号
+local function pkg_rainbow()
+    local rainbow = require('rainbow-delimiters')
+    m.nnore({ '<leader>tr', function() rainbow.toggle(0) end })
+end
+
+-- 高亮缩进块
+local function pkg_hlchunk()
+    require('hlchunk').setup({
+        chunk = {
+            enable = true,
+            use_treesitter = use.nts,
+            style = {
+                { fg = '#fe8019' }, -- Normal chunk
+                { fg = '#c21f30' }, -- Wrong chunk
+            },
+        },
+        indent = {
+            enable = true,
+            chars = { '⁞' },
+            style = { 'Gray30' },
+        },
+        line_num = { enable = false },
+        blank = { enable = false },
+    })
+end
+
 -- Mini插件库
 local function pkg_mini()
     require('mini.align').setup({
@@ -378,23 +405,6 @@ local function pkg_mini()
             start_with_preview = 'ga',
         },
     })
-
-    require('mini.ai').setup({})
-
-    local indentscope = require('mini.indentscope')
-    indentscope.setup({
-        draw = {
-            delay = 0,
-            animation = indentscope.gen_animation.none(),
-        },
-        symbol = '⁞',
-    })
-end
-
--- 括号
-local function pkg_rainbow()
-    local rainbow = require('rainbow-delimiters')
-    m.nnore({ '<leader>tr', function() rainbow.toggle(0) end })
 end
 
 --------------------------------------------------------------------------------
@@ -732,7 +742,11 @@ local pkgs = {
     { 'goolord/alpha-nvim', config = pkg_alpha },
     { 'rcarriga/nvim-notify', config = pkg_notify },
     { 'stevearc/dressing.nvim', opts = {} },
-    { 'kevinhwang91/nvim-ufo', config = pkg_ufo, dependencies = { 'kevinhwang91/promise-async' } },
+    {
+        'kevinhwang91/nvim-ufo',
+        config = pkg_ufo,
+        dependencies = { 'kevinhwang91/promise-async' },
+    },
     { 'kevinhwang91/nvim-bqf', config = pkg_bqf, ft = 'qf' },
     { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, keys = { { '<M-w>', mode = 'i' } } },
     { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' } },
@@ -742,19 +756,19 @@ local pkgs = {
         config = pkg_telescope,
         keys = { '<leader><leader>n', '<leader>nf', '<leader>nl', '<leader>nm' },
     },
-    { 'nvim-tree/nvim-web-devicons', lazy = true, enabled = use.ui.patch },
-    { 'echasnovski/mini.nvim', config = pkg_mini },
+    { 'nvim-tree/nvim-web-devicons', lazy = true, enabled = use.ui.icon },
     { 'HiPhish/rainbow-delimiters.nvim', config = pkg_rainbow },
+    { 'shellRaining/hlchunk.nvim', config = pkg_hlchunk },
+    { 'echasnovski/mini.nvim', config = pkg_mini },
     { 'morhetz/gruvbox' },
     { 'rakr/vim-one' },
     { 'tanvirtin/monokai.nvim' },
-    { 'Yggdroot/indentLine' },
     { 'yehuohan/popc' },
     { 'yehuohan/popset', dependencies = { 'yehuohan/popc' } },
     { 'yehuohan/popc-floaterm', dependencies = { 'yehuohan/popc' } },
     {
         'scrooloose/nerdtree',
-        dependencies = { { 'ryanoasis/vim-devicons', enabled = use.ui.patch } },
+        dependencies = { { 'ryanoasis/vim-devicons', enabled = use.ui.icon } },
         cmd = { 'NERDTreeToggle', 'NERDTree' },
     },
     { 'itchyny/screensaver.vim' },
@@ -790,7 +804,11 @@ local pkgs = {
             'nvim-lua/plenary.nvim',
         },
     },
-    { 'nvim-treesitter/nvim-treesitter', enabled = use.nts, config = pkg_treesitter },
+    {
+        'nvim-treesitter/nvim-treesitter',
+        enabled = use.nts,
+        config = pkg_treesitter,
+    },
     { 'stevearc/overseer.nvim', config = pkg_overseer },
     { 'folke/trouble.nvim', config = pkg_trouble, keys = { '<leader>vq', '<leader>vl' } },
     { 'stevearc/conform.nvim', config = pkg_conform },
