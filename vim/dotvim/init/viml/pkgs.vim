@@ -67,11 +67,6 @@ vnoremap <leader><leader>A :EasyAlign<Space>
 map <M-r> <Plug>(expand_region_expand)
 map <M-w> <Plug>(expand_region_shrink)
 " }}}
-
-" traces {{{ 预览增强
-" 支持:s, :g, :v, :sort, :range预览
-let g:traces_num_range_preview = 1      " 支持范围:N,M预览
-" }}}
 " }}}
 
 " Component {{{
@@ -328,13 +323,6 @@ nnoremap <leader>di
         \ 'cmd' : {sopt, sel -> vimspector#LaunchWithSettings({'configuration': sel})}
         \})<CR>
 endif
-" }}}
-
-" Vista {{{ 代码Tags
-let g:vista_echo_cursor = 0
-let g:vista_stay_on_open = 0
-let g:vista_disable_statusline = 1
-nnoremap <leader>tv :Vista!!<CR>
 " }}}
 
 " quickhl {{{ 单词高亮

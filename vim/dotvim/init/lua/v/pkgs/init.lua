@@ -731,7 +731,6 @@ local pkgs = {
     { 'mg979/vim-visual-multi' },
     { 'junegunn/vim-easy-align' },
     { 'terryma/vim-expand-region' },
-    { 'markonm/traces.vim' },
 
     -- Component
     {
@@ -827,7 +826,6 @@ local pkgs = {
     { 'SirVer/ultisnips', enabled = use.has_py, dependencies = { 'honza/vim-snippets' } },
     { 'rcarriga/nvim-dap-ui', enabled = use.ndap, dependencies = { 'mfussenegger/nvim-dap' } },
     { 'puremourning/vimspector', enabled = use.ndap },
-    { 'liuchengxu/vista.vim', cmd = 'Vista' },
     { 't9md/vim-quickhl' },
     { 'voldikss/vim-floaterm' },
     { 'rust-lang/rust.vim' },

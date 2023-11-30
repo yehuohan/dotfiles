@@ -71,6 +71,11 @@ nmap <M-j> <Plug>(SmoothieForwards)
 nmap <M-k> <Plug>(SmoothieBackwards)
 " }}}
 
+" traces {{{ 预览增强
+" 支持:s, :g, :v, :sort, :range预览
+let g:traces_num_range_preview = 1      " 支持范围:N,M预览
+" }}}
+
 " textobj-user {{{ 文本对象
 " v-ai-wWsp(b[<t{B"'`
 " v-ai-ifcmu
@@ -266,6 +271,13 @@ function! PkgSetupCoc(timer)
 endfunction
 call timer_start(700, 'PkgSetupCoc')
 endif
+" }}}
+
+" Vista {{{ 代码Tags
+let g:vista_echo_cursor = 0
+let g:vista_stay_on_open = 0
+let g:vista_disable_statusline = 1
+nnoremap <leader>tv :Vista!!<CR>
 " }}}
 
 " asyncrun {{{ 导步运行程序
