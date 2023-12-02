@@ -5,6 +5,13 @@ local m = nlib.m
 --------------------------------------------------------------------------------
 -- Editor
 --------------------------------------------------------------------------------
+-- 匹配符跳转
+local function pkg_matchup()
+    -- packadd matchit
+    vim.g.matchup_matchparen_offscreen = { method = 'popup' }
+    m.map({ '<S-m>', '%' })
+end
+
 -- 快速跳转
 local function pkg_hop()
     require('hop').setup({ match_mappings = { 'zh', 'zh_sc' }, extensions = {} })
@@ -17,6 +24,47 @@ local function pkg_hop()
     m.nore({ '<leader><leader>j', '<Cmd>HopLine<CR>' })
     m.nore({ '<leader>mj', '<Cmd>HopLineStart<CR>' })
     m.nore({ '<leader>mw', '<Cmd>HopWord<CR>' })
+end
+
+-- 多光标编辑
+local function pkg_visual_multi()
+    -- Tab: 切换cursor/extend模式
+    vim.g.VM_mouse_mappings = 0 -- 禁用鼠标
+    vim.g.VM_leader = ','
+    vim.g.VM_maps = {
+        -- stylua: ignore start
+        ['Find Under']           = '<C-n>',
+        ['Cursor Down']          = '<C-Down>',
+        ['Cursor Up']            = '<C-Up>',
+        ['Select All']           = ',a',
+        ['Start Regex Search']   = ',/',
+        ['Add Cursor At Pos']    = ',,',
+        ['Visual All']           = ',A',
+        ['Visual Regex']         = ',/',
+        ['Visual Cursors']       = ',c',
+        ['Visual Add']           = ',a',
+        ['Find Next']            = 'n',
+        ['Find Prev']            = 'N',
+        ['Goto Next']            = ']',
+        ['Goto Prev']            = '[',
+        ['Skip Region']          = 'q',
+        ['Remove Region']        = 'Q',
+        ['Select Operator']      = 'v',
+        ['Toggle Mappings']      = ',<Space>',
+        ['Toggle Single Region'] = ',<CR>',
+        -- stylua: ignore end
+    }
+    vim.g.VM_custom_remaps = {
+        ['s'] = '<Cmd>HopChar1<CR>',
+    }
+end
+
+-- 字符对齐
+local function pkg_easy_align()
+    vim.g.easy_align_bypass_fold = 1
+    vim.g.easy_align_ignore_groups = {} -- 默认任何group都进行对齐
+    m.nmap({ '<leader>al', '<Plug>(LiveEasyAlign)ip' })
+    m.xmap({ '<leader>al', '<Plug>(LiveEasyAlign)' })
 end
 
 -- 书签管理
@@ -128,9 +176,23 @@ local function pkg_winshift()
     m.nnore({ '<C-m>', ':WinShift<CR>' })
 end
 
+-- 块扩展
+local function pkg_expand_region()
+    m.map({ '<M-r>', '<Plug>(expand_region_expand)' })
+    m.map({ '<M-w>', '<Plug>(expand_region_shrink)' })
+end
+
 --------------------------------------------------------------------------------
 -- Component
 --------------------------------------------------------------------------------
+-- 主题
+local function pkg_theme()
+    vim.g.gruvbox_contrast_dark = 'soft'
+    vim.g.gruvbox_italic = 1
+    vim.g.gruvbox_invert_selection = 0
+    vim.g.one_allow_italics = 1
+end
+
 -- 启动首页
 local function pkg_alpha()
     local tpl = require('alpha.themes.startify')
@@ -272,13 +334,47 @@ local function pkg_bqf()
     })
 end
 
--- 字体图标选择器
-local function pkg_icon_picker()
-    require('icon-picker').setup({
-        disable_legacy_commands = true,
-    })
-    m.inore({ '<M-w>', '<Cmd>IconPickerInsert alt_font emoji html_colors nerd_font_v3 symbols<CR>' })
-    m.nnore({ '<leader><leader>i', ':IconPickerInsert<Space>' })
+-- Buffer,Bookmarks,Workspace管理
+local function pkg_popc()
+    -- popc
+    vim.g.Popc_jsonPath = vim.env.DotVimLocal
+    vim.g.Popc_useFloatingWin = 1
+    vim.g.Popc_highlight = {
+        text = 'Pmenu',
+        selected = 'CursorLineNr',
+    }
+    vim.g.Popc_useTabline = 1
+    vim.g.Popc_useStatusline = 1
+    vim.g.Popc_usePowerFont = use.ui.icon
+    if use.ui.icon then
+        vim.g.Popc_selectPointer = ''
+        vim.g.Popc_separator = { left = '', right = '' }
+        vim.g.Popc_subSeparator = { left = '', right = '' }
+    end
+    vim.g.Popc_wksSaveUnderRoot = 0
+    vim.g.Popc_wksRootPatterns = { '.popc', '.git', '.svn', '.hg', 'tags' }
+    m.nnore({ '<leader><leader>h', '<Cmd>PopcBuffer<CR>' })
+    m.nnore({ '<M-u>', '<Cmd>PopcBufferSwitchTabLeft!<CR>' })
+    m.nnore({ '<M-p>', '<Cmd>PopcBufferSwitchTabRight!<CR>' })
+    m.nnore({ '<M-i>', '<Cmd>PopcBufferSwitchLeft!<CR>' })
+    m.nnore({ '<M-o>', '<Cmd>PopcBufferSwitchRight!<CR>' })
+    m.nnore({ '<C-i>', '<Cmd>PopcBufferJumpPrev<CR>' })
+    m.nnore({ '<Tab>', '<Cmd>PopcBufferJumpPrev<CR>' })
+    m.nnore({ '<C-o>', '<Cmd>PopcBufferJumpNext<CR>' })
+    m.nnore({ '<C-u>', '<C-o>' })
+    m.nnore({ '<C-p>', '<C-i>' })
+    m.nnore({ '<leader>wq', '<Cmd>PopcBufferClose!<CR>' })
+    m.nnore({ '<leader><leader>b', '<Cmd>PopcBookmark<CR>' })
+    m.nnore({ '<leader><leader>w', '<Cmd>PopcWorkspace<CR>' })
+    -- popset
+    vim.g.Popset_SelectionData = {
+        {
+            opt = { 'colorscheme', 'colo' },
+            lst = { 'gruvbox', 'one', 'monokai_pro', 'monokai_soda' },
+        },
+    }
+    m.nnore({ '<leader><leader>p', ':PopSet<Space>' })
+    m.nnore({ '<leader>sp', ':PopSet popset<CR>' })
 end
 
 -- 目录树
@@ -412,13 +508,18 @@ local function pkg_telescope()
         defaults = {
             borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
             color_devicons = true,
-            history = {
-                path = vim.env.DotVimLocal .. '/telescope_history',
-            },
+            history = { path = vim.env.DotVimLocal .. '/telescope_history' },
             mappings = {
                 i = {
+                    ['<Esc>'] = 'close',
+                    ['<Tab>'] = { '<Esc>', type = 'command' },
+                    ['<M-i>'] = 'toggle_selection',
                     ['<M-j>'] = 'move_selection_next',
                     ['<M-k>'] = 'move_selection_previous',
+                    ['<M-n>'] = 'results_scrolling_down',
+                    ['<M-m>'] = 'results_scrolling_up',
+                    ['<M-s>'] = 'results_scrolling_left',
+                    ['<M-f>'] = 'results_scrolling_right',
                 },
             },
         },
@@ -438,6 +539,48 @@ local function pkg_telescope()
     m.nnore({ '<leader><leader>n', ':Telescope<Space>' })
     m.nnore({ '<leader>nf', ':Telescope find_files<CR>' })
     m.nnore({ '<leader>nr', ':Telescope frecency<CR>' })
+end
+
+-- 模糊查找
+local function pkg_fzf()
+    vim.g.fzf_command_prefix = 'Fzf'
+    vim.g.fzf_layout = { down = '40%' }
+    vim.g.fzf_preview_window = { 'right:40%,border-sharp' }
+    vim.env.FZF_DEFAULT_OPTS = '--bind alt-j:down,alt-k:up'
+    m.nnore({ '<leader><leader>f', ':Fzf' })
+    vim.api.nvim_create_autocmd('Filetype', {
+        group = 'v.Pkgs',
+        command = 'tnoremap <buffer> <Esc> <C-c>',
+    })
+end
+
+-- 模糊查找
+local function pkg_leaderf()
+    -- autocmd VimEnter * call execute('autocmd! LeaderF_Mru')
+    vim.g.Lf_CacheDirectory = vim.env.DotVimLocal
+    vim.g.Lf_PreviewInPopup = 1
+    vim.g.Lf_PreviewResult = { File = 0, Buffer = 0, Mru = 0, Tag = 0, Rg = 0 }
+    vim.g.Lf_StlSeparator = use.ui.icon and { left = '', right = '' }
+        or { left = '', right = '' }
+    vim.g.Lf_ShowDevIcons = 0
+    vim.g.Lf_ShortcutF = ''
+    vim.g.Lf_ShortcutB = ''
+    vim.g.Lf_ReverseOrder = 1
+    vim.g.Lf_ShowHidden = 1
+    vim.g.Lf_DefaultExternalTool = 'rg'
+    vim.g.Lf_UseVersionControlTool = 1
+    vim.g.Lf_WildIgnore = {
+        dir = { '.git', '.svn', '.hg' },
+        file = {},
+    }
+    vim.g.Lf_GtagsAutoGenerate = 0
+    vim.g.Lf_GtagsAutoUpdate = 0
+    m.nnore({ '<leader><leader>l', ':Leaderf' })
+    m.nnore({ '<leader>lf', ':LeaderfFile<CR>' })
+    m.nnore({ '<leader>lu', ':LeaderfFunction<CR>' })
+    m.nnore({ '<leader>ll', ':LeaderfLine<CR>' })
+    m.nnore({ '<leader>lb', ':LeaderfBuffer<CR>' })
+    m.nnore({ '<leader>lr', ':LeaderfMru<CR>' })
 end
 
 -- Mini插件库
@@ -503,6 +646,36 @@ local function pkg_treesitter()
     })
 end
 
+-- Coc补全
+local function pkg_coc()
+    vim.fn['coc#config']('Lua', {
+        workspace = {
+            library = {
+                vim.env.DotVimInit .. '/lua',
+                vim.env.VIMRUNTIME .. '/lua',
+                vim.env.VIMRUNTIME .. '/lua/vim',
+                vim.env.VIMRUNTIME .. '/lua/vim/lsp',
+                vim.env.VIMRUNTIME .. '/lua/vim/treesitter',
+            },
+        },
+    })
+end
+
+-- 代码片段
+local function pkg_ultisnips()
+    vim.cmd([[
+function! PkgLoadSnip(filename)
+    return join(readfile($DotVimWork . '/template/' . a:filename), "\n")
+endfunction
+    ]])
+    vim.g.UltiSnipsEditSplit = 'vertical'
+    vim.g.UltiSnipsSnippetDirectories = { vim.env.DotVimWork .. '/snips', 'UltiSnips' }
+    vim.g.UltiSnipsExpandTrigger = '<Tab>'
+    vim.g.UltiSnipsJumpForwardTrigger = '<M-l>'
+    vim.g.UltiSnipsJumpBackwardTrigger = '<M-h>'
+    vim.g.UltiSnipsListSnippets = '<M-u>'
+end
+
 -- 导步程序/任务
 local function pkg_overseer()
     local overseer = require('overseer')
@@ -558,6 +731,27 @@ local function pkg_conform()
         },
     })
     m.nore({ '<leader>fo', conform.format })
+end
+
+-- 终端浮窗
+local function pkg_floaterm()
+    m.tnore({ '<C-l>', '<C-><C-n><C-w>' })
+    m.tnore({ '<Esc>', '<C-><C-n>' })
+    m.nnore({ '<leader>tz', ':FloatermToggle<CR>' })
+    m.nnore({ '<leader><leader>m', ':Popc Floaterm<CR>' })
+    m.nnore({ '<leader><leader>z', ':FloatermNew --cwd=.<Space>' })
+    m.tnore({ '<M-u>', '<C-><C-n>:FloatermFirst<CR>' })
+    m.tnore({ '<M-i>', '<C-><C-n>:FloatermPrev<CR>' })
+    m.tnore({ '<M-o>', '<C-><C-n>:FloatermNext<CR>' })
+    m.tnore({ '<M-p>', '<C-><C-n>:FloatermLast<CR>' })
+    m.tnore({ '<M-q>', '<C-><C-n>:FloatermKill<CR>' })
+    m.tnore({ '<M-h>', '<C-><C-n>:FloatermHide<CR>' })
+    m.tnore({ '<M-n>', '<C-><C-n>:FloatermUpdate --height=0.6 --width=0.6<CR>' })
+    m.tnore({ '<M-m>', '<C-><C-n>:FloatermUpdate --height=0.9 --width=0.9<CR>' })
+    m.tnore({ '<M-r>', '<C-><C-n>:FloatermUpdate --position=topright<CR>' })
+    m.tnore({ '<M-c>', '<C-><C-n>:FloatermUpdate --position=center<CR>' })
+    m.nnore({ '<leader>mz', ':FloatermNew --cwd=. zsh<CR>' })
+    m.nnore({ '<leader>mf', ':FloatermNew lf<CR>' })
 end
 
 -- 批量注释
@@ -616,6 +810,15 @@ local function pkg_surround()
     m.nmap({ '<leader>sW', 'ySiw' })
 end
 
+-- 快速高亮
+local function pkg_quickhl()
+    m.map({ '<leader>hw', '<Plug>(quickhl-manual-this)' })
+    m.map({ '<leader>hs', '<Plug>(quickhl-manual-this-whole-word)' })
+    m.map({ '<leader>hc', '<Plug>(quickhl-manual-clear)' })
+    m.nmap({ '<leader>hr', '<Plug>(quickhl-manual-reset)' })
+    m.nmap({ '<leader>th', '<Plug>(quickhl-manual-toggle)' })
+end
+
 -- 彩虹括号
 local function pkg_rainbow()
     local rainbow = require('rainbow-delimiters')
@@ -637,32 +840,10 @@ local function pkg_hlchunk()
             enable = true,
             chars = { '⁞' },
             style = { 'Gray30' },
+            exclude_filetypes = { screensaver = true },
         },
         line_num = { enable = false },
         blank = { enable = false },
-    })
-end
-
--- 颜色预览
-local function pkg_ccc()
-    m.nnore({ '<leader>tc', ':CccHighlighterToggle<CR>' })
-    m.nnore({ '<leader>lp', ':CccPick<CR>' })
-    local ccc = require('ccc')
-    ccc.setup({
-        disable_default_mappings = true,
-        mappings = {
-            ['<CR>'] = ccc.mapping.complete,
-            ['q'] = ccc.mapping.quit,
-            ['m'] = ccc.mapping.toggle_input_mode,
-            ['f'] = ccc.mapping.toggle_output_mode,
-            ['a'] = ccc.mapping.toggle_alpha,
-            ['l'] = ccc.mapping.increase1,
-            ['o'] = ccc.mapping.increase5,
-            ['L'] = ccc.mapping.increase10,
-            ['h'] = ccc.mapping.decrease1,
-            ['i'] = ccc.mapping.decrease5,
-            ['H'] = ccc.mapping.decrease10,
-        },
     })
 end
 
@@ -681,26 +862,11 @@ local function pkg_trouble()
     m.nnore({ '<leader>vl', ':TroubleToggle loclist<CR>' })
 end
 
--- Coc补全
-local function pkg_coc()
-    vim.fn['coc#config']('Lua', {
-        workspace = {
-            library = {
-                vim.env.DotVimInit .. '/lua',
-                vim.env.VIMRUNTIME .. '/lua',
-                vim.env.VIMRUNTIME .. '/lua/vim',
-                vim.env.VIMRUNTIME .. '/lua/vim/lsp',
-                vim.env.VIMRUNTIME .. '/lua/vim/treesitter',
-            },
-        },
-    })
-end
-
 --------------------------------------------------------------------------------
 -- Utils
 --------------------------------------------------------------------------------
--- Markdown预览
-local function pkg_peek()
+-- Markdown
+local function pkg_md()
     -- Dependency: sudo pacman -S webkit2gtk
     local peek = require('peek')
     peek.setup({
@@ -725,7 +891,7 @@ local function pkg_peek()
     })
 end
 
--- reStructuredText预览
+-- reStructuredText
 local function pkg_rst()
     vim.g.riv_auto_format_table = 0
     vim.g.riv_i_tab_pum_next = 0
@@ -754,6 +920,54 @@ local function pkg_rst()
             end,
         })
     end
+end
+
+-- Latex
+local function pkg_tex()
+    vim.g.vimtex_cache_root = vim.env.DotVimLocal .. '/.vimtex'
+    vim.g.vimtex_view_general_viewer = 'sioyek'
+    vim.g.vimtex_complete_enabled = 1 -- 使用vimtex#complete#omnifunc补全
+    vim.g.vimtex_complete_close_braces = 1
+    vim.g.vimtex_compiler_method = 'latexmk'
+    m.nmap({ '<leader>at', '<Plug>(vimtex-toc-toggle)' })
+    m.nmap({ '<leader>ab', '<Plug>(vimtex-compile-ss)' })
+    m.nmap({ '<leader>aB', '<Plug>(vimtex-compile)' })
+    m.nmap({ '<leader>as', '<Plug>(vimtex-stop)' })
+    m.nmap({ '<leader>ac', '<Plug>(vimtex-clean)' })
+    m.nmap({ '<leader>am', '<Plug>(vimtex-toggle-main)' })
+    m.nmap({ '<leader>av', '<Plug>(vimtex-view)' })
+end
+
+-- 颜色预览
+local function pkg_ccc()
+    m.nnore({ '<leader>tc', ':CccHighlighterToggle<CR>' })
+    m.nnore({ '<leader>lp', ':CccPick<CR>' })
+    local ccc = require('ccc')
+    ccc.setup({
+        disable_default_mappings = true,
+        mappings = {
+            ['<CR>'] = ccc.mapping.complete,
+            ['q'] = ccc.mapping.quit,
+            ['m'] = ccc.mapping.toggle_input_mode,
+            ['f'] = ccc.mapping.toggle_output_mode,
+            ['a'] = ccc.mapping.toggle_alpha,
+            ['l'] = ccc.mapping.increase1,
+            ['o'] = ccc.mapping.increase5,
+            ['L'] = ccc.mapping.increase10,
+            ['h'] = ccc.mapping.decrease1,
+            ['i'] = ccc.mapping.decrease5,
+            ['H'] = ccc.mapping.decrease10,
+        },
+    })
+end
+
+-- 字体图标选择器
+local function pkg_icon_picker()
+    require('icon-picker').setup({
+        disable_legacy_commands = true,
+    })
+    m.inore({ '<M-w>', '<Cmd>IconPickerInsert alt_font emoji html_colors nerd_font_v3 symbols<CR>' })
+    m.nnore({ '<leader><leader>i', ':IconPickerInsert<Space>' })
 end
 
 -- 在线搜索
@@ -790,58 +1004,61 @@ end
 --------------------------------------------------------------------------------
 local pkgs = {
     -- Editor
+    { 'andymass/vim-matchup', config = pkg_matchup },
     { 'yehuohan/hop.nvim', config = pkg_hop },
+    { 'mg979/vim-visual-multi', init = pkg_visual_multi },
+    { 'junegunn/vim-easy-align', config = pkg_easy_align },
     { 'yehuohan/marks.nvim', config = pkg_marks },
     { 'xiyaowong/nvim-cursorword', config = pkg_cursorword },
     { 'booperlv/nvim-gomove', config = pkg_gomove },
     { 'declancm/cinnamon.nvim', config = pkg_cinnamon },
     { 's1n7ax/nvim-window-picker', config = pkg_window_picker },
     { 'sindrets/winshift.nvim', config = pkg_winshift },
-    { 'andymass/vim-matchup' },
-    { 'mg979/vim-visual-multi' },
-    { 'junegunn/vim-easy-align' },
-    { 'terryma/vim-expand-region' },
+    { 'terryma/vim-expand-region', config = pkg_expand_region },
+    { 'stevearc/dressing.nvim', opts = {} },
+    { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' } },
 
     -- Component
+    { 'morhetz/gruvbox', config = pkg_theme },
+    { 'rakr/vim-one' },
+    { 'tanvirtin/monokai.nvim' },
     { 'nvim-tree/nvim-web-devicons', lazy = true, enabled = use.ui.icon },
-    {
+    { -- heirline
         'rebelot/heirline.nvim',
         config = require('v.pkgs.nstl').setup,
         dependencies = { 'yehuohan/popc' },
     },
     { 'goolord/alpha-nvim', config = pkg_alpha },
     { 'rcarriga/nvim-notify', config = pkg_notify },
-    { 'stevearc/dressing.nvim', opts = {} },
     { 'kevinhwang91/nvim-ufo', config = pkg_ufo, dependencies = { 'kevinhwang91/promise-async' } },
     { 'kevinhwang91/nvim-bqf', config = pkg_bqf, ft = 'qf' },
-    { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, keys = { { '<M-w>', mode = 'i' } } },
-    { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' } },
-    {
+    { 'yehuohan/popc', init = pkg_popc },
+    { 'yehuohan/popset', dependencies = { 'yehuohan/popc' } },
+    { 'yehuohan/popc-floaterm', dependencies = { 'yehuohan/popc' } },
+    { -- neo-tree
         'nvim-neo-tree/neo-tree.nvim',
         config = pkg_neotree,
         dependencies = { 'nvim-lua/plenary.nvim', 'MunifTanjim/nui.nvim' },
         keys = { '<leader>tt', '<leader>tT' },
     },
-    {
+    { -- telescope
         'nvim-telescope/telescope.nvim',
         config = pkg_telescope,
         keys = { '<leader><leader>n', '<leader>nf', '<leader>nr' },
     },
     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
     { 'nvim-telescope/telescope-frecency.nvim' },
+    { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' } },
+    { -- LeaderF
+        'Yggdroot/LeaderF',
+        enabled = use.has_py,
+        config = pkg_leaderf,
+        build = ':LeaderfInstallCExtension',
+    },
     { 'echasnovski/mini.nvim', config = pkg_mini },
-    { 'morhetz/gruvbox' },
-    { 'rakr/vim-one' },
-    { 'tanvirtin/monokai.nvim' },
-    { 'yehuohan/popc' },
-    { 'yehuohan/popset', dependencies = { 'yehuohan/popc' } },
-    { 'yehuohan/popc-floaterm', dependencies = { 'yehuohan/popc' } },
-    { 'itchyny/screensaver.vim' },
-    { 'junegunn/fzf.vim', dependencies = { 'junegunn/fzf' } },
-    { 'Yggdroot/LeaderF', enabled = use.has_py, build = ':LeaderfInstallCExtension' },
 
     -- Coding
-    {
+    { -- cmp
         'hrsh7th/nvim-cmp',
         enabled = use.nlsp,
         config = require('v.pkgs.nlsp').setup,
@@ -869,16 +1086,7 @@ local pkgs = {
         },
     },
     { 'nvim-treesitter/nvim-treesitter', enabled = use.nts, config = pkg_treesitter },
-    { 'stevearc/overseer.nvim', config = pkg_overseer },
-    { 'stevearc/conform.nvim', config = pkg_conform },
-    { 'numToStr/Comment.nvim', config = pkg_comment },
-    { 'windwp/nvim-autopairs', config = pkg_autopairs },
-    { 'kylechui/nvim-surround', config = pkg_surround },
-    { 'HiPhish/rainbow-delimiters.nvim', config = pkg_rainbow },
-    { 'shellRaining/hlchunk.nvim', config = pkg_hlchunk },
-    { 'uga-rosa/ccc.nvim', config = pkg_ccc, keys = { '<leader>tc', '<leader>lp' } },
-    { 'folke/trouble.nvim', config = pkg_trouble, keys = { '<leader>vq', '<leader>vl' } },
-    {
+    { -- coc
         'neoclide/coc.nvim',
         enabled = use.coc,
         branch = 'release',
@@ -886,19 +1094,34 @@ local pkgs = {
         event = 'InsertEnter',
         dependencies = { 'neoclide/jsonc.vim' },
     },
-    { 'SirVer/ultisnips', enabled = use.has_py, dependencies = { 'honza/vim-snippets' } },
     { 'rcarriga/nvim-dap-ui', enabled = use.ndap, dependencies = { 'mfussenegger/nvim-dap' } },
-    { 'puremourning/vimspector', enabled = use.ndap },
-    { 't9md/vim-quickhl' },
-    { 'voldikss/vim-floaterm' },
+    { -- ultisnips
+        'SirVer/ultisnips',
+        enabled = use.has_py,
+        config = pkg_ultisnips,
+        dependencies = { 'honza/vim-snippets' },
+    },
+    { 'stevearc/overseer.nvim', config = pkg_overseer },
+    { 'stevearc/conform.nvim', config = pkg_conform },
+    { 'voldikss/vim-floaterm', config = pkg_floaterm },
+    { 'numToStr/Comment.nvim', config = pkg_comment },
+    { 'windwp/nvim-autopairs', config = pkg_autopairs },
+    { 'kylechui/nvim-surround', config = pkg_surround },
+    { 't9md/vim-quickhl', config = pkg_quickhl },
+    { 'HiPhish/rainbow-delimiters.nvim', config = pkg_rainbow },
+    { 'shellRaining/hlchunk.nvim', config = pkg_hlchunk },
+    { 'folke/trouble.nvim', config = pkg_trouble, keys = { '<leader>vq', '<leader>vl' } },
     { 'rust-lang/rust.vim' },
 
     -- Utils
-    { 'toppair/peek.nvim', config = pkg_peek, ft = 'markdown', build = 'deno task build:fast' },
+    { 'toppair/peek.nvim', config = pkg_md, ft = 'markdown', build = 'deno task build:fast' },
     { 'Rykka/InstantRst', config = pkg_rst, ft = 'rst', dependencies = { 'Rykka/riv.vim' } },
+    { 'lervag/vimtex', config = pkg_tex, ft = 'tex' },
+    { 'uga-rosa/ccc.nvim', config = pkg_ccc, keys = { '<leader>tc', '<leader>lp' } },
+    { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, keys = { { '<M-w>', mode = 'i' } } },
+    { 'itchyny/screensaver.vim', keys = { { '<leader>ss', '<Cmd>ScreenSaver clock<CR>' } } },
     { 'tyru/open-browser.vim', config = pkg_open_browser },
     { 'voldikss/vim-translator', config = pkg_translator },
-    { 'lervag/vimtex', ft = 'tex' },
     { 'brglng/vim-im-select' },
 }
 
@@ -928,7 +1151,15 @@ local function pkg_lazy()
 
     vim.api.nvim_create_augroup('v.Pkgs', { clear = true })
 
-    vim.cmd.source(vim.env.DotVimVimL .. '/pkgs.vim')
+    vim.g.loaded_gzip = 1
+    vim.g.loaded_tarPlugin = 1
+    vim.g.loaded_tar = 1
+    vim.g.loaded_zipPlugin = 1
+    vim.g.loaded_zip = 1
+    vim.g.loaded_netrw = 1
+    vim.g.loaded_netrwPlugin = 1
+    vim.g.loaded_matchit = 1
+    vim.g.loaded_matchparen = 1
     require('lazy').setup(pkgs, {
         root = bundle,
         defaults = { lazy = false },
@@ -945,6 +1176,7 @@ local function pkg_lazy()
         callback = function()
             vim.api.nvim_set_hl(0, 'HopPreview', { fg = '#b8bb26', bold = true, ctermfg = 142 })
             vim.api.nvim_set_hl(0, 'CursorWord', { bg = '#505060', ctermbg = 60 })
+            vim.api.nvim_set_hl(0, 'FloatermBorder', { link = 'Constant' })
             vim.api.nvim_set_hl(0, 'TranslatorBorder', { link = 'Constant' })
         end,
     })

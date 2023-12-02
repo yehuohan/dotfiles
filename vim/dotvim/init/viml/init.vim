@@ -60,6 +60,5 @@ map <Tab> <Tab>
 source $DotVimVimL/env.vim
 source $DotVimVimL/use.vim
 source $DotVimVimL/pkgs.vim
-source $DotVimVimL/pkgs.ext.vim
 source $DotVimVimL/mods.vim
 source $DotVimVimL/sets.vim
