@@ -123,49 +123,6 @@ nnoremap <leader>ty
     \           [['buffer', 'tab'], ['buffer', ''], ['', 'tab']][g:Popc_tablineLayout])<CR>
 " }}}
 
-" nerdtree {{{ 目录树导航
-let g:NERDTreeShowHidden = 1
-let g:NERDTreeMinimalUI = 1
-let g:NERDTreeStatusline = -1
-let g:NERDTreeDirArrowExpandable = '▸'
-let g:NERDTreeDirArrowCollapsible = '▾'
-let g:NERDTreeMapActivateNode = 'o'
-let g:NERDTreeMapOpenExpl = ''
-let g:NERDTreeMapOpenRecursively = ''
-let g:NERDTreeMapPreview = 'go'
-let g:NERDTreeMapCloseDir = 'x'
-let g:NERDTreeMapOpenInTab = 't'
-let g:NERDTreeMapOpenInTabSilent = 'gt'
-let g:NERDTreeMapOpenVSplit = 'i'
-let g:NERDTreeMapOpenSplit = 'gi'
-let g:NERDTreeMapPreviewSplit = ''
-let g:NERDTreeMapPreviewVSplit = ''
-let g:NERDTreeMapJumpLastChild = 'J'
-let g:NERDTreeMapJumpFirstChild = 'K'
-let g:NERDTreeMapJumpNextSibling = '<C-n>'
-let g:NERDTreeMapJumpPrevSibling = '<C-p>'
-let g:NERDTreeMapJumpParent = 'p'
-let g:NERDTreeMapChangeRoot = 'cd'
-let g:NERDTreeMapChdir = ''
-let g:NERDTreeMapCWD = ''
-let g:NERDTreeMapUpdir = 'U'
-let g:NERDTreeMapUpdirKeepOpen = 'u'
-let g:NERDTreeMapRefresh = 'r'
-let g:NERDTreeMapRefreshRoot = 'R'
-let g:NERDTreeMapToggleHidden = '.'
-let g:NERDTreeMapToggleZoom = 'Z'
-let g:NERDTreeMapQuit = 'q'
-let g:NERDTreeMapToggleFiles = 'F'
-let g:NERDTreeMapMenu = 'M'
-let g:NERDTreeMapToggleBookmarks = ''
-nnoremap <leader>te :NERDTreeToggle<CR>
-if has('nvim')
-nnoremap <leader>tE <Cmd>execute ':NERDTree ' . fnamemodify(nvim_buf_get_name(0), ':p:h')<CR>
-else
-nnoremap <leader>tE <Cmd>execute ':NERDTree ' . Expand('%', ':p:h')<CR>
-endif
-" }}}
-
 " screensaver {{{ 屏保
 nnoremap <leader>ss <Cmd>ScreenSaver clock<CR>
 " }}}

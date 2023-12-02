@@ -3,7 +3,7 @@ local m = require('v.nlib').m
 
 --- Symbols
 local sym = {
-    sep = { '(', ')' },
+    sep = { ' ', '' },
     row = '',
     col = '$',
     vos = '',
@@ -202,18 +202,14 @@ local function stls()
         fallthrough = false,
         {
             condition = function()
-                return conds.buffer_matches({
-                    filetype = { 'vim%-plug', 'OverseerList', 'NvimTree', 'nerdtree', 'vista' },
-                })
+                return conds.buffer_matches({ filetype = { 'OverseerList', 'neo-tree' } })
             end,
             ComType,
         },
         {
             condition = function()
                 return conds.is_not_active()
-                    or conds.buffer_matches({
-                        buftype = { 'help', 'terminal' },
-                    })
+                    or conds.buffer_matches({ buftype = { 'help', 'terminal' } })
             end,
             ComFile,
         },
@@ -297,8 +293,7 @@ end
 
 --- Winbars
 local function disabled_bars(args)
-    local bar_excluded_filetypes =
-        { 'alpha', 'vim%-plug', 'OverseerList', 'NvimTree', 'nerdtree', 'vista' }
+    local bar_excluded_filetypes = { 'alpha', 'OverseerList', 'neo-tree' }
     local bar_excluded_buftypes = { 'nofile', 'terminal', 'quickfix' }
     local filetype = vim.tbl_contains(bar_excluded_filetypes, vim.bo[args.buf].filetype)
     local buftype = vim.tbl_contains(bar_excluded_buftypes, vim.bo[args.buf].buftype)

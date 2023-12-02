@@ -39,7 +39,7 @@ end
 
 -- 自动高亮当前word
 local function pkg_cursorword()
-    vim.g.cursorword_disable_filetypes = { 'nerdtree', 'NvimTree' }
+    vim.g.cursorword_disable_filetypes = { 'neo-tree' }
     vim.g.cursorword_disable_at_startup = false
     vim.g.cursorword_min_width = 2
     vim.g.cursorword_max_width = 64
@@ -101,19 +101,21 @@ local function pkg_cinnamon()
 end
 
 -- 窗口跳转
-local function pkg_winpick()
-    local winpick = require('winpick')
-    winpick.setup({
-        border = 'none',
-        prompt = 'Pick a window: ',
-        format_label = winpick.defaults.format_label,
-        chars = { 'f', 'j', 'd', 'k', 's', 'l' },
+local function pkg_window_picker()
+    local window_picker = require('window-picker')
+    window_picker.setup({
+        hint = 'floating-big-letter',
+        filter_rules = {
+            autoselect_one = false,
+            include_current_win = true,
+            bo = { filetype = {}, buftype = {} },
+        },
     })
     m.nnore({
         '<leader>wi',
         function()
-            local winid, _ = winpick.select()
-            if winid then
+            local winid = window_picker.pick_window()
+            if winid and vim.api.nvim_win_is_valid(winid) then
                 vim.api.nvim_set_current_win(winid)
             end
         end,
@@ -279,72 +281,128 @@ local function pkg_icon_picker()
     m.nnore({ '<leader><leader>i', ':IconPickerInsert<Space>' })
 end
 
--- 目录树导航
-local function pkg_tree()
-    require('nvim-tree').setup({
-        on_attach = function(bufnr)
-            local tapi = require('nvim-tree.api')
-            -- stylua: ignore start
-            m.nnore({'<CR>'         , tapi.node.open.edit             , buffer = bufnr, silent = true, nowait = true, desc = 'Open'                  })
-            m.nnore({'o'            , tapi.node.open.edit             , buffer = bufnr, silent = true, nowait = true, desc = 'Open'                  })
-            m.nnore({'<2-LeftMouse>', tapi.node.open.edit             , buffer = bufnr, silent = true, nowait = true, desc = 'Open'                  })
-            m.nnore({'i'            , tapi.node.open.vertical         , buffer = bufnr, silent = true, nowait = true, desc = 'Open: Vertical Split'  })
-            m.nnore({'gi'           , tapi.node.open.horizontal       , buffer = bufnr, silent = true, nowait = true, desc = 'Open: Horizontal Split'})
-            m.nnore({'t'            , tapi.node.open.tab              , buffer = bufnr, silent = true, nowait = true, desc = 'Open: New Tab'         })
-            m.nnore({'<Tab>'        , tapi.node.open.preview          , buffer = bufnr, silent = true, nowait = true, desc = 'Open Preview'          })
-            m.nnore({'cd'           , tapi.tree.change_root_to_node   , buffer = bufnr, silent = true, nowait = true, desc = 'CD'                    })
-            m.nnore({'u'            , tapi.tree.change_root_to_parent , buffer = bufnr, silent = true, nowait = true, desc = 'Up'                    })
-            m.nnore({'K'            , tapi.node.navigate.sibling.first, buffer = bufnr, silent = true, nowait = true, desc = 'First Sibling'         })
-            m.nnore({'J'            , tapi.node.navigate.sibling.last , buffer = bufnr, silent = true, nowait = true, desc = 'Last Sibling'          })
-            m.nnore({'<C-p>'        , tapi.node.navigate.sibling.prev , buffer = bufnr, silent = true, nowait = true, desc = 'Previous Sibling'      })
-            m.nnore({'<C-n>'        , tapi.node.navigate.sibling.next , buffer = bufnr, silent = true, nowait = true, desc = 'Next Sibling'          })
-            m.nnore({'p'            , tapi.node.navigate.parent       , buffer = bufnr, silent = true, nowait = true, desc = 'Parent Directory'      })
-            m.nnore({'.'            , tapi.tree.toggle_hidden_filter  , buffer = bufnr, silent = true, nowait = true, desc = 'Toggle Dotfiles'       })
-            m.nnore({'m'            , tapi.node.show_info_popup       , buffer = bufnr, silent = true, nowait = true, desc = 'Info'                  })
-            m.nnore({'r'            , tapi.tree.reload                , buffer = bufnr, silent = true, nowait = true, desc = 'Refresh'               })
-            m.nnore({'q'            , tapi.tree.close                 , buffer = bufnr, silent = true, nowait = true, desc = 'Close'                 })
-            m.nnore({'?'            , tapi.tree.toggle_help           , buffer = bufnr, silent = true, nowait = true, desc = 'Help'                  })
-            m.nnore({'O'            , tapi.node.run.system            , buffer = bufnr, silent = true, nowait = true, desc = 'Run System'            })
-            m.nnore({'A'            , tapi.fs.create                  , buffer = bufnr, silent = true, nowait = true, desc = 'Create'                })
-            m.nnore({'D'            , tapi.fs.remove                  , buffer = bufnr, silent = true, nowait = true, desc = 'Delete'                })
-            m.nnore({'R'            , tapi.fs.rename                  , buffer = bufnr, silent = true, nowait = true, desc = 'Rename'                })
-            m.nnore({'<C-r>'        , tapi.fs.rename_sub              , buffer = bufnr, silent = true, nowait = true, desc = 'Rename: Omit Filename' })
-            m.nnore({'X'            , tapi.fs.cut                     , buffer = bufnr, silent = true, nowait = true, desc = 'Cut'                   })
-            m.nnore({'C'            , tapi.fs.copy.node               , buffer = bufnr, silent = true, nowait = true, desc = 'Copy'                  })
-            m.nnore({'P'            , tapi.fs.paste                   , buffer = bufnr, silent = true, nowait = true, desc = 'Paste'                 })
-            m.nnore({'y'            , tapi.fs.copy.filename           , buffer = bufnr, silent = true, nowait = true, desc = 'Copy Name'             })
-            m.nnore({'Y'            , tapi.fs.copy.absolute_path      , buffer = bufnr, silent = true, nowait = true, desc = 'Copy Absolute Path'    })
-            -- stylua: ignore end
-        end,
-        auto_reload_on_write = false,
-        renderer = {
-            indent_markers = {
-                enable = true,
-                icons = {
-                    corner = '└ ',
-                    edge = '│ ',
-                    none = '  ',
+-- 目录树
+local function pkg_neotree()
+    --- Goto first sibling
+    local first_sibling = function(state)
+        local node = state.tree:get_node()
+        local parent = state.tree:get_node(node:get_parent_id())
+        local siblings = parent:get_child_ids()
+        require('neo-tree.ui.renderer').focus_node(state, siblings[1])
+    end
+
+    --- Goto last sibling
+    local last_sibling = function(state)
+        local node = state.tree:get_node()
+        local parent = state.tree:get_node(node:get_parent_id())
+        local siblings = parent:get_child_ids()
+        require('neo-tree.ui.renderer').focus_node(state, siblings[#siblings])
+    end
+
+    --- Open file with systme
+    local open_system = function(state)
+        local node = state.tree:get_node()
+        local path = node.path
+        local ostype = os.getenv('OS')
+        if ostype == 'Windows_NT' then
+            os.execute('start ' .. path)
+        elseif ostype == 'Darwin' then
+            os.execute('open ' .. path)
+        else
+            os.execute('xdg-open ' .. path)
+        end
+    end
+
+    --- Copy filepath from file  node
+    local copy_filepath = function(mods)
+        return function(state)
+            local node = state.tree:get_node()
+            local path = node:get_id()
+            local copy = vim.fn.fnamemodify(path, mods)
+            vim.fn.setreg('0', copy)
+            vim.fn.setreg('*', copy)
+            vim.fn.setreg('+', copy)
+            vim.notify('Copied: ' .. copy)
+        end
+    end
+
+    require('neo-tree').setup({
+        sources = { 'filesystem' },
+        enable_diagnostics = false,
+        enable_git_status = false,
+        enable_modified_markers = false,
+        enable_opened_markers = false,
+        enable_refresh_on_write = false,
+        log_to_file = false,
+        use_default_mappings = false,
+        default_component_configs = {
+            file_size = { enabled = false },
+            type = { enabled = false },
+            last_modified = { enabled = false },
+            created = { enabled = false },
+            symlink_target = { enabled = true },
+        },
+        commands = {
+            first_sibling = first_sibling,
+            last_sibling = last_sibling,
+            open_system = open_system,
+            yank_absolute_path = copy_filepath(':p'),
+            yank_filename = copy_filepath(':t'),
+        },
+        window = {
+            width = 30,
+            mappings = {
+                ['<CR>'] = 'open',
+                ['<2-LeftMouse>'] = 'open',
+                ['o'] = 'open',
+                ['<Tab>'] = 'open_with_window_picker',
+                ['i'] = 'open_vsplit',
+                ['gi'] = 'open_split',
+                ['t'] = 'open_tabnew',
+                ['p'] = { 'toggle_preview', config = { use_float = true } },
+                ['J'] = last_sibling,
+                ['K'] = first_sibling,
+                ['r'] = 'refresh',
+                ['H'] = 'close_node',
+                ['Z'] = 'close_all_subnodes',
+                ['q'] = 'close_window',
+                ['M'] = 'toggle_auto_expand_width',
+                ['?'] = 'show_help',
+                ['<Esc>'] = 'cancel',
+            },
+        },
+        filesystem = {
+            window = {
+                mappings = {
+                    ['.'] = 'toggle_hidden',
+                    ['u'] = 'navigate_up',
+                    ['cd'] = 'set_root',
+                    ['m'] = 'show_file_details',
+                    ['n'] = { 'order_by_name', nowait = false },
+                    ['N'] = { 'order_by_type', nowait = false },
+                    ['O'] = 'open_system',
+                    ['y'] = 'yank_filename',
+                    ['Y'] = 'yank_absolute_path',
+                    ['a'] = { 'add', config = { show_path = 'absolute' } },
+                    ['A'] = 'add_directory',
+                    ['D'] = 'delete',
+                    ['R'] = 'rename',
+                    ['X'] = 'cut_to_clipboard',
+                    ['C'] = 'copy_to_clipboard',
+                    ['P'] = 'paste_from_clipboard',
+                    ['L'] = 'fuzzy_finder',
+                },
+                fuzzy_finder_mappings = {
+                    ['<M-j>'] = 'move_cursor_down',
+                    ['<M-k>'] = 'move_cursor_up',
                 },
             },
+            bind_to_cwd = false,
+            use_libuv_file_watcher = false,
         },
-        actions = {
-            open_file = {
-                resize_window = false,
-            },
-        },
-        filesystem_watchers = { enable = false },
-        diagnostics = { enable = false },
-        git = { enable = false },
     })
-    m.nnore({ '<leader>tt', ':NvimTreeToggle<CR>' })
-    m.nnore({
-        '<leader>tT',
-        function()
-            local tapi = require('nvim-tree.api')
-            tapi.tree.close()
-            tapi.tree.open(vim.fs.dirname(vim.api.nvim_buf_get_name(0)))
-        end,
-    })
+    m.nnore({ '<leader>tt', ':Neotree toggle<CR>' })
+    m.nnore({ '<leader>tT', ':Neotree left reveal_force_cwd<CR>' })
 end
 
 -- 模糊查找
@@ -368,33 +426,6 @@ local function pkg_telescope()
     m.nnore({ '<leader>nf', ':Telescope find_files<CR>' })
     m.nnore({ '<leader>nl', ':Telescope live_grep<CR>' })
     m.nnore({ '<leader>nm', ':Telescope oldfiles<CR>' })
-end
-
--- 彩虹括号
-local function pkg_rainbow()
-    local rainbow = require('rainbow-delimiters')
-    m.nnore({ '<leader>tr', function() rainbow.toggle(0) end })
-end
-
--- 高亮缩进块
-local function pkg_hlchunk()
-    require('hlchunk').setup({
-        chunk = {
-            enable = true,
-            use_treesitter = use.nts,
-            style = {
-                { fg = '#fe8019' }, -- Normal chunk
-                { fg = '#c21f30' }, -- Wrong chunk
-            },
-        },
-        indent = {
-            enable = true,
-            chars = { '⁞' },
-            style = { 'Gray30' },
-        },
-        line_num = { enable = false },
-        blank = { enable = false },
-    })
 end
 
 -- Mini插件库
@@ -502,21 +533,6 @@ local function pkg_overseer()
     })
 end
 
--- 列表视图
-local function pkg_trouble()
-    require('trouble').setup({
-        mode = 'quickfix',
-        icons = true,
-        action_keys = {
-            jump_close = { 'O' },
-            toggle_fold = { 'zA', 'za', 'o' },
-        },
-        auto_preview = false,
-    })
-    m.nnore({ '<leader>vq', ':TroubleToggle quickfix<CR>' })
-    m.nnore({ '<leader>vl', ':TroubleToggle loclist<CR>' })
-end
-
 -- 代码格式化
 local function pkg_conform()
     local conform = require('conform')
@@ -530,6 +546,29 @@ local function pkg_conform()
         },
     })
     m.nore({ '<leader>fo', conform.format })
+end
+
+-- 批量注释
+local function pkg_comment()
+    require('Comment').setup({
+        toggler = { line = 'gcc', block = 'gbc' },
+        opleader = { line = 'gc', block = 'gb' },
+        mappings = {
+            basic = true,
+            extra = false,
+            extended = false,
+        },
+    })
+    local comment = require('Comment.api')
+    m.nnore({ '<leader>ci', function() comment.toggle.linewise.count(vim.v.count1) end })
+    m.nnore({ '<leader>cl', function() comment.comment.linewise.count(vim.v.count1) end })
+    m.nnore({
+        '<leader>cu',
+        function()
+            -- ignore errors when uncommenting a non-commented line
+            pcall(function() comment.uncomment.linewise.count(vim.v.count1) end)
+        end,
+    })
 end
 
 -- 自动括号
@@ -565,26 +604,30 @@ local function pkg_surround()
     m.nmap({ '<leader>sW', 'ySiw' })
 end
 
--- 批量注释
-local function pkg_comment()
-    require('Comment').setup({
-        toggler = { line = 'gcc', block = 'gbc' },
-        opleader = { line = 'gc', block = 'gb' },
-        mappings = {
-            basic = true,
-            extra = false,
-            extended = false,
+-- 彩虹括号
+local function pkg_rainbow()
+    local rainbow = require('rainbow-delimiters')
+    m.nnore({ '<leader>tr', function() rainbow.toggle(0) end })
+end
+
+-- 高亮缩进块
+local function pkg_hlchunk()
+    require('hlchunk').setup({
+        chunk = {
+            enable = true,
+            use_treesitter = use.nts,
+            style = {
+                { fg = '#fe8019' }, -- Normal chunk
+                { fg = '#c21f30' }, -- Wrong chunk
+            },
         },
-    })
-    local comment = require('Comment.api')
-    m.nnore({ '<leader>ci', function() comment.toggle.linewise.count(vim.v.count1) end })
-    m.nnore({ '<leader>cl', function() comment.comment.linewise.count(vim.v.count1) end })
-    m.nnore({
-        '<leader>cu',
-        function()
-            -- ignore errors when uncommenting a non-commented line
-            pcall(function() comment.uncomment.linewise.count(vim.v.count1) end)
-        end,
+        indent = {
+            enable = true,
+            chars = { '⁞' },
+            style = { 'Gray30' },
+        },
+        line_num = { enable = false },
+        blank = { enable = false },
     })
 end
 
@@ -609,6 +652,21 @@ local function pkg_ccc()
             ['H'] = ccc.mapping.decrease10,
         },
     })
+end
+
+-- 列表视图
+local function pkg_trouble()
+    require('trouble').setup({
+        mode = 'quickfix',
+        icons = true,
+        action_keys = {
+            jump_close = { 'O' },
+            toggle_fold = { 'zA', 'za', 'o' },
+        },
+        auto_preview = false,
+    })
+    m.nnore({ '<leader>vq', ':TroubleToggle quickfix<CR>' })
+    m.nnore({ '<leader>vl', ':TroubleToggle loclist<CR>' })
 end
 
 -- Coc补全
@@ -725,7 +783,7 @@ local pkgs = {
     { 'xiyaowong/nvim-cursorword', config = pkg_cursorword },
     { 'booperlv/nvim-gomove', config = pkg_gomove },
     { 'declancm/cinnamon.nvim', config = pkg_cinnamon },
-    { 'gbrlsnchs/winpick.nvim', config = pkg_winpick },
+    { 's1n7ax/nvim-window-picker', config = pkg_window_picker },
     { 'sindrets/winshift.nvim', config = pkg_winshift },
     { 'andymass/vim-matchup' },
     { 'mg979/vim-visual-multi' },
@@ -733,6 +791,7 @@ local pkgs = {
     { 'terryma/vim-expand-region' },
 
     -- Component
+    { 'nvim-tree/nvim-web-devicons', lazy = true, enabled = use.ui.icon },
     {
         'rebelot/heirline.nvim',
         config = require('v.pkgs.nstl').setup,
@@ -741,23 +800,21 @@ local pkgs = {
     { 'goolord/alpha-nvim', config = pkg_alpha },
     { 'rcarriga/nvim-notify', config = pkg_notify },
     { 'stevearc/dressing.nvim', opts = {} },
-    {
-        'kevinhwang91/nvim-ufo',
-        config = pkg_ufo,
-        dependencies = { 'kevinhwang91/promise-async' },
-    },
+    { 'kevinhwang91/nvim-ufo', config = pkg_ufo, dependencies = { 'kevinhwang91/promise-async' } },
     { 'kevinhwang91/nvim-bqf', config = pkg_bqf, ft = 'qf' },
     { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, keys = { { '<M-w>', mode = 'i' } } },
     { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' } },
-    { 'nvim-tree/nvim-tree.lua', config = pkg_tree, keys = { '<leader>tt', '<leader>tT' } },
+    {
+        'nvim-neo-tree/neo-tree.nvim',
+        config = pkg_neotree,
+        dependencies = { 'nvim-lua/plenary.nvim', 'MunifTanjim/nui.nvim' },
+        keys = { '<leader>tt', '<leader>tT' },
+    },
     {
         'nvim-telescope/telescope.nvim',
         config = pkg_telescope,
         keys = { '<leader><leader>n', '<leader>nf', '<leader>nl', '<leader>nm' },
     },
-    { 'nvim-tree/nvim-web-devicons', lazy = true, enabled = use.ui.icon },
-    { 'HiPhish/rainbow-delimiters.nvim', config = pkg_rainbow },
-    { 'shellRaining/hlchunk.nvim', config = pkg_hlchunk },
     { 'echasnovski/mini.nvim', config = pkg_mini },
     { 'morhetz/gruvbox' },
     { 'rakr/vim-one' },
@@ -765,11 +822,6 @@ local pkgs = {
     { 'yehuohan/popc' },
     { 'yehuohan/popset', dependencies = { 'yehuohan/popc' } },
     { 'yehuohan/popc-floaterm', dependencies = { 'yehuohan/popc' } },
-    {
-        'scrooloose/nerdtree',
-        dependencies = { { 'ryanoasis/vim-devicons', enabled = use.ui.icon } },
-        cmd = { 'NERDTreeToggle', 'NERDTree' },
-    },
     { 'itchyny/screensaver.vim' },
     { 'junegunn/fzf' },
     { 'junegunn/fzf.vim' },
@@ -809,12 +861,14 @@ local pkgs = {
         config = pkg_treesitter,
     },
     { 'stevearc/overseer.nvim', config = pkg_overseer },
-    { 'folke/trouble.nvim', config = pkg_trouble, keys = { '<leader>vq', '<leader>vl' } },
     { 'stevearc/conform.nvim', config = pkg_conform },
+    { 'numToStr/Comment.nvim', config = pkg_comment },
     { 'windwp/nvim-autopairs', config = pkg_autopairs },
     { 'kylechui/nvim-surround', config = pkg_surround },
-    { 'numToStr/Comment.nvim', config = pkg_comment },
+    { 'HiPhish/rainbow-delimiters.nvim', config = pkg_rainbow },
+    { 'shellRaining/hlchunk.nvim', config = pkg_hlchunk },
     { 'uga-rosa/ccc.nvim', config = pkg_ccc, keys = { '<leader>tc', '<leader>lp' } },
+    { 'folke/trouble.nvim', config = pkg_trouble, keys = { '<leader>vq', '<leader>vl' } },
     {
         'neoclide/coc.nvim',
         enabled = use.coc,

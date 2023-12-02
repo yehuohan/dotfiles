@@ -36,7 +36,7 @@ nnoremap <M-.>      :call signature#mark#Goto('next', 'line', 'pos')<CR>
 " illuminate {{{ 自动高亮
 let g:Illuminate_useDeprecated = 1
 let g:Illuminate_delay = 200
-let g:Illuminate_ftblacklist = ['nerdtree', 'NvimTree']
+let g:Illuminate_ftblacklist = ['nerdtree']
 nnoremap <leader>tg :IlluminationToggle<CR>
 highlight link illuminatedWord MatchParen
 " }}}
@@ -137,7 +137,7 @@ let g:lightline = {
             \ 'chk_indent'  : 'error',
             \ 'chk_trailing': 'error',
             \ },
-    \ 'fallback' : {'Popc': 0, 'vista': 'Vista', 'nerdtree': 'NerdTree', 'NvimTree': 'NvimTree'},
+    \ 'fallback' : {'Popc': 0, 'vista': 'Vista', 'nerdtree': 'NerdTree'},
     \ }
 if s:use.ui.icon
 let g:lightline.separator            = {'left': '', 'right': ''}
@@ -257,6 +257,45 @@ let g:indentLinet_color_term = 200      " 设置标识符颜色
 let g:indentLine_concealcursor = 'nvic'
 let g:indentLine_fileTypeExclude = ['startify', 'alpha']
 nnoremap <leader>ti :IndentLinesToggle<CR>
+" }}}
+
+" nerdtree {{{ 目录树导航
+let g:NERDTreeShowHidden = 1
+let g:NERDTreeMinimalUI = 1
+let g:NERDTreeStatusline = -1
+let g:NERDTreeDirArrowExpandable = '▸'
+let g:NERDTreeDirArrowCollapsible = '▾'
+let g:NERDTreeMapActivateNode = 'o'
+let g:NERDTreeMapOpenExpl = ''
+let g:NERDTreeMapOpenRecursively = ''
+let g:NERDTreeMapPreview = 'go'
+let g:NERDTreeMapCloseDir = 'x'
+let g:NERDTreeMapOpenInTab = 't'
+let g:NERDTreeMapOpenInTabSilent = 'gt'
+let g:NERDTreeMapOpenVSplit = 'i'
+let g:NERDTreeMapOpenSplit = 'gi'
+let g:NERDTreeMapPreviewSplit = ''
+let g:NERDTreeMapPreviewVSplit = ''
+let g:NERDTreeMapJumpLastChild = 'J'
+let g:NERDTreeMapJumpFirstChild = 'K'
+let g:NERDTreeMapJumpNextSibling = '<C-n>'
+let g:NERDTreeMapJumpPrevSibling = '<C-p>'
+let g:NERDTreeMapJumpParent = 'p'
+let g:NERDTreeMapChangeRoot = 'cd'
+let g:NERDTreeMapChdir = ''
+let g:NERDTreeMapCWD = ''
+let g:NERDTreeMapUpdir = 'U'
+let g:NERDTreeMapUpdirKeepOpen = 'u'
+let g:NERDTreeMapRefresh = 'r'
+let g:NERDTreeMapRefreshRoot = 'R'
+let g:NERDTreeMapToggleHidden = '.'
+let g:NERDTreeMapToggleZoom = 'Z'
+let g:NERDTreeMapQuit = 'q'
+let g:NERDTreeMapToggleFiles = 'F'
+let g:NERDTreeMapMenu = 'M'
+let g:NERDTreeMapToggleBookmarks = ''
+nnoremap <leader>tt :NERDTreeToggle<CR>
+nnoremap <leader>tT <Cmd>execute ':NERDTree ' . Expand('%', ':p:h')<CR>
 " }}}
 " }}}
 
