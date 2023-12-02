@@ -164,7 +164,7 @@ nnoremap <leader>lf :LeaderfFile<CR>
 nnoremap <leader>lu :LeaderfFunction<CR>
 nnoremap <leader>ll :LeaderfLine<CR>
 nnoremap <leader>lb :LeaderfBuffer<CR>
-nnoremap <leader>lm :LeaderfMru<CR>
+nnoremap <leader>lr :LeaderfMru<CR>
 endif
 " }}}
 " }}}

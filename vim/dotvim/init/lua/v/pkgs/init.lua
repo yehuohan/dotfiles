@@ -378,8 +378,8 @@ local function pkg_neotree()
                     ['u'] = 'navigate_up',
                     ['cd'] = 'set_root',
                     ['m'] = 'show_file_details',
-                    ['n'] = { 'order_by_name', nowait = false },
-                    ['N'] = { 'order_by_type', nowait = false },
+                    ['dn'] = { 'order_by_name', nowait = false },
+                    ['dt'] = { 'order_by_type', nowait = false },
                     ['O'] = 'open_system',
                     ['y'] = 'yank_filename',
                     ['Y'] = 'yank_absolute_path',
@@ -407,7 +407,8 @@ end
 
 -- 模糊查找
 local function pkg_telescope()
-    require('telescope').setup({
+    local telescope = require('telescope')
+    telescope.setup({
         defaults = {
             borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
             color_devicons = true,
@@ -421,11 +422,22 @@ local function pkg_telescope()
                 },
             },
         },
+        extensions = {
+            fzf = {
+                override_generic_sorter = true,
+                override_file_sorter = true,
+            },
+            frecency = {
+                db_root = vim.env.DotVimLocal,
+                sorter = require('telescope.config').values.file_sorter(),
+            },
+        },
     })
+    telescope.load_extension('fzf')
+    telescope.load_extension('frecency')
     m.nnore({ '<leader><leader>n', ':Telescope<Space>' })
     m.nnore({ '<leader>nf', ':Telescope find_files<CR>' })
-    m.nnore({ '<leader>nl', ':Telescope live_grep<CR>' })
-    m.nnore({ '<leader>nm', ':Telescope oldfiles<CR>' })
+    m.nnore({ '<leader>nr', ':Telescope frecency<CR>' })
 end
 
 -- Mini插件库
@@ -813,8 +825,10 @@ local pkgs = {
     {
         'nvim-telescope/telescope.nvim',
         config = pkg_telescope,
-        keys = { '<leader><leader>n', '<leader>nf', '<leader>nl', '<leader>nm' },
+        keys = { '<leader><leader>n', '<leader>nf', '<leader>nr' },
     },
+    { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+    { 'nvim-telescope/telescope-frecency.nvim' },
     { 'echasnovski/mini.nvim', config = pkg_mini },
     { 'morhetz/gruvbox' },
     { 'rakr/vim-one' },
@@ -823,8 +837,7 @@ local pkgs = {
     { 'yehuohan/popset', dependencies = { 'yehuohan/popc' } },
     { 'yehuohan/popc-floaterm', dependencies = { 'yehuohan/popc' } },
     { 'itchyny/screensaver.vim' },
-    { 'junegunn/fzf' },
-    { 'junegunn/fzf.vim' },
+    { 'junegunn/fzf.vim', dependencies = { 'junegunn/fzf' } },
     { 'Yggdroot/LeaderF', enabled = use.has_py, build = ':LeaderfInstallCExtension' },
 
     -- Coding
@@ -855,11 +868,7 @@ local pkgs = {
             'nvim-lua/plenary.nvim',
         },
     },
-    {
-        'nvim-treesitter/nvim-treesitter',
-        enabled = use.nts,
-        config = pkg_treesitter,
-    },
+    { 'nvim-treesitter/nvim-treesitter', enabled = use.nts, config = pkg_treesitter },
     { 'stevearc/overseer.nvim', config = pkg_overseer },
     { 'stevearc/conform.nvim', config = pkg_conform },
     { 'numToStr/Comment.nvim', config = pkg_comment },
@@ -885,12 +894,7 @@ local pkgs = {
     { 'rust-lang/rust.vim' },
 
     -- Utils
-    {
-        'toppair/peek.nvim',
-        config = pkg_peek,
-        ft = 'markdown',
-        build = 'deno task --quiet build:fast',
-    },
+    { 'toppair/peek.nvim', config = pkg_peek, ft = 'markdown', build = 'deno task build:fast' },
     { 'Rykka/InstantRst', config = pkg_rst, ft = 'rst', dependencies = { 'Rykka/riv.vim' } },
     { 'tyru/open-browser.vim', config = pkg_open_browser },
     { 'voldikss/vim-translator', config = pkg_translator },
