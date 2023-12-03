@@ -39,16 +39,13 @@ scoop bucket add nerd-fonts https://github.com/matthewjberger/scoop-nerd-fonts.g
 scoop install neovim neovide nvy vim-nightly -a 64bit
 scoop install bat fd fzf ripgrep lf universal-ctags
 scoop install 7zip cmake ninja
+scoop install vcpkg # Requires stable network access to github
 scoop install lua python deno nodejs # Then run apps/python/current/install-pep-514.reg
 scoop install conemu wox snipaste everything  screentogif rapidee
 scoop install notepadnext honeyview qttabbar-indiff-np
 scoop download clink -h
 scoop install CodeNewRoman-NF-Mono FantasqueSansMono-NF-Mono -s
 scoop install https://raw.githubusercontent.com/daipeihust/im-select/master/bucket/im-select.json
-
-scoop install vcpkg # Requires stable network access to github
-# x64-windows, x64-windows-static, x64-mingw-dynamic, x64-mingw-static, arm64-android
-vcpkg install vulkan-headers --triplet x64-mingw-static
 
 scoop install vulkan renderdoc shadered # Then run apps/vulkan/current/install-vk-layers.ps1
 scoop install cuda11.1 # Prefer conda install cudatoolkit cudnn
