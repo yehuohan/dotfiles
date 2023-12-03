@@ -544,7 +544,7 @@ endif
 " ultisnips {{{ 代码片段
 if s:use.has_py
 function! PkgLoadSnip(filename)
-    return join(readfile($DotVimWork . '/template/' . a:filename), "\n")
+    return join(readfile($DotVimWork . '/' . a:filename), "\n")
 endfunction
 let g:UltiSnipsEditSplit = 'vertical'
 let g:UltiSnipsSnippetDirectories = [$DotVimWork . '/snips', 'UltiSnips']

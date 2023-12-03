@@ -665,7 +665,7 @@ end
 local function pkg_ultisnips()
     vim.cmd([[
 function! PkgLoadSnip(filename)
-    return join(readfile($DotVimWork . '/template/' . a:filename), "\n")
+    return join(readfile($DotVimWork . '/' . a:filename), "\n")
 endfunction
     ]])
     vim.g.UltiSnipsEditSplit = 'vertical'
