@@ -422,6 +422,26 @@ local function pkg_neotree()
         end
     end
 
+    --- Edit file
+    local edit = function(preview)
+        return function(state)
+            require('neo-tree.sources.filesystem.commands').open(state)
+            local node = state.tree:get_node()
+            if node.type == 'file' then
+                if vim.fn.bufnr('#') > 0 then
+                    -- No idea why the opened buffer may be unlisted(nvim-tree doesnt' have this issue)
+                    -- Switch buffer twice to make the opened buffer detected by popc
+                    local codes = vim.api.nvim_replace_termcodes('<C-^>', true, true, true)
+                    vim.cmd.normal({ args = { codes }, bang = true })
+                    vim.cmd.normal({ args = { codes }, bang = true })
+                end
+                if preview then
+                    vim.cmd.wincmd('p')
+                end
+            end
+        end
+    end
+
     require('neo-tree').setup({
         sources = { 'filesystem' },
         enable_diagnostics = false,
@@ -439,6 +459,8 @@ local function pkg_neotree()
             symlink_target = { enabled = true },
         },
         commands = {
+            edit = edit(false),
+            edit_preview = edit(true),
             first_sibling = first_sibling,
             last_sibling = last_sibling,
             open_system = open_system,
@@ -448,9 +470,9 @@ local function pkg_neotree()
         window = {
             width = 30,
             mappings = {
-                ['<CR>'] = 'open',
-                ['<2-LeftMouse>'] = 'open',
-                ['o'] = 'open',
+                ['<CR>'] = 'edit',
+                ['<2-LeftMouse>'] = 'edit',
+                ['o'] = 'edit_preview',
                 ['<Tab>'] = 'open_with_window_picker',
                 ['i'] = 'open_vsplit',
                 ['gi'] = 'open_split',
@@ -518,8 +540,12 @@ local function pkg_telescope()
                     ['<M-k>'] = 'move_selection_previous',
                     ['<M-n>'] = 'results_scrolling_down',
                     ['<M-m>'] = 'results_scrolling_up',
-                    ['<M-s>'] = 'results_scrolling_left',
-                    ['<M-f>'] = 'results_scrolling_right',
+                    ['<M-h>'] = 'results_scrolling_left',
+                    ['<M-l>'] = 'results_scrolling_right',
+                    ['<M-f>'] = 'preview_scrolling_down',
+                    ['<M-d>'] = 'preview_scrolling_up',
+                    ['<M-s>'] = 'preview_scrolling_left',
+                    ['<M-g>'] = 'preview_scrolling_right',
                 },
             },
         },

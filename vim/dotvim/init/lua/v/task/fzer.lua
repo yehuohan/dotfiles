@@ -13,7 +13,7 @@ local wsc = nlib.new_configer({
     globlst = '!_VOut',
     options = '',
     vimgrep = false,
-    fuzzier = 'leaderf',
+    fuzzier = 'telescope',
 })
 
 --- @return table<string>

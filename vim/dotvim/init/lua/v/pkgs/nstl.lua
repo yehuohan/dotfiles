@@ -202,7 +202,7 @@ local function stls()
         fallthrough = false,
         {
             condition = function()
-                return conds.buffer_matches({ filetype = { 'OverseerList', 'neo-tree' } })
+                return conds.buffer_matches({ filetype = { 'OverseerList', 'neo%-tree' } })
             end,
             ComType,
         },
@@ -293,7 +293,7 @@ end
 
 --- Winbars
 local function disabled_bars(args)
-    local bar_excluded_filetypes = { 'alpha', 'OverseerList', 'neo-tree' }
+    local bar_excluded_filetypes = { 'alpha', 'OverseerList', 'neo%-tree' }
     local bar_excluded_buftypes = { 'nofile', 'terminal', 'quickfix' }
     local filetype = vim.tbl_contains(bar_excluded_filetypes, vim.bo[args.buf].filetype)
     local buftype = vim.tbl_contains(bar_excluded_buftypes, vim.bo[args.buf].buftype)
