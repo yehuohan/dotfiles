@@ -9,8 +9,10 @@ local task = require('v.task')
 local wsc = nlib.new_configer({
     envs = '',
     path = '',
-    pathlst = {},
-    globlst = '!_VOut',
+    paths = {},
+    globs = '!_VOut',
+    hidden = true,
+    ignore = true,
     options = '',
     vimgrep = false,
     fuzzier = 'telescope',
@@ -32,14 +34,20 @@ end
 
 --- @return table<string>
 local function rg_globs()
-    if wsc.globlst ~= '' then
+    if wsc.globs ~= '' then
         return vim.tbl_map(
             function(glob) return ('-g%s'):format(glob) end,
-            nlib.u.str2arg(wsc.globlst)
+            nlib.u.str2arg(wsc.globs)
         )
     end
     return {}
 end
+
+--- @return table<string>
+local function rg_hidden() return wsc.hidden and { '--hidden' } or {} end
+
+--- @return table<string>
+local function rg_ignore() return wsc.ignore and {} or { '--no-ignore' } end
 
 --- @return string|nil
 local function uproot()
@@ -53,7 +61,7 @@ local function uproot()
     if dir then
         dir = vim.fs.dirname(dir)
         wsc.path = dir
-        table.insert(wsc.pathlst, dir)
+        table.insert(wsc.paths, dir)
         return dir
     end
 end
@@ -76,7 +84,7 @@ local fzer = {
         file = ':FzfFiles {loc}',
         live = function(rep)
             if IsWin() then
-                rep.loc = string.gsub(rep.loc, '/', '\\') -- Fzf preview need '\' path
+                rep.loc = string.gsub(rep.loc, '/', '\\') -- Fzf preview needs '\' path
             end
             local grep_cmd = replace(
                 'rg --column --line-number --no-heading --color=always --smart-case {opt} -e "{pat}" {loc}',
@@ -127,10 +135,13 @@ function fzer.telescope(rhs, args)
     local picker = fzer._telescope[rhs]
     require('telescope.builtin')[picker]({
         cwd = args.loc[1],
-        search = args.pat,
-        search_file = args.pat,
-        search_dirs = args.loc,
-        additional_args = args.opt,
+        hidden = wsc.hidden, -- For find_files
+        no_ignore = not wsc.ignore, -- For find_files
+        search_file = args.pat ~= '' and args.pat or nil, -- For find_files
+        search_dirs = args.loc, -- For find_files, grep_string
+        search = args.pat, -- For grep_string
+        additional_args = args.opt, -- For grep_string with rg
+        -- ctags_file = '', -- For tags
     })
 end
 
@@ -162,37 +173,32 @@ local _sels = {
     opt = 'config fzer task',
     lst = nil,
     -- lst for rg
-    lst_r = { 'envs', 'path', 'globlst', 'options', 'vimgrep' },
+    lst_r = { 'envs', 'path', 'globs', 'hidden', 'ignore', 'options', 'vimgrep' },
     -- lst for fuzzier
-    lst_f = { 'envs', 'path', 'globlst', 'options', 'fuzzier' },
+    lst_f = { 'envs', 'path', 'globs', 'hidden', 'ignore', 'options', 'fuzzier' },
     dic = {
         envs = { lst = { 'PATH=' }, cpl = 'environment' },
-        path = { dsr = 'cached fzer path list', lst = wsc.pathlst, cpl = 'file' },
-        globlst = { dsr = function() return table.concat(rg_globs(), ' ') end },
-        options = {
-            lst = {
-                '--word-regexp',
-                '--no-fixed-strings',
-                '--hidden',
-                '--no-ignore',
-                '--encoding gbk',
-            },
-        },
-        vimgrep = { lst = { true, false } },
+        path = { dsr = 'cached fzer path list', lst = wsc.paths, cpl = 'file' },
+        globs = { dsr = function() return table.concat(rg_globs(), ' ') end },
+        hidden = vim.empty_dict(),
+        ignore = vim.empty_dict(),
+        options = { lst = { '-w', '-i', '-s', '-S', '--no-fixed-strings', '--encoding gbk' } },
+        vimgrep = vim.empty_dict(),
         fuzzier = { lst = { 'fzf', 'leaderf', 'telescope' } },
     },
     evt = function(name)
         if name == 'onCR' then
             if wsc.path ~= '' then
                 wsc.path = vim.fs.normalize(vim.fn.fnamemodify(wsc.path, ':p'))
-                if not vim.tbl_contains(wsc.pathlst, wsc.path) then
-                    table.insert(wsc.pathlst, wsc.path)
+                if not vim.tbl_contains(wsc.paths, wsc.path) then
+                    table.insert(wsc.paths, wsc.path)
                 end
             end
             wsc:reinit(wsc:get())
         end
     end,
     sub = {
+        lst = { true, false },
         cmd = function(sopt, sel) wsc[sopt] = sel end,
         get = function(sopt) return wsc[sopt] end,
     },
@@ -242,15 +248,18 @@ end
 local function parse_opt(kt)
     local opt = {}
     if kt.E:match('[sS]') then
-        opt[#opt + 1] = '-w'
+        opt[#opt + 1] = '-w' -- --word-regexp
     end
     if kt.E:match('[iwsyu]') then
-        opt[#opt + 1] = '-i'
+        opt[#opt + 1] = '-i' -- --ignore-case
     elseif kt.E:match('[IWSYU]') then
-        opt[#opt + 1] = '-s'
+        opt[#opt + 1] = '-s' -- --case-sensitive
     end
     if not kt.A:match('[p]') then
-        vim.list_extend(opt, rg_globs()) -- Custom paths may conflict with rg's globs
+        -- Custom paths may conflict with rg's globs and ignore rules
+        vim.list_extend(opt, rg_globs())
+        vim.list_extend(opt, rg_hidden())
+        vim.list_extend(opt, rg_ignore())
     end
     if wsc.options ~= '' then
         vim.list_extend(opt, nlib.u.str2arg(wsc.options))
@@ -297,7 +306,7 @@ local entry = async(function(kt, bang)
     -- Modify fzer config
     if kt.S == 'F' then
         _sels.lst = _sels.lst_r
-        _sels.dic.path.lst = wsc.pathlst
+        _sels.dic.path.lst = wsc.paths
         if not await(a.pop_selection(_sels)) then
             return
         end
@@ -361,7 +370,7 @@ local entry_fuzzier = async(function(kt)
     -- Modify fzer.fuzzier config
     if kt.S == 'F' then
         _sels.lst = _sels.lst_f
-        _sels.dic.path.lst = wsc.pathlst
+        _sels.dic.path.lst = wsc.paths
         if not await(a.pop_selection(_sels)) then
             return
         end

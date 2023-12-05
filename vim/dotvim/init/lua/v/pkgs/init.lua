@@ -336,7 +336,6 @@ end
 
 -- Buffer,Bookmarks,Workspace管理
 local function pkg_popc()
-    -- popc
     vim.g.Popc_jsonPath = vim.env.DotVimLocal
     vim.g.Popc_useFloatingWin = 1
     vim.g.Popc_highlight = {
@@ -366,7 +365,7 @@ local function pkg_popc()
     m.nnore({ '<leader>wq', '<Cmd>PopcBufferClose!<CR>' })
     m.nnore({ '<leader><leader>b', '<Cmd>PopcBookmark<CR>' })
     m.nnore({ '<leader><leader>w', '<Cmd>PopcWorkspace<CR>' })
-    -- popset
+
     vim.g.Popset_SelectionData = {
         {
             opt = { 'colorscheme', 'colo' },
@@ -375,6 +374,7 @@ local function pkg_popc()
     }
     m.nnore({ '<leader><leader>p', ':PopSet<Space>' })
     m.nnore({ '<leader>sp', ':PopSet popset<CR>' })
+    m.nnore({ '<leader><leader>m', '<Cmd>Popc Floaterm<CR>' })
 end
 
 -- 目录树
@@ -472,7 +472,8 @@ local function pkg_neotree()
             mappings = {
                 ['<CR>'] = 'edit',
                 ['<2-LeftMouse>'] = 'edit',
-                ['o'] = 'edit_preview',
+                ['o'] = 'edit',
+                ['go'] = 'edit_preview',
                 ['<Tab>'] = 'open_with_window_picker',
                 ['i'] = 'open_vsplit',
                 ['gi'] = 'open_split',
@@ -526,6 +527,7 @@ end
 -- 模糊查找
 local function pkg_telescope()
     local telescope = require('telescope')
+    local builtin = require('telescope.builtin')
     telescope.setup({
         defaults = {
             borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
@@ -562,9 +564,28 @@ local function pkg_telescope()
     })
     telescope.load_extension('fzf')
     telescope.load_extension('frecency')
-    m.nnore({ '<leader><leader>n', ':Telescope<Space>' })
-    m.nnore({ '<leader>nf', ':Telescope find_files<CR>' })
-    m.nnore({ '<leader>nr', ':Telescope frecency<CR>' })
+    m.nnore({ '<leader><leader>f', ':Telescope<Space>' })
+    m.nnore({
+        '<leader>lf',
+        function()
+            builtin.find_files({
+                cwd = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
+                hidden = true,
+            })
+        end,
+    })
+    m.nnore({
+        '<leader>lg',
+        function()
+            local bufname = vim.api.nvim_buf_get_name(0)
+            builtin.grep_string({
+                cwd = vim.fs.dirname(bufname),
+                search = '',
+                search_dirs = { bufname },
+            })
+        end,
+    })
+    m.nnore({ '<leader>lr', ':Telescope frecency<CR>' })
 end
 
 -- 模糊查找
@@ -572,17 +593,16 @@ local function pkg_fzf()
     vim.g.fzf_command_prefix = 'Fzf'
     vim.g.fzf_layout = { down = '40%' }
     vim.g.fzf_preview_window = { 'right:40%,border-sharp' }
-    vim.env.FZF_DEFAULT_OPTS = '--bind alt-j:down,alt-k:up'
-    m.nnore({ '<leader><leader>f', ':Fzf' })
+    vim.env.FZF_DEFAULT_OPTS = '--bind alt-j:down,alt-k:up,esc:abort'
     vim.api.nvim_create_autocmd('Filetype', {
         group = 'v.Pkgs',
+        pattern = { 'fzf' },
         command = 'tnoremap <buffer> <Esc> <C-c>',
     })
 end
 
 -- 模糊查找
 local function pkg_leaderf()
-    -- autocmd VimEnter * call execute('autocmd! LeaderF_Mru')
     vim.g.Lf_CacheDirectory = vim.env.DotVimLocal
     vim.g.Lf_PreviewInPopup = 1
     vim.g.Lf_PreviewResult = { File = 0, Buffer = 0, Mru = 0, Tag = 0, Rg = 0 }
@@ -595,18 +615,14 @@ local function pkg_leaderf()
     vim.g.Lf_ShowHidden = 1
     vim.g.Lf_DefaultExternalTool = 'rg'
     vim.g.Lf_UseVersionControlTool = 1
-    vim.g.Lf_WildIgnore = {
-        dir = { '.git', '.svn', '.hg' },
-        file = {},
-    }
+    vim.g.Lf_WildIgnore = { dir = { '.git', '.svn', '.hg' }, file = {} }
     vim.g.Lf_GtagsAutoGenerate = 0
     vim.g.Lf_GtagsAutoUpdate = 0
-    m.nnore({ '<leader><leader>l', ':Leaderf' })
-    m.nnore({ '<leader>lf', ':LeaderfFile<CR>' })
+    m.nnore({ '<leader>li', ':LeaderfFile<CR>' })
     m.nnore({ '<leader>lu', ':LeaderfFunction<CR>' })
     m.nnore({ '<leader>ll', ':LeaderfLine<CR>' })
     m.nnore({ '<leader>lb', ':LeaderfBuffer<CR>' })
-    m.nnore({ '<leader>lr', ':LeaderfMru<CR>' })
+    m.nnore({ '<leader>lm', ':LeaderfMru<CR>' })
 end
 
 -- Mini插件库
@@ -761,23 +777,24 @@ end
 
 -- 终端浮窗
 local function pkg_floaterm()
-    m.tnore({ '<C-l>', '<C-><C-n><C-w>' })
-    m.tnore({ '<Esc>', '<C-><C-n>' })
+    m.tnore({ '<C-l>', '<C-\\><C-n><C-w>' })
+    m.tnore({ '<Esc>', '<C-\\><C-n>' })
     m.nnore({ '<leader>tz', ':FloatermToggle<CR>' })
-    m.nnore({ '<leader><leader>m', ':Popc Floaterm<CR>' })
     m.nnore({ '<leader><leader>z', ':FloatermNew --cwd=.<Space>' })
-    m.tnore({ '<M-u>', '<C-><C-n>:FloatermFirst<CR>' })
-    m.tnore({ '<M-i>', '<C-><C-n>:FloatermPrev<CR>' })
-    m.tnore({ '<M-o>', '<C-><C-n>:FloatermNext<CR>' })
-    m.tnore({ '<M-p>', '<C-><C-n>:FloatermLast<CR>' })
-    m.tnore({ '<M-q>', '<C-><C-n>:FloatermKill<CR>' })
-    m.tnore({ '<M-h>', '<C-><C-n>:FloatermHide<CR>' })
-    m.tnore({ '<M-n>', '<C-><C-n>:FloatermUpdate --height=0.6 --width=0.6<CR>' })
-    m.tnore({ '<M-m>', '<C-><C-n>:FloatermUpdate --height=0.9 --width=0.9<CR>' })
-    m.tnore({ '<M-r>', '<C-><C-n>:FloatermUpdate --position=topright<CR>' })
-    m.tnore({ '<M-c>', '<C-><C-n>:FloatermUpdate --position=center<CR>' })
+    m.tnore({ '<M-u>', '<C-\\><C-n>:FloatermFirst<CR>' })
+    m.tnore({ '<M-i>', '<C-\\><C-n>:FloatermPrev<CR>' })
+    m.tnore({ '<M-o>', '<C-\\><C-n>:FloatermNext<CR>' })
+    m.tnore({ '<M-p>', '<C-\\><C-n>:FloatermLast<CR>' })
+    m.tnore({ '<M-q>', '<C-\\><C-n>:FloatermKill<CR>' })
+    m.tnore({ '<M-h>', '<C-\\><C-n>:FloatermHide<CR>' })
+    m.tnore({ '<M-n>', '<C-\\><C-n>:FloatermUpdate --height=0.6 --width=0.6<CR>' })
+    m.tnore({ '<M-m>', '<C-\\><C-n>:FloatermUpdate --height=0.9 --width=0.9<CR>' })
+    m.tnore({ '<M-r>', '<C-\\><C-n>:FloatermUpdate --position=topright<CR>' })
+    m.tnore({ '<M-c>', '<C-\\><C-n>:FloatermUpdate --position=center<CR>' })
     m.nnore({ '<leader>mz', ':FloatermNew --cwd=. zsh<CR>' })
-    m.nnore({ '<leader>mf', ':FloatermNew lf<CR>' })
+    m.nnore({ '<leader>mf', ':FloatermNew --cwd=. fzf --cycle<CR>' })
+    m.nnore({ '<leader>mr', ':FloatermNew --cwd=. rg<CR>' })
+    m.nnore({ '<leader>ml', ':FloatermNew --cwd=. lf<CR>' })
 end
 
 -- 批量注释
@@ -856,6 +873,7 @@ local function pkg_hlchunk()
     require('hlchunk').setup({
         chunk = {
             enable = true,
+            notify = false,
             use_treesitter = use.nts,
             style = {
                 { fg = '#fe8019' }, -- Normal chunk
@@ -1070,7 +1088,7 @@ local pkgs = {
     { -- telescope
         'nvim-telescope/telescope.nvim',
         config = pkg_telescope,
-        keys = { '<leader><leader>n', '<leader>nf', '<leader>nr' },
+        keys = { '<leader><leader>f', '<leader>lf', '<leader>lg', '<leader>lr' },
     },
     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
     { 'nvim-telescope/telescope-frecency.nvim' },
@@ -1078,7 +1096,7 @@ local pkgs = {
     { -- LeaderF
         'Yggdroot/LeaderF',
         enabled = use.has_py,
-        config = pkg_leaderf,
+        init = pkg_leaderf,
         build = ':LeaderfInstallCExtension',
     },
     { 'echasnovski/mini.nvim', config = pkg_mini },

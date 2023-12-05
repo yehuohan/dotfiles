@@ -422,7 +422,7 @@ nnoremap <leader>tT <Cmd>execute ':NERDTree ' . Expand('%', ':p:h')<CR>
 let g:fzf_command_prefix = 'Fzf'
 let g:fzf_layout = { 'down': '40%' }
 let g:fzf_preview_window = ['right:40%,border-sharp']
-let $FZF_DEFAULT_OPTS='--bind alt-j:down,alt-k:up'
+let $FZF_DEFAULT_OPTS='--bind alt-j:down,alt-k:up,esc:abort'
 nnoremap <leader><leader>f :Fzf
 augroup PkgFzf
     autocmd!
