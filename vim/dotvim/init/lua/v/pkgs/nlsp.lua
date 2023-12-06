@@ -34,6 +34,7 @@ local function __servers()
     opts['clangd'] = function()
         lspconfig.clangd.setup({
             capabilities = capabilities,
+            -- Treesitter is better than clangd's semantic
             on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
         })
     end
@@ -152,8 +153,8 @@ local function cmp_format(entry, citem)
     return citem
 end
 
---- Setup completion framework
-local function __completion()
+--- Setup completion sources
+local function __sources()
     local cmp_im = require('cmp_im')
     cmp_im.setup({
         tables = require('cmp_im_zh').tables({ 'wubi', 'pinyin' }),
@@ -164,7 +165,17 @@ local function __completion()
         function() vim.notify('IM is ' .. (cmp_im.toggle() and 'enabled' or 'disabled')) end,
     })
 
+    -- Use forked repo with changed configs. Because original repo's setup() not work here.
+    require('cmp_nvim_ultisnips').setup({
+        filetype_source = 'ultisnips_default',
+        show_snippets = 'all', -- Fix typing lays with pynvim 0.5 (no this issue with 0.4.3)
+    })
+end
+
+--- Setup completion framework
+local function __completion()
     local cmp = require('cmp')
+    local cmp_im = require('cmp_im')
     local compare = cmp.config.compare
     local cmp_mappings = {
         ['<M-i>'] = cmp.mapping(function() cmp.complete() end, { 'i' }),
@@ -396,7 +407,7 @@ local function __lsp_mappings()
     m.nnore({ '<leader>ga', '<Cmd>Lspsaga code_action<CR>' })
     m.nnore({ '<leader>gh', '<Cmd>Lspsaga hover_doc<CR>' })
     m.nnore({ '<leader>gp', '<Cmd>Lspsaga peek_definition<CR>' })
-    m.nnore({ '<leader>gs', '<Cmd>Lspsaga lsp_finder<CR>' })
+    m.nnore({ '<leader>gs', '<Cmd>Lspsaga finder<CR>' })
     m.nnore({ '<leader>go', '<Cmd>Lspsaga outline<CR>' })
 
     m.nore({ '<leader>of', vim.lsp.buf.format }) -- Terrible format experience form lsp
@@ -432,12 +443,11 @@ end
 
 return {
     setup = vim.schedule_wrap(function()
-        if use.nlsp then
-            __servers()
-            __completion()
-            __lsp_highlights()
-            __lsp_settings()
-            __lsp_mappings()
-        end
+        __servers()
+        __sources()
+        __completion()
+        __lsp_highlights()
+        __lsp_settings()
+        __lsp_mappings()
     end),
 }

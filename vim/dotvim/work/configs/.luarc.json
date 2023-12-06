@@ -1,0 +1,14 @@
+{
+    "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
+    "runtime.version": "LuaJIT",
+    "workspace.library": [
+        "./",
+        "${env:VIMRUNTIME}/lua",
+        "${env:VIMRUNTIME}/lua/vim",
+        "${env:VIMRUNTIME}/lua/vim/lsp",
+        "${env:VIMRUNTIME}/lua/vim/treesitter",
+        "${env:DotVimDir}/bundle/plenary.nvim/lua"
+    ],
+    "telemetry.enable": false,
+    "format.enable": false
+}

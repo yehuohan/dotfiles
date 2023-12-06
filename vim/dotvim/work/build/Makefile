@@ -152,10 +152,6 @@ src-android-vcpkg:
 deps:
 	vcpkg install ${DEPS} --triplet=${VCPKG_TRIPLET} --x-install-root=${DEPS_DIR} --x-asset-sources=${VCPKG_XSCRIPT}
 
-.PHONY: cc
-cc: src
-	cp ${BUILD_DIR}/compile_commands.json ./
-
 .PHONY: clean
 clean:
 	-rm -r ${BUILD_DIR}

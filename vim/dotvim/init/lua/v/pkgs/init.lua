@@ -865,6 +865,9 @@ end
 -- 彩虹括号
 local function pkg_rainbow()
     local rainbow = require('rainbow-delimiters')
+    vim.g.rainbow_delimiters = {
+        log = { level = vim.log.levels.OFF },
+    }
     m.nnore({ '<leader>tr', function() rainbow.toggle(0) end })
 end
 
@@ -1122,8 +1125,8 @@ local pkgs = {
             'yehuohan/cmp-path',
             'yehuohan/cmp-im',
             'yehuohan/cmp-im-zh',
+            'yehuohan/cmp-nvim-ultisnips',
             'dmitmel/cmp-cmdline-history',
-            'quangnguyen30192/cmp-nvim-ultisnips',
             'kdheepak/cmp-latex-symbols',
             'f3fora/cmp-spell',
             'nvim-lua/plenary.nvim',
@@ -1152,7 +1155,7 @@ local pkgs = {
     { 'windwp/nvim-autopairs', config = pkg_autopairs },
     { 'kylechui/nvim-surround', config = pkg_surround },
     { 't9md/vim-quickhl', config = pkg_quickhl },
-    { 'HiPhish/rainbow-delimiters.nvim', config = pkg_rainbow },
+    { 'HiPhish/rainbow-delimiters.nvim', init = pkg_rainbow },
     { 'shellRaining/hlchunk.nvim', config = pkg_hlchunk },
     { 'folke/trouble.nvim', config = pkg_trouble, keys = { '<leader>vq', '<leader>vl' } },
     { 'rust-lang/rust.vim' },
