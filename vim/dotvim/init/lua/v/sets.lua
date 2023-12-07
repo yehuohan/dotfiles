@@ -71,6 +71,7 @@ local function set_default_opts()
     o.ignorecase = true                              -- 不区别大小写搜索
     o.smartcase = true                               -- 有大写字母时才区别大小写搜索
     o.tildeop = false                                -- 使切换大小写的~，类似于c,y,d等操作符
+    o.keywordprg = ':help'                           -- K使用的command
     vim.opt.nrformats = {
         'bin', 'octal', 'hex', 'alpha'
     }                                                -- CTRL-A-X支持数字和字母
