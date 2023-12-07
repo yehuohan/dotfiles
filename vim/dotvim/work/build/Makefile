@@ -74,6 +74,9 @@ tags:
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # cmake targets
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DIR_ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+# DIR_PATH := $(shell cygpath -u ${DIR_ROOT})
+
 BUILD_TYPE ?= Debug
 #BUILD_TYPE ?= RelWithDebInfo
 #BUILD_TYPE ?= Release
@@ -83,12 +86,14 @@ BUILD_GEN ?= "Ninja"
 BUILD_JOB ?= -j4
 BUILD_DIR ?= ${DIR_ROOT}/_VOut/${BUILD_TYPE}
 INSTALL_DIR ?= ${DIR_ROOT}/install/${BUILD_TYPE}
+
 NDK_ROOT ?= ${Android_SDK}/ndk-bundle
 NDK_ABI ?= arm64-v8a
 NDK_PLATFORM ?= android-27
+
 VCPKG_ROOT ?= ${APPS_HOME}/_packs/apps/vcpkg/current
 VCPKG_TRIPLET ?= arm64-android # x64-windows, x64-windows-static, x64-mingw-dynamic, x64-mingw-static
-# VCPKG_XSCRIPT := 'clear;x-script,${DIR_ROOT}/scripts/vcpkg_xscript.bat {url} {sha512} {dst};x-block-origin'
+# VCPKG_XSCRIPT := 'clear;x-script,${DIR_PATH}/scripts/vcpkg_xscript.bat {url} {sha512} {dst};x-block-origin'
 VCPKG_XSCRIPT := 'clear;x-script,${DIR_ROOT}/scripts/vcpkg_xscript.sh {url} {sha512} {dst};x-block-origin'
 DEPS ?= vulkan-headers volk
 DEPS_DIR ?= ${DIR_ROOT}/deps
@@ -107,6 +112,7 @@ src:
 		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
 		-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
 		-DPROJECT_BUILD_DIR=${BUILD_DIR} \
+		# With vcpkg:
 		# -DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
 		# -DVCPKG_TARGET_TRIPLET=${VCPKG_TRIPLET}
 		# -DVCPKG_INSTALLED_DIR=${DEPS_DIR}
@@ -128,24 +134,11 @@ src-android:
 		-DANDROID_PLATFORM=${NDK_PLATFORM} \
 		-DANDROID_TOOLCHAIN=clang \
 		-DANDROID_STL=c++_static \
-		-DCMAKE_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake \
-		-S . -B ${BUILD_DIR}
-
-.PHONY: src-android-vcpkg
-src-android-vcpkg:
-	cmake -G ${BUILD_GEN} -Wno-dev \
-		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-		-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
-		-DPROJECT_BUILD_DIR=${BUILD_DIR} \
-		-DANDROID_NDK=${NDK_ROOT} \
-		-DANDROID_ABI=${NDK_ABI} \
-		-DANDROID_PLATFORM=${NDK_PLATFORM} \
-		-DANDROID_TOOLCHAIN=clang \
-		-DANDROID_STL=c++_static \
-		-DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake \
-		-DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake \
-		-DVCPKG_TARGET_TRIPLET=${VCPKG_TRIPLET} \
-		-DVCPKG_INSTALLED_DIR=${DEPS_DIR} \
+		# With vcpkg:
+		# -DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
+		# -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake
+		# -DVCPKG_TARGET_TRIPLET=${VCPKG_TRIPLET}
+		# -DVCPKG_INSTALLED_DIR=${DEPS_DIR}
 		-S . -B ${BUILD_DIR}
 
 .PHONY: deps
