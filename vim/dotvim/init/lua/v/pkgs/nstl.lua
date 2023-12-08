@@ -29,7 +29,7 @@ end
 local ctxs = {}
 
 ctxs.attr = '%{&ft!=#""?&ft."│":""}%{&fenc!=#""?&fenc:&enc}│%{&ff}'
-ctxs.lite = sym.row .. '%l/%L ' .. sym.col .. '%v %{winnr()}.%n%{&mod?"+":""}'
+ctxs.lite = sym.row .. '%l/%L ' .. sym.col .. '%v %{win_getid()}.%n%{&mod?"+":""}'
 ctxs.info = 'U%-2B %p%% ' .. ctxs.lite
 
 function ctxs.mode()

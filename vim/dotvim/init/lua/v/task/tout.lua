@@ -6,9 +6,9 @@ local PAUSE_PATS = {
 }
 
 --- @class ToutQuickfix
---- @field ns(number) Quickfix highlight namespace
---- @field hwin(number|nil) Quickfix window handle
---- @field hbuf(number|nil) Quickfix buf handle
+--- @field ns(integer) Quickfix highlight namespace
+--- @field hwin(integer|nil) Quickfix window handle
+--- @field hbuf(integer|nil) Quickfix buf handle
 --- @field task(table|nil) The task output to quickfix
 --- @field title(TaskTitle|nil)
 local qf = {
@@ -175,32 +175,35 @@ function qf.on_output(task, data, cpt, params)
 end
 
 --- @class ToutTerminal
---- @field hwin(number|nil) Terminal(vterm) window handle
+--- @field twin(table<integer,integer>) The pined terminal(vterm) window handle for each tabpage
 --- @field task(table|nil) The task output to terminal
 local term = {
-    hwin = nil,
+    -- hwin = nil,
+    twin = {},
     task = nil,
 }
 
----@param pin(boolean|nil) Pin task output to the terminal or not
+--- Close the pined window of current tabpage
+function term.close()
+    local tab = vim.api.nvim_get_current_tabpage()
+    if vim.api.nvim_win_is_valid(term.twin[tab]) then
+        vim.api.nvim_win_close(term.twin[tab], false)
+    end
+end
+
+--- @param pin(boolean|nil) Pin task output to the terminal or not
 function term.redir(task, pin)
+    local tab = vim.api.nvim_get_current_tabpage()
     local hwin
     if pin then
         term.task = task
-        if (not term.hwin) or (not vim.api.nvim_win_is_valid(term.hwin)) then
+        if not term.twin[tab] or (not vim.api.nvim_win_is_valid(term.twin[tab])) then
             vim.cmd.split({ range = { 8 }, mods = { split = 'botright' } })
-            term.hwin = vim.api.nvim_get_current_win()
+            term.twin[tab] = vim.api.nvim_get_current_win()
             vim.cmd.wincmd('p')
-            require('v.nlib').m.nnore({
-                '<leader>vc',
-                function()
-                    if vim.api.nvim_win_is_valid(term.hwin) then
-                        vim.api.nvim_win_close(term.hwin, false)
-                    end
-                end,
-            })
+            require('v.nlib').m.nnore({ '<leader>vc', term.close })
         end
-        hwin = term.hwin
+        hwin = term.twin[tab]
     else
         vim.cmd.split({ range = { 8 } })
         hwin = vim.api.nvim_get_current_win()
@@ -213,9 +216,10 @@ function term.redir(task, pin)
 end
 
 function term.on_complete(task, status, result)
-    if term.hwin and vim.api.nvim_win_is_valid(term.hwin) then
-        local cursor = vim.api.nvim_win_get_cursor(term.hwin)
-        vim.api.nvim_win_set_cursor(term.hwin, { cursor[1], 0 })
+    local tab = vim.api.nvim_get_current_tabpage()
+    if term.twin[tab] and vim.api.nvim_win_is_valid(term.twin[tab]) then
+        local cursor = vim.api.nvim_win_get_cursor(term.twin[tab])
+        vim.api.nvim_win_set_cursor(term.twin[tab], { cursor[1], 0 })
     end
     term.task = nil
 end
