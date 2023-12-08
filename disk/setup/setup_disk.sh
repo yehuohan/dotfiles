@@ -14,8 +14,8 @@ cp -r $DIR_DISK/msys2/etc/*         /etc/
 cp -r $DIR_DISK/msys2/etc/.*        /etc/
 cp -r $DIR_DISK/msys2/home/*        ~/
 cp -r $DIR_DISK/msys2/home/.*       ~/
-cp -r $DIR_DISK/home-win/*          $USERPROFILE/
-cp -r $DIR_DISK/home-win/.*         $USERPROFILE/
+cp -r $DIR_DISK/home/*              $USERPROFILE/
+cp -r $DIR_DISK/home/.*             $USERPROFILE/
 
 pacman -Sy
 
