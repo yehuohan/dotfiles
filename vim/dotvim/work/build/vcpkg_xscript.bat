@@ -1,11 +1,14 @@
 @echo off
 
-set url=%1
-set sha512=%2
-set dst=%3
-echo X-Script.url:    %url%
-echo X-Script.dsr:    %sha512%
-echo X-Script.sha512: %dst%
+REM Usage:
+REM     cmd /k vcpkg_xscript.bat {url} {dst}
 
-set url=%url:https://github.com=https://kkgithub.com%
+set url=%1
+set dst=%2
+set sha512=%3
+echo X-Script.url:    %url%
+echo X-Script.dst:    %dst%
+echo X-Script.sha512: %sha512%
+
+set url=%url:https://github.com=https://<mirror>%
 curl --progress-bar -L %url% --create-dirs --output %dst%

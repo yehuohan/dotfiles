@@ -75,7 +75,6 @@ tags:
 # cmake targets
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 DIR_ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-# DIR_PATH := $(shell cygpath -u ${DIR_ROOT})
 
 BUILD_TYPE ?= Debug
 #BUILD_TYPE ?= RelWithDebInfo
@@ -93,8 +92,8 @@ NDK_PLATFORM ?= android-27
 
 VCPKG_ROOT ?= ${APPS_HOME}/vcpkg
 VCPKG_TRIPLET ?= arm64-android # x64-windows, x64-windows-static, x64-mingw-dynamic, x64-mingw-static
-# VCPKG_XSCRIPT := 'clear;x-script,${DIR_PATH}/scripts/vcpkg_xscript.bat {url} {sha512} {dst};x-block-origin'
-VCPKG_XSCRIPT := 'clear;x-script,${DIR_ROOT}/scripts/vcpkg_xscript.sh {url} {sha512} {dst};x-block-origin'
+VCPKG_XSCRIPT := 'clear;x-script,bash ${DIR_ROOT}/scripts/vcpkg_xscript.sh {url} {dst};x-block-origin'
+# VCPKG_XSCRIPT := 'clear;x-script,cmd /k ${DIR_ROOT}/scripts/vcpkg_xscript.bat {url} {dst};x-block-origin'
 DEPS ?= vulkan-headers volk
 DEPS_DIR ?= ${DIR_ROOT}/deps
 # DEPS_DIR ?= ${VCPKG_ROOT}/installed
@@ -143,7 +142,11 @@ src-android:
 
 .PHONY: deps
 deps:
-	vcpkg install ${DEPS} --triplet=${VCPKG_TRIPLET} --x-install-root=${DEPS_DIR} --x-asset-sources=${VCPKG_XSCRIPT}
+	vcpkg install ${DEPS} --recurse --no-binarycaching \
+		--triplet=${VCPKG_TRIPLET} \
+		--overlay-triplets=${DIR_ROOT}/cmake \
+		--x-install-root=${DEPS_DIR} \
+		--x-asset-sources=${VCPKG_XSCRIPT}
 
 .PHONY: clean
 clean:
