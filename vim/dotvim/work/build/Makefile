@@ -142,6 +142,7 @@ src-android:
 
 .PHONY: deps
 deps:
+	# ANDROID_NDK_HOME=${NDK_ROOT}
 	vcpkg install ${DEPS} --recurse --no-binarycaching \
 		--triplet=${VCPKG_TRIPLET} \
 		--overlay-triplets=${DIR_ROOT}/cmake \
