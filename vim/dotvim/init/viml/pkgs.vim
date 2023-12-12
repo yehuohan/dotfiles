@@ -432,7 +432,6 @@ augroup END
 
 " LeaderF {{{ 模糊查找
 if s:use.has_py
-" autocmd VimEnter * call execute('autocmd! LeaderF_Mru')
 let g:Lf_CacheDirectory = $DotVimLocal
 let g:Lf_PreviewInPopup = 1
 let g:Lf_PreviewResult = {'File': 0, 'Buffer': 0, 'Mru': 0, 'Tag': 0, 'Rg': 0}

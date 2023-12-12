@@ -606,7 +606,7 @@ end
 local function pkg_leaderf()
     vim.g.Lf_CacheDirectory = vim.env.DotVimLocal
     vim.g.Lf_PreviewInPopup = 1
-    vim.g.Lf_PreviewResult = { File = 0, Buffer = 0, Mru = 0, Tag = 0, Rg = 0 }
+    vim.g.Lf_PreviewResult = { File = 0, Buffer = 0, Tag = 0, Rg = 0 }
     vim.g.Lf_StlSeparator = use.ui.icon and { left = '', right = '' }
         or { left = '', right = '' }
     vim.g.Lf_ShowDevIcons = 0
@@ -617,13 +617,12 @@ local function pkg_leaderf()
     vim.g.Lf_DefaultExternalTool = 'rg'
     vim.g.Lf_UseVersionControlTool = 1
     vim.g.Lf_WildIgnore = { dir = { '.git', '.svn', '.hg' }, file = {} }
+    vim.g.Lf_MruEnable = 0
     vim.g.Lf_GtagsAutoGenerate = 0
     vim.g.Lf_GtagsAutoUpdate = 0
     m.nnore({ '<leader>li', ':LeaderfFile<CR>' })
     m.nnore({ '<leader>lu', ':LeaderfFunction<CR>' })
     m.nnore({ '<leader>ll', ':LeaderfLine<CR>' })
-    m.nnore({ '<leader>lb', ':LeaderfBuffer<CR>' })
-    m.nnore({ '<leader>lm', ':LeaderfMru<CR>' })
 end
 
 -- Mini插件库
