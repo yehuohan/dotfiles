@@ -347,8 +347,8 @@ local function pkg_popc()
     vim.g.Popc_usePowerFont = use.ui.icon
     if use.ui.icon then
         vim.g.Popc_selectPointer = ''
-        vim.g.Popc_separator = { left = '', right = '' }
-        vim.g.Popc_subSeparator = { left = '', right = '' }
+        vim.g.Popc_separator = { left = '', right = '' }
+        vim.g.Popc_subSeparator = { left = '', right = '' }
     end
     vim.g.Popc_wksSaveUnderRoot = 0
     vim.g.Popc_wksRootPatterns = { '.popc', '.git', '.svn', '.hg', 'tags' }

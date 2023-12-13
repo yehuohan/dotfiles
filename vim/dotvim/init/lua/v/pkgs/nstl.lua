@@ -6,9 +6,12 @@ local sym = {
     sep = { ' ', '' },
     row = '',
     col = '$',
-    vos = '',
     buf = 'B',
     tab = 'T',
+    lck = '*',
+    mod = '+',
+    lck_mod = '#',
+    vos = '',
 }
 if use.ui.icon then
     sym.sep = { '', '' }
@@ -16,6 +19,9 @@ if use.ui.icon then
     sym.col = ''
     sym.buf = ''
     sym.tab = ''
+    sym.lck = '󰌾'
+    sym.mod = '󱇬'
+    sym.lck_mod = '󰗻'
     if IsLinux() then
         sym.vos = ''
     elseif IsMac() == 1 then
@@ -29,8 +35,8 @@ end
 local ctxs = {}
 
 ctxs.attr = '%{&ft!=#""?&ft."│":""}%{&fenc!=#""?&fenc:&enc}│%{&ff}'
-ctxs.lite = sym.row .. '%l/%L ' .. sym.col .. '%v %{win_getid()}.%n%{&mod?"+":""}'
-ctxs.info = 'U%-2B %p%% ' .. ctxs.lite
+ctxs.lite = sym.row .. '%l/%L ' .. sym.col .. '%v %{win_getid()}.%n'
+ctxs.info = 'U%-2B ' .. ctxs.lite
 
 function ctxs.mode()
     local mch = vim.fn.mode()
@@ -54,7 +60,15 @@ function ctxs.hint()
     elseif ft == 'help' then
         res = 'Help'
     end
-    return sym.vos .. ' ' .. res
+    local icon = sym.vos
+    if vim.bo.readonly and vim.bo.modified then
+        icon = sym.lck_mod
+    elseif vim.bo.readonly then
+        icon = sym.lck
+    elseif vim.bo.modified then
+        icon = sym.mod
+    end
+    return icon .. ' ' .. res
 end
 
 function ctxs.root_path() return vim.fs.normalize(require('v.task').wsc.fzer.path) end

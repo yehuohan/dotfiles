@@ -124,6 +124,7 @@ src:
 #   objcopy --strip-unneeded <target>
 .PHONY: src-android
 src-android:
+	# ANDROID_NDK_HOME=${NDK_ROOT}
 	cmake -G ${BUILD_GEN} -Wno-dev \
 		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
 		-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
