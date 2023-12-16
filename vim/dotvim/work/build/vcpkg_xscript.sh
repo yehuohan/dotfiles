@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # Usage:
+#     # set mirror, then run:
 #     bash vcpkg_xscript.sh {url} {dst}
 
 url=$1

@@ -18,7 +18,7 @@ NDK_ABI ?= arm64-v8a
 NDK_PLATFORM ?= android-27
 
 VCPKG_ROOT ?= ${APPS_HOME}/vcpkg
-VCPKG_TRIPLET ?= arm64-android # x64-windows, x64-windows-static, x64-mingw-dynamic, x64-mingw-static
+VCPKG_TRIPLET ?= x64-mingw-mix # x64-windows-mix, arm64-android 
 VCPKG_XSCRIPT := 'clear;x-script,bash ${DIR_ROOT}/scripts/vcpkg_xscript.sh {url} {dst};x-block-origin'
 # VCPKG_XSCRIPT := 'clear;x-script,cmd /k ${DIR_ROOT}/scripts/vcpkg_xscript.bat {url} {dst};x-block-origin'
 DEPS ?= vulkan-headers volk

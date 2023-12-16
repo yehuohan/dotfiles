@@ -1,6 +1,7 @@
 @echo off
 
 REM Usage:
+REM     # set mirror, then run:
 REM     cmd /k vcpkg_xscript.bat {url} {dst}
 
 set url=%1
