@@ -7,5 +7,6 @@ Windows Registry Editor Version 5.00
 "RUSTUP_UPDATE_ROOT"="https://mirrors.ustc.edu.cn/rust-static/rustup"
 "RUSTUP_HOME"="C:\\apps\\rust\\rustup"
 "CARGO_HOME"="C:\\apps\\rust\\cargo"
+"VCPKG_DEFAULT_BINARY_CACHE"="C:\\apps\\vcpkg\\archives"
 
 ; APPS_PATH和PATH均需要修改类型为`可扩展字符串`
