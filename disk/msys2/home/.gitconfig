@@ -20,3 +20,5 @@
 	navigate = true # use n and N to move between diff sections
 	light = false
 	side-by-side = true
+[init]
+	defaultBranch = main
