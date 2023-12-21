@@ -173,7 +173,7 @@ end
 -- 窗口移动
 local function pkg_winshift()
     require('winshift').setup({})
-    m.nnore({ '<C-m>', ':WinShift<CR>' })
+    m.nnore({ '<leader>wm', ':WinShift<CR>' })
 end
 
 -- 块扩展
@@ -358,10 +358,13 @@ local function pkg_popc()
     m.nnore({ '<M-i>', '<Cmd>PopcBufferSwitchLeft!<CR>' })
     m.nnore({ '<M-o>', '<Cmd>PopcBufferSwitchRight!<CR>' })
     m.nnore({ '<C-i>', '<Cmd>PopcBufferJumpPrev<CR>' })
-    m.nnore({ '<Tab>', '<Cmd>PopcBufferJumpPrev<CR>' })
     m.nnore({ '<C-o>', '<Cmd>PopcBufferJumpNext<CR>' })
     m.nnore({ '<C-u>', '<C-o>' })
     m.nnore({ '<C-p>', '<C-i>' })
+    m.nnore({ '<M-8>', '<Cmd>PopcBufferJumpPrev<CR>' })
+    m.nnore({ '<M-9>', '<Cmd>PopcBufferJumpNext<CR>' })
+    m.nnore({ '<M-7>', '<C-o>' })
+    m.nnore({ '<M-0>', '<C-i>' })
     m.nnore({ '<leader>wq', '<Cmd>PopcBufferClose!<CR>' })
     m.nnore({ '<leader><leader>b', '<Cmd>PopcBookmark<CR>' })
     m.nnore({ '<leader><leader>w', '<Cmd>PopcWorkspace<CR>' })
@@ -1159,6 +1162,7 @@ local pkgs = {
     { 'shellRaining/hlchunk.nvim', config = pkg_hlchunk },
     { 'folke/trouble.nvim', config = pkg_trouble, keys = { '<leader>vq', '<leader>vl' } },
     { 'rust-lang/rust.vim' },
+    { 'NoahTheDuke/vim-just', ft = 'just' },
 
     -- Utils
     { 'toppair/peek.nvim', config = pkg_md, ft = 'markdown', build = 'deno task build:fast' },

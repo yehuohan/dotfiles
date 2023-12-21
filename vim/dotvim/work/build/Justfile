@@ -1,0 +1,95 @@
+set shell := ['bash', '-uc']
+# set shell := ['cmd.exe', '/c']
+set dotenv-load
+set ignore-comments
+
+# dir_root := justfile_directory()
+dir_root := replace(justfile_directory(), '\', '/')
+dir_home := replace(env('APPS_HOME'), '\', '/')
+
+build_type := env('BUILD_TYPE', 'Debug')
+# build_type := env('BUILD_TYPE', 'RelWithDebInfo')
+# build_type := env('BUILD_TYPE', 'Release')
+build_gen := env('BUILD_GEN', 'Ninja')
+# build_gen := env('BUILD_GEN', '"Unix Makefiles"')
+# build_gen := env('BUILD_GEN', '"NMake Makefiles"')
+build_job := '-j4'
+dir_build := dir_root / '_VOut' / build_type
+dir_install := dir_root / 'install' / build_type
+
+NDK_ROOT := env('NDK_ROOT', 'path/to/ndk-bundle')
+NDK_ABI := env('NDK_ABI', 'arm64-v8a')
+NDK_PLATFORM := env('NDK_PLATFORM', 'android-27')
+export ANDROID_NDK_HOME := NDK_ROOT
+
+VCPKG_ROOT := env('VCPKG_ROOT', dir_home / 'vcpkg')
+VCPKG_TRIPLET := env('VCPKG_TRIPLET', 'x64-mingw-mix') # x64-windows-mix, arm64-android
+VCPKG_XSCRIPT := 'clear;x-script,bash {{dir_root}}/scripts/vcpkg_xscript.sh {url} {dst};x-block-origin'
+VCPKG_XSCRIPT := 'clear;x-script,cmd /k {{dir_root}}/scripts/vcpkg_xscript.bat {url} {dst};x-block-origin'
+DEPS := 'vulkan-headers volk'
+DEPS_DIR := dir_root / 'deps'
+
+
+all: gen agen
+    cmake --build {{dir_build}} {{build_job}}
+    # cmake --install {{dir_build}} --component <comp>
+    cmake --install {{dir_build}}
+
+gen:
+    cmake -G {{build_gen}} -Wno-dev \
+        -DCMAKE_BUILD_TYPE={{build_type}} \
+        -DCMAKE_INSTALL_PREFIX={{dir_install}} \
+        -DPROJECT_BUILD_DIR={{dir_build}} \
+        # With vcpkg:
+        # -DCMAKE_TOOLCHAIN_FILE={{VCPKG_ROOT}}/scripts/buildsystems/vcpkg.cmake \
+        # -DVCPKG_TARGET_TRIPLET={{VCPKG_TRIPLET}} \
+        # -DVCPKG_OVERLAY_TRIPLETS={{dir_root}}/cmake \
+        # -DVCPKG_INSTALLED_DIR={{DEPS_DIR}} \
+        # -DVCPKG_MANIFEST_INSTALL=OFF \
+        -S . -B {{dir_build}}
+
+# Release for android need to remove '-g' from android-legacy.toolchain.cmake
+# See https://github.com/android/ndk/issues/243
+# Or strip manually:
+#   objcopy --only-keep-debug <target> <target.sym>
+#   objcopy --strip-unneeded <target>
+agen:
+    cmake -G {{build_gen}} -Wno-dev \
+        -DCMAKE_BUILD_TYPE={{build_type}} \
+        -DCMAKE_INSTALL_PREFIX={{dir_install}} \
+        -DPROJECT_BUILD_DIR={{dir_build}} \
+        -DANDROID_NDK={{NDK_ROOT}} \
+        -DANDROID_ABI={{NDK_ABI}} \
+        -DANDROID_PLATFORM={{NDK_PLATFORM}} \
+        -DANDROID_TOOLCHAIN=clang \
+        -DANDROID_STL=c++_static \
+        # With vcpkg:
+        # -DCMAKE_TOOLCHAIN_FILE={{VCPKG_ROOT}}/scripts/buildsystems/vcpkg.cmake \
+        # -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE={{NDK_ROOT}}/build/cmake/android.toolchain.cmake \
+        # -DVCPKG_TARGET_TRIPLET={{VCPKG_TRIPLET}} \
+        # -DVCPKG_OVERLAY_TRIPLETS={{dir_root}}/cmake \
+        # -DVCPKG_INSTALLED_DIR={{DEPS_DIR}} \
+        # -DVCPKG_MANIFEST_INSTALL=OFF \
+        -S . -B {{dir_build}}
+
+deps:
+    vcpkg install {{DEPS}} --recurse --no-binarycaching \
+        --triplet={{VCPKG_TRIPLET}} \
+        --overlay-triplets={{dir_root}}/cmake \
+        --x-install-root={{DEPS_DIR}} \
+        --x-asset-sources={{VCPKG_XSCRIPT}}
+
+clean:
+    -rm -rf {{dir_build}}
+    -rm -rf {{dir_install}}
+
+[windows]
+clean:
+    -del /f/s/q {{replace(dir_build, '/', '\')}}
+    -rmdir /s/q {{replace(dir_build, '/', '\')}}
+    -del /f/s/q {{replace(dir_install, '/', '\')}}
+    -rmdir /s/q {{replace(dir_install, '/', '\')}}
+
+tags:
+    cmake --build {{dir_build}} {{build_job}} --target tags
+    cmake --install {{dir_build}}

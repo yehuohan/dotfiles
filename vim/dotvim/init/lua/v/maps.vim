@@ -42,8 +42,8 @@ nnoremap zl zb
 " 命令行
 cnoremap <C-v> <C-r>+
 cnoremap <C-p> <C-r>0
-cnoremap <C-j> <Down>
-cnoremap <C-k> <Up>
+cnoremap <M-n> <Down>
+cnoremap <M-m> <Up>
 cnoremap <M-j> <C-n>
 cnoremap <M-k> <C-p>
 cnoremap <M-h> <Left>

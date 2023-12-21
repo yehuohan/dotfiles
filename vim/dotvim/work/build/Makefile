@@ -10,40 +10,40 @@ BUILD_TYPE ?= Debug
 #BUILD_GEN ?= "NMake Makefiles"
 BUILD_GEN ?= "Ninja"
 BUILD_JOB ?= -j4
-BUILD_DIR ?= ${DIR_ROOT}/_VOut/${BUILD_TYPE}
-INSTALL_DIR ?= ${DIR_ROOT}/install/${BUILD_TYPE}
+DIR_BUILD ?= ${DIR_ROOT}/_VOut/${BUILD_TYPE}
+DIR_INSTALL ?= ${DIR_ROOT}/install/${BUILD_TYPE}
 
 NDK_ROOT ?= ${Android_SDK}/ndk-bundle
 NDK_ABI ?= arm64-v8a
 NDK_PLATFORM ?= android-27
 
 VCPKG_ROOT ?= ${APPS_HOME}/vcpkg
-VCPKG_TRIPLET ?= x64-mingw-mix # x64-windows-mix, arm64-android 
+VCPKG_TRIPLET ?= x64-mingw-mix # x64-windows-mix, arm64-android
 VCPKG_XSCRIPT := 'clear;x-script,bash ${DIR_ROOT}/scripts/vcpkg_xscript.sh {url} {dst};x-block-origin'
 # VCPKG_XSCRIPT := 'clear;x-script,cmd /k ${DIR_ROOT}/scripts/vcpkg_xscript.bat {url} {dst};x-block-origin'
 DEPS ?= vulkan-headers volk
 DEPS_DIR ?= ${DIR_ROOT}/deps
-# DEPS_DIR ?= ${VCPKG_ROOT}/installed
 
 
 .PHONY: all
 all: src src_android
-	cmake --build ${BUILD_DIR} ${BUILD_JOB}
-	# cmake --install ${BUILD_DIR} --component <comp>
-	cmake --install ${BUILD_DIR}
+	cmake --build ${DIR_BUILD} ${BUILD_JOB}
+	# cmake --install ${DIR_BUILD} --component <comp>
+	cmake --install ${DIR_BUILD}
 
 .PHONY: src
 src:
 	cmake -G ${BUILD_GEN} -Wno-dev \
 		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-		-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
-		-DPROJECT_BUILD_DIR=${BUILD_DIR} \
+		-DCMAKE_INSTALL_PREFIX=${DIR_INSTALL} \
+		-DPROJECT_BUILD_DIR=${DIR_BUILD} \
 		# With vcpkg:
 		# -DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
 		# -DVCPKG_TARGET_TRIPLET=${VCPKG_TRIPLET}
 		# -DVCPKG_OVERLAY_TRIPLETS=${DIR_ROOT}/cmake
 		# -DVCPKG_INSTALLED_DIR=${DEPS_DIR}
-		-S . -B ${BUILD_DIR}
+		# -DVCPKG_MANIFEST_INSTALL=OFF
+		-S . -B ${DIR_BUILD}
 
 # Release for android need to remove '-g' from android-legacy.toolchain.cmake
 # See https://github.com/android/ndk/issues/243
@@ -55,8 +55,8 @@ src-android:
 	# ANDROID_NDK_HOME=${NDK_ROOT}
 	cmake -G ${BUILD_GEN} -Wno-dev \
 		-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-		-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR} \
-		-DPROJECT_BUILD_DIR=${BUILD_DIR} \
+		-DCMAKE_INSTALL_PREFIX=${DIR_INSTALL} \
+		-DPROJECT_BUILD_DIR=${DIR_BUILD} \
 		-DANDROID_NDK=${NDK_ROOT} \
 		-DANDROID_ABI=${NDK_ABI} \
 		-DANDROID_PLATFORM=${NDK_PLATFORM} \
@@ -68,7 +68,8 @@ src-android:
 		# -DVCPKG_TARGET_TRIPLET=${VCPKG_TRIPLET}
 		# -DVCPKG_OVERLAY_TRIPLETS=${DIR_ROOT}/cmake
 		# -DVCPKG_INSTALLED_DIR=${DEPS_DIR}
-		-S . -B ${BUILD_DIR}
+		# -DVCPKG_MANIFEST_INSTALL=OFF
+		-S . -B ${DIR_BUILD}
 
 .PHONY: deps
 deps:
@@ -81,12 +82,13 @@ deps:
 
 .PHONY: clean
 clean:
-	-rm -r ${BUILD_DIR}
+	-rm -rf ${DIR_BUILD}
+	-rm -rf ${DIR_INSTALL}
 
 .PHONY: src
 tags:
-	cmake --build ${BUILD_DIR} ${BUILD_JOB} --target tags
-	cmake --install ${BUILD_DIR}
+	cmake --build ${DIR_BUILD} ${BUILD_JOB} --target tags
+	cmake --install ${DIR_BUILD}
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -160,5 +162,3 @@ clean:
 .PHONY: tags
 tags:
 	${CTAGS} -R ${DIR_INC} ${DIR_SRC}
-
-

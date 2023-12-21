@@ -34,6 +34,7 @@ local wsc = nlib.new_configer({
 --- @field stage(string) Task stage from {'build', 'run', 'clean', 'test'}
 
 --- @class CodeTable Single code file tasks according to filetype
+--- For codes: cmd {barg} {bsrc} => {bout} {earg}
 -- stylua: ignore start
 local codes = {
     nvim       = { cmd = 'nvim {barg} -l {bsrc} {earg}' },
@@ -51,6 +52,7 @@ local codes = {
     go         = { cmd = 'go run {bsrc} {earg}' },
     javascript = { cmd = 'node {bsrc} {earg}' },
     typescript = { cmd = 'node {bsrc} {earg}' },
+    just       = { cmd = 'just -f {bsrc} {earg}', efm = [[\ %#-->\ %f:%l:%c]] },
     make       = { cmd = 'make -f {bsrc} {earg}', efm = [[make:\ ***\ [%f:%l:\ %m]] },
     cmake      = { cmd = 'cmake {earg} -P {bsrc}', efm = [[CMake\ Error\ at\ %f:%l\ %#%m:]]
                                                       .. [[,\ \ %f:%l\ (%m)]] },
@@ -65,7 +67,9 @@ local codes = {
 -- stylua: ignore end
 
 --- @class PackTable Project package tasks
+--- For packs: generate {garg} {gtar} => build {barg} {bout} => run/clean/test {earg}
 local packs = {
+    just = 'just {barg}',
     make = 'make {barg}',
     cmake = {
         'cmake -G "{gtar}" -DCMAKE_INSTALL_PREFIX=_VOut {garg} -S . -B _VOut',
@@ -73,10 +77,6 @@ local packs = {
         'cmake --install _VOut',
     },
     cargo = 'cargo {stage} {barg} -- {earg}',
-    sphinx = {
-        'make clean',
-        'make html',
-    },
     _pats = {
         tar = [[^TARGET%s*:?=%s*([%w%-_]+)%s*$]], -- TARGET := <bout>
         pro = [[^project%s*%(%s*([%w%-_]+).*%).*$]], -- project(<bout>)
@@ -167,6 +167,22 @@ function _hdls.file(cfg)
     return replace(cmd, rep)
 end
 
+function _hdls.just(cfg)
+    cfg.tout.efm = codes.just.efm .. ',' .. codes.cmake.efm .. ',' .. vim.o.errorformat
+
+    local rep = {}
+    rep.barg = cfg.barg
+    if cfg.stage == 'clean' then
+        rep.barg = 'clean'
+    end
+
+    local cmds = {}
+    cmds[#cmds + 1] = (IsWin() and cfg.msvc) and packs._msvc or nil
+    cmds[#cmds + 1] = replace(packs.just, rep)
+
+    return sequence(cmds)
+end
+
 function _hdls.make(cfg)
     cfg.tout.efm = codes.make.efm .. ',' .. codes.cmake.efm .. ',' .. vim.o.errorformat
 
@@ -224,19 +240,6 @@ function _hdls.cargo(cfg)
     return replace(packs.cargo, rep)
 end
 
-function _hdls.sphinx(cfg)
-    local cmd
-    if cfg.stage == 'clean' then
-        cmd = packs.sphinx[1]
-    else
-        cmd = sequence({
-            packs.sphinx[2],
-            'firefox build/html/index.html',
-        })
-    end
-    return cmd
-end
-
 --- Dispatch task handle and return task command
 --- @param rhs(CodeHandleMap)
 --- @param cfg(TaskConfig)
@@ -258,7 +261,14 @@ local _args = {}
 
 function _args.nvim(dic, cfg) dic.barg.lst = { '--headless', '--noplugin' } end
 
-function _args.file(dic, cfg) dic.barg.lst = { '-static' } end
+function _args.file(dic, cfg)
+    dic.barg.lst = { '-static' }
+    dic.earg.lst = { '--summary' }
+end
+
+function _args.just(dic, cfg)
+    dic.barg.lst = nlib.u.str2arg(vim.fn.system('just --summary --unsorted -f ' .. cfg.file))
+end
 
 function _args.make(dic, cfg) dic.barg.lst = pat_list(packs._pats.pho, cfg.file) end
 
@@ -283,9 +293,7 @@ local function update_sels(rhs, dic, cfg)
             vim.notify(string.format('None of %s was found!', rhs.pat))
             return false
         end
-        if _args[rhs.fn] then
-            _args[rhs.fn](dic, cfg)
-        end
+        _args[rhs.fn](dic, cfg)
     end
     return true
 end
@@ -299,22 +307,22 @@ end
 -- stylua: ignore start
 --- @type table<string,CodeHandleMap>
 local _maps = {
-    { 'l', 'f', 'm', 'u', 'n', 'j', 'o', 'h' },
+    { 'l', 'f', 'j', 'm', 'u', 'n', 'i', 'o' },
     l = { fn = 'nvim',   desc = 'Nvim lua' },
     f = { fn = 'file',   desc = 'Single file' },
+    j = { fn = 'just',   desc = 'Just',        pat = 'Justfile' },
     m = { fn = 'make',   desc = 'Make',        pat = 'Makefile' },
     u = { fn = 'cmake',  desc = 'CMake Unix',  pat = 'CMakeLists', target = 'Unix Makefiles' },
     n = { fn = 'cmake',  desc = 'CMake NMake', pat = 'CMakeLists', target = 'NMake Makefiles' },
-    j = { fn = 'cmake',  desc = 'CMake Ninja', pat = 'CMakeLists', target = 'Ninja' },
+    i = { fn = 'cmake',  desc = 'CMake Ninja', pat = 'CMakeLists', target = 'Ninja' },
     o = { fn = 'cargo',  desc = 'Cargo rust',  pat = 'Cargo.toml' },
-    h = { fn = 'sphinx', desc = 'Sphinx doc',  pat = IsWin() and 'make.bat' or 'Makefile' },
 }
 
 local _keys = {
-    'Rp' , 'Rm' , 'Ru' , 'Rn' , 'Rj' , 'Ro' , 'Rh' , 'Rf', 'Rl',
-    'rp' , 'rm' , 'ru' , 'rn' , 'rj' , 'ro' , 'rh' , 'rf', 'rl',
-    'rcp', 'rcm', 'rcu', 'rcn', 'rcj', 'rco', 'rch',
-    'rbp', 'rbm', 'rbu', 'rbn', 'rbj', 'rbo', 'rbh',
+    'Rp' , 'Rj' , 'Rm' , 'Ru' , 'Rn' , 'Ri' , 'Ro' , 'Rf', 'Rl',
+    'rp' , 'rj' , 'rm' , 'ru' , 'rn' , 'ri' , 'ro' , 'rf', 'rl',
+    'rcp', 'rcj', 'rcm', 'rcu', 'rcn', 'rci', 'rco',
+    'rbp', 'rbj', 'rbm', 'rbu', 'rbn', 'rbi', 'rbo',
 }
 -- stylua: ignore end
 
