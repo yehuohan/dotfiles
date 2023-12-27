@@ -68,22 +68,20 @@ set ttimeout                            " 打开键码超时检测
 set timeoutlen=1000                     " 映射超时时间为1000ms
 set ttimeoutlen=70                      " 键码超时时间为70ms
 
-if IsVim()
-    " 终端Alt键映射处理：如 Alt+x，实际连续发送 <Esc>x 的键码
-    "<1> set <M-x>=x                  " 设置键码，这里的是一个字符，即<Esc>的键码（按i-C-v, i-C-[输入）
-    "    nnoremap <M-x>  :CmdTest<CR>   " 按键码超时时间检测
-    "<2> nnoremap <Esc>x :CmdTest<CR>   " 按映射超时时间检测
-    "<3> nnoremap x    :CmdTest<CR>   " 按映射超时时间检测
-    for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m ; , .', ' ')
-        execute 'set <M-'. t . '>=' . t
-    endfor
+" 终端Alt键映射处理：如 Alt+x，实际连续发送 <Esc>x 的键码
+"<1> set <M-x>=x                      " 设置键码，这里的是一个字符，即<Esc>的键码（按i-C-v, i-C-[输入）
+"    nnoremap <M-x>  :CmdTest<CR>       " 按键码超时时间检测
+"<2> nnoremap <Esc>x :CmdTest<CR>       " 按映射超时时间检测
+"<3> nnoremap x    :CmdTest<CR>       " 按映射超时时间检测
+for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m ; , .', ' ')
+    execute 'set <M-'. t . '>=' . t
+endfor
 
-    if &term == 'xterm' || &term == 'xterm-256color'
-        set t_vb=                       " 关闭终端可视闪铃，即normal模式时按esc会有响铃
-        let &t_SI = "\<Esc>[6 q"        " 进入Insert模式，5,6:竖线
-        let &t_SR = "\<Esc>[3 q"        " 进入Replace模式，3,4:横线
-        let &t_EI = "\<Esc>[2 q"        " 退出Insert模式，1,2:方块
-    endif
+if &term == 'xterm' || &term == 'xterm-256color'
+    set t_vb=                           " 关闭终端可视闪铃，即normal模式时按esc会有响铃
+    let &t_SI = "\<Esc>[6 q"            " 进入Insert模式，5,6:竖线
+    let &t_SR = "\<Esc>[3 q"            " 进入Replace模式，3,4:横线
+    let &t_EI = "\<Esc>[2 q"            " 退出Insert模式，1,2:方块
 endif
 " }}}
 
@@ -208,10 +206,6 @@ augroup SetupCmd
     autocmd BufReadPre * call s:onLargeFile()
     autocmd BufEnter * call s:onWinAlter(v:true)
     autocmd BufLeave * call s:onWinAlter(v:false)
-if IsNVim()
-    autocmd BufNewFile,BufRead *.vert,*.tesc,*.tese,*.glsl,*.geom,*.frag,*.comp,*.rgen,*.rmiss,*.rchit,*.rahit,*.rint,*.rcall set filetype=glsl
-    autocmd TextYankPost * silent! lua vim.highlight.on_yank{higroup='IncSearch', timeout=200}
-endif
 augroup END
 " }}}
 
@@ -220,7 +214,6 @@ set guioptions=M                        " 完全禁用Gui界面元素
 let g:did_install_default_menus = 1     " 禁止加载缺省菜单
 let g:did_install_syntax_menu = 1       " 禁止加载Syntax菜单
 
-" Fonts {{{
 function! GuiSetFonts(inc)
     let s:use.ui.fontsize += a:inc
     let s:use.ui.widesize += a:inc
@@ -231,53 +224,14 @@ call GuiSetFonts(0)
 nnoremap <k0> :call GuiSetFonts(0)<CR>
 nnoremap <kPlus> :call GuiSetFonts(1)<CR>
 nnoremap <kMinus> :call GuiSetFonts(-1)<CR>
-" }}}
 
-" Gui-vim {{{
-if IsVim() && has('gui_running')
-    set lines=25
-    set columns=90
-    set linespace=0
-    if IsWin()
-        nnoremap <leader>tf
-            \ <Cmd>call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)<CR>
-    endif
+set lines=25
+set columns=90
+set linespace=0
+if IsWin()
+    nnoremap <leader>tf
+        \ <Cmd>call libcallnr('gvimfullscreen.dll', 'ToggleFullScreen', 0)<CR>
 endif
-" }}}
-
-" Gui-nvim {{{
-if IsNVim()
-augroup SetupGui
-    autocmd!
-    autocmd UIEnter * call s:onUIEnter()
-augroup END
-
-function! s:onUIEnter()
-    set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
-        \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
-        \,sm:block-blinkwait175-blinkoff150-blinkon175
-
-    " Gui-neovim, 在UIEnter之后才起作用
-    if exists('g:GuiLoaded')
-        GuiLinespace 0
-        GuiTabline 0
-        GuiPopupmenu 0
-        noremap <RightMouse> <Cmd>call GuiShowContextMenu()<CR>
-        inoremap <RightMouse> <Cmd>call GuiShowContextMenu()<CR>
-        nnoremap <leader>tf <Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>
-        nnoremap <leader>tm <Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>
-    endif
-
-    " Gui-neovide
-    if exists('g:neovide')
-        let g:neovide_remember_window_size = v:true
-        let g:neovide_cursor_antialiasing = v:false
-        let g:neovide_cursor_vfx_mode = "railgun"
-        nnoremap <leader>tf <Cmd>let g:neovide_fullscreen=!g:neovide_fullscreen<CR>
-    endif
-endfunction
-endif
-" }}}
 " }}}
 
 " Mappings {{{
@@ -311,10 +265,8 @@ noremap <S-h> ^
 nnoremap <leader>za zA
 nnoremap <leader>zc zC
 nnoremap <leader>zo zO
-if IsVim()
 nnoremap <leader>zm zM
 nnoremap <leader>zr zR
-endif
 nnoremap <leader>zn zN
 nnoremap <leader>zx zX
 nnoremap <leader>zf zF
@@ -349,9 +301,7 @@ nnoremap <leader><leader>S :sort fr //<Left>
 vnoremap <leader><leader>S :<C-u>sort fr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
 " lua测试代码
 nnoremap <leader><leader>u :lua=<Space>
-nnoremap <leader><leader>U :lua= vim.api.nvim_parse_cmd('', {})<Left><Left><Left><Left><Left><Left>
 vnoremap <leader><leader>u <Cmd>call feedkeys(':lua= ' . GetSelected(''), 'n')<CR>
-vnoremap <leader><leader>U <Cmd>call feedkeys(':lua= vim.api.nvim_parse_cmd(''' . GetSelected('') . ''', {})', 'n')<CR>
 " 查看help文档
 nnoremap <leader><leader>k :h <C-r><C-w>
 vnoremap <leader><leader>k <Cmd>call feedkeys(':h ' . GetSelected(''), 'n')<CR>
@@ -403,30 +353,12 @@ endfor
 " }}}
 
 " Tab, Buffer, Window {{{
-if IsNVim()
-" FUNCTION: WinGotoNextFloating() {{{ 跳转到下一个floating窗口
-function! WinGotoNextFloating()
-    for l:wid in nvim_list_wins()
-        if l:wid != nvim_get_current_win()
-            let l:cfg = nvim_win_get_config(wid)
-            if get(l:cfg, 'relative', '') != '' && get(l:cfg, 'focusable', v:true) == v:true
-                call win_gotoid(wid)
-            endif
-        endif
-    endfor
-endfunction
-" }}}
-endif
-
 " FUNCTION: WinMoveSpliter(dir, inc) range {{{ 移动窗口的分界，改变窗口大小
 " 只有最bottom-right的窗口是移动其top-left的分界，其余窗口移动其bottom-right分界
 function! WinMoveSpliter(dir, inc) range
     let l:wnr = winnr()
     let l:pos = win_screenpos(l:wnr)
     let l:hei = winheight(l:wnr) + l:pos[0] + &cmdheight
-    if IsNVim()
-        let l:hei += (empty(&winbar) ? 0 : 1)
-    endif
     let l:wid = winwidth(l:wnr) - 1 + l:pos[1]
     let l:all_hei = &lines
     let l:all_wid = &columns
@@ -461,9 +393,6 @@ nnoremap <leader>wl <C-w>l
 nnoremap <leader>wp <C-w>p
 nnoremap <leader>wP <C-w>P
 nnoremap <leader>ww <C-w>w
-if IsNVim()
-nnoremap <leader>wf :call WinGotoNextFloating()<CR>
-endif
 " 移动窗口
 nnoremap <leader>wH <C-w>H
 nnoremap <leader>wJ <C-w>J

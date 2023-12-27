@@ -78,11 +78,7 @@ endfunction
 
 " FUNCTION: Notify(msg) {{{ 信息通知
 function! Notify(msg)
-    if IsNVim()
-        call v:lua.vim.notify(a:msg)
-    else
-        echo a:msg
-    endif
+    echo a:msg
 endfunction
 " }}}
 
@@ -1061,18 +1057,6 @@ endfunction
 " @param suffix: 临时文件附加后缀
 " @param type: 编辑窗口类型
 function! FnEditFile(suffix, type)
-if IsNVim() && a:type ==# 'f'
-    let l:buf = nvim_create_buf(v:true, v:false)
-    let l:opts = {
-        \ 'relative': 'editor',
-        \ 'width': float2nr(0.6 * &columns),
-        \ 'height': float2nr(0.7 * &lines),
-        \ 'col': 2,
-        \ 'row': 1,
-        \ 'border': 'single',
-        \ }
-    call nvim_open_win(l:buf, v:true, l:opts)
-endif
     execute printf('%s %s.%s',
                 \ a:type ==# 't' ? 'tabedit' : 'edit',
                 \ fnamemodify(tempname(), ':r'),
@@ -1196,15 +1180,6 @@ nnoremap <leader>etr :call FnEditFile('rs' , 't')<CR>
 nnoremap <leader>etp :call FnEditFile('py' , 't')<CR>
 nnoremap <leader>etm :call FnEditFile('md' , 't')<CR>
 nnoremap <leader>etl :call FnEditFile('lua', 't')<CR>
-if IsNVim()
-nnoremap <leader>efi <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 'f')<CR>
-nnoremap <leader>efc :call FnEditFile('c'  , 'f')<CR>
-nnoremap <leader>efa :call FnEditFile('cpp', 'f')<CR>
-nnoremap <leader>efr :call FnEditFile('rs' , 'f')<CR>
-nnoremap <leader>efp :call FnEditFile('py' , 'f')<CR>
-nnoremap <leader>efl :call FnEditFile('lua', 'f')<CR>
-nnoremap <leader>efm :call FnEditFile('md' , 'f')<CR>
-endif
 nnoremap <silent> <leader>dh :call Input2Fn(['Divide Right: '] , 'FnInsertSpace', 'h')<CR>
 nnoremap <silent> <leader>db :call Input2Fn(['Divide Both: ']  , 'FnInsertSpace', 'b')<CR>
 nnoremap <silent> <leader>dl :call Input2Fn(['Divide Left: ']  , 'FnInsertSpace', 'l')<CR>
