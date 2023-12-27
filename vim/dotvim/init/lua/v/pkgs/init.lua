@@ -122,30 +122,10 @@ local function pkg_cinnamon()
         default_delay = 7,
         hide_cursor = false,
     })
-    m.nnore({
-        '<M-n>',
-        function()
-            if use.coc and vim.fn['coc#float#has_scroll']() == 1 then
-                return vim.fn['coc#float#scroll'](1)
-            else
-                return [[<Cmd>lua Scroll('<C-d>', 1, 1)<CR>]]
-            end
-        end,
-        expr = true,
-    })
-    m.nnore({
-        '<M-m>',
-        function()
-            if use.coc and vim.fn['coc#float#has_scroll']() == 1 then
-                return vim.fn['coc#float#scroll'](0)
-            else
-                return [[<Cmd>lua Scroll('<C-u>', 1, 1)<CR>]]
-            end
-        end,
-        expr = true,
-    })
     m.nnore({ '<M-j>', [[<Cmd>lua Scroll('<C-f>', 1, 1)<CR>]] })
     m.nnore({ '<M-k>', [[<Cmd>lua Scroll('<C-b>', 1, 1)<CR>]] })
+    m.nnore({ '<M-n>', [[<Cmd>lua Scroll('<C-d>', 1, 1)<CR>]] })
+    m.nnore({ '<M-m>', [[<Cmd>lua Scroll('<C-u>', 1, 1)<CR>]] })
 end
 
 -- 窗口跳转
@@ -691,21 +671,6 @@ local function pkg_treesitter()
     })
 end
 
--- Coc补全
-local function pkg_coc()
-    vim.fn['coc#config']('Lua', {
-        workspace = {
-            library = {
-                vim.env.DotVimInit .. '/lua',
-                vim.env.VIMRUNTIME .. '/lua',
-                vim.env.VIMRUNTIME .. '/lua/vim',
-                vim.env.VIMRUNTIME .. '/lua/vim/lsp',
-                vim.env.VIMRUNTIME .. '/lua/vim/treesitter',
-            },
-        },
-    })
-end
-
 -- 代码片段
 local function pkg_ultisnips()
     vim.cmd([[
@@ -1136,14 +1101,6 @@ local pkgs = {
         },
     },
     { 'nvim-treesitter/nvim-treesitter', enabled = use.nts, config = pkg_treesitter },
-    { -- coc
-        'neoclide/coc.nvim',
-        enabled = use.coc,
-        branch = 'release',
-        config = pkg_coc,
-        event = 'InsertEnter',
-        dependencies = { 'neoclide/jsonc.vim' },
-    },
     { 'rcarriga/nvim-dap-ui', enabled = use.ndap, dependencies = { 'mfussenegger/nvim-dap' } },
     { -- ultisnips
         'SirVer/ultisnips',

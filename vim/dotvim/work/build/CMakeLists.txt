@@ -48,7 +48,7 @@ endif()
 
 add_executable(${PROJECT_NAME} ${SRC})
 add_library(${PROJECT_NAME} SHARED|STATIC ${SRC})
-target_include_directories() # target_xxx命令：其它Target链接此Target需要的include_directories
+target_include_directories(${PROJECT_NAME} INTERFACE|PUBLIC|PRIVATE inc)
 target_compile_options(${PROJECT_NAME} INTERFACE|PUBLIC|PRIVATE -g -Wall -DMYVAR=1)
 target_link_libraries(${PROJECT_NAME} INTERFACE|PUBLIC|PRIVATE lib)
 

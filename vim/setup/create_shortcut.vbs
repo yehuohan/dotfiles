@@ -3,7 +3,7 @@ Set WshShell = CreateObject("WScript.Shell")
 Set Neovide = WshShell.CreateShortcut("./Neovide.lnk")
 Neovide.TargetPath = "%APPS_HOME%\_packs\apps\neovide\current\neovide.exe"
 Neovide.IconLocation = "%APPS_HOME%\_packs\apps\neovide\current\neovide.exe"
-Neovide.Arguments = "--geometry=70x20"
+Neovide.Arguments = "--grid=70x20"
 Neovide.WorkingDirectory = "%APPS_HOME%\_packs\apps\neovide"
 Neovide.Save
 

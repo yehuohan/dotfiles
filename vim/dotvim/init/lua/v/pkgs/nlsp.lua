@@ -361,8 +361,8 @@ local function __lsp_settings()
     require('lspsaga').setup({
         ui = { border = 'single' },
         scroll_preview = {
-            scroll_down = '<M-f>',
-            scroll_up = '<M-d>',
+            scroll_down = '<M-n>',
+            scroll_up = '<M-m>',
         },
         code_action = {
             keys = { quit = { 'q', '<Esc>' } },
@@ -402,8 +402,8 @@ local function __lsp_mappings()
     m.nnore({ '<leader>gr', vim.lsp.buf.references })
     m.nnore({ '<leader>gn', vim.lsp.buf.rename })
     m.nnore({ '<leader>gf', function() vim.lsp.buf.code_action({ apply = true }) end })
-    -- m.nnore{'<leader>ga', vim.lsp.buf.code_action}
-    -- m.nnore{'<leader>gh', vim.lsp.buf.hover}
+    -- m.nnore({ '<leader>ga', vim.lsp.buf.code_action })
+    -- m.nnore({ '<leader>gh', vim.lsp.buf.hover })
     m.nnore({ '<leader>ga', '<Cmd>Lspsaga code_action<CR>' })
     m.nnore({ '<leader>gh', '<Cmd>Lspsaga hover_doc<CR>' })
     m.nnore({ '<leader>gp', '<Cmd>Lspsaga peek_definition<CR>' })
