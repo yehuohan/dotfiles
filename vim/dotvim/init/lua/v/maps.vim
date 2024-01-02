@@ -193,6 +193,8 @@ nnoremap <leader><Esc> <Cmd>nohlsearch<CR>
 nnoremap i <Cmd>nohlsearch<CR>i
 nnoremap <leader>8 *
 nnoremap <leader>3 #
+nnoremap <leader>* /\V\C\<<C-r><C-w>\><CR>
+nnoremap <leader># ?\V\C\<<C-r><C-w>\><CR>
 vnoremap <leader>8 /\V\c\<<C-r>=escape(v:lua.require('v.nlib').get_selected(''), '\/')<CR>\><CR>
 vnoremap <leader>3 ?\V\c\<<C-r>=escape(v:lua.require('v.nlib').get_selected(''), '\/')<CR>\><CR>
 nnoremap <leader>/ /\V\c<C-r><C-w><CR>
