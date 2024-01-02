@@ -1,10 +1,4 @@
 " Basic {{{
-nnoremap <leader><leader>q :lua os.exit(0)
-nnoremap <leader>.         <Cmd>lua require('v.nlib').recall()<CR>
-nnoremap <leader><leader>. <Cmd>lua require('v.nlib').recall(nil, { feedcmd = true })<CR>
-nnoremap <C-;> @:
-vnoremap <leader><leader>; <Cmd>call feedkeys(':' . v:lua.require('v.nlib').get_selected(''), 'n')<CR>
-vnoremap <leader><leader>: <Cmd>call feedkeys(':lua ' . v:lua.require('v.nlib').get_selected(''), 'n')<CR>
 " Mark跳转
 nnoremap ' `
 nnoremap ` '
@@ -52,6 +46,15 @@ cnoremap <M-o> <C-Right>
 cnoremap <M-i> <C-Left>
 cnoremap <M-u> <C-b>
 cnoremap <M-p> <C-e>
+" }}}
+
+" Cmdline {{{
+nnoremap <leader><leader>q :lua os.exit(0)
+nnoremap <leader>.         <Cmd>lua require('v.nlib').recall()<CR>
+nnoremap <leader><leader>. <Cmd>lua require('v.nlib').recall(nil, { feedcmd = true })<CR>
+nnoremap <C-;> @:
+vnoremap <leader><leader>; <Cmd>call feedkeys(':' . v:lua.require('v.nlib').get_selected(''), 'n')<CR>
+vnoremap <leader><leader>: <Cmd>call feedkeys(':lua ' . v:lua.require('v.nlib').get_selected(''), 'n')<CR>
 " 替换
 nnoremap <leader><leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
 vnoremap <leader><leader>s <Cmd>call feedkeys(':%s/' . v:lua.require('v.nlib').get_selected('') . '/', 'n')<CR>
@@ -69,6 +72,21 @@ vnoremap <leader><leader>k <Cmd>call feedkeys(':h ' . v:lua.require('v.nlib').ge
 " HEX编辑
 nnoremap <leader>xx :%!xxd<CR>
 nnoremap <leader>xr :%!xxd -r<CR>
+" }}}
+
+" Search {{{
+nnoremap <leader><Esc> <Cmd>nohlsearch<CR>
+nnoremap i <Cmd>nohlsearch<CR>i
+nnoremap <leader>8 *
+nnoremap <leader>3 #
+nnoremap <leader>* /\V\C\<<C-r><C-w>\><CR>
+nnoremap <leader># ?\V\C\<<C-r><C-w>\><CR>
+vnoremap <leader>8 /\V\c\<<C-r>=escape(v:lua.require('v.nlib').get_selected(''), '\/')<CR>\><CR>
+vnoremap <leader>3 ?\V\c\<<C-r>=escape(v:lua.require('v.nlib').get_selected(''), '\/')<CR>\><CR>
+nnoremap <leader>/ /\V\c<C-r><C-w><CR>
+vnoremap <leader>/ /\V\c<C-r>=escape(v:lua.require('v.nlib').get_selected(''), '\/')<CR><CR>
+nnoremap <leader><leader>/ /<C-r><C-w>
+vnoremap <leader><leader>/ /<C-r>=v:lua.require('v.nlib').get_selected('')<CR>
 " }}}
 
 " Copy & Paste {{{
@@ -186,19 +204,4 @@ nnoremap <leader>dp <Cmd>execute '.,+' . string(v:count1-1) . 'diffput'<CR>
 nnoremap <leader>dg <Cmd>execute '.,+' . string(v:count1-1) . 'diffget'<CR>
 nnoremap <leader>dj ]c
 nnoremap <leader>dk [c
-" }}}
-
-" Search {{{
-nnoremap <leader><Esc> <Cmd>nohlsearch<CR>
-nnoremap i <Cmd>nohlsearch<CR>i
-nnoremap <leader>8 *
-nnoremap <leader>3 #
-nnoremap <leader>* /\V\C\<<C-r><C-w>\><CR>
-nnoremap <leader># ?\V\C\<<C-r><C-w>\><CR>
-vnoremap <leader>8 /\V\c\<<C-r>=escape(v:lua.require('v.nlib').get_selected(''), '\/')<CR>\><CR>
-vnoremap <leader>3 ?\V\c\<<C-r>=escape(v:lua.require('v.nlib').get_selected(''), '\/')<CR>\><CR>
-nnoremap <leader>/ /\V\c<C-r><C-w><CR>
-vnoremap <leader>/ /\V\c<C-r>=escape(v:lua.require('v.nlib').get_selected(''), '\/')<CR><CR>
-nnoremap <leader><leader>/ /<C-r><C-w>
-vnoremap <leader><leader>/ /<C-r>=v:lua.require('v.nlib').get_selected('')<CR>
 " }}}

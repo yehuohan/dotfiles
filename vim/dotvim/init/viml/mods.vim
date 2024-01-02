@@ -98,7 +98,7 @@ function! Input2Str(prompt, ...)
     elseif a:0 == 2
         return input(a:prompt, a:1, a:2)
     elseif a:0 == 3
-        execute 'lcd ' . escape(a:3, ' \')
+        execute 'lcd ' . a:3
         return input(a:prompt, a:1, a:2)
     endif
 endfunction
@@ -634,11 +634,6 @@ let s:fw = {
             \ 'fl' : ':Leaderf rg --nowrap --input "%s"',
             \ 'fh' : ':Leaderf tag --nowrap --input "%s"',
             \ },
-        \ 'telescope' : {
-            \ 'ff' : ':lua require("telescope.builtin").find_files({search_file="%s"})',
-            \ 'fl' : ':lua require("telescope.builtin").live_grep({placeholder="%s"})',
-            \ 'fh' : ':lua require("telescope.builtin").tags({placeholder="%s"})',
-            \ }
         \ },
     \ }
 " s:fw_mappings {{{

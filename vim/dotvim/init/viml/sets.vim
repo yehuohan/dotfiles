@@ -235,13 +235,8 @@ endif
 " }}}
 
 " Mappings {{{
-" Misc {{{
-nnoremap <leader>.         :call ExecLast(1)<CR>
-nnoremap <leader><leader>. :call ExecLast(0)<CR>
-nnoremap <C-;> @:
-vnoremap <leader><leader>; <Cmd>call feedkeys(':' . GetSelected(''), 'n')<CR>
-vnoremap <leader><leader>: <Cmd>call feedkeys(':lua ' . GetSelected(''), 'n')<CR>
-nnoremap <leader><leader>q :lua os.exit(0)
+" Basic {{{
+" Mark跳转
 nnoremap ' `
 nnoremap ` '
 " 回退操作
@@ -293,21 +288,40 @@ cnoremap <M-o> <C-Right>
 cnoremap <M-i> <C-Left>
 cnoremap <M-u> <C-b>
 cnoremap <M-p> <C-e>
+" }}}
+
+" Cmdline {{{
+nnoremap <leader>.         :call ExecLast(1)<CR>
+nnoremap <leader><leader>. :call ExecLast(0)<CR>
+nnoremap <C-;> @:
+vnoremap <leader><leader>; <Cmd>call feedkeys(':' . GetSelected(''), 'n')<CR>
 " 替换
 nnoremap <leader><leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
 vnoremap <leader><leader>s <Cmd>call feedkeys(':%s/' . GetSelected('') . '/', 'n')<CR>
 " 排序
 nnoremap <leader><leader>S :sort fr //<Left>
 vnoremap <leader><leader>S :<C-u>sort fr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
-" lua测试代码
-nnoremap <leader><leader>u :lua=<Space>
-vnoremap <leader><leader>u <Cmd>call feedkeys(':lua= ' . GetSelected(''), 'n')<CR>
 " 查看help文档
 nnoremap <leader><leader>k :h <C-r><C-w>
 vnoremap <leader><leader>k <Cmd>call feedkeys(':h ' . GetSelected(''), 'n')<CR>
 " HEX编辑
 nnoremap <leader>xx :%!xxd<CR>
 nnoremap <leader>xr :%!xxd -r<CR>
+" }}}
+
+" Search {{{
+nnoremap <leader><Esc> :nohlsearch<CR>
+nnoremap i <Cmd>nohlsearch<CR>i
+nnoremap <leader>8 *
+nnoremap <leader>3 #
+nnoremap <leader>* /\V\C\<<C-r><C-w>\><CR>
+nnoremap <leader># ?\V\C\<<C-r><C-w>\><CR>
+vnoremap <leader>8 /\V\c\<<C-r>=escape(GetSelected(''), '\/')<CR>\><CR>
+vnoremap <leader>3 ?\V\c\<<C-r>=escape(GetSelected(''), '\/')<CR>\><CR>
+nnoremap <leader>/ /\V\c<C-r><C-w><CR>
+vnoremap <leader>/ /\V\c<C-r>=escape(GetSelected(''), '\/')<CR><CR>
+nnoremap <leader><leader>/ /<C-r><C-w>
+vnoremap <leader><leader>/ /<C-r>=GetSelected('')<CR>
 " }}}
 
 " Copy & Paste {{{
@@ -524,20 +538,5 @@ nnoremap <leader>dp <Cmd>execute '.,+' . string(v:count1-1) . 'diffput'<CR>
 nnoremap <leader>dg <Cmd>execute '.,+' . string(v:count1-1) . 'diffget'<CR>
 nnoremap <leader>dj ]c
 nnoremap <leader>dk [c
-" }}}
-
-" Search {{{
-nnoremap <leader><Esc> :nohlsearch<CR>
-nnoremap i <Cmd>nohlsearch<CR>i
-nnoremap <leader>8 *
-nnoremap <leader>3 #
-nnoremap <leader>* /\V\C\<<C-r><C-w>\><CR>
-nnoremap <leader># ?\V\C\<<C-r><C-w>\><CR>
-vnoremap <leader>8 /\V\c\<<C-r>=escape(GetSelected(''), '\/')<CR>\><CR>
-vnoremap <leader>3 ?\V\c\<<C-r>=escape(GetSelected(''), '\/')<CR>\><CR>
-nnoremap <leader>/ /\V\c<C-r><C-w><CR>
-vnoremap <leader>/ /\V\c<C-r>=escape(GetSelected(''), '\/')<CR><CR>
-nnoremap <leader><leader>/ /<C-r><C-w>
-vnoremap <leader><leader>/ /<C-r>=GetSelected('')<CR>
 " }}}
 " }}}
