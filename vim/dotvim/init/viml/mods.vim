@@ -76,12 +76,6 @@ function! GetMultiFilesCompletion(arglead, cmdline, cursorpos)
 endfunction
 " }}}
 
-" FUNCTION: Notify(msg) {{{ 信息通知
-function! Notify(msg)
-    echo a:msg
-endfunction
-" }}}
-
 " FUNCTION: Expand(expr, [mods]) {{{ 路径扩展
 " @param expr: 扩展表达式，对于%，会受到lcd的影响
 function! Expand(expr, ...)
@@ -498,7 +492,7 @@ function! RunProject(keys, ...)
         try
             call s:rp.run(get(a:000, 0, s:parseProps(km)))
 		catch /\V\^[RP] /
-            call Notify(v:exception)
+            echo v:exception
         catch
             echo v:exception
             echo v:throwpoint
@@ -1158,7 +1152,7 @@ function! FnEvalStr(fn, inp, out)
         elseif a:out ==# 'c'
             call setreg('0', l:res)
             call setreg('+', l:res)
-            call Notify(l:res .. ' -> copied')
+            echo l:res .. ' -> copied'
         endif
     endif
 endfunction

@@ -113,10 +113,10 @@ endfunction
 function! s:opt.fns.syntax()
     if exists('g:syntax_on')
         syntax off
-        call Notify('syntax off')
+        echo 'syntax off'
     else
         syntax on
-        call Notify('syntax on')
+        echo 'syntax on'
     endif
 endfunction
 " }}}
@@ -125,7 +125,7 @@ endfunction
 " Function: OptionInv(opt) {{{ 切换参数值（bool取反）
 function! OptionInv(opt)
     execute printf('setlocal inv%s', a:opt)
-    call Notify(printf('%s = %s', a:opt, eval('&' . a:opt)))
+    echo printf('%s = %s', a:opt, eval('&' . a:opt))
 endfunction
 " }}}
 
@@ -135,7 +135,7 @@ function! OptionLst(opt)
     let l:idx = index(l:lst, eval('&' . a:opt))
     let l:idx = (l:idx + 1) % len(l:lst)
     execute printf('set %s=%s', a:opt, l:lst[l:idx])
-    call Notify(printf('%s = %s', a:opt, eval('&' . a:opt)))
+    echo printf('%s = %s', a:opt, eval('&' . a:opt))
 endfunction
 " }}}
 
@@ -319,12 +319,12 @@ nnoremap ya
     \ <Cmd>
     \ execute 'silent normal! "9' . v:count1 . 'yy' <Bar>
     \ let @0 .= @" <Bar>
-    \ call Notify(v:count1 . ' lines append') <CR>
+    \ echo v:count1 . ' lines append' <CR>
 nnoremap yd
     \ <Cmd>
     \ execute 'silent normal! ' . v:count1 . 'dd' <Bar>
     \ let @0 .= @" <Bar>
-    \ call Notify(v:count1 . ' deleted lines append') <CR>
+    \ echo v:count1 . ' deleted lines append' <CR>
 nnoremap <leader>p "0p
 nnoremap <leader>P "0P
 nnoremap <leader>ap p`[<Left>
@@ -339,8 +339,8 @@ inoremap <C-v> <Esc>"+pi
 inoremap <M-v> <C-v>
 " 矩形选择
 noremap vv <C-v>
-xnoremap <C-g> <C-g><Cmd>call Notify('mode: ' . string(mode(1)))<CR>
-snoremap <C-g> <C-g><Cmd>call Notify('mode: ' . string(mode(1)))<CR>
+xnoremap <C-g> <C-g><Cmd>echo 'mode: ' . string(mode(1))<CR>
+snoremap <C-g> <C-g><Cmd>echo 'mode: ' . string(mode(1))<CR>
 
 for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m 0 1 2 3 4 5 6 7 8 9', ' ')
     " 寄存器快速复制与粘贴

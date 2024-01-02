@@ -65,7 +65,7 @@ let g:textmanip_enable_mappings = 0
 xnoremap <M-o>
     \ <Cmd>
     \ let g:textmanip_current_mode = (g:textmanip_current_mode == 'replace') ? 'insert' : 'replace' <Bar>
-    \ call Notify('textmanip mode: ' . g:textmanip_current_mode)<CR>
+    \ echo 'textmanip mode: ' . g:textmanip_current_mode <CR>
 xmap <C-o> <M-o>
 " 更据Mode使用Move-Insert或Move-Replace
 xmap <C-j> <Plug>(textmanip-move-down)
@@ -230,7 +230,7 @@ nnoremap <leader>tk
     \ <Cmd>
     \ let b:statusline_check_enabled = !get(b:, 'statusline_check_enabled', v:true) <Bar>
     \ call lightline#update() <Bar>
-    \ call Notify('b:statusline_check_enabled = ' . b:statusline_check_enabled)<CR>
+    \ echo 'b:statusline_check_enabled = ' . b:statusline_check_enabled <CR>
 
 " Augroup: Lightline {{{
 augroup PkgLightline
@@ -673,12 +673,12 @@ let g:mkdp_command_for_global = 0       " 只有markdown文件可以预览
 let g:mkdp_browser = 'firefox'
 nnoremap <leader>vm
     \ <Cmd>
-    \ call Notify(get(b:, 'MarkdownPreviewToggleBool') ? 'Close markdown preview' : 'Open markdown preview') <Bar>
+    \ echo get(b:, 'MarkdownPreviewToggleBool') ? 'Close markdown preview' : 'Open markdown preview' <Bar>
     \ call mkdp#util#toggle_preview()<CR>
 nnoremap <leader>tb
     \ <Cmd>
     \ let g:mkdp_browser = (g:mkdp_browser ==# 'firefox') ? 'chrome' : 'firefox' <Bar>
-    \ call Notify('Browser: ' . g:mkdp_browser)<CR>
+    \ echo 'Browser: ' . g:mkdp_browser <CR>
 " }}}
 
 " ReStructruedText {{{
@@ -698,7 +698,7 @@ else
 " 需要安装 https://github.com/Rykka/instant-rst.py
 nnoremap <leader>vr
     \ <Cmd>
-    \ call Notify(g:_instant_rst_daemon_started ? 'Close rst' : 'Open rst') <Bar>
+    \ echo g:_instant_rst_daemon_started ? 'Close rst' : 'Open rst' <Bar>
     \ execute g:_instant_rst_daemon_started ? 'StopInstantRst' : 'InstantRst'<CR>
 endif
 " }}}
