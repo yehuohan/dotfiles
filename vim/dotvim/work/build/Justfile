@@ -1,5 +1,5 @@
 set shell := ['bash', '-uc']
-# set shell := ['cmd.exe', '/c']
+set windows-shell := ['pwsh', '-NoLogo', '-NoProfileLoadTime', '-Command']
 set dotenv-load
 set ignore-comments
 
@@ -85,10 +85,8 @@ clean:
 
 [windows]
 clean:
-    -del /f/s/q {{replace(dir_build, '/', '\')}}
-    -rmdir /s/q {{replace(dir_build, '/', '\')}}
-    -del /f/s/q {{replace(dir_install, '/', '\')}}
-    -rmdir /s/q {{replace(dir_install, '/', '\')}}
+    Remove-Item {{dir_build}} -Recurse -Force
+    Remove-Item {{dir_install}} -Recurse -Force
 
 tags:
     cmake --build {{dir_build}} {{build_job}} --target tags

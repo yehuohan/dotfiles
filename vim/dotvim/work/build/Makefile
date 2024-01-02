@@ -16,6 +16,7 @@ DIR_INSTALL ?= ${DIR_ROOT}/install/${BUILD_TYPE}
 NDK_ROOT ?= ${Android_SDK}/ndk-bundle
 NDK_ABI ?= arm64-v8a
 NDK_PLATFORM ?= android-27
+export ANDROID_NDK_HOME := ${NDK_ROOT}
 
 VCPKG_ROOT ?= ${APPS_HOME}/vcpkg
 VCPKG_TRIPLET ?= x64-mingw-mix # x64-windows-mix, arm64-android
