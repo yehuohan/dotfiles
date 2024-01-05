@@ -91,3 +91,13 @@ clean:
 tags:
     cmake --build {{dir_build}} {{build_job}} --target tags
     cmake --install {{dir_build}}
+
+latest_tag := `git describe --tags --abbrev=0`
+info tag=latest_tag:
+    @git tag --list -n
+    @git describe --match {{tag}}
+    @git --no-pager log --oneline {{tag}}~..
+    @git rev-list --count --grep='fix' {{tag}}..
+    @git rev-list --count -E --grep='fix|feat' {{tag}}..
+    @git --no-pager log --oneline --grep='fix' {{tag}}~..
+    @git --no-pager log --oneline -E --grep='fix|feat' {{tag}}~..
