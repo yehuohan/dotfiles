@@ -1,5 +1,5 @@
 
-## dotconfigs
+## dotfiles
 
 - [root](./root): Linux configs
     - arch: Arch linux

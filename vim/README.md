@@ -4,14 +4,14 @@
 - Linux
 
 ```sh
-cd dotconfigs/vim/setup
+cd dotfiles/vim/setup
 ./setup_dotvim.sh
 ```
 
 - Windows
 
 ```sh
-cd dotconfigs/vim/setup
+cd dotfiles/vim/setup
 # 首先运行disk/setup/add_apps_path.reg，添加APPS_HOME等环境变量
 setup_dotvim.bat
 setup_link_msys64.bat

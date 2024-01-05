@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# cd to <dotconfigs> first before execute this file;
-# this file must be in '~/dotconfigs/'.
+# cd to <dotfiles> first before execute this file;
+# this file must be in '~/dotfiles/'.
 
 if [[ `uname` == "Linux" ]]; then
 
-    if [[ $(cd `dirname "$0"`;pwd) != ~/dotconfigs ]]; then
-        echo 'Is NOT in ~/dotconfigs'
+    if [[ $(cd `dirname "$0"`;pwd) != ~/dotfiles ]]; then
+        echo 'Is NOT in ~/dotfiles'
         exit
     fi
 
