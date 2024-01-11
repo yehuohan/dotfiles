@@ -1077,7 +1077,7 @@ local pkgs = {
         'hrsh7th/nvim-cmp',
         enabled = use.nlsp,
         config = require('v.pkgs.nlsp').setup,
-        event = { 'InsertEnter', 'CmdlineEnter' },
+        event = { 'InsertEnter' },
         dependencies = {
             'williamboman/mason.nvim',
             'williamboman/mason-lspconfig.nvim',

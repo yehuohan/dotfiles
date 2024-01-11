@@ -88,6 +88,13 @@ clean:
     Remove-Item {{dir_build}} -Recurse -Force
     Remove-Item {{dir_install}} -Recurse -Force
 
+[windows]
+copy:
+    #!pwsh
+    # or !powershell
+    ls ./ | %{ echo $_.name }
+    Get-ChildItem ./ | %{ echo $_.Name }
+
 tags:
     cmake --build {{dir_build}} {{build_job}} --target tags
     cmake --install {{dir_build}}
