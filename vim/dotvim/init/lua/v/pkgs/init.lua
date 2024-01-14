@@ -1041,7 +1041,7 @@ local pkgs = {
     { -- heirline
         'rebelot/heirline.nvim',
         config = require('v.pkgs.nstl').setup,
-        dependencies = { 'yehuohan/popc' },
+        dependencies = { 'yehuohan/popc', 'linrongbin16/lsp-progress.nvim' },
     },
     { 'goolord/alpha-nvim', config = pkg_alpha },
     { 'rcarriga/nvim-notify', config = pkg_notify },

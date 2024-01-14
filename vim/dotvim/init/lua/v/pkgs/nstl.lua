@@ -11,6 +11,7 @@ local sym = {
     lck = '*',
     mod = '+',
     lck_mod = '#',
+    lsp = '@',
     vos = '',
 }
 if use.ui.icon then
@@ -22,6 +23,7 @@ if use.ui.icon then
     sym.lck = '󰌾'
     sym.mod = '󱇬'
     sym.lck_mod = '󰗻'
+    sym.lsp = ''
     if IsLinux() then
         sym.vos = ''
     elseif IsMac() == 1 then
@@ -128,7 +130,7 @@ function ctxs.tabs_bufs(layout)
     return res
 end
 
---- Colors
+--- Alias basic colors
 local function load_colors()
     return {
         blank = require('heirline.utils').get_highlight('Normal').bg or '#000000',
@@ -211,6 +213,20 @@ local function stls()
             return self.check ~= nil
         end,
     })
+    local ComLsp = pad('areaC', {
+        provider = function(self) return self:nonlocal('lsp') end,
+        hl = { fg = 'blue', bold = true, italic = true },
+        update = {
+            'User',
+            pattern = 'LspProgressStatusUpdated',
+            callback = vim.schedule_wrap(function() vim.cmd.redrawstatus() end),
+        },
+    }, {
+        condition = function(self)
+            self.lsp = require('lsp-progress').progress(self)
+            return use.nlsp and self.lsp ~= ''
+        end,
+    })
 
     local SecLeft = {
         fallthrough = false,
@@ -222,8 +238,7 @@ local function stls()
         },
         {
             condition = function()
-                return conds.is_not_active()
-                    or conds.buffer_matches({ buftype = { 'help', 'terminal' } })
+                return conds.is_not_active() or conds.buffer_matches({ buftype = { 'terminal' } })
             end,
             ComFile,
         },
@@ -233,6 +248,7 @@ local function stls()
         fallthrough = false,
         {
             condition = conds.is_active,
+            ComLsp,
             ComCheck,
             ComAttr,
             ComInfo,
@@ -362,10 +378,25 @@ local function toggle_layout()
 end
 
 local function setup()
+    -- Tabline status from popc
     vim.g.Popc_useTabline = 0
     vim.g.tabline_layout = { tab = true, buf = true }
     vim.o.termguicolors = true
     vim.o.showtabline = 2
+
+    -- Lsp status
+    require('lsp-progress').setup({
+        format = function(client_messages)
+            local sign = sym.lsp .. ' Lsp'
+            if #client_messages > 0 then
+                return sign .. ' ' .. table.concat(client_messages, ' ')
+            end
+            if #vim.lsp.get_active_clients({ bufnr = vim.api.nvim_get_current_buf() }) > 0 then
+                return sign
+            end
+            return ''
+        end,
+    })
 
     local reset = function()
         local heirline = require('heirline')
