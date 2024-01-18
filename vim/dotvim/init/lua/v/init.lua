@@ -32,7 +32,6 @@ end
 local function setup(dotvim)
     vim.env.DotVimDir = dotvim
     vim.env.DotVimInit = dotvim .. '/init'
-    vim.env.DotVimVimL = dotvim .. '/init/viml'
     vim.env.DotVimWork = dotvim .. '/work'
     vim.env.DotVimLocal = dotvim .. '/local'
     vim.env.NVimConfigDir = vim.fn.stdpath('config')
@@ -61,3 +60,4 @@ local function setup(dotvim)
 end
 
 return { setup = setup }
+-- return { setup = require('v.mini') }

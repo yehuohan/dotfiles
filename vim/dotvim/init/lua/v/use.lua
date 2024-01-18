@@ -94,7 +94,6 @@ local M = setmetatable({
         vim.api.nvim_create_user_command('Use', use_init, { nargs = 0 })
         use_load()
     end,
-    get = function() return use end,
 }, { __index = function(t, k) return use[k] end })
 
 return M
