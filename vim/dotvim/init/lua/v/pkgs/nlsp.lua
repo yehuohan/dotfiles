@@ -237,6 +237,7 @@ local function __completion()
         }, {
             { name = 'buffer' },
         }),
+        preselect = cmp.PreselectMode.None,
         window = {
             completion = {
                 border = 'none',
