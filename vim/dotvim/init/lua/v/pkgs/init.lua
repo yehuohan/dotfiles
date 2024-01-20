@@ -688,8 +688,9 @@ endfunction
         s({ trig = 'cb([~#*-_=])', dscr = 'comment box', regTrig = true }, {
             i(1, 'cmt'),
             f(function(args, parent)
+                local size = 80 - 1 - vim.api.nvim_win_get_cursor(0)[2]
+                local line = string.rep(parent.captures[1], size)
                 local head = args[1][1]
-                local line = string.rep(parent.captures[1], 80 - #head)
                 return { line, head, head .. line }
             end, { 1 }),
         }),
