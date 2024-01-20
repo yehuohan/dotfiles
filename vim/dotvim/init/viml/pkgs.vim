@@ -463,7 +463,7 @@ endif
 " Coding {{{
 " coc {{{ 自动补全
 if s:use.coc
-let g:coc_config_home = $DotVimWork
+let g:coc_config_home = $DotVimShare
 let g:coc_data_home = $DotVimLocal . '/.coc'
 let g:coc_global_extensions = ['coc-marketplace']
 let g:coc_status_error_sign = '🗴'
@@ -542,9 +542,9 @@ endif
 " }}}
 
 " snipmate {{{ 代码片段
-set rtp^=$DotVimWork
+set rtp^=$DotVimShare
 function! PkgLoadSnip(filename)
-    return join(readfile($DotVimWork . '/' . a:filename), "\n")
+    return join(readfile($DotVimShare . '/' . a:filename), "\n")
 endfunction
 let g:snips_no_mappings = 1
 imap <Tab> <Plug>snipMateTrigger

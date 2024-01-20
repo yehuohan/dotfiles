@@ -204,7 +204,7 @@ local function on_UIEnter()
         .. ',a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor'
         .. ',sm:block-blinkwait175-blinkoff150-blinkon175'
 
-    -- g:GuiLoaded work after UIEnter
+    -- g:GuiLoaded works after UIEnter
     if vim.g.GuiLoaded then
         vim.cmd.GuiLinespace(0)
         vim.cmd.GuiTabline(0)

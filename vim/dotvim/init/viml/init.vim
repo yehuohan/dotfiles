@@ -25,7 +25,7 @@ let $DotVimDir=resolve(expand('<sfile>:p:h:h:h'))
 endif
 let $DotVimInit=$DotVimDir . '/init'
 let $DotVimVimL=$DotVimDir . '/init/viml'
-let $DotVimWork=$DotVimDir . '/work'
+let $DotVimShare=$DotVimDir . '/share'
 let $DotVimLocal=$DotVimDir . '/local'
 set rtp^=$DotVimDir
 set encoding=utf-8                      " 内部使用utf-8编码

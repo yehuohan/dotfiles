@@ -32,7 +32,7 @@ end
 local function setup(dotvim)
     vim.env.DotVimDir = dotvim
     vim.env.DotVimInit = dotvim .. '/init'
-    vim.env.DotVimWork = dotvim .. '/work'
+    vim.env.DotVimShare = dotvim .. '/share'
     vim.env.DotVimLocal = dotvim .. '/local'
     vim.env.NVimConfigDir = vim.fn.stdpath('config')
     setup_env()

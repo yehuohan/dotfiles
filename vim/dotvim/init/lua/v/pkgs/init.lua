@@ -676,7 +676,7 @@ end
 local function pkg_snip()
     vim.cmd([[
 function! PkgLoadSnip(filename)
-    return join(readfile($DotVimWork . '/' . a:filename), "\n")
+    return join(readfile($DotVimShare . '/' . a:filename), "\n")
 endfunction
     ]])
 
@@ -696,7 +696,7 @@ endfunction
     })
     require('luasnip.loaders.from_snipmate').lazy_load({
         paths = {
-            vim.env.DotVimWork .. '/snippets',
+            vim.env.DotVimShare .. '/snippets',
             vim.env.DotVimDir .. '/bundle/vim-snippets/snippets',
         },
     })
