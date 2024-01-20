@@ -316,6 +316,7 @@ end
 
 -- Buffer,Bookmarks,Workspace管理
 local function pkg_popc()
+    -- vim.g.Popc_enableLog = 1
     vim.g.Popc_jsonPath = vim.env.DotVimLocal
     vim.g.Popc_useFloatingWin = 1
     vim.g.Popc_highlight = {
@@ -672,18 +673,42 @@ local function pkg_treesitter()
 end
 
 -- 代码片段
-local function pkg_ultisnips()
+local function pkg_snip()
     vim.cmd([[
 function! PkgLoadSnip(filename)
     return join(readfile($DotVimWork . '/' . a:filename), "\n")
 endfunction
     ]])
-    vim.g.UltiSnipsEditSplit = 'vertical'
-    vim.g.UltiSnipsSnippetDirectories = { vim.env.DotVimWork .. '/snips', 'UltiSnips' }
-    vim.g.UltiSnipsExpandTrigger = '<Tab>'
-    vim.g.UltiSnipsJumpForwardTrigger = '<M-l>'
-    vim.g.UltiSnipsJumpBackwardTrigger = '<M-h>'
-    vim.g.UltiSnipsListSnippets = '<M-u>'
+
+    local snip = require('luasnip')
+    local s = snip.snippet
+    local i = snip.insert_node
+    local f = snip.function_node
+    snip.add_snippets('all', {
+        s({ trig = 'cb([~#*-_=])', dscr = 'comment box', regTrig = true }, {
+            i(1, 'cmt'),
+            f(function(args, parent)
+                local head = args[1][1]
+                local line = string.rep(parent.captures[1], 80 - #head)
+                return { line, head, head .. line }
+            end, { 1 }),
+        }),
+    })
+    require('luasnip.loaders.from_snipmate').lazy_load({
+        paths = {
+            vim.env.DotVimWork .. '/snippets',
+            vim.env.DotVimDir .. '/bundle/vim-snippets/snippets',
+        },
+    })
+    m.inore({
+        '<Tab>',
+        function() return snip.expandable() and '<Plug>luasnip-expand-snippet' or '<Tab>' end,
+        expr = true,
+    })
+    m.inore({ '<M-l>', function() snip.jump(1) end })
+    m.snore({ '<M-l>', function() snip.jump(1) end })
+    m.inore({ '<M-h>', function() snip.jump(-1) end })
+    m.snore({ '<M-h>', function() snip.jump(-1) end })
 end
 
 -- 导步程序/任务
@@ -1093,7 +1118,7 @@ local pkgs = {
             'yehuohan/cmp-path',
             'yehuohan/cmp-im',
             'yehuohan/cmp-im-zh',
-            'yehuohan/cmp-nvim-ultisnips',
+            'saadparwaiz1/cmp_luasnip',
             'dmitmel/cmp-cmdline-history',
             'kdheepak/cmp-latex-symbols',
             'f3fora/cmp-spell',
@@ -1102,12 +1127,7 @@ local pkgs = {
     },
     { 'nvim-treesitter/nvim-treesitter', enabled = use.nts, config = pkg_treesitter },
     { 'rcarriga/nvim-dap-ui', enabled = use.ndap, dependencies = { 'mfussenegger/nvim-dap' } },
-    { -- ultisnips
-        'SirVer/ultisnips',
-        enabled = use.has_py,
-        config = pkg_ultisnips,
-        dependencies = { 'honza/vim-snippets' },
-    },
+    { 'L3MON4D3/LuaSnip', config = pkg_snip, dependencies = { 'honza/vim-snippets' } },
     { 'stevearc/overseer.nvim', config = pkg_overseer },
     { 'stevearc/conform.nvim', config = pkg_conform },
     { 'voldikss/vim-floaterm', config = pkg_floaterm },

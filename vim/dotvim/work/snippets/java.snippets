@@ -1,0 +1,84 @@
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# doxygen style for java
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+snippet dmpage "doxygen mainpage"
+	/**
+	 * @mainpage ${1:title}
+	#${0:markdown}
+	 */
+
+snippet dpage "doxygen page"
+	/**
+	 * @page ${1:name} ${2:title}
+	${0:markdown}
+	 */
+
+snippet dspage "doxygen subpage"
+	 * @subpage ${1:name} "${2:text}"
+
+snippet dfile "doxygen file"
+	/**
+	 * @file `expand('%')`
+	 * @brief ${0}
+	 *
+	 * @date `strftime("%Y-%m-%d")`
+	 * @version
+	 * @author
+	 * @copyright
+	 */
+
+snippet dbrief "doxygen brief for class etc."
+	/**
+	 * @brief ${0}
+	 *
+	 */
+
+snippet dfunc "doxygen function"
+	/**
+	 * @brief ${0}
+	 *
+	 * @param None
+	 * @return
+	 * @retval None
+	 */
+
+snippet dmod "doxygen module define"
+	/**
+	 * @defgroup ${1:label} ${2:name}
+	 *${0}
+	 * @{
+	 * @}
+	 */
+
+snippet dmod1 "doxygen module"
+	/**
+	 * @defgroup ${1:label} ${2:name}
+	 *${0}
+	 * @{
+	 */
+
+	/** @} */
+
+snippet damod "doxygen addtomodule"
+	/**
+	 * @addtogroup ${1:label}
+	 *${0}
+	 * @{
+	 */
+
+	/** @} */
+
+snippet dblock "doxygen block"
+	/**
+	 * @name ${0}
+	 * @{
+	 */
+
+	/** @} */
+
+snippet dline "doxygen line"
+	/** ${0} */
+
+snippet dlline "doxygen last-line"
+	/**< ${0} */

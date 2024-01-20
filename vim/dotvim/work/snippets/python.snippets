@@ -1,0 +1,95 @@
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# python's code snippets of python modules
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+snippet mpl "matplotlib for python"
+	from matplotlib.backend_bases import KeyEvent
+	import matplotlib.pyplot as plt
+
+	def on_key(event:KeyEvent):
+		if event.key == 'escape':
+			plt.close()
+
+	fig = plt.figure('Plot')
+	fig.canvas.mpl_connect('key_press_event', on_key)
+	# fig.subplots_adjust(0.1, 0.1, 1.0, 1.0, 0.1, 0.05)
+	# ax = fig.add_subplot(1, 1, 1)
+	# ax = fig.add_axes((0.1, 0.1, 0.8, 0.8))
+	# ax.plot()
+	plt.show()
+	${0}
+
+snippet mplt "matplotlib.pyplot for python"
+	from matplotlib.backend_bases import KeyEvent
+	import matplotlib.pyplot as plt
+
+	def on_key(event:KeyEvent):
+		if event.key == 'escape':
+			plt.close()
+
+	plt.figure('Plot')
+	plt.connect('key_press_event', on_key)
+	# plt.subplots_adjust(0.1, 0.1, 1.0, 1.0, 0.1, 0.05)
+	# plt.subplot(1, 1, 1)
+	# plt.axes((0.1, 0.1, 0.8, 0.8))
+	# plt.plot()
+	plt.show()
+	${0}
+
+snippet mpl3d "matplotlib 3d for python"
+	import mpl_toolkits.mplot3d as plt3d
+
+	#ax = fig.add_subplot(111, projection='3d')
+	#ax.plot_wireframe(x, y, z)
+	#x, y = np.meshgrid(np.linespace(), np.arange())
+	#ax.plot_surface(x, y, z, shade=True, cmap='jet')
+
+snippet mplmouse "matplotlib for mouse click event"
+	from matplotlib.backend_bases import KeyEvent
+	import matplotlib.pyplot as plt
+
+	def on_key(event:KeyEvent):
+		if event.button == 1:
+			if event.xdata == None:
+				return
+
+	fig.canvas.mpl_connect('button_press_event', on_click)
+	plt.connect('button_press_event', on_click)
+
+snippet mplparam "matplotlib param settings"
+	import matplotlib as mpl
+
+	mpl.rcParams['font.family'] = 'Consolas'
+	mpl.rcParams['font.family'] = 'DejaVu Sans'
+	mpl.rcParams['font.size'] = 9
+
+snippet mgif "pymovie make gif"
+	import moviepy.editor as mpy
+	from moviepy.video.io.bindings import mplfig_to_npimage
+
+	def make_frame(t):
+		return mplfig_to_npimage(fig)
+
+	anim = mpy.VideoClip(make_frame, duration=1)
+	anim.write_videofile("m.mp4", fps=24)
+	anim.write_gif("m.gif", fps=24)
+
+snippet mplay "pyaudio play pcm"
+	import pyaudio
+	pa = pyaudio.PyAudio()
+	stream=pa.open(format=pa.get_format_from_width(2), # 2bytes => 16bits
+			channels=1, rate=16000, output=True)
+	chunk = 1024
+	while (len(data) > 0):
+		stream.write(data[:chunk])
+		data = data[chunk:]
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ReStructuredText docstring style for python
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+snippet pfunc "python function"
+	"""${0:rst}
+	:Parameters:
+	:Returns:
+	:Raises:
+	"""

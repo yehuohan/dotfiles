@@ -278,8 +278,8 @@ nnoremap zl zb
 " 命令行
 cnoremap <C-v> <C-r>+
 cnoremap <C-p> <C-r>0
-cnoremap <C-j> <Down>
-cnoremap <C-k> <Up>
+cnoremap <M-n> <Down>
+cnoremap <M-m> <Up>
 cnoremap <M-j> <C-n>
 cnoremap <M-k> <C-p>
 cnoremap <M-h> <Left>
@@ -419,10 +419,10 @@ nnoremap <silent> <M-e> <Cmd>call WinMoveSpliter('e', 5)<CR>
 nnoremap <silent> <M-s> <Cmd>call WinMoveSpliter('s', 5)<CR>
 nnoremap <silent> <M-f> <Cmd>call WinMoveSpliter('f', 5)<CR>
 nnoremap <silent> <M-d> <Cmd>call WinMoveSpliter('d', 5)<CR>
-nnoremap <M-Up> :call WinMoveSpliter('e', 1)<CR>
-nnoremap <M-Down> :call WinMoveSpliter('d', 1)<CR>
-nnoremap <M-Left> :call WinMoveSpliter('s', 1)<CR>
-nnoremap <M-Right> :call WinMoveSpliter('f', 1)<CR>
+nnoremap <silent> <M-E> <Cmd>call WinMoveSpliter('e', 1)<CR>
+nnoremap <silent> <M-D> <Cmd>call WinMoveSpliter('d', 1)<CR>
+nnoremap <silent> <M-S> <Cmd>call WinMoveSpliter('s', 1)<CR>
+nnoremap <silent> <M-F> <Cmd>call WinMoveSpliter('f', 1)<CR>
 " }}}
 
 " Quickfix {{{

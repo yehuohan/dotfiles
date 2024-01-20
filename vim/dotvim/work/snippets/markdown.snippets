@@ -1,0 +1,37 @@
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# markdown
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+snippet mh1 "section h1"
+	- [${1:name}](#${2:id})
+	<h1 id="$2">$1</h1>
+
+snippet mh2 "section h2"
+	- [${1:name}](#${2:id})
+	<h2 id="$2">$1</h2>
+
+snippet mh3 "section h3"
+	- [${1:name}](#${2:id})
+	<h3 id="$2">$1</h3>
+
+snippet mh4 "section h4"
+	- [${1:name}](#${2:id})
+	<h4 id="$2">$1</h4>
+
+snippet mh5 "section h5"
+	- [${1:name}](#${2:id})
+	<h5 id="$2">$1</h5>
+
+snippet mh6 "section h6"
+	- [${1:name}](#${2:id})
+	<h6 id="$2">$1</h6>
+
+snippet mspan "span in markdown"
+	<span id = "${1:id}"></span>
+	[${2:name}](#${1})
+
+snippet mimg "image in markdown"
+	<img alt="${1:name}" src="${2:jpg}" height="70%" width="70%">
+
+snippet mhref "href in markdown"
+	<a href="${1:url}" target="_blank">${2:name}</a>

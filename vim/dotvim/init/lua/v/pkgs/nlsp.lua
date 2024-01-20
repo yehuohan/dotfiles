@@ -24,6 +24,8 @@ local function __servers()
     require('neodev').setup({})
     local lspconfig = require('lspconfig')
     local capabilities = require('cmp_nvim_lsp').default_capabilities()
+    -- Disable lsp snippet support
+    -- capabilities.textDocument.completion.completionItem.snippetSupport = false
     local opts = {
         function(server_name)
             lspconfig[server_name].setup({
@@ -36,6 +38,7 @@ local function __servers()
             capabilities = capabilities,
             -- Treesitter is better than clangd's semantic
             on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
+            -- cmd = { 'clangd', '--function-arg-placeholders=0' },
         })
     end
     opts['cmake'] = function()
@@ -57,6 +60,7 @@ local function __servers()
                     notifications = { cargoTomlNotFound = false },
                     diagnostics = { disabled = { 'inactive-code' } },
                     procMacro = { enable = true },
+                    -- completion = { addCallArgumentSnippets = false, addCallParenthesis = false },
                 },
             },
         })
@@ -130,7 +134,7 @@ local kind_icons = {
 local kind_sources = {
     buffer          = 'Buf',
     nvim_lsp        = 'Lsp',
-    ultisnips       = 'Snp',
+    luasnip         = 'Snp',
     cmdline         = 'Cmd',
     cmdline_history = 'Cmh',
     path            = 'Pth',
@@ -164,12 +168,6 @@ local function __sources()
         '<M-;>',
         function() vim.notify('IM is ' .. (cmp_im.toggle() and 'enabled' or 'disabled')) end,
     })
-
-    -- Use forked repo with changed configs. Because original repo's setup() not work here.
-    require('cmp_nvim_ultisnips').setup({
-        filetype_source = 'ultisnips_default',
-        show_snippets = 'all', -- Fix typing lays with pynvim 0.5 (no this issue with 0.4.3)
-    })
 end
 
 --- Setup completion framework
@@ -180,7 +178,7 @@ local function __completion()
     local cmp_mappings = {
         ['<M-i>'] = cmp.mapping(function() cmp.complete() end, { 'i' }),
         ['<M-u>'] = cmp.mapping(function()
-            local opts = { config = { sources = { { name = 'ultisnips' } } } }
+            local opts = { config = { sources = { { name = 'luasnip' } } } }
             cmp.complete(opts)
         end, { 'i' }),
         ['<M-e>'] = cmp.mapping(function() cmp.abort() end, { 'i', 'c' }),
@@ -209,16 +207,6 @@ local function __completion()
             end
         end, { 'c' }),
         ['<Space>'] = cmp.mapping(cmp_im.select(), { 'i', 'c' }),
-        ['1'] = cmp.mapping(cmp_im.select(1), { 'i', 'c' }),
-        ['2'] = cmp.mapping(cmp_im.select(2), { 'i', 'c' }),
-        ['3'] = cmp.mapping(cmp_im.select(3), { 'i', 'c' }),
-        ['4'] = cmp.mapping(cmp_im.select(4), { 'i', 'c' }),
-        ['5'] = cmp.mapping(cmp_im.select(5), { 'i', 'c' }),
-        ['6'] = cmp.mapping(cmp_im.select(6), { 'i', 'c' }),
-        ['7'] = cmp.mapping(cmp_im.select(7), { 'i', 'c' }),
-        ['8'] = cmp.mapping(cmp_im.select(8), { 'i', 'c' }),
-        ['9'] = cmp.mapping(cmp_im.select(9), { 'i', 'c' }),
-        ['0'] = cmp.mapping(cmp_im.select(10), { 'i', 'c' }),
     }
     m.imap({ '<C-j>', '<M-j>' })
     m.imap({ '<C-k>', '<M-k>' })
@@ -226,11 +214,11 @@ local function __completion()
     cmp.setup({
         mapping = cmp_mappings,
         snippet = {
-            expand = function(args) vim.fn['UltiSnips#Anon'](args.body) end,
+            expand = function(args) require('luasnip').lsp_expand(args.body) end,
         },
         sources = cmp.config.sources({
             { name = 'nvim_lsp' },
-            { name = 'ultisnips' },
+            { name = 'luasnip' },
             { name = 'path' },
             { name = 'calc' },
             { name = 'IM' },
@@ -275,7 +263,7 @@ local function __completion()
     })
     cmp.setup.filetype({ 'tex', 'latex', 'markdown', 'restructuredtext', 'text', 'help' }, {
         sources = cmp.config.sources({
-            { name = 'ultisnips' },
+            { name = 'luasnip' },
             { name = 'path' },
             { name = 'calc' },
             { name = 'IM' },
@@ -387,13 +375,13 @@ local function __lsp_settings()
         padding = ' ',
         floating_window = false,
         toggle_key = '<M-o>',
-        select_signature_key = '<M-l>',
+        select_signature_key = '<M-p>',
     })
 end
 
 --- Setup lsp mappings
 local function __lsp_mappings()
-    m.inore({ '<M-o>', vim.lsp.buf.signature_help })
+    -- m.inore({ '<M-o>', vim.lsp.buf.signature_help })
     m.nnore({ 'gd', vim.lsp.buf.definition })
     m.nnore({ 'gD', vim.lsp.buf.declaration })
     m.nnore({ '<leader>gd', vim.lsp.buf.definition })

@@ -343,6 +343,7 @@ nnoremap <leader>sp :PopSet popset<CR>
 " }}}
 
 " popc {{{
+" let g:Popc_enableLog = 1
 let g:Popc_jsonPath = $DotVimLocal
 let g:Popc_useFloatingWin = 1
 let g:Popc_highlight = {
@@ -540,18 +541,17 @@ call timer_start(700, 'PkgSetupCoc')
 endif
 " }}}
 
-" ultisnips {{{ 代码片段
-if s:use.has_py
+" snipmate {{{ 代码片段
+set rtp^=$DotVimWork
 function! PkgLoadSnip(filename)
     return join(readfile($DotVimWork . '/' . a:filename), "\n")
 endfunction
-let g:UltiSnipsEditSplit = 'vertical'
-let g:UltiSnipsSnippetDirectories = [$DotVimWork . '/snips', 'UltiSnips']
-let g:UltiSnipsExpandTrigger = '<Tab>'
-let g:UltiSnipsJumpForwardTrigger = '<M-l>'
-let g:UltiSnipsJumpBackwardTrigger = '<M-h>'
-let g:UltiSnipsListSnippets = '<M-u>'
-endif
+let g:snips_no_mappings = 1
+imap <Tab> <Plug>snipMateTrigger
+imap <M-l> <Plug>snipMateNextOrTrigger
+smap <M-l> <Plug>snipMateNextOrTrigger
+imap <M-h> <Plug>snipMateBack
+smap <M-h> <Plug>snipMateBack
 " }}}
 
 " vimspector {{{ 调试
@@ -809,10 +809,9 @@ if s:use.coc
     Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
     Plug 'neoclide/jsonc.vim'
 endif
-if s:use.has_py
-    Plug 'SirVer/ultisnips'
+    Plug 'garbas/vim-snipmate'
+    Plug 'MarcWeber/vim-addon-mw-utils'
     Plug 'honza/vim-snippets'
-endif
 if s:use.ndap
     Plug 'puremourning/vimspector'
 endif
