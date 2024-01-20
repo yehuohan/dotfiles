@@ -1,0 +1,13 @@
+# .rustfmt.toml
+#
+# #[rustfmt::skip]
+# #[rustfmt::skip::macros(target_macro_name)]
+# #[rustfmt::skip::attributes(target_attribute_name)]
+
+tab_spaces = 4
+hard_tabs = false
+newline_style = "Unix" # "Auto", "Native", "Unix", "Windows"
+max_width = 100
+format_strings = false
+format_macro_bodies = false
+# ignore = [ ]
