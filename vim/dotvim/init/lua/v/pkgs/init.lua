@@ -823,7 +823,7 @@ local function pkg_autopairs()
         '<leader>tp',
         function()
             local ap = require('nvim-autopairs').state.disabled
-            print('Auto pairs:', ap)
+            vim.notify(string.format('Auto pairs: %s', ap))
             require('nvim-autopairs').state.disabled = not ap
         end,
     })

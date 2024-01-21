@@ -25,7 +25,6 @@ local function __servers()
     local lspconfig = require('lspconfig')
     local capabilities = require('cmp_nvim_lsp').default_capabilities()
     -- Disable lsp snippet support
-    -- capabilities.textDocument.completion.completionItem.snippetSupport = false
     local opts = {
         function(server_name)
             lspconfig[server_name].setup({
@@ -38,7 +37,6 @@ local function __servers()
             capabilities = capabilities,
             -- Treesitter is better than clangd's semantic
             on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
-            -- cmd = { 'clangd', '--function-arg-placeholders=0' },
         })
     end
     opts['cmake'] = function()
@@ -60,7 +58,6 @@ local function __servers()
                     notifications = { cargoTomlNotFound = false },
                     diagnostics = { disabled = { 'inactive-code' } },
                     procMacro = { enable = true },
-                    -- completion = { addCallArgumentSnippets = false, addCallParenthesis = false },
                 },
             },
         })
@@ -136,7 +133,7 @@ local kind_sources = {
     nvim_lsp        = 'Lsp',
     luasnip         = 'Snp',
     cmdline         = 'Cmd',
-    cmdline_history = 'Cmh',
+    cmdline_history = 'CLh',
     path            = 'Pth',
     calc            = 'Cal',
     IM              = 'IMs',
@@ -160,27 +157,40 @@ end
 --- Setup completion sources
 local function __sources()
     local cmp_im = require('cmp_im')
+    local cmp_im_zh = require('cmp_im_zh')
     cmp_im.setup({
-        tables = require('cmp_im_zh').tables({ 'wubi', 'pinyin' }),
+        tables = cmp_im_zh.tables({ 'wubi', 'pinyin' }),
         maxn = 5,
     })
     m.add({ 'n', 'v', 'c', 'i' }, {
         '<M-;>',
-        function() vim.notify('IM is ' .. (cmp_im.toggle() and 'enabled' or 'disabled')) end,
+        function()
+            if cmp_im.toggle() then
+                vim.notify('IM is enabled')
+                for lhs, rhs in pairs(cmp_im_zh.symbols()) do
+                    m.inore({ lhs, rhs })
+                end
+            else
+                vim.notify('IM is disabled')
+                for lhs, _ in pairs(cmp_im_zh.symbols()) do
+                    m.idel({ lhs })
+                end
+            end
+        end,
     })
 end
 
 --- Setup completion framework
 local function __completion()
     local cmp = require('cmp')
-    local cmp_im = require('cmp_im')
     local compare = cmp.config.compare
+    local opts_snip = { config = { sources = { { name = 'luasnip' } } } }
+    local opts_cmdh = { config = { sources = { { name = 'cmdline_history' } } } }
     local cmp_mappings = {
-        ['<M-i>'] = cmp.mapping(function() cmp.complete() end, { 'i' }),
-        ['<M-u>'] = cmp.mapping(function()
-            local opts = { config = { sources = { { name = 'luasnip' } } } }
-            cmp.complete(opts)
-        end, { 'i' }),
+        ['<CR>'] = cmp.mapping.confirm(),
+        ['<M-i>'] = cmp.mapping.complete(),
+        ['<M-u>'] = cmp.mapping(function() cmp.complete(opts_snip) end, { 'i' }),
+        ['<M-y>'] = cmp.mapping(function() cmp.complete(opts_cmdh) end, { 'c' }),
         ['<M-e>'] = cmp.mapping(function() cmp.abort() end, { 'i', 'c' }),
         ['<M-j>'] = cmp.mapping(function() cmp.select_next_item() end, { 'i', 'c' }),
         ['<M-k>'] = cmp.mapping(function() cmp.select_prev_item() end, { 'i', 'c' }),
@@ -188,10 +198,6 @@ local function __completion()
         ['<M-m>'] = cmp.mapping.scroll_docs(-4),
         ['<M-f>'] = cmp.mapping.scroll_docs(4),
         ['<M-d>'] = cmp.mapping.scroll_docs(-4),
-        ['<M-y>'] = cmp.mapping(function()
-            local opts = { config = { sources = { { name = 'cmdline_history' } } } }
-            cmp.complete(opts)
-        end, { 'c' }),
         ['<Tab>'] = cmp.mapping(function()
             if cmp.visible() then
                 cmp.select_next_item()
@@ -199,14 +205,8 @@ local function __completion()
                 cmp.complete()
             end
         end, { 'c' }),
-        ['<S-Tab>'] = cmp.mapping(function()
-            if cmp.visible() then
-                cmp.select_prev_item()
-            else
-                cmp.complete()
-            end
-        end, { 'c' }),
-        ['<Space>'] = cmp.mapping(cmp_im.select(), { 'i', 'c' }),
+        ['<S-Tab>'] = cmp.mapping(function() cmp.select_prev_item() end, { 'c' }),
+        ['<Space>'] = cmp.mapping(require('cmp_im').select(), { 'i', 'c' }),
     }
     m.imap({ '<C-j>', '<M-j>' })
     m.imap({ '<C-k>', '<M-k>' })

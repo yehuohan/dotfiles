@@ -415,6 +415,7 @@ end
 local _m = {}
 M.m = _m
 
+local delmap = vim.keymap.del
 local setmap = vim.keymap.set
 
 local function setopts(opts, defaults)
@@ -435,14 +436,26 @@ end
 --- ```lua
 ---      local m = require('v.nlib').m
 ---      m.add({'n', 'v'}, {'<leader>', ':echo b:<CR>', buffer = true})
----      m.nore{'<leader>', ':echo b:<CR>', silent = true, buffer = 9}
+---      m.del({'n', 'v'}, {'<leader>', buffer = true})
+---      m.nnore{'<leader>', ':echo b:<CR>', silent = true, buffer = 9}
+---      m.ndel{'<leader>', buffer = 9}
 --- ```
 --- @param mods(string|table) Mapping modes
 --- @param opts(table) Mapping options with {lhs, rhs, **kwargs}
 -- stylua: ignore start
+function _m.del(mods, opts)     delmap(mods, opts[1], setopts(opts)) end
 function _m.add(mods, opts)     setmap(mods, opts[1], opts[2], setopts(opts, { remap = true })) end
 function _m.addnore(mods, opts) setmap(mods, opts[1], opts[2], setopts(opts, { noremap = true })) end
 
+function _m.ndel(opts)  delmap('n', opts[1], setopts(opts)) end
+function _m.vdel(opts)  delmap('v', opts[1], setopts(opts)) end
+function _m.xdel(opts)  delmap('x', opts[1], setopts(opts)) end
+function _m.sdel(opts)  delmap('s', opts[1], setopts(opts)) end
+function _m.odel(opts)  delmap('o', opts[1], setopts(opts)) end
+function _m.idel(opts)  delmap('i', opts[1], setopts(opts)) end
+function _m.ldel(opts)  delmap('l', opts[1], setopts(opts)) end
+function _m.cdel(opts)  delmap('c', opts[1], setopts(opts)) end
+function _m.tdel(opts)  delmap('t', opts[1], setopts(opts)) end
 function _m.map(opts)   setmap({'n', 'v'}, opts[1], opts[2], setopts(opts, { remap = true })) end
 function _m.nmap(opts)  setmap('n', opts[1], opts[2], setopts(opts, { remap = true })) end
 function _m.vmap(opts)  setmap('v', opts[1], opts[2], setopts(opts, { remap = true })) end
