@@ -277,7 +277,10 @@ function _args.cmake(dic, cfg)
     dic.barg.lst = { '--target tags', '-j4' }
 end
 
-function _args.cargo(dic, cfg) dic.earg.lst = { '--nocapture' } end
+function _args.cargo(dic, cfg)
+    dic.barg.lst = { '--package <test>' }
+    dic.earg.lst = { '--nocapture' }
+end
 
 --- Update _sels.dic
 --- @param rhs(CodeHandleMap)

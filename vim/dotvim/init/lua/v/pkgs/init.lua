@@ -1126,7 +1126,12 @@ local pkgs = {
             'nvim-lua/plenary.nvim',
         },
     },
-    { 'nvim-treesitter/nvim-treesitter', enabled = use.nts, config = pkg_treesitter },
+    {
+        'nvim-treesitter/nvim-treesitter',
+        enabled = use.nts,
+        version = '*',
+        config = pkg_treesitter,
+    },
     { 'rcarriga/nvim-dap-ui', enabled = use.ndap, dependencies = { 'mfussenegger/nvim-dap' } },
     { 'L3MON4D3/LuaSnip', config = pkg_snip, dependencies = { 'honza/vim-snippets' } },
     { 'stevearc/overseer.nvim', config = pkg_overseer },
