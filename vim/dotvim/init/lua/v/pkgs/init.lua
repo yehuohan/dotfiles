@@ -632,7 +632,7 @@ local function pkg_treesitter()
     local parser_dir = vim.env.DotVimLocal .. '/.treesitter'
     require('nvim-treesitter.configs').setup({
         parser_install_dir = parser_dir,
-        --ensure_installed = { 'c', 'cpp', 'rust', 'vim', 'lua', 'python', 'markdown', 'markdown_inline', },
+        --ensure_installed = { 'c', 'cpp', 'rust', 'vim', 'lua', 'python', 'markdown', 'markdown_inline' },
         --auto_install = true,
         highlight = {
             enable = true,
@@ -1108,6 +1108,7 @@ local pkgs = {
             'williamboman/mason.nvim',
             'williamboman/mason-lspconfig.nvim',
             'neovim/nvim-lspconfig',
+            'folke/neoconf.nvim',
             'folke/neodev.nvim',
             'nvimdev/lspsaga.nvim',
             'ray-x/lsp_signature.nvim',
@@ -1126,7 +1127,7 @@ local pkgs = {
             'nvim-lua/plenary.nvim',
         },
     },
-    {
+    { -- treesitter
         'nvim-treesitter/nvim-treesitter',
         enabled = use.nts,
         version = '*',

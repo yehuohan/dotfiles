@@ -1,40 +1,43 @@
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# configs
+# Add configs
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-snippet cfg-clangd ".clangd"
+snippet add-nlsp ".nlsp.json"
+	`PkgLoadSnip('nlsp.json')`
+
+snippet add-clangd ".clangd"
 	`PkgLoadSnip('configs/.clangd')`
 
-snippet cfg-clang-format ".clang-format"
+snippet add-clang-format ".clang-format"
 	`PkgLoadSnip('configs/.clang-format')`
 
-snippet cfg-rustfmt ".rustfmt.toml"
+snippet add-rustfmt ".rustfmt.toml"
 	`PkgLoadSnip('configs/.rustfmt.toml')`
 
-snippet cfg-pyright "pyrightconfig.json"
+snippet add-pyright "pyrightconfig.json"
 	`PkgLoadSnip('configs/pyrightconfig.json')`
 
-snippet cfg-black "pyproject.toml"
+snippet add-black "pyproject.toml"
 	`PkgLoadSnip('configs/pyproject.toml')`
 
-snippet cfg-luarc ".luarc.json"
+snippet add-luarc ".luarc.json"
 	`PkgLoadSnip('configs/.luarc.json')`
 
-snippet cfg-stylua ".stylua.toml"
+snippet add-stylua ".stylua.toml"
 	`PkgLoadSnip('configs/.stylua.toml')`
 
-snippet cfg-ycm ".ycm_extra_conf.py"
+snippet add-ycm ".ycm_extra_conf.py"
 	`PkgLoadSnip('configs/.ycm_extra_conf.py')`
 
-snippet cfg-spector ".vimspector.json"
+snippet add-spector ".vimspector.json"
 	`PkgLoadSnip('configs/.vimspector.json')`
 
-snippet cfg-sphinx "conf.py"
+snippet add-sphinx "conf.py"
 	`PkgLoadSnip('configs/sphinx-conf.py')`
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# build tools
+# Load template for building tools
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 snippet lt-jt "Justfile template"
 	`PkgLoadSnip('build/Justfile')`

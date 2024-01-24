@@ -1,8 +1,17 @@
 local use = require('v.use')
 local m = require('v.nlib').m
 
---- Setup langauge servers
+--- Setup language servers
 local function __servers()
+    -- Settings
+    require('neoconf').setup({
+        -- Priority: lspconfig.setup() > global > local
+        local_settings = '.nlsp.json',
+        global_settings = 'nlsp.json',
+        filetype_jsonc = use.nts,
+    })
+    require('neodev').setup({})
+    -- Servers
     local url = 'https://github.com/%s/releases/download/%s/%s'
     if vim.fn.empty(use.xgit) == 0 then
         url = use.xgit .. '/%s/releases/download/%s/%s'
@@ -21,10 +30,8 @@ local function __servers()
         },
     })
     require('mason-lspconfig').setup({})
-    require('neodev').setup({})
     local lspconfig = require('lspconfig')
     local capabilities = require('cmp_nvim_lsp').default_capabilities()
-    -- Disable lsp snippet support
     local opts = {
         function(server_name)
             lspconfig[server_name].setup({
@@ -50,24 +57,9 @@ local function __servers()
             capabilities = capabilities,
             settings = {
                 ['rust-analyzer'] = {
-                    updates = {
-                        checkOnStartup = false,
-                        channel = 'nightly',
-                    },
+                    updates = { checkOnStartup = false, channel = 'nightly' },
                     cargo = { allFeatures = true },
                     notifications = { cargoTomlNotFound = false },
-                    diagnostics = { disabled = { 'inactive-code' } },
-                    procMacro = { enable = true },
-                },
-            },
-        })
-    end
-    opts['pyright'] = function()
-        lspconfig.pyright.setup({
-            capabilities = capabilities,
-            settings = {
-                python = {
-                    analysis = { stubPath = 'typings' },
                 },
             },
         })
@@ -421,10 +413,13 @@ local function __lsp_mappings()
     m.nnore({ '<leader>oK', vim.diagnostic.goto_prev })
     -- TODO: list for workspace, sources, servers, commands
     -- m.nnore{'<leader>ow', vim.lsp.buf.manage_workspace_folder}
-    -- m.nnore{'<leader>oc', vim.lsp.buf.execute_command}
+    -- m.nnore{'<leader>oe', vim.lsp.buf.execute_command}
     m.nnore({ '<leader><leader>o', ':LspStart<Space>' })
     m.nnore({ '<leader>oR', ':LspRestart<CR>' })
     m.nnore({ '<leader>ol', ':LspInfo<CR>' })
+    m.nnore({ '<leader>oc', ':Neoconf<CR>' })
+    m.nnore({ '<leader>on', ':Neoconf lsp<CR>' })
+    m.nnore({ '<leader>oN', ':Neoconf show<CR>' })
     m.nnore({ '<leader>om', ':Mason<CR>' })
     m.nnore({ '<leader>os', ':CmpStatus<CR>' })
     m.nnore({ '<leader>oh', '<Cmd>ClangdSwitchSourceHeader<CR>' })

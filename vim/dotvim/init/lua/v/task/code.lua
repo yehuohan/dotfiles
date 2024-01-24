@@ -18,7 +18,7 @@ local wsc = nlib.new_configer({
     earg = '',
     msvc = false, -- Setup msvc environment
     stage = 'run',
-    closest = false, -- Find the closest file relative to wdir
+    outer = true, -- Prioritize finding the outermost file relative to wdir
     style = 'ansi',
     verbose = '',
     tout = {},
@@ -122,7 +122,7 @@ local function pat_file(pattern)
         upward = true,
         type = 'file',
         path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
-        limit = wsc.closest and 1 or math.huge,
+        limit = wsc.outer and math.huge or 1,
     })
     return files[#files]
 end
@@ -334,11 +334,11 @@ local _sels = {
     opt = 'config code task',
     lst = nil,
     -- lst for kt.E != p
-    lst_d = { 'envs', 'garg', 'barg', 'earg', 'msvc', 'stage', 'closest', 'style' },
+    lst_d = { 'envs', 'garg', 'barg', 'earg', 'msvc', 'stage', 'outer', 'style' },
     -- lst for kt.E = p
     lst_p = { 'key', 'file', 'type', 'envs', 'garg', 'barg', 'earg', 'msvc', 'stage', 'style' },
     -- lst for CodeWscInit
-    lst_i = { 'envs', 'msvc', 'closest', 'style', 'verbose' },
+    lst_i = { 'envs', 'msvc', 'outer', 'style', 'verbose' },
     dic = {
         key = { lst = _maps[1], dic = vim.tbl_map(function(h) return h.desc end, _maps) },
         file = { cpl = 'file' },
@@ -349,7 +349,7 @@ local _sels = {
         earg = vim.empty_dict(),
         msvc = vim.empty_dict(),
         stage = { lst = { 'build', 'run', 'clean', 'test' } },
-        closest = vim.empty_dict(),
+        outer = vim.empty_dict(),
         style = { lst = { 'term', 'ansi', 'raw', 'job' } },
         verbose = {
             lst = { 'a', 'w', 'b', 't', 'h', 'n' },
