@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- init.lua: configuration for neovim
 -- Github: https://github.com/yehuohan/dotfiles
--- Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
+-- Author: <yehuohan@qq.com>, <yehuohan@gmail.com>
 --------------------------------------------------------------------------------
 
 function IsLinux()

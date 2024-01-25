@@ -23,9 +23,11 @@
     /* Language server settings */
     "lspconfig": {
         "rust_analyzer": {
-            "updates.channel": "nightly", // stable, nightly
-            "diagnostics.disabled": ["inactive-code"],
-            "procMacro.enable": true
+            "rust-analyzer.updates.channel": "nightly", // stable, nightly
+            "rust-analyzer.diagnostics.disabled": ["inactive-code"],
+            "rust-analyzer.inlayHints.typeHints.enable": true,
+            "rust-analyzer.inlayHints.parameterHints.enable": true,
+            "rust-analyzer.procMacro.enable": true
         },
         "pyright": {
             "python.analysis.stubPath": "typings"

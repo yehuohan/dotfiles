@@ -1,7 +1,7 @@
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " init.vim: configuration for vim
 " Github: https://github.com/yehuohan/dotfiles
-" Author: yehuohan, <yehuohan@qq.com>, <yehuohan@gmail.com>
+" Author: <yehuohan@qq.com>, <yehuohan@gmail.com>
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 " Platforms {{{
