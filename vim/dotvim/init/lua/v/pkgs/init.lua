@@ -904,10 +904,10 @@ local function pkg_trouble()
 end
 
 --------------------------------------------------------------------------------
--- Utils
+-- Misc
 --------------------------------------------------------------------------------
 -- Markdown
-local function pkg_md()
+local function pkg_peek()
     -- Dependency: sudo pacman -S webkit2gtk
     local peek = require('peek')
     peek.setup({
@@ -1112,7 +1112,7 @@ local pkgs = {
             'folke/neodev.nvim',
             'nvimdev/lspsaga.nvim',
             'ray-x/lsp_signature.nvim',
-            -- 'simrat39/rust-tools.nvim'
+            -- { 'mrcjkb/rustaceanvim', ft = { 'rust' } },
             'hrsh7th/cmp-nvim-lsp',
             'hrsh7th/cmp-buffer',
             'hrsh7th/cmp-calc',
@@ -1148,8 +1148,8 @@ local pkgs = {
     { 'rust-lang/rust.vim' },
     { 'NoahTheDuke/vim-just', ft = 'just' },
 
-    -- Utils
-    { 'toppair/peek.nvim', config = pkg_md, ft = 'markdown', build = 'deno task build:fast' },
+    -- Misc
+    { 'toppair/peek.nvim', config = pkg_peek, ft = 'markdown', build = 'deno task build:fast' },
     { 'Rykka/InstantRst', config = pkg_rst, ft = 'rst', dependencies = { 'Rykka/riv.vim' } },
     { 'lervag/vimtex', config = pkg_tex, ft = 'tex' },
     { 'uga-rosa/ccc.nvim', config = pkg_ccc, keys = { '<leader>tc', '<leader>lp' } },

@@ -77,10 +77,7 @@
     "clangd.enabled": true,
     "clangd.arguments": [], // arguments for clangd server
     "clangd.compilationDatabasePath": "", // specifies the directory containing the compilation database
-    "clangd.fallbackFlags": [
-        "-std=c++20",
-        "-D_VOut"
-    ], // extra clang flags used to parse files when no compilation database is found
+    "clangd.fallbackFlags": ["-std=c++20"], // extra clang flags used to parse files when no compilation database is found
     "clangd.path": "clangd",
 
     /* coc-rust-analyzer */

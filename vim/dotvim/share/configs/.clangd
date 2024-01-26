@@ -5,3 +5,6 @@ CompileFlags:
 
 Diagnostics:
   UnusedIncludes: None
+
+InlayHints:
+  Enabled: Yes

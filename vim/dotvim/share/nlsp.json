@@ -10,7 +10,7 @@
             "lua_ls": { "enabled": true }
         }
     },
-    /* Nvim lua development */
+    /* Neovim lua development settings */
     "neodev": {
         "library": {
             "enabled": true,
@@ -22,6 +22,10 @@
     },
     /* Language server settings */
     "lspconfig": {
+        "clangd": {
+            "clangd.arguments": [],
+            "clangd.fallbackFlags": ["-std=c++20"]
+        },
         "rust_analyzer": {
             "rust-analyzer.updates.channel": "nightly", // stable, nightly
             "rust-analyzer.diagnostics.disabled": ["inactive-code"],
