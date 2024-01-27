@@ -205,9 +205,7 @@ local function __completion()
 
     cmp.setup({
         mapping = cmp_mappings,
-        snippet = {
-            expand = function(args) require('luasnip').lsp_expand(args.body) end,
-        },
+        snippet = { expand = function(args) require('luasnip').lsp_expand(args.body) end },
         sources = cmp.config.sources({
             { name = 'nvim_lsp' },
             { name = 'luasnip' },
@@ -231,6 +229,8 @@ local function __completion()
             fields = { 'kind', 'abbr', 'menu' },
             format = cmp_format,
         },
+    })
+    cmp.setup.filetype({ 'c', 'cpp' }, {
         sorting = {
             comparators = {
                 compare.offset,
