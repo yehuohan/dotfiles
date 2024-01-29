@@ -130,22 +130,33 @@ function ctxs.tabs_bufs(layout)
     return res
 end
 
---- Alias basic colors
+--- Alias colors
 local function load_colors()
-    return {
-        blank = require('heirline.utils').get_highlight('Normal').bg or '#000000',
+    local normal_bg = require('heirline.utils').get_highlight('Normal').bg or '#000000'
+    local colors = {
+        blank = normal_bg,
         red = '#fa461e',
         green = '#b8bb26',
         blue = '#83a598',
         gray = '#665c54',
-        -- gruvbox dark
-        areaA = '#ff8019',
-        areaB = '#beaa82',
-        areaC = '#504b4b',
-        textA = '#dc6919',
-        textB = '#ebdcb4',
-        textC = '#b4aa96',
+        -- gruvbox dark as default
+        base = '#ff8019', -- Base highlight color
+        area = '#504b4b', -- Base block bg
+        atxt = '#ebdcb4', -- Base block fg
+        astr = '#b4aa96', -- Base inactive block fg
+        fill = '#beaa82', -- Fill block bg
+        ftxt = normal_bg, -- Fill block fg
     }
+    local colorscheme = vim.g.colors_name or ''
+    if colorscheme:match('^monokai') then
+        colors.base = '#fa8419'
+        colors.area = '#4d5154'
+        colors.atxt = '#e3e3e1'
+        colors.astr = '#B1B1B1'
+        colors.fill = '#A1B5B1'
+        colors.ftxt = normal_bg
+    end
+    return colors
 end
 
 --- Pad component as a block
@@ -184,36 +195,36 @@ local function stls()
             elseif mch == 'R' then
                 return 'blue'
             end
-            return 'areaB'
+            return 'fill'
         end,
-        { provider = ctxs.hint, hl = { fg = 'blank', bold = true } },
+        { provider = ctxs.hint, hl = { fg = 'ftxt', bold = true } },
         { condition = conds.is_active }
     )
-    local ComPath = pad('areaC', {
-        { provider = ctxs.root_path, hl = { fg = 'textA', bold = true } },
-        { provider = ctxs.relative_path, hl = { fg = 'textB' } },
+    local ComPath = pad('area', {
+        { provider = ctxs.root_path, hl = { fg = 'base', bold = true } },
+        { provider = ctxs.relative_path, hl = { fg = 'atxt' } },
     })
-    local ComFile = pad('areaC', {
+    local ComFile = pad('area', {
         provider = '%F',
-        hl = function() return { fg = conds.is_active() and 'textB' or 'textC' } end,
+        hl = function() return { fg = conds.is_active() and 'atxt' or 'astr' } end,
     })
-    local ComType = pad('areaC', {
+    local ComType = pad('area', {
         provider = '%y',
-        hl = function() return { fg = conds.is_active() and 'textB' or 'textC' } end,
+        hl = function() return { fg = conds.is_active() and 'atxt' or 'astr' } end,
     })
-    local ComAttr = pad('areaC', { provider = ctxs.attr, hl = { fg = 'textB' } })
-    local ComInfo = pad('areaB', { provider = ctxs.info, hl = { fg = 'blank' } })
-    local ComLite = pad('areaC', { provider = ctxs.lite, hl = { fg = 'textC' } })
-    local ComCheck = pad('areaA', {
+    local ComAttr = pad('area', { provider = ctxs.attr, hl = { fg = 'atxt' } })
+    local ComInfo = pad('fill', { provider = ctxs.info, hl = { fg = 'ftxt' } })
+    local ComLite = pad('area', { provider = ctxs.lite, hl = { fg = 'astr' } })
+    local ComCheck = pad('base', {
         provider = function(self) return self:nonlocal('check') end,
-        hl = { fg = 'blank', italic = true },
+        hl = { fg = 'ftxt', italic = true },
     }, {
         condition = function(self)
             self.check = ctxs.check_lines()
             return self.check ~= nil
         end,
     })
-    local ComLsp = pad('areaC', {
+    local ComLsp = pad('area', {
         provider = function(self) return self:nonlocal('lsp') end,
         hl = { fg = 'blue', bold = true, italic = true },
         update = {
@@ -261,15 +272,15 @@ end
 
 --- Tablines
 local function ele(e, fn)
-    local fg = 'textB'
-    local bg = 'areaC'
+    local fg = 'atxt'
+    local bg = 'area'
     local txt = e.title
     if e.modified == 0 and e.selected == 1 then
-        fg = 'blank'
+        fg = 'ftxt'
         bg = 'blue'
     elseif e.modified == 1 and e.selected == 1 then
         txt = txt .. '+'
-        fg = 'blank'
+        fg = 'ftxt'
         bg = 'green'
     elseif e.modified == 1 and e.selected == 0 then
         txt = txt .. '+'
@@ -286,13 +297,13 @@ local function tabs()
     local utils = require('heirline.utils')
 
     local ComAlign = { provider = '%=' }
-    local ComBuf = utils.surround({ '', sym.sep[2] }, 'areaA', {
+    local ComBuf = utils.surround({ '', sym.sep[2] }, 'base', {
         provider = sym.buf,
-        hl = { fg = 'blank' },
+        hl = { fg = 'ftxt' },
     })
-    local ComTab = utils.surround({ sym.sep[1], '' }, 'areaA', {
+    local ComTab = utils.surround({ sym.sep[1], '' }, 'base', {
         provider = sym.tab,
-        hl = { fg = 'blank' },
+        hl = { fg = 'ftxt' },
     })
 
     return wrap({
