@@ -165,12 +165,18 @@ end
 --------------------------------------------------------------------------------
 -- Component
 --------------------------------------------------------------------------------
--- 主题
-local function pkg_theme()
-    vim.g.gruvbox_contrast_dark = 'soft'
-    vim.g.gruvbox_italic = 1
-    vim.g.gruvbox_invert_selection = 0
-    vim.g.one_allow_italics = 1
+-- Colorscheme gruvbox
+local function pkg_gruvbox()
+    require('gruvbox').setup({
+        contrast = 'soft', -- 'hard', 'soft' or ''
+        italic = {
+            strings = false,
+            emphasis = true,
+            comments = true,
+            operators = false,
+            folds = true,
+        },
+    })
 end
 
 -- 启动首页
@@ -287,6 +293,7 @@ local function pkg_ufo()
             return use.nts and { 'treesitter', 'indent' } or { 'indent' }
         end,
     })
+    vim.api.nvim_set_hl(0, 'UfoFoldedBg', { bg = '#5a5555' })
     m.nnore({
         '<leader>tu',
         function()
@@ -353,7 +360,7 @@ local function pkg_popc()
     vim.g.Popset_SelectionData = {
         {
             opt = { 'colorscheme', 'colo' },
-            lst = { 'gruvbox', 'one', 'monokai_pro', 'monokai_soda' },
+            lst = { 'gruvbox', 'monokai-nightasty' },
         },
     }
     m.nnore({ '<leader><leader>p', ':PopSet<Space>' })
@@ -881,7 +888,7 @@ local function pkg_hlchunk()
             enable = true,
             chars = { '⁞' },
             style = { 'Gray30' },
-            exclude_filetypes = { screensaver = true },
+            exclude_filetypes = { Popc = true, screensaver = true },
         },
         line_num = { enable = false },
         blank = { enable = false },
@@ -1060,9 +1067,8 @@ local pkgs = {
     { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' } },
 
     -- Component
-    { 'morhetz/gruvbox', config = pkg_theme },
-    { 'rakr/vim-one' },
-    { 'tanvirtin/monokai.nvim' },
+    { 'ellisonleao/gruvbox.nvim', config = pkg_gruvbox },
+    { 'polirritmico/monokai-nightasty.nvim' },
     { 'nvim-tree/nvim-web-devicons', lazy = true, enabled = use.ui.icon },
     { -- heirline
         'rebelot/heirline.nvim',

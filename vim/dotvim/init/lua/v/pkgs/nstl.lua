@@ -148,12 +148,12 @@ local function load_colors()
         ftxt = normal_bg, -- Fill block fg
     }
     local colorscheme = vim.g.colors_name or ''
-    if colorscheme:match('^monokai') then
-        colors.base = '#fa8419'
+    if colorscheme == 'monokai-nightasty' then
+        colors.base = '#ff9700'
         colors.area = '#4d5154'
         colors.atxt = '#e3e3e1'
-        colors.astr = '#B1B1B1'
-        colors.fill = '#A1B5B1'
+        colors.astr = '#b1b1b1'
+        colors.fill = '#a1b5b1'
         colors.ftxt = normal_bg
     end
     return colors
