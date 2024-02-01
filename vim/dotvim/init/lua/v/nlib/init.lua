@@ -227,6 +227,21 @@ function M.get_selected(sep)
     end
 end
 
+--- Try to find root directory upward
+--- @return string|nil
+function M.try_root()
+    local dirs = vim.fs.find({ '.git' }, {
+        upward = true,
+        type = 'directory',
+        path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
+        limit = math.huge,
+    })
+    local dir = dirs[#dirs]
+    if dir then
+        return vim.fs.dirname(dir)
+    end
+end
+
 --- Get extended modeline
 --- @param tag(string) Tag for extended modeline
 --- @return table|nil tbl

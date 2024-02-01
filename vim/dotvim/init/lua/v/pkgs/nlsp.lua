@@ -283,7 +283,7 @@ local function __completion()
 end
 
 --- Setup lsp highlights
-local function __lsp_highlights()
+local function __highlights()
     local api = vim.api
     -- stylua: ignore start
     api.nvim_set_hl(0, 'LspSignatureActiveParameter', {link = 'Tag' })
@@ -431,7 +431,7 @@ return {
         __servers()
         __sources()
         __completion()
-        __lsp_highlights()
+        __highlights()
         __lsp_settings()
         __lsp_mappings()
     end),

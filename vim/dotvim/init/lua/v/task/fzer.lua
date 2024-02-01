@@ -49,23 +49,6 @@ local function rg_hidden() return wsc.hidden and { '--hidden' } or {} end
 --- @return table<string>
 local function rg_ignore() return wsc.ignore and {} or { '--no-ignore' } end
 
---- @return string|nil
-local function uproot()
-    local dirlst = vim.fs.find({ '.git' }, {
-        upward = true,
-        type = 'directory',
-        path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
-        limit = math.huge,
-    })
-    local dir = dirlst[#dirlst]
-    if dir then
-        dir = vim.fs.dirname(dir)
-        wsc.path = dir
-        table.insert(wsc.paths, dir)
-        return dir
-    end
-end
-
 --- @class FzerVars
 --- @field opt(string) Options
 --- @field pat(string) Pattern
@@ -238,7 +221,14 @@ local function parse_loc(kt)
     else
         local loc = wsc.path
         if loc == '' then
-            loc = uproot() or vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+            local dir = nlib.try_root()
+            if dir then
+                wsc.path = dir
+                table.insert(wsc.paths, dir)
+                loc = dir
+            else
+                loc = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+            end
         end
         return { loc }
     end
