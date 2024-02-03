@@ -1,3 +1,4 @@
+# black
 # pyproject.toml
 
 [tool.black]

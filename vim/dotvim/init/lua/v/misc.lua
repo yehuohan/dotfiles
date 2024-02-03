@@ -59,6 +59,36 @@ local fast_cmds = {
     end,
 }
 
+--- Edit or create chore files
+--- @param under_root(boolean) Edit or create chore file from root
+local function edit_chores(under_root)
+    local dir = nil
+    if under_root then
+        dir = nlib.try_root()
+    end
+    if not dir then
+        dir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+    end
+    local src_dir = vim.env.DotVimShare .. '/chores'
+    local chores = {}
+    for res, type in vim.fs.dir(src_dir, { depth = 2 }) do
+        if type == 'file' then
+            chores[#chores + 1] = res
+        end
+    end
+    vim.ui.select(
+        vim.tbl_map(function(c) return dir .. '/' .. c end, chores),
+        { prompt = 'Select chores to edit/create' },
+        function(choice, idx)
+            if choice then
+                vim.fn.mkdir(vim.fs.dirname(choice), 'p')
+                vim.cmd.edit(choice)
+                vim.cmd.read({ args = { src_dir .. '/' .. chores[idx] }, range = { 0 } })
+            end
+        end
+    )
+end
+
 --- Edit a temporary file
 --- @param ft(string) File type
 --- @param wt(string|nil) Window type with 'tab' or 'floating'
@@ -148,6 +178,8 @@ end
 
 local function setup()
     m.nnore({ '<leader>se', function() vim.fn['popset#set#PopSelection'](fast_cmds) end })
+    m.nnore({ '<leader>srl', function() edit_chores(true) end })
+    m.nnore({ '<leader>sl', function() edit_chores(false) end })
 
     m.nnore({ '<leader>ei', function() vim.ui.input({ prompt = 'Filetype:' }, edit_tmpfile) end })
     m.nnore({ '<leader>ec', function() edit_tmpfile('c') end })

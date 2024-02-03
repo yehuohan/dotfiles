@@ -1,0 +1,44 @@
+/// Local .nlsp.json
+///
+/// Disable server: "lspconfig.server": false
+{
+    /* Neoconf settings */
+    "neoconf": {
+        "plugins": {
+            "lspconfig": { "enabled": true },
+            "jsonls": { "enabled": true },
+            "lua_ls": { "enabled": true }
+        }
+    },
+    /* Neovim lua development settings */
+    "neodev": {
+        "library": {
+            "enabled": true,
+            "runtime": true,
+            "types": true,
+            "plugins": true // Add all loaded plugins to lua_ls runtime
+            // "plugins": [ ] // Add specified plugins to lua_ls runtime
+        }
+    },
+    /* Language server settings */
+    "lspconfig": {
+        "clangd": {
+            "clangd.arguments": [],
+            "clangd.fallbackFlags": ["-std=c++20"]
+        },
+        "rust_analyzer": {
+            "rust-analyzer.updates.channel": "nightly", // stable, nightly
+            "rust-analyzer.diagnostics.disabled": ["inactive-code"],
+            "rust-analyzer.inlayHints.typeHints.enable": true,
+            "rust-analyzer.inlayHints.parameterHints.enable": true,
+            "rust-analyzer.procMacro.enable": true
+        },
+        "pyright": {
+            "python.analysis.stubPath": "typings"
+        },
+        "lua_ls": {
+            "Lua.runtime.version": "LuaJIT", // "Lua 5.2", "LuaJIT"
+            "Lua.workspace.library": []
+        }
+    }
+}

@@ -3,50 +3,29 @@
 # Add configs
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 snippet add-nlsp ".nlsp.json"
-	`PkgLoadSnip('nlsp.json')`
+	`PkgLoadSnip('chores/.nlsp.json')`
 
 snippet add-clangd ".clangd"
-	`PkgLoadSnip('configs/.clangd')`
+	`PkgLoadSnip('chores/.clangd')`
 
 snippet add-clang-format ".clang-format"
-	`PkgLoadSnip('configs/.clang-format')`
+	`PkgLoadSnip('chores/.clang-format')`
 
 snippet add-rustfmt ".rustfmt.toml"
-	`PkgLoadSnip('configs/.rustfmt.toml')`
-
-snippet add-pyright "pyrightconfig.json"
-	`PkgLoadSnip('configs/pyrightconfig.json')`
-
-snippet add-black "pyproject.toml"
-	`PkgLoadSnip('configs/pyproject.toml')`
-
-snippet add-luarc ".luarc.json"
-	`PkgLoadSnip('configs/.luarc.json')`
-
-snippet add-stylua ".stylua.toml"
-	`PkgLoadSnip('configs/.stylua.toml')`
-
-snippet add-ycm ".ycm_extra_conf.py"
-	`PkgLoadSnip('configs/.ycm_extra_conf.py')`
-
-snippet add-spector ".vimspector.json"
-	`PkgLoadSnip('configs/.vimspector.json')`
-
-snippet add-sphinx "conf.py"
-	`PkgLoadSnip('configs/sphinx-conf.py')`
+	`PkgLoadSnip('chores/.rustfmt.toml')`
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Load template for building tools
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 snippet lt-jt "Justfile template"
-	`PkgLoadSnip('build/Justfile')`
+	`PkgLoadSnip('chores/Justfile')`
 
 snippet lt-mk "Makefile template"
-	`PkgLoadSnip('build/Makefile')`
+	`PkgLoadSnip('chores/Makefile')`
 
 snippet lt-cmk "CMake template"
-	`PkgLoadSnip('build/CMakeLists.txt')`
+	`PkgLoadSnip('chores/CMakeLists.txt')`
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
