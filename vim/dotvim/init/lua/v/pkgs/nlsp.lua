@@ -219,11 +219,14 @@ local function __completion()
         window = {
             completion = {
                 border = 'none',
-                winhighlight = 'Normal:Pmenu,CursorLine:Visual,FloatBorder:Pmenu,Search:None',
+                winhighlight = 'Normal:Pmenu,CursorLine:DiffChange,FloatBorder:Pmenu,Search:None',
                 col_offset = -2,
                 side_padding = 0,
             },
-            documentation = { max_width = 80 },
+            documentation = {
+                winhighlight = 'Normal:Pmenu,FloatBorder:Pmenu,Search:None',
+                max_width = 80,
+            },
         },
         formatting = {
             fields = { 'kind', 'abbr', 'menu' },
