@@ -211,10 +211,9 @@ let s:rp = {
         \ 'm' : ['s:FnMake'  , 'makefile'],
         \ 'u' : ['s:FnCMake' , 'cmakelists.txt'],
         \ 'n' : ['s:FnCMake' , 'cmakelists.txt'],
-        \ 'j' : ['s:FnCMake' , 'cmakelists.txt'],
+        \ 'i' : ['s:FnCMake' , 'cmakelists.txt'],
         \ 'q' : ['s:FnQMake' , '*.pro'],
-        \ 'a' : ['s:FnCargo' , 'Cargo.toml'],
-        \ 'h' : ['s:FnSphinx', IsWin() ? 'make.bat' : 'makefile'],
+        \ 'o' : ['s:FnCargo' , 'Cargo.toml'],
         \ },
     \ 'type' : {
         \ 'c'          : ['gcc -g %s %s -o "%s" && "./%s" %s',            'abld', 'srcf', 'outf', 'outf', 'arun'],
@@ -254,14 +253,14 @@ let s:rp = {
     \ }
 " s:rp_mappings {{{
 const s:rp_mappings = [
-        \  'Rp',  'Rm',  'Ru',  'Rn',  'Rj',  'Rq',  'Ra',  'Rh',  'Rf',
-        \  'rp',  'rm',  'ru',  'rn',  'rj',  'rq',  'ra',  'rh',  'rf',
-        \ 'rcp', 'rcm', 'rcu', 'rcn', 'rcj', 'rcq', 'rca', 'rch',
-        \ 'rbp', 'rbm', 'rbu', 'rbn', 'rbj', 'rbq', 'rba', 'rbh',
-        \ 'rlp', 'rlm', 'rlu', 'rln', 'rlj', 'rlq', 'rla', 'rlh', 'rlf',
-        \ 'rtp', 'rtm', 'rtu', 'rtn', 'rtj', 'rtq', 'rta', 'rth', 'rtf',
-        \ 'rep', 'rem', 'reu', 'ren', 'rej', 'req', 'rea', 'reh', 'ref',
-        \ 'rop', 'rom', 'rou', 'ron', 'roj', 'roq', 'roa', 'roh',
+        \  'Rp',  'Rm',  'Ru',  'Rn',  'Ri',  'Rq',  'Ro',  'Rf',
+        \  'rp',  'rm',  'ru',  'rn',  'ri',  'rq',  'ro',  'rf',
+        \ 'rcp', 'rcm', 'rcu', 'rcn', 'rci', 'rcq', 'rco',
+        \ 'rbp', 'rbm', 'rbu', 'rbn', 'rbi', 'rbq', 'rbo',
+        \ 'rlp', 'rlm', 'rlu', 'rln', 'rli', 'rlq', 'rlo', 'rlf',
+        \ 'rtp', 'rtm', 'rtu', 'rtn', 'rti', 'rtq', 'rto', 'rtf',
+        \ 'rep', 'rem', 'reu', 'ren', 'rei', 'req', 'reo', 'ref',
+        \ 'rap', 'ram', 'rau', 'ran', 'rai', 'raq', 'rao',
         \ ]
 " }}}
 
@@ -391,7 +390,7 @@ function! s:parseProps(km, ...)
     endif
     let l:cfg.term   = get({'l': 'floaterm', 't': 'right', 'e': 'external'}, a:km.A, l:cfg.term)
     let l:cfg.deploy = get({'b': 'build', 'c': 'clean'}, a:km.A, l:cfg.deploy)
-    let l:cfg.lowest = (a:km.A ==# 'o') ? 1 : l:cfg.lowest
+    let l:cfg.lowest = (a:km.A ==# 'a') ? 1 : l:cfg.lowest
     return l:cfg
 endfunction
 " }}}
@@ -460,7 +459,7 @@ endfunction
 "   l : run project in floaterm
 "   t : run project in terminal
 "   e : run project in external
-"   o : use project with the lowest directory
+"   a : run project from the lowest directory
 " Project: %3 = km.E
 "   p : run project from s:ws.rp
 "   ... : supported project from s:rp.proj
@@ -491,7 +490,7 @@ function! RunProject(keys, ...)
     else
         try
             call s:rp.run(get(a:000, 0, s:parseProps(km)))
-		catch /\V\^[RP] /
+        catch /\V\^[RP] /
             echo v:exception
         catch
             echo v:exception
@@ -532,14 +531,14 @@ endfunction
 " Function: s:FnCMake(cfg) {{{
 " u: cmake for unix makefiles
 " n: cmake for nmake makefiles
-" j: cmake for ninja
+" i: cmake for ninja
 function! s:FnCMake(cfg)
     let [l:dir, l:out] = s:vout(a:cfg)
     if a:cfg.deploy !=# 'clean'
         let l:gen = {
             \ 'u': 'Unix Makefiles',
             \ 'n': 'NMake Makefiles',
-            \ 'j': 'Ninja',
+            \ 'i': 'Ninja',
             \ }[a:cfg.key]
         let l:fmt = (IsWin() ? 'vcvars64.bat && ' : '')
             \ . 'cmake -DCMAKE_INSTALL_PREFIX=. %s -G "%s" ..'
@@ -572,20 +571,6 @@ function! s:FnCargo(cfg)
         let l:cmd .= ' -- ' . a:cfg.arun
     endif
     let a:cfg.type = 'rust'
-    return l:cmd
-endfunction
-" }}}
-
-" Function: s:FnSphinx(cfg) {{{
-function! s:FnSphinx(cfg)
-    if a:cfg.deploy ==# 'clean'
-        let l:cmd = 'make clean'
-    else
-        let l:cmd = 'make html ' . a:cfg.abld
-        if a:cfg.deploy ==# 'run'
-            let l:cmd .= ' && firefox build/html/index.html'
-        endif
-    endif
     return l:cmd
 endfunction
 " }}}
