@@ -83,7 +83,9 @@ local function edit_chores(under_root)
             if choice then
                 vim.fn.mkdir(vim.fs.dirname(choice), 'p')
                 vim.cmd.edit(choice)
-                vim.cmd.read({ args = { src_dir .. '/' .. chores[idx] }, range = { 0 } })
+                if vim.fn.filereadable(choice) == 0 then
+                    vim.cmd.read({ args = { src_dir .. '/' .. chores[idx] }, range = { 0 } })
+                end
             end
         end
     )

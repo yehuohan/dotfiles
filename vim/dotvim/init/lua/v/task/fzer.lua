@@ -214,24 +214,39 @@ end
 
 --- @return table<string>
 local function parse_loc(kt)
+    local loc = {}
+    local restore = false
     if kt.B == 'b' then
-        return { vim.fs.normalize(vim.api.nvim_buf_get_name(0)) }
+        loc = { vim.fs.normalize(vim.api.nvim_buf_get_name(0)) }
     elseif kt.B == 'p' then
-        return rg_paths()
-    else
-        local loc = wsc.path
-        if loc == '' then
-            local dir = nlib.try_root()
-            if dir then
-                wsc.path = dir
-                table.insert(wsc.paths, dir)
-                loc = dir
-            else
-                loc = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+        loc = rg_paths()
+        if #loc > 0 then
+            if wsc.path == '' then
+                wsc.path = loc[1]
             end
+            for _, dir in ipairs(loc) do
+                if not vim.tbl_contains(wsc.paths, dir) then
+                    table.insert(wsc.paths, dir)
+                end
+            end
+            restore = true
         end
-        return { loc }
+    else
+        if wsc.path == '' then
+            wsc.path = nlib.try_root() or vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+            if not vim.tbl_contains(wsc.paths, wsc.path) then
+                table.insert(wsc.paths, wsc.path)
+            end
+            restore = true
+        end
+        loc = { wsc.path }
     end
+    -- Need reinit wsc when modified path or paths
+    if restore then
+        wsc:reinit(wsc:get())
+        task.wsc.fzer = wsc:get()
+    end
+    return loc
 end
 
 --- @return table<string>
@@ -268,7 +283,7 @@ end
 --- kt.B
 ---     '': find with wsc
 ---     b : use current buffer
----     p : input paths
+---     p : input path
 --- kt.E
 ---     y : text from register "0
 ---     u : text from register "+ (clipboard of system)
