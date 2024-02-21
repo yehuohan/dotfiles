@@ -88,7 +88,6 @@ local function __servers()
         })
     end
     require('mason-lspconfig').setup_handlers(opts)
-    lspconfig.glsl_analyzer.setup({})
 end
 
 -- stylua: ignore start
