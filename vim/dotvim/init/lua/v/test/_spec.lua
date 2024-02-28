@@ -360,15 +360,14 @@ describe('task', function()
     require('v')
     local task = require('v.task')
     task.setup()
-    local fns = { { task, 'run' }, { vim, 'notify', 'print' } }
+    local fns = { { task, 'run' }, { vim, 'notify', 'print' }, { vim.fn, 'input' } }
     local mocked = mock(fns)
 
-    local cfg
-    local msg
-    local txt
+    local cfg, msg, txt, inp
     task.run = function(_cfg) cfg = _cfg end
     vim.notify = function(_msg) msg = _msg end
     vim.print = function(_txt) txt = _txt end
+    vim.fn.input = function() return inp end
 
     local tmp
     before_each(function()
@@ -414,10 +413,30 @@ describe('task', function()
         EQ('term', txt.code.style)
 
         vim.cmd.CodeWsc({ bang = true })
-        EQ('', cfg.key)
-        EQ('', cfg.file)
-        EQ('', cfg.type)
-        EQ('ansi', cfg.style)
+        EQ('', txt.key)
+        EQ('', txt.file)
+        EQ('', txt.type)
+        EQ('ansi', txt.style)
+    end)
+
+    it('. fzer . :Fzer fpw', function()
+        feedkeys('iword<Esc>')
+
+        vim.cmd.FzerWsc({ bang = true })
+        EQ('', txt.path) -- wsc.path = '' for the first Fzer execution
+        inp = 'Z:/abc/def'
+        vim.cmd.Fzer({ args = { 'fpw' } })
+        EQ(inp, cfg.path)
+        vim.cmd.FzerWsc({ bang = true })
+        EQ(inp, txt.path)
+    end)
+
+    it('. fzer . :Fzer Fw', function()
+        feedkeys('iword<Esc>')
+
+        vim.cmd.Fzer({ args = { 'Fw' } })
+        feedkeys('jm<CR><CR>') -- Make wsc.path = ''
+        EQ(vim.fs.dirname(tmp), cfg.path)
     end)
 
     unmock(mocked, fns)
