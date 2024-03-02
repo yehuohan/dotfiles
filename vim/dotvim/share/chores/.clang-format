@@ -39,6 +39,8 @@ PenaltyReturnTypeOnItsOwnLine: 300
 PointerAlignment: Left
 ReferenceAlignment: Left
 
+# MacroBlockBegin: "^NEGIN|START$"
+# MacroBlockEnd: "^END|STOP$"
 AttributeMacros:
   - __ATTR
   - __API
