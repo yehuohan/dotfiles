@@ -1047,6 +1047,21 @@ local function pkg_translator()
     })
 end
 
+-- 输入法自动切换
+local function pkg_im_switch()
+    require('im-switch').setup({
+        windows = {
+            enabled = true,
+        },
+        linux = {
+            enabled = true,
+            default_im = 'keyboard-us',
+            obtain_im_command = 'fcitx5-remote -n',
+            set_im_command = { 'fcitx5-remote', '-s' },
+        },
+    })
+end
+
 --------------------------------------------------------------------------------
 -- Lazy
 --------------------------------------------------------------------------------
@@ -1163,7 +1178,11 @@ local pkgs = {
     { 'itchyny/screensaver.vim', keys = { { '<leader>ss', '<Cmd>ScreenSaver clock<CR>' } } },
     { 'tyru/open-browser.vim', config = pkg_open_browser },
     { 'voldikss/vim-translator', config = pkg_translator },
-    { 'brglng/vim-im-select' },
+    { -- im-switch
+        'drop-stones/im-switch.nvim',
+        config = pkg_im_switch,
+        dependencies = { 'nvim-lua/plenary.nvim' },
+    },
 }
 
 local function clone_lazy(url, bundle)
