@@ -10,7 +10,8 @@ local wsc = nlib.new_configer({
     envs = '',
     path = '',
     paths = {},
-    globs = '!_VOut',
+    glob = '!_VOut',
+    globs = {},
     hidden = true,
     ignore = true,
     options = '',
@@ -34,10 +35,10 @@ end
 
 --- @return table<string>
 local function rg_globs()
-    if wsc.globs ~= '' then
+    if wsc.glob ~= '' then
         return vim.tbl_map(
             function(glob) return ('-g%s'):format(glob) end,
-            nlib.u.str2arg(wsc.globs)
+            nlib.u.str2arg(wsc.glob)
         )
     end
     return {}
@@ -156,13 +157,13 @@ local _sels = {
     opt = 'config fzer task',
     lst = nil,
     -- lst for rg
-    lst_r = { 'envs', 'path', 'globs', 'hidden', 'ignore', 'options', 'vimgrep' },
+    lst_r = { 'envs', 'path', 'glob', 'hidden', 'ignore', 'options', 'vimgrep' },
     -- lst for fuzzier
-    lst_f = { 'envs', 'path', 'globs', 'hidden', 'ignore', 'options', 'fuzzier' },
+    lst_f = { 'envs', 'path', 'glob', 'hidden', 'ignore', 'options', 'fuzzier' },
     dic = {
         envs = { lst = { 'PATH=' }, cpl = 'environment' },
         path = { dsr = 'cached fzer path list', lst = wsc.paths, cpl = 'file' },
-        globs = { dsr = function() return table.concat(rg_globs(), ' ') end },
+        glob = { dsr = function() return table.concat(rg_globs(), ' ') end, lst = wsc.globs },
         hidden = vim.empty_dict(),
         ignore = vim.empty_dict(),
         options = { lst = { '-w', '-i', '-s', '-S', '--no-fixed-strings', '--encoding gbk' } },
@@ -175,6 +176,11 @@ local _sels = {
                 wsc.path = vim.fs.normalize(vim.fn.fnamemodify(wsc.path, ':p'))
                 if not vim.tbl_contains(wsc.paths, wsc.path) then
                     table.insert(wsc.paths, wsc.path)
+                end
+            end
+            if wsc.glob ~= '' then
+                if not vim.tbl_contains(wsc.globs, wsc.glob) then
+                    table.insert(wsc.globs, wsc.glob)
                 end
             end
             wsc:reinit(wsc:get())
@@ -261,7 +267,7 @@ local function parse_opt(kt)
         opt[#opt + 1] = '-s' -- --case-sensitive
     end
     if not kt.A:match('[p]') then
-        -- Custom paths may conflict with rg's globs and ignore rules
+        -- Custom paths may conflict with rg's glob and ignore rules
         vim.list_extend(opt, rg_globs())
         vim.list_extend(opt, rg_hidden())
         vim.list_extend(opt, rg_ignore())
@@ -312,6 +318,7 @@ local entry = async(function(kt, bang)
     if kt.S == 'F' then
         _sels.lst = _sels.lst_r
         _sels.dic.path.lst = wsc.paths
+        _sels.dic.glob.lst = wsc.globs
         if not await(a.pop_selection(_sels)) then
             return
         end
@@ -376,6 +383,7 @@ local entry_fuzzier = async(function(kt)
     if kt.S == 'F' then
         _sels.lst = _sels.lst_f
         _sels.dic.path.lst = wsc.paths
+        _sels.dic.glob.lst = wsc.globs
         if not await(a.pop_selection(_sels)) then
             return
         end
