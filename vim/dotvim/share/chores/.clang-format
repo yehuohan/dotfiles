@@ -38,6 +38,7 @@ PenaltyBreakBeforeFirstCallParameter: 0
 PenaltyReturnTypeOnItsOwnLine: 300
 PointerAlignment: Left
 ReferenceAlignment: Left
+SortIncludes: true
 
 # MacroBlockBegin: "^NEGIN|START$"
 # MacroBlockEnd: "^END|STOP$"
