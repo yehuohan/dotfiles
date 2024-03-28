@@ -63,6 +63,21 @@ snippet mplparam "matplotlib param settings"
 	mpl.rcParams['font.family'] = 'DejaVu Sans'
 	mpl.rcParams['font.size'] = 9
 
+snippet mplimshow "matplotlib format_coord for imshow"
+	def get_format_coord(img):
+		def format_coord(x, y):
+			col = round(x)
+			row = round(y)
+			nrows, ncols = img.shape[:2]
+			if 0 <= col < ncols and 0 <= row < nrows:
+				z = str(img[row, col])
+				return f'({x:1.2f}, {y:1.2f}) : {z}'
+			else:
+				return f'({x:1.2f}, {y:1.2f})'
+		return format_coord
+	plt.gca().format_coord = get_format_coord(img)
+	ax.format_coord = get_format_coord(img)
+
 snippet mgif "pymovie make gif"
 	import moviepy.editor as mpy
 	from moviepy.video.io.bindings import mplfig_to_npimage
