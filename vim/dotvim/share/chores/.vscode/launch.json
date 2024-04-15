@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug C/C++",
+            "type": "cppdbg", // cppdbg for GDB and LLDB, cppvsdbg for VS
+            "request": "launch", // attach
+            "program": "${workspaceFolder}/install/Debug/main.exe",
+            "args": ["${workspaceFolder}/assets", "${workspaceFolder}/glsl"],
+            "cwd": "${workspaceFolder}",
+            "environment": [], // { "name": "PATH", "value": "."}
+            "externalConsole": false,
+            "stopAtEntry": false,
+            "linux": { "MIMode": "gdb", "miDebuggerPath": "/usr/bin/gdb" },
+            "osx": { "MIMode": "lldb" },
+            // pacman -S --needed base-devel mingw-w64-ucrt-x86_64-toolchain
+            "windows": { "MIMode": "gdb", "miDebuggerPath": "gdb" },
+            "setupCommands": [
+                { "text": "-enable-pretty-printing", "ignoreFailures": true },
+                { "text": "-gdb-set disassembly-flavor intel", "ignoreFailures": true }
+            ]
+        }
+    ]
+}
