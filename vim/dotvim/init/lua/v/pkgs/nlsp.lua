@@ -5,7 +5,7 @@ local m = require('v.nlib').m
 local function __servers()
     -- Settings
     require('neoconf').setup({
-        -- Priority: lspconfig.setup() > global > local
+        -- Priority: lspconfig.setup() < global < local
         local_settings = '.nlsp.json',
         global_settings = 'nlsp.json',
         filetype_jsonc = use.nts,

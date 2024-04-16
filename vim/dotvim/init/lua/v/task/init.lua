@@ -91,7 +91,7 @@ function M.cmd(cmd, bang)
 end
 
 --- Setup quickfix window for task result
-local function setup_qf()
+local function setup_quickfix()
     vim.api.nvim_create_autocmd('BufWinEnter', {
         group = 'v.Task',
         callback = function(args)
@@ -136,6 +136,75 @@ local function setup_qf()
     vim.api.nvim_set_hl(0, 'QuickFixLine', { bg = '#505050' })
 end
 
+--- Setup task plugin overseer
+local function setup_overseer()
+    local components = {
+        {
+            'on_task_output',
+            open = true,
+            jump = false,
+            scroll = true,
+            append = false,
+            title = M.title.Task,
+            style = 'job',
+        },
+        'display_duration',
+        'on_output_summarize',
+        'on_exit_set_status',
+        'on_complete_dispose',
+        'unique',
+    }
+    local opts = {
+        strategy = { 'jobstart', use_terminal = false },
+        templates = { 'builtin' },
+        dap = false,
+        form = { win_opts = { winblend = 0 } },
+        task_list = {
+            direction = 'right',
+            bindings = {
+                ['i'] = 'Edit',
+                ['p'] = 'TogglePreview',
+                ['o'] = 'OpenQuickFix',
+                ['O'] = function()
+                    require('overseer.task_list.sidebar').get():run_action('restart')
+                end,
+                ['K'] = function() require('overseer.task_list.sidebar').get():run_action('stop') end,
+                ['D'] = function()
+                    require('overseer.task_list.sidebar').get():run_action('dispose')
+                end,
+            },
+        },
+        component_aliases = {
+            default = components,
+            default_vscode = components,
+        },
+    }
+    local overseer = require('overseer')
+    overseer.setup(opts)
+
+    nlib.m.nnore({ '<leader>ru', function() overseer.run_template({ prompt = 'never' }) end })
+    nlib.m.nnore({ '<leader>rU', function() overseer.run_template({ prompt = 'allow' }) end })
+    nlib.m.nnore({
+        '<leader>rk',
+        function()
+            local list = overseer.list_tasks()
+            if #list > 0 then
+                list[#list]:stop()
+            end
+        end,
+    })
+    nlib.m.nnore({
+        '<leader>rK',
+        function()
+            local list = overseer.list_tasks()
+            for _, t in ipairs(list) do
+                t:stop()
+            end
+        end,
+    })
+    nlib.m.nnore({ '<leader>tk', '<Cmd>OverseerToggle<CR>' })
+end
+
 function M.setup()
     -- Setup task commands
     vim.api.nvim_create_user_command('TaskWsc', function() vim.print(M.wsc) end, { nargs = 0 })
@@ -174,7 +243,8 @@ function M.setup()
         end,
     })
 
-    setup_qf()
+    setup_overseer()
+    setup_quickfix()
     require('v.task.code').setup()
     require('v.task.fzer').setup()
 end

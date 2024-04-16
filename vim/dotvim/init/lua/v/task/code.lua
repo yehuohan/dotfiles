@@ -13,7 +13,6 @@ local wsc = nlib.new_configer({
     file = '',
     type = '',
     envs = '',
-    garg = '',
     barg = '',
     earg = '',
     msvc = false, -- Setup msvc environment
@@ -29,8 +28,6 @@ local wsc = nlib.new_configer({
 --- @field bsrc(string) Build source file
 --- @field bout(string) Build output file
 --- @field earg(string) Execution arguments
---- @field gtar(string) Generator target
---- @field garg(string) Generate arguments
 --- @field stage(string) Task stage from {'build', 'run', 'clean', 'test'}
 
 --- @class CodeTable Single code file tasks according to filetype
@@ -67,35 +64,15 @@ local codes = {
 -- stylua: ignore end
 
 --- @class PackTable Project package tasks
---- For packs: generate {garg} {gtar} => build {barg} {bout} => run/clean/test {earg}
 local packs = {
     just = 'just {barg}',
     make = 'make {barg}',
-    cmake = {
-        'cmake -G "{gtar}" -DCMAKE_INSTALL_PREFIX=_VOut {garg} -S . -B _VOut',
-        'cmake --build _VOut {barg}',
-        'cmake --install _VOut',
-    },
     cargo = 'cargo {stage} {barg} -- {earg}',
     _pats = {
-        tar = [[^TARGET%s*:?=%s*([%w%-_]+)%s*$]], -- TARGET := <bout>
-        pro = [[^project%s*%(%s*([%w%-_]+).*%).*$]], -- project(<bout>)
-        pho = [[^%.PHONY:%s*([%w%-_]+)%s*$]], -- .PHONY: <barg>
+        phony = [[^%.PHONY:%s*([%w%-_]+)%s*$]], -- .PHONY: <barg>
     },
-    _exec = '"./{bout}" {earg}',
     _msvc = 'vcvars64.bat',
-    _vout = '_VOut',
 }
-
---- @return string|nil
-local function pat_text(pattern, file)
-    for line in io.lines(file) do
-        local res = string.match(line, pattern)
-        if res then
-            return res
-        end
-    end
-end
 
 --- @return table<string>
 local function pat_list(pattern, file)
@@ -188,44 +165,13 @@ function _hdls.make(cfg)
 
     local rep = {}
     rep.barg = cfg.barg
-    rep.bout = (cfg.stage ~= 'build') and pat_text(packs._pats.tar, cfg.file) or nil
-    rep.bout = rep.bout and packs._vout .. '/' .. rep.bout
-    rep.earg = cfg.earg
     if cfg.stage == 'clean' then
         rep.barg = 'clean'
-        rep.bout = nil
     end
 
     local cmds = {}
     cmds[#cmds + 1] = (IsWin() and cfg.msvc) and packs._msvc or nil
     cmds[#cmds + 1] = replace(packs.make, rep)
-    cmds[#cmds + 1] = rep.bout and replace(packs._exec, rep) or nil
-
-    return sequence(cmds)
-end
-
-function _hdls.cmake(cfg)
-    local outdir = cfg.wdir .. '/' .. packs._vout
-    if cfg.stage == 'clean' then
-        vim.fn.delete(outdir, 'rf')
-        throw(string.format('%s was removed', outdir), 0)
-    end
-    vim.fn.mkdir(outdir, 'p')
-    cfg.tout.efm = codes.cmake.efm .. ',' .. vim.o.errorformat
-
-    local rep = {}
-    rep.gtar = cfg.target
-    rep.garg = cfg.garg
-    rep.barg = cfg.barg
-    rep.bout = (cfg.stage ~= 'build') and pat_text(packs._pats.pro, cfg.file) or nil
-    rep.bout = rep.bout and packs._vout .. '/' .. rep.bout
-    rep.earg = cfg.earg
-    local cmds = {}
-    cmds[#cmds + 1] = (IsWin() and cfg.msvc) and packs._msvc or nil
-    cmds[#cmds + 1] = replace(packs.cmake[1], rep)
-    cmds[#cmds + 1] = replace(packs.cmake[2], rep)
-    cmds[#cmds + 1] = replace(packs.cmake[3], rep)
-    cmds[#cmds + 1] = rep.bout and replace(packs._exec, rep) or nil
 
     return sequence(cmds)
 end
@@ -234,9 +180,9 @@ function _hdls.cargo(cfg)
     cfg.tout.efm = codes.rust.efm
 
     local rep = {}
-    rep.stage = cfg.stage
     rep.barg = cfg.barg
     rep.earg = cfg.earg
+    rep.stage = cfg.stage
     return replace(packs.cargo, rep)
 end
 
@@ -252,7 +198,6 @@ local function dispatch(rhs, cfg)
         end
     end
     cfg.wdir = vim.fs.dirname(cfg.file)
-    cfg.target = rhs.target
     return _hdls[rhs.fn](cfg)
 end
 
@@ -270,12 +215,7 @@ function _args.just(dic, cfg)
     dic.barg.lst = nlib.u.str2arg(vim.fn.system('just --summary --unsorted -f ' .. cfg.file))
 end
 
-function _args.make(dic, cfg) dic.barg.lst = pat_list(packs._pats.pho, cfg.file) end
-
-function _args.cmake(dic, cfg)
-    dic.garg.lst = { '-DCMAKE_BUILD_TYPE=Release' }
-    dic.barg.lst = { '--target tags', '-j4' }
-end
+function _args.make(dic, cfg) dic.barg.lst = pat_list(packs._pats.phony, cfg.file) end
 
 function _args.cargo(dic, cfg)
     dic.barg.lst = { '--package <test>' }
@@ -287,7 +227,6 @@ end
 --- @param dic(table) What to update
 --- @param cfg(TaskConfig)
 local function update_sels(rhs, dic, cfg)
-    dic.garg = { lst = {} }
     dic.barg = { lst = {} }
     dic.earg = { lst = {} }
     if rhs then
@@ -305,27 +244,22 @@ end
 --- @field fn(string) Function name for CodeHandles
 --- @field desc(string)
 --- @field pat(string|nil) File pattern to get item from CodeTable or PackTable
---- @field target(string|nil)
 
 -- stylua: ignore start
 --- @type table<string,CodeHandleMap>
 local _maps = {
-    { 'l', 'f', 'j', 'm', 'u', 'n', 'i', 'o' },
+    { 'l', 'f', 'j', 'm', 'o' },
     l = { fn = 'nvim',   desc = 'Nvim lua' },
     f = { fn = 'file',   desc = 'Single file' },
     j = { fn = 'just',   desc = 'Just',        pat = 'Justfile' },
     m = { fn = 'make',   desc = 'Make',        pat = 'Makefile' },
-    u = { fn = 'cmake',  desc = 'CMake Unix',  pat = 'CMakeLists', target = 'Unix Makefiles' },
-    n = { fn = 'cmake',  desc = 'CMake NMake', pat = 'CMakeLists', target = 'NMake Makefiles' },
-    i = { fn = 'cmake',  desc = 'CMake Ninja', pat = 'CMakeLists', target = 'Ninja' },
     o = { fn = 'cargo',  desc = 'Cargo rust',  pat = 'Cargo.toml' },
 }
 
 local _keys = {
-    'Rp' , 'Rj' , 'Rm' , 'Ru' , 'Rn' , 'Ri' , 'Ro' , 'Rf', 'Rl',
-    'rp' , 'rj' , 'rm' , 'ru' , 'rn' , 'ri' , 'ro' , 'rf', 'rl',
-    'rcp', 'rcj', 'rcm', 'rcu', 'rcn', 'rci', 'rco',
-    'rbp', 'rbj', 'rbm', 'rbu', 'rbn', 'rbi', 'rbo',
+    'Rp' , 'Rj' , 'Rm' , 'Ro' , 'Rf', 'Rl',
+    'rp' , 'rj' , 'rm' , 'ro' , 'rf', 'rl',
+    'rcp', 'rcj', 'rcm', 'rco',
 }
 -- stylua: ignore end
 
@@ -334,17 +268,16 @@ local _sels = {
     opt = 'config code task',
     lst = nil,
     -- lst for kt.E != p
-    lst_d = { 'envs', 'garg', 'barg', 'earg', 'msvc', 'stage', 'outer', 'style' },
+    lst_d = { 'envs', 'barg', 'earg', 'msvc', 'stage', 'outer', 'style' },
     -- lst for kt.E = p
-    lst_p = { 'key', 'file', 'type', 'envs', 'garg', 'barg', 'earg', 'msvc', 'stage', 'style' },
+    lst_p = { 'key', 'file', 'type', 'envs', 'barg', 'earg', 'msvc', 'stage', 'style' },
     -- lst for CodeWscInit
     lst_i = { 'envs', 'msvc', 'outer', 'style', 'verbose' },
     dic = {
         key = { lst = _maps[1], dic = vim.tbl_map(function(h) return h.desc end, _maps) },
-        file = { cpl = 'file' },
-        type = { cpl = 'filetype' },
+        file = { lst = {}, cpl = 'file' },
+        type = { lst = { 'just', 'python' }, cpl = 'filetype' },
         envs = { lst = { 'PATH=' }, cpl = 'environment' },
-        garg = vim.empty_dict(),
         barg = vim.empty_dict(),
         earg = vim.empty_dict(),
         msvc = vim.empty_dict(),
@@ -394,13 +327,12 @@ end
 --- @param kt(table) [rR][cb][p...]
 ---                  [%S][%A][%E  ]
 --- kt.S
----     r : build and run task
+---     r : run task
 ---     R : modify code task config
 --- kt.A
 ---     c : clean task
----     b : build without run
 --- kt.E
---      ? : from _maps
+---     ? : from _maps
 ---     p : run task from task.wsc.code
 --- Forward
 ---     R^p => r^p (r^p means r[kt.E != p])
@@ -449,7 +381,7 @@ local entry = async(function(kt, bang)
     -- Run code task
     vim.cmd.wall({ mods = { silent = true, emsg_silent = true } })
     wsc.key = kt.E
-    wsc.stage = (kt.A == 'b' and 'build') or (kt.A == 'c' and 'clean') or wsc.stage
+    wsc.stage = (kt.A == 'c' and 'clean') or wsc.stage
     wsc.tout.open = true
     wsc.tout.jump = false
     wsc.tout.scroll = true

@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run command",
+            "type": "shell",
+            "command": "gcc -g test.c -o test && \"./test\"",
+            "options": {
+                "shell": {
+                    "executable": "bash -uc"
+                },
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "FOO": "bar"
+                }
+            }
+        }
+    ]
+}

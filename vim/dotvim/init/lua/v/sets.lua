@@ -161,7 +161,7 @@ local function set_default_autocmds()
     -- stylua: ignore start
     api.nvim_create_autocmd('BufNewFile', { group = 'v.Sets', command = 'setlocal fileformat=unix' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.nvim' }, command = 'setlocal filetype=vim' })
-    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { 'nlsp.json', '.nlsp.json', 'launch.json' }, command = 'setlocal filetype=jsonc' })
+    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { 'nlsp.json', '.nlsp.json', 'tasks.json', 'launch.json' }, command = 'setlocal filetype=jsonc' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.log' }, command = 'setlocal filetype=log' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.hlsl', '*.usf', '*.ush' }, command = 'setlocal filetype=hlsl' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.uproject', '*.uplugin' }, command = 'setlocal filetype=json' })

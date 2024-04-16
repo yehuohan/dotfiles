@@ -719,48 +719,6 @@ endfunction
     m.snore({ '<M-h>', function() snip.jump(-1) end })
 end
 
--- 导步程序/任务
-local function pkg_overseer()
-    local overseer = require('overseer')
-    overseer.setup({
-        dap = false,
-        task_list = {
-            direction = 'right',
-            bindings = {
-                ['i'] = 'Edit',
-                ['p'] = 'TogglePreview',
-                ['o'] = 'OpenQuickFix',
-                ['O'] = function()
-                    require('overseer.task_list.sidebar').get():run_action('restart')
-                end,
-                ['K'] = function() require('overseer.task_list.sidebar').get():run_action('stop') end,
-                ['D'] = function()
-                    require('overseer.task_list.sidebar').get():run_action('dispose')
-                end,
-            },
-        },
-    })
-    m.nnore({ '<leader>tk', '<Cmd>OverseerToggle<CR>' })
-    m.nnore({
-        '<leader>rk',
-        function()
-            local list = overseer.list_tasks()
-            if #list > 0 then
-                list[#list]:stop()
-            end
-        end,
-    })
-    m.nnore({
-        '<leader>rK',
-        function()
-            local list = overseer.list_tasks()
-            for _, t in ipairs(list) do
-                t:stop()
-            end
-        end,
-    })
-end
-
 -- 代码格式化
 local function pkg_conform()
     local conform = require('conform')
@@ -1156,7 +1114,7 @@ local pkgs = {
     },
     { 'rcarriga/nvim-dap-ui', enabled = use.ndap, dependencies = { 'mfussenegger/nvim-dap' } },
     { 'L3MON4D3/LuaSnip', config = pkg_snip, dependencies = { 'honza/vim-snippets' } },
-    { 'stevearc/overseer.nvim', config = pkg_overseer },
+    { 'stevearc/overseer.nvim' }, -- Setup from v.task
     { 'stevearc/conform.nvim', config = pkg_conform },
     { 'voldikss/vim-floaterm', config = pkg_floaterm },
     { 'numToStr/Comment.nvim', config = pkg_comment },
