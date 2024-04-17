@@ -7,8 +7,10 @@ local dir_bundle = vim.fs.dirname(dir_init) .. '/bundle'
 vim.opt.rtp:prepend(dir_init)
 vim.opt.rtp:prepend(dir_bundle .. '/popc')
 vim.opt.rtp:prepend(dir_bundle .. '/popset')
+vim.opt.rtp:prepend(dir_bundle .. '/overseer.nvim')
 vim.cmd.runtime('plugin/popc.vim')
 vim.cmd.runtime('plugin/popset.vim')
+vim.cmd.runtime('plugin/overseer.nvim')
 
 local EQ = assert.are.same -- The table's metatable won't be compared
 local OK = assert.has_no.errors

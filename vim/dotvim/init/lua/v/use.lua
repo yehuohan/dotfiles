@@ -39,6 +39,7 @@ local lst = {
 --- @type PopSelectionEvent
 local function use_save(name)
     if name == 'onCR' then
+        vim.fn.mkdir(vim.env.DotVimLocal, 'p')
         vim.fn.writefile({ vim.json.encode(use) }, use_file)
         vim.notify('v.use save successful!')
     end
