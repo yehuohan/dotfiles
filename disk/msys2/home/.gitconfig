@@ -12,7 +12,7 @@
 [pull]
 	rebase = true
 [http]
-	postBuffer = 524288000
+	postBuffer = 1048576000
 [oh-my-zsh]
 	hide-status = 1
 	hide-dirty = 1
