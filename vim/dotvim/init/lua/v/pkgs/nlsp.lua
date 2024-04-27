@@ -179,6 +179,26 @@ local function __completion()
     local opts_cmdh = { config = { sources = { { name = 'cmdline_history' } } } }
     local cmp_mappings = {
         ['<CR>'] = cmp.mapping.confirm(),
+        ['<Tab>'] = cmp.mapping({
+            i = function(fallback)
+                local snip = require('luasnip')
+                if snip.expandable() then
+                    snip.expand()
+                elseif cmp.visible() and cmp.get_active_entry() then
+                    cmp.confirm({ select = false })
+                else
+                    fallback()
+                end
+            end,
+            c = function()
+                if cmp.visible() then
+                    cmp.select_next_item()
+                else
+                    cmp.complete()
+                end
+            end,
+        }),
+        ['<S-Tab>'] = cmp.mapping(function() cmp.select_prev_item() end, { 'c' }),
         ['<M-i>'] = cmp.mapping.complete(),
         ['<M-u>'] = cmp.mapping(function() cmp.complete(opts_snip) end, { 'i' }),
         ['<M-y>'] = cmp.mapping(function() cmp.complete(opts_cmdh) end, { 'c' }),
@@ -189,14 +209,6 @@ local function __completion()
         ['<M-m>'] = cmp.mapping.scroll_docs(-4),
         ['<M-f>'] = cmp.mapping.scroll_docs(4),
         ['<M-d>'] = cmp.mapping.scroll_docs(-4),
-        ['<Tab>'] = cmp.mapping(function()
-            if cmp.visible() then
-                cmp.select_next_item()
-            else
-                cmp.complete()
-            end
-        end, { 'c' }),
-        ['<S-Tab>'] = cmp.mapping(function() cmp.select_prev_item() end, { 'c' }),
         ['<Space>'] = cmp.mapping(require('cmp_im').select(), { 'i', 'c' }),
     }
     m.imap({ '<C-j>', '<M-j>' })

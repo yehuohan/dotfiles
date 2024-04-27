@@ -6,9 +6,11 @@ cmake_minimum_required(VERSION 3.5)
 set(VCPKG_TARGET_ARCHITECTURE x64)
 
 # Make sure `vcpkg install` can access what from $PATH (like `bash` and `cmd` of VCPKG_XSCRIPT)
-# Prefer 'UNTRACKED' that won't cause rebuilds on ENV change
+# Prefer 'UNTRACKED' that won't cause rebuild on ENV change
 # set(VCPKG_ENV_PASSTHROUGH PATH)
 set(VCPKG_ENV_PASSTHROUGH_UNTRACKED PATH)
+# Disable track compiler which will cause rebuild when compiler changed
+# set(VCPKG_DISABLE_COMPILER_TRACKING ON)
 
 set(DEPS_DYNAMIC assimp)
 if((PORT IN_LIST DEPS_DYNAMIC) OR (PORT MATCHES "^qt-.*"))
