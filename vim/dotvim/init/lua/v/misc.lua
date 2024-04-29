@@ -180,8 +180,8 @@ end
 
 local function setup()
     m.nnore({ '<leader>se', function() vim.fn['popset#set#PopSelection'](fast_cmds) end })
-    m.nnore({ '<leader>srl', function() edit_chores(true) end })
-    m.nnore({ '<leader>sl', function() edit_chores(false) end })
+    m.nnore({ '<leader>sl', function() edit_chores(true) end })
+    m.nnore({ '<leader>sL', function() edit_chores(false) end })
 
     m.nnore({ '<leader>ei', function() vim.ui.input({ prompt = 'Filetype:' }, edit_tmpfile) end })
     m.nnore({ '<leader>ec', function() edit_tmpfile('c') end })

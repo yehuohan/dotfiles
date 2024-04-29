@@ -20,6 +20,7 @@ local M = {}
 --- @field append(boolean)
 --- @field title(string)
 --- @field style(string)
+--- @field encoding(string)
 --- @field verbose(string|nil)
 
 --- @type TaskWorkspace
@@ -47,6 +48,8 @@ function M.run(cfg)
     opts.env = type(cfg.envs) == 'string' and nlib.u.str2env(cfg.envs) or cfg.envs
     if cfg.tout.style == 'job' then
         opts.strategy = { 'jobstart', use_terminal = false }
+    else
+        opts.strategy = 'terminal'
     end
     opts.components = {
         {
@@ -58,6 +61,7 @@ function M.run(cfg)
             append = cfg.tout.append,
             title = cfg.tout.title,
             style = cfg.tout.style,
+            encoding = cfg.tout.encoding,
             verbose = cfg.tout.verbose,
         },
         'display_duration',
@@ -155,6 +159,7 @@ local function setup_overseer()
         'unique',
     }
     local opts = {
+        -- `overseer.run_template` requires 'jobstart' to get a clean 'on_task_output'
         strategy = { 'jobstart', use_terminal = false },
         templates = { 'builtin' },
         dap = false,

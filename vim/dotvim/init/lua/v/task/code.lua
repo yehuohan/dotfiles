@@ -19,6 +19,7 @@ local wsc = nlib.new_configer({
     stage = 'run',
     outer = true, -- Prioritize finding the outermost file relative to wdir
     style = 'ansi',
+    encoding = '', -- Setup output encoding
     verbose = '',
     tout = {},
 })
@@ -268,9 +269,9 @@ local _sels = {
     opt = 'config code task',
     lst = nil,
     -- lst for kt.E != p
-    lst_d = { 'envs', 'barg', 'earg', 'msvc', 'stage', 'outer', 'style' },
+    lst_d = { 'envs', 'barg', 'earg', 'msvc', 'stage', 'outer', 'style', 'encoding' },
     -- lst for kt.E = p
-    lst_p = { 'key', 'file', 'type', 'envs', 'barg', 'earg', 'msvc', 'stage', 'style' },
+    lst_p = { 'key', 'file', 'type', 'envs', 'barg', 'earg', 'msvc', 'stage', 'style', 'encoding' },
     -- lst for CodeWscInit
     lst_i = { 'envs', 'msvc', 'outer', 'style', 'verbose' },
     dic = {
@@ -284,6 +285,7 @@ local _sels = {
         stage = { lst = { 'build', 'run', 'clean', 'test' } },
         outer = vim.empty_dict(),
         style = { lst = { 'term', 'ansi', 'raw', 'job' } },
+        encoding = { lst = { 'utf-8', 'cp936' } },
         verbose = {
             lst = { 'a', 'w', 'b', 't', 'h', 'n' },
             dic = {
@@ -388,6 +390,7 @@ local entry = async(function(kt, bang)
     wsc.tout.append = false
     wsc.tout.title = task.title.Code
     wsc.tout.style = wsc.style
+    wsc.tout.encoding = wsc.style == 'job' and wsc.encoding or ''
     wsc.tout.verbose = bang and 'a' or wsc.verbose
     if wsc.tout.verbose:match('[aw]') then
         vim.notify(('resovle = %s, restore = %s\n%s'):format(resovle, restore, vim.inspect(wsc)))

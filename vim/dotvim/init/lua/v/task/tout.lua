@@ -81,7 +81,12 @@ function qf.highlight(hl, line, cs, ce)
     )
 end
 
-function qf.display(lines, highlights, efm)
+function qf.display(lines, highlights, efm, encoding)
+    if encoding ~= '' then
+        for k, _ in ipairs(lines) do
+            lines[k] = vim.iconv(lines[k], encoding, vim.o.encoding)
+        end
+    end
     vim.fn.setqflist({}, 'a', {
         lines = lines,
         efm = efm,
@@ -90,6 +95,23 @@ function qf.display(lines, highlights, efm)
         for _, hls in ipairs(highlights) do
             for _, hl in ipairs(hls) do
                 qf.highlight(hl[1], hl[2], hl[3], hl[4])
+            end
+        end
+    end
+end
+
+function qf.react(data, chan_id, encoding)
+    for _, str in ipairs(data) do
+        local txt = str
+        if encoding ~= '' then
+            txt = vim.iconv(str, encoding, vim.o.encoding)
+        end
+        -- React to pause command
+        if IsWin() then
+            for _, pat in ipairs(PAUSE_PATS) do
+                if txt and txt:match(pat) then
+                    vim.api.nvim_chan_send(chan_id, ' ')
+                end
             end
         end
     end
@@ -121,11 +143,12 @@ end
 ---@param cpt Tout.Component
 ---@param params Tout.Params
 function qf.on_complete(task, status, result, cpt, params)
+    local encoding = params.encoding
     local dt = os.time() - cpt.start_time
     local lines, highlights = cpt.chanor()
 
     qf.get()
-    qf.display(lines, highlights, params.errorformat)
+    qf.display(lines, highlights, params.errorformat, encoding)
 
     -- Add tail message
     local msg = string.format('}}} [%s] %s in %ds', os.date('%H:%M:%S'), status, dt)
@@ -155,20 +178,13 @@ end
 ---@param cpt Tout.Component
 ---@param params Tout.Params
 function qf.on_output(task, data, cpt, params)
-    -- React to pause command
-    if IsWin() then
-        for _, str in ipairs(data) do
-            for _, pat in ipairs(PAUSE_PATS) do
-                if str:match(pat) then
-                    vim.api.nvim_chan_send(task.strategy.chan_id, ' ')
-                end
-            end
-        end
-    end
+    local encoding = params.encoding
+    local chan_id = params.style == 'job' and task.strategy.job_id or task.strategy.chan_id
+    qf.react(data, chan_id, encoding)
 
     local lines, highlights = cpt.chanor(data)
     qf.get()
-    qf.display(lines, highlights, params.errorformat)
+    qf.display(lines, highlights, params.errorformat, encoding)
     if params.scroll then
         qf.scroll(#lines)
     end
@@ -271,6 +287,11 @@ local M = {
             desc = 'Choose the display style {term, ansi, raw, job}',
             type = 'string',
             default = 'ansi',
+        },
+        encoding = {
+            desc = "Display encoding (works with style = 'job')",
+            type = 'string',
+            default = '',
         },
         verbose = {
             desc = 'Output verbose for quickfix debug',
