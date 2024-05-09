@@ -16,7 +16,6 @@ local wsc = nlib.new_configer({
     barg = '',
     earg = '',
     msvc = false, -- Setup msvc environment
-    stage = 'run',
     outer = true, -- Prioritize finding the outermost file relative to wdir
     style = 'ansi',
     encoding = '', -- Setup output encoding
@@ -29,7 +28,6 @@ local wsc = nlib.new_configer({
 --- @field bsrc(string) Build source file
 --- @field bout(string) Build output file
 --- @field earg(string) Execution arguments
---- @field stage(string) Task stage from {'build', 'run', 'clean', 'test'}
 
 --- @class CodeTable Single code file tasks according to filetype
 --- For codes: cmd {barg} {bsrc} => {bout} {earg}
@@ -68,7 +66,7 @@ local codes = {
 local packs = {
     just = 'just {barg}',
     make = 'make {barg}',
-    cargo = 'cargo {stage} {barg} -- {earg}',
+    cargo = 'cargo {barg} -- {earg}',
     _pats = {
         phony = [[^%.PHONY:%s*([%w%-_]+)%s*$]], -- .PHONY: <barg>
     },
@@ -150,9 +148,6 @@ function _hdls.just(cfg)
 
     local rep = {}
     rep.barg = cfg.barg
-    if cfg.stage == 'clean' then
-        rep.barg = 'clean'
-    end
 
     local cmds = {}
     cmds[#cmds + 1] = (IsWin() and cfg.msvc) and packs._msvc or nil
@@ -166,9 +161,6 @@ function _hdls.make(cfg)
 
     local rep = {}
     rep.barg = cfg.barg
-    if cfg.stage == 'clean' then
-        rep.barg = 'clean'
-    end
 
     local cmds = {}
     cmds[#cmds + 1] = (IsWin() and cfg.msvc) and packs._msvc or nil
@@ -182,8 +174,10 @@ function _hdls.cargo(cfg)
 
     local rep = {}
     rep.barg = cfg.barg
+    if rep.barg == '' then
+        rep.barg = 'run'
+    end
     rep.earg = cfg.earg
-    rep.stage = cfg.stage
     return replace(packs.cargo, rep)
 end
 
@@ -205,7 +199,13 @@ end
 --- @class CodeHandleArgs Provide more args for _sels
 local _args = {}
 
-function _args.nvim(dic, cfg) dic.barg.lst = { '--headless', '--noplugin' } end
+function _args.nvim(dic, cfg)
+    dic.barg.lst = {
+        '--headless',
+        '--noplugin',
+        '-u NONE -i NONE',
+    }
+end
 
 function _args.file(dic, cfg)
     dic.barg.lst = { '-static' }
@@ -219,13 +219,21 @@ end
 function _args.make(dic, cfg) dic.barg.lst = pat_list(packs._pats.phony, cfg.file) end
 
 function _args.cargo(dic, cfg)
-    dic.barg.lst = { '--package <test>' }
+    dic.barg.lst = {
+        'run',
+        'build',
+        'clean',
+        'check',
+        'clippy',
+        'test --package <what>',
+        'doc --no-deps',
+    }
     dic.earg.lst = { '--nocapture' }
 end
 
 --- Update _sels.dic
 --- @param rhs(CodeHandleMap)
---- @param dic(table) What to update
+--- @param dic(table) The _sels.dic to update
 --- @param cfg(TaskConfig)
 local function update_sels(rhs, dic, cfg)
     dic.barg = { lst = {} }
@@ -260,7 +268,6 @@ local _maps = {
 local _keys = {
     'Rp' , 'Rj' , 'Rm' , 'Ro' , 'Rf', 'Rl',
     'rp' , 'rj' , 'rm' , 'ro' , 'rf', 'rl',
-    'rcp', 'rcj', 'rcm', 'rco',
 }
 -- stylua: ignore end
 
@@ -269,9 +276,9 @@ local _sels = {
     opt = 'config code task',
     lst = nil,
     -- lst for kt.E != p
-    lst_d = { 'envs', 'barg', 'earg', 'msvc', 'stage', 'outer', 'style', 'encoding' },
+    lst_d = { 'envs', 'barg', 'earg', 'msvc', 'outer', 'style', 'encoding' },
     -- lst for kt.E = p
-    lst_p = { 'key', 'file', 'type', 'envs', 'barg', 'earg', 'msvc', 'stage', 'style', 'encoding' },
+    lst_p = { 'key', 'file', 'type', 'envs', 'barg', 'earg', 'msvc', 'style', 'encoding' },
     -- lst for CodeWscInit
     lst_i = { 'envs', 'msvc', 'outer', 'style', 'verbose' },
     dic = {
@@ -282,7 +289,6 @@ local _sels = {
         barg = vim.empty_dict(),
         earg = vim.empty_dict(),
         msvc = vim.empty_dict(),
-        stage = { lst = { 'build', 'run', 'clean', 'test' } },
         outer = vim.empty_dict(),
         style = { lst = { 'term', 'ansi', 'raw', 'job' } },
         encoding = { lst = { 'utf-8', 'cp936' } },
@@ -326,13 +332,12 @@ local function evt_i(name)
 end
 
 --- Entry of code task
---- @param kt(table) [rR][cb][p...]
+--- @param kt(table) [rR][  ][p...]
 ---                  [%S][%A][%E  ]
 --- kt.S
 ---     r : run task
 ---     R : modify code task config
 --- kt.A
----     c : clean task
 --- kt.E
 ---     ? : from _maps
 ---     p : run task from task.wsc.code
@@ -383,7 +388,6 @@ local entry = async(function(kt, bang)
     -- Run code task
     vim.cmd.wall({ mods = { silent = true, emsg_silent = true } })
     wsc.key = kt.E
-    wsc.stage = (kt.A == 'c' and 'clean') or wsc.stage
     wsc.tout.open = true
     wsc.tout.jump = false
     wsc.tout.scroll = true
