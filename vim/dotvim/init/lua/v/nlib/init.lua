@@ -85,8 +85,7 @@ function M.new_configer(opts)
     function C:get() return M.u.deepcopy(self) end
 
     --- Setup config's current options
-    --- * All savable options in mask will be merged from new_opts;
-    --- * All non-savable options will be keeped.
+    --- * All savable and non-savable options in mask will be merged from new_opts
     function C:set(new_opts, mask) M.u.deepmerge(self, new_opts, mask) end
 
     --- Reinit config's options
@@ -418,7 +417,7 @@ function _u.deepmerge(dst, src, mask)
                 end
                 _u.deepmerge(dst[k], v, mask and mask[k])
             else
-                rawset(dst, k, v)
+                dst[k] = v
             end
         end
     end

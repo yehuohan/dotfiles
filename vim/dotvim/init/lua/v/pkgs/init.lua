@@ -261,6 +261,24 @@ local function pkg_notify()
     m.nnore({ '<leader>dm', function() vim.notify.dismiss() end })
 end
 
+-- 系统消息提示
+local function pkg_notifications()
+    local notifications = require('notifications')
+    notifications.setup({
+        override_notify = false,
+        hist_command = 'SysNotifications',
+        icons = {
+            TRACE = '🔍 ',
+            DEBUG = '🐞 ',
+            INFO = '📣 ',
+            WARN = '⚠️  ',
+            ERROR = '❌ ',
+            OFF = '⛔ ',
+        },
+    })
+    vim.sysnotify = notifications.notify
+end
+
 -- 代码折叠
 local function pkg_ufo()
     local ufo = require('ufo')
@@ -892,7 +910,7 @@ local function pkg_peek()
                 s = 'enabled'
                 peek.open()
             end
-            vim.notify('Markdown preview is ' .. s)
+            vim.sysnotify('Markdown preview is ' .. s, vim.log.levels.INFO)
         end,
     })
 end
@@ -1050,6 +1068,7 @@ local pkgs = {
     },
     { 'goolord/alpha-nvim', config = pkg_alpha },
     { 'rcarriga/nvim-notify', config = pkg_notify },
+    { 'ObserverOfTime/notifications.nvim', config = pkg_notifications },
     { 'kevinhwang91/nvim-ufo', config = pkg_ufo, dependencies = { 'kevinhwang91/promise-async' } },
     { 'kevinhwang91/nvim-bqf', config = pkg_bqf, ft = 'qf' },
     { 'yehuohan/popc', init = pkg_popc },
