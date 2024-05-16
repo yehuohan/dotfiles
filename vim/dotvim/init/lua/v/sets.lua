@@ -76,7 +76,6 @@ local function set_default_opts()
         'bin', 'octal', 'hex', 'alpha'
     }                                                -- CTRL-A-X支持数字和字母
     o.mouse = 'a'                                    -- 使能鼠标
-    o.imdisable = false                              -- 不禁用输入法
     o.spell = false                                  -- 默认关闭拼写检查
     o.spelllang = 'en_us'                            -- 设置拼写语言
     o.visualbell = true                              -- 使用可视响铃代替鸣声
@@ -305,7 +304,7 @@ function M.setup()
     api.nvim_create_augroup('v.Sets', { clear = true })
     set_default_autocmds()
 
-    vim.o.guioptions = 'M' -- 完全禁用Gui界面元素
+    --vim.o.guioptions = 'M' -- 完全禁用Gui界面元素
     vim.g.did_install_default_menus = 1 -- 禁止加载缺省菜单
     vim.g.did_install_syntax_menu = 1 -- 禁止加载Syntax菜单
     api.nvim_create_autocmd('UIEnter', { group = 'v.Sets', callback = on_UIEnter })

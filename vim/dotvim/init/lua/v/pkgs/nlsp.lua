@@ -410,13 +410,19 @@ local function __lsp_mappings()
     m.nnore({
         '<leader>oD',
         function()
-            if vim.diagnostic.is_disabled(0) then
-                vim.diagnostic.enable(0)
-                vim.notify('Diagnostic enabled')
-            else
-                vim.diagnostic.disable(0)
-                vim.notify('Diagnostic disabled')
-            end
+            local filter = { bufnr = 0 }
+            local enabled = vim.diagnostic.is_enabled(filter)
+            vim.diagnostic.enable(not enabled, filter)
+            vim.notify('Diagnostic ' .. (enabled and 'disabled' or 'enabled'))
+        end,
+    })
+    m.nnore({
+        '<leader>oH',
+        function()
+            local filter = { bufnr = 0 }
+            local enabled = vim.lsp.inlay_hint.is_enabled(filter)
+            vim.lsp.inlay_hint.enable(not enabled, filter)
+            vim.notify('Inlay hint ' .. (enabled and 'disabled' or 'enabled'))
         end,
     })
     m.nnore({ '<leader>oi', vim.diagnostic.open_float })

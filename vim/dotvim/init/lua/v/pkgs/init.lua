@@ -5,13 +5,6 @@ local m = nlib.m
 --------------------------------------------------------------------------------
 -- Editor
 --------------------------------------------------------------------------------
--- 匹配符跳转
-local function pkg_matchup()
-    -- packadd matchit
-    vim.g.matchup_matchparen_offscreen = { method = 'popup' }
-    m.map({ '<S-m>', '%' })
-end
-
 -- 快速跳转
 local function pkg_hop()
     require('hop').setup({ match_mappings = { 'zh', 'zh_sc' }, extensions = {} })
@@ -405,18 +398,7 @@ local function pkg_neotree()
     end
 
     --- Open file with systme
-    local open_system = function(state)
-        local node = state.tree:get_node()
-        local path = node.path
-        local ostype = os.getenv('OS')
-        if ostype == 'Windows_NT' then
-            os.execute('start ' .. path)
-        elseif ostype == 'Darwin' then
-            os.execute('open ' .. path)
-        else
-            os.execute('xdg-open ' .. path)
-        end
-    end
+    local open_system = function(state) vim.ui.open(state.tree:get_node().path) end
 
     --- Copy filepath from file  node
     local copy_filepath = function(mods)
@@ -657,7 +639,8 @@ local function pkg_treesitter()
     local parser_dir = vim.env.DotVimLocal .. '/.treesitter'
     require('nvim-treesitter.configs').setup({
         parser_install_dir = parser_dir,
-        --ensure_installed = { 'c', 'cpp', 'rust', 'vim', 'lua', 'python', 'markdown', 'markdown_inline' },
+        --neovim's builtin: { 'bash', 'c', 'vim', 'lua', 'python', 'markdown', 'markdown_inline' },
+        --ensure_installed = { 'cpp', 'rust', 'cmake', 'glsl', 'hlsl', 'wgsl', 'jsonc' },
         --auto_install = true,
         highlight = {
             enable = true,
@@ -695,6 +678,10 @@ local function pkg_treesitter()
             vim.notify('Treesitter indent is ' .. (res and 'enabled' or 'disabled'))
         end,
     })
+
+    -- packadd matchit
+    require('tree-pairs').setup()
+    m.map({ '<S-m>', '%' })
 end
 
 -- 代码片段
@@ -770,11 +757,11 @@ local function pkg_floaterm()
     m.tnore({ '<M-c>', '<C-\\><C-n>:FloatermUpdate --position=center<CR>' })
     m.nnore({ '<leader>mz', ':FloatermNew --cwd=. zsh<CR>' })
     m.nnore({ '<leader>mf', ':FloatermNew --cwd=. fzf --cycle<CR>' })
-    m.nnore({ '<leader>mr', ':FloatermNew --cwd=. rg<CR>' })
+    m.nnore({ '<leader>mg', ':FloatermNew --cwd=. lazygit<CR>' })
     m.nnore({ '<leader>ml', ':FloatermNew --cwd=. lf<CR>' })
 end
 
--- 批量注释
+-- 代码注释
 local function pkg_comment()
     require('Comment').setup({
         toggler = { line = 'gcc', block = 'gbc' },
@@ -994,23 +981,6 @@ local function pkg_icon_picker()
     m.nnore({ '<leader><leader>i', ':IconPickerInsert<Space>' })
 end
 
--- 在线搜索
-local function pkg_open_browser()
-    vim.g.openbrowser_default_search = 'bing'
-    vim.g.openbrowser_search_engines = { bing = 'https://cn.bing.com/search?q={query}' }
-    m.map({ '<leader>bs', '<Plug>(openbrowser-smart-search)' })
-    m.nnore({ '<leader>big', ':OpenBrowserSearch -google<Space>' })
-    m.nnore({ '<leader>bib', ':OpenBrowserSearch -bing<Space>' })
-    m.nnore({ '<leader>bih', ':OpenBrowserSearch -github<Space>' })
-    local browser = vim.fn['openbrowser#search']
-    m.nnore({ '<leader>bb', function() browser(vim.fn.expand('<cword>'), 'bing') end })
-    m.nnore({ '<leader>bg', function() browser(vim.fn.expand('<cword>'), 'google') end })
-    m.nnore({ '<leader>bh', function() browser(vim.fn.expand('<cword>'), 'github') end })
-    m.vnore({ '<leader>bb', function() browser(nlib.get_selected(' '), 'bing') end })
-    m.vnore({ '<leader>bg', function() browser(nlib.get_selected(' '), 'google') end })
-    m.vnore({ '<leader>bh', function() browser(nlib.get_selected(' '), 'github') end })
-end
-
 -- 翻译
 local function pkg_translator()
     vim.g.translator_default_engines = { 'haici', 'bing', 'youdao' }
@@ -1043,7 +1013,6 @@ end
 --------------------------------------------------------------------------------
 local pkgs = {
     -- Editor
-    { 'andymass/vim-matchup', config = pkg_matchup },
     { 'yehuohan/hop.nvim', config = pkg_hop },
     { 'mg979/vim-visual-multi', init = pkg_visual_multi },
     { 'junegunn/vim-easy-align', config = pkg_easy_align },
@@ -1052,7 +1021,7 @@ local pkgs = {
     { 'booperlv/nvim-gomove', config = pkg_gomove },
     { 'declancm/cinnamon.nvim', config = pkg_cinnamon },
     { 's1n7ax/nvim-window-picker', config = pkg_window_picker },
-    { 'sindrets/winshift.nvim', config = pkg_winshift },
+    { 'sindrets/winshift.nvim', config = pkg_winshift, keys = { '<leader>wm' } },
     { 'terryma/vim-expand-region', config = pkg_expand_region },
     { 'stevearc/dressing.nvim', opts = {} },
     { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' } },
@@ -1130,6 +1099,7 @@ local pkgs = {
         enabled = use.nts,
         version = '*',
         config = pkg_treesitter,
+        dependencies = { 'yorickpeterse/nvim-tree-pairs' },
     },
     { 'rcarriga/nvim-dap-ui', enabled = use.ndap, dependencies = { 'mfussenegger/nvim-dap' } },
     { 'L3MON4D3/LuaSnip', config = pkg_snip, dependencies = { 'honza/vim-snippets' } },
@@ -1140,7 +1110,7 @@ local pkgs = {
     { 'windwp/nvim-autopairs', config = pkg_autopairs },
     { 'kylechui/nvim-surround', config = pkg_surround },
     { 't9md/vim-quickhl', config = pkg_quickhl },
-    { 'HiPhish/rainbow-delimiters.nvim', init = pkg_rainbow },
+    { 'HiPhish/rainbow-delimiters.nvim', init = pkg_rainbow, submodules = false },
     { 'shellRaining/hlchunk.nvim', config = pkg_hlchunk },
     { 'folke/trouble.nvim', config = pkg_trouble, keys = { '<leader>vq', '<leader>vl' } },
     { 'rust-lang/rust.vim' },
@@ -1153,7 +1123,6 @@ local pkgs = {
     { 'uga-rosa/ccc.nvim', config = pkg_ccc, keys = { '<leader>tc', '<leader>lp' } },
     { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, keys = { { '<M-w>', mode = 'i' } } },
     { 'itchyny/screensaver.vim', keys = { { '<leader>ss', '<Cmd>ScreenSaver clock<CR>' } } },
-    { 'tyru/open-browser.vim', config = pkg_open_browser },
     { 'voldikss/vim-translator', config = pkg_translator },
     { -- im-switch
         'drop-stones/im-switch.nvim',

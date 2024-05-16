@@ -7,6 +7,9 @@ nnoremap <S-u> <C-r>
 " 行移动
 nnoremap > >>
 nnoremap < <<
+" 注释
+nmap <leader>cl gcc
+nmap <leader>cu gcc
 " 加减序号
 noremap <leader>aj <C-x>
 noremap <leader>ak <C-a>
@@ -49,7 +52,6 @@ cnoremap <M-p> <C-e>
 " }}}
 
 " Cmdline {{{
-nnoremap <leader><leader>q :lua os.exit(0)
 nnoremap <leader>.         <Cmd>lua require('v.nlib').recall()<CR>
 nnoremap <leader><leader>. <Cmd>lua require('v.nlib').recall(nil, { feedcmd = true })<CR>
 nnoremap <C-;> @:

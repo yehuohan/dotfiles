@@ -208,6 +208,7 @@ end
 --- Get selected text
 --- When used with 'vmap', '<Cmd>' is required and ':' will cause issue.
 --- @param sep(string|nil): Join with sep for multi-lines text
+--- @return string
 function M.get_selected(sep)
     local reg_var = vim.fn.getreg('9', 1)
     local reg_mode = vim.fn.getregtype('9')
@@ -229,16 +230,10 @@ end
 --- Try to find root directory upward
 --- @return string|nil
 function M.try_root()
-    local dirs = vim.fs.find({ '.git' }, {
-        upward = true,
-        type = 'directory',
-        path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
-        limit = math.huge,
-    })
-    local dir = dirs[#dirs]
-    if dir then
-        return vim.fs.dirname(dir)
-    end
+    return vim.fs.root(
+        vim.api.nvim_buf_get_name(0),
+        { '.git', 'Justfile', 'justfile', '.justfile', 'Makefile', 'makefile' }
+    )
 end
 
 --- Get extended modeline
@@ -246,7 +241,6 @@ end
 --- @return table|nil tbl
 --- @return string|nil cmd
 function M.modeline(tag, file)
-    -- TODO: refactor with vim.re later
     local pat1 = [[^.*vim@]] .. tag .. [[:%s*(.*)$]] -- vim@<tag>: <cmd>
     local pat2 = [[^.*vim@]] .. tag .. [[({.*}):%s*(.*)$]] -- vim@<tag>{<tbl>}: <cmd>
     local tbl, cmd

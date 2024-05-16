@@ -179,13 +179,28 @@ local function eval_math(strfn, copy_result)
 end
 
 --- Search from internet
---- @param text(string|nil) What to search
-local function nsearch(text)
-    if text:match('^https://.*$') or text:match('^http://.*$') then
+local function nsearch(engine, smart)
+    local text
+    local head = 'https://cn.bing.com/search?q='
+    if engine == 'google' then
+        head = 'https://google.com/search?q='
+    end
+    if vim.fn.mode() == 'n' then
+        if smart then
+            text = vim.fn.expand('<cWORD>')
+            if not text:match('^https?://.*$') then
+                text = head .. vim.fn.expand('<cword>')
+            end
+        else
+            text = head .. vim.fn.expand('<cword>')
+        end
+    else
+        text = head .. nlib.get_selected(' ')
+    end
+    if text then
         vim.ui.open(text)
     else
-        -- 'https://google.com/search?q={query}'
-        vim.ui.open('https://cn.bing.com/search?q=' .. text)
+        vim.sysnotify('Nothing to search from internet', vim.log.levels.WARN)
     end
 end
 
@@ -236,27 +251,11 @@ local function setup()
     m.nore({ '<leader>eu', function() eval_math('luaeval') end })
     m.nore({ '<leader>egu', function() eval_math('luaeval', true) end })
 
-    m.nnore({ '<leader>bs', function() nsearch(vim.fn.expand('<cword>')) end })
-    m.nnore({ '<leader>bb', function() nsearch(vim.fn.expand('<cword>')) end })
-    -- m.nnore({ '<leader>bg', function() nsearch(vim.fn.expand('<cword>'), 'google') end })
-    m.vnore({ '<leader>bb', function() nsearch(nlib.get_selected(' ')) end })
-    -- m.vnore({ '<leader>bg', function() nsearch(nlib.get_selected(' '), 'google') end })
-    -- -- 在线搜索
-    -- local function pkg_open_browser()
-    --     vim.g.openbrowser_default_search = 'bing'
-    --     vim.g.openbrowser_search_engines = { bing = 'https://cn.bing.com/search?q={query}' }
-    --     m.map({ '<leader>bs', '<Plug>(openbrowser-smart-search)' })
-    --     m.nnore({ '<leader>big', ':OpenBrowserSearch -google<Space>' })
-    --     m.nnore({ '<leader>bib', ':OpenBrowserSearch -bing<Space>' })
-    --     m.nnore({ '<leader>bih', ':OpenBrowserSearch -github<Space>' })
-    --     local browser = vim.fn['openbrowser#search']
-    --     m.nnore({ '<leader>bb', function() browser(vim.fn.expand('<cword>'), 'bing') end })
-    --     m.nnore({ '<leader>bg', function() browser(vim.fn.expand('<cword>'), 'google') end })
-    --     m.nnore({ '<leader>bh', function() browser(vim.fn.expand('<cword>'), 'github') end })
-    --     m.vnore({ '<leader>bb', function() browser(nlib.get_selected(' '), 'bing') end })
-    --     m.vnore({ '<leader>bg', function() browser(nlib.get_selected(' '), 'google') end })
-    --     m.vnore({ '<leader>bh', function() browser(nlib.get_selected(' '), 'github') end })
-    -- end
+    m.nnore({ '<leader>bs', function() nsearch(nil, true) end })
+    m.nnore({ '<leader>bb', function() nsearch() end })
+    m.nnore({ '<leader>bg', function() nsearch('google') end })
+    m.vnore({ '<leader>bb', function() nsearch() end })
+    m.vnore({ '<leader>bg', function() nsearch('google') end })
 end
 
 return { setup = setup }

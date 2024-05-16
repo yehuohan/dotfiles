@@ -17,6 +17,8 @@ setup_dotvim.bat
 setup_link_msys64.bat
 ```
 
+> Remove `dotvim/bundle/nvim-treesitter` and `dotvim/local/.treesitter` when updating neovim
+
 ## dotvim
 
 > *Code task:*

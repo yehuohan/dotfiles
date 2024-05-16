@@ -88,13 +88,7 @@ local function pat_file(pattern)
     if not pattern then
         return vim.fs.normalize(vim.api.nvim_buf_get_name(0))
     end
-
-    local files = vim.fs.find(function(name, path)
-        local re = vim.regex('\\c' .. pattern)
-        -- Require checking file's existence, because vim.fs.normalize's bug(old version):
-        -- vim.fs.normalize('C:/') will return 'C:', which is equal to '.' for vim.fs.find.
-        return re:match_str(name) and (vim.fn.filereadable(path .. '/' .. name) == 1)
-    end, {
+    local files = vim.fs.find({ pattern }, {
         upward = true,
         type = 'file',
         path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),

@@ -32,11 +32,7 @@ local lsp = {
 
 --- Setup the target pkgs to debug
 local function setup_pkgs(targets)
-    local use = require('v.use')
     local url = 'https://github.com'
-    if vim.fn.empty(use.xgit) == 0 then
-        url = use.xgit
-    end
     local bundle = vim.env.DotVimDir .. '/bundle'
     vim.opt.runtimepath:prepend(bundle .. '/lazy.nvim')
     require('lazy').setup(targets, {
@@ -58,7 +54,6 @@ return function(dotvim)
     vim.env.DotVimShare = dotvim .. '/share'
     vim.env.DotVimLocal = dotvim .. '/local'
     vim.env.NVimConfigDir = vim.fn.stdpath('config')
-    require('v.use').setup()
 
     setup_pkgs(lsp)
 end
