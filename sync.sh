@@ -98,8 +98,6 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp $USERPROFILE/.cargo/config                   ./disk/home/.cargo/
     cp $USERPROFILE/pip/pip.ini                     ./disk/home/pip/
     cp $USERPROFILE/clink_inputrc                   ./disk/home/
-    cp $USERPROFILE/.ideavimrc                      ./disk/home/
-    cp $APPDATA/Code/User/settings.json             ./disk/home/AppData/Roaming/Code/User/
     cp $LOCALAPPDATA/lf/lfrc                        ./disk/home/AppData/Local/lf/
 
     # scoop
