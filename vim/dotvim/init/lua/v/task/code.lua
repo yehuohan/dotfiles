@@ -193,7 +193,7 @@ end
 --- @class CodeHandleArgs Provide more args for _sels
 local _args = {}
 
-function _args.nvim(dic, cfg)
+function _args.nvim(dic, file)
     dic.barg.lst = {
         '--headless',
         '--noplugin',
@@ -201,18 +201,18 @@ function _args.nvim(dic, cfg)
     }
 end
 
-function _args.file(dic, cfg)
+function _args.file(dic, file)
     dic.barg.lst = { '-static' }
     dic.earg.lst = { '--summary' }
 end
 
-function _args.just(dic, cfg)
-    dic.barg.lst = nlib.u.str2arg(vim.fn.system('just --summary --unsorted -f ' .. cfg.file))
+function _args.just(dic, file)
+    dic.barg.lst = nlib.u.str2arg(vim.fn.system('just --summary --unsorted -f ' .. file))
 end
 
-function _args.make(dic, cfg) dic.barg.lst = pat_list(packs._pats.phony, cfg.file) end
+function _args.make(dic, file) dic.barg.lst = pat_list(packs._pats.phony, file) end
 
-function _args.cargo(dic, cfg)
+function _args.cargo(dic, file)
     dic.barg.lst = {
         'run',
         'build',
@@ -228,17 +228,17 @@ end
 --- Update _sels.dic
 --- @param rhs(CodeHandleMap)
 --- @param dic(table) The _sels.dic to update
---- @param cfg(TaskConfig)
-local function update_sels(rhs, dic, cfg)
+--- @return boolean
+local function update_sels(rhs, dic)
     dic.barg = { lst = {} }
     dic.earg = { lst = {} }
     if rhs then
-        cfg.file = pat_file(rhs.pat)
-        if not cfg.file then
-            vim.notify(string.format('None of %s was found!', rhs.pat))
+        local file = pat_file(rhs.pat)
+        if not file then
+            vim.notify(string.format('None of %s was found to update _sels!', rhs.pat))
             return false
         end
-        _args[rhs.fn](dic, cfg)
+        _args[rhs.fn](dic, file)
     end
     return true
 end
@@ -366,7 +366,7 @@ local entry = async(function(kt, bang)
 
     -- Need to resolve config
     if resovle then
-        if not update_sels(_maps[kt.E], _sels.dic, wsc) then
+        if not update_sels(_maps[kt.E], _sels.dic) then
             return
         end
         if not await(a.pop_selection(_sels)) then

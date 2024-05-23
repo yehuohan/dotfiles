@@ -41,17 +41,6 @@ local function next_csi(str, pat)
 end
 
 local function sgr2hl(args)
-    if args == '' or args == '0' then
-        return nil
-    end
-
-    -- TODO: vim.api.nvim_set_hl
-    local hl = {}
-    if args == '1' then
-        hl.bold = true
-    elseif args == '3' then
-        hl.italic = true
-    end
     return 'Special'
 end
 
