@@ -98,6 +98,7 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp $USERPROFILE/.cargo/config                   ./disk/home/.cargo/
     cp $USERPROFILE/pip/pip.ini                     ./disk/home/pip/
     cp $USERPROFILE/clink_inputrc                   ./disk/home/
+    cp -r $USERPROFILE/Documents/WindowsPowerShell  ./disk/home/Documents/
     cp $LOCALAPPDATA/lf/lfrc                        ./disk/home/AppData/Local/lf/
 
     # scoop
