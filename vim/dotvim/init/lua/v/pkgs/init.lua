@@ -5,6 +5,13 @@ local m = nlib.m
 --------------------------------------------------------------------------------
 -- Editor
 --------------------------------------------------------------------------------
+-- 配符跳转
+local function pkg_matchup()
+    -- packadd matchit
+    vim.g.matchup_matchparen_offscreen = { method = 'popup' }
+    m.map({ '<S-m>', '%' })
+end
+
 -- 快速跳转
 local function pkg_hop()
     require('hop').setup({ match_mappings = { 'zh', 'zh_sc' }, extensions = {} })
@@ -659,6 +666,7 @@ local function pkg_treesitter()
                 scope_incremental = '<M-q>',
             },
         },
+        matchup = { enable = true },
     })
     vim.opt.runtimepath:prepend(parser_dir)
     m.nnore({
@@ -678,10 +686,6 @@ local function pkg_treesitter()
             vim.notify('Treesitter indent is ' .. (res and 'enabled' or 'disabled'))
         end,
     })
-
-    -- packadd matchit
-    require('tree-pairs').setup()
-    m.map({ '<S-m>', '%' })
 end
 
 -- 代码片段
@@ -1013,6 +1017,7 @@ end
 --------------------------------------------------------------------------------
 local pkgs = {
     -- Editor
+    { 'andymass/vim-matchup', config = pkg_matchup },
     { 'yehuohan/hop.nvim', config = pkg_hop },
     { 'mg979/vim-visual-multi', init = pkg_visual_multi },
     { 'junegunn/vim-easy-align', config = pkg_easy_align },
@@ -1099,7 +1104,6 @@ local pkgs = {
         enabled = use.nts,
         version = '*',
         config = pkg_treesitter,
-        dependencies = { 'yorickpeterse/nvim-tree-pairs' },
     },
     { 'rcarriga/nvim-dap-ui', enabled = use.ndap, dependencies = { 'mfussenegger/nvim-dap' } },
     { 'L3MON4D3/LuaSnip', config = pkg_snip, dependencies = { 'honza/vim-snippets' } },
