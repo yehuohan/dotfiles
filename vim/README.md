@@ -12,7 +12,7 @@ cd dotfiles/vim/setup
 
 ```sh
 cd dotfiles/vim/setup
-# 首先运行disk/setup/add_apps_path.reg，添加APPS_HOME等环境变量
+# 首先运行disk/setup/add_envs.reg，添加DOT_HOME和DOT_APPS等环境变量
 setup_dotvim.bat
 setup_link_msys64.bat
 ```
@@ -72,5 +72,3 @@ neovide --remote-tcp=localhost:6666
 - [Ripgrep](https://github.com/BurntSushi/ripgrep)
 - [Fzf](https://github.com/junegunn/fzf)
 - [Bat](https://github.com/sharkdp/bat)
-- [Ctags](https://github.com/universal-ctags/ctags)
-- [Lf](https://github.com/gokcehan/lf)

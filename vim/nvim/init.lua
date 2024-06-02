@@ -1,6 +1,6 @@
 local dotvim
 if vim.fn.has('win32') == 1 or vim.fn.has('win64') == 1 then
-    dotvim = vim.env.APPS_HOME .. '/dotvim'
+    dotvim = vim.env.DOT_HOME .. '/dotvim'
 else
     dotvim = '~/dotvim'
 end

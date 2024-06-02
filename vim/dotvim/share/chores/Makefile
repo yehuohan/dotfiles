@@ -18,7 +18,7 @@ NDK_ABI ?= arm64-v8a
 NDK_PLATFORM ?= android-27
 export ANDROID_NDK_HOME := ${NDK_ROOT}
 
-VCPKG_ROOT ?= ${APPS_HOME}/vcpkg
+VCPKG_ROOT ?= ${DOT_APPS}/vcpkg
 VCPKG_TRIPLET ?= x64-mingw-mix # x64-windows-mix, arm64-android
 VCPKG_XSCRIPT := 'clear;x-script,bash ${DIR_ROOT}/scripts/vcpkg_xscript.sh {url} {dst};x-block-origin'
 # VCPKG_XSCRIPT := 'clear;x-script,cmd /k ${DIR_ROOT}/scripts/vcpkg_xscript.bat {url} {dst};x-block-origin'

@@ -1,7 +1,7 @@
-source $APPS_HOME/dotvim/init/viml/init.vim
+source $DOT_HOME/dotvim/init/viml/init.vim
 
 if IsWin()
-    set pythonthreedll=python311.dll
+    set pythonthreedll=python312.dll
     let s:use = SvarUse()
     let s:use.ui.wide = 'Microsoft YaHei Mono'
     call GuiSetFonts(0)

@@ -41,7 +41,7 @@ local function next_csi(str, pat)
 end
 
 local function sgr2hl(args)
-    return 'Special'
+    return nil
 end
 
 local function new()

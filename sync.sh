@@ -69,25 +69,25 @@ if [[ `uname` == "Linux" ]]; then
 
 elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
 
-    if [ ! -d "$APPS_HOME/dotvim" ]; then
-        echo "$APPS_HOME/dotvim is not existed."
+    if [ ! -d "$DOT_HOME/dotvim" ]; then
+        echo "$DOT_HOME/dotvim is not existed."
         exit
     fi
 
     # vim & neovim
-    cp -r $APPS_HOME/dotvim/autoload                ./vim/dotvim/
-    cp -r $APPS_HOME/dotvim/init                    ./vim/dotvim/
-    cp -r $APPS_HOME/dotvim/share                   ./vim/dotvim/
+    cp -r $DOT_HOME/dotvim/autoload                ./vim/dotvim/
+    cp -r $DOT_HOME/dotvim/init                    ./vim/dotvim/
+    cp -r $DOT_HOME/dotvim/share                   ./vim/dotvim/
     cp $LOCALAPPDATA/nvim/init.lua                  ./vim/nvim/
     #cp $LOCALAPPDATA/nvim/init.vim                  ./vim/nvim/
 
     # gw
-    cp $APPS_HOME/msys64/ucrt64.ini                         ./disk/msys2/
-    cp $APPS_HOME/msys64/etc/pacman.conf                    ./disk/msys2/etc/
-    cp $APPS_HOME/msys64/etc/pacman.d/mirrorlist.msys       ./disk/msys2/etc/pacman.d
-    cp $APPS_HOME/msys64/etc/pacman.d/mirrorlist.mingw32    ./disk/msys2/etc/pacman.d
-    cp $APPS_HOME/msys64/etc/pacman.d/mirrorlist.mingw64    ./disk/msys2/etc/pacman.d
-    cp $APPS_HOME/msys64/etc/pacman.d/mirrorlist.ucrt64     ./disk/msys2/etc/pacman.d
+    cp $DOT_APPS/msys64/ucrt64.ini                         ./disk/msys2/
+    cp $DOT_APPS/msys64/etc/pacman.conf                    ./disk/msys2/etc/
+    cp $DOT_APPS/msys64/etc/pacman.d/mirrorlist.msys       ./disk/msys2/etc/pacman.d
+    cp $DOT_APPS/msys64/etc/pacman.d/mirrorlist.mingw32    ./disk/msys2/etc/pacman.d
+    cp $DOT_APPS/msys64/etc/pacman.d/mirrorlist.mingw64    ./disk/msys2/etc/pacman.d
+    cp $DOT_APPS/msys64/etc/pacman.d/mirrorlist.ucrt64     ./disk/msys2/etc/pacman.d
     cp ~/.minttyrc                                          ./disk/msys2/home/
     cp ~/.gitconfig                                         ./disk/msys2/home/
     cp ~/.zshrc                                             ./disk/msys2/home/
@@ -102,7 +102,7 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp $LOCALAPPDATA/lf/lfrc                        ./disk/home/AppData/Local/lf/
 
     # scoop
-    cp -r $APPS_HOME/_packs/persist/conemu          ./disk/scoop/
+    cp -r $DOT_APPS/_packs/persist/conemu          ./disk/scoop/
 
-    echo "Gw: Copy was completed!"
+    echo "Win: Copy was completed!"
 fi

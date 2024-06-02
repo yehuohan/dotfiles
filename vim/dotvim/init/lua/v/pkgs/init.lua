@@ -647,7 +647,7 @@ local function pkg_treesitter()
     require('nvim-treesitter.configs').setup({
         parser_install_dir = parser_dir,
         --neovim's builtin: { 'bash', 'c', 'vim', 'lua', 'python', 'markdown', 'markdown_inline' },
-        --ensure_installed = { 'cpp', 'rust', 'cmake', 'glsl', 'hlsl', 'wgsl', 'jsonc' },
+        --ensure_installed = { 'cpp', 'rust', 'cmake', 'glsl', 'hlsl', 'wgsl', 'json', 'jsonc' },
         --auto_install = true,
         highlight = {
             enable = true,

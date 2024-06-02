@@ -1,7 +1,7 @@
 @echo off
 
 for %%i in ("%~dp0\..\") do set DIR_VIM=%%~dpi
-set DIR_DOT=%APPS_HOME%\dotvim
+set DIR_DOT=%DOT_HOME%\dotvim
 set InitFile=init.lua
 REM set InitFile=init.vim
 
@@ -9,9 +9,9 @@ echo DIR_VIM: %DIR_VIM%
 echo DIR_DOT: %DIR_DOT%
 echo Init file: %InitFile%
 
-REM check APPS_HOME
-if not defined APPS_HOME (
-    echo ERROR: "APPS_HOME" is not set
+REM check DOT_HOME
+if not defined DOT_HOME (
+    echo ERROR: "DOT_HOME" is not set
     pause
     exit
 )
