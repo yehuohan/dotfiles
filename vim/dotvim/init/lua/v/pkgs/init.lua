@@ -33,7 +33,8 @@ local function pkg_visual_multi()
     vim.g.VM_leader = ','
     vim.g.VM_maps = {
         -- stylua: ignore start
-        ['Find Under']           = '<C-n>',
+        ['Find Under']           = '<leader><leader>v',
+        ['Find Subword Under']   = '<leader><leader>v',
         ['Cursor Down']          = '<C-Down>',
         ['Cursor Up']            = '<C-Up>',
         ['Select All']           = ',a',
@@ -110,22 +111,6 @@ local function pkg_gomove()
     m.xmap({ '<M-k>', '<Plug>GoVSDUp' })
     m.xmap({ '<M-h>', '<Plug>GoVSDLeft' })
     m.xmap({ '<M-l>', '<Plug>GoVSDRight' })
-end
-
--- 平滑滚动
-local function pkg_cinnamon()
-    require('cinnamon').setup({
-        default_keymaps = false,
-        extra_keymaps = false,
-        extended_keymaps = false,
-        centered = true,
-        default_delay = 7,
-        hide_cursor = false,
-    })
-    m.nnore({ '<M-j>', [[<Cmd>lua Scroll('<C-f>', 1, 1)<CR>]] })
-    m.nnore({ '<M-k>', [[<Cmd>lua Scroll('<C-b>', 1, 1)<CR>]] })
-    m.nnore({ '<M-n>', [[<Cmd>lua Scroll('<C-d>', 1, 1)<CR>]] })
-    m.nnore({ '<M-m>', [[<Cmd>lua Scroll('<C-u>', 1, 1)<CR>]] })
 end
 
 -- 窗口跳转
@@ -363,14 +348,10 @@ local function pkg_popc()
     m.nnore({ '<M-p>', '<Cmd>PopcBufferSwitchTabRight!<CR>' })
     m.nnore({ '<M-i>', '<Cmd>PopcBufferSwitchLeft!<CR>' })
     m.nnore({ '<M-o>', '<Cmd>PopcBufferSwitchRight!<CR>' })
-    m.nnore({ '<C-i>', '<Cmd>PopcBufferJumpPrev<CR>' })
-    m.nnore({ '<C-o>', '<Cmd>PopcBufferJumpNext<CR>' })
-    m.nnore({ '<C-u>', '<C-o>' })
-    m.nnore({ '<C-p>', '<C-i>' })
-    m.nnore({ '<M-8>', '<Cmd>PopcBufferJumpPrev<CR>' })
-    m.nnore({ '<M-9>', '<Cmd>PopcBufferJumpNext<CR>' })
-    m.nnore({ '<M-7>', '<C-o>' })
-    m.nnore({ '<M-0>', '<C-i>' })
+    m.nnore({ '<M-n>', '<Cmd>PopcBufferJumpPrev<CR>' })
+    m.nnore({ '<M-m>', '<Cmd>PopcBufferJumpNext<CR>' })
+    m.nnore({ '<C-n>', '<C-o>' })
+    m.nnore({ '<C-m>', '<C-i>' })
     m.nnore({ '<leader>wq', '<Cmd>PopcBufferClose!<CR>' })
     m.nnore({ '<leader><leader>b', '<Cmd>PopcBookmark<CR>' })
     m.nnore({ '<leader><leader>w', '<Cmd>PopcWorkspace<CR>' })
@@ -1024,7 +1005,6 @@ local pkgs = {
     { 'yehuohan/marks.nvim', config = pkg_marks },
     { 'xiyaowong/nvim-cursorword', config = pkg_cursorword },
     { 'booperlv/nvim-gomove', config = pkg_gomove },
-    { 'declancm/cinnamon.nvim', config = pkg_cinnamon },
     { 's1n7ax/nvim-window-picker', config = pkg_window_picker },
     { 'sindrets/winshift.nvim', config = pkg_winshift, keys = { '<leader>wm' } },
     { 'terryma/vim-expand-region', config = pkg_expand_region },
@@ -1081,7 +1061,7 @@ local pkgs = {
             'williamboman/mason-lspconfig.nvim',
             'neovim/nvim-lspconfig',
             'folke/neoconf.nvim',
-            'folke/neodev.nvim',
+            { 'folke/lazydev.nvim', ft = 'lua' },
             'nvimdev/lspsaga.nvim',
             'ray-x/lsp_signature.nvim',
             -- { 'mrcjkb/rustaceanvim', ft = { 'rust' } },

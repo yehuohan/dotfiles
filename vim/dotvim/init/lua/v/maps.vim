@@ -30,6 +30,8 @@ nnoremap <leader>zo zO
 " 滚屏
 nnoremap <C-j> <C-e>
 nnoremap <C-k> <C-y>
+nnoremap <M-j> <C-d>
+nnoremap <M-k> <C-u>
 nnoremap <C-h> zh
 nnoremap <C-l> zl
 nnoremap <M-h> 16zh

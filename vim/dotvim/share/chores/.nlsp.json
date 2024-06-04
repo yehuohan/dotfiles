@@ -10,16 +10,6 @@
             "lua_ls": { "enabled": true }
         }
     },
-    /* Neovim lua development settings */
-    "neodev": {
-        "library": {
-            "enabled": true,
-            "runtime": true,
-            "types": true,
-            "plugins": true // Add all loaded plugins to lua_ls runtime
-            // "plugins": [ ] // Add specified plugins to lua_ls runtime
-        }
-    },
     /* Language server settings */
     "lspconfig": {
         "clangd": {

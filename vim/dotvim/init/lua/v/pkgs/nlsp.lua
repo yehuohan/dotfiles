@@ -10,7 +10,7 @@ local function __servers()
         global_settings = 'nlsp.json',
         filetype_jsonc = use.nts,
     })
-    require('neodev').setup({})
+    require('lazydev').setup({})
     -- Servers
     local url = 'https://github.com/%s/releases/download/%s/%s'
     if vim.fn.empty(use.xgit) == 0 then
@@ -219,6 +219,7 @@ local function __completion()
         snippet = { expand = function(args) require('luasnip').lsp_expand(args.body) end },
         sources = cmp.config.sources({
             { name = 'nvim_lsp' },
+            { name = 'lazydev', group_index = 0 }, -- Set group index to 0 to skip loading LuaLS completions
             { name = 'luasnip' },
             { name = 'path' },
             { name = 'calc' },

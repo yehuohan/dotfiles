@@ -220,10 +220,6 @@ local function on_UIEnter()
         vim.g.neovide_remember_window_size = true
         vim.g.neovide_cursor_antialiasing = false
         vim.g.neovide_cursor_vfx_mode = 'railgun'
-        m.nnore({ '<M-j>', '<C-f>' })
-        m.nnore({ '<M-k>', '<C-b>' })
-        m.nnore({ '<M-n>', '<C-d>' })
-        m.nnore({ '<M-m>', '<C-u>' })
         m.nnore({
             '<leader>tf',
             function() vim.g.neovide_fullscreen = not vim.g.neovide_fullscreen end,
