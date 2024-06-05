@@ -4,6 +4,34 @@
 --- m: set SGR(Select Graphic Rendition)
 local CSI_PAT = '\x1b%[([%d:;<=>%?]*)([KHm])'
 
+--- Basic SGR color codes
+--- * bold = 1
+--- * italic = 3
+--- * underline = 4
+--- * fg = 30~37, 38, 90~97
+--- * bg = 40~47, 48, 100~107
+local CSI_SGR = {
+    hls = {},
+    colors = {
+        ['30'] = '#1e1e1e', --'#000000',
+        ['31'] = '#cc241d', --'#800000',
+        ['32'] = '#98971a', --'#008000',
+        ['33'] = '#d79921', --'#808000',
+        ['34'] = '#458588', --'#000080',
+        ['35'] = '#b16286', --'#800080',
+        ['36'] = '#689d6a', --'#008080',
+        ['37'] = '#ebdbb2', --'#c0c0c0',
+        ['90'] = '#928374', --'#808080',
+        ['91'] = '#fb4934', --'#ff0000',
+        ['92'] = '#b8bb26', --'#00ff00',
+        ['93'] = '#fabd2f', --'#ffff00',
+        ['94'] = '#83a598', --'#0000ff',
+        ['95'] = '#d3869b', --'#ff00ff',
+        ['96'] = '#8ec07c', --'#00ffff',
+        ['97'] = '#ebdbb2', --'#ffffff',
+    },
+}
+
 local function trim(str)
     return str
         :gsub('\x1b%].*[\x07\x9c]', '') -- Remove all OSC code
@@ -40,8 +68,26 @@ local function next_csi(str, pat)
     end
 end
 
+--- Generate highlight from SGR
 local function sgr2hl(args)
-    return nil
+    if args == '' or args == '0' then
+        return nil
+    end
+
+    -- Only support simple foreground color
+    local hl
+    local c = args
+    if CSI_SGR.colors[c] then
+        if CSI_SGR.hls[c] then
+            hl = CSI_SGR.hls[c]
+        else
+            local fg = CSI_SGR.colors[c]
+            hl = 'v.nlib.ansi.fg' .. c
+            vim.api.nvim_set_hl(0, hl, { fg = fg })
+            CSI_SGR.hls[c] = hl
+        end
+    end
+    return hl
 end
 
 local function new()

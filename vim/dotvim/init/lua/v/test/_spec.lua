@@ -383,20 +383,20 @@ describe('task', function()
 
     it('. code . :CodeWscInit', function()
         vim.cmd.CodeWsc({ bang = true })
-        EQ('job', txt.style)
-
-        vim.cmd.CodeWscInit()
-        feedkeys('kkmansi<CR>')
-        feedkeys('<CR>')
-        vim.cmd.CodeWsc({ bang = true })
         EQ('ansi', txt.style)
 
-        -- Change back code.wsc, or has effect on other test items
         vim.cmd.CodeWscInit()
         feedkeys('kkmjob<CR>')
         feedkeys('<CR>')
         vim.cmd.CodeWsc({ bang = true })
         EQ('job', txt.style)
+
+        -- Change back code.wsc, or has effect on other test items
+        vim.cmd.CodeWscInit()
+        feedkeys('kkmansi<CR>')
+        feedkeys('<CR>')
+        vim.cmd.CodeWsc({ bang = true })
+        EQ('ansi', txt.style)
     end)
 
     it('. code . :Code! Rp', function()
@@ -421,7 +421,7 @@ describe('task', function()
         EQ('', txt.key)
         EQ('', txt.file)
         EQ('', txt.type)
-        EQ('job', txt.style)
+        EQ('ansi', txt.style)
     end)
 
     it('. fzer . :Fzer fpw', function()
