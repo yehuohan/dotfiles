@@ -386,14 +386,14 @@ describe('task', function()
         EQ('ansi', txt.style)
 
         vim.cmd.CodeWscInit()
-        feedkeys('kkmjob<CR>')
+        feedkeys('kkkmjob<CR>')
         feedkeys('<CR>')
         vim.cmd.CodeWsc({ bang = true })
         EQ('job', txt.style)
 
         -- Change back code.wsc, or has effect on other test items
         vim.cmd.CodeWscInit()
-        feedkeys('kkmansi<CR>')
+        feedkeys('kkkmansi<CR>')
         feedkeys('<CR>')
         vim.cmd.CodeWsc({ bang = true })
         EQ('ansi', txt.style)

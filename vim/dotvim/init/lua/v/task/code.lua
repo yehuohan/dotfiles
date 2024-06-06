@@ -233,6 +233,7 @@ local function update_sels(rhs, dic)
     dic.barg = { lst = {} }
     dic.earg = { lst = {} }
     if rhs then
+        -- Must not save to wsc.file here, as wsc.outer may changed
         local file = pat_file(rhs.pat)
         if not file then
             vim.notify(string.format('None of %s was found to update _sels!', rhs.pat))
@@ -260,8 +261,9 @@ local _maps = {
 }
 
 local _keys = {
-    'Rp' , 'Rj' , 'Rm' , 'Ro' , 'Rf', 'Rl',
-    'rp' , 'rj' , 'rm' , 'ro' , 'rf', 'rl',
+    'Rp' , 'Rj' , 'Rm' , 'Ro' , 'Rf' , 'Rl' ,
+    'rp' , 'rj' , 'rm' , 'ro' , 'rf' , 'rl' ,
+    'rtp', 'rtj', 'rtm', 'rto', 'rtf', 'rtl',
 }
 -- stylua: ignore end
 
@@ -270,11 +272,11 @@ local _sels = {
     opt = 'config code task',
     lst = nil,
     -- lst for kt.E != p
-    lst_d = { 'envs', 'barg', 'earg', 'msvc', 'outer', 'style', 'encoding' },
+    lst_d = { 'envs', 'barg', 'earg', 'msvc', 'outer', 'style', 'encoding', 'verbose' },
     -- lst for kt.E = p
     lst_p = { 'key', 'file', 'type', 'envs', 'barg', 'earg', 'msvc', 'style', 'encoding' },
     -- lst for CodeWscInit
-    lst_i = { 'envs', 'msvc', 'outer', 'style', 'verbose' },
+    lst_i = { 'envs', 'msvc', 'outer', 'style', 'encoding', 'verbose' },
     dic = {
         key = { lst = _maps[1], dic = vim.tbl_map(function(h) return h.desc end, _maps) },
         file = { lst = {}, cpl = 'file' },
@@ -332,6 +334,7 @@ end
 ---     r : run task
 ---     R : modify code task config
 --- kt.A
+---     t : set wsc.style = 'term'
 --- kt.E
 ---     ? : from _maps
 ---     p : run task from task.wsc.code
@@ -377,6 +380,10 @@ local entry = async(function(kt, bang)
     if restore then
         kt.E = wsc.key
         task.wsc.code = wsc:get()
+    end
+    -- Set config
+    if kt.A == 't' then
+        wsc.style = 'term'
     end
 
     -- Run code task
