@@ -14,6 +14,8 @@
 [Install python-fontforge](http://designwithfontforge.com/en-US/Installing_Fontforge.html) and clone repo with following command.
 
 ```sh
+scoop install fontforge
+
 git clone --filter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts
 cd nerd-fonts
 git sparse-checkout add font-patcher # Ignore this line if font-patcher has been existed

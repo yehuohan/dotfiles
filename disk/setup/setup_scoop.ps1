@@ -34,7 +34,7 @@ The 'extras' is some big, so can clone manually or use mirror github:
 scoop bucket add main https://github.com/ScoopInstaller/Main.git # If main is not inited
 scoop bucket add extras https://github.com/ScoopInstaller/Extras.git
 scoop bucket add versions https://github.com/ScoopInstaller/Versions.git
-scoop bucket add sysinternals https://github.com/niheaven/scoop-sysinternals
+scoop bucket add sysinternals https://github.com/niheaven/scoop-sysinternals.git
 scoop bucket add nonportable https://github.com/ScoopInstaller/Nonportable.git
 scoop bucket add nerd-fonts https://github.com/matthewjberger/scoop-nerd-fonts.git
 
@@ -43,7 +43,8 @@ scoop bucket add nerd-fonts https://github.com/matthewjberger/scoop-nerd-fonts.g
 scoop install neovim neovim-qt neovide nvy vim-nightly vscode -a 64bit
 scoop install bat delta fd fzf ripgrep lf universal-ctags lazygit@0.40.2
 scoop install 7zip 7ztm cmake ninja just
-scoop install lua python deno nodejs # Then run apps/python/current/install-pep-514.reg
+scoop install lua deno nodejs
+scoop install python # Then run apps/python/current/install-pep-514.reg (Prefer miniconda3)
 scoop install wox snipaste everything screentogif rapidee
 scoop install autoruns process-explorer procmon context-menu-manager # cpu-z gpu-z
 scoop install qttabbar-indiff-np # Works with [ExplorerPatcher](https://github.com/valinet/ExplorerPatcher) on windows 11

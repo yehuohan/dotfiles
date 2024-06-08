@@ -99,6 +99,7 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp $USERPROFILE/pip/pip.ini                     ./disk/home/pip/
     cp $USERPROFILE/clink_inputrc                   ./disk/home/
     cp -r $USERPROFILE/Documents/WindowsPowerShell  ./disk/home/Documents/
+    cp $APPDATA/lazygit/config.yml                  ./disk/home/AppData/Roaming/lazygit/
     cp $LOCALAPPDATA/lf/lfrc                        ./disk/home/AppData/Local/lf/
 
     # scoop
