@@ -79,16 +79,6 @@ xmap <M-h> <Plug>(textmanip-duplicate-left)
 xmap <M-l> <Plug>(textmanip-duplicate-right)
 " }}}
 
-" smoothie {{{ 平滑滚动
-let g:smoothie_no_default_mappings = v:true
-let g:smoothie_update_interval = 30
-let g:smoothie_base_speed = 20
-nmap <M-n> <Plug>(SmoothieDownwards)
-nmap <M-m> <Plug>(SmoothieUpwards)
-nmap <M-j> <Plug>(SmoothieForwards)
-nmap <M-k> <Plug>(SmoothieBackwards)
-" }}}
-
 " vim-visual-multi {{{ 多光标编辑
 " Tab: 切换cursor/extend模式
 let g:VM_mouse_mappings = 0         " 禁用鼠标
@@ -772,7 +762,6 @@ call plug#begin($DotVimDir.'/bundle')  " 设置插件位置，且自动设置了
     Plug 'kshenoy/vim-signature'
     Plug 'RRethy/vim-illuminate'
     Plug 't9md/vim-textmanip'
-    Plug 'psliwka/vim-smoothie'
     Plug 'tpope/vim-repeat'
     Plug 'mg979/vim-visual-multi'
     Plug 'markonm/traces.vim'

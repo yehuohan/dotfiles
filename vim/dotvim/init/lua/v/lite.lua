@@ -186,16 +186,15 @@ local function nsearch(engine, smart)
         head = 'https://google.com/search?q='
     end
     if vim.fn.mode() == 'n' then
-        if smart then
-            text = vim.fn.expand('<cWORD>')
-            if not text:match('^https?://.*$') then
-                text = head .. vim.fn.expand('<cword>')
-            end
-        else
+        text = vim.fn.expand('<cWORD>')
+        if not (smart and text:match('^https?://.*$')) then
             text = head .. vim.fn.expand('<cword>')
         end
     else
-        text = head .. nlib.get_selected(' ')
+        text = nlib.get_selected(' ')
+        if not (smart and text:match('^https?://.*$')) then
+            text = head .. text
+        end
     end
     if text then
         vim.ui.open(text)
@@ -252,9 +251,10 @@ local function setup()
     m.nore({ '<leader>egu', function() eval_math('luaeval', true) end })
 
     m.nnore({ '<leader>bs', function() nsearch(nil, true) end })
+    m.vnore({ '<leader>bs', function() nsearch(nil, true) end })
     m.nnore({ '<leader>bb', function() nsearch() end })
-    m.nnore({ '<leader>bg', function() nsearch('google') end })
     m.vnore({ '<leader>bb', function() nsearch() end })
+    m.nnore({ '<leader>bg', function() nsearch('google') end })
     m.vnore({ '<leader>bg', function() nsearch('google') end })
 end
 
