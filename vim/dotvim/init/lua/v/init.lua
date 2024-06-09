@@ -38,7 +38,7 @@ local function setup(dotvim)
     setup_env()
 
     if IsWin() then
-        vim.g.python3_host_prog = vim.env.DOT_APPS .. '/_packs/apps/python/current/python.exe'
+        vim.g.python3_host_prog = vim.env.DOT_APPS .. '/miniconda3/python.exe'
         vim.g.node_host_prog = vim.env.DotVimLocal .. '/node_modules/neovim/bin/cli.js'
     else
         vim.g.python3_host_prog = '/usr/bin/python3'

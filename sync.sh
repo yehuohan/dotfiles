@@ -82,12 +82,12 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     #cp $LOCALAPPDATA/nvim/init.vim                  ./vim/nvim/
 
     # gw
-    cp $DOT_APPS/msys64/ucrt64.ini                         ./disk/msys2/
-    cp $DOT_APPS/msys64/etc/pacman.conf                    ./disk/msys2/etc/
-    cp $DOT_APPS/msys64/etc/pacman.d/mirrorlist.msys       ./disk/msys2/etc/pacman.d
-    cp $DOT_APPS/msys64/etc/pacman.d/mirrorlist.mingw32    ./disk/msys2/etc/pacman.d
-    cp $DOT_APPS/msys64/etc/pacman.d/mirrorlist.mingw64    ./disk/msys2/etc/pacman.d
-    cp $DOT_APPS/msys64/etc/pacman.d/mirrorlist.ucrt64     ./disk/msys2/etc/pacman.d
+    cp $DOT_APPS/msys64/ucrt64.ini                          ./disk/msys2/
+    cp $DOT_APPS/msys64/etc/pacman.conf                     ./disk/msys2/etc/
+    cp $DOT_APPS/msys64/etc/pacman.d/mirrorlist.msys        ./disk/msys2/etc/pacman.d
+    cp $DOT_APPS/msys64/etc/pacman.d/mirrorlist.mingw32     ./disk/msys2/etc/pacman.d
+    cp $DOT_APPS/msys64/etc/pacman.d/mirrorlist.mingw64     ./disk/msys2/etc/pacman.d
+    cp $DOT_APPS/msys64/etc/pacman.d/mirrorlist.ucrt64      ./disk/msys2/etc/pacman.d
     cp ~/.minttyrc                                          ./disk/msys2/home/
     cp ~/.gitconfig                                         ./disk/msys2/home/
     cp ~/.zshrc                                             ./disk/msys2/home/
@@ -97,6 +97,7 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     # win
     cp $USERPROFILE/.cargo/config                   ./disk/home/.cargo/
     cp $USERPROFILE/pip/pip.ini                     ./disk/home/pip/
+    cp $USERPROFILE/.condarc                        ./disk/home/
     cp $USERPROFILE/clink_inputrc                   ./disk/home/
     cp -r $USERPROFILE/Documents/WindowsPowerShell  ./disk/home/Documents/
     cp $APPDATA/lazygit/config.yml                  ./disk/home/AppData/Roaming/lazygit/

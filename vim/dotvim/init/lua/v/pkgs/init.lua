@@ -582,6 +582,9 @@ local function pkg_fzf()
 end
 
 -- 模糊查找
+-- 若使用Miniconda3，需要修改install.bat：
+--  * comment 'py -2 ...'
+--  * 'py -3 ...' => 'python ...'
 local function pkg_leaderf()
     vim.g.Lf_CacheDirectory = vim.env.DotVimLocal
     vim.g.Lf_PreviewInPopup = 1
@@ -1088,6 +1091,7 @@ local pkgs = {
     { 'rcarriga/nvim-dap-ui', enabled = use.ndap, dependencies = { 'mfussenegger/nvim-dap' } },
     { 'L3MON4D3/LuaSnip', config = pkg_snip, dependencies = { 'honza/vim-snippets' } },
     { 'stevearc/overseer.nvim' }, -- Setup from v.task
+    { 'kmontocam/nvim-conda', ft = 'python', dependencies = { 'nvim-lua/plenary.nvim' } },
     { 'stevearc/conform.nvim', config = pkg_conform },
     { 'voldikss/vim-floaterm', config = pkg_floaterm },
     { 'numToStr/Comment.nvim', config = pkg_comment },
