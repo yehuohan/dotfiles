@@ -329,18 +329,16 @@ local function pkg_popc()
     -- vim.g.Popc_enableLog = 1
     vim.g.Popc_jsonPath = vim.env.DotVimLocal
     vim.g.Popc_useFloatingWin = 1
+    vim.g.Popc_useNerdSymbols = use.ui.icon
+    if use.ui.icon then
+        vim.g.Popc_symbols = { Sep = { '', '' }, SubSep = { '', '' } }
+    end
     vim.g.Popc_highlight = {
         text = 'Pmenu',
         selected = 'CursorLineNr',
     }
     vim.g.Popc_useTabline = 1
     vim.g.Popc_useStatusline = 1
-    vim.g.Popc_usePowerFont = use.ui.icon
-    if use.ui.icon then
-        vim.g.Popc_selectPointer = ''
-        vim.g.Popc_separator = { left = '', right = '' }
-        vim.g.Popc_subSeparator = { left = '', right = '' }
-    end
     vim.g.Popc_wksSaveUnderRoot = 0
     vim.g.Popc_wksRootPatterns = { '.popc', '.git', '.svn', '.hg', 'tags' }
     m.nnore({ '<leader><leader>h', '<Cmd>PopcBuffer<CR>' })

@@ -30,8 +30,8 @@ fi
 # Install on-my-zsh from https://github.com/ohmyzsh/ohmyzsh
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
     sh -c "$(wget -O- https://${ZSH_URL}/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    cp $DIR_DISK/msys2/home/.zshrc ~/
 fi
-cp $DIR_DISK/msys2/home/.zshrc ~/
 
 # Install gcc
 # pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-make

@@ -336,18 +336,16 @@ nnoremap <leader>sp :PopSet popset<CR>
 " let g:Popc_enableLog = 1
 let g:Popc_jsonPath = $DotVimLocal
 let g:Popc_useFloatingWin = 1
+let Popc_useNerdSymbols = s:use.ui.icon
+if s:use.ui.icon
+let g:Popc_symbols = { 'Sep' : ['', ''], 'SubSep': [ '', '' ] }
+endif
 let g:Popc_highlight = {
     \ 'text'     : 'Pmenu',
     \ 'selected' : 'CursorLineNr',
     \ }
 let g:Popc_useTabline = 1
 let g:Popc_useStatusline = 1
-let g:Popc_usePowerFont = s:use.ui.icon
-if s:use.ui.icon
-let g:Popc_selectPointer = ''
-let g:Popc_separator = {'left' : '', 'right': ''}
-let g:Popc_subSeparator = {'left' : '', 'right': ''}
-endif
 let g:Popc_wksSaveUnderRoot = 0
 let g:Popc_wksRootPatterns = ['.popc', '.git', '.svn', '.hg', 'tags']
 nnoremap <leader><leader>h <Cmd>PopcBuffer<CR>
