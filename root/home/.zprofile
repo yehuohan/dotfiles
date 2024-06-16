@@ -35,12 +35,9 @@ export XMODIFIERS=@im=fcitx
 # user path
 #===============================================================================
 export PATH=$PATH:$HOME/uapps
-export PATH=$PATH:$HOME/uapps/AppImage
-export PATH=$PATH:$HOME/uapps/XXNet
 export PATH=$PATH:$HOME/uapps/firefox
 export PATH=$PATH:/opt/cuda/bin
 
-#export PATH=$PATH:$HOME/uapps/android-studio/bin
 export ANDROID_HOME=$HOME/uapps/Android/SDK
 export PATH=$PATH:$ANDROID_HOME
 export PATH=$PATH:$ANDROID_HOME/platform-tools

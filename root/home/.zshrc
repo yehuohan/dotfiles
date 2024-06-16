@@ -154,11 +154,10 @@ alias gitlog='git log'
 alias gitpush='git push'
 alias gitpull='git pull'
 alias gitfetch='git fetch'
+alias gityzal='lazygit'
 
 alias nxxx='nvidia-xrun'
 alias xxx='startx ~/.xinitrc'
-
-alias ndkmake='ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk NDK_APPLICATION_MK=Application.mk'
 
 # auto program
 clear
