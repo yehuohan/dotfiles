@@ -429,7 +429,10 @@ describe('task', function()
 
         vim.cmd.FzerWsc({ bang = true })
         EQ('', txt.path) -- wsc.path = '' for the first Fzer execution
-        inp = 'Z:/abc/def'
+        inp = '/abc/def'
+        if (vim.fn.has('win32') == 1) or (vim.fn.has('win64') == 1) then
+            inp = 'Z:/abc/def'
+        end
         vim.cmd.Fzer({ args = { 'fpw' } })
         EQ(inp, cfg.path)
         vim.cmd.FzerWsc({ bang = true })
