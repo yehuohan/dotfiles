@@ -55,16 +55,19 @@ local function rg_ignore() return wsc.ignore and {} or { '--no-ignore' } end
 --- @field pat(string) Pattern
 --- @field loc(string) Location
 
---- @alias FuzzierHandle string|function
 --- @class Fuzzier
---- @field file(FuzzierHandle)
---- @field live(FuzzierHandle)
---- @field tags(FuzzierHandle)
+--- @field file(string|function)
+--- @field live(string|function)
+--- @field tags(string|function)
 
 --- @class FzerTable Fuzzy finder tasks
+--- @field rg(string)
+--- @field fzf(Fuzzier)
+--- @field leader(Fuzzier)
+--- @field telescope(Fuzzier)
 local fzer = {
     rg = 'rg --vimgrep -F {opt} -e "{pat}" {loc}',
-    _fzf = {
+    fzf = {
         file = ':FzfFiles {loc}',
         live = function(rep)
             if IsWin() then
@@ -78,56 +81,62 @@ local fzer = {
         end,
         tags = ':FzfTags {pat}',
     },
-    _leaderf = {
+    leaderf = {
         file = ':Leaderf file --input "{pat}" "{loc}"',
         live = ':Leaderf rg --nowrap {opt} -e "{pat}" {loc}',
         tags = ':Leaderf tag --nowrap --input "{pat}"',
     },
-    _telescope = {
+    telescope = {
         file = 'find_files',
         live = 'grep_string',
         tags = 'tags',
     },
 }
 
-function fzer.fzf(rhs, args)
-    local rep = {
-        pat = args.pat,
-        loc = table.concat(args.loc, ' '),
-        opt = table.concat(args.opt, ' '),
-    }
-    local strfn = fzer._fzf[rhs]
-    if type(strfn) == 'function' then
-        fzer._fzf[rhs](rep)
-    elseif type(strfn) == 'string' then
-        local cmd = replace(strfn, rep)
+setmetatable(fzer.fzf, {
+    __call = function(self, rhs, args)
+        local rep = {
+            pat = args.pat,
+            loc = table.concat(args.loc, ' '),
+            opt = table.concat(args.opt, ' '),
+        }
+        local strfn = self[rhs]
+        if type(strfn) == 'function' then
+            self[rhs](rep)
+        elseif type(strfn) == 'string' then
+            local cmd = replace(strfn, rep)
+            vim.cmd(cmd)
+        end
+    end,
+})
+
+setmetatable(fzer.leaderf, {
+    __call = function(self, rhs, args)
+        local rep = {
+            pat = args.pat,
+            loc = table.concat(args.loc, ' '),
+            opt = table.concat(args.opt, ' '),
+        }
+        local cmd = replace(self[rhs], rep)
         vim.cmd(cmd)
-    end
-end
+    end,
+})
 
-function fzer.leaderf(rhs, args)
-    local rep = {
-        pat = args.pat,
-        loc = table.concat(args.loc, ' '),
-        opt = table.concat(args.opt, ' '),
-    }
-    local cmd = replace(fzer._leaderf[rhs], rep)
-    vim.cmd(cmd)
-end
-
-function fzer.telescope(rhs, args)
-    local picker = fzer._telescope[rhs]
-    require('telescope.builtin')[picker]({
-        cwd = args.loc[1],
-        hidden = wsc.hidden, -- For find_files
-        no_ignore = not wsc.ignore, -- For find_files
-        search_file = args.pat ~= '' and args.pat or nil, -- For find_files
-        search_dirs = args.loc, -- For find_files, grep_string
-        search = args.pat, -- For grep_string
-        additional_args = args.opt, -- For grep_string with rg
-        -- ctags_file = '', -- For tags
-    })
-end
+setmetatable(fzer.telescope, {
+    __call = function(self, rhs, args)
+        local picker = self[rhs]
+        require('telescope.builtin')[picker]({
+            cwd = args.loc[1],
+            hidden = wsc.hidden, -- For find_files
+            no_ignore = not wsc.ignore, -- For find_files
+            search_file = args.pat ~= '' and args.pat or nil, -- For find_files
+            search_dirs = args.loc, -- For find_files, grep_string
+            search = args.pat, -- For grep_string
+            additional_args = args.opt, -- For grep_string with rg
+            -- ctags_file = '', -- For tags
+        })
+    end,
+})
 
 -- stylua: ignore start
 local _keys = {
