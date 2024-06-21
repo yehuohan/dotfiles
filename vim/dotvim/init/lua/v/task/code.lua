@@ -73,7 +73,7 @@ local packs = {
     _msvc = 'vcvars64.bat',
 }
 
---- @return table<string>
+--- @return string[]
 local function pat_list(pattern, file)
     local lst = {}
     for line in io.lines(file) do

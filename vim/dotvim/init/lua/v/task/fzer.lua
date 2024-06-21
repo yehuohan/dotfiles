@@ -19,7 +19,7 @@ local wsc = nlib.new_configer({
     fuzzier = 'telescope',
 })
 
---- @return table<string>
+--- @return string[]
 local function rg_paths()
     -- rg supports multi-paths via cmp-path
     local locstr = vim.fn.input('Location: ', '', 'file')
@@ -33,7 +33,7 @@ local function rg_paths()
     return {}
 end
 
---- @return table<string>
+--- @return string[]
 local function rg_globs()
     if wsc.glob ~= '' then
         return vim.tbl_map(
@@ -44,10 +44,10 @@ local function rg_globs()
     return {}
 end
 
---- @return table<string>
+--- @return string[]
 local function rg_hidden() return wsc.hidden and { '--hidden' } or {} end
 
---- @return table<string>
+--- @return string[]
 local function rg_ignore() return wsc.ignore and {} or { '--no-ignore' } end
 
 --- @class FzerVars
@@ -227,7 +227,7 @@ local function parse_pat(kt)
     return pat
 end
 
---- @return table<string>
+--- @return string[]
 local function parse_loc(kt)
     local loc = {}
     local restore = false
@@ -264,7 +264,7 @@ local function parse_loc(kt)
     return loc
 end
 
---- @return table<string>
+--- @return string[]
 local function parse_opt(kt)
     local opt = {}
     if kt.E:match('[sS]') then

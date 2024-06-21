@@ -16,7 +16,18 @@ local EQ = assert.are.same -- The table's metatable won't be compared
 local OK = assert.has_no.errors
 local NOK = assert.has.errors
 
---- @param fns(table<table<table, string>>) All function need to mock
+--- @alias MockFnList [table, string, ...]
+
+--- Mock some funcions
+---
+--- Example:
+---
+--- ```lua
+--- local fns = { { vim, 'notify', 'print' }, { vim.fn, 'input' } }
+--- local mocked = mock(fns)
+--- unmock(mocked, fns)
+--- ```
+--- @param fns(MockFnList[]) All function need to mock
 local function mock(fns)
     local mocked = {}
     for _, fn in ipairs(fns) do
@@ -27,7 +38,8 @@ local function mock(fns)
     return mocked
 end
 
---- @param fns(table<table<table, string>>) All function need to unmock
+--- Restor the mocked funcions
+--- @param fns(MockFnList[]) All function need to unmock
 local function unmock(mocked, fns)
     for _, fn in ipairs(fns) do
         for k = 2, #fn do

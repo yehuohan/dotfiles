@@ -36,7 +36,7 @@ M.title = {
     Fzer = 'v.task.fzer',
 }
 
---- @type table<string> String to highlight from task outputs at quickfix window
+--- @type string[] String to highlight from task outputs at quickfix window
 M.hlstr = {}
 
 --- Run task

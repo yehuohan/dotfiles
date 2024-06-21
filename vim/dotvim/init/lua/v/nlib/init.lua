@@ -148,8 +148,8 @@ function M.new_chanor(opts)
     end
 
     --- Process raw data stream from terminal's stdout
-    --- @param data(table<string>|nil) nil means all processed buffer lines should be displayed
-    --- @return table<string> lines Processed lines
+    --- @param data(string[]|nil) nil means all processed buffer lines should be displayed
+    --- @return string[] lines Processed lines
     --- @return table highlights Processed highlights for lines
     return function(data)
         local bufs = ansi.bufs()
@@ -377,7 +377,7 @@ end
 function _u.replace(cmd, rep) return vim.trim(string.gsub(cmd, '{(%w+)}', rep)) end
 
 --- Sequence commands
---- @param cmdlist(table<string>) Command list to join with ' && '
+--- @param cmdlist(string[]) Command list to join with ' && '
 function _u.sequence(cmdlist) return table.concat(cmdlist, ' && ') end
 
 --- Deep copy variable
