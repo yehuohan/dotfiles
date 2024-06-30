@@ -970,8 +970,8 @@ end
 -- 翻译
 local function pkg_translator()
     vim.g.translator_default_engines = { 'haici', 'bing', 'youdao' }
-    m.nmap({ '<Leader>tw', '<Plug>TranslateW' })
-    m.vmap({ '<Leader>tw', '<Plug>TranslateWV' })
+    m.nmap({ '<leader>tw', '<Plug>TranslateW' })
+    m.vmap({ '<leader>tw', '<Plug>TranslateWV' })
     m.nnore({ '<leader><leader>t', ':TranslateW<Space>' })
     m.vnore({
         '<leader><leader>t',
