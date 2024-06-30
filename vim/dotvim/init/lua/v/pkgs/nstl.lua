@@ -73,17 +73,26 @@ function ctxs.hint()
     return icon .. ' ' .. res
 end
 
-function ctxs.root_path() return vim.fs.normalize(require('v.task').wsc.fzer.path) end
+function ctxs.root_path()
+    if not vim.t.nstl_root_path_disabled then
+        return vim.fs.normalize(require('v.task').wsc.fzer.path)
+    end
+    return ''
+end
 
 function ctxs.relative_path()
     local filepath = vim.fs.normalize(vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':p'))
-    local rootpath = vim.fs.normalize(require('v.task').wsc.fzer.path)
-    local pat = '^' .. vim.fn.escape(rootpath, '\\')
-    return vim.fn.substitute(filepath, pat, '', '')
+    if vim.t.nstl_root_path_disabled then
+        return filepath
+    else
+        local rootpath = vim.fs.normalize(require('v.task').wsc.fzer.path)
+        local pat = '^' .. vim.fn.escape(rootpath, '\\')
+        return vim.fn.substitute(filepath, pat, '', '')
+    end
 end
 
 function ctxs.check_lines()
-    if vim.b.statusline_check_enabled == false then
+    if vim.b.nstl_check_lines_enabled == false then
         return nil
     end
     local check_last = vim.b.statusline_check_last or 0
@@ -308,7 +317,7 @@ local function tabs()
 
     return wrap({
         init = function(self)
-            local res = ctxs.tabs_bufs(vim.g.tabline_layout)
+            local res = ctxs.tabs_bufs(vim.g.nstl_tabline_layout)
             local children = {}
             -- buffers
             if res.buf then
@@ -367,16 +376,24 @@ local function bars()
 end
 
 --- Setup functions
-local function toggle_check()
-    if vim.b.statusline_check_enabled == nil then
-        vim.b.statusline_check_enabled = true
+local function toggle_root_path()
+    if vim.t.nstl_root_path_disabled == nil then
+        vim.t.nstl_root_path_disabled = false
     end
-    vim.b.statusline_check_enabled = not vim.b.statusline_check_enabled
-    vim.notify('b:statusline_check_enabled = ' .. tostring(vim.b.statusline_check_enabled))
+    vim.t.nstl_root_path_disabled = not vim.t.nstl_root_path_disabled
+    vim.notify('t:nstl_root_path_disabled = ' .. tostring(vim.t.nstl_root_path_disabled))
 end
 
-local function toggle_layout()
-    local layout = vim.g.tabline_layout
+local function toggle_check_lines()
+    if vim.b.nstl_check_lines_enabled == nil then
+        vim.b.nstl_check_lines_enabled = true
+    end
+    vim.b.nstl_check_lines_enabled = not vim.b.nstl_check_lines_enabled
+    vim.notify('b:nstl_check_lines_enabled = ' .. tostring(vim.b.nstl_check_lines_enabled))
+end
+
+local function toggle_tabline_layout()
+    local layout = vim.g.nstl_tabline_layout
     if layout.tab and layout.buf then
         layout.tab = false
     elseif not layout.tab and layout.buf then
@@ -385,13 +402,13 @@ local function toggle_layout()
     elseif layout.tab and not layout.buf then
         layout.buf = true
     end
-    vim.g.tabline_layout = layout
+    vim.g.nstl_tabline_layout = layout
 end
 
 local function setup()
     -- Tabline status from popc
     vim.g.Popc_useTabline = 0
-    vim.g.tabline_layout = { tab = true, buf = true }
+    vim.g.nstl_tabline_layout = { tab = true, buf = true }
     vim.o.termguicolors = true
     vim.o.showtabline = 2
 
@@ -402,7 +419,7 @@ local function setup()
             if #client_messages > 0 then
                 return sign .. ' ' .. table.concat(client_messages, ' ')
             end
-            if #vim.lsp.get_active_clients({ bufnr = vim.api.nvim_get_current_buf() }) > 0 then
+            if #vim.lsp.get_clients({ bufnr = vim.api.nvim_get_current_buf() }) > 0 then
                 return sign
             end
             return ''
@@ -431,8 +448,9 @@ local function setup()
             require('heirline.utils').on_colorscheme(colors)
         end,
     })
-    m.nnore({ '<leader>tl', toggle_check })
-    m.nnore({ '<leader>ty', toggle_layout })
+    m.nnore({ '<leader>ta', toggle_root_path })
+    m.nnore({ '<leader>tl', toggle_check_lines })
+    m.nnore({ '<leader>ty', toggle_tabline_layout })
 end
 
 return { setup = setup }
