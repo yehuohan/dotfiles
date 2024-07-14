@@ -2,7 +2,7 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\*\Shell\Nvy]
 @="Edit with &Nvy"
-"Icon"="\"D:\\apps\\_packs\\apps\\nvy\\current\\Nvy.exe\""
+"Icon"="\"C:\\apps\\_packs\\apps\\nvy\\current\\Nvy.exe\""
 
 [HKEY_CLASSES_ROOT\*\Shell\Nvy\command]
-@="\"D:\\apps\\_packs\\apps\\nvy\\current\\Nvy.exe\" --position=500,200 --geometry=70x20 \"%1\""
+@="\"C:\\apps\\_packs\\apps\\nvy\\current\\Nvy.exe\" --position=500,200 --geometry=70x20 \"%1\""
