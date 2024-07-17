@@ -6,8 +6,8 @@ Then unlock install.ps1 from attributes to install scoop. How stupid!
 #>
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh -outfile 'install.ps1'
-.\install.ps1 -ScoopDir 'C:\apps\_packs' -ScoopGlobalDir 'C:\apps\_packs' -NoProxy
 .\install.ps1 -ScoopDir "$env:DOT_APPS\_packs" -ScoopGlobalDir "$env:DOT_APPS\_packs" -NoProxy
+
 
 ### .Patch
 $SCOOP_PACKAGE_REPO = "https://kkgithub.com/ScoopInstaller/Scoop/archive/master.zip"

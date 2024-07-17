@@ -1,5 +1,6 @@
 set shell := ['bash', '-uc']
 set windows-shell := ['pwsh', '-NoLogo', '-NoProfileLoadTime', '-Command']
+set windows-shell := ["powershell", "-NoLogo", "-Command"]
 set dotenv-load
 set ignore-comments
 
