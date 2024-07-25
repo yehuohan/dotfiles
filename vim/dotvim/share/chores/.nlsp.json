@@ -25,9 +25,6 @@
             "rust-analyzer.checkOnSave.enable": true,
             "rust-analyzer.checkOnSave.extraArgs": ["--target-dir", "target/check"]
         },
-        "pyright": {
-            "python.analysis.stubPath": "typings"
-        },
         "lua_ls": {
             "Lua.runtime.version": "LuaJIT", // "Lua 5.2", "LuaJIT"
             "Lua.workspace.library": []

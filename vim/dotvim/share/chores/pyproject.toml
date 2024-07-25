@@ -1,6 +1,26 @@
-# black
-# pyproject.toml
 
+### black
+# fmt: on/off
 [tool.black]
 line-length = 88
 skip-string-normalization = 0
+
+
+### pyright
+# Only enable pyright or basedpyright
+# [tool.pyright]
+# typeCheckingMode = 'standard' # "off", "basic", "standard", "strict"
+#
+# [[tool.pyright.executionEnvironments]]
+# root = "."
+# extraPaths = ["src", "../lib"]
+
+
+### basedpyright
+[tool.basedpyright]
+typeCheckingMode = 'standard' # "off", "basic", "standard", "strict", "all"
+reportAny = false
+
+[[tool.basedpyright.executionEnvironments]]
+root = "."
+extraPaths = ["src", "../lib"]

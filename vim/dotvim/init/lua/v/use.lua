@@ -20,9 +20,6 @@ local lst = {
     git = {
         vim.v.null,
         'https://kkgithub.com',
-        'https://hub.njuu.cf',
-        'https://hub.nuaa.cf',
-        'https://hub.yzuu.cf',
     },
     fonts = {
         'Consolas',
