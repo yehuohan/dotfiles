@@ -64,6 +64,13 @@ local function __servers()
             },
         })
     end
+    opts['basedpyright'] = function()
+        lspconfig.basedpyright.setup({
+            capabilities = capabilities,
+            -- Treesitter is better than basedpyright's semantic
+            on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
+        })
+    end
     opts['lua_ls'] = function()
         lspconfig.lua_ls.setup({
             capabilities = capabilities,

@@ -210,9 +210,13 @@ function _args.just(dic, file)
     dic.barg.lst = nlib.u.str2arg(vim.fn.system('just --summary --unsorted -f ' .. file))
 end
 
-function _args.make(dic, file) dic.barg.lst = pat_list(packs._pats.phony, file) end
+function _args.make(dic, file)
+    dic.envs.lst = { 'PATH=.', 'BUILD_TYPE=Release' }
+    dic.barg.lst = pat_list(packs._pats.phony, file)
+end
 
 function _args.cargo(dic, file)
+    dic.envs.lst = { 'RUST_BACKTRACE=1', 'RUST_BACKTRACE=full' }
     dic.barg.lst = {
         'run',
         'build',
@@ -230,6 +234,7 @@ end
 --- @param dic(table) The _sels.dic to update
 --- @return boolean
 local function update_sels(rhs, dic)
+    dic.envs = { lst = { 'PATH=.' }, cpl = 'environment' }
     dic.barg = { lst = {} }
     dic.earg = { lst = {} }
     if rhs then
@@ -281,7 +286,7 @@ local _sels = {
         key = { lst = _maps[1], dic = vim.tbl_map(function(h) return h.desc end, _maps) },
         file = { lst = {}, cpl = 'file' },
         type = { lst = { 'just', 'python' }, cpl = 'filetype' },
-        envs = { lst = { 'PATH=' }, cpl = 'environment' },
+        envs = vim.empty_dict(),
         barg = vim.empty_dict(),
         earg = vim.empty_dict(),
         msvc = vim.empty_dict(),
