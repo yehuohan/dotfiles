@@ -99,6 +99,8 @@ Windows Registry Editor Version 5.00
 [HKEY_CURRENT_USER\Software\ExplorerPatcher]
 "UpdateAllowDowngrades"=dword:00000000
 [HKEY_CURRENT_USER\Software\ExplorerPatcher]
+"UpdateUseLocal"=dword:00000000
+[HKEY_CURRENT_USER\Software\ExplorerPatcher]
 "UpdateURL"=""
 [HKEY_CURRENT_USER\Software\ExplorerPatcher]
 "UpdateURLStaging"=""
