@@ -22,5 +22,3 @@ else()
     set(VCPKG_CRT_LINKAGE static)
     set(VCPKG_LIBRARY_LINKAGE static)
 endif()
-
-

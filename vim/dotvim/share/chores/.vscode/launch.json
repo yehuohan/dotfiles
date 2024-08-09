@@ -44,6 +44,7 @@
             "cwd": "${workspaceFolder}",
             "env": {}, // { "PATH": "."}
             "console": "integratedTerminal", // "internalConsole", "integratedTerminal", "externalTerminal"
+            "justMyCode": false,
         }
     ]
 }

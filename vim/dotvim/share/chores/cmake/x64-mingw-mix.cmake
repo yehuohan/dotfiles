@@ -23,4 +23,3 @@ else()
     # Static
     set(VCPKG_LIBRARY_LINKAGE static)
 endif()
-

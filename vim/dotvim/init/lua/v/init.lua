@@ -19,13 +19,10 @@ function IsMac() return vim.fn.has('mac') == 1 end
 local function setup_env()
     local fp = io.open(vim.env.DotVimLocal .. '/.env.json')
     if fp then
-        -- Load extra {"path":[], "vars":{}} from .env.json
+        -- Load extra {"path":[]} from .env.json
         local ex = vim.json.decode(fp:read('*a'))
         local sep = IsWin() and ';' or ':'
         vim.env.PATH = vim.env.PATH .. sep .. table.concat(ex.path, sep)
-        for name, val in pairs(ex.vars) do
-            vim.env[name] = val
-        end
     end
 end
 
