@@ -71,6 +71,7 @@ local function __servers()
             on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
         })
     end
+    opts['ruff'] = function() end -- Disable ruff server
     opts['lua_ls'] = function()
         lspconfig.lua_ls.setup({
             capabilities = capabilities,
