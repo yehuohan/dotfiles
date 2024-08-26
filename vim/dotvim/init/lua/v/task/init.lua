@@ -170,13 +170,9 @@ local function setup_overseer()
                 ['i'] = 'Edit',
                 ['p'] = 'TogglePreview',
                 ['o'] = 'OpenQuickFix',
-                ['O'] = function()
-                    require('overseer.task_list.sidebar').get():run_action('restart')
-                end,
+                ['O'] = function() require('overseer.task_list.sidebar').get():run_action('restart') end,
                 ['K'] = function() require('overseer.task_list.sidebar').get():run_action('stop') end,
-                ['D'] = function()
-                    require('overseer.task_list.sidebar').get():run_action('dispose')
-                end,
+                ['D'] = function() require('overseer.task_list.sidebar').get():run_action('dispose') end,
             },
         },
         component_aliases = {

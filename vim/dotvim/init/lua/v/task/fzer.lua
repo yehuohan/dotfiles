@@ -36,10 +36,7 @@ end
 --- @return string[]
 local function rg_globs()
     if wsc.glob ~= '' then
-        return vim.tbl_map(
-            function(glob) return ('-g%s'):format(glob) end,
-            nlib.u.str2arg(wsc.glob)
-        )
+        return vim.tbl_map(function(glob) return ('-g%s'):format(glob) end, nlib.u.str2arg(wsc.glob))
     end
     return {}
 end

@@ -1,6 +1,6 @@
 # -- stylua: ignore start
 # -- stylua: ignore end
-column_width = 100
+column_width = 108
 line_endings = "Unix"
 indent_type = "Spaces"
 indent_width = 4

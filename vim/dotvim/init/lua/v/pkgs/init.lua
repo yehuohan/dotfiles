@@ -170,10 +170,8 @@ local function pkg_alpha()
     tpl.nvim_web_devicons.enabled = use.ui.icon
     tpl.section.header.val = function()
         if vim.fn.filereadable(vim.env.DotVimLocal .. '/todo.md') == 1 then
-            local todo = vim.fn.filter(
-                vim.fn.readfile(vim.env.DotVimLocal .. '/todo.md'),
-                'v:val !~ "\\m^[ \t]*$"'
-            )
+            local text = vim.fn.readfile(vim.env.DotVimLocal .. '/todo.md')
+            local todo = vim.fn.filter(text, 'v:val !~ "\\m^[ \t]*$"')
             if vim.tbl_isempty(todo) then
                 return ''
             end
@@ -292,9 +290,7 @@ local function pkg_ufo()
             table.insert(res, { ('  %s%d '):format(tag_num, endLnum - lnum), 'MoreMsg' })
             return res
         end,
-        provider_selector = function()
-            return use.nts and { 'treesitter', 'indent' } or { 'indent' }
-        end,
+        provider_selector = function() return use.nts and { 'treesitter', 'indent' } or { 'indent' } end,
     })
     vim.api.nvim_set_hl(0, 'UfoFoldedBg', { bg = '#5a5555' })
     m.nnore({
@@ -587,8 +583,7 @@ local function pkg_leaderf()
     vim.g.Lf_CacheDirectory = vim.env.DotVimLocal
     vim.g.Lf_PreviewInPopup = 1
     vim.g.Lf_PreviewResult = { File = 0, Buffer = 0, Tag = 0, Rg = 0 }
-    vim.g.Lf_StlSeparator = use.ui.icon and { left = '', right = '' }
-        or { left = '', right = '' }
+    vim.g.Lf_StlSeparator = use.ui.icon and { left = '', right = '' } or { left = '', right = '' }
     vim.g.Lf_ShowDevIcons = 0
     vim.g.Lf_ShortcutF = ''
     vim.g.Lf_ShortcutB = ''
@@ -863,6 +858,14 @@ end
 -- Misc
 --------------------------------------------------------------------------------
 -- Markdown
+local function pkg_markview()
+    require('markview').setup({
+        modes = { 'n', 'no' },
+    })
+    m.nore({ '<leader>tm', ':Markview toggle<CR>' })
+end
+
+-- Markdown
 local function pkg_peek()
     -- Dependency: sudo pacman -S webkit2gtk
     local peek = require('peek')
@@ -1043,12 +1046,7 @@ local pkgs = {
     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
     { 'nvim-telescope/telescope-frecency.nvim' },
     { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' } },
-    { -- LeaderF
-        'Yggdroot/LeaderF',
-        enabled = use.has_py,
-        init = pkg_leaderf,
-        build = ':LeaderfInstallCExtension',
-    },
+    { 'Yggdroot/LeaderF', enabled = use.has_py, init = pkg_leaderf, build = ':LeaderfInstallCExtension' },
     { 'echasnovski/mini.nvim', config = pkg_mini },
 
     -- Coding
@@ -1080,12 +1078,7 @@ local pkgs = {
             'nvim-lua/plenary.nvim',
         },
     },
-    { -- treesitter
-        'nvim-treesitter/nvim-treesitter',
-        enabled = use.nts,
-        version = '*',
-        config = pkg_treesitter,
-    },
+    { 'nvim-treesitter/nvim-treesitter', enabled = use.nts, version = '*', config = pkg_treesitter },
     { 'rcarriga/nvim-dap-ui', enabled = use.ndap, dependencies = { 'mfussenegger/nvim-dap' } },
     { 'L3MON4D3/LuaSnip', config = pkg_snip, dependencies = { 'honza/vim-snippets' } },
     { 'stevearc/overseer.nvim' }, -- Setup from v.task
@@ -1103,6 +1096,13 @@ local pkgs = {
     { 'NoahTheDuke/vim-just', ft = 'just' },
 
     -- Misc
+    { -- makrview
+        'OXY2DEV/markview.nvim',
+        config = pkg_markview,
+        ft = 'markdown',
+        submodules = false,
+        dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
+    },
     { 'toppair/peek.nvim', config = pkg_peek, ft = 'markdown', build = 'deno task build:fast' },
     { 'Rykka/InstantRst', config = pkg_rst, ft = 'rst', dependencies = { 'Rykka/riv.vim' } },
     { 'lervag/vimtex', config = pkg_tex, ft = 'tex' },
@@ -1110,11 +1110,7 @@ local pkgs = {
     { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, keys = { { '<M-w>', mode = 'i' } } },
     { 'itchyny/screensaver.vim', keys = { { '<leader>ss', '<Cmd>ScreenSaver clock<CR>' } } },
     { 'voldikss/vim-translator', config = pkg_translator },
-    { -- im-switch
-        'drop-stones/im-switch.nvim',
-        config = pkg_im_switch,
-        dependencies = { 'nvim-lua/plenary.nvim' },
-    },
+    { 'drop-stones/im-switch.nvim', config = pkg_im_switch, dependencies = { 'nvim-lua/plenary.nvim' } },
 }
 
 local function clone_lazy(url, bundle)

@@ -5,9 +5,7 @@
 --------------------------------------------------------------------------------
 
 function IsLinux()
-    return (vim.fn.has('unix') == 1)
-        and (vim.fn.has('macunix') == 0)
-        and (vim.fn.has('win32unix') == 0)
+    return (vim.fn.has('unix') == 1) and (vim.fn.has('macunix') == 0) and (vim.fn.has('win32unix') == 0)
 end
 
 function IsWin() return (vim.fn.has('win32') == 1) or (vim.fn.has('win64') == 1) end
