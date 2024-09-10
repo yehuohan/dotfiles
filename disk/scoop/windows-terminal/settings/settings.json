@@ -1,0 +1,136 @@
+{
+    "$help": "https://aka.ms/terminal-documentation",
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+    "actions": 
+    [
+        {
+            "command": 
+            {
+                "action": "copy",
+                "singleLine": false
+            },
+            "id": "User.copy.644BA8F2",
+            "keys": "ctrl+c"
+        },
+        {
+            "command": "paste",
+            "id": "User.paste",
+            "keys": "ctrl+v"
+        },
+        {
+            "command": "find",
+            "id": "User.find",
+            "keys": "ctrl+shift+f"
+        },
+        {
+            "command": 
+            {
+                "action": "splitPane",
+                "split": "auto",
+                "splitMode": "duplicate"
+            },
+            "id": "User.splitPane.A6751878",
+            "keys": "alt+shift+d"
+        }
+    ],
+    "copyFormatting": "none",
+    "copyOnSelect": false,
+    "defaultProfile": "{0496ac52-53d6-4473-98dd-847bcafc97e2}",
+    "initialCols": 90,
+    "initialRows": 25,
+    "newTabMenu": 
+    [
+        {
+            "type": "remainingProfiles"
+        }
+    ],
+    "profiles": 
+    {
+        "defaults": 
+        {
+            "colorScheme": "One Half Dark",
+            "font": 
+            {
+                "face": "FantasqueSansM Nerd Font Mono",
+                "size": 15
+            }
+        },
+        "list": 
+        [
+            {
+                "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "hidden": false,
+                "name": "Windows PowerShell",
+                "startingDirectory": null
+            },
+            {
+                "commandline": "%SystemRoot%\\System32\\cmd.exe",
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "hidden": false,
+                "name": "\u547d\u4ee4\u63d0\u793a\u7b26",
+                "startingDirectory": null
+            },
+            {
+                "guid": "{05135076-1f5a-585c-9378-32778ccb5835}",
+                "hidden": false,
+                "name": "Developer Command for VS 2022",
+                "source": "Windows.Terminal.VisualStudio",
+                "startingDirectory": null
+            },
+            {
+                "guid": "{3f4a2e50-9c11-578a-9ffb-95f33f83c5aa}",
+                "hidden": false,
+                "name": "Developer PowerShell for VS 2022",
+                "source": "Windows.Terminal.VisualStudio",
+                "startingDirectory": null
+            },
+            {
+                "altGrAliasing": true,
+                "antialiasingMode": "grayscale",
+                "closeOnExit": "automatic",
+                "colorScheme": "One Half Dark",
+                "commandline": "pwsh",
+                "cursorShape": "bar",
+                "font": 
+                {
+                    "face": "FantasqueSansM Nerd Font Mono",
+                    "size": 12
+                },
+                "guid": "{0496ac52-53d6-4473-98dd-847bcafc97e2}",
+                "hidden": false,
+                "historySize": 9001,
+                "icon": "C:\\apps\\_packs\\apps\\pwsh\\current\\pwsh.exe",
+                "name": "Pwsh",
+                "padding": "8, 8, 8, 8",
+                "snapOnInput": true,
+                "startingDirectory": null,
+                "useAcrylic": false
+            },
+            {
+                "altGrAliasing": true,
+                "antialiasingMode": "grayscale",
+                "closeOnExit": "automatic",
+                "colorScheme": "One Half Dark",
+                "commandline": "pwsh -ExecutionPolicy ByPass -NoExit -Command \"& 'C:\\apps\\miniconda3\\shell\\condabin\\conda-hook.ps1' ; conda activate 'C:\\apps\\miniconda3' \"",
+                "cursorShape": "bar",
+                "font": 
+                {
+                    "face": "FantasqueSansM Nerd Font Mono",
+                    "size": 12
+                },
+                "guid": "{dafbccaa-f9e3-4cb0-b47f-3e5dc557de7e}",
+                "hidden": false,
+                "historySize": 9001,
+                "icon": "C:\\apps\\_packs\\apps\\pwsh\\current\\pwsh.exe",
+                "name": "Pwsh::Conda",
+                "padding": "8, 8, 8, 8",
+                "snapOnInput": true,
+                "startingDirectory": null,
+                "useAcrylic": false
+            }
+        ]
+    },
+    "schemes": [],
+    "themes": []
+}

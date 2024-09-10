@@ -100,11 +100,13 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp $USERPROFILE/.condarc                        ./disk/home/
     cp $USERPROFILE/clink_inputrc                   ./disk/home/
     cp -r $USERPROFILE/Documents/WindowsPowerShell  ./disk/home/Documents/
+    cp -r $USERPROFILE/Documents/PowerShell         ./disk/home/Documents/
     cp $APPDATA/lazygit/config.yml                  ./disk/home/AppData/Roaming/lazygit/
     cp $LOCALAPPDATA/lf/lfrc                        ./disk/home/AppData/Local/lf/
 
     # scoop
-    cp -r $DOT_APPS/_packs/persist/conemu          ./disk/scoop/
+    cp $DOT_APPS/_packs/persist/windows-terminal/settings/settings.json     ./disk/scoop/windows-terminal/settings/
+    cp -r $DOT_APPS/_packs/persist/conemu                                   ./disk/scoop/
 
     echo "Win: Copy was completed!"
 fi
