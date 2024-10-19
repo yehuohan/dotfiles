@@ -160,7 +160,7 @@ local _maps_fuzzier = { f = 'file', l = 'live', h = 'tags' }
 
 --- @type PopSelection Selection for fzer task
 local _sels = {
-    opt = 'config fzer task',
+    opt = 'setup fzer task',
     lst = nil,
     -- lst for rg
     lst_r = { 'envs', 'path', 'glob', 'hidden', 'ignore', 'options', 'vimgrep' },

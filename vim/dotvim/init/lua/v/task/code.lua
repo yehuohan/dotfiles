@@ -274,7 +274,7 @@ local _keys = {
 
 --- @type PopSelection Selection for code task
 local _sels = {
-    opt = 'config code task',
+    opt = 'setup code task',
     lst = nil,
     -- lst for kt.E != p
     lst_d = { 'envs', 'barg', 'earg', 'msvc', 'outer', 'style', 'encoding', 'verbose' },
