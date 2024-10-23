@@ -1,0 +1,17 @@
+#version 450
+
+layout (local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+layout (binding = 0, rgba32f) readonly uniform image2D inp_img;
+layout (binding = 1, rgba32f) writeonly uniform image2D out_img;
+
+//in uvec3 gl_NumWorkGroups        = global work group size we gave to glDispatchCompute()
+//in uvec3 gl_WorkGroupSize        = local work group size we defined in layout with local_size_xyz
+//in uvec3 gl_WorkGroupID          = [0, gl_NumWorkGroups.xyz)
+//in uvec3 gl_LocalInvocationID    = [0, gl_WorkGroupSize.xyz)
+//in uint  gl_LocalInvocationIndex = 1D index representation of gl_LocalInvocationID
+//in uvec3 gl_GlobalInvocationID   = gl_WorkGroupID * gl_WorkGroupSize + gl_LocalInvocationID
+void main() {
+    ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    vec3 color = imageLoad(inp_img, pos).rgb;
+    imageStore(out_img, pos, vec4(color, 1.0));
+}

@@ -982,7 +982,7 @@ local function pkg_translator()
     })
 end
 
--- 输入法自动切换
+-- 输入法自动切换（增加mode切换延迟时间）
 local function pkg_im_switch()
     require('im-switch').setup({
         windows = {
@@ -1110,7 +1110,7 @@ local pkgs = {
     { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, keys = { { '<M-w>', mode = 'i' } } },
     { 'itchyny/screensaver.vim', keys = { { '<leader>ss', '<Cmd>ScreenSaver clock<CR>' } } },
     { 'voldikss/vim-translator', config = pkg_translator },
-    { 'drop-stones/im-switch.nvim', config = pkg_im_switch, dependencies = { 'nvim-lua/plenary.nvim' } },
+    -- { 'drop-stones/im-switch.nvim', config = pkg_im_switch, dependencies = { 'nvim-lua/plenary.nvim' } },
 }
 
 local function clone_lazy(url, bundle)
