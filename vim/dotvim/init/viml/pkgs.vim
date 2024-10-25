@@ -669,28 +669,6 @@ nnoremap <leader>tb
     \ echo 'Browser: ' . g:mkdp_browser <CR>
 " }}}
 
-" ReStructruedText {{{
-let g:riv_auto_format_table = 0
-let g:riv_i_tab_pum_next = 0
-let g:riv_ignored_imaps = '<Tab>,<S-Tab>,<CR>'
-let g:riv_ignored_nmaps = '<Tab>,<S-Tab>,<CR>'
-let g:riv_ignored_vmaps = '<Tab>,<S-Tab>,<CR>'
-let g:instant_rst_browser = 'firefox'
-if IsWin()
-" 需要安装 https://github.com/mgedmin/restview
-nnoremap <leader>vr
-    \ <Cmd>
-    \ execute ':AsyncRun restview ' . Expand('%', ':p:t') <Bar>
-    \ cclose<CR>
-else
-" 需要安装 https://github.com/Rykka/instant-rst.py
-nnoremap <leader>vr
-    \ <Cmd>
-    \ echo g:_instant_rst_daemon_started ? 'Close rst' : 'Open rst' <Bar>
-    \ execute g:_instant_rst_daemon_started ? 'StopInstantRst' : 'InstantRst'<CR>
-endif
-" }}}
-
 " vimtex {{{ Latex
 let g:vimtex_cache_root = $DotVimLocal . '/.vimtex'
 let g:vimtex_view_general_viewer = 'sioyek'
@@ -778,7 +756,6 @@ if s:use.ui.icon
     Plug 'ryanoasis/vim-devicons'
 endif
     Plug 'morhetz/gruvbox'
-    Plug 'rakr/vim-one'
     Plug 'tanvirtin/monokai.nvim'
     Plug 'luochen1990/rainbow'
     Plug 'Yggdroot/indentLine'
@@ -817,8 +794,6 @@ endif
     Plug 'gabrielelana/vim-markdown', {'for': 'markdown'}
     Plug 'joker1007/vim-markdown-quote-syntax', {'for': 'markdown'}
     Plug 'iamcco/markdown-preview.nvim', {'for': 'markdown', 'do': { -> mkdp#util#install()}}
-    Plug 'Rykka/riv.vim', {'for': 'rst'}
-    Plug 'Rykka/InstantRst', {'for': 'rst'}
     Plug 'lervag/vimtex', {'for': 'tex'}
     Plug 'lilydjwg/colorizer', {'on': 'ColorToggle'}
     Plug 'itchyny/screensaver.vim'

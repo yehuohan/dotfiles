@@ -839,21 +839,6 @@ local function pkg_hlchunk()
     })
 end
 
--- 列表视图
-local function pkg_trouble()
-    require('trouble').setup({
-        mode = 'quickfix',
-        icons = true,
-        action_keys = {
-            jump_close = { 'O' },
-            toggle_fold = { 'zA', 'za', 'o' },
-        },
-        auto_preview = false,
-    })
-    m.nnore({ '<leader>vq', ':TroubleToggle quickfix<CR>' })
-    m.nnore({ '<leader>vl', ':TroubleToggle loclist<CR>' })
-end
-
 --------------------------------------------------------------------------------
 -- Misc
 --------------------------------------------------------------------------------
@@ -889,37 +874,6 @@ local function pkg_peek()
             vim.sysnotify('Markdown preview is ' .. s, vim.log.levels.INFO)
         end,
     })
-end
-
--- reStructuredText
-local function pkg_rst()
-    vim.g.riv_auto_format_table = 0
-    vim.g.riv_i_tab_pum_next = 0
-    vim.g.riv_ignored_imaps = '<Tab>,<S-Tab>,<CR>'
-    vim.g.riv_ignored_nmaps = '<Tab>,<S-Tab>,<CR>'
-    vim.g.riv_ignored_vmaps = '<Tab>,<S-Tab>,<CR>'
-    vim.g.instant_rst_browser = 'firefox'
-    if IsWin() then
-        -- 需要安装 https://github.com/mgedmin/restview
-        m.nnore({
-            '<leader>vr',
-            function() require('v.task').cmd('restview ' .. vim.fn.expand('%', ':p:t')) end,
-        })
-    else
-        -- 需要安装 https://github.com/Rykka/instant-rst.py
-        m.nnore({
-            '<leader>vr',
-            function()
-                if vim.g._instant_rst_daemon_started == 1 then
-                    vim.notify('Close rst')
-                    vim.cmd.StopInstantRst()
-                else
-                    vim.notify('Open rst')
-                    vim.cmd.InstantRst()
-                end
-            end,
-        })
-    end
 end
 
 -- Latex
@@ -1091,7 +1045,6 @@ local pkgs = {
     { 't9md/vim-quickhl', config = pkg_quickhl },
     { 'HiPhish/rainbow-delimiters.nvim', init = pkg_rainbow, submodules = false },
     { 'shellRaining/hlchunk.nvim', config = pkg_hlchunk },
-    { 'folke/trouble.nvim', config = pkg_trouble, keys = { '<leader>vq', '<leader>vl' } },
     { 'rust-lang/rust.vim' },
     { 'NoahTheDuke/vim-just', ft = 'just' },
 
@@ -1104,7 +1057,6 @@ local pkgs = {
         dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
     },
     { 'toppair/peek.nvim', config = pkg_peek, ft = 'markdown', build = 'deno task build:fast' },
-    { 'Rykka/InstantRst', config = pkg_rst, ft = 'rst', dependencies = { 'Rykka/riv.vim' } },
     { 'lervag/vimtex', config = pkg_tex, ft = 'tex' },
     { 'uga-rosa/ccc.nvim', config = pkg_ccc, keys = { '<leader>tc', '<leader>lp' } },
     { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, keys = { { '<M-w>', mode = 'i' } } },
