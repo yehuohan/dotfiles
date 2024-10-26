@@ -62,12 +62,12 @@ neovide --remote-tcp=localhost:6666
 - [neovim](https://github.com/neovim/neovim)
   - [nvim.appimage](https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage)
   - `pacman -S xclip or xsel`
-- [Python](https://www.python.org/)
+- Miniconda3
   - `pip install pynvim`
-- [NodeJs](https://nodejs.org)
+- NodeJs
   - `HTTPS_PROXY=addr:port npm install -g neovim`
   - `cd $DotVimPath/local && HTTPS_PROXY=addr:port npm install neovim`
-- Git: [Msys2](http://www.msys2.org/)
+- Git: Msys2
   - `git config --global http.proxy addr:port`
 - [Ripgrep](https://github.com/BurntSushi/ripgrep)
 - [Fzf](https://github.com/junegunn/fzf)

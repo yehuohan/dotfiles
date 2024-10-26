@@ -34,9 +34,10 @@ export XMODIFIERS=@im=fcitx
 #===============================================================================
 # user path
 #===============================================================================
-export PATH=$PATH:$HOME/uapps
-export PATH=$PATH:$HOME/uapps/firefox
-export PATH=$PATH:/opt/cuda/bin
+export DOT_HOME=$HOME
+export DOT_APPS=$HOME/uapps
+export PATH=$PATH:$DOT_APPS
+export PATH=$PATH:$DOT_APPS/firefox
 
 export ANDROID_HOME=$HOME/uapps/Android/SDK
 export PATH=$PATH:$ANDROID_HOME

@@ -34,11 +34,10 @@ local function setup(dotvim)
 
     if IsWin() then
         vim.g.python3_host_prog = vim.env.DOT_APPS .. '/miniconda3/python.exe'
-        vim.g.node_host_prog = vim.env.DotVimLocal .. '/node_modules/neovim/bin/cli.js'
     else
-        vim.g.python3_host_prog = '/usr/bin/python3'
-        vim.g.node_host_prog = vim.env.DotVimLocal .. '/node_modules/neovim/bin/cli.js'
+        vim.g.python3_host_prog = vim.env.DOT_APPS .. '/miniconda3/bin/python'
     end
+    vim.g.node_host_prog = vim.env.DotVimLocal .. '/node_modules/neovim/bin/cli.js'
     vim.o.encoding = 'utf-8'
     vim.g.mapleader = ' '
     vim.keymap.set('n', ';', ':', { noremap = true })
