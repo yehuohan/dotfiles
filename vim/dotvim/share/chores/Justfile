@@ -25,8 +25,8 @@ export ANDROID_NDK_HOME := NDK_ROOT
 
 VCPKG_ROOT := env('VCPKG_ROOT', dir_home / 'vcpkg')
 VCPKG_TRIPLET := env('VCPKG_TRIPLET', 'x64-mingw-mix') # x64-windows-mix, arm64-android
-VCPKG_XSCRIPT := 'clear;x-script,bash {{dir_root}}/scripts/vcpkg_xscript.sh {url} {dst};x-block-origin'
-VCPKG_XSCRIPT := 'clear;x-script,cmd /k {{dir_root}}/scripts/vcpkg_xscript.bat {url} {dst};x-block-origin'
+VCPKG_XSCRIPT := '"clear;x-script,bash {{dir_root}}/scripts/vcpkg_xscript.sh {url} {dst};x-block-origin"'
+VCPKG_XSCRIPT := '"clear;x-script,cmd /k {{dir_root}}/scripts/vcpkg_xscript.bat {url} {dst};x-block-origin"'
 DEPS := 'vulkan-headers volk'
 DEPS_DIR := dir_root / 'deps'
 

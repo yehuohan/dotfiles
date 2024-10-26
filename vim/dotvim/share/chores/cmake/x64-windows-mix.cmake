@@ -1,5 +1,5 @@
 # x64-windows-mix
-# Usage: vcpkg install --triplet=x64-windows-mix --overlay-triplets=<directory/of/x64-windows-mix.cmake>
+# Usage: vcpkg install --triplet=x64-windows-mix --overlay-triplets=<path-of-x64-windows-mix.cmake>
 
 cmake_minimum_required(VERSION 3.5)
 
