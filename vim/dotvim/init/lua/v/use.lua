@@ -44,11 +44,7 @@ end
 
 local function use_load()
     if vim.fn.filereadable(use_file) == 1 then
-        use = vim.tbl_deep_extend(
-            'force',
-            use,
-            vim.json.decode(vim.fn.join(vim.fn.readfile(use_file)))
-        )
+        use = vim.tbl_deep_extend('force', use, vim.json.decode(vim.fn.join(vim.fn.readfile(use_file))))
     else
         use_save('onCR')
     end
