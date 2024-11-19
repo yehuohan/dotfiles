@@ -23,10 +23,10 @@ NDK_ABI := env('NDK_ABI', 'arm64-v8a')
 NDK_PLATFORM := env('NDK_PLATFORM', 'android-27')
 export ANDROID_NDK_HOME := NDK_ROOT
 
-VCPKG_ROOT := env('VCPKG_ROOT', dir_home / 'vcpkg')
-VCPKG_TRIPLET := env('VCPKG_TRIPLET', 'x64-mingw-mix') # x64-windows-mix, arm64-android
-VCPKG_XSCRIPT := '"clear;x-script,bash {{dir_root}}/scripts/vcpkg_xscript.sh {url} {dst};x-block-origin"'
-VCPKG_XSCRIPT := '"clear;x-script,cmd /k {{dir_root}}/scripts/vcpkg_xscript.bat {url} {dst};x-block-origin"'
+export VCPKG_ROOT := env('VCPKG_ROOT', dir_home / 'vcpkg')
+export VCPKG_TRIPLET := if os() == "windows" { 'x64-mingw-mix' } else { 'x64-linux-mix' } # x64-linux-mix, x64-windows-mix, arm64-android
+VCPKG_XSCRIPT := '"clear;x-script,bash ' + dir_root + '/scripts/vcpkg_xscript.sh {url} {dst};x-block-origin"'
+VCPKG_XSCRIPT := '"clear;x-script,cmd /k' + dir_root + '/scripts/vcpkg_xscript.bat {url} {dst};x-block-origin"'
 DEPS := 'vulkan-headers volk'
 DEPS_DIR := dir_root / 'deps'
 
@@ -73,12 +73,27 @@ agen:
         # -DVCPKG_MANIFEST_INSTALL=OFF \
         -S . -B {{dir_build}}
 
+tags:
+    cmake --build {{dir_build}} {{build_job}} --target tags
+    cmake --install {{dir_build}}
+
 deps:
+    # Update baseline: vcpkg x-update-baseline --add-initial-baseline
     vcpkg install {{DEPS}} --recurse --no-binarycaching \
         --triplet={{VCPKG_TRIPLET}} \
         --overlay-triplets={{dir_root}}/cmake \
         --x-install-root={{DEPS_DIR}} \
         --x-asset-sources={{VCPKG_XSCRIPT}}
+
+deps-repos:
+    # With branch or tag
+    -git clone --depth=1 -b <branch-or-tag-name> https://github.com/yehuohan/dotfiles.git {{DEPS_DIR}}/repos/dotfiles
+    # With commit-id
+    git clone --depth=1 https://github.com/yehuohan/dotfiles.git {{DEPS_DIR}}/repos/dotfiles
+    pushd {{DEPS_DIR}}/repos/dotfiles
+    git fetch --depth=1 origin <commit-id>
+    git checkout <commit-id>
+    popd
 
 clean:
     -rm -rf {{dir_build}}
@@ -95,10 +110,6 @@ copy:
     # or !powershell
     ls ./ | %{ echo $_.name }
     Get-ChildItem ./ | %{ echo $_.Name }
-
-tags:
-    cmake --build {{dir_build}} {{build_job}} --target tags
-    cmake --install {{dir_build}}
 
 latest_tag := `git describe --tags --abbrev=0`
 info tag=latest_tag:
