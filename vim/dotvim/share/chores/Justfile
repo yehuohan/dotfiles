@@ -7,6 +7,7 @@ set ignore-comments
 # dir_root := justfile_directory()
 dir_root := replace(justfile_directory(), '\', '/')
 dir_home := replace(env('DOT_APPS'), '\', '/')
+dir_this := `pwd` # shell('pwd')
 
 build_type := env('BUILD_TYPE', 'Debug')
 # build_type := env('BUILD_TYPE', 'RelWithDebInfo')

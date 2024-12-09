@@ -165,7 +165,7 @@ local function set_default_autocmds()
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { 'nlsp.json', '.nlsp.json', 'tasks.json', 'launch.json' }, command = 'setlocal filetype=jsonc' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.log' }, command = 'setlocal filetype=log' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.hlsl', '*.usf', '*.ush' }, command = 'setlocal filetype=hlsl' })
-    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.uproject', '*.uplugin' }, command = 'setlocal filetype=json' })
+    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.uproject', '*.uplugin', '*.gltf' }, command = 'setlocal filetype=json' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.wgsl' }, command = 'setlocal filetype=wgsl' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = {
             '*.vert', '*.tesc', '*.tese', '*.glsl', '*.geom', '*.frag', '*.comp',
