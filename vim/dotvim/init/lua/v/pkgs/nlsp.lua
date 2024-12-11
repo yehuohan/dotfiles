@@ -119,7 +119,7 @@ local kind_icons = {
     File          = { '󰈙', 'File' },
     Reference     = { '', 'Ref'  },
     Folder        = { '󰉋', 'Dir'  },
-    EnumMember    = { '', 'EnuM' },
+    EnumMember    = { '', 'EMem' },
     Constant      = { '', 'Cons' },
     Struct        = { '', 'Stru' },
     Event         = { '', 'Evnt' },
@@ -143,7 +143,7 @@ local kind_sources = {
 
 --- Format completion menu with (cmp.Entry, vim.CompletedItem)
 local function cmp_format(entry, citem)
-    local ico = kind_icons[citem.kind]
+    local ico = kind_icons[citem.kind] or { '?', vim.inspect(citem.kind) }
     local src = kind_sources[entry.source.name] or entry.source.name
     citem.kind = string.format(' %s', use.ui.icon and ico[1] or ico[2]:sub(1, 1))
     if string.len(citem.abbr) > 80 then
