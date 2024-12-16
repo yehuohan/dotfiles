@@ -65,6 +65,7 @@ agen:
         -DANDROID_PLATFORM={{NDK_PLATFORM}} \
         -DANDROID_TOOLCHAIN=clang \
         -DANDROID_STL=c++_static \
+        -DCMAKE_TOOLCHAIN_FILE={{NDK_ROOT}}/build/cmake/android.toolchain.cmake \
         # With vcpkg:
         # -DCMAKE_TOOLCHAIN_FILE={{VCPKG_ROOT}}/scripts/buildsystems/vcpkg.cmake \
         # -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE={{NDK_ROOT}}/build/cmake/android.toolchain.cmake \
