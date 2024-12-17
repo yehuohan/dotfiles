@@ -532,6 +532,8 @@ local function pkg_telescope()
             },
             frecency = {
                 db_root = vim.env.DotVimLocal,
+                db_safe_mode = false, -- `true` will break vim.ui.select
+                auto_validate = true,
                 sorter = require('telescope.config').values.file_sorter(),
             },
         },
