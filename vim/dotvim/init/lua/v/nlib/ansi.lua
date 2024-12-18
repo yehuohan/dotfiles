@@ -1,8 +1,12 @@
 --- CSI(Control Sequence Introducer) pattern
---- K: erase in line
+--- A: move cursor up
+--- B: move cursor down
+--- C: move cursor forward
+--- D: move cursor back
 --- H: set cursor position
+--- K: erase in line
 --- m: set SGR(Select Graphic Rendition)
-local CSI_PAT = '\x1b%[([%d:;<=>%?]*)([KHm])'
+local CSI_PAT = '\x1b%[([%d:;<=>%?]*)([CHKm])'
 
 --- Basic SGR color codes
 --- * bold = 1
@@ -149,12 +153,14 @@ local function new()
             end
 
             -- Process CSI code
-            if byte == 'K' then
+            if byte == 'C' then
+                local n = (args ~= '') and tonumber(args) or 1
+                bufs[srow] = (bufs[srow] or '') .. string.rep(' ', n)
+            elseif byte == 'K' then
                 -- n = 0: clear from cursor to end of line
                 -- n = 1: clear from cursor to begin of line
                 -- n = 2: clear entire line
-                -- local n = string.match(args, '(%d)K')
-                -- n = (n ~= '') and tonumber(n) or 0
+                -- local n = (args ~= '') and tonumber(args) or 0
                 erased_lines = erased_lines + 1
                 if bufs[srow] then
                     srow = srow + 1
