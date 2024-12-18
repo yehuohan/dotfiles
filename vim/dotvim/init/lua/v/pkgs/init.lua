@@ -878,6 +878,18 @@ local function pkg_peek()
     })
 end
 
+-- Typst
+local function pkg_typst()
+    local typst = require('typst-preview')
+    typst.setup({
+        dependencies_bin = {
+            tinymist = IsWin() and 'tinymist.cmd' or 'tinymist',
+            websocat = nil,
+        },
+    })
+    m.nnore({ '<leader>vt', ':TypstPreviewToggle<CR>' })
+end
+
 -- Latex
 local function pkg_tex()
     vim.g.vimtex_cache_root = vim.env.DotVimLocal .. '/.vimtex'
@@ -885,13 +897,11 @@ local function pkg_tex()
     vim.g.vimtex_complete_enabled = 1 -- 使用vimtex#complete#omnifunc补全
     vim.g.vimtex_complete_close_braces = 1
     vim.g.vimtex_compiler_method = 'latexmk'
-    m.nmap({ '<leader>at', '<Plug>(vimtex-toc-toggle)' })
+    m.nmap({ '<leader>va', '<Plug>(vimtex-view)' })
     m.nmap({ '<leader>ab', '<Plug>(vimtex-compile-ss)' })
     m.nmap({ '<leader>aB', '<Plug>(vimtex-compile)' })
-    m.nmap({ '<leader>as', '<Plug>(vimtex-stop)' })
-    m.nmap({ '<leader>ac', '<Plug>(vimtex-clean)' })
-    m.nmap({ '<leader>am', '<Plug>(vimtex-toggle-main)' })
-    m.nmap({ '<leader>av', '<Plug>(vimtex-view)' })
+    m.nmap({ '<leader>ak', '<Plug>(vimtex-stop)' })
+    m.nmap({ '<leader>aK', '<Plug>(vimtex-stop-all)' })
 end
 
 -- 颜色预览
@@ -1059,6 +1069,7 @@ local pkgs = {
         dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
     },
     { 'toppair/peek.nvim', config = pkg_peek, ft = 'markdown', build = 'deno task build:fast' },
+    { 'chomosuke/typst-preview.nvim', config = pkg_typst, ft = 'typst' },
     { 'lervag/vimtex', config = pkg_tex, ft = 'tex' },
     { 'uga-rosa/ccc.nvim', config = pkg_ccc, keys = { '<leader>tc', '<leader>lp' } },
     { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, keys = { { '<M-w>', mode = 'i' } } },

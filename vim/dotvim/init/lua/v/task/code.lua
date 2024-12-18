@@ -48,7 +48,7 @@ local codes = {
     go         = { cmd = 'go run {bsrc} {earg}' },
     javascript = { cmd = 'node {bsrc} {earg}' },
     typescript = { cmd = 'node {bsrc} {earg}' },
-    just       = { cmd = 'just -f {bsrc} {earg}', efm = [[\ %#-->\ %f:%l:%c]] },
+    just       = { cmd = 'just -f {bsrc} {earg}', efm = [[%Eerror:%m,%C %#%[%^ ]%# %#%f:%l:%c]] },
     make       = { cmd = 'make -f {bsrc} {earg}', efm = [[make:\ ***\ [%f:%l:\ %m]] },
     cmake      = { cmd = 'cmake {earg} -P {bsrc}', efm = [[CMake\ Error\ at\ %f:%l\ %#%m:]]
                                                       .. [[,\ \ %f:%l\ (%m)]] },
@@ -56,8 +56,9 @@ local codes = {
     ps1        = { cmd = 'Powershell -ExecutionPolicy Bypass -File {bsrc} {earg}' },
     dosbatch   = { cmd = '{bsrc} {earg}' },
     glsl       = { cmd = 'glslangValidator {earg} {bsrc}', efm = [[%+P%f,ERROR:\ %c:%l:\ %m,%-Q]] },
-    json       = { cmd = 'python -m json.tool {bsrc}' },
     html       = { cmd = 'firefox {bsrc}' },
+    json       = { cmd = 'python -m json.tool {bsrc}' },
+    typst      = { cmd = 'typst compile {bsrc} && sioyek "{bout}.pdf"', efm = [[%Eerror:%m,%C %#%[%^ ]%# %#%\%\%\%\?%\%\%f:%l:%c]]},
     tex        = { cmd = 'xelatex -file-line-error {bsrc} && sioyek "{bout}.pdf"', efm = [[%f:%l:\ %m]] },
 }
 -- stylua: ignore end

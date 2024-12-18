@@ -95,6 +95,12 @@ local function __servers()
             },
         })
     end
+    opts['tinymist'] = function()
+        lspconfig.tinymist.setup({
+            capabilities = capabilities,
+            single_file_support = true,
+        })
+    end
     require('mason-lspconfig').setup_handlers(opts)
 end
 

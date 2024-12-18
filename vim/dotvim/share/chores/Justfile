@@ -107,9 +107,10 @@ clean:
     Remove-Item {{dir_install}} -Recurse -Force
 
 [windows]
-copy:
+copy src='abc,xyz':
     #!pwsh
     # or !powershell
+    '{{src}}'.split(',') | %{ echo $_}
     ls ./ | %{ echo $_.name }
     Get-ChildItem ./ | %{ echo $_.Name }
 
