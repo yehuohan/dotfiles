@@ -73,14 +73,22 @@ local function next_csi(str, pat)
 end
 
 --- Generate highlight from SGR
-local function sgr2hl(args)
+local function sgr2hl(curhl, args)
     if args == '' or args == '0' then
         return nil
     end
 
+    -- Get color code
+    local c = args:match('38;5;(%d*)')
+    if c then
+        local n = tonumber(c)
+        c = n <= 7 and tostring(30 + n) or tostring(90 + n - 8)
+    else
+        c = args
+    end
+
     -- Only support simple foreground color
-    local hl
-    local c = args
+    local hl = nil
     if CSI_SGR.colors[c] then
         if CSI_SGR.hls[c] then
             hl = CSI_SGR.hls[c]
@@ -91,7 +99,7 @@ local function sgr2hl(args)
             CSI_SGR.hls[c] = hl
         end
     end
-    return hl
+    return hl or curhl
 end
 
 local function new()
@@ -139,9 +147,9 @@ local function new()
                     local ce = cs + string.len(trimed) -- col_end
                     if hlgrp then
                         s_hl[#s_hl + 1] = { hlgrp, srow, cs, ce }
-                    end
-                    if verb_h then
-                        trimed = trimed .. ('<%d,%d,%d>'):format(srow, cs, ce)
+                        if verb_h then
+                            trimed = trimed .. ('<%d,%d,%d>'):format(srow, cs, ce)
+                        end
                     end
                     bufs[srow] = s_line .. trimed
                     hlts[srow] = s_hl
@@ -167,7 +175,7 @@ local function new()
                     bufs[srow] = verb_n and ('K%d>'):format(srow)
                 end
             elseif byte == 'H' then
-                local cur_row, cur_col = string.match(args, '(%d*);?(%d*)')
+                local cur_row, cur_col = args:match('(%d*);?(%d*)')
                 cur_row = (cur_row ~= '') and tonumber(cur_row) or 1
                 cur_col = (cur_col ~= '') and tonumber(cur_col) or 1
                 cur_col = cur_col - 1 -- The cursor cell will also be filled with the inputs
@@ -193,7 +201,7 @@ local function new()
                     bufs[srow] = string.rep(verb_n and '%' or ' ', cur_col)
                 end
             elseif byte == 'm' then
-                hlgrp = sgr2hl(args)
+                hlgrp = sgr2hl(hlgrp, args)
             end
         end
 
