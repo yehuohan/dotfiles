@@ -204,7 +204,7 @@ local function pkg_alpha()
             { type = 'padding', val = 1 },
             {
                 type = 'group',
-                val = function() return { tpl.mru(0, false, 8) } end,
+                val = function() return { tpl.mru(0, nil, 8) } end,
             },
         },
     }
@@ -236,12 +236,14 @@ end
 -- 消息提示
 local function pkg_notify()
     require('notify').setup({
-        max_width = function() return math.floor(vim.api.nvim_get_option('columns') * 0.7) end,
+        max_width = function()
+            return math.floor(vim.api.nvim_get_option_value('columns', { scope = 'global' }) * 0.7)
+        end,
         minimum_width = 30,
         top_down = false,
     })
     vim.notify = require('notify')
-    m.nnore({ '<leader>dm', function() vim.notify.dismiss() end })
+    m.nnore({ '<leader>dm', function() vim.notify.dismiss({ pending = true, silent = true }) end })
 end
 
 -- 系统消息提示
@@ -1080,7 +1082,7 @@ local pkgs = {
 
 local function clone_lazy(url, bundle)
     local lazygit = bundle .. '/lazy.nvim'
-    if not vim.loop.fs_stat(lazygit) then
+    if not vim.uv.fs_stat(lazygit) then
         vim.api.nvim_echo({ { 'Clone lazy.nvim ...', 'WarningMsg' } }, false, {})
         vim.fn.system({
             'git',

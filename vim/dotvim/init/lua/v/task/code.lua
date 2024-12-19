@@ -38,16 +38,17 @@ local codes = {
     cpp        = { cmd = 'g++ -g -std=c++20 {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
     rust       = { cmd = IsWin() and 'rustc {barg} {bsrc} -o "{bout}.exe" && "./{bout}" {earg}'
                                   or 'rustc {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
-                   efm = [[%Eerror:%m,%C %#%[%^ ]%# %#%f:%l:%c]] },
-    python     = { cmd = 'python {bsrc} {earg}', efm = [[%*\sFile \"%f\"\, line %l\, %m]]
-                                                    .. [[,%*\sFile \"%f\"\, line %l]] },
+                   efm = [[%Eerror:%m,%C %#%[%^ ]%# %#%f:%l:%c %#,]]
+                      .. [[%Wwarning:%m,%C %#%[%^ ]%# %#%f:%l:%c %#]] },
+    python     = { cmd = 'python {bsrc} {earg}', efm = [[%*\sFile \"%f\"\, line %l\, %m,]]
+                                                    .. [[%*\sFile \"%f\"\, line %l]] },
     lua        = { cmd = 'lua {bsrc} {earg}', efm = [[%.%#: %f:%l: %m, %#%f:%l: %m]] },
     java       = { cmd = 'javac {barg} {bsrc} && java "{bout}" {earg}' },
     julia      = { cmd = 'julia {bsrc} {earg}' },
     go         = { cmd = 'go run {bsrc} {earg}' },
     javascript = { cmd = 'node {bsrc} {earg}' },
     typescript = { cmd = 'node {bsrc} {earg}' },
-    just       = { cmd = 'just -f {bsrc} {earg}', efm = [[%Eerror:%m,%C %#%[%^ ]%# %#%f:%l:%c]] },
+    just       = { cmd = 'just -f {bsrc} {earg}', efm = [[%Eerror:%m,%C %#%[%^ ]%# %#%f:%l:%c %#]] },
     make       = { cmd = 'make -f {bsrc} {earg}', efm = [[make: *** [%f:%l:%m] Error %n]] },
     cmake      = { cmd = 'cmake {earg} -P {bsrc}', efm = [[%ECMake Error at %f:%l:,%Z%m]] },
     sh         = { cmd = 'bash ./{bsrc} {earg}' },
@@ -56,7 +57,7 @@ local codes = {
     glsl       = { cmd = 'glslangValidator {earg} {bsrc}', efm = [[%+P%f,ERROR: %c:%l: %m,%-Q]] },
     html       = { cmd = 'firefox {bsrc}' },
     json       = { cmd = 'python -m json.tool {bsrc}' },
-    typst      = { cmd = 'typst compile {bsrc} && sioyek "{bout}.pdf"', efm = [[%Eerror:%m,%C %#%[%^ ]%# %#%\%\%\%\?%\%\%f:%l:%c]]},
+    typst      = { cmd = 'typst compile {bsrc} && sioyek "{bout}.pdf"', efm = [[%Eerror:%m,%C %#%[%^ ]%# %#%\%\%\%\?%\%\%f:%l:%c %#]]},
     tex        = { cmd = 'xelatex -file-line-error {bsrc} && sioyek "{bout}.pdf"', efm = [[%f:%l: %m]] },
 }
 -- stylua: ignore end

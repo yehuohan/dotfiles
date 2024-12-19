@@ -131,9 +131,9 @@ local function setup_quickfix()
                     vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| {{{ / conceal]] } })
                     vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| }}} / conceal]] } })
                 end)
-                vim.api.nvim_win_set_option(qf.winid, 'number', false)
-                vim.api.nvim_win_set_option(qf.winid, 'relativenumber', false)
-                vim.api.nvim_win_set_option(qf.winid, 'signcolumn', 'no')
+                vim.api.nvim_set_option_value('number', false, { win = qf.winid })
+                vim.api.nvim_set_option_value('relativenumber', false, { win = qf.winid })
+                vim.api.nvim_set_option_value('signcolumn', 'no', { win = qf.winid })
             end
         end,
     })

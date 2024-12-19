@@ -168,8 +168,8 @@ function qf.on_complete(task, status, result, cpt, params)
 
     -- Setup fold
     if qf.hwin then
-        vim.api.nvim_win_set_option(qf.hwin, 'foldmethod', 'marker')
-        vim.api.nvim_win_set_option(qf.hwin, 'foldmarker', '{{{,}}}')
+        vim.api.nvim_set_option_value('foldmethod', 'marker', { win = qf.hwin })
+        vim.api.nvim_set_option_value('foldmarker', '{{{,}}}', { win = qf.hwin })
         vim.fn.win_execute(qf.hwin, 'silent! normal! zO')
     end
     qf.task = nil
@@ -226,9 +226,9 @@ function term.redir(task, pin)
         vim.cmd.wincmd('p')
     end
     vim.api.nvim_win_set_buf(hwin, task:get_bufnr())
-    vim.api.nvim_win_set_option(hwin, 'number', false)
-    vim.api.nvim_win_set_option(hwin, 'relativenumber', false)
-    vim.api.nvim_win_set_option(hwin, 'signcolumn', 'no')
+    vim.api.nvim_set_option_value('number', false, { win = hwin })
+    vim.api.nvim_set_option_value('relativenumber', false, { win = hwin })
+    vim.api.nvim_set_option_value('signcolumn', 'no', { win = hwin })
 end
 
 function term.on_complete(task, status, result)
