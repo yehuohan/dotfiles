@@ -100,6 +100,10 @@ local function __servers()
         lspconfig.tinymist.setup({
             capabilities = capabilities,
             single_file_support = true,
+            offset_encoding = 'utf-8',
+            settings = {
+                formatterMode = 'typstfmt',
+            },
         })
     end
     require('mason-lspconfig').setup_handlers(opts)
