@@ -13,7 +13,7 @@ local M = {}
 --- @field tout(TaskOutputConfig)
 
 --- @class TaskOutputConfig
---- @field efm(string)
+--- @field efm(string|nil)
 --- @field open(boolean)
 --- @field jump(boolean)
 --- @field scroll(boolean)
@@ -51,19 +51,9 @@ function M.run(cfg)
     else
         opts.strategy = 'terminal'
     end
+    cfg.tout[1] = 'on_task_output'
     opts.components = {
-        {
-            'on_task_output',
-            errorformat = cfg.tout.efm,
-            open = cfg.tout.open,
-            jump = cfg.tout.jump,
-            scroll = cfg.tout.scroll,
-            append = cfg.tout.append,
-            title = cfg.tout.title,
-            style = cfg.tout.style,
-            encoding = cfg.tout.encoding,
-            verbose = cfg.tout.verbose,
-        },
+        cfg.tout,
         'display_duration',
         'on_output_summarize',
         'on_exit_set_status',
@@ -88,6 +78,7 @@ function M.cmd(cmd, bang)
             append = false,
             title = M.title.Task,
             style = 'term',
+            encoding = '',
             verbose = bang and 'a',
         },
     }

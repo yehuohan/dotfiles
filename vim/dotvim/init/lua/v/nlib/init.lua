@@ -16,22 +16,23 @@ local M = {}
 ---         },
 ---     },
 --- }
---- @alias Configer table An useful configer with saveable options
+--- @alias Configer table An useful configer with savable options
 --- @alias ConfigerMethod table Configer's methods
---- @alias ConfigerSaveable table Configer's saveable options
---- @alias ConfigerNonSaveable table Configer's non-saveable options
+--- @alias ConfigerSaveable table Configer's savable options without `ConfigerMethod`
+--- @alias ConfigerNonSaveable table Configer's non-savable options
 
 --- Create a configer
 --- Configer need metatable for internal usage, so metatable from `opts` will be droped
 --- @param opts(table) Savable options of configer
---- @return Configer
+--- @return Configer opts with `ConfigerMethod` is called `Configer`
 function M.new_configer(opts)
     if type(opts) ~= 'table' then
-        error('Initial saveable options shoule be a table')
+        error('Initial savable options shoule be a table')
     end
     local copy_opts = M.u.deepcopy(opts)
 
-    --- Create non-saveable options for each sub-tables
+    --- Create non-savable options for each sub-tables
+    --- @param init_opts(table) Savable options of configer
     --- @param nsc(ConfigerNonSaveable)
     local function sub_non_savable_config(nsc, init_opts)
         for ik, iv in pairs(init_opts) do
@@ -42,10 +43,10 @@ function M.new_configer(opts)
                 local B = {}
                 B.__index = function(t, k) return rawget(t, k) or nsc[ik][k] end
                 B.__newindex = function(t, k, v)
-                    if (type(k) == 'number') and (1 <= k) and (k <= #t + 1) then
-                        rawset(t, k, v)
-                    else
+                    if rawget(t, k) == nil then
                         nsc[ik][k] = v
+                    else
+                        rawset(t, k, v)
                     end
                 end
                 setmetatable(init_opts[ik], B)
@@ -53,7 +54,8 @@ function M.new_configer(opts)
         end
     end
 
-    --- Create non-saveable options
+    --- Create non-savable options
+    --- @param init_opts(table) Savable options of configer
     --- @return ConfigerNonSaveable
     local function non_savable_config(init_opts)
         local nsc = {}
@@ -92,6 +94,7 @@ function M.new_configer(opts)
     --- * The initial options will be repleaced with reinit_opts;
     --- * All savable options will be cleared first, then reinited with reinit_opts;
     --- * All non-savable options will be cleared.
+    --- @param reinit_opts(table|nil) New savable options of configer
     function C:reinit(reinit_opts)
         if reinit_opts then
             copy_opts = M.u.deepcopy(reinit_opts)

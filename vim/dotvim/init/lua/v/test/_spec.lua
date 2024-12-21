@@ -126,13 +126,15 @@ describe('nlib', function()
                 EQ({
                     cmd = 'gcc',
                     file = 'foo.c',
-                    args = { '-a', '-b', num = 2, ARGS = { '-A', '-B', CNT = 2 } },
+                    args = { '-a', num = 2, ARGS = { '-A', CNT = 2 } },
                 }, cfg)
                 EQ({
+                    [2] = '-b',
                     [5] = '-c',
                     [ab2] = 'ab2',
                     inp = 'src',
                     ARGS = {
+                        [2] = '-B',
                         [5] = '-C',
                         [AB2] = 'AB2',
                         OUT = 'BIN',

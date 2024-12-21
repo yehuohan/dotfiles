@@ -148,7 +148,7 @@ function qf.on_complete(task, status, result, cpt, params)
     local lines, highlights = cpt.chanor()
 
     qf.get()
-    qf.display(lines, highlights, params.errorformat, encoding)
+    qf.display(lines, highlights, params.efm, encoding)
 
     -- Add tail message
     local msg = string.format('}}} [%s] %s in %ds', os.date('%H:%M:%S'), status, dt)
@@ -184,7 +184,7 @@ function qf.on_output(task, data, cpt, params)
 
     local lines, highlights = cpt.chanor(data)
     qf.get()
-    qf.display(lines, highlights, params.errorformat, encoding)
+    qf.display(lines, highlights, params.efm, encoding)
     if params.scroll then
         qf.scroll(#lines)
     end
@@ -252,7 +252,7 @@ end
 local M = {
     desc = 'Sync task output into the quickfix(default) or terminal',
     params = {
-        errorformat = {
+        efm = {
             desc = 'See :help errorformat',
             type = 'string',
             optional = true,
