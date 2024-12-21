@@ -52,6 +52,7 @@ local CSI_SGR = {
 }
 
 local function trim(str)
+    -- Complete CSI: '\x1b%[[\x30-\x3f]*[\x20-\x2f]*[\x40-\x7e]'
     return str
         :gsub('\x1b%].*[\x07\x9c]', '') -- Remove all OSC code
         :gsub('\x1b%[[%d:;<=>%?]*[a-zA-Z]', '') -- Remove all CSI code
@@ -95,6 +96,7 @@ local function new_sgr()
         italic = false,
         underline = false,
         strikethrough = false,
+        reverse = false,
     }
     local sgr = { hl = nil }
 
@@ -107,6 +109,7 @@ local function new_sgr()
             opts.italic = false
             opts.underline = false
             opts.strikethrough = false
+            opts.reverse = false
             return
         end
         if args == '1' then
@@ -125,6 +128,10 @@ local function new_sgr()
             opts.strikethrough = true
         elseif args == '29' then
             opts.strikethrough = false
+        elseif args == '7' then
+            opts.reverse = true
+        elseif args == '27' then
+            opts.reverse = false
         end
 
         -- Get foreground color code
@@ -161,6 +168,7 @@ local function new_sgr()
             .. (opts.italic and '1' or '0')
             .. (opts.underline and '1' or '0')
             .. (opts.strikethrough and '1' or '0')
+            .. (opts.reverse and '1' or '0')
         if CSI_SGR.hls[key] then
             sgr.hl = CSI_SGR.hls[key]
         else
