@@ -719,7 +719,10 @@ local function pkg_conform()
             cpp = { 'clang_format' },
             rust = { 'rustfmt' },
             python = { 'ruff_format' },
-            typst = { 'typstfmt' },
+            typst = { 'typstyle' },
+        },
+        default_format_opts = {
+            lsp_format = 'fallback',
         },
     })
     m.nore({ '<leader>fo', conform.format })

@@ -101,9 +101,7 @@ local function __servers()
             capabilities = capabilities,
             single_file_support = true,
             offset_encoding = 'utf-8',
-            settings = {
-                formatterMode = 'typstfmt',
-            },
+            settings = { formatterMode = 'typstyle' },
         })
     end
     require('mason-lspconfig').setup_handlers(opts)
@@ -425,7 +423,7 @@ local function __lsp_mappings()
     m.nnore({ '<leader>gs', '<Cmd>Lspsaga finder<CR>' })
     m.nnore({ '<leader>go', '<Cmd>Lspsaga outline<CR>' })
 
-    m.nore({ '<leader>of', vim.lsp.buf.format }) -- Terrible format experience form lsp
+    m.nore({ '<leader>of', vim.lsp.buf.format })
     m.nnore({ '<leader>od', vim.diagnostic.setloclist })
     m.nnore({
         '<leader>oD',
