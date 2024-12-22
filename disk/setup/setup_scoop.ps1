@@ -59,6 +59,6 @@ scoop install renderdoc shadered
 scoop install cuda11.1 # Prefer conda install cudatoolkit cudnn
 scoop install llvm portable-virtualbox
 
-scoop install typst notepadnext honeyview potplayer
-scoop install draw.io wpsoffice sioyek
+scoop install notepadnext typst draw.io wpsoffice
+scoop install honeyview potplayer sioyek
 scoop shim add sioyek $env:DOT_APPS/_packs/apps/sioyek/current/sioyek.exe
