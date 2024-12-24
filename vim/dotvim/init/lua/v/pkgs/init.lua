@@ -1047,6 +1047,7 @@ local pkgs = {
             'dmitmel/cmp-cmdline-history',
             'kdheepak/cmp-latex-symbols',
             'f3fora/cmp-spell',
+            'zjp-CN/nvim-cmp-lsp-rs',
             'nvim-lua/plenary.nvim',
         },
     },

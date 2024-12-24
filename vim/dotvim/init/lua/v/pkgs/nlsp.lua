@@ -191,6 +191,7 @@ end
 --- Setup completion framework
 local function __completion()
     local cmp = require('cmp')
+    local cmp_lsp_rs = require('cmp_lsp_rs')
     local compare = cmp.config.compare
     local opts_snip = { config = { sources = { { name = 'luasnip' } } } }
     local opts_cmdh = { config = { sources = { { name = 'cmdline_history' } } } }
@@ -262,26 +263,14 @@ local function __completion()
             format = cmp_format,
         },
     })
-    cmp.setup.filetype({ 'c', 'cpp' }, {
+    cmp.setup.filetype('rust', {
         sorting = {
             comparators = {
                 compare.offset,
                 compare.exact,
-                function(entry1, entry2)
-                    local ea = entry1.completion_item.label
-                    local eb = entry2.completion_item.label
-                    local la = ea:gsub('%(.*%)', ''):gsub('<.*>', ''):gsub('_', ''):len()
-                    local lb = eb:gsub('%(.*%)', ''):gsub('<.*>', ''):gsub('_', ''):len()
-                    if la ~= lb then
-                        return la - lb < 0
-                    end
-                end,
                 compare.score,
-                compare.recently_used,
-                compare.locality,
-                compare.kind,
-                compare.length,
-                compare.order,
+                cmp_lsp_rs.comparators.inscope_inherent_import,
+                cmp_lsp_rs.comparators.sort_by_label_but_underscore_last,
             },
         },
     })
