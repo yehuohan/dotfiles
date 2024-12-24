@@ -38,8 +38,9 @@ local codes = {
     cpp        = { cmd = 'g++ -g -std=c++20 {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
     rust       = { cmd = IsWin() and 'rustc {barg} {bsrc} -o "{bout}.exe" && "./{bout}" {earg}'
                                   or 'rustc {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
-                   efm = [[%Eerror:%m,%C %#%[%^ ]%# %#%f:%l:%c %#,]]
-                      .. [[%Wwarning:%m,%C %#%[%^ ]%# %#%f:%l:%c %#]] },
+                   efm = { [[%Eerror:%m,%C %#%[%^ ]%# %#%f:%l:%c %#,]]
+                        .. [[%Wwarning:%m,%C %#%[%^ ]%# %#%f:%l:%c %#]],
+                           [[ %#%[%^ ]%# %#%f:%l:%c %#]] }},
     python     = { cmd = 'python {bsrc} {earg}', efm = [[%*\sFile \"%f\"\, line %l\, %m,]]
                                                     .. [[%*\sFile \"%f\"\, line %l]] },
     lua        = { cmd = 'lua {bsrc} {earg}', efm = [[%.%#: %f:%l: %m, %#%f:%l: %m]] },
@@ -48,7 +49,9 @@ local codes = {
     go         = { cmd = 'go run {bsrc} {earg}' },
     javascript = { cmd = 'node {bsrc} {earg}' },
     typescript = { cmd = 'node {bsrc} {earg}' },
-    just       = { cmd = 'just -f {bsrc} {earg}', efm = [[%Eerror:%m,%C %#%[%^ ]%# %#%f:%l:%c %#]] },
+    just       = { cmd = 'just -f {bsrc} {earg}',
+                   efm = { [[%Eerror:%m,%C %#%[%^ ]%# %#%f:%l:%c %#]],
+                           [[ %#%[%^ ]%# %#%f:%l:%c %#]] }},
     make       = { cmd = 'make -f {bsrc} {earg}', efm = [[make: *** [%f:%l:%m] Error %n]] },
     cmake      = { cmd = 'cmake {earg} -P {bsrc}', efm = [[%ECMake Error at %f:%l:,%Z%m]] },
     sh         = { cmd = 'bash ./{bsrc} {earg}' },
@@ -57,7 +60,9 @@ local codes = {
     glsl       = { cmd = 'glslangValidator {earg} {bsrc}', efm = [[%+P%f,ERROR: %c:%l: %m,%-Q]] },
     html       = { cmd = 'firefox {bsrc}' },
     json       = { cmd = 'python -m json.tool {bsrc}' },
-    typst      = { cmd = 'typst compile {bsrc} && sioyek "{bout}.pdf"', efm = [[%Eerror:%m,%C %#%[%^ ]%# %#%\%\%\%\?%\%\%f:%l:%c %#]]},
+    typst      = { cmd = 'typst compile {bsrc} && sioyek "{bout}.pdf"',
+                   efm = { [[%Eerror:%m,%C %#%[%^ ]%# %#%\%\%\%\?%\%\%f:%l:%c %#]],
+                           [[ %#%[%^ ]%# %#%\%\%\%\?%\%\%f:%l:%c %#]] }},
     tex        = { cmd = 'xelatex -file-line-error {bsrc} && sioyek "{bout}.pdf"', efm = [[%f:%l: %m]] },
 }
 -- stylua: ignore end
@@ -138,7 +143,10 @@ function _hdls.file(cfg)
 end
 
 function _hdls.just(cfg)
-    cfg.tout.efm = codes.just.efm .. ',' .. codes.cmake.efm .. ',' .. vim.o.errorformat
+    cfg.tout.efm = {
+        codes.just.efm[1] .. ',' .. codes.cmake.efm .. ',' .. vim.o.errorformat,
+        codes.just.efm[2] .. ',' .. codes.cmake.efm .. ',' .. vim.o.errorformat,
+    }
 
     local rep = {}
     rep.barg = cfg.barg
@@ -291,17 +299,15 @@ local _sels = {
         earg = vim.empty_dict(),
         msvc = vim.empty_dict(),
         outer = vim.empty_dict(),
-        style = { lst = { 'term', 'ansi', 'raw', 'job' } },
+        style = { lst = { 'term', 'ansi', 'job' } },
         encoding = { lst = { 'utf-8', 'cp936' } },
         verbose = {
-            lst = { 'a', 'w', 'b', 't', 'h', 'n' },
+            lst = { 'a', 'w', 'r', 'h', 'd' },
             dic = {
                 a = 'Show all',
                 w = 'Show code wsc',
-                b = 'Show bufs',
-                t = 'Show without trimed',
                 h = 'Show highlights',
-                n = 'Show line number',
+                d = 'Show debug',
             },
         },
     },

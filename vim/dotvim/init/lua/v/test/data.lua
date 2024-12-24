@@ -1,19 +1,16 @@
 -- stylua: ignore start
 return {
-    {
-        {
-            '\27[2J\27[1m\27[93m\27[49m\27[Hwarning\27]0;C:\\Windows\\SYSTEM32\\cmd.exe\a\27[?25h\27[25l\27[m\27[1m\27[93m\27[Hwarning\27[97m: unused variable: `args`\27[m\27[52X\r',
-            ' \27[1m\27[96m--> \27[mtest.rs:3:9\27[68X\r',
-            '  \27[1m\27[96m|\27[m\27[81X\27[1m\27[96m\r',
-            '3\27[m \27[1m\27[96m|\27[m     let args = std::env::args();\27[48X\r',
-            '  \27[1m\27[96m| \27[m        \27[1m\27[93m^^^^\27[m \27[1m\27[93mhelp: if this is intentional, prefix it with an underscore: `_args`\27[m\r',
-            '  \27[1m\27[96m|\27[m\27[81X\r',
-            '  \27[1m\27[96m= \27[97mnote\27[m: `#[warn(unused_variables)]` on by default\27[33X\27[9;1H\27[?25h'
-        },
-        { '\27[1m\27[93mwarning' },
-        { '\27[25l\27[m\27[1m\27[97m: 1 warning emitted\27[11;1H\27[?25h' },
-        { '\27[mHello Rust\r', '' },
-        { '' },
+    ['test.rs'] = {
+        [=[[?25l[2J[m[38;5;11m[1m[Hwarning[38;5;15m: unused variable: `args`[m]=] .. '\r',
+        [=[[38;5;14m[1m[1C-->[m[1Ctest.rs:3:9]=] .. '\r',
+        [=[[38;5;14m[1m[2C|]=] .. '\r',
+        [=[3[m[38;5;14m[1m[1C|[m     let args = std::env::args();]=] .. '\r',
+        [=[[38;5;14m[1m[2C|[m[1C[38;5;11m[1m[8C^^^^[m[38;5;11m[1m[1Chelp: if this is intentional, prefix it with an underscore: `_args`[m]=] .. '\r',
+        [=[[38;5;14m[1m[2C|[m]=] .. '\r',
+        [=[[38;5;14m[1m[2C=[38;5;15m[1Cnote[m: `#[warn(unused_variables)]` on by default[9;1H]0;C:\Windows\SYSTEM32\cmd.exe[?25h[?25l[38;5;11m[1mwarning[38;5;15m: 1 warning emitted[11;1H[?25h]=],
+        [=[[m]=],
+        [=[Hello Rust]=] .. '\r',
+        [=['']=],
     },
 }
 -- stylua: ignore end

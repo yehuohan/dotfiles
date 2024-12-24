@@ -129,24 +129,18 @@ function M.new_chanor(opts)
     local verbose = opts and opts.verbose or ''
 
     local ansi = require('v.nlib.ansi').new()
-    local out_idx = 1
+    local buf_idx = 1
     local pending = ''
 
-    --- Process raw data stream
-    --- @param str(string) String to be processed
-    --- @param is_pending(boolean|nil) Is str a pending string or not
+    --- Process one raw line string of data stream
+    --- @param linestr(string) String to be processed
     --- @return string|nil Pending string that can't be break into multi-lines
-    local function process_lines(str, is_pending)
-        str = str:gsub('\r', '') -- Remove ^M
+    local function process_linestr(linestr)
         if style == 'ansi' then
-            return ansi.feed(str, is_pending, verbose)
+            ansi.feed(linestr, verbose)
         else
             local bufs = ansi.bufs()
-            if not is_pending then
-                bufs[#bufs + 1] = str
-            else
-                return str
-            end
+            bufs[#bufs + 1] = { linestr:gsub('\r', '') } -- Remove ^M
         end
     end
 
@@ -156,51 +150,43 @@ function M.new_chanor(opts)
     --- @return table highlights Processed highlights for lines
     return function(data)
         local bufs = ansi.bufs()
-        local hlts = ansi.hlts()
 
         -- Process raw data into lines according to ':h channel-lines'
         local eof = (not data) or (#data == 1 and data[1] == '')
-        local end_idx = #bufs
         if eof then
             if pending ~= '' then
-                process_lines(pending)
+                process_linestr(pending)
                 pending = ''
-                end_idx = #bufs
             end
         elseif data then
             local num = #data
-            pending = pending .. data[1]
-            local rest = process_lines(pending, num == 1)
-            pending = rest or ''
+            process_linestr(pending .. data[1])
+            pending = ''
             for k = 2, num - 1, 1 do
-                process_lines(data[k])
+                process_linestr(data[k])
             end
             if num >= 2 then
                 pending = data[num]
             end
-            end_idx = #bufs - 1
         end
 
         -- Copy returned lines and highlights
         local lines = {}
         local highlights = {}
-        for k = out_idx, end_idx, 1 do
+        for k = buf_idx, #bufs, 1 do
             if bufs[k] then
-                lines[#lines + 1] = bufs[k]
+                lines[#lines + 1] = bufs[k][1]
+                if style == 'ansi' then
+                    highlights[#highlights + 1] = bufs[k][2]
+                end
             end
-            if hlts[k] and style == 'ansi' then
-                highlights[#highlights + 1] = hlts[k]
-            end
-            out_idx = out_idx + 1
+            buf_idx = buf_idx + 1
         end
 
         -- Reset locals
         if not data then
-            if verbose:match('[ab]') then
-                vim.notify(('num = %d\n%s'):format(#bufs, vim.inspect(bufs)))
-            end
-            ansi.reset()
-            out_idx = 1
+            ansi = require('v.nlib.ansi').new()
+            buf_idx = 1
             pending = ''
         end
 

@@ -247,7 +247,6 @@ end
 --- For params.style:
 ---     'term' : termopen + terminal
 ---     'ansi' : termopen + quickfix with highlighted ANSI
----     'raw'  : termopen + quickfix with raw ANSI
 ---     'job'  : jobstart + quickfix
 local M = {
     desc = 'Sync task output into the quickfix(default) or terminal',
@@ -284,7 +283,7 @@ local M = {
             default = 'v.task.tout',
         },
         style = {
-            desc = 'Choose the display style {term, ansi, raw, job}',
+            desc = 'Choose the display style {term, ansi, job}',
             type = 'string',
             default = 'ansi',
         },
@@ -314,6 +313,14 @@ function M.constructor(params)
             style = params.style,
             verbose = params.verbose,
         })
+        -- Resolve errorformat for 'ansi' style to make one quickfix item only take one buffer line
+        if type(params.efm) == 'table' then
+            if #params.efm > 1 and params.style == 'ansi' then
+                params.efm = params.efm[2]
+            else
+                params.efm = params.efm[1]
+            end
+        end
     end
 
     cpt.on_start = function(self, task)

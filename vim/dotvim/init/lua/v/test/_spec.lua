@@ -169,23 +169,21 @@ describe('nlib', function()
 
     -- nlib.new_chanor
     it('. new_chanor', function()
+        vim.o.columns = 200
+        vim.o.lines = 50
         local data = require('v.test.data')
         local chanor = nlib.new_chanor({ style = 'ansi' })
-        local lines = {}
-        local hls = {}
-        for _, d in ipairs(data[1]) do
-            local chunk, hl = chanor(d)
-            vim.list_extend(lines, chunk)
-            vim.list_extend(hls, hl or {})
-        end
+        local lines, hls = chanor(data['test.rs'])
         EQ([[warning: unused variable: `args`]], lines[1])
-        EQ(unpack({ 1, 0, 7 }), unpack(hls[1][2], 2, 4))
-        EQ(unpack({ 1, 7, 7 + 25 }), unpack(hls[1][3], 2, 4))
+        EQ(unpack({ 1, 0, 7 }), unpack(hls[1][1], 2, 4))
+        EQ(unpack({ 1, 7, 7 + 25 }), unpack(hls[1][1], 2, 4))
         EQ([[3 |     let args = std::env::args();]], lines[4])
         EQ(unpack({ 4, 0, 1 }), unpack(hls[4][1], 2, 4))
         EQ(unpack({ 4, 2, 3 }), unpack(hls[4][2], 2, 4))
         EQ('', lines[8])
+        EQ(0, #hls[8])
         EQ('', lines[10])
+        EQ(0, #hls[10])
         EQ('Hello Rust', lines[#lines])
         -- for _, line in ipairs(lines) do
         --     vim.print(vim.inspect(line))

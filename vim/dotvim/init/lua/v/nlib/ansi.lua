@@ -52,10 +52,10 @@ local CSI_SGR = {
 }
 
 local function trim(str)
-    -- Complete CSI: '\x1b%[[\x30-\x3f]*[\x20-\x2f]*[\x40-\x7e]'
     return str
+        :gsub('\r', '') -- Remove ^M
         :gsub('\x1b%].*[\x07\x9c]', '') -- Remove all OSC code
-        :gsub('\x1b%[[%d:;<=>%?]*[a-zA-Z]', '') -- Remove all CSI code
+        :gsub('\x1b%[[\x30-\x3f]*[\x20-\x2f]*[\x40-\x7e]', '') -- Remove all CSI code
 end
 
 --- Generate next line that ends with a CSI code
@@ -88,6 +88,29 @@ local function next_csi(str, pat)
     end
 end
 
+--- Generate next line that ends with '\r'
+--- @param str(string)
+--- @yield line(string) The matched line ends with '\r'
+local function next_cr(str)
+    local ci = 1
+
+    return function()
+        if ci < 0 then
+            return nil
+        end
+        local si, ei = string.find(str, '[^\r]*\r', ci)
+        if si then
+            local line = string.sub(str, ci, ei)
+            ci = ei + 1
+            return line
+        else
+            local line = string.sub(str, ci)
+            ci = -1
+            return line
+        end
+    end
+end
+
 local function new_sgr()
     local opts = {
         fg = nil,
@@ -114,7 +137,7 @@ local function new_sgr()
         end
         if args == '1' then
             opts.bold = true
-        elseif args == '21' then
+        elseif args == '21' or args == '22' then
             opts.bold = false
         elseif args == '3' then
             opts.italic = true
@@ -183,114 +206,117 @@ end
 
 local function new()
     local bufs = {} -- Processed buffer lines
-    local hlts = {} -- Processed highlights
-    local srow = 1 -- Cursor position row
-    -- local scol = 1 -- Cursor position col
-    local erased_lines = 0 -- Erased lines should be displayed too
+    local bufc = { '', {} } -- Processed buffer cache lines
+    local bot = 1 -- The bottom buffer line in terminal window
+    local wid = vim.o.columns
+    local hei = vim.o.lines
     local sgr = new_sgr()
 
     -- ANSI object
     local ansi = {}
 
-    ansi.bufs = function() return bufs end
-
-    ansi.hlts = function() return hlts end
-
-    ansi.reset = function()
-        bufs = {}
-        hlts = {}
-        srow = 1
-        -- scol = 1
-        erased_lines = 0
-        sgr = new_sgr()
+    --- Create next buffer line
+    --- @param buf(string|nil) The processed buffer line
+    --- @param hlt(table|nil) The highlight of a processed buffer line
+    --- @param opts(table|nil)
+    --- @return integer row The row of buffer line to process
+    --- @return string buf The buffer line to process
+    --- @return table hlt The highlight of buffer line to process
+    local function nextline(buf, hlt, opts)
+        local completed = opts and opts.completed
+        if buf and hlt then
+            if completed then
+                bufs[#bufs + 1] = { buf, hlt }
+                if bot < hei then
+                    -- There should always `bot <= hei` as terminal window lines = `hei`
+                    bot = bot + 1
+                    local cell_len = vim.fn.strdisplaywidth(buf)
+                    if cell_len > wid then
+                        bot = bot + math.floor(cell_len / wid)
+                    end
+                    bot = math.min(bot, hei)
+                end
+                -- Override `bufc` directly as `buf` and `hlt` contain previous `bufc`
+                bufc = { '', {} }
+            else
+                bufc = { buf, hlt }
+            end
+        end
+        return #bufs + 1, bufc[1], bufc[2]
     end
 
-    ansi.feed = function(linestr, is_pending, verbose)
-        local verb_t = verbose:match('[at]')
-        local verb_h = verbose:match('[ah]')
-        local verb_n = verbose:match('[an]')
-        local has_csi = false
-        for last, line, args, byte in next_csi(linestr, CSI_PAT) do
-            -- The rest pending line shouldn't append into buffer lines
-            if is_pending and last then
-                return line
-            end
+    --- Backtrace previous buffer line
+    --- @param buf(string) The processed buffer line
+    --- @param hlt(table) The highlight of a processed buffer line
+    --- @return integer row The row of buffer line to process
+    --- @return string buf The buffer line to process
+    --- @return table hlt The highlight of buffer line to process
+    local function prevline(buf, hlt)
+        local _buf, _hlt = unpack(bufs[#bufs])
+        bufs[#bufs] = nil
+        return #bufs + 1, _buf .. buf, vim.list_extend(_hlt, hlt)
+    end
 
-            -- Process line with highlight
-            if line ~= '' then
-                local trimed = verb_t and line or trim(line)
+    ansi.bufs = function() return bufs end
+
+    ansi.feed = function(linestr, verbose)
+        local verb_h = verbose:match('[ah]')
+        local verb_d = verbose:match('[ad]')
+
+        if verb_d then
+            bufs[#bufs + 1] = { '>', {} }
+            bufs[#bufs + 1] = { linestr, {} }
+        end
+
+        local row, buf, hlt = nextline()
+        for _, line, args, byte in next_csi(linestr, CSI_PAT) do
+            -- Process CSI SGR
+            for separated in next_cr(line) do
+                local trimed = trim(separated)
                 if trimed ~= '' then
-                    local s_line = bufs[srow] or (verb_n and ('#%d>'):format(srow) or '')
-                    local s_hl = hlts[srow] or {}
-                    local cs = string.len(s_line) -- col_start
+                    local cs = string.len(buf) -- col_start
                     local ce = cs + string.len(trimed) -- col_end
                     if sgr.hl then
-                        s_hl[#s_hl + 1] = { sgr.hl, srow, cs, ce }
+                        hlt[#hlt + 1] = { sgr.hl, row, cs, ce }
                         if verb_h then
-                            trimed = trimed .. ('<%d,%d,%d>'):format(srow, cs, ce)
+                            trimed = trimed .. ('<%d,%d,%d>'):format(row, cs, ce)
                         end
                     end
-                    bufs[srow] = s_line .. trimed
-                    hlts[srow] = s_hl
+                    buf = buf .. trimed
                 end
+                row, buf, hlt = nextline(buf, hlt, { completed = separated:match('.*\r$') })
+            end
+            if byte == 'm' then
+                sgr.tohl(args)
             end
 
-            if byte then
-                has_csi = true
-            end
-
-            -- Process CSI code
+            -- Process CSI
             if byte == 'C' then
                 local n = (args ~= '') and tonumber(args) or 1
-                bufs[srow] = (bufs[srow] or '') .. string.rep(' ', n)
+                buf = buf .. string.rep(' ', n)
             elseif byte == 'K' then
                 -- n = 0: clear from cursor to end of line
                 -- n = 1: clear from cursor to begin of line
                 -- n = 2: clear entire line
                 -- local n = (args ~= '') and tonumber(args) or 0
-                erased_lines = erased_lines + 1
-                if bufs[srow] then
-                    srow = srow + 1
-                    bufs[srow] = verb_n and ('K%d>'):format(srow)
-                end
             elseif byte == 'H' then
-                local cur_row, cur_col = args:match('(%d*);?(%d*)')
-                cur_row = (cur_row ~= '') and tonumber(cur_row) or 1
-                cur_col = (cur_col ~= '') and tonumber(cur_col) or 1
-                cur_col = cur_col - 1 -- The cursor cell will also be filled with the inputs
-                cur_row = cur_row + erased_lines
-                -- Sync cursor row
-                while srow < cur_row do
-                    bufs[srow] = bufs[srow] or (verb_n and ('H%d>'):format(srow) or '')
-                    srow = srow + 1
+                local nr, nc = args:match('(%d*);?(%d*)')
+                nr = (nr ~= '') and tonumber(nr) or 1
+                nc = (nc ~= '') and tonumber(nc) or 1
+                while bot < nr do
+                    row, buf, hlt = nextline(buf, hlt, { completed = true })
                 end
-                while srow > cur_row do
-                    bufs[srow] = verb_n and ((bufs[srow] or '') .. ('H%d<'):format(srow))
-                    srow = srow - 1
+                if bot == nr + 1 then
+                    bot = bot - 1 -- Support backtrace one buffer line had been processed
+                    row, buf, hlt = prevline(buf, hlt)
                 end
-                -- Sync cursor col
-                if bufs[srow] then
-                    if verb_n then
-                        bufs[srow] = bufs[srow] .. '&' .. string.rep('%', cur_col)
-                    else
-                        local dlen = string.len(bufs[srow]) -- Displayed length
-                        bufs[srow] = bufs[srow]:sub(1, cur_col) .. string.rep(' ', cur_col - dlen)
-                    end
+                local cell_len = vim.fn.strdisplaywidth(buf)
+                if cell_len < (nc - 1) then
+                    buf = buf .. string.rep(' ', nc - 1 - cell_len)
                 else
-                    bufs[srow] = string.rep(verb_n and '%' or ' ', cur_col)
+                    buf = string.sub(buf, 1, nc - 1) -- Don't support multi-bytes char
                 end
-            elseif byte == 'm' then
-                sgr.tohl(args)
             end
-        end
-
-        -- For next new line
-        if bufs[srow] then
-            srow = srow + 1
-            bufs[srow] = verb_n and ('$%d>'):format(srow)
-        elseif linestr ~= '' and not has_csi then
-            bufs[srow] = verb_n and ('$%d>'):format(srow) or ''
-            srow = srow + 1
         end
     end
 
