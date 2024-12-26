@@ -146,15 +146,15 @@ local function on_large_file()
 end
 
 local function on_alter_enter()
-    if vim.b.alter_view and (vim.bo.filetype ~= 'qf') and not vim.wo.diff then
-        fn.winrestview(vim.b.alter_view)
-        vim.b.alter_view = nil
+    if vim.b.sets_alter_view and (vim.bo.filetype ~= 'qf') and not vim.wo.diff then
+        fn.winrestview(vim.b.sets_alter_view)
+        vim.b.sets_alter_view = nil
     end
 end
 
 local function on_alter_leave()
     if (vim.bo.filetype ~= 'qf') and not vim.wo.diff then
-        vim.b.alter_view = fn.winsaveview()
+        vim.b.sets_alter_view = fn.winsaveview()
     end
 end
 

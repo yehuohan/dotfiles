@@ -277,6 +277,7 @@ local _keys = {
     'Rp' , 'Rj' , 'Rm' , 'Ro' , 'Rf' , 'Rl' ,
     'rp' , 'rj' , 'rm' , 'ro' , 'rf' , 'rl' ,
     'rtp', 'rtj', 'rtm', 'rto', 'rtf', 'rtl',
+    'rgp', 'rgj', 'rgm', 'rgo', 'rgf', 'rgl',
 }
 -- stylua: ignore end
 
@@ -395,6 +396,8 @@ local entry = async(function(kt, bang)
     -- Set config
     if kt.A == 't' then
         wsc.style = 'term'
+    elseif kt.A == 'g' then
+        wsc.style = 'job'
     end
 
     -- Run code task

@@ -92,15 +92,18 @@ function ctxs.relative_path()
 end
 
 function ctxs.check_lines()
+    if not vim.bo.modifiable then
+        return nil
+    end
     if vim.b.nstl_check_lines_enabled == false then
         return nil
     end
-    local check_last = vim.b.statusline_check_last or 0
+    local check_last = vim.b.nstl_check_last or 0
     local check_this = vim.fn.reltimefloat(vim.fn.reltime())
     if check_this - check_last < 1.0 then
-        return vim.b.statusline_check_res
+        return vim.b.nstl_check_res
     end
-    vim.b.statusline_check_last = check_this
+    vim.b.nstl_check_last = check_this
 
     local lst = {}
     local pos
@@ -119,7 +122,7 @@ function ctxs.check_lines()
     if #lst > 0 then
         res = table.concat(lst, '│')
     end
-    vim.b.statusline_check_res = res
+    vim.b.nstl_check_res = res
     return res
 end
 
@@ -182,9 +185,7 @@ local function pad(color, component, fileds)
 end
 
 --- Wrap component as a block with blank background
-local function wrap(component)
-    return require('heirline.utils').surround({ '', '' }, 'blank', component)
-end
+local function wrap(component) return require('heirline.utils').surround({ '', '' }, 'blank', component) end
 
 --- Statuslines
 local function stls()
@@ -194,21 +195,17 @@ local function stls()
         provider = '%=%<',
         hl = { fg = 'gray', strikethrough = true },
     }
-    local ComHint = pad(
-        function()
-            local mch = ctxs.mode()
-            if mch == 'V' or mch == 'S' or mch == '^V' or mch == '^S' then
-                return 'red'
-            elseif mch == 'I' or mch == 'T' then
-                return 'green'
-            elseif mch == 'R' then
-                return 'blue'
-            end
-            return 'fill'
-        end,
-        { provider = ctxs.hint, hl = { fg = 'ftxt', bold = true } },
-        { condition = conds.is_active }
-    )
+    local ComHint = pad(function()
+        local mch = ctxs.mode()
+        if mch == 'V' or mch == 'S' or mch == '^V' or mch == '^S' then
+            return 'red'
+        elseif mch == 'I' or mch == 'T' then
+            return 'green'
+        elseif mch == 'R' then
+            return 'blue'
+        end
+        return 'fill'
+    end, { provider = ctxs.hint, hl = { fg = 'ftxt', bold = true } }, { condition = conds.is_active })
     local ComPath = pad('area', {
         { provider = ctxs.root_path, hl = { fg = 'base', bold = true } },
         { provider = ctxs.relative_path, hl = { fg = 'atxt' } },
@@ -295,11 +292,7 @@ local function ele(e, fn)
         txt = txt .. '+'
         fg = 'green'
     end
-    return pad(
-        bg,
-        { provider = txt, hl = { fg = fg } },
-        { on_click = { callback = fn, minwid = e.index } }
-    )
+    return pad(bg, { provider = txt, hl = { fg = fg } }, { on_click = { callback = fn, minwid = e.index } })
 end
 
 local function tabs()
@@ -347,10 +340,7 @@ local function disabled_bars(args)
     local bar_excluded_buftypes = { 'nofile', 'terminal', 'quickfix' }
     local filetype = vim.tbl_contains(bar_excluded_filetypes, vim.bo[args.buf].filetype)
     local buftype = vim.tbl_contains(bar_excluded_buftypes, vim.bo[args.buf].buftype)
-    return filetype
-        or buftype
-        or vim.o.laststatus ~= 3
-        or vim.api.nvim_win_get_config(0).relative ~= ''
+    return filetype or buftype or vim.o.laststatus ~= 3 or vim.api.nvim_win_get_config(0).relative ~= ''
 end
 
 local function bars()
