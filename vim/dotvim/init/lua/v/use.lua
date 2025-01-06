@@ -24,6 +24,7 @@ local lst = {
     fonts = {
         'Consolas',
         'Consolas,CodeNewRoman Nerd Font Mono',
+        'Consolas,Cousine Nerd Font Mono',
         'Consolas Nerd Font Mono',
         'FantasqueSansM Nerd Font Mono',
         'Microsoft YaHei UI',
