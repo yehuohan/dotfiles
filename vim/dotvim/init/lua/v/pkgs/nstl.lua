@@ -395,7 +395,7 @@ local function toggle_tabline_layout()
     vim.g.nstl_tabline_layout = layout
 end
 
-local function setup()
+local function pkg_nstl()
     -- Tabline status from popc
     vim.g.Popc_useTabline = 0
     vim.g.nstl_tabline_layout = { tab = true, buf = true }
@@ -443,4 +443,8 @@ local function setup()
     m.nnore({ '<leader>ty', toggle_tabline_layout })
 end
 
-return { setup = setup }
+return {
+    'rebelot/heirline.nvim',
+    config = pkg_nstl,
+    dependencies = { 'yehuohan/popc', 'linrongbin16/lsp-progress.nvim' },
+}

@@ -5,6 +5,7 @@ local use = {
     nlsp = false,
     nts = false,
     ndap = false,
+    full = false,
     has_py = false,
     ui = {
         icon = false,

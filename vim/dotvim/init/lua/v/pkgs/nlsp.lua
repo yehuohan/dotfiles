@@ -453,13 +453,41 @@ local function __lsp_mappings()
     m.nnore({ '<leader>oh', '<Cmd>ClangdSwitchSourceHeader<CR>' })
 end
 
+local pkg_nslp = vim.schedule_wrap(function()
+    __servers()
+    __sources()
+    __completion()
+    __highlights()
+    __lsp_settings()
+    __lsp_mappings()
+end)
+
 return {
-    setup = vim.schedule_wrap(function()
-        __servers()
-        __sources()
-        __completion()
-        __highlights()
-        __lsp_settings()
-        __lsp_mappings()
-    end),
+    'hrsh7th/nvim-cmp',
+    enabled = use.nlsp,
+    config = pkg_nslp,
+    event = { 'InsertEnter' },
+    dependencies = {
+        'williamboman/mason.nvim',
+        'williamboman/mason-lspconfig.nvim',
+        'neovim/nvim-lspconfig',
+        'folke/neoconf.nvim',
+        { 'folke/lazydev.nvim', ft = 'lua' },
+        'nvimdev/lspsaga.nvim',
+        'ray-x/lsp_signature.nvim',
+        -- { 'mrcjkb/rustaceanvim', ft = { 'rust' } },
+        'hrsh7th/cmp-nvim-lsp',
+        'hrsh7th/cmp-buffer',
+        'hrsh7th/cmp-calc',
+        'yehuohan/cmp-cmdline',
+        'yehuohan/cmp-path',
+        'yehuohan/cmp-im',
+        'yehuohan/cmp-im-zh',
+        'saadparwaiz1/cmp_luasnip',
+        'dmitmel/cmp-cmdline-history',
+        'kdheepak/cmp-latex-symbols',
+        'f3fora/cmp-spell',
+        'zjp-CN/nvim-cmp-lsp-rs',
+        'nvim-lua/plenary.nvim',
+    },
 }

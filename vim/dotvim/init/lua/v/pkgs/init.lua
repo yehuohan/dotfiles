@@ -976,11 +976,7 @@ local pkgs = {
     { 'ellisonleao/gruvbox.nvim', config = pkg_gruvbox },
     { 'polirritmico/monokai-nightasty.nvim' },
     { 'nvim-tree/nvim-web-devicons', lazy = true, enabled = use.ui.icon },
-    { -- heirline
-        'rebelot/heirline.nvim',
-        config = require('v.pkgs.nstl').setup,
-        dependencies = { 'yehuohan/popc', 'linrongbin16/lsp-progress.nvim' },
-    },
+    require('v.pkgs.nstl'),
     { 'goolord/alpha-nvim', config = pkg_alpha },
     { 'rcarriga/nvim-notify', config = pkg_notify },
     { 'ObserverOfTime/notifications.nvim', config = pkg_notifications },
@@ -1007,35 +1003,7 @@ local pkgs = {
     { 'echasnovski/mini.nvim', config = pkg_mini },
 
     -- Coding
-    { -- cmp
-        'hrsh7th/nvim-cmp',
-        enabled = use.nlsp,
-        config = require('v.pkgs.nlsp').setup,
-        event = { 'InsertEnter' },
-        dependencies = {
-            'williamboman/mason.nvim',
-            'williamboman/mason-lspconfig.nvim',
-            'neovim/nvim-lspconfig',
-            'folke/neoconf.nvim',
-            { 'folke/lazydev.nvim', ft = 'lua' },
-            'nvimdev/lspsaga.nvim',
-            'ray-x/lsp_signature.nvim',
-            -- { 'mrcjkb/rustaceanvim', ft = { 'rust' } },
-            'hrsh7th/cmp-nvim-lsp',
-            'hrsh7th/cmp-buffer',
-            'hrsh7th/cmp-calc',
-            'yehuohan/cmp-cmdline',
-            'yehuohan/cmp-path',
-            'yehuohan/cmp-im',
-            'yehuohan/cmp-im-zh',
-            'saadparwaiz1/cmp_luasnip',
-            'dmitmel/cmp-cmdline-history',
-            'kdheepak/cmp-latex-symbols',
-            'f3fora/cmp-spell',
-            'zjp-CN/nvim-cmp-lsp-rs',
-            'nvim-lua/plenary.nvim',
-        },
-    },
+    require('v.pkgs.nlsp'),
     { 'nvim-treesitter/nvim-treesitter', enabled = use.nts, version = '*', config = pkg_treesitter },
     { 'rcarriga/nvim-dap-ui', enabled = use.ndap, dependencies = { 'mfussenegger/nvim-dap' } },
     { 'L3MON4D3/LuaSnip', config = pkg_snip, dependencies = { 'honza/vim-snippets' } },
@@ -1067,7 +1035,7 @@ local pkgs = {
     { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, keys = { { '<M-w>', mode = 'i' } } },
     { 'itchyny/screensaver.vim', keys = { { '<leader>ss', '<Cmd>ScreenSaver clock<CR>' } } },
     { 'voldikss/vim-translator', config = pkg_translator },
-    { 'keaising/im-select.nvim', opts = { set_default_events = { 'InsertLeave' } } },
+    { 'keaising/im-select.nvim', enabled = use.full, opts = { set_default_events = { 'InsertLeave' } } },
 }
 
 local function clone_lazy(url, bundle)
