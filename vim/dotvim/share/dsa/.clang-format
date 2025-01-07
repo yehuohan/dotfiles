@@ -1,11 +1,7 @@
 # vim: ft=yaml
 
-# .clang-format
-#
-# clang-format on/off
-
 IndentWidth: 4
-ColumnLimit: 100
+ColumnLimit: 128
 
 ---
 Language: Cpp
@@ -40,12 +36,3 @@ PenaltyReturnTypeOnItsOwnLine: 300
 PointerAlignment: Left
 ReferenceAlignment: Left
 SortIncludes: true
-
-# MacroBlockBegin: "^NEGIN|START$"
-# MacroBlockEnd: "^END|STOP$"
-AttributeMacros:
-  - __ATTR
-  - __API
-# StatementAttributeLikeMacros:
-# StatementMacros:
-# WhitespaceSensitiveMacros:
