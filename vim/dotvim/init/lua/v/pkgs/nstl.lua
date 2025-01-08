@@ -95,7 +95,7 @@ function ctxs.check_lines()
     if not vim.bo.modifiable then
         return nil
     end
-    if vim.b.nstl_check_lines_enabled == false then
+    if vim.b.nstl_check_lines_enabled == false or vim.b.sets_large_file then
         return nil
     end
     local check_last = vim.b.nstl_check_last or 0

@@ -103,7 +103,9 @@ local function setup_quickfix()
                     local item = vim.fn.getqflist()[row]
                     if item.bufnr > 0 then
                         vim.api.nvim_set_current_win(vim.fn.win_getid(vim.fn.winnr('#')))
-                        vim.cmd.edit({ args = { vim.api.nvim_buf_get_name(item.bufnr) } })
+                        if not vim.b.sets_large_file then
+                            vim.cmd.edit({ args = { vim.api.nvim_buf_get_name(item.bufnr) } })
+                        end
                         local pos = { item.lnum, item.col > 0 and (item.col - 1) or 0 }
                         vim.api.nvim_win_set_cursor(0, pos)
                     end
