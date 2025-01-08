@@ -1,8 +1,0 @@
-Windows Registry Editor Version 5.00
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\background\shell\Msys2]
-@="Msys2 Here"
-"Icon"="\"C:\\apps\\msys64\\ucrt64.exe\""
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\background\shell\Msys2\command]
-@="\"C:\\apps\\msys64\\msys2_shell.cmd\" -ucrt64 -here"

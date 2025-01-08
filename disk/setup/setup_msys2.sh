@@ -14,8 +14,6 @@ cp -r $DIR_DISK/msys2/etc/*         /etc/
 cp -r $DIR_DISK/msys2/etc/.*        /etc/
 cp -r $DIR_DISK/msys2/home/*        ~/
 cp -r $DIR_DISK/msys2/home/.*       ~/
-cp -r $DIR_DISK/home/*              $USERPROFILE/
-cp -r $DIR_DISK/home/.*             $USERPROFILE/
 
 pacman -Sy
 
@@ -37,4 +35,4 @@ fi
 # pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-make
 # cp /ucrt64/bin/mingw32-make.exe /ucrt64/bin/make.exe
 
-echo "Disk setup was completed!"
+echo "Setup msys2 completed!"
