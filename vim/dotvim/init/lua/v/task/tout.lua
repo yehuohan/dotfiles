@@ -3,6 +3,8 @@
 local PAUSE_PATS = {
     '请按任意键继续. . .',
     'Press any key to continue . . .',
+    '按 Enter 键继续...:',
+    'Press Enter to continue...:',
 }
 
 --- @class ToutQuickfix
@@ -110,7 +112,7 @@ function qf.react(data, chan_id, encoding)
         if IsWin() then
             for _, pat in ipairs(PAUSE_PATS) do
                 if txt and txt:match(pat) then
-                    vim.api.nvim_chan_send(chan_id, ' ')
+                    vim.api.nvim_chan_send(chan_id, '\x0D')
                 end
             end
         end
