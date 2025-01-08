@@ -107,33 +107,59 @@ local function __servers()
     require('mason-lspconfig').setup_handlers(opts)
 end
 
+--- Setup completion sources
+local function __sources()
+    local cmp_im = require('cmp_im')
+    local cmp_im_zh = require('cmp_im_zh')
+    cmp_im.setup({
+        tables = cmp_im_zh.tables({ 'wubi', 'pinyin' }),
+        maxn = 5,
+    })
+    m.add({ 'n', 'v', 'c', 'i' }, {
+        '<M-;>',
+        function()
+            if cmp_im.toggle() then
+                vim.notify('IM is enabled')
+                for lhs, rhs in pairs(cmp_im_zh.symbols()) do
+                    m.inore({ lhs, rhs })
+                end
+            else
+                vim.notify('IM is disabled')
+                for lhs, _ in pairs(cmp_im_zh.symbols()) do
+                    m.idel({ lhs })
+                end
+            end
+        end,
+    })
+end
+
 -- stylua: ignore start
 local kind_icons = {
-    Text          = { '', 'Txt'  },
-    Method        = { '󰆧', 'Meth' },
-    Function      = { '󰊕', 'Fun'  },
-    Constructor   = { '', 'CnSt' },
-    Field         = { '󰇽', 'Fied' },
-    Variable      = { 'ω', 'Var'  },
-    Class         = { '󰠱', 'Cla'  },
-    Interface     = { '', 'InF'  },
-    Module        = { '', 'Mod'  },
-    Property      = { '󰜢', 'Prop' },
-    Unit          = { '', 'Unit' },
-    Value         = { '󰎠', 'Val'  },
-    Enum          = { '', 'Enum' },
-    Keyword       = { '󰌋', 'Key'  },
-    Snippet       = { '', 'Snip' },
-    Color         = { '󰏘', 'Clr'  },
-    File          = { '󰈙', 'File' },
-    Reference     = { '', 'Ref'  },
-    Folder        = { '󰉋', 'Dir'  },
-    EnumMember    = { '', 'EMem' },
-    Constant      = { '', 'Cons' },
-    Struct        = { '', 'Stru' },
-    Event         = { '', 'Evnt' },
-    Operator      = { '󰆕', 'Oprt' },
-    TypeParameter = { '', 'TyPa' },
+    Text          = { '', 'Txt' , 1  },
+    Method        = { '󰆧', 'Meth', 2  },
+    Function      = { '󰊕', 'Fun' , 3  },
+    Constructor   = { '', 'CnSt', 4  },
+    Field         = { '󰇽', 'Fied', 5  },
+    Variable      = { 'ω', 'Var' , 6  },
+    Class         = { '󰠱', 'Cla' , 7  },
+    Interface     = { '', 'InF' , 8  },
+    Module        = { '', 'Mod' , 9  },
+    Property      = { '󰜢', 'Prop', 10 },
+    Unit          = { '', 'Unit', 11 },
+    Value         = { '󰎠', 'Val' , 12 },
+    Enum          = { '', 'Enum', 13 },
+    Keyword       = { '󰌋', 'Key' , 14 },
+    Snippet       = { '', 'Snip', 15 },
+    Color         = { '󰏘', 'Clr' , 16 },
+    File          = { '󰈙', 'File', 17 },
+    Reference     = { '', 'Ref' , 18 },
+    Folder        = { '󰉋', 'Dir' , 19 },
+    EnumMember    = { '', 'EMem', 20 },
+    Constant      = { '', 'Cons', 21 },
+    Struct        = { '', 'Stru', 22 },
+    Event         = { '', 'Evnt', 23 },
+    Operator      = { '󰆕', 'Oprt', 24 },
+    TypeParameter = { '', 'TyPa', 25 },
 }
 
 local kind_sources = {
@@ -162,30 +188,39 @@ local function cmp_format(entry, citem)
     return citem
 end
 
---- Setup completion sources
-local function __sources()
-    local cmp_im = require('cmp_im')
-    local cmp_im_zh = require('cmp_im_zh')
-    cmp_im.setup({
-        tables = cmp_im_zh.tables({ 'wubi', 'pinyin' }),
-        maxn = 5,
-    })
-    m.add({ 'n', 'v', 'c', 'i' }, {
-        '<M-;>',
-        function()
-            if cmp_im.toggle() then
-                vim.notify('IM is enabled')
-                for lhs, rhs in pairs(cmp_im_zh.symbols()) do
-                    m.inore({ lhs, rhs })
-                end
-            else
-                vim.notify('IM is disabled')
-                for lhs, _ in pairs(cmp_im_zh.symbols()) do
-                    m.idel({ lhs })
-                end
-            end
-        end,
-    })
+--- Completion's super-tab
+local function cmp_supertab(fallback)
+    local cmp = require('cmp')
+    local snip = require('luasnip')
+    if cmp.visible() and cmp.get_active_entry() then
+        cmp.confirm({ select = false })
+    elseif snip.expandable() then
+        snip.expand()
+    else
+        fallback()
+    end
+end
+
+--- Get select options
+---@param count(integer) +1 for next and -1 for prev
+local function cmp_select(count)
+    local cmp = require('cmp')
+    local behavior = cmp.SelectBehavior.Insert
+    local entries = cmp.get_entries()
+    local index_max = #entries
+    if index_max > 0 then
+        local index = cmp.get_selected_index() or 0
+        index = index + count
+        if index < 0 then
+            index = index_max
+        elseif index > index_max then
+            index = 0
+        end
+        if index > 0 and entries[index].completion_item.kind == kind_icons['Snippet'][3] then
+            behavior = cmp.SelectBehavior.Select
+        end
+    end
+    return { behavior = behavior }
 end
 
 --- Setup completion framework
@@ -196,33 +231,20 @@ local function __completion()
     local opts_snip = { config = { sources = { { name = 'luasnip' } } } }
     local opts_cmdh = { config = { sources = { { name = 'cmdline_history' } } } }
     local cmp_mappings = {
-        ['<CR>'] = cmp.mapping.confirm(),
         ['<Tab>'] = cmp.mapping({
-            i = function(fallback)
-                local snip = require('luasnip')
-                if snip.expandable() then
-                    snip.expand()
-                elseif cmp.visible() and cmp.get_active_entry() then
-                    cmp.confirm({ select = false })
-                else
-                    fallback()
-                end
-            end,
-            c = function()
-                if cmp.visible() then
-                    cmp.select_next_item()
-                else
-                    cmp.complete()
-                end
-            end,
+            i = cmp_supertab,
+            c = function() return cmp.visible() and cmp.select_next_item() or cmp.complete() end,
         }),
-        ['<S-Tab>'] = cmp.mapping(function() cmp.select_prev_item() end, { 'c' }),
+        ['<S-Tab>'] = cmp.mapping({
+            c = function() return cmp.visible() and cmp.select_prev_item() or cmp.complete() end,
+        }),
+        ['<CR>'] = cmp.mapping.confirm(),
         ['<M-i>'] = cmp.mapping.complete(),
         ['<M-u>'] = cmp.mapping(function() cmp.complete(opts_snip) end, { 'i' }),
         ['<M-y>'] = cmp.mapping(function() cmp.complete(opts_cmdh) end, { 'c' }),
         ['<M-e>'] = cmp.mapping(function() cmp.abort() end, { 'i', 'c' }),
-        ['<M-j>'] = cmp.mapping(function() cmp.select_next_item() end, { 'i', 'c' }),
-        ['<M-k>'] = cmp.mapping(function() cmp.select_prev_item() end, { 'i', 'c' }),
+        ['<M-j>'] = cmp.mapping(function() cmp.select_next_item(cmp_select(1)) end, { 'i', 'c' }),
+        ['<M-k>'] = cmp.mapping(function() cmp.select_prev_item(cmp_select(-1)) end, { 'i', 'c' }),
         ['<M-n>'] = cmp.mapping.scroll_docs(4),
         ['<M-m>'] = cmp.mapping.scroll_docs(-4),
         ['<M-f>'] = cmp.mapping.scroll_docs(4),
@@ -277,6 +299,7 @@ local function __completion()
     cmp.setup.filetype({ 'tex', 'latex', 'markdown', 'restructuredtext', 'text', 'help' }, {
         sources = cmp.config.sources({
             { name = 'luasnip' },
+            { name = 'buffer' },
             { name = 'path' },
             { name = 'calc' },
             { name = 'IM' },
@@ -288,15 +311,15 @@ local function __completion()
     cmp.setup.cmdline({ '/', '?' }, {
         mapping = cmp_mappings,
         sources = {
-            { name = 'IM' },
             { name = 'buffer' },
+            { name = 'IM' },
         },
     })
     cmp.setup.cmdline({ ':', '@' }, {
         mapping = cmp_mappings,
         sources = cmp.config.sources({
-            { name = 'IM' },
             { name = 'path' },
+            { name = 'IM' },
         }, {
             { name = 'cmdline' },
         }),
@@ -439,7 +462,7 @@ local function __lsp_mappings()
     m.nnore({ '<leader>oJ', vim.diagnostic.goto_next })
     m.nnore({ '<leader>oK', vim.diagnostic.goto_prev })
     -- TODO: list for workspace, sources, servers, commands
-    -- m.nnore{'<leader>ow', vim.lsp.buf.manage_workspace_folder}
+    -- m.nnore{'<leader>ow', vim.lsp.buf.xxx_workspace_folder}
     -- m.nnore{'<leader>oe', vim.lsp.buf.execute_command}
     m.nnore({ '<leader><leader>o', ':LspStart<Space>' })
     m.nnore({ '<leader>oR', ':LspRestart<CR>' })
