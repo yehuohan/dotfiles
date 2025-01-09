@@ -56,7 +56,7 @@ if [[ `uname` == "Linux" ]]; then
         # modules
         cp -r /etc/modprobe.d                       ./root/etc-arch/
         cp -r /etc/modules-load.d                   ./root/etc-arch/
-        echo "Arch: Copy was completed!"
+        echo "Arch: Copy completed!"
     fi
 
     # Ubuntu
@@ -64,7 +64,7 @@ if [[ `uname` == "Linux" ]]; then
         # home/.config
         cp ~/.config/libinput-gestures.conf         ./root/home/.config/
 
-        echo "Ubuntu: Copy was completed!"
+        echo "Ubuntu: Copy completed!"
     fi
 
 elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
@@ -108,5 +108,5 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp $DOT_APPS/_packs/persist/windows-terminal/settings/settings.json     ./disk/scoop/windows-terminal/settings/
     cp -r $DOT_APPS/_packs/persist/conemu                                   ./disk/scoop/
 
-    echo "Win: Copy was completed!"
+    echo "Win: Copy completed!"
 fi
