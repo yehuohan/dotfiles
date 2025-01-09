@@ -1,8 +1,0 @@
-Windows Registry Editor Version 5.00
-
-[HKEY_CLASSES_ROOT\*\Shell\Neovide]
-@="Edit with &Neovide"
-"Icon"="\"C:\\apps\\_packs\\apps\\neovide\\current\\neovide.exe\""
-
-[HKEY_CLASSES_ROOT\*\Shell\Neovide\command]
-@="\"C:\\apps\\_packs\\apps\\neovide\\current\\neovide.exe\" --grid=70x20 \"%1\""

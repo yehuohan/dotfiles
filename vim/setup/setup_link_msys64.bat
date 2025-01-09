@@ -11,5 +11,5 @@ mklink /D %DOT_APPS%\msys64\home\%USERNAME%\dotvim\bundle      %DOT_HOME%\dotvim
 mklink /D %DOT_APPS%\msys64\home\%USERNAME%\dotvim\init        %DOT_HOME%\dotvim\init
 mklink /D %DOT_APPS%\msys64\home\%USERNAME%\dotvim\share       %DOT_HOME%\dotvim\share
 
-echo Dotvim link was made successful!
+echo Link dotvim completed!
 pause

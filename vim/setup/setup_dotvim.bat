@@ -40,5 +40,5 @@ if not exist %LOCALAPPDATA%\nvim (
 )
 copy %DIR_VIM%\nvim\%InitFile%      %LOCALAPPDATA%\nvim\
 
-echo Dotvim setup was completed!
+echo Setup dotvim completed!
 pause

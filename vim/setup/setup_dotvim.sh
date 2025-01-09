@@ -26,4 +26,4 @@ cp -r $DIR_VIM/dotvim/*         $DIR_DOT/
 mkdir -p ~/.config/nvim
 cp $DIR_VIM/nvim/$InitFile      ~/.config/nvim/
 
-echo "Dotvim setup was completed!"
+echo "Setup dotvim completed!"
