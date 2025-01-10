@@ -94,5 +94,5 @@ Windows Registry Editor Version 5.00
 
 foreach ($editor in $editors) {
     echo ('Generated ' + $editor.Name)
-    $editor.Text | Out-File -FilePath ("$dir_vim/setup/" + $editor.Name)
+    [IO.File]::WriteAllText("$dir_vim/setup/" + $editor.Name, $editor.Text, [Text.Encoding]::UTF8)
 }

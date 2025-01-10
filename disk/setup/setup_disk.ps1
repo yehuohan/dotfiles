@@ -33,8 +33,7 @@ Windows Registry Editor Version 5.00
 '@
 
 echo 'Generated msys2_here.reg'
-"$cmd_add" | Out-File -FilePath $dir_disk/setup/msys2_here.reg
+[IO.File]::WriteAllText("$dir_disk/setup/msys2_here.reg", $cmd_add, [Text.Encoding]::UTF8)
 echo 'Generated msys2_here.del.reg'
-"$cmd_del" | Out-File -FilePath $dir_disk/setup/msys2_here.del.reg
-
+[IO.File]::WriteAllText("$dir_disk/setup/msys2_here.del.reg", $cmd_del, [Text.Encoding]::UTF8)
 pause
