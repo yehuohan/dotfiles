@@ -353,9 +353,8 @@ nnoremap <M-u> <Cmd>PopcBufferSwitchTabLeft!<CR>
 nnoremap <M-p> <Cmd>PopcBufferSwitchTabRight!<CR>
 nnoremap <M-i> <Cmd>PopcBufferSwitchLeft!<CR>
 nnoremap <M-o> <Cmd>PopcBufferSwitchRight!<CR>
-nnoremap <C-i> <Cmd>PopcBufferJumpPrev<CR>
-nnoremap <Tab> <Cmd>PopcBufferJumpPrev<CR>
-nnoremap <C-o> <Cmd>PopcBufferJumpNext<CR>
+nnoremap <M-n> <Cmd>PopcBufferJumpPrev<CR>
+nnoremap <M-m> <Cmd>PopcBufferJumpNext<CR>
 nnoremap <C-u> <C-o>
 nnoremap <C-p> <C-i>
 nnoremap <leader>wq <Cmd>PopcBufferClose!<CR>
@@ -469,12 +468,8 @@ imap <C-k> <M-k>
 inoremap <silent><expr> <M-i> coc#refresh()
 inoremap <silent><expr> <M-e> coc#pum#cancel()
 inoremap <M-o> <Cmd>call CocActionAsync('showSignatureHelp')<CR>
-nnoremap <M-f> <Cmd>call coc#float#scroll(1)<CR>
-nnoremap <M-d> <Cmd>call coc#float#scroll(0)<CR>
 inoremap <M-f> <Cmd>call coc#float#scroll(1)<CR>
 inoremap <M-d> <Cmd>call coc#float#scroll(0)<CR>
-nnoremap <M-n> <Cmd>call coc#float#scroll(1)<CR>
-nnoremap <M-m> <Cmd>call coc#float#scroll(0)<CR>
 inoremap <M-n> <Cmd>call coc#float#scroll(1)<CR>
 inoremap <M-m> <Cmd>call coc#float#scroll(0)<CR>
 nmap         gd <Plug>(coc-definition)
@@ -517,13 +512,19 @@ nnoremap <leader>oc <Cmd>CocList commands<CR>
 nnoremap <leader>oh <Cmd>CocCommand clangd.switchSourceHeader<CR>
 nnoremap <leader>oe <Cmd>CocCommand rust-analyzer.expandMacro<CR>
 nnoremap <leader>op <Cmd>CocCommand cSpell.toggleEnableSpellChecker<CR>
-nmap <leader>oe <Plug>(coc-calc-result-append)
 
 function! PkgSetupCoc(timer)
     call plug#load('coc.nvim')
-    for [sec, val] in items(Env_coc_settings())
-        call coc#config(sec, val)
-    endfor
+    call coc#config('Lua', {
+        \ "workspace": {
+            \ "library": {
+                \ $VIMRUNTIME."/lua": v:true,
+                \ $VIMRUNTIME."/lua/vim": v:true,
+                \ $VIMRUNTIME."/lua/vim/lsp": v:true,
+                \ $VIMRUNTIME."/lua/vim/treesitter": v:true
+            \}
+        \ }
+    \ })
 endfunction
 call timer_start(700, 'PkgSetupCoc')
 endif
@@ -634,7 +635,8 @@ tnoremap <M-m> <C-\><C-n>:FloatermUpdate --height=0.9 --width=0.9<CR>
 tnoremap <M-r> <C-\><C-n>:FloatermUpdate --position=topright<CR>
 tnoremap <M-c> <C-\><C-n>:FloatermUpdate --position=center<CR>
 nnoremap <leader>mz :FloatermNew --cwd=. zsh<CR>
-nnoremap <leader>mf :FloatermNew lf<CR>
+nnoremap <leader>mf :FloatermNew --cwd=. fzf --cycle<CR>
+nnoremap <leader>mg :FloatermNew --cwd=. lazygit<CR>
 highlight! default link FloatermBorder Constant
 " }}}
 
@@ -675,13 +677,10 @@ let g:vimtex_view_general_viewer = 'sioyek'
 let g:vimtex_complete_enabled = 1       " 使用vimtex#complete#omnifunc补全
 let g:vimtex_complete_close_braces = 1
 let g:vimtex_compiler_method = 'latexmk'
-nmap <leader>at <Plug>(vimtex-toc-toggle)
+nmap <leader>va <Plug>(vimtex-view)
 nmap <leader>ab <Plug>(vimtex-compile-ss)
 nmap <leader>aB <Plug>(vimtex-compile)
-nmap <leader>as <Plug>(vimtex-stop)
-nmap <leader>ac <Plug>(vimtex-clean)
-nmap <leader>am <Plug>(vimtex-toggle-main)
-nmap <leader>av <Plug>(vimtex-view)
+nmap <leader>ak <Plug>(vimtex-stop-all)
 " }}}
 
 " colorizer {{{ 颜色预览

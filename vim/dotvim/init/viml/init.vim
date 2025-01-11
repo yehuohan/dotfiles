@@ -27,6 +27,14 @@ let $DotVimInit=$DotVimDir . '/init'
 let $DotVimVimL=$DotVimDir . '/init/viml'
 let $DotVimShare=$DotVimDir . '/share'
 let $DotVimLocal=$DotVimDir . '/local'
+" Append {'path':[]} from .env.json
+let s:env_file = $DotVimLocal . '/.env.json'
+if filereadable(s:env_file)
+    let s:sep = IsWin() ? ';' : ':'
+    let s:env = json_decode(join(readfile(s:env_file)))
+    let $PATH .= s:sep . join(s:env.path, s:sep)
+endif
+
 set rtp^=$DotVimDir
 set encoding=utf-8                      " 内部使用utf-8编码
 set nocompatible                        " 不兼容vi
@@ -38,7 +46,6 @@ map <CR> <CR>
 map <Tab> <Tab>
 " }}}
 
-source $DotVimVimL/env.vim
 source $DotVimVimL/use.vim
 source $DotVimVimL/pkgs.vim
 source $DotVimVimL/mods.vim

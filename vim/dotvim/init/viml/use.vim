@@ -14,6 +14,7 @@ let s:use = {
     \ 'ui'     : {
         \ 'icon'     : v:false,
         \ 'font'     : 'Consolas',
+        \ 'fontback' : 'Consolas',
         \ 'fontsize' : 12,
         \ 'wide'     : 'Microsoft YaHei UI',
         \ 'widesize' : 11,
@@ -50,12 +51,10 @@ function! s:useInit()
     " Set ui
     let l:fontlst = [
         \ 'Consolas',
-        \ 'Consolas,CaskaydiaCove Nerd Font Mono',
+        \ 'Consolas,CodeNewRoman Nerd Font Mono',
+        \ 'Consolas,Cousine Nerd Font Mono',
         \ 'Consolas Nerd Font Mono',
-        \ 'CaskaydiaCove Nerd Font Mono',
-        \ 'agave Nerd Font Mono',
-        \ 'FantasqueSansMono Nerd Font Mono',
-        \ 'UbuntuMono Nerd Font Mono',
+        \ 'FantasqueSansM Nerd Font Mono',
         \ 'Microsoft YaHei UI',
         \ 'Microsoft YaHei Mono',
         \ 'WenQuanYi Micro Hei Mono',
@@ -66,8 +65,9 @@ function! s:useInit()
         \ 'lst' : sort(keys(s:use.ui)),
         \ 'dic' : {
             \ 'icon'     : {'lst' : [v:true, v:false]},
-            \ 'font'     : {'dsr' : 'set guifont', 'lst' : l:fontlst},
-            \ 'wide'     : {'dsr' : 'set guifontwide', 'lst' : l:fontlst},
+            \ 'font'     : {'dsr' : 'as guifont', 'lst' : l:fontlst},
+            \ 'fontback' : {'dsr' : 'as guifont fallback', 'lst' : l:fontlst },
+            \ 'wide'     : {'dsr' : 'as guifontwide', 'lst' : l:fontlst},
             \ 'fontsize' : {'lst' : l:fontsizelst},
             \ 'widesize' : {'lst' : l:fontsizelst},
             \ },

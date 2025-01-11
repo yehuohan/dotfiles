@@ -257,15 +257,10 @@ noremap k gk
 noremap <S-l> $
 noremap <S-h> ^
 " 折叠
-nnoremap <leader>za zA
 nnoremap <leader>zc zC
 nnoremap <leader>zo zO
 nnoremap <leader>zm zM
 nnoremap <leader>zr zR
-nnoremap <leader>zn zN
-nnoremap <leader>zx zX
-nnoremap <leader>zf zF
-nnoremap <leader>zd zD
 " 滚屏
 nnoremap <C-j> <C-e>
 nnoremap <C-k> <C-y>
