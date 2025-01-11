@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# cd to <dotfiles> first before execute this file;
-# this file must be in '~/dotfiles/'.
+# cd to <dotfiles> first before execute this file
 
 if [[ `uname` == "Linux" ]]; then
 

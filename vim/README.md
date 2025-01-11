@@ -12,7 +12,7 @@ cd dotfiles/vim/setup
 
 ```sh
 cd dotfiles/vim/setup
-# 首先运行disk/setup/add_envs.reg，添加DOT_HOME和DOT_APPS等环境变量
+# 首先运行disk/setup/add_envs.ps1，添加DOT_HOME和DOT_APPS等环境变量
 setup_dotvim.bat
 setup_link_msys64.bat
 ```
