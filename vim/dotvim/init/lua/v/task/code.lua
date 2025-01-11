@@ -34,30 +34,35 @@ local wsc = nlib.new_configer({
 -- stylua: ignore start
 local codes = {
     nvim       = { cmd = 'nvim {barg} -l {bsrc} {earg}' },
-    c          = { cmd = 'gcc -g {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
-    cpp        = { cmd = 'g++ -g -std=c++20 {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}' },
+    c          = { cmd = 'gcc -g {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
+                   efm = [[%f:%l:%c: %m]] },
+    cpp        = { cmd = 'g++ -g -std=c++20 {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
+                   efm = [[%f:%l:%c: %m]] },
     rust       = { cmd = IsWin() and 'rustc {barg} {bsrc} -o "{bout}.exe" && "./{bout}" {earg}'
                                   or 'rustc {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
                    efm = { [[%Eerror:%m,%C %#%[%^ ]%# %#%f:%l:%c %#,]]
                         .. [[%Wwarning:%m,%C %#%[%^ ]%# %#%f:%l:%c %#]],
                            [[ %#%[%^ ]%# %#%f:%l:%c %#]] }},
-    python     = { cmd = 'python {bsrc} {earg}', efm = [[%*\sFile \"%f\"\, line %l\, %m,]]
-                                                    .. [[%*\sFile \"%f\"\, line %l]] },
+    python     = { cmd = 'python {bsrc} {earg}',
+                   efm = [[%*\sFile \"%f\"\, line %l\, %m,]]
+                      .. [[%*\sFile \"%f\"\, line %l]] },
     lua        = { cmd = 'lua {bsrc} {earg}', efm = [[%.%#: %f:%l: %m, %#%f:%l: %m]] },
-    java       = { cmd = 'javac {barg} {bsrc} && java "{bout}" {earg}' },
     julia      = { cmd = 'julia {bsrc} {earg}' },
-    go         = { cmd = 'go run {bsrc} {earg}' },
-    javascript = { cmd = 'node {bsrc} {earg}' },
-    typescript = { cmd = 'node {bsrc} {earg}' },
+    glsl       = { cmd = 'glslangValidator {earg} {bsrc}', efm = [[%+P%f,ERROR: %c:%l: %m,%-Q]] },
+    java       = { cmd = 'javac {barg} {bsrc} && java "{bout}" {earg}' },
+    javascript = { cmd = 'node {bsrc} {earg}', efm = [[%f:%l]] },
+    typescript = { cmd = 'node {bsrc} {earg}', efm = [[%f:%l]] },
     just       = { cmd = 'just -f {bsrc} {earg}',
                    efm = { [[%Eerror:%m,%C %#%[%^ ]%# %#%f:%l:%c %#]],
                            [[ %#%[%^ ]%# %#%f:%l:%c %#]] }},
     make       = { cmd = 'make -f {bsrc} {earg}', efm = [[make: *** [%f:%l:%m] Error %n]] },
-    cmake      = { cmd = 'cmake {earg} -P {bsrc}', efm = [[%ECMake Error at %f:%l:,%Z%m]] },
-    sh         = { cmd = 'bash ./{bsrc} {earg}' },
-    ps1        = { cmd = 'Powershell -ExecutionPolicy Bypass -File {bsrc} {earg}' },
-    dosbatch   = { cmd = '{bsrc} {earg}' },
-    glsl       = { cmd = 'glslangValidator {earg} {bsrc}', efm = [[%+P%f,ERROR: %c:%l: %m,%-Q]] },
+    cmake      = { cmd = 'cmake {earg} -P {bsrc}', efm = [[%ECMake Error at %f:%l:]] },
+    sh         = { cmd = 'bash ./{bsrc} {earg}',
+                   efm = [[%f: 行 %l: %m,%f: line %l: %m]] },
+    ps1        = { cmd = 'Powershell -ExecutionPolicy Bypass -File {bsrc} {earg}',
+                   efm = [[所在位置 %f:%l 字符: %c,At %f:%l char:%c]],
+                   enc = 'cp936' },
+    dosbatch   = { cmd = '{bsrc} {earg}', enc = 'cp936' },
     html       = { cmd = 'firefox {bsrc}' },
     json       = { cmd = 'python -m json.tool {bsrc}' },
     typst      = { cmd = 'typst compile {bsrc} && sioyek "{bout}.pdf"',
@@ -107,7 +112,7 @@ local _hdls = {}
 
 function _hdls.nvim(cfg)
     cfg.type = 'lua'
-    cfg.tout.efm = codes.lua.efm
+    cfg.efm = codes.lua.efm
 
     local rep = {}
     rep.barg = cfg.barg
@@ -129,7 +134,8 @@ function _hdls.file(cfg)
         throw(string.format('Code task doesn\'t support "%s"', ft), 0)
     end
     cfg.type = ft
-    cfg.tout.efm = codes[cfg.type].efm
+    cfg.efm = codes[cfg.type].efm
+    cfg.encoding = codes[cfg.type].enc or ''
 
     local rep = {}
     rep.barg = cfg.barg
@@ -143,9 +149,21 @@ function _hdls.file(cfg)
 end
 
 function _hdls.just(cfg)
-    cfg.tout.efm = {
-        codes.just.efm[1] .. ',' .. codes.cmake.efm .. ',' .. vim.o.errorformat,
-        codes.just.efm[2] .. ',' .. codes.cmake.efm .. ',' .. vim.o.errorformat,
+    cfg.efm = {
+        table.concat({
+            codes.just.efm[1],
+            codes.cmake.efm,
+            codes.c.efm,
+            codes.rust.efm[1],
+            codes.python.efm,
+        }, ','),
+        table.concat({
+            codes.just.efm[2],
+            codes.cmake.efm,
+            codes.c.efm,
+            codes.rust.efm[2],
+            codes.python.efm,
+        }, ','),
     }
 
     local rep = {}
@@ -159,7 +177,22 @@ function _hdls.just(cfg)
 end
 
 function _hdls.make(cfg)
-    cfg.tout.efm = codes.make.efm .. ',' .. codes.cmake.efm .. ',' .. vim.o.errorformat
+    cfg.efm = {
+        table.concat({
+            codes.make.efm,
+            codes.cmake.efm,
+            codes.c.efm,
+            codes.rust.efm[1],
+            codes.python.efm,
+        }, ','),
+        table.concat({
+            codes.make.efm,
+            codes.cmake.efm,
+            codes.c.efm,
+            codes.rust.efm[2],
+            codes.python.efm,
+        }, ','),
+    }
 
     local rep = {}
     rep.barg = cfg.barg
@@ -172,7 +205,7 @@ function _hdls.make(cfg)
 end
 
 function _hdls.cargo(cfg)
-    cfg.tout.efm = codes.rust.efm
+    cfg.efm = codes.rust.efm
 
     local rep = {}
     rep.barg = cfg.barg
@@ -303,12 +336,13 @@ local _sels = {
         style = { lst = { 'term', 'ansi', 'job' } },
         encoding = { lst = { 'utf-8', 'cp936' } },
         verbose = {
-            lst = { 'a', 'w', 'r', 'h', 'd' },
+            lst = { 'a', 'w', 'e', 'h', 'r' },
             dic = {
-                a = 'Show all',
+                a = 'Enable all = wehr',
                 w = 'Show code wsc',
-                h = 'Show highlights',
-                d = 'Show debug',
+                e = 'Disable errorformat',
+                h = 'Tag highlights with (row, col-start, col-end)',
+                r = 'Keep raw line string',
             },
         },
     },
@@ -409,13 +443,17 @@ local entry = async(function(kt, bang)
     wsc.tout.append = false
     wsc.tout.title = task.title.Code
     wsc.tout.style = wsc.style
-    wsc.tout.encoding = wsc.style == 'job' and wsc.encoding or ''
     wsc.tout.verbose = bang and 'a' or wsc.verbose
-    if wsc.tout.verbose:match('[aw]') then
-        vim.notify(('resovle = %s, restore = %s\n%s'):format(resovle, restore, vim.inspect(wsc)))
-    end
     local ok, msg = pcall(function()
         wsc.cmd = dispatch(_maps[wsc.key], wsc)
+        wsc.tout.efm = wsc.efm
+        wsc.tout.encoding = wsc.style == 'job' and wsc.encoding or ''
+        if wsc.tout.verbose:match('[ae]') then
+            wsc.tout.efm = ' '
+        end
+        if wsc.tout.verbose:match('[aw]') then
+            vim.notify(('resovle = %s, restore = %s\n%s'):format(resovle, restore, vim.inspect(wsc)))
+        end
         task.run(wsc)
         nlib.recall(function() task.run(wsc) end)
     end)

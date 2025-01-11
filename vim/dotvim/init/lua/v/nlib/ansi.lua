@@ -207,6 +207,7 @@ end
 local function new()
     local bufs = {} -- Processed buffer lines
     local bufc = { '', {} } -- Processed buffer cache lines
+    local cnt = 1 -- Buffer line counter
     local bot = 1 -- The bottom buffer line in terminal window
     local wid = vim.o.columns
     local hei = vim.o.lines
@@ -261,11 +262,12 @@ local function new()
 
     ansi.feed = function(linestr, verbose)
         local verb_h = verbose:match('[ah]')
-        local verb_d = verbose:match('[ad]')
+        local verb_r = verbose:match('[ar]')
 
-        if verb_d then
-            bufs[#bufs + 1] = { '>', {} }
-            bufs[#bufs + 1] = { linestr, {} }
+        if verb_r then
+            bufs[#bufs + 1] = { ('> line=%d'):format(cnt), {} }
+            bufs[#bufs + 1] = { linestr, {} } -- May populate `bufs` used by `prevline()`
+            cnt = cnt + 1
         end
 
         local row, buf, hlt = nextline()

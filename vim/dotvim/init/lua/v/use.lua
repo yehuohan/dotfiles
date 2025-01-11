@@ -63,8 +63,8 @@ local function use_init()
             icon = { lst = { true, false } },
             font = { dsr = 'as guifont', lst = lst.fonts },
             fontback = { dsr = 'as guifont fallback', lst = lst.fonts },
-            fontsize = { lst = lst.fontsize },
             wide = { dsr = 'as guifontwide', lst = lst.fonts },
+            fontsize = { lst = lst.fontsize },
             widesize = { lst = lst.fontsize },
         },
         sub = {

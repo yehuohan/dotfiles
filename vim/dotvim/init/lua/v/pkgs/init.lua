@@ -747,7 +747,6 @@ local function pkg_floaterm()
     m.nnore({ '<leader>mz', ':FloatermNew --cwd=. zsh<CR>' })
     m.nnore({ '<leader>mf', ':FloatermNew --cwd=. fzf --cycle<CR>' })
     m.nnore({ '<leader>mg', ':FloatermNew --cwd=. lazygit<CR>' })
-    m.nnore({ '<leader>ml', ':FloatermNew --cwd=. lf<CR>' })
 end
 
 -- 代码注释
@@ -906,8 +905,7 @@ local function pkg_tex()
     m.nmap({ '<leader>va', '<Plug>(vimtex-view)' })
     m.nmap({ '<leader>ab', '<Plug>(vimtex-compile-ss)' })
     m.nmap({ '<leader>aB', '<Plug>(vimtex-compile)' })
-    m.nmap({ '<leader>ak', '<Plug>(vimtex-stop)' })
-    m.nmap({ '<leader>aK', '<Plug>(vimtex-stop-all)' })
+    m.nmap({ '<leader>ak', '<Plug>(vimtex-stop-all)' })
 end
 
 -- 颜色预览

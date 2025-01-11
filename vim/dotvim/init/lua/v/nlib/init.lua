@@ -173,7 +173,7 @@ function M.new_chanor(opts)
         -- Copy returned lines and highlights
         local lines = {}
         local highlights = {}
-        for k = buf_idx, #bufs, 1 do
+        for k = buf_idx, #bufs, 1 do -- #bufs - (eof and 0 or 1): may need keep lines
             if bufs[k] then
                 lines[#lines + 1] = bufs[k][1]
                 if style == 'ansi' then
