@@ -323,6 +323,9 @@ function M.constructor(params)
                 params.efm = params.efm[1]
             end
         end
+        if params.efm == '' then
+            params.efm = ' ' -- The errorformat can be nil, but can't be ''
+        end
     end
 
     cpt.on_start = function(self, task)

@@ -82,6 +82,28 @@ local packs = {
     _msvc = 'vcvars64.bat',
 }
 
+--- Fetch and combine errorformats
+--- @param types(string[])
+--- @return string[]
+local function fetch_efm(types)
+    local res1 = {}
+    local res2 = {}
+    for _, ft in ipairs(types) do
+        local efm = codes[ft].efm
+        if type(efm) == 'table' then
+            res1[#res1 + 1] = efm[1]
+            res2[#res2 + 1] = efm[2]
+        elseif type(efm) == 'string' then
+            res1[#res1 + 1] = efm
+            res2[#res2 + 1] = efm
+        end
+    end
+    return {
+        table.concat(res1, ','),
+        table.concat(res2, ','),
+    }
+end
+
 --- @return string[]
 local function pat_list(pattern, file)
     local lst = {}
@@ -148,23 +170,6 @@ function _hdls.file(cfg)
 end
 
 function _hdls.just(cfg)
-    cfg.efm = {
-        table.concat({
-            codes.just.efm[1],
-            codes.cmake.efm,
-            codes.c.efm,
-            codes.rust.efm[1],
-            codes.python.efm,
-        }, ','),
-        table.concat({
-            codes.just.efm[2],
-            codes.cmake.efm,
-            codes.c.efm,
-            codes.rust.efm[2],
-            codes.python.efm,
-        }, ','),
-    }
-
     local rep = {}
     rep.barg = cfg.barg
 
@@ -172,27 +177,24 @@ function _hdls.just(cfg)
     cmds[#cmds + 1] = (IsWin() and cfg.msvc) and packs._msvc or nil
     cmds[#cmds + 1] = replace(packs.just, rep)
 
-    return sequence(cmds)
+    local tbl, cmd = nlib.modeline('code', cfg.file)
+    local efm_fts = { 'just', 'cmake', 'c', 'rust', 'python' }
+    if tbl then
+        local efm = fetch_efm(vim.list_extend(tbl.efm_fts or {}, efm_fts))
+        cfg:set(tbl)
+        cfg.efm = efm
+        if tbl.efm then
+            cfg.efm = { tbl.efm .. ',' .. efm[1], tbl.efm .. ',' .. efm[2] }
+        end
+    else
+        local efm = fetch_efm(efm_fts)
+        cfg.efm = efm
+    end
+    cmd = cmd or sequence(cmds)
+    return cmd
 end
 
 function _hdls.make(cfg)
-    cfg.efm = {
-        table.concat({
-            codes.make.efm,
-            codes.cmake.efm,
-            codes.c.efm,
-            codes.rust.efm[1],
-            codes.python.efm,
-        }, ','),
-        table.concat({
-            codes.make.efm,
-            codes.cmake.efm,
-            codes.c.efm,
-            codes.rust.efm[2],
-            codes.python.efm,
-        }, ','),
-    }
-
     local rep = {}
     rep.barg = cfg.barg
 
@@ -200,7 +202,21 @@ function _hdls.make(cfg)
     cmds[#cmds + 1] = (IsWin() and cfg.msvc) and packs._msvc or nil
     cmds[#cmds + 1] = replace(packs.make, rep)
 
-    return sequence(cmds)
+    local tbl, cmd = nlib.modeline('code', cfg.file)
+    local efm_fts = { 'make', 'cmake', 'c' }
+    if tbl then
+        local efm = fetch_efm(vim.list_extend(tbl.efm_fts or {}, efm_fts))
+        cfg:set(tbl)
+        cfg.efm = efm
+        if tbl.efm then
+            cfg.efm = { tbl.efm .. ',' .. efm[1], tbl.efm .. ',' .. efm[2] }
+        end
+    else
+        local efm = fetch_efm(efm_fts)
+        cfg.efm = efm
+    end
+    cmd = cmd or sequence(cmds)
+    return cmd
 end
 
 function _hdls.cargo(cfg)
