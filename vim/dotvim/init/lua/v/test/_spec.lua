@@ -1,5 +1,5 @@
 --- Simple testcases for neovim configration
---- vim@code{ tout = { style = 'term'}}: nvim --headless --noplugin -u NONE -i NONE -n -c "set rtp+=../../../../bundle/plenary.nvim | runtime plugin/plenary.vim | PlenaryBustedDirectory . {minimal_init='NONE'}"
+--- vim@code{ tout = { style = 'term' }}: nvim --headless --noplugin -u NONE -i NONE -n -c "set rtp+=../../../../bundle/plenary.nvim | runtime plugin/plenary.vim | PlenaryBustedDirectory . {minimal_init='NONE'}"
 
 local dir_this = vim.fn.getcwd()
 local dir_init = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(dir_this)))
@@ -114,7 +114,7 @@ describe('nlib', function()
                 local ab2 = { 'a', 'b', 2 }
                 local AB2 = { 'A', 'B', 2 }
                 cfg.args[#cfg.args + 1] = '-b'
-                cfg.args[5] = '-c'
+                table.insert(cfg.args, 5, '-c')
                 cfg.args[ab2] = 'ab2'
                 cfg.args.num = 2
                 cfg.args.inp = 'src'
@@ -126,11 +126,10 @@ describe('nlib', function()
                 EQ({
                     cmd = 'gcc',
                     file = 'foo.c',
-                    args = { '-a', num = 2, ARGS = { '-A', CNT = 2 } },
+                    args = { '-a', [5] = '-c', num = 2, ARGS = { '-A', CNT = 2 } },
                 }, cfg)
                 EQ({
                     [2] = '-b',
-                    [5] = '-c',
                     [ab2] = 'ab2',
                     inp = 'src',
                     ARGS = {

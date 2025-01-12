@@ -17,6 +17,7 @@ local wsc = nlib.new_configer({
     options = '',
     vimgrep = false,
     fuzzier = 'telescope',
+    verbose = '',
 })
 
 --- @return string[]
@@ -64,6 +65,7 @@ local function rg_ignore() return wsc.ignore and {} or { '--no-ignore' } end
 --- @field telescope(Fuzzier)
 local fzer = {
     rg = 'rg --vimgrep -F {opt} -e "{pat}" {loc}',
+    efm = [[%f:%l:%c:%m]],
     fzf = {
         file = ':FzfFiles {loc}',
         live = function(rep)
@@ -163,9 +165,9 @@ local _sels = {
     opt = 'setup fzer task',
     lst = nil,
     -- lst for rg
-    lst_r = { 'envs', 'path', 'glob', 'hidden', 'ignore', 'options', 'vimgrep' },
+    lst_r = { 'envs', 'path', 'glob', 'hidden', 'ignore', 'options', 'vimgrep', 'verbose' },
     -- lst for fuzzier
-    lst_f = { 'envs', 'path', 'glob', 'hidden', 'ignore', 'options', 'fuzzier' },
+    lst_f = { 'envs', 'path', 'glob', 'hidden', 'ignore', 'options', 'fuzzier', 'verbose' },
     dic = {
         envs = { lst = { 'PATH=' }, cpl = 'environment' },
         path = { dsr = 'cached fzer path list', lst = wsc.paths, cpl = 'file' },
@@ -175,6 +177,14 @@ local _sels = {
         options = { lst = { '-w', '-i', '-s', '-S', '--no-fixed-strings', '--encoding gbk' } },
         vimgrep = vim.empty_dict(),
         fuzzier = { lst = { 'fzf', 'leaderf', 'telescope' } },
+        verbose = {
+            lst = { 'a', 'w', 'e' },
+            dic = {
+                a = 'Enable all = wehr',
+                w = 'Show code wsc',
+                e = 'Disable errorformat',
+            },
+        },
     },
     evt = function(name)
         if name == 'onCR' then
@@ -342,6 +352,7 @@ local entry = async(function(kt, bang)
     wsc.cmd = replace(fzer.rg, rep)
     wsc.wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
     wsc.tout = {
+        efm = fzer.efm,
         open = true,
         jump = true,
         scroll = false,
@@ -349,13 +360,16 @@ local entry = async(function(kt, bang)
         title = task.title.Fzer,
         style = 'job',
         encoding = '',
-        verbose = bang and 'a',
+        verbose = bang and 'a' or wsc.verbose,
     }
     if not wsc.tout.append then
         task.hlstr = {}
     end
-    table.insert(task.hlstr, rep.pat)
-    if bang then
+    task.hlstr[#task.hlstr + 1] = rep.pat
+    if wsc.tout.verbose:match('[ae]') then
+        wsc.tout.efm = ' '
+    end
+    if wsc.tout.verbose:match('[aw]') then
         vim.notify(vim.inspect(wsc))
     end
     task.run(wsc)

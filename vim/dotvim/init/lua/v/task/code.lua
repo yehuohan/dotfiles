@@ -20,7 +20,6 @@ local wsc = nlib.new_configer({
     style = 'ansi',
     encoding = '', -- Setup output encoding
     verbose = '',
-    tout = {},
 })
 
 --- @class CodeVars
@@ -437,17 +436,19 @@ local entry = async(function(kt, bang)
     -- Run code task
     vim.cmd.wall({ mods = { silent = true, emsg_silent = true } })
     wsc.key = kt.E
-    wsc.tout.open = true
-    wsc.tout.jump = false
-    wsc.tout.scroll = true
-    wsc.tout.append = false
-    wsc.tout.title = task.title.Code
-    wsc.tout.style = wsc.style
-    wsc.tout.verbose = bang and 'a' or wsc.verbose
     local ok, msg = pcall(function()
         wsc.cmd = dispatch(_maps[wsc.key], wsc)
-        wsc.tout.efm = wsc.efm
-        wsc.tout.encoding = wsc.style == 'job' and wsc.encoding or ''
+        wsc.tout = {
+            efm = wsc.efm,
+            open = true,
+            jump = false,
+            scroll = true,
+            append = false,
+            title = task.title.Code,
+            style = wsc.style,
+            encoding = wsc.style == 'job' and wsc.encoding or '',
+            verbose = bang and 'a' or wsc.verbose,
+        }
         if wsc.tout.verbose:match('[ae]') then
             wsc.tout.efm = ' '
         end

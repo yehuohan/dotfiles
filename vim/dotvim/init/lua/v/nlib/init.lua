@@ -1,21 +1,6 @@
 --- @class NLib Neovim Library
 local M = {}
 
---- Configer {
----     opt0 = xxx,
----     opt1 = {xxx},
----     ...,
----     <metatable> = ConfigerMethod {
----         fn0 = xxx,
----         fn1 = xxx,
----         ...,
----         <metatable> = ConfigerNonSaveable {
----             eopt0 = xxx,
----             eopt1 = {xxx},
----             ...,
----         },
----     },
---- }
 --- @alias Configer table An useful configer with savable options
 --- @alias ConfigerMethod table Configer's methods
 --- @alias ConfigerSaveable table Configer's savable options without `ConfigerMethod`
@@ -23,6 +8,33 @@ local M = {}
 
 --- Create a configer
 --- Configer need metatable for internal usage, so metatable from `opts` will be droped
+---
+--- `table.insert()` won't trigger `B.__newindex`, but works as `rawset()`:
+---  * table.insert(opts.arg, 'abc')
+---  * opts.arg[1] = 'ABC'
+---
+--- opts@Configer {
+---     opt = xxx,
+---     arg = {
+---         'abc',
+---         <metatable> = B {
+---             __index,
+---             __newindex,
+---         },
+---     },
+---     ...
+---     <metatable> = C@ConfigerMethod {
+---         __index,
+---         __newindex,
+---         set(),
+---         get(),
+---         ...
+---         <metatable> = nsc@ConfigerNonSaveable {
+---             ext = yyy,
+---             arg = { 'ABC' },
+---         },
+---     },
+--- }
 --- @param opts(table) Savable options of configer
 --- @return Configer opts with `ConfigerMethod` is called `Configer`
 function M.new_configer(opts)
