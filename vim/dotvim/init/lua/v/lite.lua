@@ -6,7 +6,6 @@ local m = nlib.m
 local special_cmds = {
     t = [[%s/\s\+$//ge]],
     m = [[%s/\r//ge]],
-    c = [[syntax match QC /\v^[^|]*\|[^|]*\| / conceal]],
     ['Clear undo changes'] = function()
         local ulbak = vim.o.undolevels
         vim.o.undolevels = -1
@@ -26,7 +25,6 @@ local fast_cmds = {
         'retab!',
         special_cmds.t,
         special_cmds.m,
-        special_cmds.c,
         'edit ++enc=utf-8',
         'edit ++enc=cp936',
         'Assembly commands',

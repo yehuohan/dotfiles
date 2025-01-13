@@ -10,7 +10,7 @@ local PAUSE_PATS = {
 --- @class ToutQuickfix
 --- @field ns(integer) Quickfix highlight namespace
 --- @field hwin(integer|nil) Quickfix window handle
---- @field hbuf(integer|nil) Quickfix buf handle
+--- @field hbuf(integer|nil) Quickfix buffer handle
 --- @field task(table|nil) The task output to quickfix
 --- @field title(TaskTitle|nil)
 local qf = {
@@ -134,11 +134,15 @@ function qf.on_start(task, cpt, params)
         lines = { msg },
         efm = ' ', -- Avoid match time string
         title = params.title,
+        context = { hltext = params.hltext },
     })
     if qf.hbuf then
         local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
         qf.highlight('Constant', line, 5, 13)
         qf.highlight('Identifier', line, 15, string.len(msg))
+    end
+    if qf.hwin then
+        require('v.task').qf_adapt(qf.hwin, params.hltext)
     end
 end
 
@@ -278,6 +282,11 @@ local M = {
             desc = 'Append result to quickfix list',
             type = 'boolean',
             default = false,
+        },
+        hltext = {
+            desc = 'Text to highlight from task outputs at quickfix window',
+            type = 'string', -- Actually use string[]
+            default = '',
         },
         title = {
             desc = 'Set quickfix title as a identifier',

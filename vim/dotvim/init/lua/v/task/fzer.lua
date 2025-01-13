@@ -18,6 +18,7 @@ local wsc = nlib.new_configer({
     vimgrep = false,
     fuzzier = 'telescope',
     verbose = '',
+    hltext = {},
 })
 
 --- @return string[]
@@ -350,6 +351,12 @@ local entry = async(function(kt, bang)
     rep.opt = table.concat(parse_opt(kt), ' ')
 
     -- Run fzer task
+    local append = kt.A == 'a'
+    if not append then
+        wsc.hltext = {}
+    end
+    table.insert(wsc.hltext, rep.pat)
+    wsc:mut('hltext', wsc.hltext)
     wsc.cmd = replace(fzer.rg, rep)
     wsc.wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
     wsc.tout = {
@@ -357,16 +364,13 @@ local entry = async(function(kt, bang)
         open = true,
         jump = true,
         scroll = false,
-        append = kt.A == 'a',
+        append = append,
         title = task.title.Fzer,
         style = 'job',
         encoding = '',
         verbose = bang and 'a' or wsc.verbose,
+        hltext = wsc.hltext,
     }
-    if not wsc.tout.append then
-        task.hlstr = {}
-    end
-    task.hlstr[#task.hlstr + 1] = rep.pat
     if wsc.tout.verbose:match('[ae]') then
         wsc.tout.efm = ' '
     end

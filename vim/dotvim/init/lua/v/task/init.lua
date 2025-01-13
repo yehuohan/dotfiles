@@ -18,6 +18,7 @@ local M = {}
 --- @field jump(boolean)
 --- @field scroll(boolean)
 --- @field append(boolean)
+--- @field hltext(string[]|nil)
 --- @field title(string)
 --- @field style(string)
 --- @field encoding(string)
@@ -35,9 +36,6 @@ M.title = {
     Code = 'v.task.code',
     Fzer = 'v.task.fzer',
 }
-
---- @type string[] String to highlight from task outputs at quickfix window
-M.hlstr = {}
 
 --- Run task
 --- @param cfg(TaskConfig)
@@ -85,48 +83,55 @@ function M.cmd(cmd, bang)
     M.run(cfg)
 end
 
+--- Goto the quickfix item
+--- @param qfwin(integer) Quickfix window handle
+function M.qf_goto(qfwin)
+    -- Open with absolute file path
+    local row = vim.fn.line('.', qfwin)
+    local item = vim.fn.getqflist()[row]
+    if item.bufnr > 0 then
+        vim.api.nvim_set_current_win(vim.fn.win_getid(vim.fn.winnr('#')))
+        if not vim.b.sets_large_file then
+            vim.cmd.edit({ args = { vim.api.nvim_buf_get_name(item.bufnr) } })
+        end
+        local pos = { item.lnum, item.col > 0 and (item.col - 1) or 0 }
+        vim.api.nvim_win_set_cursor(0, pos)
+    end
+    vim.fn.setqflist({}, 'a', { idx = row })
+end
+
+--- Adapt quickfix output like terminal
+--- @param qfwin(integer) Quickfix window handle
+--- @param hltext(string[]|nil) Text to highlight
+function M.qf_adapt(qfwin, hltext)
+    vim.api.nvim_win_call(qfwin, function()
+        if type(hltext) == 'table' then
+            for _, txt in ipairs(hltext) do
+                local estr = vim.fn.escape(txt, '\\/')
+                vim.cmd.syntax({ args = { ([[match IncSearch /\V\c%s/]]):format(estr) } })
+            end
+        end
+        vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| / conceal]] } })
+        vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| {{{ / conceal]] } })
+        vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| }}} / conceal]] } })
+    end)
+    vim.api.nvim_set_option_value('number', false, { win = qfwin })
+    vim.api.nvim_set_option_value('relativenumber', false, { win = qfwin })
+    vim.api.nvim_set_option_value('signcolumn', 'no', { win = qfwin })
+end
+
 --- Setup quickfix window for task result
 local function setup_quickfix()
     vim.api.nvim_create_autocmd('BufWinEnter', {
         group = 'v.Task',
         callback = function(args)
-            local qf = vim.fn.getqflist({ winid = 0, qfbufnr = 0, title = 0 })
+            local qf = vim.fn.getqflist({ winid = 1, qfbufnr = 1, context = 1 })
             if qf.qfbufnr ~= args.buf then
                 return
             end
-            -- Setup key mappings
-            nlib.m.nnore({
-                '<CR>',
-                function()
-                    -- Open with absolute file path
-                    local row = vim.fn.line('.', qf.winid)
-                    local item = vim.fn.getqflist()[row]
-                    if item.bufnr > 0 then
-                        vim.api.nvim_set_current_win(vim.fn.win_getid(vim.fn.winnr('#')))
-                        if not vim.b.sets_large_file then
-                            vim.cmd.edit({ args = { vim.api.nvim_buf_get_name(item.bufnr) } })
-                        end
-                        local pos = { item.lnum, item.col > 0 and (item.col - 1) or 0 }
-                        vim.api.nvim_win_set_cursor(0, pos)
-                    end
-                    vim.fn.setqflist({}, 'a', { idx = row })
-                end,
-                buffer = qf.qfbufnr,
-            })
-            -- Setup window display
+            nlib.m.nnore({ '<CR>', function() M.qf_goto(qf.winid) end, buffer = qf.qfbufnr })
             if (qf.winid > 0) and vim.api.nvim_win_is_valid(qf.winid) then
-                vim.api.nvim_win_call(qf.winid, function()
-                    for _, str in ipairs(M.hlstr) do
-                        local estr = vim.fn.escape(str, '\\/')
-                        vim.cmd.syntax({ args = { ([[match IncSearch /\V\c%s/]]):format(estr) } })
-                    end
-                    vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| / conceal]] } })
-                    vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| {{{ / conceal]] } })
-                    vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| }}} / conceal]] } })
-                end)
-                vim.api.nvim_set_option_value('number', false, { win = qf.winid })
-                vim.api.nvim_set_option_value('relativenumber', false, { win = qf.winid })
-                vim.api.nvim_set_option_value('signcolumn', 'no', { win = qf.winid })
+                M.qf_adapt(qf.winid, qf.context.hltext)
             end
         end,
     })
