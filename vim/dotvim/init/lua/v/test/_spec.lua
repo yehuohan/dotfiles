@@ -66,9 +66,9 @@ describe('nlib', function()
 
         it('. modify methods', function()
             local cfg = nlib.new_configer({})
-            NOK(function() cfg.get = 'foo' end)
+            NOK(function() cfg.new = 'foo' end)
             NOK(function() cfg.set = 'foo' end)
-            NOK(function() cfg.reinit = 'foo' end)
+            NOK(function() cfg.get = 'foo' end)
         end)
 
         it('. modify savable and non-savable options', function()
@@ -87,7 +87,7 @@ describe('nlib', function()
             EQ('c', rawget(getmetatable(getmetatable(cfg2)), 'type'))
         end)
 
-        it('. get/set/reinit', function()
+        it('. get/set/mut/new', function()
             local cfg = nlib.new_configer({ file = 'foo.c', args = { '-g' } })
             -- .get
             local out = cfg:get()
@@ -103,13 +103,22 @@ describe('nlib', function()
             EQ('c', rawget(getmetatable(getmetatable(cfg)), 'type'))
             EQ({ a = 'a' }, rawget(getmetatable(getmetatable(cfg)), 'args'))
             EQ({ A = 'A' }, rawget(getmetatable(getmetatable(cfg)), 'ARGS'))
-            -- .reinit
-            cfg:reinit()
-            EQ({ file = 'foo.c', args = { '-g' } }, cfg)
+            -- .mut
+            cfg:mut('cmd', 'gcc')
+            EQ('gcc', rawget(cfg, 'cmd'))
+            cfg:mut('ARGS', { '-F', a = { b = 'c' } })
+            cfg.ARGS.a.b = 'abc'
+            EQ('abc', rawget(cfg, 'ARGS').a.b)
+            EQ('c', getmetatable(cfg)._opts.ARGS.a.b)
+            cfg:mut('ARGS')
+            EQ(nil, rawget(cfg, 'ARGS'))
+            -- .new
+            cfg:new()
+            EQ({ cmd = 'gcc', file = 'foo.c', args = { '-g' } }, cfg)
             EQ(nil, rawget(getmetatable(getmetatable(cfg)), 'type'))
         end)
 
-        it('. new/reinit with multi-level-table-option', function()
+        it('. new with multi-level-table-option', function()
             local function check(cfg)
                 local ab2 = { 'a', 'b', 2 }
                 local AB2 = { 'A', 'B', 2 }
@@ -148,7 +157,7 @@ describe('nlib', function()
             })
             check(cfg1)
             local cfg2 = nlib.new_configer({ file = 'bar.c' })
-            cfg2:reinit({
+            cfg2:new({
                 cmd = 'gcc',
                 file = 'foo.c',
                 args = { '-a', num = 1, ARGS = { '-A', CNT = 1 } },

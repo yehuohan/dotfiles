@@ -383,7 +383,7 @@ end
 --- @type PopSelectionEvent
 local function evt_i(name)
     if name == 'onCR' then
-        wsc:reinit(wsc:get())
+        wsc:new(wsc:get())
         vim.notify('Code task wsc is reinited!')
     end
 end
@@ -403,7 +403,7 @@ end
 ---     R^p => r^p (r^p means r[kt.E != p])
 ---     Rp  => rp  => r^p
 local entry = async(function(kt, bang)
-    wsc:reinit()
+    wsc:new()
 
     local resovle = false
     local restore = false
@@ -512,12 +512,12 @@ local function setup()
     )
     vim.api.nvim_create_user_command('CodeWsc', function(opts)
         if opts.bang then
-            wsc:reinit()
+            wsc:new()
         end
         vim.print(wsc)
     end, { bang = true, nargs = 0 })
     vim.api.nvim_create_user_command('CodeWscInit', function()
-        wsc:reinit()
+        wsc:new()
         _sels.lst = _sels.lst_i
         _sels.evt = evt_i
         vim.fn.PopSelection(_sels)

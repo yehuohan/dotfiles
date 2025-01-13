@@ -199,7 +199,7 @@ local _sels = {
                     table.insert(wsc.globs, wsc.glob)
                 end
             end
-            wsc:reinit(wsc:get())
+            wsc:new(wsc:get())
         end
     end,
     sub = {
@@ -265,7 +265,8 @@ local function parse_loc(kt)
     end
     -- Need reinit wsc when modified path or paths
     if restore then
-        wsc:reinit(wsc:get())
+        wsc:mut('path', wsc.path)
+        wsc:mut('paths', wsc.paths)
         task.wsc.fzer = wsc:get()
     end
     return loc
@@ -320,7 +321,7 @@ end
 ---     LowerCase: [iwsyu] ignorecase
 ---     UpperCase: [IWSYU] case insensitive
 local entry = async(function(kt, bang)
-    wsc:reinit()
+    wsc:new()
 
     -- Parse rg pattern
     local rep = {}
@@ -388,7 +389,7 @@ end)
 ---     l : fuzzier.live
 ---     h : fuzzier.tags with <cword> by default
 local entry_fuzzier = async(function(kt)
-    wsc:reinit()
+    wsc:new()
 
     -- Parse fuzzier pattern
     local rep = { pat = '' }
@@ -450,7 +451,7 @@ local function setup()
     )
     vim.api.nvim_create_user_command('FzerWsc', function(opts)
         if opts.bang then
-            wsc:reinit()
+            wsc:new()
         end
         vim.print(wsc)
     end, { bang = true, nargs = 0 })
@@ -460,6 +461,6 @@ return {
     setup = setup,
     setwsc = function(__wsc)
         wsc:set(__wsc)
-        wsc:reinit(wsc:get())
+        wsc:new(wsc:get())
     end,
 }

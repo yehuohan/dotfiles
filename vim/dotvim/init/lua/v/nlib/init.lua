@@ -26,6 +26,7 @@ local M = {}
 ---     <metatable> = C@ConfigerMethod {
 ---         __index,
 ---         __newindex,
+---         _opts = { ... },
 ---         set(),
 ---         get(),
 ---         ...
@@ -41,7 +42,6 @@ function M.new_configer(opts)
     if type(opts) ~= 'table' then
         error('Initial savable options shoule be a table')
     end
-    local copy_opts = M.u.deepcopy(opts)
 
     --- Create non-savable options for each sub-tables
     --- @param init_opts(table) Savable options of configer
@@ -77,7 +77,7 @@ function M.new_configer(opts)
     end
 
     --- @type ConfigerMethod
-    local C = {}
+    local C = { _opts = M.u.deepcopy(opts) }
     setmetatable(C, non_savable_config(opts))
     C.__index = C
     C.__newindex = function(t, k, v)
@@ -94,27 +94,19 @@ function M.new_configer(opts)
         end
     end
 
-    --- Get only savable options as a table
-    --- @return ConfigerSaveable
-    function C:get() return M.u.deepcopy(self) end
-
-    --- Setup config's current options
-    --- * All savable and non-savable options in mask will be merged from new_opts
-    function C:set(new_opts, mask) M.u.deepmerge(self, new_opts, mask) end
-
-    --- Reinit config's options
-    --- * The initial options will be repleaced with reinit_opts;
-    --- * All savable options will be cleared first, then reinited with reinit_opts;
+    --- Re-new config's options
+    --- * `C._opts` will be repleaced with new_opts;
+    --- * All savable options will be cleared first, then reinited with new_opts;
     --- * All non-savable options will be cleared.
-    --- @param reinit_opts(table|nil) New savable options of configer
-    function C:reinit(reinit_opts)
-        if reinit_opts then
-            copy_opts = M.u.deepcopy(reinit_opts)
+    --- @param new_opts(table|nil) New savable options of configer
+    function C:new(new_opts)
+        if new_opts then
+            C._opts = M.u.deepcopy(new_opts)
         end
         for k, _ in pairs(self) do
             rawset(self, k, nil)
         end
-        for k, v in pairs(copy_opts) do
+        for k, v in pairs(C._opts) do
             if type(v) == 'table' then
                 rawset(self, k, M.u.deepcopy(v))
             else
@@ -124,6 +116,34 @@ function M.new_configer(opts)
         -- C == getmetatable(self)
         setmetatable(C, non_savable_config(self))
     end
+
+    --- Modify config's one option
+    --- This won't construct metatable `opt.B` even if the `val` is table.
+    --- * `C._opts` will be modified;
+    --- * The savable option will modified.
+    function C:mut(opt, val)
+        if type(val) == 'table' then
+            if type(rawget(self, opt)) ~= 'table' then
+                rawset(self, opt, {})
+                C._opts[opt] = {}
+            end
+            for k, v in pairs(val) do
+                rawset(self[opt], k, v) -- It's better that `v` is not a sub-table
+            end
+            M.u.deepmerge(C._opts[opt], val)
+        else
+            rawset(self, opt, val)
+            rawset(C._opts, opt, val)
+        end
+    end
+
+    --- Setup config's current options
+    --- * All savable and non-savable options in mask will be merged from new_opts
+    function C:set(new_opts, mask) M.u.deepmerge(self, new_opts, mask) end
+
+    --- Get only savable options as a table
+    --- @return ConfigerSaveable
+    function C:get() return M.u.deepcopy(self) end
 
     return setmetatable(opts, C)
 end
@@ -400,7 +420,7 @@ function _u.deepcopy(orig, mt)
 end
 
 --- Deep merge table
---- @param dst(table) The table to merge into, and metable will be keeped
+--- @param dst(table) The table to merge into, and metatable will works and be keeped
 --- @param src(table) The table to merge from
 --- @param mask(table|nil) Mask what will be merged from `src`, nil means all masked
 function _u.deepmerge(dst, src, mask)
