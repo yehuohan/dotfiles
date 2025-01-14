@@ -118,7 +118,7 @@ nnoremap <leader>cp "+p
 nnoremap <leader>cP "+P
 vnoremap <C-c> "+y
 nnoremap <C-v> "+p
-inoremap <C-v> <Esc>"+pi
+inoremap <C-v> <Esc>"+pa
 inoremap <M-v> <C-v>
 " 矩形选择
 noremap vv <C-v>

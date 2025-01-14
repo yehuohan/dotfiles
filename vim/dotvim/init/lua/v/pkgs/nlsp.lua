@@ -2,7 +2,7 @@ local use = require('v.use')
 local m = require('v.nlib').m
 
 --- Setup language servers
-local function __servers()
+local function setup_servers()
     -- Settings
     require('neoconf').setup({
         -- Priority: lspconfig.setup() < global < local
@@ -108,7 +108,7 @@ local function __servers()
 end
 
 --- Setup completion sources
-local function __sources()
+local function setup_sources()
     local cmp_im = require('cmp_im')
     local cmp_im_zh = require('cmp_im_zh')
     cmp_im.setup({
@@ -224,7 +224,7 @@ local function cmp_select(count)
 end
 
 --- Setup completion framework
-local function __completion()
+local function setup_completion()
     local cmp = require('cmp')
     local cmp_lsp_rs = require('cmp_lsp_rs')
     local compare = cmp.config.compare
@@ -249,6 +249,14 @@ local function __completion()
         ['<M-m>'] = cmp.mapping.scroll_docs(-4),
         ['<M-f>'] = cmp.mapping.scroll_docs(4),
         ['<M-d>'] = cmp.mapping.scroll_docs(-4),
+        ['<C-p>'] = cmp.mapping(
+            function() vim.api.nvim_feedkeys(vim.fn.getreg('0'), 'i', false) end,
+            { 'i', 'c' }
+        ),
+        ['<C-v>'] = cmp.mapping(
+            function() vim.api.nvim_feedkeys(vim.fn.getreg('+'), 'i', false) end,
+            { 'i', 'c' }
+        ),
         ['<Space>'] = cmp.mapping(require('cmp_im').select(), { 'i', 'c' }),
     }
     m.imap({ '<C-j>', '<M-j>' })
@@ -309,14 +317,12 @@ local function __completion()
         }),
     })
     cmp.setup.cmdline({ '/', '?' }, {
-        mapping = cmp_mappings,
         sources = {
             { name = 'buffer' },
             { name = 'IM' },
         },
     })
     cmp.setup.cmdline({ ':', '@' }, {
-        mapping = cmp_mappings,
         sources = cmp.config.sources({
             { name = 'path' },
             { name = 'IM' },
@@ -327,7 +333,7 @@ local function __completion()
 end
 
 --- Setup lsp highlights
-local function __highlights()
+local function setup_highlights()
     local api = vim.api
     -- stylua: ignore start
     api.nvim_set_hl(0, 'LspSignatureActiveParameter', {link = 'Tag' })
@@ -369,7 +375,7 @@ local function __highlights()
 end
 
 --- Setup lsp settings
-local function __lsp_settings()
+local function setup_lsp_settings()
     vim.lsp.set_log_level(vim.lsp.log_levels.OFF)
     if use.ui.icon then
         for name, icon in pairs({
@@ -416,7 +422,7 @@ local function __lsp_settings()
 end
 
 --- Setup lsp mappings
-local function __lsp_mappings()
+local function setup_lsp_mappings()
     -- m.inore({ '<M-o>', vim.lsp.buf.signature_help })
     m.nnore({ 'gd', vim.lsp.buf.definition })
     m.nnore({ 'gD', vim.lsp.buf.declaration })
@@ -477,12 +483,12 @@ local function __lsp_mappings()
 end
 
 local pkg_nslp = vim.schedule_wrap(function()
-    __servers()
-    __sources()
-    __completion()
-    __highlights()
-    __lsp_settings()
-    __lsp_mappings()
+    setup_servers()
+    setup_sources()
+    setup_completion()
+    setup_highlights()
+    setup_lsp_settings()
+    setup_lsp_mappings()
 end)
 
 return {

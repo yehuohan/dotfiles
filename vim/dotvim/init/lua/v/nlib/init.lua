@@ -7,16 +7,12 @@ local M = {}
 --- @alias ConfigerNonSaveable table Configer's non-savable options
 
 --- Create a configer
---- Configer need metatable for internal usage, so metatable from `opts` will be droped
----
---- `table.insert()` won't trigger `B.__newindex`, but works as `rawset()`:
----  * table.insert(opts.arg, 'abc')
----  * opts.arg[1] = 'ABC'
----
+--- Configer need metatable for internal usage, so metatable from `opts` will be droped.
+--- `table.insert()` works as `rawset()` and won't trigger `B.__newindex`:
 --- opts@Configer {
 ---     opt = xxx,
 ---     arg = {
----         'abc',
+---         'abc', -- table.insert(opts.arg, 'abc')
 ---         <metatable> = B {
 ---             __index,
 ---             __newindex,
@@ -32,7 +28,7 @@ local M = {}
 ---         ...
 ---         <metatable> = nsc@ConfigerNonSaveable {
 ---             ext = yyy,
----             arg = { 'ABC' },
+---             arg = { 'ABC' }, -- opts.arg[1] = 'ABC'
 ---         },
 ---     },
 --- }

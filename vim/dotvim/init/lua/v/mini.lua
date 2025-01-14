@@ -1,32 +1,19 @@
 local lsp = {
     {
-        'hrsh7th/nvim-cmp',
+        'yehuohan/hop.nvim',
         config = function()
-            require('mason').setup({ install_root_dir = vim.env.DotVimLocal .. '/.mason' })
-            require('mason-lspconfig').setup({})
-            local lspconfig = require('lspconfig')
-            local capabilities = require('cmp_nvim_lsp').default_capabilities()
-            local opts = {
-                function(server_name) lspconfig[server_name].setup({ capabilities = capabilities }) end,
-            }
-            require('mason-lspconfig').setup_handlers(opts)
-            local cmp = require('cmp')
-            cmp.setup({
-                mapping = {
-                    ['<M-i>'] = cmp.mapping(function() cmp.complete() end, { 'i' }),
-                    ['<M-j>'] = cmp.mapping(function() cmp.select_next_item() end, { 'i', 'c' }),
-                    ['<M-k>'] = cmp.mapping(function() cmp.select_prev_item() end, { 'i', 'c' }),
-                },
-                sources = cmp.config.sources({ { name = 'nvim_lsp' } }),
-                preselect = cmp.PreselectMode.None,
-            })
+            require('hop').setup({ match_mappings = { 'zh', 'zh_sc' }, extensions = {} })
+            vim.keymap.set('n', 's', '<Cmd>HopChar1MW<CR>', { remap = true })
         end,
-        dependencies = {
-            'williamboman/mason.nvim',
-            'williamboman/mason-lspconfig.nvim',
-            'neovim/nvim-lspconfig',
-            'hrsh7th/cmp-nvim-lsp',
-        },
+    },
+    {
+        'yehuohan/popc',
+        init = function()
+            vim.g.Popc_jsonPath = vim.env.DotVimLocal
+            vim.g.Popc_useFloatingWin = 1
+            vim.g.Popc_useNerdSymbols = 0
+            vim.keymap.set('n', '<leader><leader>h', '<Cmd>PopcBuffer<CR>', { noremap = true })
+        end,
     },
 }
 
@@ -54,6 +41,7 @@ return function(dotvim)
     vim.env.DotVimShare = dotvim .. '/share'
     vim.env.DotVimLocal = dotvim .. '/local'
     vim.env.NVimConfigDir = vim.fn.stdpath('config')
+    vim.g.mapleader = ' '
 
     setup_pkgs(lsp)
 end
