@@ -1,0 +1,21 @@
+
+.git
+
+# Vim
+*.swp
+_VOut
+
+# Rust
+/target
+
+# C/C++
+.cache
+compile_commands.json
+tags
+
+# CMake
+CMakeLists.txt.user
+/install
+
+# Python
+__pycache__
