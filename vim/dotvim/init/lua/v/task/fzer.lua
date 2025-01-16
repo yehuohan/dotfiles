@@ -173,9 +173,18 @@ local _sels = {
         envs = { lst = { 'PATH=' }, cpl = 'environment' },
         path = { dsr = 'cached fzer path list', lst = wsc.paths, cpl = 'file' },
         glob = { dsr = function() return table.concat(rg_globs(), ' ') end, lst = wsc.globs },
-        hidden = vim.empty_dict(),
-        ignore = vim.empty_dict(),
-        options = { lst = { '-w', '-i', '-s', '-S', '--no-fixed-strings', '--encoding gbk' } },
+        hidden = { dsr = 'search hidden files and directories' },
+        ignore = { dsr = 'respect .gitignore, .ignore and .rgignore' },
+        options = {
+            lst = { '-w', '-i', '-s', '-S', '-z', '--no-fixed-strings', '--encoding gbk' },
+            dic = {
+                ['-w'] = [[--word-regexp]],
+                ['-i'] = [[--ignore-case]],
+                ['-s'] = [[--word-regexp]],
+                ['-S'] = [[--smart-case]],
+                ['-z'] = [[--search-zip]],
+            },
+        },
         vimgrep = vim.empty_dict(),
         fuzzier = { lst = { 'fzf', 'leaderf', 'telescope' } },
         verbose = {
@@ -277,12 +286,12 @@ end
 local function parse_opt(kt)
     local opt = {}
     if kt.E:match('[sS]') then
-        opt[#opt + 1] = '-w' -- --word-regexp
+        opt[#opt + 1] = '-w'
     end
     if kt.E:match('[iwsyu]') then
-        opt[#opt + 1] = '-i' -- --ignore-case
+        opt[#opt + 1] = '-i'
     elseif kt.E:match('[IWSYU]') then
-        opt[#opt + 1] = '-s' -- --case-sensitive
+        opt[#opt + 1] = '-s'
     end
     if not kt.A:match('[p]') then
         -- Custom paths may conflict with rg's glob and ignore rules
