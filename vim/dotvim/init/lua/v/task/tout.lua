@@ -142,7 +142,7 @@ function qf.on_start(task, cpt, params)
         qf.highlight('Identifier', line, 15, string.len(msg))
     end
     if qf.hwin then
-        require('v.task').qf_adapt(qf.hwin, params.hltext)
+        require('v.task').qf_adapt(qf.hwin, params.title, params.hltext)
     end
 end
 

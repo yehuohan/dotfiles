@@ -15,7 +15,7 @@ local wsc = nlib.new_configer({
     hidden = true,
     ignore = true,
     options = '',
-    vimgrep = false,
+    vimgrep = false, -- `:vimgrep` doesn't works with `hidden`, `ignore` and `options`
     fuzzier = 'telescope',
     verbose = '',
     hltext = {},
@@ -66,6 +66,8 @@ local function rg_ignore() return wsc.ignore and {} or { '--no-ignore' } end
 --- @field telescope(Fuzzier)
 local fzer = {
     rg = 'rg --vimgrep -F {opt} -e "{pat}" {loc}',
+    vg = ':vimgrep /{pat}/j {loc}',
+    vga = ':vimgrepadd /{pat}/j {loc}',
     efm = [[%f:%l:%c:%m]],
     fzf = {
         file = ':FzfFiles {loc}',
@@ -104,8 +106,7 @@ setmetatable(fzer.fzf, {
         if type(strfn) == 'function' then
             self[rhs](rep)
         elseif type(strfn) == 'string' then
-            local cmd = replace(strfn, rep)
-            vim.cmd(cmd)
+            vim.cmd(replace(strfn, rep))
         end
     end,
 })
@@ -117,8 +118,7 @@ setmetatable(fzer.leaderf, {
             loc = table.concat(args.loc, ' '),
             opt = table.concat(args.opt, ' '),
         }
-        local cmd = replace(self[rhs], rep)
-        vim.cmd(cmd)
+        vim.cmd(replace(self[rhs], rep))
     end,
 })
 
@@ -180,7 +180,7 @@ local _sels = {
             dic = {
                 ['-w'] = [[--word-regexp]],
                 ['-i'] = [[--ignore-case]],
-                ['-s'] = [[--word-regexp]],
+                ['-s'] = [[--case-sensitive]],
                 ['-S'] = [[--smart-case]],
                 ['-z'] = [[--search-zip]],
             },
@@ -190,7 +190,7 @@ local _sels = {
         verbose = {
             lst = { 'a', 'w', 'e' },
             dic = {
-                a = 'Enable all = wehr',
+                a = 'Enable all = we',
                 w = 'Show code wsc',
                 e = 'Disable errorformat',
             },
@@ -248,7 +248,7 @@ end
 local function parse_loc(kt)
     local loc = {}
     local restore = false
-    if kt.B == 'b' then
+    if kt.B == 'b' or wsc.vimgrep then
         loc = { vim.fs.normalize(vim.api.nvim_buf_get_name(0)) }
     elseif kt.B == 'p' then
         loc = rg_paths()
@@ -305,6 +305,21 @@ local function parse_opt(kt)
     return opt
 end
 
+--- Parse `vimgrep` command
+--- @return string pat updated for `vimgrep`
+local function parse_vg(kt, txt)
+    local pat = vim.fn.escape(txt, [[!/\]])
+    if kt.E:match('[sS]') then
+        pat = string.format('\\<%s\\>', pat)
+    end
+    if kt.E:match('[iwsyu]') then
+        pat = '\\c' .. pat
+    elseif kt.E:match('[IWSYU]') then
+        pat = '\\C' .. pat
+    end
+    return '\\V' .. pat
+end
+
 --- Entry of fzer task
 --- @param kt(table): [fF][av][bp][IiWwSsYyUu]
 ---                   [%S][%A][%B][%E        ]
@@ -333,15 +348,14 @@ end
 local entry = async(function(kt, bang)
     wsc:new()
 
-    -- Parse rg pattern
+    -- Parse pattern
     local rep = {}
     rep.pat = parse_pat(kt)
     if rep.pat == '' then
         return
     end
-    rep.pat = vim.fn.escape(rep.pat, '"')
 
-    -- Modify fzer config
+    -- Set config
     if kt.S == 'F' then
         _sels.lst = _sels.lst_r
         _sels.dic.path.lst = wsc.paths
@@ -352,20 +366,33 @@ local entry = async(function(kt, bang)
         task.wsc.fzer = wsc:get()
     end
 
-    -- Parse rg location and options
+    -- Parse location and options
     rep.loc = table.concat(parse_loc(kt), ' ')
     if rep.loc == '' then
         return
     end
-    rep.opt = table.concat(parse_opt(kt), ' ')
+    if not wsc.vimgrep then
+        rep.opt = table.concat(parse_opt(kt), ' ')
+    end
 
-    -- Run fzer task
+    -- Highlight text
     local append = kt.A == 'a'
     if not append then
         wsc.hltext = {}
     end
     table.insert(wsc.hltext, rep.pat)
     wsc:mut('hltext', wsc.hltext)
+
+    -- Run task
+    if wsc.vimgrep then
+        rep.pat = parse_vg(kt, rep.pat)
+        vim.cmd(replace(append and fzer.vga or fzer.vg, rep))
+        vim.fn.setqflist({}, 'a', { title = task.title.Fzer, context = { hltext = wsc.hltext } })
+        vim.cmd.copen({ count = 8, mods = { split = 'botright' } })
+        return
+    end
+
+    rep.pat = vim.fn.escape(rep.pat, [["\]])
     wsc.cmd = replace(fzer.rg, rep)
     wsc.wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
     wsc.tout = {

@@ -449,7 +449,7 @@ local entry = async(function(kt, bang)
         wsc.style = 'job'
     end
 
-    -- Run code task
+    -- Run task
     vim.cmd.wall({ mods = { silent = true, emsg_silent = true } })
     wsc.key = kt.E
     local ok, msg = pcall(function()

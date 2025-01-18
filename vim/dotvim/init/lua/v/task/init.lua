@@ -103,11 +103,11 @@ end
 --- Adapt quickfix output like terminal
 --- @param qfwin(integer) Quickfix window handle
 --- @param hltext(string[]|nil) Text to highlight
-function M.qf_adapt(qfwin, hltext)
+function M.qf_adapt(qfwin, title, hltext)
     vim.api.nvim_win_call(qfwin, function()
-        if type(hltext) == 'table' then
+        if title == M.title.Fzer and type(hltext) == 'table' then
             for _, txt in ipairs(hltext) do
-                local estr = vim.fn.escape(txt, '\\/')
+                local estr = vim.fn.escape(txt, [[/\]])
                 vim.cmd.syntax({ args = { ([[match IncSearch /\V\c%s/]]):format(estr) } })
             end
         end
@@ -125,13 +125,13 @@ local function setup_quickfix()
     vim.api.nvim_create_autocmd('BufWinEnter', {
         group = 'v.Task',
         callback = function(args)
-            local qf = vim.fn.getqflist({ winid = 1, qfbufnr = 1, context = 1 })
+            local qf = vim.fn.getqflist({ winid = 1, qfbufnr = 1, title = 1, context = 1 })
             if qf.qfbufnr ~= args.buf then
                 return
             end
             nlib.m.nnore({ '<CR>', function() M.qf_goto(qf.winid) end, buffer = qf.qfbufnr })
             if (qf.winid > 0) and vim.api.nvim_win_is_valid(qf.winid) then
-                M.qf_adapt(qf.winid, qf.context.hltext)
+                M.qf_adapt(qf.winid, qf.title, qf.context.hltext)
             end
         end,
     })
