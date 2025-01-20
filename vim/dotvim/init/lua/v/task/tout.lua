@@ -141,8 +141,8 @@ function qf.on_start(task, cpt, params)
         qf.highlight('Constant', line, 5, 13)
         qf.highlight('Identifier', line, 15, string.len(msg))
     end
-    if qf.hwin then
-        require('v.task').qf_adapt(qf.hwin, params.title, params.hltext)
+    if qf.hwin and params.title == require('v.task').title.Fzer then
+        require('v.task').qf_hlstr(qf.hwin, params.hltext)
     end
 end
 

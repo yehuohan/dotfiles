@@ -102,15 +102,8 @@ end
 
 --- Adapt quickfix output like terminal
 --- @param qfwin(integer) Quickfix window handle
---- @param hltext(string[]|nil) Text to highlight
-function M.qf_adapt(qfwin, title, hltext)
+function M.qf_adapt(qfwin)
     vim.api.nvim_win_call(qfwin, function()
-        if title == M.title.Fzer and type(hltext) == 'table' then
-            for _, txt in ipairs(hltext) do
-                local estr = vim.fn.escape(txt, [[/\]])
-                vim.cmd.syntax({ args = { ([[match IncSearch /\V\c%s/]]):format(estr) } })
-            end
-        end
         vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| / conceal]] } })
         vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| {{{ / conceal]] } })
         vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| }}} / conceal]] } })
@@ -118,6 +111,20 @@ function M.qf_adapt(qfwin, title, hltext)
     vim.api.nvim_set_option_value('number', false, { win = qfwin })
     vim.api.nvim_set_option_value('relativenumber', false, { win = qfwin })
     vim.api.nvim_set_option_value('signcolumn', 'no', { win = qfwin })
+end
+
+--- Highlight specified strings from quickfix output
+--- @param qfwin(integer) Quickfix window handle
+--- @param texts(string[]|nil) Text array to highlight
+function M.qf_hlstr(qfwin, texts)
+    if type(texts) == 'table' then
+        vim.api.nvim_win_call(qfwin, function()
+            for _, txt in ipairs(texts) do
+                local etxt = vim.fn.escape(txt, [[/\]])
+                vim.cmd.syntax({ args = { ([[match IncSearch /\V\c%s/]]):format(etxt) } })
+            end
+        end)
+    end
 end
 
 --- Setup quickfix window for task result
@@ -131,7 +138,10 @@ local function setup_quickfix()
             end
             nlib.m.nnore({ '<CR>', function() M.qf_goto(qf.winid) end, buffer = qf.qfbufnr })
             if (qf.winid > 0) and vim.api.nvim_win_is_valid(qf.winid) then
-                M.qf_adapt(qf.winid, qf.title, qf.context.hltext)
+                M.qf_adapt(qf.winid)
+                if qf.title == M.title.Fzer then
+                    M.qf_hlstr(qf.winid, qf.context.hltext)
+                end
             end
         end,
     })

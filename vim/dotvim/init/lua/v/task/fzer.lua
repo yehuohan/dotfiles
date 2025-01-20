@@ -66,8 +66,7 @@ local function rg_ignore() return wsc.ignore and {} or { '--no-ignore' } end
 --- @field telescope(Fuzzier)
 local fzer = {
     rg = 'rg --vimgrep -F {opt} -e "{pat}" {loc}',
-    vg = ':vimgrep /{pat}/j {loc}',
-    vga = ':vimgrepadd /{pat}/j {loc}',
+    vg = ':vimgrepadd /{pat}/j {loc}',
     efm = [[%f:%l:%c:%m]],
     fzf = {
         file = ':FzfFiles {loc}',
@@ -386,9 +385,22 @@ local entry = async(function(kt, bang)
     -- Run task
     if wsc.vimgrep then
         rep.pat = parse_vg(kt, rep.pat)
-        vim.cmd(replace(append and fzer.vga or fzer.vg, rep))
-        vim.fn.setqflist({}, 'a', { title = task.title.Fzer, context = { hltext = wsc.hltext } })
+        local cmd = replace(fzer.vg, rep)
+        vim.fn.setqflist({}, append and 'a' or 'r', {
+            lines = { string.format('{{{ [%s] %s', os.date('%H:%M:%S'), cmd) },
+            efm = ' ',
+            title = task.title.Fzer,
+            context = { hltext = wsc.hltext },
+        })
         vim.cmd.copen({ count = 8, mods = { split = 'botright' } })
+        vim.cmd(cmd)
+        vim.fn.setqflist({}, 'a', {
+            lines = { string.format('}}} [%s] Completed', os.date('%H:%M:%S')) },
+            efm = ' ',
+        })
+        vim.api.nvim_set_option_value('foldmethod', 'marker', { win = 0 })
+        vim.api.nvim_set_option_value('foldmarker', '{{{,}}}', { win = 0 })
+        vim.fn.win_execute(0, 'silent! normal! zO')
         return
     end
 
