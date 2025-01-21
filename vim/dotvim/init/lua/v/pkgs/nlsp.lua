@@ -116,7 +116,7 @@ local function setup_sources()
         maxn = 5,
     })
     m.add({ 'n', 'v', 'c', 'i' }, {
-        '<M-;>',
+        '<C-;>',
         function()
             if cmp_im.toggle() then
                 vim.notify('IM is enabled')

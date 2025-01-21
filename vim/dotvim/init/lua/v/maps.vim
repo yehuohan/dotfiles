@@ -56,7 +56,7 @@ cnoremap <M-p> <C-e>
 " Cmdline {{{
 nnoremap <leader>.         <Cmd>lua require('v.nlib').recall()<CR>
 nnoremap <leader><leader>. <Cmd>lua require('v.nlib').recall(nil, { feedcmd = true })<CR>
-nnoremap <C-;> @:
+nnoremap <M-;> @:
 vnoremap <leader><leader>; <Cmd>call feedkeys(':' . v:lua.require('v.nlib').get_selected(''), 'n')<CR>
 vnoremap <leader><leader>: <Cmd>call feedkeys(':lua ' . v:lua.require('v.nlib').get_selected(''), 'n')<CR>
 " 替换
