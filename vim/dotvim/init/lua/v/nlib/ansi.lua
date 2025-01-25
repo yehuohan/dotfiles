@@ -265,8 +265,10 @@ local function new()
         local verb_r = verbose:match('[ar]')
 
         if verb_r then
-            bufs[#bufs + 1] = { ('> line=%d'):format(cnt), {} }
-            bufs[#bufs + 1] = { linestr, {} } -- May populate `bufs` used by `prevline()`
+            local head = ('> line=%d'):format(cnt)
+            bufs[#bufs + 1] = { head, { { 'DiffText', #bufs + 1, 0, string.len(head) } } }
+            bufs[#bufs + 1] = { linestr, {} }
+            bufs[#bufs + 1] = { '<', {} } -- May populate `bufs` used by `prevline()`
             cnt = cnt + 1
         end
 
@@ -313,10 +315,18 @@ local function new()
                     row, buf, hlt = prevline(buf, hlt)
                 end
                 local cell_len = vim.fn.strdisplaywidth(buf)
-                if cell_len < (nc - 1) then
+                -- if cell_len < (nc - 1) then
+                --     buf = buf .. string.rep(' ', nc - 1 - cell_len)
+                -- else
+                --     buf = string.sub(buf, 1, nc - 1) -- Don't support multi-bytes char
+                -- end
+
+                local tail_len = cell_len % wid
+                local head_len = cell_len - tail_len
+                if tail_len < (nc - 1) then
                     buf = buf .. string.rep(' ', nc - 1 - cell_len)
                 else
-                    buf = string.sub(buf, 1, nc - 1) -- Don't support multi-bytes char
+                    buf = string.sub(buf, head_len + 1, nc - 1) -- Don't support multi-bytes char
                 end
             end
         end
