@@ -54,4 +54,4 @@ local function setup(dotvim)
 end
 
 return { setup = setup }
--- return { setup = require('v.mini') }
+-- return { setup = require('v.test.mini') }

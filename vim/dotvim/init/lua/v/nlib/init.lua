@@ -147,7 +147,7 @@ end
 --- @alias Chanor function A channel lines processor for terminal's stdout
 --- @class ChanorOptions Chanor options according to OnTaskOutput.params
 --- @field style(string|nil)
---- @field verbose(string|nil) Works with style='ansi'
+--- @field verbose(string|nil)
 
 --- Create a chanor
 --- @param opts(ChanorOptions|nil)
@@ -155,8 +155,10 @@ end
 function M.new_chanor(opts)
     local style = opts and opts.style
     local verbose = opts and opts.verbose or ''
+    local verb_r = verbose:match('[ar]')
 
-    local ansi = require('v.nlib.ansi').new()
+    local raws = {}
+    local ansi = require('v.nlib.ansi').new(verbose)
     local buf_idx = 1
     local pending = ''
 
@@ -164,8 +166,11 @@ function M.new_chanor(opts)
     --- @param linestr(string) String to be processed
     --- @return string|nil Pending string that can't be break into multi-lines
     local function process_linestr(linestr)
+        if verb_r then
+            raws[#raws + 1] = linestr
+        end
         if style == 'ansi' then
-            ansi.feed(linestr, verbose)
+            ansi.feed(linestr)
         else
             local bufs = ansi.bufs()
             bufs[#bufs + 1] = { linestr:gsub('\r', '') } -- Remove ^M
@@ -201,7 +206,7 @@ function M.new_chanor(opts)
         -- Copy returned lines and highlights
         local lines = {}
         local highlights = {}
-        for k = buf_idx, #bufs, 1 do -- #bufs - (eof and 0 or 1): may need keep lines
+        for k = buf_idx, #bufs - (eof and 0 or 1), 1 do -- `ansi` may backtrace one buffer line
             if bufs[k] then
                 lines[#lines + 1] = bufs[k][1]
                 if style == 'ansi' then
@@ -213,7 +218,10 @@ function M.new_chanor(opts)
 
         -- Reset locals
         if not data then
-            ansi = require('v.nlib.ansi').new()
+            if verb_r then
+                vim.notify(vim.inspect(raws))
+            end
+            ansi = require('v.nlib.ansi').new(verbose)
             buf_idx = 1
             pending = ''
         end

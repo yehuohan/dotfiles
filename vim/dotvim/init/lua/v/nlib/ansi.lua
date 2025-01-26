@@ -51,6 +51,7 @@ local CSI_SGR = {
     },
 }
 
+--- Trim raw string
 local function trim(str)
     return str
         :gsub('\r', '') -- Remove ^M
@@ -121,6 +122,7 @@ local function new_sgr()
         strikethrough = false,
         reverse = false,
     }
+    -- ANSI SGR object
     local sgr = { hl = nil }
 
     sgr.tohl = function(args)
@@ -204,7 +206,10 @@ local function new_sgr()
     return sgr
 end
 
-local function new()
+local function new_ansi(verbose)
+    local verb_h = verbose:match('[ah]')
+    local verb_r = verbose:match('[ar]')
+
     local bufs = {} -- Processed buffer lines
     local bufc = { '', {} } -- Processed buffer cache lines
     local cnt = 1 -- Buffer line counter
@@ -230,11 +235,7 @@ local function new()
                 bufs[#bufs + 1] = { buf, hlt }
                 if bot < hei then
                     -- There should always `bot <= hei` as terminal window lines = `hei`
-                    bot = bot + 1
-                    local cell_len = vim.fn.strdisplaywidth(buf)
-                    if cell_len > wid then
-                        bot = bot + math.floor(cell_len / wid)
-                    end
+                    bot = bot + math.max(1, math.floor((vim.fn.strdisplaywidth(buf) + wid - 1) / wid))
                     bot = math.min(bot, hei)
                 end
                 -- Override `bufc` directly as `buf` and `hlt` contain previous `bufc`
@@ -254,19 +255,19 @@ local function new()
     --- @return table hlt The highlight of buffer line to process
     local function prevline(buf, hlt)
         local _buf, _hlt = unpack(bufs[#bufs])
+        bot = bot - 1
         bufs[#bufs] = nil
         return #bufs + 1, _buf .. buf, vim.list_extend(_hlt, hlt)
     end
 
     ansi.bufs = function() return bufs end
 
-    ansi.feed = function(linestr, verbose)
-        local verb_h = verbose:match('[ah]')
-        local verb_r = verbose:match('[ar]')
-
+    ansi.feed = function(linestr)
         if verb_r then
-            bufs[#bufs + 1] = { ('> line=%d'):format(cnt), {} }
-            bufs[#bufs + 1] = { linestr, {} } -- May populate `bufs` used by `prevline()`
+            local head = ('> line=%d'):format(cnt)
+            bufs[#bufs + 1] = { head, { { 'DiffText', #bufs + 1, 0, string.len(head) } } }
+            bufs[#bufs + 1] = { linestr, {} }
+            bufs[#bufs + 1] = { '<', {} } -- May populate `bufs` used by `prevline()`
             cnt = cnt + 1
         end
 
@@ -296,11 +297,6 @@ local function new()
             if byte == 'C' then
                 local n = (args ~= '') and tonumber(args) or 1
                 buf = buf .. string.rep(' ', n)
-            elseif byte == 'K' then
-                -- n = 0: clear from cursor to end of line
-                -- n = 1: clear from cursor to begin of line
-                -- n = 2: clear entire line
-                -- local n = (args ~= '') and tonumber(args) or 0
             elseif byte == 'H' then
                 local nr, nc = args:match('(%d*);?(%d*)')
                 nr = (nr ~= '') and tonumber(nr) or 1
@@ -309,15 +305,21 @@ local function new()
                     row, buf, hlt = nextline(buf, hlt, { completed = true })
                 end
                 if bot == nr + 1 then
-                    bot = bot - 1 -- Support backtrace one buffer line had been processed
-                    row, buf, hlt = prevline(buf, hlt)
+                    row, buf, hlt = prevline(buf, hlt) -- Backtrace one buffer line had been processed
                 end
                 local cell_len = vim.fn.strdisplaywidth(buf)
-                if cell_len < (nc - 1) then
-                    buf = buf .. string.rep(' ', nc - 1 - cell_len)
+                local tail_len = cell_len % wid
+                local head_len = cell_len - tail_len
+                if tail_len < (nc - 1) then
+                    buf = buf .. string.rep(' ', nc - 1 - tail_len)
                 else
-                    buf = string.sub(buf, 1, nc - 1) -- Don't support multi-bytes char
+                    buf = string.sub(buf, 1, head_len + nc - 1) -- Don't support multi-bytes char
                 end
+            elseif byte == 'K' then
+                -- n = 0: clear from cursor to end of line
+                -- n = 1: clear from cursor to begin of line
+                -- n = 2: clear entire line
+                -- local n = (args ~= '') and tonumber(args) or 0
             end
         end
     end
@@ -325,4 +327,4 @@ local function new()
     return ansi
 end
 
-return { new = new }
+return { new = new_ansi }
