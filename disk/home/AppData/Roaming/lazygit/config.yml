@@ -1,4 +1,4 @@
-# Config relating to the Lazygit UI
+# lazygit
+
 gui:
-  # One of 'auto' (default) | 'en' | 'zh-CN' | 'zh-TW' | 'pl' | 'nl' | 'ja' | 'ko' | 'ru'
-  language: 'en'
+  language: 'en' # 'auto' (default) | 'en' | 'zh-CN'
