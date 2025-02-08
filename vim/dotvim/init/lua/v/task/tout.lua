@@ -223,7 +223,7 @@ function term.redir(task, pin)
             vim.cmd.split({ range = { 8 }, mods = { split = 'botright' } })
             term.twin[tab] = vim.api.nvim_get_current_win()
             vim.cmd.wincmd('p')
-            require('v.nlib').m.nnore({ '<leader>vc', term.close })
+            require('v.nlib').m.nnore({ '<leader>vc', term.close, desc = "Colse tout's terminal" })
         end
         hwin = term.twin[tab]
     else

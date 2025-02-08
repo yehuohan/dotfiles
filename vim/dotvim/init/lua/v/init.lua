@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- init.lua: configuration for neovim
+-- init.lua: neovim configuration
 -- Github: https://github.com/yehuohan/dotfiles
 -- Author: <yehuohan@qq.com>, <yehuohan@gmail.com>
 --------------------------------------------------------------------------------

@@ -191,8 +191,16 @@ local function setup_overseer()
     local overseer = require('overseer')
     overseer.setup(opts)
 
-    nlib.m.nnore({ '<leader>ru', function() overseer.run_template({ prompt = 'never' }) end })
-    nlib.m.nnore({ '<leader>rU', function() overseer.run_template({ prompt = 'allow' }) end })
+    nlib.m.nnore({
+        '<leader>ru',
+        function() overseer.run_template({ prompt = 'never' }) end,
+        desc = 'Run overseer template without prompt',
+    })
+    nlib.m.nnore({
+        '<leader>rU',
+        function() overseer.run_template({ prompt = 'allow' }) end,
+        desc = 'Run overseer template with prompt',
+    })
     nlib.m.nnore({
         '<leader>rk',
         function()
@@ -201,6 +209,7 @@ local function setup_overseer()
                 list[#list]:stop()
             end
         end,
+        desc = 'Kill the last overseer task',
     })
     nlib.m.nnore({
         '<leader>rK',
@@ -210,6 +219,7 @@ local function setup_overseer()
                 t:stop()
             end
         end,
+        desc = 'Kill all overseer tasks',
     })
     nlib.m.nnore({ '<leader>tk', '<Cmd>OverseerToggle<CR>' })
 end

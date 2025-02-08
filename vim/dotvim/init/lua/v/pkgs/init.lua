@@ -132,6 +132,7 @@ local function pkg_window_picker()
                 vim.api.nvim_set_current_win(winid)
             end
         end,
+        desc = 'Pick window',
     })
 end
 
@@ -243,7 +244,11 @@ local function pkg_notify()
         top_down = false,
     })
     vim.notify = require('notify')
-    m.nnore({ '<leader>dm', function() vim.notify.dismiss({ pending = true, silent = true }) end })
+    m.nnore({
+        '<leader>dm',
+        function() vim.notify.dismiss({ pending = true, silent = true }) end,
+        desc = 'Dismiss notifications',
+    })
 end
 
 -- 系统消息提示
@@ -305,6 +310,7 @@ local function pkg_ufo()
                 ufo.attach(bufnr)
             end
         end,
+        desc = 'Toggle ufo',
     })
     m.nnore({ '<leader>zr', ufo.openAllFolds })
     m.nnore({ '<leader>zm', ufo.closeAllFolds })
@@ -527,6 +533,9 @@ local function pkg_telescope()
                 },
             },
         },
+        pickers = {
+            keymaps = { modes = { 'n', 'i', 'c', 'x', 's', 'v', 't', 'l', 'o' } },
+        },
         extensions = {
             fzf = {
                 override_generic_sorter = true,
@@ -546,22 +555,18 @@ local function pkg_telescope()
     m.nnore({
         '<leader>lf',
         function()
-            builtin.find_files({
-                cwd = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
-                hidden = true,
-            })
+            local bufname = vim.api.nvim_buf_get_name(0)
+            builtin.find_files({ cwd = vim.fs.dirname(bufname), hidden = true })
         end,
+        desc = 'Telescope files',
     })
     m.nnore({
         '<leader>lg',
         function()
             local bufname = vim.api.nvim_buf_get_name(0)
-            builtin.grep_string({
-                cwd = vim.fs.dirname(bufname),
-                search = '',
-                search_dirs = { bufname },
-            })
+            builtin.grep_string({ cwd = vim.fs.dirname(bufname), search = '', search_dirs = { bufname } })
         end,
+        desc = 'Telescope string',
     })
     m.nnore({ '<leader>lr', ':Telescope frecency<CR>' })
 end
@@ -658,6 +663,7 @@ local function pkg_treesitter()
             local res = require('vim.treesitter.highlighter').active[buf]
             vim.notify('Treesitter highlight is ' .. (res and 'enabled' or 'disabled'))
         end,
+        desc = 'Toggle treesitter highlight',
     })
     m.nnore({
         '<leader>si',
@@ -666,6 +672,7 @@ local function pkg_treesitter()
             local res = vim.bo.indentexpr == 'nvim_treesitter#indent()'
             vim.notify('Treesitter indent is ' .. (res and 'enabled' or 'disabled'))
         end,
+        desc = 'Toggle treesitter indent',
     })
 end
 
@@ -702,11 +709,10 @@ endfunction
         '<Tab>',
         function() return snip.expandable() and '<Plug>luasnip-expand-snippet' or '<Tab>' end,
         expr = true,
+        desc = 'Expand snippet or <Tab>',
     })
-    m.inore({ '<M-l>', function() snip.jump(1) end })
-    m.snore({ '<M-l>', function() snip.jump(1) end })
-    m.inore({ '<M-h>', function() snip.jump(-1) end })
-    m.snore({ '<M-h>', function() snip.jump(-1) end })
+    m.add({ 'i', 's' }, { '<M-l>', function() snip.jump(1) end, desc = 'Next snippet placeholder' })
+    m.add({ 'i', 's' }, { '<M-h>', function() snip.jump(-1) end, desc = 'Prev snippet placeholder' })
 end
 
 -- 代码格式化
@@ -725,7 +731,7 @@ local function pkg_conform()
             lsp_format = 'fallback',
         },
     })
-    m.nore({ '<leader>fo', conform.format })
+    m.nore({ '<leader>fo', conform.format, desc = 'Format code' })
 end
 
 -- 终端浮窗
@@ -752,7 +758,7 @@ end
 -- 代码注释
 local function pkg_comment()
     require('Comment').setup({
-        toggler = { line = 'gcc', block = 'gbc' },
+        toggler = { line = '<leader>cl', block = '<leader>cb' },
         opleader = { line = 'gc', block = 'gb' },
         mappings = {
             basic = true,
@@ -761,14 +767,13 @@ local function pkg_comment()
         },
     })
     local comment = require('Comment.api')
-    m.nnore({ '<leader>ci', function() comment.toggle.linewise.count(vim.v.count1) end })
-    m.nnore({ '<leader>cl', function() comment.comment.linewise.count(vim.v.count1) end })
     m.nnore({
         '<leader>cu',
         function()
             -- ignore errors when uncommenting a non-commented line
             pcall(function() comment.uncomment.linewise.count(vim.v.count1) end)
         end,
+        desc = 'Uncomment lines',
     })
 end
 
@@ -784,6 +789,7 @@ local function pkg_autopairs()
             vim.notify(string.format('Auto pairs: %s', ap))
             require('nvim-autopairs').state.disabled = not ap
         end,
+        desc = 'Toggle auto pairs',
     })
 end
 
@@ -820,7 +826,7 @@ local function pkg_rainbow()
     vim.g.rainbow_delimiters = {
         log = { level = vim.log.levels.OFF },
     }
-    m.nnore({ '<leader>tr', function() rainbow.toggle(0) end })
+    m.nnore({ '<leader>tr', function() rainbow.toggle(0) end, desc = 'Toggle rainbow' })
 end
 
 -- 高亮缩进块
@@ -870,16 +876,15 @@ local function pkg_peek()
     m.nnore({
         '<leader>vm',
         function()
-            local s
+            local state = peek.is_open() and 'disabled' or 'enabled'
             if peek.is_open() then
-                s = 'disabled'
                 peek.close()
             else
-                s = 'enabled'
                 peek.open()
             end
-            vim.sysnotify('Markdown preview is ' .. s, vim.log.levels.INFO)
+            vim.sysnotify('Markdown preview is ' .. state, vim.log.levels.INFO)
         end,
+        desc = 'Visualize markdown',
     })
 end
 
@@ -949,6 +954,7 @@ local function pkg_translator()
     m.vnore({
         '<leader><leader>t',
         function() vim.api.nvim_feedkeys(':TranslateW ' .. nlib.get_selected(' '), 'n', true) end,
+        desc = 'Translate',
     })
 end
 

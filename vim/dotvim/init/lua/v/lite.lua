@@ -202,11 +202,19 @@ local function nsearch(engine, smart)
 end
 
 local function setup()
-    m.nnore({ '<leader>se', function() vim.fn['popset#set#PopSelection'](fast_cmds) end })
-    m.nnore({ '<leader>sl', function() edit_chores(true) end })
-    m.nnore({ '<leader>sL', function() edit_chores(false) end })
+    m.nnore({
+        '<leader>se',
+        function() vim.fn['popset#set#PopSelection'](fast_cmds) end,
+        desc = 'Fast commands',
+    })
+    m.nnore({ '<leader>sl', function() edit_chores(true) end, desc = 'Edit chores under root path' })
+    m.nnore({ '<leader>sL', function() edit_chores(false) end, desc = 'Edit chores under current path' })
 
-    m.nnore({ '<leader>ei', function() vim.ui.input({ prompt = 'Filetype:' }, edit_tmpfile) end })
+    m.nnore({
+        '<leader>ei',
+        function() vim.ui.input({ prompt = 'Filetype:' }, edit_tmpfile) end,
+        desc = 'Edit tmpfile',
+    })
     m.nnore({ '<leader>ec', function() edit_tmpfile('c') end })
     m.nnore({ '<leader>ea', function() edit_tmpfile('cpp') end })
     m.nnore({ '<leader>er', function() edit_tmpfile('rs') end })
@@ -218,6 +226,7 @@ local function setup()
         function()
             vim.ui.input({ prompt = 'Filetype:' }, function(ft) edit_tmpfile(ft, 'tab') end)
         end,
+        desc = 'Edit tmpfile in another tab',
     })
     m.nnore({ '<leader>etc', function() edit_tmpfile('c', 'tab') end })
     m.nnore({ '<leader>eta', function() edit_tmpfile('cpp', 'tab') end })
@@ -230,6 +239,7 @@ local function setup()
         function()
             vim.ui.input({ prompt = 'Filetype:' }, function(ft) edit_tmpfile(ft, 'floating') end)
         end,
+        desc = 'Edit tmpfile in floating window',
     })
     m.nnore({ '<leader>efc', function() edit_tmpfile('c', 'floating') end })
     m.nnore({ '<leader>efa', function() edit_tmpfile('cpp', 'floating') end })
@@ -238,22 +248,19 @@ local function setup()
     m.nnore({ '<leader>efl', function() edit_tmpfile('lua', 'floating') end })
     m.nnore({ '<leader>efm', function() edit_tmpfile('md', 'floating') end })
 
-    m.nore({ '<leader>af', function() eval_str('eval') end })
-    m.nore({ '<leader>agf', function() eval_str('eval', true) end })
-    m.nore({ '<leader>ae', function() eval_str('execute') end })
-    m.nore({ '<leader>age', function() eval_str('execute', true) end })
+    m.nore({ '<leader>af', function() eval_str('eval') end, desc = 'Append eval string' })
+    m.nore({ '<leader>agf', function() eval_str('eval', true) end, desc = 'Copy eval string' })
+    m.nore({ '<leader>ae', function() eval_str('execute') end, desc = 'Append exec command' })
+    m.nore({ '<leader>age', function() eval_str('execute', true) end, desc = 'Copy exec command' })
 
-    m.nore({ '<leader>ev', function() eval_math('eval') end })
-    m.nore({ '<leader>egv', function() eval_math('eval', true) end })
-    m.nore({ '<leader>eu', function() eval_math('luaeval') end })
-    m.nore({ '<leader>egu', function() eval_math('luaeval', true) end })
+    m.nore({ '<leader>ev', function() eval_math('eval') end, desc = 'Append vim math' })
+    m.nore({ '<leader>egv', function() eval_math('eval', true) end, desc = 'Copy vim math' })
+    m.nore({ '<leader>eu', function() eval_math('luaeval') end, desc = 'Append lua math' })
+    m.nore({ '<leader>egu', function() eval_math('luaeval', true) end, desc = 'Copy lua math' })
 
-    m.nnore({ '<leader>bs', function() nsearch(nil, true) end })
-    m.vnore({ '<leader>bs', function() nsearch(nil, true) end })
-    m.nnore({ '<leader>bb', function() nsearch() end })
-    m.vnore({ '<leader>bb', function() nsearch() end })
-    m.nnore({ '<leader>bg', function() nsearch('google') end })
-    m.vnore({ '<leader>bg', function() nsearch('google') end })
+    m.nore({ '<leader>bs', function() nsearch(nil, true) end, desc = 'Smart search' })
+    m.nore({ '<leader>bb', function() nsearch() end, desc = 'Search with bing' })
+    m.nore({ '<leader>bg', function() nsearch('google') end, desc = 'Search with google' })
 end
 
 return { setup = setup }

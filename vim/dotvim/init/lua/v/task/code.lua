@@ -503,6 +503,7 @@ local function setup()
                 vim.notify('Source completed')
             end
         end,
+        desc = 'Source vim script',
     })
 
     vim.api.nvim_create_user_command(

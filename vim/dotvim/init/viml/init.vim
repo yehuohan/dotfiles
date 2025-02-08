@@ -1,5 +1,5 @@
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-" init.vim: configuration for vim
+" init.vim: vim configuration
 " Github: https://github.com/yehuohan/dotfiles
 " Author: <yehuohan@qq.com>, <yehuohan@gmail.com>
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

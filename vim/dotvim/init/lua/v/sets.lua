@@ -215,8 +215,8 @@ local function on_UIEnter()
         vim.cmd.GuiPopupmenu(0)
         m.nore({ '<RightMouse>', fn.GuiShowContextMenu })
         m.inore({ '<RightMouse>', fn.GuiShowContextMenu })
-        m.nnore({ '<leader>tf', [[<Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>]] })
-        m.nnore({ '<leader>tm', [[<Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>]] })
+        m.nnore({ '<leader>tF', [[<Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>]] })
+        m.nnore({ '<leader>tM', [[<Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>]] })
     end
 
     if vim.g.neovide then
@@ -224,8 +224,9 @@ local function on_UIEnter()
         vim.g.neovide_cursor_antialiasing = false
         vim.g.neovide_cursor_vfx_mode = 'railgun'
         m.nnore({
-            '<leader>tf',
+            '<leader>tF',
             function() vim.g.neovide_fullscreen = not vim.g.neovide_fullscreen end,
+            desc = 'Toggle fullscreen',
         })
     end
 
@@ -288,17 +289,17 @@ end
 
 function M.setup()
     set_default_opts()
-    m.nnore({ '<leader>iw', function() opt_inv('wrap') end })
-    m.nnore({ '<leader>il', function() opt_inv('list') end })
-    m.nnore({ '<leader>ii', function() opt_inv('ignorecase') end })
-    m.nnore({ '<leader>ie', function() opt_inv('expandtab') end })
-    m.nnore({ '<leader>ib', function() opt_inv('scrollbind') end })
-    m.nnore({ '<leader>ip', function() opt_inv('spell') end })
-    m.nnore({ '<leader>ic', function() opt_lst('conceallevel') end })
-    m.nnore({ '<leader>iv', function() opt_lst('virtualedit') end })
-    m.nnore({ '<leader>is', function() opt_lst('laststatus') end })
-    m.nnore({ '<leader>in', options.number })
-    m.nnore({ '<leader>ih', options.syntax })
+    m.nnore({ '<leader>iw', function() opt_inv('wrap') end, desc = 'Invert wrap' })
+    m.nnore({ '<leader>il', function() opt_inv('list') end, desc = 'Invert list' })
+    m.nnore({ '<leader>ii', function() opt_inv('ignorecase') end, desc = 'Invert ignorecase' })
+    m.nnore({ '<leader>ie', function() opt_inv('expandtab') end, desc = 'Invert expandtab' })
+    m.nnore({ '<leader>ib', function() opt_inv('scrollbind') end, desc = 'Invert scrollbind' })
+    m.nnore({ '<leader>ip', function() opt_inv('spell') end, desc = 'Invert spell' })
+    m.nnore({ '<leader>ic', function() opt_lst('conceallevel') end, desc = 'Invert conceallevel' })
+    m.nnore({ '<leader>iv', function() opt_lst('virtualedit') end, desc = 'Invert virtualedit' })
+    m.nnore({ '<leader>is', function() opt_lst('laststatus') end, desc = 'Invert laststatus' })
+    m.nnore({ '<leader>in', options.number, desc = 'Invert number' })
+    m.nnore({ '<leader>ih', options.syntax, desc = 'Invert syntax' })
 
     api.nvim_create_augroup('v.Sets', { clear = true })
     set_default_autocmds()

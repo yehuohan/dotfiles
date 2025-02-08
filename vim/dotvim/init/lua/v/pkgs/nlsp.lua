@@ -130,6 +130,7 @@ local function setup_sources()
                 end
             end
         end,
+        desc = 'Toggle input method',
     })
 end
 
@@ -432,7 +433,11 @@ local function setup_lsp_mappings()
     m.nnore({ '<leader>gy', vim.lsp.buf.type_definition })
     m.nnore({ '<leader>gr', vim.lsp.buf.references })
     m.nnore({ '<leader>gn', vim.lsp.buf.rename })
-    m.nnore({ '<leader>gf', function() vim.lsp.buf.code_action({ apply = true }) end })
+    m.nnore({
+        '<leader>gf',
+        function() vim.lsp.buf.code_action({ apply = true }) end,
+        desc = 'Apply code action',
+    })
     -- m.nnore({ '<leader>ga', vim.lsp.buf.code_action })
     -- m.nnore({ '<leader>gh', vim.lsp.buf.hover })
     m.nnore({ '<leader>ga', '<Cmd>Lspsaga code_action<CR>' })
@@ -451,6 +456,7 @@ local function setup_lsp_mappings()
             vim.diagnostic.enable(not enabled, filter)
             vim.notify('Diagnostic ' .. (enabled and 'disabled' or 'enabled'))
         end,
+        desc = 'Toggle lsp diagnostic',
     })
     m.nnore({
         '<leader>oH',
@@ -460,13 +466,14 @@ local function setup_lsp_mappings()
             vim.lsp.inlay_hint.enable(not enabled, filter)
             vim.notify('Inlay hint ' .. (enabled and 'disabled' or 'enabled'))
         end,
+        desc = 'Toggle lsp inlay hint',
     })
     m.nnore({ '<leader>oi', vim.diagnostic.open_float })
     local opts = { severity = vim.diagnostic.severity.ERROR }
-    m.nnore({ '<leader>oj', function() vim.diagnostic.goto_next(opts) end })
-    m.nnore({ '<leader>ok', function() vim.diagnostic.goto_prev(opts) end })
-    m.nnore({ '<leader>oJ', vim.diagnostic.goto_next })
-    m.nnore({ '<leader>oK', vim.diagnostic.goto_prev })
+    m.nnore({ '<leader>oj', function() vim.diagnostic.goto_next(opts) end, desc = 'Next error' })
+    m.nnore({ '<leader>ok', function() vim.diagnostic.goto_prev(opts) end, desc = 'Prev error' })
+    m.nnore({ '<leader>oJ', vim.diagnostic.goto_next, desc = 'Next diagnostic' })
+    m.nnore({ '<leader>oK', vim.diagnostic.goto_prev, desc = 'Prev diagnostic' })
     -- TODO: list for workspace, sources, servers, commands
     -- m.nnore{'<leader>ow', vim.lsp.buf.xxx_workspace_folder}
     -- m.nnore{'<leader>oe', vim.lsp.buf.execute_command}
