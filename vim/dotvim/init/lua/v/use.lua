@@ -1,12 +1,13 @@
 local use_file = vim.env.DotVimLocal .. '/.use.json'
 local use = {
-    xgit = vim.v.null,
-    coc = false,
-    nlsp = false,
-    nts = false,
-    ndap = false,
-    full = false,
     has_py = false,
+    nlsp = false,
+    ndap = false,
+    nts = false,
+    pkgs = {
+        coc = false,
+        im_select = false,
+    },
     ui = {
         icon = false,
         font = 'Consolas',
@@ -15,13 +16,10 @@ local use = {
         wide = 'Microsoft YaHei UI',
         widesize = 11,
     },
+    xgit = vim.v.null,
 }
 
 local lst = {
-    git = {
-        vim.v.null,
-        'https://kkgithub.com',
-    },
     fonts = {
         'Consolas',
         'Consolas,CodeNewRoman Nerd Font Mono',
@@ -33,6 +31,10 @@ local lst = {
         'WenQuanYi Micro Hei Mono',
     },
     fontsize = { 9, 10, 11, 12, 13, 14, 15, 16 },
+    git = {
+        vim.v.null,
+        'https://kkgithub.com',
+    },
 }
 
 --- @type PopSelectionEvent
@@ -55,7 +57,16 @@ end
 local function use_init()
     -- Init with empty dict '{}' to indicate sub-selection
     local udic = vim.tbl_map(function() return vim.empty_dict() end, use)
-    udic.xgit = { lst = lst.git }
+    udic.pkgs = {
+        dsr = 'set pkgs',
+        lst = vim.fn.sort(vim.tbl_keys(use.pkgs)),
+        dic = vim.tbl_map(function() return vim.empty_dict() end, use.pkgs),
+        sub = {
+            lst = { true, false },
+            cmd = function(sopt, sel) use.pkgs[sopt] = sel end,
+            get = function(sopt) return use.pkgs[sopt] end,
+        },
+    }
     udic.ui = {
         dsr = 'set ui',
         lst = vim.fn.sort(vim.tbl_keys(use.ui)),
@@ -72,6 +83,7 @@ local function use_init()
             get = function(sopt) return use.ui[sopt] end,
         },
     }
+    udic.xgit = { lst = lst.git }
     vim.fn.PopSelection({
         opt = 'use',
         lst = vim.fn.sort(vim.tbl_keys(use)),

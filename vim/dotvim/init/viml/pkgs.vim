@@ -156,7 +156,7 @@ nmap <leader>zu <Plug>(FastFoldUpdate)
 " }}}
 " }}}
 
-" Component {{{
+" Enchance {{{
 " theme {{{ Vim主题
 let g:gruvbox_contrast_dark = 'soft'    " 背景选项：dark, medium, soft
 let g:gruvbox_italic = 1
@@ -449,7 +449,7 @@ endif
 
 " Coding {{{
 " coc {{{ 自动补全
-if s:use.coc
+if s:use.pkgs.coc
 let g:coc_config_home = $DotVimShare
 let g:coc_data_home = $DotVimLocal . '/.coc'
 let g:coc_global_extensions = ['coc-marketplace']
@@ -718,11 +718,13 @@ highlight! default link TranslatorBorder Constant
 " }}}
 
 " im-select {{{ 输入法
+if s:use.pkgs.coc
 if IsWin() || IsGw()
 let g:im_select_get_im_cmd = 'im-select'
 let g:im_select_default = '1033'        " 输入法代码：切换到期望的默认输入法，运行im-select
 endif
 let g:ImSelectSetImCmd = {key -> ['im-select', key]}
+endif
 " }}}
 " }}}
 
@@ -748,7 +750,7 @@ call plug#begin($DotVimDir.'/bundle')  " 设置插件位置，且自动设置了
     Plug 'adriaanzon/vim-textobj-matchit'
     Plug 'lucapette/vim-textobj-underscore'
     Plug 'Konfekt/FastFold'
-    " component
+    " enchance
     Plug 'yehuohan/lightline.vim'
     Plug 'mhinz/vim-startify'
 if s:use.ui.icon
@@ -768,7 +770,7 @@ if s:use.has_py
     Plug 'Yggdroot/LeaderF', {'do': IsWin() ? './install.bat' : './install.sh'}
 endif
     " coding
-if s:use.coc
+if s:use.pkgs.coc
     Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
     Plug 'neoclide/jsonc.vim'
 endif
@@ -798,7 +800,9 @@ endif
     Plug 'itchyny/screensaver.vim'
     Plug 'tyru/open-browser.vim'
     Plug 'voldikss/vim-translator'
+if s:use.pkgs.coc
     Plug 'brglng/vim-im-select'
+endif
 call plug#end()
 " }}}
 

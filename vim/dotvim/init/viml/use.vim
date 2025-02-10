@@ -5,12 +5,14 @@ endfunction
 " Struct s:use {{{
 let s:use_file = $DotVimLocal . '/.use.json'
 let s:use = {
-    \ 'xgit'   : v:null,
-    \ 'coc'    : v:false,
-    \ 'nlsp'   : v:false,
-    \ 'nts'    : v:false,
-    \ 'ndap'   : v:false,
     \ 'has_py' : v:false,
+    \ 'nlsp'   : v:false,
+    \ 'ndap'   : v:false,
+    \ 'nts'    : v:false,
+    \ 'pkgs'   : {
+        \ 'coc'       : v:false,
+        \ 'im_select' : v:false,
+        \ },
     \ 'ui'     : {
         \ 'icon'     : v:false,
         \ 'font'     : 'Consolas',
@@ -18,7 +20,8 @@ let s:use = {
         \ 'fontsize' : 12,
         \ 'wide'     : 'Microsoft YaHei UI',
         \ 'widesize' : 11,
-        \ }
+        \ },
+    \ 'xgit'   : v:null,
     \ }
 " }}}
 
@@ -46,9 +49,16 @@ endfunction
 function! s:useInit()
     " Init with empty dict '{}' to indicate sub-selection
     let l:dic = map(copy(s:use), '{}')
-    " Set xgit
-    let l:dic.xgit = { 'lst': [v:null, 'https://kkgithub.com'] }
-    " Set ui
+    let l:dic.pkgs = {
+        \ 'dsr' : 'set pkgs',
+        \ 'lst' : sort(keys(s:use.pkgs)),
+        \ 'dic' : map(copy(s:use.pkgs), '{}'),
+        \ 'sub' : {
+            \ 'lst' : [v:true, v:false],
+            \ 'cmd' : {sopt, sel -> extend(s:use.pkgs, {sopt : sel})},
+            \ 'get' : {sopt -> s:use.pkgs[sopt]},
+            \ },
+        \ }
     let l:fontlst = [
         \ 'Consolas',
         \ 'Consolas,CodeNewRoman Nerd Font Mono',
@@ -76,6 +86,7 @@ function! s:useInit()
             \ 'get' : {sopt -> s:use.ui[sopt]},
             \ },
         \ }
+    let l:dic.xgit = { 'lst': [v:null, 'https://kkgithub.com'] }
 
     call PopSelection({
         \ 'opt' : 'use',

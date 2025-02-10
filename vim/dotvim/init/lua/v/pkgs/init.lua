@@ -149,7 +149,7 @@ local function pkg_expand_region()
 end
 
 --------------------------------------------------------------------------------
--- Component
+-- Enchance
 --------------------------------------------------------------------------------
 -- Colorscheme gruvbox
 local function pkg_gruvbox()
@@ -585,9 +585,10 @@ local function pkg_fzf()
 end
 
 -- 模糊查找
--- 若使用Miniconda3，需要修改install.bat：
+-- 使用Miniconda3，需要修改install.bat：
 --  * comment 'py -2 ...'
 --  * 'py -3 ...' => 'python ...'
+-- 然后运行 ':LeaderfInstallCExtension'
 local function pkg_leaderf()
     vim.g.Lf_CacheDirectory = vim.env.DotVimLocal
     vim.g.Lf_PreviewInPopup = 1
@@ -622,60 +623,6 @@ end
 --------------------------------------------------------------------------------
 -- Coding
 --------------------------------------------------------------------------------
--- 语法树
-local function pkg_treesitter()
-    if vim.fn.empty(use.xgit) == 0 then
-        for _, c in pairs(require('nvim-treesitter.parsers').get_parser_configs()) do
-            c.install_info.url = c.install_info.url:gsub('https://github.com', use.xgit)
-        end
-    end
-    local parser_dir = vim.env.DotVimLocal .. '/.treesitter'
-    require('nvim-treesitter.configs').setup({
-        parser_install_dir = parser_dir,
-        --neovim's builtin: { 'bash', 'c', 'vim', 'lua', 'python', 'markdown', 'markdown_inline' },
-        --ensure_installed = { 'cpp', 'rust', 'cmake', 'glsl', 'hlsl', 'wgsl', 'json', 'jsonc' },
-        --auto_install = true,
-        highlight = {
-            enable = true,
-            additional_vim_regex_highlighting = false,
-        },
-        indent = {
-            enable = true,
-            disable = { 'python' },
-        },
-        incremental_selection = {
-            enable = true,
-            keymaps = {
-                init_selection = '<M-g>',
-                node_incremental = '<M-g>',
-                node_decremental = '<M-a>',
-                scope_incremental = '<M-q>',
-            },
-        },
-        matchup = { enable = true },
-    })
-    vim.opt.runtimepath:prepend(parser_dir)
-    m.nnore({
-        '<leader>sh',
-        function()
-            vim.cmd.TSBufToggle('highlight')
-            local buf = vim.api.nvim_get_current_buf()
-            local res = require('vim.treesitter.highlighter').active[buf]
-            vim.notify('Treesitter highlight is ' .. (res and 'enabled' or 'disabled'))
-        end,
-        desc = 'Toggle treesitter highlight',
-    })
-    m.nnore({
-        '<leader>si',
-        function()
-            vim.cmd.TSBufToggle('indent')
-            local res = vim.bo.indentexpr == 'nvim_treesitter#indent()'
-            vim.notify('Treesitter indent is ' .. (res and 'enabled' or 'disabled'))
-        end,
-        desc = 'Toggle treesitter indent',
-    })
-end
-
 -- 代码片段
 local function pkg_snip()
     vim.cmd([[
@@ -963,65 +910,65 @@ end
 --------------------------------------------------------------------------------
 local pkgs = {
     -- Editor
-    { 'andymass/vim-matchup', config = pkg_matchup },
-    { 'yehuohan/hop.nvim', config = pkg_hop },
-    { 'mg979/vim-visual-multi', init = pkg_visual_multi },
-    { 'junegunn/vim-easy-align', config = pkg_easy_align },
-    { 'yehuohan/marks.nvim', config = pkg_marks },
-    { 'xiyaowong/nvim-cursorword', config = pkg_cursorword },
-    { 'booperlv/nvim-gomove', config = pkg_gomove },
-    { 's1n7ax/nvim-window-picker', config = pkg_window_picker },
+    { 'andymass/vim-matchup', config = pkg_matchup, event = 'VeryLazy' },
+    { 'yehuohan/hop.nvim', config = pkg_hop, event = 'VeryLazy' },
+    { 'mg979/vim-visual-multi', init = pkg_visual_multi, event = 'VeryLazy' },
+    { 'junegunn/vim-easy-align', config = pkg_easy_align, event = 'VeryLazy' },
+    { 'yehuohan/marks.nvim', config = pkg_marks, event = 'VeryLazy' },
+    { 'xiyaowong/nvim-cursorword', config = pkg_cursorword, event = 'VeryLazy' },
+    { 'booperlv/nvim-gomove', config = pkg_gomove, event = 'VeryLazy' },
+    { 's1n7ax/nvim-window-picker', config = pkg_window_picker, event = 'VeryLazy' },
     { 'sindrets/winshift.nvim', config = pkg_winshift, keys = { '<leader>wm' } },
-    { 'terryma/vim-expand-region', config = pkg_expand_region },
-    { 'stevearc/dressing.nvim', opts = {} },
-    { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' } },
+    { 'terryma/vim-expand-region', config = pkg_expand_region, event = 'VeryLazy' },
+    { 'stevearc/dressing.nvim', opts = {}, event = 'VeryLazy' },
+    { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' }, event = 'VeryLazy' },
 
-    -- Component
-    { 'ellisonleao/gruvbox.nvim', config = pkg_gruvbox },
-    { 'polirritmico/monokai-nightasty.nvim' },
+    -- Enchance
     { 'nvim-tree/nvim-web-devicons', lazy = true, enabled = use.ui.icon },
+    { 'nvim-lua/plenary.nvim', lazy = true },
+    { 'MunifTanjim/nui.nvim', lazy = true },
+    { 'kevinhwang91/promise-async', lazy = true },
     require('v.pkgs.nstl'),
+    { 'ellisonleao/gruvbox.nvim', config = pkg_gruvbox, event = 'VeryLazy' },
+    { 'polirritmico/monokai-nightasty.nvim', event = 'VeryLazy' },
     { 'goolord/alpha-nvim', config = pkg_alpha },
-    { 'rcarriga/nvim-notify', config = pkg_notify },
-    { 'ObserverOfTime/notifications.nvim', config = pkg_notifications },
-    { 'kevinhwang91/nvim-ufo', config = pkg_ufo, dependencies = { 'kevinhwang91/promise-async' } },
+    { 'rcarriga/nvim-notify', config = pkg_notify, event = 'VeryLazy' },
+    { 'ObserverOfTime/notifications.nvim', config = pkg_notifications, event = 'VeryLazy' },
+    { 'kevinhwang91/nvim-ufo', config = pkg_ufo, event = 'VeryLazy' },
     { 'kevinhwang91/nvim-bqf', config = pkg_bqf, ft = 'qf' },
-    { 'yehuohan/popc', init = pkg_popc },
-    { 'yehuohan/popset', dependencies = { 'yehuohan/popc' } },
-    { 'yehuohan/popc-floaterm', dependencies = { 'yehuohan/popc' } },
-    { -- neo-tree
-        'nvim-neo-tree/neo-tree.nvim',
-        config = pkg_neotree,
-        dependencies = { 'nvim-lua/plenary.nvim', 'MunifTanjim/nui.nvim' },
-        keys = { '<leader>tt', '<leader>tT' },
-    },
+    { 'yehuohan/popc', init = pkg_popc, event = 'VeryLazy' },
+    { 'yehuohan/popset', dependencies = { 'yehuohan/popc' }, event = 'VeryLazy' },
+    { 'yehuohan/popc-floaterm', dependencies = { 'yehuohan/popc' }, event = 'VeryLazy' },
+    { 'nvim-neo-tree/neo-tree.nvim', config = pkg_neotree, event = 'VeryLazy' },
     { -- telescope
         'nvim-telescope/telescope.nvim',
         config = pkg_telescope,
-        keys = { '<leader><leader>f', '<leader>lf', '<leader>lg', '<leader>lr' },
+        event = 'VeryLazy',
+        dependencies = {
+            { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+            'nvim-telescope/telescope-frecency.nvim',
+        },
     },
-    { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
-    { 'nvim-telescope/telescope-frecency.nvim' },
-    { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' } },
-    { 'Yggdroot/LeaderF', enabled = use.has_py, init = pkg_leaderf, build = ':LeaderfInstallCExtension' },
-    { 'echasnovski/mini.nvim', config = pkg_mini },
+    { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' }, event = 'VeryLazy' },
+    { 'Yggdroot/LeaderF', enabled = use.has_py, init = pkg_leaderf, event = 'VeryLazy' },
+    { 'echasnovski/mini.nvim', config = pkg_mini, event = 'VeryLazy' },
 
     -- Coding
+    -- { 'rcarriga/nvim-dap-ui', enabled = use.ndap, dependencies = { 'mfussenegger/nvim-dap' }, event = 'VeryLazy' },
     require('v.pkgs.nlsp'),
-    { 'nvim-treesitter/nvim-treesitter', enabled = use.nts, version = '*', config = pkg_treesitter },
-    { 'rcarriga/nvim-dap-ui', enabled = use.ndap, dependencies = { 'mfussenegger/nvim-dap' } },
-    { 'L3MON4D3/LuaSnip', config = pkg_snip, dependencies = { 'honza/vim-snippets' } },
+    require('v.pkgs.nts'),
     { 'stevearc/overseer.nvim' }, -- Setup from v.task
-    { 'kmontocam/nvim-conda', ft = 'python', dependencies = { 'nvim-lua/plenary.nvim' } },
-    { 'stevearc/conform.nvim', config = pkg_conform },
-    { 'voldikss/vim-floaterm', config = pkg_floaterm },
-    { 'numToStr/Comment.nvim', config = pkg_comment },
-    { 'windwp/nvim-autopairs', config = pkg_autopairs },
-    { 'kylechui/nvim-surround', config = pkg_surround },
-    { 't9md/vim-quickhl', config = pkg_quickhl },
-    { 'HiPhish/rainbow-delimiters.nvim', init = pkg_rainbow, submodules = false },
+    { 'L3MON4D3/LuaSnip', config = pkg_snip, dependencies = { 'honza/vim-snippets' }, event = 'VeryLazy' },
+    { 'kmontocam/nvim-conda', ft = 'python' },
+    { 'stevearc/conform.nvim', config = pkg_conform, event = 'VeryLazy' },
+    { 'voldikss/vim-floaterm', config = pkg_floaterm, event = 'VeryLazy' },
+    { 'numToStr/Comment.nvim', config = pkg_comment, event = 'VeryLazy' },
+    { 'windwp/nvim-autopairs', config = pkg_autopairs, event = 'VeryLazy' },
+    { 'kylechui/nvim-surround', config = pkg_surround, event = 'VeryLazy' },
+    { 't9md/vim-quickhl', config = pkg_quickhl, event = 'VeryLazy' },
+    { 'HiPhish/rainbow-delimiters.nvim', init = pkg_rainbow, submodules = false, event = 'VeryLazy' },
     { 'shellRaining/hlchunk.nvim', config = pkg_hlchunk },
-    { 'rust-lang/rust.vim' },
+    { 'rust-lang/rust.vim', event = 'VeryLazy' },
     { 'NoahTheDuke/vim-just', ft = 'just' },
 
     -- Misc
@@ -1030,16 +977,21 @@ local pkgs = {
         config = pkg_markview,
         ft = 'markdown',
         submodules = false,
-        dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
+        dependencies = { 'nvim-treesitter/nvim-treesitter' },
     },
     { 'toppair/peek.nvim', config = pkg_peek, ft = 'markdown', build = 'deno task build:fast' },
     { 'chomosuke/typst-preview.nvim', config = pkg_typst, ft = 'typst' },
     { 'lervag/vimtex', config = pkg_tex, ft = 'tex' },
-    { 'uga-rosa/ccc.nvim', config = pkg_ccc, keys = { '<leader>tc', '<leader>lp' } },
-    { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, keys = { { '<M-w>', mode = 'i' } } },
+    { 'uga-rosa/ccc.nvim', config = pkg_ccc, event = 'VeryLazy' },
+    { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, event = 'VeryLazy' },
     { 'itchyny/screensaver.vim', keys = { { '<leader>ss', '<Cmd>ScreenSaver clock<CR>' } } },
-    { 'voldikss/vim-translator', config = pkg_translator },
-    { 'keaising/im-select.nvim', enabled = use.full, opts = { set_default_events = { 'InsertLeave' } } },
+    { 'voldikss/vim-translator', config = pkg_translator, event = 'VeryLazy' },
+    {
+        'keaising/im-select.nvim',
+        enabled = use.pkgs.im_select,
+        opts = { set_default_events = { 'InsertLeave' } },
+        event = 'VeryLazy',
+    },
 }
 
 local function clone_lazy(url, bundle)
