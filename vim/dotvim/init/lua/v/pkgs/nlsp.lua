@@ -500,7 +500,7 @@ end)
 
 return {
     'hrsh7th/nvim-cmp',
-    enabled = use.nlsp,
+    cond = use.nlsp,
     config = pkg_nslp,
     event = { 'InsertEnter' },
     dependencies = {

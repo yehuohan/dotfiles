@@ -56,7 +56,7 @@ end
 
 return {
     'nvim-treesitter/nvim-treesitter',
-    enabled = use.nts,
+    cond = use.nts,
     version = '*',
     config = pkg_nts,
     event = 'VeryLazy',

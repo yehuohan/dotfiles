@@ -6,6 +6,7 @@ local use = {
     nts = false,
     pkgs = {
         coc = false,
+        which_key = false,
         im_select = false,
     },
     ui = {

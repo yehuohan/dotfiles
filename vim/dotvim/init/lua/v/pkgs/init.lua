@@ -610,6 +610,25 @@ local function pkg_leaderf()
     m.nnore({ '<leader>ll', ':LeaderfLine<CR>' })
 end
 
+-- 按键提示
+local function pkg_which_key()
+    local which_key = require('which-key')
+    which_key.setup({
+        preset = 'classic',
+        keys = {
+            scroll_down = '<M-j>',
+            scroll_up = '<M-k>',
+        },
+        replace = {
+            key = { function(key) return key end },
+        },
+        icons = {
+            breadcrumb = '',
+            separator = '󰁔',
+        },
+    })
+end
+
 -- Mini插件库
 local function pkg_mini()
     require('mini.align').setup({
@@ -792,7 +811,7 @@ local function pkg_hlchunk()
             enable = true,
             chars = { '⁞' },
             style = { 'Gray30' },
-            exclude_filetypes = { Popc = true, screensaver = true },
+            exclude_filetypes = { alpha = true, Popc = true, screensaver = true },
         },
         line_num = { enable = false },
         blank = { enable = false },
@@ -905,6 +924,15 @@ local function pkg_translator()
     })
 end
 
+-- 输入法切换
+local function pkg_im_select()
+    require('im_select').setup({
+        set_default_events = { 'InsertLeave' },
+        set_previous_events = { 'InsertEnter' },
+        async_switch_im = true,
+    })
+end
+
 --------------------------------------------------------------------------------
 -- Lazy
 --------------------------------------------------------------------------------
@@ -924,7 +952,7 @@ local pkgs = {
     { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' }, event = 'VeryLazy' },
 
     -- Enchance
-    { 'nvim-tree/nvim-web-devicons', lazy = true, enabled = use.ui.icon },
+    { 'nvim-tree/nvim-web-devicons', lazy = true, cond = use.ui.icon },
     { 'nvim-lua/plenary.nvim', lazy = true },
     { 'MunifTanjim/nui.nvim', lazy = true },
     { 'kevinhwang91/promise-async', lazy = true },
@@ -940,21 +968,16 @@ local pkgs = {
     { 'yehuohan/popset', dependencies = { 'yehuohan/popc' }, event = 'VeryLazy' },
     { 'yehuohan/popc-floaterm', dependencies = { 'yehuohan/popc' }, event = 'VeryLazy' },
     { 'nvim-neo-tree/neo-tree.nvim', config = pkg_neotree, event = 'VeryLazy' },
-    { -- telescope
-        'nvim-telescope/telescope.nvim',
-        config = pkg_telescope,
-        event = 'VeryLazy',
-        dependencies = {
-            { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
-            'nvim-telescope/telescope-frecency.nvim',
-        },
-    },
+    { 'nvim-telescope/telescope.nvim', config = pkg_telescope, event = 'VeryLazy' },
+    { 'nvim-telescope/telescope-fzf-native.nvim', event = 'VeryLazy', build = 'make' },
+    { 'nvim-telescope/telescope-frecency.nvim', event = 'VeryLazy' },
     { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' }, event = 'VeryLazy' },
-    { 'Yggdroot/LeaderF', enabled = use.has_py, init = pkg_leaderf, event = 'VeryLazy' },
-    { 'echasnovski/mini.nvim', config = pkg_mini, event = 'VeryLazy' },
+    { 'Yggdroot/LeaderF', cond = use.has_py, init = pkg_leaderf, event = 'VeryLazy' },
+    { 'folke/which-key.nvim', cond = use.pkgs.which_key, config = pkg_which_key, event = 'VeryLazy' },
+    { 'echasnovski/mini.align', config = pkg_mini, event = 'VeryLazy' },
 
     -- Coding
-    -- { 'rcarriga/nvim-dap-ui', enabled = use.ndap, dependencies = { 'mfussenegger/nvim-dap' }, event = 'VeryLazy' },
+    -- { 'rcarriga/nvim-dap-ui', cond = use.ndap, dependencies = { 'mfussenegger/nvim-dap' }, event = 'VeryLazy' },
     require('v.pkgs.nlsp'),
     require('v.pkgs.nts'),
     { 'stevearc/overseer.nvim' }, -- Setup from v.task
@@ -967,18 +990,12 @@ local pkgs = {
     { 'kylechui/nvim-surround', config = pkg_surround, event = 'VeryLazy' },
     { 't9md/vim-quickhl', config = pkg_quickhl, event = 'VeryLazy' },
     { 'HiPhish/rainbow-delimiters.nvim', init = pkg_rainbow, submodules = false, event = 'VeryLazy' },
-    { 'shellRaining/hlchunk.nvim', config = pkg_hlchunk },
+    { 'shellRaining/hlchunk.nvim', config = pkg_hlchunk, event = 'VeryLazy' },
     { 'rust-lang/rust.vim', event = 'VeryLazy' },
     { 'NoahTheDuke/vim-just', ft = 'just' },
 
     -- Misc
-    { -- makrview
-        'OXY2DEV/markview.nvim',
-        config = pkg_markview,
-        ft = 'markdown',
-        submodules = false,
-        dependencies = { 'nvim-treesitter/nvim-treesitter' },
-    },
+    { 'OXY2DEV/markview.nvim', config = pkg_markview, ft = 'markdown', submodules = false },
     { 'toppair/peek.nvim', config = pkg_peek, ft = 'markdown', build = 'deno task build:fast' },
     { 'chomosuke/typst-preview.nvim', config = pkg_typst, ft = 'typst' },
     { 'lervag/vimtex', config = pkg_tex, ft = 'tex' },
@@ -986,12 +1003,7 @@ local pkgs = {
     { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, event = 'VeryLazy' },
     { 'itchyny/screensaver.vim', keys = { { '<leader>ss', '<Cmd>ScreenSaver clock<CR>' } } },
     { 'voldikss/vim-translator', config = pkg_translator, event = 'VeryLazy' },
-    {
-        'keaising/im-select.nvim',
-        enabled = use.pkgs.im_select,
-        opts = { set_default_events = { 'InsertLeave' } },
-        event = 'VeryLazy',
-    },
+    { 'keaising/im-select.nvim', cond = use.pkgs.im_select, config = pkg_im_select, event = 'VeryLazy' },
 }
 
 local function clone_lazy(url, bundle)
