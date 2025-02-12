@@ -25,12 +25,10 @@ local function setup_pkgs(targets)
     require('lazy').setup(targets, {
         root = bundle,
         defaults = { lazy = false },
-        lockfile = vim.env.DotVimLocal .. '/lazy/lazy-lock.json',
         git = { url_format = url .. '/%s.git' },
         install = { missing = false },
-        readme = { root = vim.env.DotVimLocal .. '/lazy/readme' },
+        readme = { root = vim.env.DotVimLocal .. '/lazy' },
         performance = { rtp = { reset = false, paths = { vim.env.DotVimInit } } },
-        state = vim.env.DotVimLocal .. '/lazy/state.json',
     })
 end
 

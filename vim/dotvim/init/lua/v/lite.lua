@@ -197,7 +197,7 @@ local function nsearch(engine, smart)
     if text then
         vim.ui.open(text)
     else
-        vim.sysnotify('Nothing to search from internet', vim.log.levels.WARN)
+        vim.notify('Nothing to search from internet')
     end
 end
 

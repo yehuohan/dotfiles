@@ -511,7 +511,6 @@ return {
         { 'folke/lazydev.nvim', ft = 'lua' },
         'nvimdev/lspsaga.nvim',
         'ray-x/lsp_signature.nvim',
-        -- { 'mrcjkb/rustaceanvim', ft = { 'rust' } },
         'hrsh7th/cmp-nvim-lsp',
         'hrsh7th/cmp-buffer',
         'hrsh7th/cmp-calc',
@@ -523,6 +522,7 @@ return {
         'dmitmel/cmp-cmdline-history',
         'kdheepak/cmp-latex-symbols',
         'f3fora/cmp-spell',
-        'zjp-CN/nvim-cmp-lsp-rs',
+        -- { 'mrcjkb/rustaceanvim', ft = { 'rust' } },
+        { 'zjp-CN/nvim-cmp-lsp-rs', ft = { 'rust' } },
     },
 }

@@ -447,5 +447,8 @@ return {
     'rebelot/heirline.nvim',
     config = pkg_nstl,
     event = 'VeryLazy',
-    dependencies = { 'yehuohan/popc', 'linrongbin16/lsp-progress.nvim' },
+    dependencies = {
+        'yehuohan/popc',
+        'linrongbin16/lsp-progress.nvim',
+    },
 }

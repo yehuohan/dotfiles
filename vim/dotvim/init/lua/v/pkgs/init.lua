@@ -251,24 +251,6 @@ local function pkg_notify()
     })
 end
 
--- 系统消息提示
-local function pkg_notifications()
-    local notifications = require('notifications')
-    notifications.setup({
-        override_notify = false,
-        hist_command = 'SysNotifications',
-        icons = {
-            TRACE = '🔍 ',
-            DEBUG = '🐞 ',
-            INFO = '📣 ',
-            WARN = '⚠️  ',
-            ERROR = '❌ ',
-            OFF = '⛔ ',
-        },
-    })
-    vim.sysnotify = notifications.notify
-end
-
 -- 代码折叠
 local function pkg_ufo()
     local ufo = require('ufo')
@@ -514,7 +496,6 @@ local function pkg_telescope()
         defaults = {
             borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
             color_devicons = true,
-            history = { path = vim.env.DotVimLocal .. '/telescope_history' },
             mappings = {
                 i = {
                     ['<Esc>'] = 'close',
@@ -542,7 +523,6 @@ local function pkg_telescope()
                 override_file_sorter = true,
             },
             frecency = {
-                db_root = vim.env.DotVimLocal,
                 db_safe_mode = false, -- `true` will break vim.ui.select
                 auto_validate = true,
                 sorter = require('telescope.config').values.file_sorter(),
@@ -590,7 +570,7 @@ end
 --  * 'py -3 ...' => 'python ...'
 -- 然后运行 ':LeaderfInstallCExtension'
 local function pkg_leaderf()
-    vim.g.Lf_CacheDirectory = vim.env.DotVimLocal
+    vim.g.Lf_CacheDirectory = vim.fn.stdpath('data')
     vim.g.Lf_PreviewInPopup = 1
     vim.g.Lf_PreviewResult = { File = 0, Buffer = 0, Tag = 0, Rg = 0 }
     vim.g.Lf_StlSeparator = use.ui.icon and { left = '', right = '' } or { left = '', right = '' }
@@ -824,7 +804,9 @@ end
 -- Markdown
 local function pkg_markview()
     require('markview').setup({
-        modes = { 'n', 'no' },
+        preview = {
+            modes = { 'n', 'no' },
+        },
     })
     m.nore({ '<leader>tm', ':Markview toggle<CR>' })
 end
@@ -848,7 +830,7 @@ local function pkg_peek()
             else
                 peek.open()
             end
-            vim.sysnotify('Markdown preview is ' .. state, vim.log.levels.INFO)
+            vim.notify('Markdown preview is ' .. state)
         end,
         desc = 'Visualize markdown',
     })
@@ -868,7 +850,7 @@ end
 
 -- Latex
 local function pkg_tex()
-    vim.g.vimtex_cache_root = vim.env.DotVimLocal .. '/.vimtex'
+    vim.g.vimtex_cache_root = vim.fn.stdpath('data') .. '/vimtex'
     vim.g.vimtex_view_general_viewer = 'sioyek'
     vim.g.vimtex_complete_enabled = 1 -- 使用vimtex#complete#omnifunc补全
     vim.g.vimtex_complete_close_braces = 1
@@ -956,12 +938,12 @@ local pkgs = {
     { 'nvim-lua/plenary.nvim', lazy = true },
     { 'MunifTanjim/nui.nvim', lazy = true },
     { 'kevinhwang91/promise-async', lazy = true },
+    { 'nvim-neotest/nvim-nio', lazy = true },
     require('v.pkgs.nstl'),
     { 'ellisonleao/gruvbox.nvim', config = pkg_gruvbox, event = 'VeryLazy' },
     { 'polirritmico/monokai-nightasty.nvim', event = 'VeryLazy' },
     { 'goolord/alpha-nvim', config = pkg_alpha },
     { 'rcarriga/nvim-notify', config = pkg_notify, event = 'VeryLazy' },
-    { 'ObserverOfTime/notifications.nvim', config = pkg_notifications, event = 'VeryLazy' },
     { 'kevinhwang91/nvim-ufo', config = pkg_ufo, event = 'VeryLazy' },
     { 'kevinhwang91/nvim-bqf', config = pkg_bqf, ft = 'qf' },
     { 'yehuohan/popc', init = pkg_popc, event = 'VeryLazy' },
@@ -972,12 +954,11 @@ local pkgs = {
     { 'nvim-telescope/telescope-fzf-native.nvim', event = 'VeryLazy', build = 'make' },
     { 'nvim-telescope/telescope-frecency.nvim', event = 'VeryLazy' },
     { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' }, event = 'VeryLazy' },
-    { 'Yggdroot/LeaderF', cond = use.has_py, init = pkg_leaderf, event = 'VeryLazy' },
+    { 'Yggdroot/LeaderF', cond = use.has_py, config = pkg_leaderf, event = 'VeryLazy' },
     { 'folke/which-key.nvim', cond = use.pkgs.which_key, config = pkg_which_key, event = 'VeryLazy' },
     { 'echasnovski/mini.align', config = pkg_mini, event = 'VeryLazy' },
 
     -- Coding
-    -- { 'rcarriga/nvim-dap-ui', cond = use.ndap, dependencies = { 'mfussenegger/nvim-dap' }, event = 'VeryLazy' },
     require('v.pkgs.nlsp'),
     require('v.pkgs.nts'),
     { 'stevearc/overseer.nvim' }, -- Setup from v.task
@@ -989,7 +970,7 @@ local pkgs = {
     { 'windwp/nvim-autopairs', config = pkg_autopairs, event = 'VeryLazy' },
     { 'kylechui/nvim-surround', config = pkg_surround, event = 'VeryLazy' },
     { 't9md/vim-quickhl', config = pkg_quickhl, event = 'VeryLazy' },
-    { 'HiPhish/rainbow-delimiters.nvim', init = pkg_rainbow, submodules = false, event = 'VeryLazy' },
+    { 'HiPhish/rainbow-delimiters.nvim', config = pkg_rainbow, submodules = false, event = 'VeryLazy' },
     { 'shellRaining/hlchunk.nvim', config = pkg_hlchunk, event = 'VeryLazy' },
     { 'rust-lang/rust.vim', event = 'VeryLazy' },
     { 'NoahTheDuke/vim-just', ft = 'just' },
@@ -1044,12 +1025,15 @@ local function pkg_lazy()
     require('lazy').setup(pkgs, {
         root = bundle,
         defaults = { lazy = false },
-        lockfile = vim.env.DotVimLocal .. '/lazy/lazy-lock.json',
         git = { url_format = url .. '/%s.git' },
         install = { missing = false },
-        readme = { root = vim.env.DotVimLocal .. '/lazy/readme' },
-        performance = { rtp = { reset = false, paths = { vim.env.DotVimInit } } },
-        state = vim.env.DotVimLocal .. '/lazy/state.json',
+        readme = {
+            root = vim.env.DotVimLocal .. '/lazy',
+            files = { 'README.md', 'lua/**/README.md', 'cookbook.md' },
+        },
+        performance = {
+            rtp = { reset = false, paths = { vim.env.DotVimInit } },
+        },
     })
 
     vim.api.nvim_create_autocmd('ColorScheme', {
