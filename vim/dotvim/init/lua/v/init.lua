@@ -1,8 +1,9 @@
---------------------------------------------------------------------------------
--- init.lua: neovim configuration
--- Github: https://github.com/yehuohan/dotfiles
--- Author: <yehuohan@qq.com>, <yehuohan@gmail.com>
---------------------------------------------------------------------------------
+--- @File: neovim configuration init.lua
+--- @Github: https://github.com/yehuohan/dotfiles
+--- @Author: <yehuohan@qq.com>, <yehuohan@gmail.com>
+---
+--- @diagnostic disable: inject-field
+--- @diagnostic disable: undefined-field
 
 function IsLinux()
     return (vim.fn.has('unix') == 1) and (vim.fn.has('macunix') == 0) and (vim.fn.has('win32unix') == 0)

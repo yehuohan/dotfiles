@@ -1,3 +1,6 @@
+--- @diagnostic disable: inject-field
+--- @diagnostic disable: undefined-field
+
 local lsp = {
     {
         'yehuohan/hop.nvim',

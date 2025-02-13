@@ -1,3 +1,6 @@
+--- @diagnostic disable: inject-field
+--- @diagnostic disable: undefined-field
+
 local use_file = vim.env.DotVimLocal .. '/.use.json'
 local use = {
     has_py = false,

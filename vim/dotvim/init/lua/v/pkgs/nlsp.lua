@@ -1,3 +1,6 @@
+--- @diagnostic disable: inject-field
+--- @diagnostic disable: undefined-field
+
 local use = require('v.use')
 local m = require('v.nlib').m
 
@@ -378,17 +381,18 @@ end
 --- Setup lsp settings
 local function setup_lsp_settings()
     vim.lsp.set_log_level(vim.lsp.log_levels.OFF)
+    local signs
     if use.ui.icon then
-        for name, icon in pairs({
-            DiagnosticSignError = '🗴',
-            DiagnosticSignWarn = '',
-            DiagnosticSignInfo = '►',
-            DiagnosticSignHint = '󰌶',
-        }) do
-            vim.fn.sign_define(name, { text = icon, texthl = name, numhl = name })
-        end
+        signs = {
+            text = {
+                [vim.diagnostic.severity.ERROR] = '🗴',
+                [vim.diagnostic.severity.WARN] = '',
+                [vim.diagnostic.severity.INFO] = '󰍟',
+                [vim.diagnostic.severity.HINT] = '󰌶',
+            },
+        }
     end
-    vim.diagnostic.config({ virtual_text = { prefix = '▪' } })
+    vim.diagnostic.config({ virtual_text = { prefix = '▪' }, signs = signs })
 
     require('lspsaga').setup({
         ui = { border = 'single' },

@@ -1,3 +1,6 @@
+--- @diagnostic disable: inject-field
+--- @diagnostic disable: undefined-field
+
 local nlib = require('v.nlib')
 local a = nlib.a
 local async = a._async

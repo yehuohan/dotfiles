@@ -1,3 +1,6 @@
+--- @diagnostic disable: inject-field
+--- @diagnostic disable: undefined-field
+
 local fn = vim.fn
 local api = vim.api
 local use = require('v.use')

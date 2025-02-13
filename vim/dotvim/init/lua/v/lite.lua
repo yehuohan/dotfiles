@@ -1,3 +1,6 @@
+--- @diagnostic disable: inject-field
+--- @diagnostic disable: undefined-field
+
 local nlib = require('v.nlib')
 local m = nlib.m
 

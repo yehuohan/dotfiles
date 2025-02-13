@@ -255,6 +255,7 @@ end
 local function pkg_ufo()
     local ufo = require('ufo')
     ufo.setup({
+        enable_get_fold_virt_text = true,
         fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
             local res = {}
             local tag = use.ui.icon and '' or '»'
@@ -548,6 +549,7 @@ local function pkg_telescope()
         end,
         desc = 'Telescope string',
     })
+    m.nnore({ '<leader>lb', ':Telescope buffers<CR>' })
     m.nnore({ '<leader>lr', ':Telescope frecency<CR>' })
 end
 

@@ -1,3 +1,6 @@
+--- @diagnostic disable: inject-field
+--- @diagnostic disable: undefined-field
+
 --- CSI(Control Sequence Introducer) pattern
 --- A: move cursor up
 --- B: move cursor down
