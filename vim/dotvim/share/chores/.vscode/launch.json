@@ -10,7 +10,7 @@
             "program": "${workspaceFolder}/install/Debug/main.exe",
             "args": ["${workspaceFolder}/assets", "${workspaceFolder}/glsl"],
             "cwd": "${workspaceFolder}",
-            "environment": [], // { "name": "PATH", "value": "."}
+            "environment": [], // { "name": "PATH", "value": "." }
             "externalConsole": false,
             "stopAtEntry": false,
             "linux": { "MIMode": "gdb", "miDebuggerPath": "/usr/bin/gdb" },
@@ -19,7 +19,7 @@
             "setupCommands": [
                 { "text": "-enable-pretty-printing", "ignoreFailures": true },
                 { "text": "-gdb-set disassembly-flavor intel", "ignoreFailures": true }
-            ],
+            ]
         }, {
             // Extension: C/C++ on Windows, CodeLLDB on Linux/macOS
             // Settings: "debug.allowBreakpointsEverywhere" : true
@@ -30,21 +30,30 @@
             // "program": "${workspaceFolder}/target/debug/deps/main.exe", // For dynamic libraries
             "args": [],
             "cwd": "${workspaceFolder}",
-            "environment": [], // { "name": "PATH", "value": "."}
+            "environment": [], // { "name": "PATH", "value": "." }
             "externalConsole": false,
-            "stopAtEntry": false,
+            "stopAtEntry": false
         }, {
             // Extension: Python Debugger
-            "name": "Debug Python",
+            "name": "Debug Python: Launch",
             "type": "debugpy",
             "request": "launch", // "attach"
             "program": "${workspaceFolder}/main.py",
             // "python": "C:/apps/miniconda3/envs/base/python", // For conda python
             "args": ["-c", "${workspaceFolder}/main.json"],
             "cwd": "${workspaceFolder}",
-            "env": {}, // { "PATH": "."}
+            // "env": { "PATH": "." },
             "console": "integratedTerminal", // "internalConsole", "integratedTerminal", "externalTerminal"
-            "justMyCode": false,
+            "justMyCode": false
+        }, {
+            // Extension: Python Debugger
+            "name": "Debug Python: Attach",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            }
         }
     ]
 }

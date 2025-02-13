@@ -543,32 +543,6 @@ imap <M-h> <Plug>snipMateBack
 smap <M-h> <Plug>snipMateBack
 " }}}
 
-" vimspector {{{ 调试
-if s:use.ndap
-let g:vimspector_install_gadgets = ['debugpy', 'vscode-cpptools', 'CodeLLDB']
-nmap <F3>  <Plug>VimspectorStop
-nmap <F4>  <Plug>VimspectorRestart
-nmap <F5>  <Plug>VimspectorContinue
-nmap <F6>  <Plug>VimspectorPause
-nmap <F7>  <Plug>VimspectorToggleConditionalBreakpoint
-nmap <F8>  <Plug>VimspectorAddFunctionBreakpoint
-nmap <F9>  <Plug>VimspectorToggleBreakpoint
-nmap <F10> <Plug>VimspectorStepOver
-nmap <F11> <Plug>VimspectorStepInto
-nmap <F12> <Plug>VimspectorStepOut
-nnoremap <leader>dr :VimspectorReset<CR>
-nnoremap <leader>de :VimspectorEval<Space>
-nnoremap <leader>dw :VimspectorWatch<Space>
-nnoremap <leader>dW :VimspectorShowOutput<Space>
-nnoremap <leader>di
-    \ <Cmd>call PopSelection({
-        \ 'opt' : 'select debug configuration',
-        \ 'lst' : keys(json_decode(join(readfile('.vimspector.json'))).configurations),
-        \ 'cmd' : {sopt, sel -> vimspector#LaunchWithSettings({'configuration': sel})}
-        \})<CR>
-endif
-" }}}
-
 " auto-pairs {{{ 自动括号
 let g:AutoPairsShortcutToggle = ''
 let g:AutoPairsShortcutFastWrap = ''
@@ -777,9 +751,6 @@ endif
     Plug 'garbas/vim-snipmate'
     Plug 'MarcWeber/vim-addon-mw-utils'
     Plug 'honza/vim-snippets'
-if s:use.ndap
-    Plug 'puremourning/vimspector'
-endif
     Plug 'jiangmiao/auto-pairs'
     Plug 'scrooloose/nerdcommenter'
     Plug 'tpope/vim-surround'

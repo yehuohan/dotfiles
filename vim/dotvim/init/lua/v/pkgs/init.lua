@@ -1,3 +1,6 @@
+--- @diagnostic disable: inject-field
+--- @diagnostic disable: undefined-field
+
 local use = require('v.use')
 local nlib = require('v.nlib')
 local m = nlib.m
@@ -961,6 +964,7 @@ local pkgs = {
     { 'echasnovski/mini.align', config = pkg_mini, event = 'VeryLazy' },
 
     -- Coding
+    require('v.pkgs.ndap'),
     require('v.pkgs.nlsp'),
     require('v.pkgs.nts'),
     { 'stevearc/overseer.nvim' }, -- Setup from v.task
