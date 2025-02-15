@@ -11,6 +11,7 @@ local task = require('v.task')
 local throw = error
 
 --- @type Configer Workspace config for code
+--- Support modeline: vim@code{ style = 'term', efm = [[%l:%c]], efm_fts = {...}, ... }: ...
 local wsc = nlib.new_configer({
     key = '',
     file = '',
@@ -36,9 +37,9 @@ local wsc = nlib.new_configer({
 -- stylua: ignore start
 local codes = {
     nvim       = { cmd = 'nvim {barg} -l {bsrc} {earg}' },
-    c          = { cmd = 'gcc -g {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
+    c          = { cmd = 'gcc {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
                    efm = [[%f:%l:%c: %m]] },
-    cpp        = { cmd = 'g++ -g -std=c++20 {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
+    cpp        = { cmd = 'g++ -std=c++20 {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
                    efm = [[%f:%l:%c: %m]] },
     rust       = { cmd = IsWin() and 'rustc {barg} {bsrc} -o "{bout}.exe" && "./{bout}" {earg}'
                                   or 'rustc {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
@@ -181,16 +182,15 @@ function _hdls.just(cfg)
     cmds[#cmds + 1] = replace(packs.just, rep)
 
     local tbl, cmd = nlib.modeline('code', cfg.file)
-    local efm_fts = { 'just', 'cmake', 'c', 'rust', 'python' }
     if tbl then
-        local efm = fetch_efm(vim.list_extend(tbl.efm_fts or {}, efm_fts))
+        local efm = fetch_efm(vim.list_extend(tbl.efm_fts or {}, { 'just' }))
         cfg:set(tbl)
         cfg.efm = efm
         if tbl.efm then
             cfg.efm = { tbl.efm .. ',' .. efm[1], tbl.efm .. ',' .. efm[2] }
         end
     else
-        local efm = fetch_efm(efm_fts)
+        local efm = fetch_efm({ 'just', 'cmake', 'c', 'rust', 'python' })
         cfg.efm = efm
     end
     cmd = cmd or sequence(cmds)
@@ -206,16 +206,15 @@ function _hdls.make(cfg)
     cmds[#cmds + 1] = replace(packs.make, rep)
 
     local tbl, cmd = nlib.modeline('code', cfg.file)
-    local efm_fts = { 'make', 'cmake', 'c' }
     if tbl then
-        local efm = fetch_efm(vim.list_extend(tbl.efm_fts or {}, efm_fts))
+        local efm = fetch_efm(vim.list_extend(tbl.efm_fts or {}, { 'make' }))
         cfg:set(tbl)
         cfg.efm = efm
         if tbl.efm then
             cfg.efm = { tbl.efm .. ',' .. efm[1], tbl.efm .. ',' .. efm[2] }
         end
     else
-        local efm = fetch_efm(efm_fts)
+        local efm = fetch_efm({ 'make', 'cmake', 'c' })
         cfg.efm = efm
     end
     cmd = cmd or sequence(cmds)
@@ -261,7 +260,7 @@ function _args.nvim(dic, file)
 end
 
 function _args.file(dic, file)
-    dic.barg.lst = { '-static' }
+    dic.barg.lst = { '-g', '-static' }
     dic.earg.lst = { '--summary' }
 end
 

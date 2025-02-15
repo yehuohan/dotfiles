@@ -6,21 +6,45 @@ local m = require('v.nlib').m
 
 local function setup_adapters()
     local dap = require('dap')
+
+    -- C/C++/Rust: gdb or lldb
+    dap.adapters.cppdbg = {
+        id = 'cppdbg',
+        type = 'executable',
+        command = vim.env.DotVimLocal .. '/.mason/bin/OpenDebugAD7',
+    }
+    if IsWin() then
+        dap.adapters.cppdbg.command = dap.adapters.cppdbg.command .. '.cmd'
+        dap.adapters.cppdbg.options = { detached = false }
+    end
+    dap.configurations.c = {
+        {
+            name = 'Launch C/C++/Rust file',
+            type = 'cppdbg',
+            request = 'launch',
+            program = function() return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':t:r') end,
+            cwd = '${workspaceFolder}',
+            stopAtEntry = true,
+        },
+    }
+    dap.configurations.cpp = dap.configurations.c
+    dap.configurations.rust = dap.configurations.c
+
     -- Python: pip install debugpy
-    dap.adapters.debugpy = function(cb, config)
-        if config.request == 'attach' then
+    dap.adapters.debugpy = function(cb, cfg)
+        if cfg.request == 'attach' then
             --- @type dap.ServerAdapter
             local adapter = {
                 type = 'server',
-                port = (config.connect or config).port,
-                host = (config.connect or config).host or '127.0.0.1',
+                port = (cfg.connect or cfg).port,
+                host = (cfg.connect or cfg).host or '127.0.0.1',
             }
             cb(adapter)
         else
             --- @type dap.ExecutableAdapter
             local adapter = {
                 type = 'executable',
-                command = config.python or 'python',
+                command = cfg.python or 'python',
                 args = { '-m', 'debugpy.adapter' },
                 options = { source_filetype = 'python' },
             }
@@ -29,7 +53,7 @@ local function setup_adapters()
     end
     dap.configurations.python = {
         {
-            name = 'Launch Python File',
+            name = 'Launch Python file',
             type = 'debugpy',
             request = 'launch',
             program = '${file}',
@@ -80,52 +104,49 @@ end
 local function setup_mappings()
     local dap = require('dap')
     local dapui = require('dapui')
+
+    local breakpoint = function()
+        dap.toggle_breakpoint()
+        dapui.update_render({})
+    end
+    local breakpoint_condition = function()
+        vim.ui.input({ prompt = 'Condition:' }, function(cond)
+            if cond then
+                dap.set_breakpoint(cond)
+                dapui.update_render({})
+            end
+        end)
+    end
+    local breakpoint_hit_condition = function()
+        vim.ui.input({ prompt = 'Hit condition:' }, function(cond)
+            if cond then
+                dap.set_breakpoint(nil, cond)
+                dapui.update_render({})
+            end
+        end)
+    end
+    local log_point_message = function()
+        vim.ui.input({ prompt = 'Log message:' }, function(msg)
+            if msg then
+                dap.set_breakpoint(nil, nil, msg)
+                dapui.update_render({})
+            end
+        end)
+    end
+
     m.nnore({ '<F4>', dap.terminate })
     m.nnore({ '<S-F5>', dap.terminate })
     m.nnore({ '<F5>', dap.continue })
     m.nnore({ '<F6>', dap.restart })
-    m.nnore({
-        '<F9>',
-        function()
-            dap.toggle_breakpoint()
-            dapui.update_render({})
-        end,
-        desc = 'Toggle breakpoint',
-    })
+    m.nnore({ '<F9>', breakpoint, desc = 'Toggle breakpoint' })
     m.nnore({ '<F10>', dap.step_over })
     m.nnore({ '<F11>', dap.step_into })
     m.nnore({ '<S-F11>', dap.step_out })
     m.nnore({ '<F12>', dap.step_out })
-    m.nnore({
-        '<leader>db',
-        function()
-            vim.ui.input({ prompt = 'Condition:' }, function(cond)
-                dap.set_breakpoint(cond)
-                dapui.update_render({})
-            end)
-        end,
-        desc = 'Set condition breakpoint',
-    })
-    m.nnore({
-        '<leader>dh',
-        function()
-            vim.ui.input({ prompt = 'Hit condition:' }, function(cond)
-                dap.set_breakpoint(nil, cond)
-                dapui.update_render({})
-            end)
-        end,
-        desc = 'Set hit condition breakpoint',
-    })
-    m.nnore({
-        '<leader>dl',
-        function()
-            vim.ui.input({ prompt = 'Log message:' }, function(cond)
-                dap.set_breakpoint(nil, nil, cond)
-                dapui.update_render({})
-            end)
-        end,
-        desc = 'Set log point',
-    })
+    m.nnore({ '<leader>db', breakpoint, desc = 'Toggle breakpoint' })
+    m.nnore({ '<leader>dc', breakpoint_condition, desc = 'Set condition breakpoint' })
+    m.nnore({ '<leader>dh', breakpoint_hit_condition, desc = 'Set hit condition breakpoint' })
+    m.nnore({ '<leader>dl', log_point_message, desc = 'Set log point message' })
     m.nnore({
         '<leader>de',
         function() dapui.eval(vim.fn.expand('<cword>'), { enter = true }) end,
@@ -148,7 +169,7 @@ local function pkg_ndap()
         vim.fn.sign_define('DapBreakpoint', { text = '', texthl = 'DiagnosticError' })
         vim.fn.sign_define('DapBreakpointCondition', { text = '󱍸', texthl = 'DiagnosticError' })
         vim.fn.sign_define('DapBreakpointRejected', { text = '', texthl = 'DiagnosticError' })
-        vim.fn.sign_define('DapLogPoint', { text = '♦', texthl = 'DiagnosticInfo' })
+        vim.fn.sign_define('DapLogPoint', { text = '󰣏', texthl = 'DiagnosticInfo' })
         vim.fn.sign_define('DapStopped', { text = '󰜴', texthl = 'DiagnosticWarn' })
     end
     setup_ui()
