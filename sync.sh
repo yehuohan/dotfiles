@@ -107,6 +107,8 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
 
     # scoop
     cp $DOT_APPS/_packs/persist/windows-terminal/settings/settings.json     ./disk/scoop/windows-terminal/settings/
+    cp $DOT_APPS/_packs/persist/sioyek/keys_user.config                     ./disk/scoop/sioyek/
+    cp $DOT_APPS/_packs/persist/sioyek/prefs_user.config                    ./disk/scoop/sioyek/
     cp -r $DOT_APPS/_packs/persist/conemu                                   ./disk/scoop/
 
     echo "Win: Copy completed!"

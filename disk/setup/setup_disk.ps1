@@ -6,15 +6,17 @@ echo "dir_disk = $dir_disk"
 echo "USERPROFILE = $env:USERPROFILE"
 Copy-Item -Path "$dir_disk/home/*" -Destination "$env:USERPROFILE" -Recurse -Force
 
-### Setup msys2
+### Setup scoop
 $dot_apps = Get-ItemPropertyValue -Path HKCU:\Environment -Name DOT_APPS -ErrorAction SilentlyContinue
 if (!$dot_apps) {
     write-host "Require DOT_APPS"
     pause
     exit
 }
-$dot_apps = $dot_apps -replace '\\', '\\'
+Copy-Item -Path "$dir_disk/scoop/*" -Destination "$dot_apps/_packs/persist/" -Recurse -Force
 
+### Setup msys2
+$dot_apps = $dot_apps -replace '\\', '\\'
 $cmd_add = @'
 Windows Registry Editor Version 5.00
 

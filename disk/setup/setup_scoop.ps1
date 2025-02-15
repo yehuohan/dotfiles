@@ -51,7 +51,7 @@ scoop install qttabbar-indiff-np # Works with [ExplorerPatcher](https://github.c
 scoop install windows-terminal pwsh # For windows-10
 scoop install conemu # Windows 11's terminal is better
 scoop download clink -h # For conemu
-scoop install CodeNewRoman-NF-Mono FantasqueSansMono-NF-Mono -s
+scoop install FantasqueSansMono-NF-Mono Cousine-NF-Mono CodeNewRoman-NF-Mono -s
 scoop install https://raw.githubusercontent.com/daipeihust/im-select/master/bucket/im-select.json
 
 scoop install vulkan # Then run apps/vulkan/current/install-vk-layers.ps1
