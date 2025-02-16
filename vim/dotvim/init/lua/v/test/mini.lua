@@ -1,7 +1,4 @@
---- @diagnostic disable: inject-field
---- @diagnostic disable: undefined-field
-
-local lsp = {
+local pkgs = {
     {
         'yehuohan/hop.nvim',
         config = function()
@@ -41,8 +38,7 @@ return function(dotvim)
     vim.env.DotVimInit = dotvim .. '/init'
     vim.env.DotVimShare = dotvim .. '/share'
     vim.env.DotVimLocal = dotvim .. '/local'
-    vim.env.NVimConfigDir = vim.fn.stdpath('config')
     vim.g.mapleader = ' '
 
-    setup_pkgs(lsp)
+    setup_pkgs(pkgs)
 end

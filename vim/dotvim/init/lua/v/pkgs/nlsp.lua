@@ -1,6 +1,3 @@
---- @diagnostic disable: inject-field
---- @diagnostic disable: undefined-field
-
 local use = require('v.use')
 local m = require('v.nlib').m
 
@@ -88,13 +85,11 @@ local function setup_servers()
                             vim.env.VIMRUNTIME .. '/lua/vim',
                             vim.env.VIMRUNTIME .. '/lua/vim/lsp',
                             vim.env.VIMRUNTIME .. '/lua/vim/treesitter',
-                            vim.env.DotVimDir .. '/bundle/plenary.nvim/lua',
                         },
                         checkThirdParty = false,
                     },
                     telemetry = { enable = false },
                     format = { enable = false },
-                    diagnostics = { disable = { 'missing-fields' } },
                 },
             },
         })
@@ -268,17 +263,6 @@ local function setup_completion()
 
     cmp.setup({
         mapping = cmp_mappings,
-        snippet = { expand = function(args) require('luasnip').lsp_expand(args.body) end },
-        sources = cmp.config.sources({
-            { name = 'nvim_lsp' },
-            { name = 'lazydev', group_index = 0 }, -- Set group index to 0 to skip loading LuaLS completions
-            { name = 'luasnip' },
-            { name = 'path' },
-            { name = 'calc' },
-            { name = 'IM' },
-        }, {
-            { name = 'buffer' },
-        }),
         preselect = cmp.PreselectMode.None,
         window = {
             completion = {
@@ -296,6 +280,17 @@ local function setup_completion()
             fields = { 'kind', 'abbr', 'menu' },
             format = cmp_format,
         },
+        snippet = { expand = function(args) require('luasnip').lsp_expand(args.body) end },
+        sources = cmp.config.sources({
+            { name = 'nvim_lsp' },
+            { name = 'lazydev', group_index = 0 }, -- Set group index to 0 to skip loading LuaLS completions
+            { name = 'luasnip' },
+            { name = 'path' },
+            { name = 'calc' },
+            { name = 'IM' },
+        }, {
+            { name = 'buffer' },
+        }),
     })
     cmp.setup.filetype('rust', {
         sorting = {
@@ -485,7 +480,6 @@ local function setup_lsp_mappings()
     m.nnore({ '<leader>oR', ':LspRestart<CR>' })
     m.nnore({ '<leader>ol', ':LspInfo<CR>' })
     m.nnore({ '<leader>oc', ':Neoconf<CR>' })
-    m.nnore({ '<leader>oC', ':e .nlsp.json<CR>' })
     m.nnore({ '<leader>on', ':Neoconf lsp<CR>' })
     m.nnore({ '<leader>oN', ':Neoconf show<CR>' })
     m.nnore({ '<leader>om', ':Mason<CR>' })

@@ -1,9 +1,6 @@
 --- @File: neovim configuration init.lua
 --- @Github: https://github.com/yehuohan/dotfiles
 --- @Author: <yehuohan@qq.com>, <yehuohan@gmail.com>
----
---- @diagnostic disable: inject-field
---- @diagnostic disable: undefined-field
 
 function IsLinux()
     return (vim.fn.has('unix') == 1) and (vim.fn.has('macunix') == 0) and (vim.fn.has('win32unix') == 0)
@@ -30,7 +27,6 @@ local function setup(dotvim)
     vim.env.DotVimInit = dotvim .. '/init'
     vim.env.DotVimShare = dotvim .. '/share'
     vim.env.DotVimLocal = dotvim .. '/local'
-    vim.env.NVimConfigDir = vim.fn.stdpath('config')
     setup_env()
 
     if IsWin() then

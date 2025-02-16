@@ -1,6 +1,3 @@
---- @diagnostic disable: inject-field
---- @diagnostic disable: undefined-field
-
 local use = require('v.use')
 local m = require('v.nlib').m
 

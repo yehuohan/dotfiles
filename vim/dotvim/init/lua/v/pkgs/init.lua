@@ -1,6 +1,3 @@
---- @diagnostic disable: inject-field
---- @diagnostic disable: undefined-field
-
 local use = require('v.use')
 local nlib = require('v.nlib')
 local m = nlib.m
@@ -194,7 +191,7 @@ local function pkg_alpha()
                 type = 'group',
                 val = {
                     tpl.file_button(vim.env.DotVimInit .. '/lua/v/init.lua', 'c'),
-                    tpl.file_button(vim.env.NVimConfigDir .. '/init.lua', 'd'),
+                    tpl.file_button(vim.fn.stdpath('config') .. '/init.lua', 'd'),
                     tpl.file_button(vim.env.DotVimLocal .. '/todo.md', 'o'),
                 },
             },
@@ -956,8 +953,8 @@ local pkgs = {
     { 'yehuohan/popc-floaterm', dependencies = { 'yehuohan/popc' }, event = 'VeryLazy' },
     { 'nvim-neo-tree/neo-tree.nvim', config = pkg_neotree, event = 'VeryLazy' },
     { 'nvim-telescope/telescope.nvim', config = pkg_telescope, event = 'VeryLazy' },
-    { 'nvim-telescope/telescope-fzf-native.nvim', event = 'VeryLazy', build = 'make' },
-    { 'nvim-telescope/telescope-frecency.nvim', event = 'VeryLazy' },
+    { 'nvim-telescope/telescope-fzf-native.nvim', lazy = true, build = 'make' },
+    { 'nvim-telescope/telescope-frecency.nvim', lazy = true },
     { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' }, event = 'VeryLazy' },
     { 'Yggdroot/LeaderF', cond = use.has_py, config = pkg_leaderf, event = 'VeryLazy' },
     { 'folke/which-key.nvim', cond = use.pkgs.which_key, config = pkg_which_key, event = 'VeryLazy' },

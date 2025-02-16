@@ -1,7 +1,4 @@
 --- Display task output into quickfix or terminal
----
---- @diagnostic disable: inject-field
---- @diagnostic disable: undefined-field
 
 local PAUSE_PATS = {
     '请按任意键继续. . .',

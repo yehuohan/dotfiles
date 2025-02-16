@@ -1,6 +1,3 @@
---- @diagnostic disable: inject-field
---- @diagnostic disable: undefined-field
-
 --- @class NLib Neovim Library
 local M = {}
 

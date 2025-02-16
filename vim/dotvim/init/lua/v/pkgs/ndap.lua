@@ -1,6 +1,3 @@
---- @diagnostic disable: inject-field
---- @diagnostic disable: undefined-field
-
 local use = require('v.use')
 local m = require('v.nlib').m
 
@@ -36,8 +33,8 @@ local function setup_adapters()
             --- @type dap.ServerAdapter
             local adapter = {
                 type = 'server',
-                port = (cfg.connect or cfg).port,
                 host = (cfg.connect or cfg).host or '127.0.0.1',
+                port = (cfg.connect or cfg).port,
             }
             cb(adapter)
         else
@@ -58,6 +55,23 @@ local function setup_adapters()
             request = 'launch',
             program = '${file}',
             console = 'integratedTerminal',
+        },
+    }
+
+    -- Neovim Lua
+    dap.adapters.nlua = function(cb, cfg)
+        cb({
+            type = 'server',
+            host = cfg.host or '127.0.0.1',
+            port = cfg.port or 9876,
+        })
+    end
+    dap.configurations.lua = {
+        {
+            name = 'Attach to nvim instance',
+            type = 'nlua',
+            request = 'attach',
+            port = 9876,
         },
     }
 end
@@ -138,11 +152,14 @@ local function setup_mappings()
     m.nnore({ '<S-F5>', dap.terminate })
     m.nnore({ '<F5>', dap.continue })
     m.nnore({ '<F6>', dap.restart })
-    m.nnore({ '<F9>', breakpoint, desc = 'Toggle breakpoint' })
+    m.nnore({ '<F7>', breakpoint_hit_condition })
+    m.nnore({ '<F8>', breakpoint_condition })
+    m.nnore({ '<F9>', breakpoint })
     m.nnore({ '<F10>', dap.step_over })
     m.nnore({ '<F11>', dap.step_into })
     m.nnore({ '<S-F11>', dap.step_out })
     m.nnore({ '<F12>', dap.step_out })
+    m.nnore({ '<leader>dd', dap.continue, desc = 'Start debug with DAP' })
     m.nnore({ '<leader>db', breakpoint, desc = 'Toggle breakpoint' })
     m.nnore({ '<leader>dc', breakpoint_condition, desc = 'Set condition breakpoint' })
     m.nnore({ '<leader>dh', breakpoint_hit_condition, desc = 'Set hit condition breakpoint' })
@@ -150,7 +167,7 @@ local function setup_mappings()
     m.nnore({
         '<leader>de',
         function() dapui.eval(vim.fn.expand('<cword>'), { enter = true }) end,
-        'Eval expression',
+        desc = 'Eval expression',
     })
     m.nnore({
         '<leader>td',
@@ -158,7 +175,12 @@ local function setup_mappings()
             dapui.toggle()
             dapui.update_render({})
         end,
-        'Toggle DAP UI',
+        desc = 'Toggle DAP UI',
+    })
+    m.nnore({
+        '<leader>dn',
+        function() require('osv').run_this() end,
+        desc = 'Debug current lua file with nvim',
     })
 end
 
@@ -187,5 +209,6 @@ return {
             'Joakker/lua-json5',
             build = IsWin() and 'powershell ./install.ps1' or './install.sh',
         },
+        'jbyuki/one-small-step-for-vimkind',
     },
 }
