@@ -272,7 +272,7 @@ local function setup_completion()
                 side_padding = 0,
             },
             documentation = {
-                winhighlight = 'Normal:Pmenu,FloatBorder:Pmenu,Search:None',
+                winhighlight = 'Normal:Pmenu,FloatBorder:Pmenu,Search:None,Error:None,ErrorMsg:None',
                 max_width = 80,
             },
         },

@@ -419,6 +419,10 @@ augroup END
 " }}}
 
 " LeaderF {{{ 模糊查找
+" 使用Miniconda3，需要修改install.bat：
+"  * comment 'py -2 ...'
+"  * 'py -3 ...' => 'python ...'
+" 然后运行 ':LeaderfInstallCExtension'
 if s:use.has_py
 let g:Lf_CacheDirectory = $DotVimLocal
 let g:Lf_PreviewInPopup = 1

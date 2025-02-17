@@ -14,10 +14,12 @@
     "lspconfig": {
         "lua_ls": {
             "Lua.runtime.version": "LuaJIT", // "Lua 5.2", "LuaJIT"
+            "Lua.workspace.library": ["../../bundle/plenary.nvim/lua"],
             "Lua.diagnostics.disable": [
                 "inject-field",
                 "missing-fields",
-                "undefined-field"
+                "undefined-field",
+                "duplicate-set-field"
             ]
         }
     }

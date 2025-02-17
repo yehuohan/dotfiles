@@ -122,7 +122,7 @@ end
 ---@param cpt Tout.Component
 ---@param params Tout.Params
 function qf.on_start(task, cpt, params)
-    cpt.start_time = os.time()
+    cpt.start_time = vim.fn.reltime()
     qf.title = params.title
     qf.task = task
     qf.get()
@@ -150,14 +150,14 @@ end
 ---@param params Tout.Params
 function qf.on_complete(task, status, result, cpt, params)
     local encoding = params.encoding
-    local dt = os.time() - cpt.start_time
+    local dt = vim.fn.reltimefloat(vim.fn.reltime(cpt.start_time))
     local lines, highlights = cpt.chanor()
 
     qf.get()
     qf.display(lines, highlights, params.efm, encoding)
 
     -- Add tail message
-    local msg = string.format('}}} [%s] %s in %ds', os.date('%H:%M:%S'), status, dt)
+    local msg = string.format('}}} [%s] %s in %0.2fs', os.date('%H:%M:%S'), status, dt)
     vim.fn.setqflist({}, 'a', {
         lines = { msg },
         efm = ' ', -- Avoid match time string

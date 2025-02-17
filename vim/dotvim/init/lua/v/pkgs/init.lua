@@ -566,32 +566,6 @@ local function pkg_fzf()
     })
 end
 
--- 模糊查找
--- 使用Miniconda3，需要修改install.bat：
---  * comment 'py -2 ...'
---  * 'py -3 ...' => 'python ...'
--- 然后运行 ':LeaderfInstallCExtension'
-local function pkg_leaderf()
-    vim.g.Lf_CacheDirectory = vim.fn.stdpath('data')
-    vim.g.Lf_PreviewInPopup = 1
-    vim.g.Lf_PreviewResult = { File = 0, Buffer = 0, Tag = 0, Rg = 0 }
-    vim.g.Lf_StlSeparator = use.ui.icon and { left = '', right = '' } or { left = '', right = '' }
-    vim.g.Lf_ShowDevIcons = 0
-    vim.g.Lf_ShortcutF = ''
-    vim.g.Lf_ShortcutB = ''
-    vim.g.Lf_ReverseOrder = 1
-    vim.g.Lf_ShowHidden = 1
-    vim.g.Lf_DefaultExternalTool = 'rg'
-    vim.g.Lf_UseVersionControlTool = 1
-    vim.g.Lf_WildIgnore = { dir = { '.git', '.svn', '.hg' }, file = {} }
-    vim.g.Lf_MruEnable = 0
-    vim.g.Lf_GtagsAutoGenerate = 0
-    vim.g.Lf_GtagsAutoUpdate = 0
-    m.nnore({ '<leader>li', ':LeaderfFile<CR>' })
-    m.nnore({ '<leader>lu', ':LeaderfFunction<CR>' })
-    m.nnore({ '<leader>ll', ':LeaderfLine<CR>' })
-end
-
 -- 按键提示
 local function pkg_which_key()
     local which_key = require('which-key')
@@ -956,7 +930,6 @@ local pkgs = {
     { 'nvim-telescope/telescope-fzf-native.nvim', lazy = true, build = 'make' },
     { 'nvim-telescope/telescope-frecency.nvim', lazy = true },
     { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' }, event = 'VeryLazy' },
-    { 'Yggdroot/LeaderF', cond = use.has_py, config = pkg_leaderf, event = 'VeryLazy' },
     { 'folke/which-key.nvim', cond = use.pkgs.which_key, config = pkg_which_key, event = 'VeryLazy' },
     { 'echasnovski/mini.align', config = pkg_mini, event = 'VeryLazy' },
 

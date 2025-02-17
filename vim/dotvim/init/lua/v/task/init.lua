@@ -237,10 +237,12 @@ function M.setup()
     nlib.m.vnore({
         '<leader><leader>r',
         function() vim.api.nvim_feedkeys(':TaskRun ' .. nlib.get_selected(''), 'n', true) end,
+        desc = ':RunTask',
     })
     nlib.m.vnore({
         '<leader><leader>R',
         function() vim.api.nvim_feedkeys(':TaskRun! ' .. nlib.get_selected(''), 'n', true) end,
+        desc = ':RunTask!',
     })
 
     -- Save and restore workspace config

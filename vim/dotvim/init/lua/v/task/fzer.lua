@@ -62,7 +62,6 @@ local function rg_ignore() return wsc.ignore and {} or { '--no-ignore' } end
 --- @class FzerTable Fuzzy finder tasks
 --- @field rg(string)
 --- @field fzf(Fuzzier)
---- @field leader(Fuzzier)
 --- @field telescope(Fuzzier)
 local fzer = {
     rg = 'rg --vimgrep -F {opt} -e "{pat}" {loc}',
@@ -81,11 +80,6 @@ local fzer = {
             vim.fn['fzf#vim#grep'](grep_cmd, vim.fn['fzf#vim#with_preview'](), 0)
         end,
         tags = ':FzfTags {pat}',
-    },
-    leaderf = {
-        file = ':Leaderf file --input "{pat}" "{loc}"',
-        live = ':Leaderf rg --nowrap {opt} -e "{pat}" {loc}',
-        tags = ':Leaderf tag --nowrap --input "{pat}"',
     },
     telescope = {
         file = 'find_files',
@@ -107,17 +101,6 @@ setmetatable(fzer.fzf, {
         elseif type(strfn) == 'string' then
             vim.cmd(replace(strfn, rep))
         end
-    end,
-})
-
-setmetatable(fzer.leaderf, {
-    __call = function(self, rhs, args)
-        local rep = {
-            pat = args.pat,
-            loc = table.concat(args.loc, ' '),
-            opt = table.concat(args.opt, ' '),
-        }
-        vim.cmd(replace(self[rhs], rep))
     end,
 })
 
@@ -185,7 +168,7 @@ local _sels = {
             },
         },
         vimgrep = vim.empty_dict(),
-        fuzzier = { lst = { 'fzf', 'leaderf', 'telescope' } },
+        fuzzier = { lst = { 'fzf', 'telescope' } },
         verbose = {
             lst = { 'a', 'w', 'e' },
             dic = {
