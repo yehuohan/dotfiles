@@ -158,13 +158,15 @@ local _sels = {
         hidden = { dsr = 'search hidden files and directories' },
         ignore = { dsr = 'respect .gitignore, .ignore and .rgignore' },
         options = {
-            lst = { '-w', '-i', '-s', '-S', '-z', '--no-fixed-strings', '--encoding gbk' },
+            lst = { '-w', '-i', '-s', '-S', '-z', '-c', '-l', '--no-fixed-strings', '--encoding gbk' },
             dic = {
                 ['-w'] = [[--word-regexp]],
                 ['-i'] = [[--ignore-case]],
                 ['-s'] = [[--case-sensitive]],
                 ['-S'] = [[--smart-case]],
                 ['-z'] = [[--search-zip]],
+                ['-c'] = [[--count]],
+                ['-l'] = [[--files-with-matches]],
             },
         },
         vimgrep = vim.empty_dict(),

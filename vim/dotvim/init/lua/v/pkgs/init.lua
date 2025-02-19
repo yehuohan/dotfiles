@@ -392,17 +392,8 @@ local function pkg_neotree()
         return function(state)
             require('neo-tree.sources.filesystem.commands').open(state)
             local node = state.tree:get_node()
-            if node.type == 'file' then
-                if vim.fn.bufnr('#') > 0 then
-                    -- No idea why the opened buffer may be unlisted(nvim-tree doesnt' have this issue)
-                    -- Switch buffer twice to make the opened buffer detected by popc
-                    local codes = vim.api.nvim_replace_termcodes('<C-^>', true, true, true)
-                    vim.cmd.normal({ args = { codes }, bang = true })
-                    vim.cmd.normal({ args = { codes }, bang = true })
-                end
-                if preview then
-                    vim.cmd.wincmd('p')
-                end
+            if preview and node.type == 'file' then
+                vim.cmd.wincmd('p')
             end
         end
     end
@@ -444,8 +435,8 @@ local function pkg_neotree()
                 ['gi'] = 'open_split',
                 ['t'] = 'open_tabnew',
                 ['p'] = { 'toggle_preview', config = { use_float = true } },
-                ['J'] = last_sibling,
-                ['K'] = first_sibling,
+                ['J'] = 'last_sibling',
+                ['K'] = 'first_sibling',
                 ['r'] = 'refresh',
                 ['H'] = 'close_node',
                 ['Z'] = 'close_all_subnodes',
@@ -495,7 +486,6 @@ local function pkg_telescope()
     local builtin = require('telescope.builtin')
     telescope.setup({
         defaults = {
-            borderchars = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
             color_devicons = true,
             mappings = {
                 i = {
@@ -547,9 +537,11 @@ local function pkg_telescope()
             local bufname = vim.api.nvim_buf_get_name(0)
             builtin.grep_string({ cwd = vim.fs.dirname(bufname), search = '', search_dirs = { bufname } })
         end,
-        desc = 'Telescope string',
+        desc = 'Telescope grep string',
     })
     m.nnore({ '<leader>lb', ':Telescope buffers<CR>' })
+    m.nnore({ '<leader>ll', ':Telescope current_buffer_fuzzy_find<CR>' })
+    m.nnore({ '<leader>lm', ':Telescope keymaps<CR>' })
     m.nnore({ '<leader>lr', ':Telescope frecency<CR>' })
 end
 
