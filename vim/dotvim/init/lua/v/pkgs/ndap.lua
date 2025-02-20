@@ -1,8 +1,52 @@
 local use = require('v.use')
-local m = require('v.nlib').m
+local nlib = require('v.nlib')
+local m = nlib.m
+
+--- Expand configuration ${variable} with repls
+--- @param repls(table<string, string|function>) Replacements for ${variable}
+--- @return fun(option:any):any
+local function expand_config(repls)
+    local function expand_variables(option)
+        if type(option) == 'table' then
+            local mt = getmetatable(option)
+            local res = {}
+            for k, v in pairs(option) do
+                res[k] = expand_variables(v)
+            end
+            return setmetatable(res, mt)
+        end
+        if type(option) ~= 'string' then
+            return option
+        end
+        local res = option
+        for key, repl in pairs(repls) do
+            res = res:gsub(key, repl)
+        end
+        return res
+    end
+    return expand_variables
+end
 
 local function setup_adapters()
     local dap = require('dap')
+
+    -- .vscode/launch.json
+    dap.providers.configs['dap.launch.json'] = function()
+        local root = nlib.try_root('.vscode')
+        local path = root and root .. '/.vscode/launch.json'
+        local ok, cfgs = pcall(require('dap.ext.vscode').getconfigs, path)
+        if ok and root then
+            local repls = {
+                ['${workspaceFolder}'] = root,
+                ['${workspaceFolderBasename}'] = vim.fn.fnamemodify(root, ':t'),
+            }
+            for k, cfg in ipairs(cfgs) do
+                cfgs[k] = vim.tbl_map(expand_config(repls), cfg)
+            end
+            return cfgs
+        end
+        return {}
+    end
 
     -- C/C++/Rust: gdb or lldb
     dap.adapters.cppdbg = {
@@ -159,7 +203,8 @@ local function setup_mappings()
     m.nnore({ '<F11>', dap.step_into })
     m.nnore({ '<S-F11>', dap.step_out })
     m.nnore({ '<F12>', dap.step_out })
-    m.nnore({ '<leader>dd', dap.continue, desc = 'Start debug with DAP' })
+    m.nnore({ '<leader>dd', dap.continue, desc = 'Start/continue debug with DAP' })
+    m.nnore({ '<leader>dr', dap.run_to_cursor, desc = 'Continue to cursor' })
     m.nnore({ '<leader>db', breakpoint, desc = 'Toggle breakpoint' })
     m.nnore({ '<leader>dc', breakpoint_condition, desc = 'Set condition breakpoint' })
     m.nnore({ '<leader>dh', breakpoint_hit_condition, desc = 'Set hit condition breakpoint' })
@@ -169,6 +214,16 @@ local function setup_mappings()
         function() dapui.eval(vim.fn.expand('<cword>'), { enter = true }) end,
         desc = 'Eval expression',
     })
+    m.vnore({
+        '<leader>de',
+        function() dapui.eval(nlib.get_selected(''), { enter = true }) end,
+        desc = 'Eval expression',
+    })
+    m.nnore({
+        '<leader>dn',
+        function() require('osv').run_this() end,
+        desc = 'Debug current lua file with nvim',
+    })
     m.nnore({
         '<leader>td',
         function()
@@ -176,11 +231,6 @@ local function setup_mappings()
             dapui.update_render({})
         end,
         desc = 'Toggle DAP UI',
-    })
-    m.nnore({
-        '<leader>dn',
-        function() require('osv').run_this() end,
-        desc = 'Debug current lua file with nvim',
     })
 end
 

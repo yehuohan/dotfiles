@@ -237,6 +237,7 @@ end
 -- 消息提示
 local function pkg_notify()
     require('notify').setup({
+        background_colour = '#32302f',
         max_width = function()
             return math.floor(vim.api.nvim_get_option_value('columns', { scope = 'global' }) * 0.7)
         end,

@@ -252,12 +252,13 @@ function M.get_selected(sep)
     end
 end
 
---- Try to find root directory upward
+--- Try to find root directory upward that contains marker
+--- @param marker(string[]|string|nil)
 --- @return string|nil
-function M.try_root()
+function M.try_root(marker)
     return vim.fs.root(
         vim.api.nvim_buf_get_name(0),
-        { '.git', 'Justfile', 'justfile', '.justfile', 'Makefile', 'makefile' }
+        marker or { '.git', 'Justfile', 'justfile', '.justfile', 'Makefile', 'makefile' }
     )
 end
 
