@@ -22,7 +22,7 @@ local M = {}
 ---     <metatable> = C@ConfigerMethod {
 ---         __index,
 ---         __newindex,
----         _opts = { ... },
+---         __opts = { ... },
 ---         set(),
 ---         get(),
 ---         ...
@@ -39,25 +39,39 @@ function M.new_configer(opts)
         error('Initial savable options shoule be a table')
     end
 
-    --- Create non-savable options for each sub-tables
-    --- @param init_opts(table) Savable options of configer
-    --- @param nsc(ConfigerNonSaveable)
-    local function sub_non_savable_config(nsc, init_opts)
-        for ik, iv in pairs(init_opts) do
-            if type(iv) == 'table' then
-                nsc[ik] = {}
-                sub_non_savable_config(nsc[ik], iv)
+    --- Setup `sub_nsc` for `sub_sc`
+    --- @param sub_nsc(ConfigerNonSaveable) Sub level non-savable options
+    --- @param sub_sc(ConfigerSaveable) Sub level savable options
+    local function setup_non_savble(sub_nsc, sub_sc)
+        local B = {}
+        B.__call = function(self, rhs)
+            -- `sub_nsc` must NOT have metatable.
+            -- Lua 5.1 `__eq` require both 'lhs' and 'rhs' have same `metatable.__eq`,
+            -- So compare table address directly with `metatable.__call`.
+            return self == sub_sc and sub_nsc == rhs
+        end
+        B.__index = function(self, k) return rawget(self, k) or sub_nsc[k] end
+        B.__newindex = function(self, k, v)
+            if rawget(self, k) == nil then
+                sub_nsc[k] = v
+            else
+                rawset(self, k, v)
+            end
+        end
+        setmetatable(sub_sc, B)
+    end
 
-                local B = {}
-                B.__index = function(t, k) return rawget(t, k) or nsc[ik][k] end
-                B.__newindex = function(t, k, v)
-                    if rawget(t, k) == nil then
-                        nsc[ik][k] = v
-                    else
-                        rawset(t, k, v)
-                    end
+    --- Deep setup non-savable options for savable options
+    local function deep_non_savable(sub_nsc, sub_sc)
+        for k, v in pairs(sub_sc) do
+            if type(v) == 'table' then
+                if type(sub_nsc[k]) ~= 'table' then
+                    sub_nsc[k] = {}
                 end
-                setmetatable(init_opts[ik], B)
+                if not (getmetatable(v) and getmetatable(v).__call and v(sub_nsc[k])) then
+                    setup_non_savble(sub_nsc[k], v)
+                end
+                deep_non_savable(sub_nsc[k], v)
             end
         end
     end
@@ -65,83 +79,72 @@ function M.new_configer(opts)
     --- Create non-savable options
     --- @param init_opts(table) Savable options of configer
     --- @return ConfigerNonSaveable
-    local function non_savable_config(init_opts)
+    local function non_savable(init_opts)
         local nsc = {}
         nsc.__index = nsc
-        sub_non_savable_config(nsc, init_opts)
+        deep_non_savable(nsc, init_opts)
         return nsc
     end
 
     --- @type ConfigerMethod
-    local C = { _opts = M.u.deepcopy(opts) }
-    setmetatable(C, non_savable_config(opts))
+    local C = { __opts = M.u.deepcopy(opts) }
+    setmetatable(opts, C) -- opts.metatable = C
+    setmetatable(C, non_savable(opts)) -- C.metatable = nsc
     C.__index = C
-    C.__newindex = function(t, k, v)
-        if rawget(t, k) then
+    C.__newindex = function(self, k, v) -- `self` = `opts`
+        if rawget(self, k) then
             -- New savable option(actually this won't happen with __newindex)
-            rawset(t, k, v)
+            rawset(self, k, v)
         elseif rawget(C, k) then
-            error(string.format('The key "%s" is a config method that should not be modified', k))
+            error(string.format('The key "%s" is a configer method that should not be modified', k))
         else
-            -- New non-savable option
-            -- C == getmetatable(t)
-            -- nsc == getmetatable(C)
-            getmetatable(getmetatable(t))[k] = v
+            -- Forward `opts.__newindex` into `nsc.__newindex`
+            getmetatable(getmetatable(self))[k] = v
         end
     end
 
-    --- Re-new config's options
-    --- * `C._opts` will be repleaced with new_opts;
-    --- * All savable options will be cleared first, then reinited with new_opts;
-    --- * All non-savable options will be cleared.
+    --- Re-new configer's options
+    --- * Replace `C.__opts` with `new_opts`;
+    --- * Replace all savable options with `C.__opts`;
+    --- * Clear all non-savable options.
     --- @param new_opts(table|nil) New savable options of configer
     function C:new(new_opts)
         if new_opts then
-            C._opts = M.u.deepcopy(new_opts)
+            C.__opts = M.u.deepcopy(new_opts)
         end
         for k, _ in pairs(self) do
             rawset(self, k, nil)
         end
-        for k, v in pairs(C._opts) do
+        for k, v in pairs(C.__opts) do
             if type(v) == 'table' then
                 rawset(self, k, M.u.deepcopy(v))
             else
                 rawset(self, k, v)
             end
         end
-        -- C == getmetatable(self)
-        setmetatable(C, non_savable_config(self))
+        setmetatable(C, non_savable(self)) -- C == getmetatable(self)
     end
 
-    --- Modify config's one option
-    --- This won't construct metatable `opt.B` even if the `val` is table.
-    --- * `C._opts` will be modified;
-    --- * The savable option will modified.
-    function C:mut(opt, val)
-        if type(val) == 'table' then
-            if type(rawget(self, opt)) ~= 'table' then
-                rawset(self, opt, {})
-                C._opts[opt] = {}
-            end
-            for k, v in pairs(val) do
-                rawset(self[opt], k, v) -- It's better that `v` is not a sub-table
-            end
-            M.u.deepmerge(C._opts[opt], val)
-        else
-            rawset(self, opt, val)
-            rawset(C._opts, opt, val)
-        end
+    --- Modify configer's options
+    --- * Merge `new_opts` into `C.__opts`;
+    --- * Merge `new_opts` into all savable options;
+    --- * Keep all non-savable options.
+    --- @param new_opts(table) New savable options of configer
+    function C:mut(new_opts)
+        M.u.deepmerge(C.__opts, new_opts)
+        M.u.deepmerge(self, new_opts, true)
+        deep_non_savable(getmetatable(C), self) -- nsc == getmetatable(C)
     end
 
-    --- Setup config's current options
-    --- * All savable and non-savable options in mask will be merged from new_opts
-    function C:set(new_opts, mask) M.u.deepmerge(self, new_opts, mask) end
+    --- Setup configer's current options
+    --- Merge `new_opts` into all savable and non-savable options
+    function C:set(new_opts) M.u.deepmerge(self, new_opts) end
 
     --- Get only savable options as a table
     --- @return ConfigerSaveable
     function C:get() return M.u.deepcopy(self) end
 
-    return setmetatable(opts, C)
+    return opts
 end
 
 --- @alias Chanor function A channel lines processor for terminal's stdout
@@ -425,17 +428,28 @@ function _u.deepcopy(orig, mt)
 end
 
 --- Deep merge table
---- @param dst(table) The table to merge into, and metatable will works and be keeped
---- @param src(table) The table to merge from
---- @param mask(table|nil) Mask what will be merged from `src`, nil means all masked
-function _u.deepmerge(dst, src, mask)
-    for k, v in pairs(src) do
-        if (not mask) or vim.tbl_contains(mask, k) then
+--- @param dst(table) The table to merge into, and metatable will be keeped
+--- @param src(table) The table to merge from, and value will be keeped for same key
+--- @param raw(boolean|nil) Use `rawget/rawset` to avoid `dst.metatable` works
+function _u.deepmerge(dst, src, raw)
+    if raw then
+        for k, v in pairs(src) do
+            if type(v) == 'table' then
+                if type(rawget(dst, k)) ~= 'table' then
+                    rawset(dst, k, {})
+                end
+                _u.deepmerge(rawget(dst, k), v, raw)
+            else
+                rawset(dst, k, v)
+            end
+        end
+    else
+        for k, v in pairs(src) do
             if type(v) == 'table' then
                 if type(dst[k]) ~= 'table' then
                     dst[k] = {}
                 end
-                _u.deepmerge(dst[k], v, mask and mask[k])
+                _u.deepmerge(dst[k], v, raw)
             else
                 dst[k] = v
             end
@@ -466,7 +480,7 @@ local function setopts(opts, defaults)
 end
 
 --- Map functions
---- 'map' and 'mnore' works at normal and visual mode by default here
+--- 'map' and 'nore' works at normal and visual mode by default here
 --- ```lua
 ---      local m = require('v.nlib').m
 ---      m.add({'n', 'v'}, {'<leader>', ':echo b:<CR>', buffer = true})

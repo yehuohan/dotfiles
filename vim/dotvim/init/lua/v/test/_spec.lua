@@ -13,7 +13,7 @@ vim.cmd.runtime('plugin/popset.vim')
 vim.cmd.runtime('plugin/overseer.nvim')
 
 local EQ = assert.are.same -- The table's metatable won't be compared
-local OK = assert.has_no.errors
+local OK = assert.has.no.errors
 local NOK = assert.has.errors
 
 --- @alias MockFnList [table, string, ...]
@@ -59,119 +59,182 @@ describe('nlib', function()
 
     -- nlib.new_configer
     describe('. new_configer', function()
-        it('. new', function()
+        it('. initialize', function()
             NOK(function() nlib.new_configer() end)
-            OK(function() nlib.new_configer({}) end)
+            local opts = {}
+            local cfg
+            OK(function() cfg = nlib.new_configer(opts) end)
+            EQ(true, cfg == opts)
+            EQ(true, getmetatable(cfg) ~= nil)
+            EQ(true, getmetatable(getmetatable(cfg)) ~= nil)
         end)
 
-        it('. modify methods', function()
-            local cfg = nlib.new_configer({})
+        local cfg, nsc
+        before_each(function()
+            cfg = nlib.new_configer({ file = 'foo.c', args = { '-f', subs = { '-g' } } })
+            nsc = { args = { subs = {} } }
+            nsc.__index = nsc
+        end)
+
+        it('. methods', function()
+            NOK(function() cfg.__opts = 'foo' end)
             NOK(function() cfg.new = 'foo' end)
+            NOK(function() cfg.mut = 'foo' end)
             NOK(function() cfg.set = 'foo' end)
             NOK(function() cfg.get = 'foo' end)
         end)
 
-        it('. modify savable and non-savable options', function()
-            -- Seperate savable and non-savable option of one configer
-            local cfg = nlib.new_configer({ file = 'foo.c' })
-            EQ({ file = 'foo.c' }, cfg)
-            cfg.file = 'foo.cpp'
-            cfg.type = 'cpp'
-            EQ('foo.cpp', rawget(cfg, 'file'))
+        it('. savable and non-savable options', function()
+            EQ({ file = 'foo.c', args = { '-f', subs = { '-g' } } }, cfg)
+            EQ(nsc, getmetatable(getmetatable(cfg)))
+            cfg.file = 'foo.rs'
+            cfg.type = 'rs'
+            cfg.opts = { '-o' }
+            EQ('foo.rs', rawget(cfg, 'file'))
             EQ(nil, rawget(cfg, 'type'))
-            EQ('cpp', rawget(getmetatable(getmetatable(cfg)), 'type'))
-            -- Seperate non-savable option between configers
-            local cfg2 = nlib.new_configer({ file = 'bar.c' })
-            cfg2.type = 'c'
-            EQ('cpp', rawget(getmetatable(getmetatable(cfg)), 'type'))
-            EQ('c', rawget(getmetatable(getmetatable(cfg2)), 'type'))
+            EQ(nil, rawget(cfg, 'opts'))
+            EQ('rs', getmetatable(getmetatable(cfg)).type)
+            EQ({ '-o' }, getmetatable(getmetatable(cfg)).opts)
+            cfg.args[1] = '-f1'
+            cfg.args[2] = '-f2'
+            cfg.args.opts = { '-a' }
+            EQ({ '-f1', subs = { '-g' } }, rawget(cfg, 'args'))
+            EQ({ [2] = '-f2', subs = {}, opts = { '-a' } }, getmetatable(getmetatable(cfg)).args)
+            cfg.args.subs[1] = '-g1'
+            cfg.args.subs[2] = '-g2'
+            cfg.args.subs.opts = { '-b' }
+            EQ({ '-g1' }, cfg.args.subs)
+            EQ({ [2] = '-g2', opts = { '-b' } }, getmetatable(getmetatable(cfg)).args.subs)
         end)
 
-        it('. get/set/mut/new', function()
-            local cfg = nlib.new_configer({ file = 'foo.c', args = { '-g' } })
-            -- .get
-            local out = cfg:get()
-            EQ({ file = 'foo.c', args = { '-g' } }, out)
-            EQ(nil, getmetatable(out))
-            -- .set
-            cfg.type = 'c'
-            cfg:set({ cmd = 'gcc', args = { '-f', a = 'a' } }, { 'cmd' })
-            EQ({ cmd = 'gcc', file = 'foo.c', args = { '-g' } }, cfg)
-            EQ({}, rawget(getmetatable(getmetatable(cfg)), 'args'))
-            cfg:set({ cmd = 'gcc', args = { '-f', a = 'a' }, ARGS = { A = 'A' } })
-            EQ({ cmd = 'gcc', file = 'foo.c', args = { '-f' } }, cfg)
-            EQ('c', rawget(getmetatable(getmetatable(cfg)), 'type'))
-            EQ({ a = 'a' }, rawget(getmetatable(getmetatable(cfg)), 'args'))
-            EQ({ A = 'A' }, rawget(getmetatable(getmetatable(cfg)), 'ARGS'))
-            -- .mut
-            cfg:mut('cmd', 'gcc')
-            EQ('gcc', rawget(cfg, 'cmd'))
-            cfg:mut('ARGS', { '-F', a = { b = 'c' } })
-            cfg.ARGS.a.b = 'abc'
-            EQ('abc', rawget(cfg, 'ARGS').a.b)
-            EQ('c', getmetatable(cfg)._opts.ARGS.a.b)
-            cfg:mut('ARGS')
-            EQ(nil, rawget(cfg, 'ARGS'))
-            -- .new
+        it('. new', function()
+            cfg.file = 'foo.rs'
+            cfg.type = 'rs'
+            cfg.opts = { '-o' }
+            cfg.args[1] = '-f1'
+            cfg.args[2] = '-f2'
+            cfg.args.opts = { '-a' }
+            cfg.args.subs[1] = '-g1'
+            cfg.args.subs[2] = '-g2'
+            cfg.args.subs.opts = { '-b' }
             cfg:new()
-            EQ({ cmd = 'gcc', file = 'foo.c', args = { '-g' } }, cfg)
-            EQ(nil, rawget(getmetatable(getmetatable(cfg)), 'type'))
+            EQ({ file = 'foo.c', args = { '-f', subs = { '-g' } } }, cfg)
+            EQ(nsc, getmetatable(getmetatable(cfg)))
+            cfg.file = 'foo.rs'
+            cfg.type = 'rs'
+            cfg.opts = { '-o' }
+            cfg.args[1] = '-f1'
+            cfg.args[2] = '-f2'
+            cfg.args[3] = '-f3'
+            cfg.args.opts = { '-a' }
+            cfg.args.subs[1] = '-g1'
+            cfg.args.subs[2] = '-g2'
+            cfg.args.subs[3] = '-g3'
+            cfg.args.subs.opts = { '-b' }
+            cfg:new({
+                path = './',
+                opts = { '-o' },
+                args = { '-f', subs = { '-g', opts = { '-b' } } },
+            })
+            cfg.args[1] = '-F'
+            cfg.args[2] = '-F2'
+            cfg.args.subs[1] = '-G'
+            cfg.args.subs[2] = '-G2'
+            cfg.args.subs.opts[2] = '-B2'
+            EQ({
+                path = './',
+                opts = { '-o' },
+                args = { '-F', subs = { '-G', opts = { '-b' } } },
+            }, cfg)
+            nsc.opts = {}
+            nsc.args = {
+                [2] = '-F2',
+                subs = { [2] = '-G2', opts = { [2] = '-B2' } },
+            }
+            EQ(nsc, getmetatable(getmetatable(cfg)))
         end)
 
-        it('. new with multi-level-table-option', function()
-            local function check(cfg)
-                local ab2 = { 'a', 'b', 2 }
-                local AB2 = { 'A', 'B', 2 }
-                cfg.args[#cfg.args + 1] = '-b'
-                table.insert(cfg.args, 5, '-c')
-                cfg.args[ab2] = 'ab2'
-                cfg.args.num = 2
-                cfg.args.inp = 'src'
-                cfg.args.ARGS[#cfg.args.ARGS + 1] = '-B'
-                cfg.args.ARGS[5] = '-C'
-                cfg.args.ARGS[AB2] = 'AB2'
-                cfg.args.ARGS.CNT = 2
-                cfg.args.ARGS.OUT = 'BIN'
-                EQ({
-                    cmd = 'gcc',
-                    file = 'foo.c',
-                    args = { '-a', [5] = '-c', num = 2, ARGS = { '-A', CNT = 2 } },
-                }, cfg)
-                EQ({
-                    [2] = '-b',
-                    [ab2] = 'ab2',
-                    inp = 'src',
-                    ARGS = {
-                        [2] = '-B',
-                        [5] = '-C',
-                        [AB2] = 'AB2',
-                        OUT = 'BIN',
-                    },
-                }, getmetatable(getmetatable(cfg)).args)
-            end
+        it('. mut', function()
+            cfg.file = 'foo.rs'
+            cfg.type = 'rs'
+            cfg.opts = { '-o' }
+            cfg.args[1] = '-f1'
+            cfg.args[2] = '-f2'
+            cfg.args[3] = '-f3'
+            cfg.args.opts = { '-a' }
+            cfg.args.subs[1] = '-g1'
+            cfg.args.subs[2] = '-g2'
+            cfg.args.subs[3] = '-g3'
+            cfg.args.subs.opts = { '-b' }
+            cfg:mut({
+                path = './',
+                type = 'c',
+                args = { '-f', '-e', subs = { '-g', opts = { '-b' } } },
+            })
+            cfg.type = 'rs'
+            cfg.args[2] = '-E'
+            cfg.args.subs[2] = '-G2'
+            cfg.args.subs.opts[2] = '-B2'
+            EQ({
+                file = 'foo.rs',
+                path = './',
+                type = 'rs',
+                args = { '-f', '-E', subs = { '-g', opts = { '-b' } } },
+            }, cfg)
+            nsc.type = 'rs'
+            nsc.opts = { '-o' }
+            nsc.args = {
+                [2] = '-f2',
+                [3] = '-f3',
+                opts = { '-a' },
+                subs = { [2] = '-G2', [3] = '-g3', opts = { '-b', '-B2' } },
+            }
+            EQ(nsc, getmetatable(getmetatable(cfg)))
+        end)
 
-            local cfg1 = nlib.new_configer({
-                cmd = 'gcc',
-                file = 'foo.c',
-                args = { '-a', num = 1, ARGS = { '-A', CNT = 1 } },
+        it('. set/get', function()
+            -- .set
+            cfg:set({
+                file = 'foo.rs',
+                type = 'rs',
+                opts = { '-o' },
+                args = { '-f', '-f2', opts = { '-a' }, subs = { '-G', '-g2', opts = { '-b' } } },
             })
-            check(cfg1)
-            local cfg2 = nlib.new_configer({ file = 'bar.c' })
-            cfg2:new({
-                cmd = 'gcc',
-                file = 'foo.c',
-                args = { '-a', num = 1, ARGS = { '-A', CNT = 1 } },
-            })
-            check(cfg2)
+            EQ({ file = 'foo.rs', args = { '-f', subs = { '-G' } } }, cfg)
+            nsc.type = 'rs'
+            nsc.opts = { '-o' }
+            nsc.args = {
+                [2] = '-f2',
+                opts = { '-a' },
+                subs = { [2] = '-g2', opts = { '-b' } },
+            }
+            EQ(nsc, getmetatable(getmetatable(cfg)))
+            -- .get
+            local res = cfg:get()
+            EQ({ file = 'foo.rs', args = { '-f', subs = { '-G' } } }, res)
+            EQ(nil, getmetatable(res))
         end)
 
         it('. encode/decode to/from json', function()
-            local opts = { cmd = 'g++', file = 'test.cpp', args = { '-g' } }
-            local cfg = nlib.new_configer(opts)
-            cfg.type = 'cpp'
+            cfg.file = 'foo.rs'
+            cfg.type = 'rs'
+            cfg.opts = { '-o' }
+            cfg.args[1] = '-F'
+            cfg.args[2] = '-f2'
+            cfg.args.opts = { '-a' }
+            cfg.args.subs[1] = '-G'
+            cfg.args.subs[2] = '-g2'
+            cfg.args.subs.opts = { '-b' }
             local str = vim.json.encode(cfg)
             local tbl = vim.json.decode(str)
-            EQ(opts, tbl)
+            EQ({
+                file = 'foo.rs',
+                args = {
+                    ['1'] = '-F', -- Json's dict doesn't support integer as key
+                    subs = { '-G' }, -- Lua's pure list will convert to json's list
+                },
+            }, tbl)
+            EQ(nil, getmetatable(tbl))
         end)
     end)
 
@@ -330,7 +393,6 @@ describe('nlib', function()
                 copy = nlib.u.deepcopy(orig, true)
                 EQ({ foo = { 'bar' }, null = vim.NIL }, copy)
                 EQ({ sub = { 'tbl' } }, getmetatable(copy))
-
                 copy = nlib.u.deepcopy(orig, false)
                 EQ({ foo = { 'bar' }, null = vim.NIL }, copy)
                 EQ(nil, getmetatable(copy))
@@ -339,7 +401,6 @@ describe('nlib', function()
                 local mkey = { abc = 'abc' }
                 setmetatable(mkey, { cba = 'cba' })
                 orig[mkey] = 'mkey'
-
                 copy = nlib.u.deepcopy(orig, true)
                 EQ({ sub = { 'tbl' } }, getmetatable(copy))
                 for k, v in pairs(copy) do
@@ -349,7 +410,6 @@ describe('nlib', function()
                         EQ('mkey', v)
                     end
                 end
-
                 copy = nlib.u.deepcopy(orig, false)
                 EQ(nil, getmetatable(copy))
                 for k, v in pairs(copy) do
@@ -371,7 +431,7 @@ describe('nlib', function()
             check(orig)
         end)
 
-        -- lib.v.deepmerge
+        -- nlib.u.deepmerge
         it('. deepmerge', function()
             local dst = { foo = { 'bar' } }
             setmetatable(dst, { m1 = { 'aaa' } })
@@ -379,11 +439,6 @@ describe('nlib', function()
             local src = { foo = { 'BAR', bar = { 'FOO' }, abc = 'cba' } }
             setmetatable(src, { M1 = { 'AAA' } })
             setmetatable(src.foo, { M2 = { 'BBB' } })
-
-            nlib.u.deepmerge(dst, src, { 'foo', foo = { 1, 'bar' } })
-            EQ({ foo = { 'BAR', bar = { 'FOO' } } }, dst)
-            EQ({ m1 = { 'aaa' } }, getmetatable(dst))
-            EQ({ m2 = { 'bbb' } }, getmetatable(dst.foo))
 
             nlib.u.deepmerge(dst, src)
             EQ({ foo = { 'BAR', bar = { 'FOO' }, abc = 'cba' } }, dst)
@@ -413,70 +468,125 @@ describe('task', function()
         vim.cmd.write()
     end)
 
-    it('. code . :CodeWscInit', function()
-        vim.cmd.CodeWsc({ bang = true })
-        EQ('ansi', txt.style)
+    -- Use `print(vim.inspect())` to debug for `vim.print` has been mocked!
+    describe('. code', function()
+        local wsc
+        before_each(function()
+            vim.cmd.CodeReset({ bang = true })
+            feedkeys('<CR>')
+            vim.cmd.CodeWsc({ bang = false }) -- Use `CodeWsc` to get `code.wsc`
+            wsc = txt
+            -- print(vim.inspect(wsc))
+        end)
 
-        vim.cmd.CodeWscInit()
-        feedkeys('kkkmjob<CR>')
-        feedkeys('<CR>')
-        vim.cmd.CodeWsc({ bang = true })
-        EQ('job', txt.style)
+        it('. :CodeWsc', function()
+            EQ('ansi', wsc.style)
+            EQ('ansi', wsc.__opts.style)
+            EQ(true, getmetatable(wsc) ~= nil)
+            EQ(true, getmetatable(getmetatable(wsc)) ~= nil)
+        end)
 
-        -- Change back code.wsc, or has effect on other test items
-        vim.cmd.CodeWscInit()
-        feedkeys('kkkmansi<CR>')
-        feedkeys('<CR>')
-        vim.cmd.CodeWsc({ bang = true })
-        EQ('ansi', txt.style)
+        it('. :CodeReset', function()
+            vim.cmd.CodeReset({ bang = false })
+            feedkeys('jjjmjob<CR><CR>')
+            EQ('job', wsc.style)
+
+            vim.cmd.CodeReset({ bang = false })
+            feedkeys('<CR>')
+            EQ('job', wsc.style)
+
+            vim.cmd.CodeReset({ bang = true })
+            feedkeys('<CR>')
+            -- `:CodeReset!` will re-create `code.wsc`, so need get new `code.wsc`
+            vim.cmd.CodeWsc({ bang = false })
+            EQ('ansi', txt.style)
+        end)
+
+        it('. :Code! Rp', function()
+            vim.cmd.Code({ args = { 'Rp' }, bang = true })
+            feedkeys('mf<CR>')
+            feedkeys('jm' .. tmp .. '<CR>')
+            feedkeys('kkkmterm<CR>')
+            feedkeys('<CR>')
+            EQ(true, cfg == wsc)
+            EQ('f', wsc.key)
+            EQ(vim.fn.expand(tmp), vim.fn.expand(wsc.file))
+            EQ('lua', wsc.type)
+            EQ('term', wsc.tout.style)
+            EQ(true, vim.startswith(msg, 'resovle = true, restore = true'))
+
+            vim.cmd.TaskWsc()
+            wsc = txt.code
+            EQ('f', wsc.key)
+            EQ(vim.fn.expand(tmp), vim.fn.expand(wsc.file))
+            EQ('lua', wsc.type)
+            EQ('term', wsc.style)
+            EQ(nil, getmetatable(wsc))
+        end)
     end)
 
-    it('. code . :Code! Rp', function()
-        vim.cmd.Code({ args = { 'Rp' }, bang = true })
-        feedkeys('mf<CR>')
-        feedkeys('jm' .. tmp .. '<CR>')
-        feedkeys('kkkmterm<CR>')
-        feedkeys('<CR>')
-        EQ('f', cfg.key)
-        EQ(vim.fn.expand(tmp), vim.fn.expand(cfg.file))
-        EQ('lua', cfg.type)
-        EQ('term', cfg.tout.style)
-        EQ(true, vim.startswith(msg, 'resovle = true, restore = true'))
+    describe('. fzer', function()
+        local wsc
+        before_each(function()
+            vim.cmd.FzerReset({ bang = true })
+            feedkeys('<CR>')
+            vim.cmd.FzerWsc({ bang = false }) -- Use `FzerWsc` to get `fzer.wsc`
+            wsc = txt
+            -- print(vim.inspect(wsc))
+        end)
 
-        vim.cmd.TaskWsc()
-        EQ('f', txt.code.key)
-        EQ(vim.fn.expand(tmp), vim.fn.expand(txt.code.file))
-        EQ('lua', txt.code.type)
-        EQ('term', txt.code.style)
+        it('. :FzerWsc', function()
+            EQ('!_VOut', wsc.glob)
+            EQ('!_VOut', wsc.__opts.glob)
+            EQ(true, getmetatable(wsc) ~= nil)
+            EQ(true, getmetatable(getmetatable(wsc)) ~= nil)
+        end)
 
-        vim.cmd.CodeWsc({ bang = true })
-        EQ('', txt.key)
-        EQ('', txt.file)
-        EQ('', txt.type)
-        EQ('ansi', txt.style)
-    end)
+        it('. :FzerReset', function()
+            vim.cmd.FzerReset({ bang = false })
+            feedkeys('jjM *.lua<CR><CR>')
+            EQ('!_VOut *.lua', wsc.glob)
 
-    it('. fzer . :Fzer fpw', function()
-        feedkeys('iword<Esc>')
+            vim.cmd.FzerReset({ bang = false })
+            feedkeys('<CR>')
+            EQ('!_VOut *.lua', wsc.glob)
 
-        vim.cmd.FzerWsc({ bang = true })
-        EQ('', txt.path) -- wsc.path = '' for the first Fzer execution
-        inp = '/abc/def'
-        if (vim.fn.has('win32') == 1) or (vim.fn.has('win64') == 1) then
-            inp = 'Z:/abc/def'
-        end
-        vim.cmd.Fzer({ args = { 'fpw' } })
-        EQ(inp, cfg.path)
-        vim.cmd.FzerWsc({ bang = true })
-        EQ(inp, txt.path)
-    end)
+            vim.cmd.FzerReset({ bang = true })
+            feedkeys('<CR>')
+            -- `:FzerReset!` will re-create `fzer.wsc`, so need get new `fzer.wsc`
+            vim.cmd.FzerWsc({ bang = false })
+            EQ('!_VOut', txt.glob)
+        end)
 
-    it('. fzer . :Fzer Fw', function()
-        feedkeys('iword<Esc>')
+        it('. :Fzer fpw', function()
+            feedkeys('iword<Esc>')
 
-        vim.cmd.Fzer({ args = { 'Fw' } })
-        feedkeys('jm<CR><CR>') -- Make wsc.path = ''
-        EQ(vim.fs.dirname(tmp), cfg.path)
+            EQ('', wsc.path)
+            inp = '/abc/def'
+            if (vim.fn.has('win32') == 1) or (vim.fn.has('win64') == 1) then
+                inp = 'Z:/abc/def'
+            end
+            vim.cmd.Fzer({ args = { 'fpw' } })
+            EQ(cfg, wsc)
+            EQ(inp, wsc.path)
+            EQ({ inp }, wsc.paths)
+            EQ({ 'word' }, wsc.hltext)
+        end)
+
+        it('. :Fzer Fw', function()
+            feedkeys('iword<Esc>')
+
+            vim.cmd.Fzer({ args = { 'Fw' } })
+            feedkeys('<CR>')
+            EQ(true, cfg == wsc)
+            EQ(vim.fs.dirname(tmp), wsc.path)
+
+            vim.cmd.TaskWsc()
+            wsc = txt.fzer
+            EQ({ '!_VOut' }, wsc.globs)
+            EQ({ vim.fs.dirname(tmp) }, wsc.paths)
+            EQ({ 'word' }, wsc.hltext)
+        end)
     end)
 
     unmock(mocked, fns)

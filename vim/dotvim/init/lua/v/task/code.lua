@@ -7,21 +7,27 @@ local sequence = nlib.u.sequence
 local task = require('v.task')
 local throw = error
 
---- @type Configer Workspace config for code
+--- Create new workspace config for code
 --- Support modeline: vim@code{ style = 'term', efm = [[%l:%c]], efm_fts = {...}, ... }: ...
-local wsc = nlib.new_configer({
-    key = '',
-    file = '',
-    type = '',
-    envs = '',
-    barg = '',
-    earg = '',
-    msvc = false, -- Setup msvc environment
-    outer = true, -- Prioritize finding the outermost file relative to wdir
-    style = 'ansi',
-    encoding = '', -- Setup output encoding
-    verbose = '',
-})
+--- @return Configer
+local function new_wsc()
+    return nlib.new_configer({
+        key = '',
+        file = '',
+        type = '',
+        envs = '',
+        barg = '',
+        earg = '',
+        msvc = false, -- Setup msvc environment
+        outer = true, -- Prioritize finding the outermost file relative to wdir
+        style = 'ansi',
+        encoding = '', -- Setup output encoding
+        verbose = '',
+    })
+end
+
+--- @type Configer Workspace config for code
+local wsc = new_wsc()
 
 --- @class CodeVars
 --- @field barg(string) Build arguments
@@ -331,13 +337,12 @@ local _keys = {
 --- @type PopSelection Selection for code task
 local _sels = {
     opt = 'setup code task',
-    lst = nil,
     -- lst for kt.E != p
     lst_d = { 'envs', 'barg', 'earg', 'msvc', 'outer', 'style', 'encoding', 'verbose' },
     -- lst for kt.E = p
     lst_p = { 'key', 'file', 'type', 'envs', 'barg', 'earg', 'msvc', 'style', 'encoding' },
-    -- lst for CodeWscInit
-    lst_i = { 'envs', 'msvc', 'outer', 'style', 'encoding', 'verbose' },
+    -- lst for CodeReset
+    lst_r = { 'envs', 'msvc', 'outer', 'style', 'encoding', 'verbose' },
     dic = {
         key = { lst = _maps[1], dic = vim.tbl_map(function(h) return h.desc end, _maps) },
         file = { lst = {}, cpl = 'file' },
@@ -380,10 +385,10 @@ local function evt_p(name)
 end
 
 --- @type PopSelectionEvent
-local function evt_i(name)
+local function evt_r(name)
     if name == 'onCR' then
         wsc:new(wsc:get())
-        vim.notify('Code task wsc is reinited!')
+        vim.notify('Code task wsc is reset!')
     end
 end
 
@@ -414,7 +419,7 @@ local entry = async(function(kt, bang)
     end
     if kt.E == 'p' then
         local __wsc = task.wsc.code
-        wsc:set(__wsc, _sels.lst_p)
+        wsc:set(__wsc)
         if __wsc.key and _maps[__wsc.key] and not resovle then
             -- Forward rp => r^p
             kt.E = __wsc.key
@@ -516,12 +521,16 @@ local function setup()
         end
         vim.print(wsc)
     end, { bang = true, nargs = 0 })
-    vim.api.nvim_create_user_command('CodeWscInit', function()
-        wsc:new()
-        _sels.lst = _sels.lst_i
-        _sels.evt = evt_i
+    vim.api.nvim_create_user_command('CodeReset', function(opts)
+        if opts.bang then
+            wsc = new_wsc()
+        else
+            wsc:new()
+        end
+        _sels.lst = _sels.lst_r
+        _sels.evt = evt_r
         vim.fn.PopSelection(_sels)
-    end, { nargs = 0 })
+    end, { bang = true, nargs = 0 })
 end
 
 return { setup = setup }

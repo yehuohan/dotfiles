@@ -61,7 +61,6 @@ function T.sqljson()
     vim.print(('ver = %s'):format(res))
 
     db:close()
-
 end
 
 T.chanor()

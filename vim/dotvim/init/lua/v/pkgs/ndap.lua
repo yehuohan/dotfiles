@@ -35,13 +35,15 @@ local function setup_adapters()
         local root = nlib.try_root('.vscode')
         local path = root and root .. '/.vscode/launch.json'
         local ok, cfgs = pcall(require('dap.ext.vscode').getconfigs, path)
-        if ok and root then
-            local repls = {
-                ['${workspaceFolder}'] = root,
-                ['${workspaceFolderBasename}'] = vim.fn.fnamemodify(root, ':t'),
-            }
-            for k, cfg in ipairs(cfgs) do
-                cfgs[k] = vim.tbl_map(expand_config(repls), cfg)
+        if ok then
+            if root then
+                local repls = {
+                    ['${workspaceFolder}'] = root,
+                    ['${workspaceFolderBasename}'] = vim.fn.fnamemodify(root, ':t'),
+                }
+                for k, cfg in ipairs(cfgs) do
+                    cfgs[k] = vim.tbl_map(expand_config(repls), cfg)
+                end
             end
             return cfgs
         end
@@ -203,8 +205,9 @@ local function setup_mappings()
     m.nnore({ '<F11>', dap.step_into })
     m.nnore({ '<S-F11>', dap.step_out })
     m.nnore({ '<F12>', dap.step_out })
-    m.nnore({ '<leader>dd', dap.continue, desc = 'Start/continue debug with DAP' })
-    m.nnore({ '<leader>dr', dap.run_to_cursor, desc = 'Continue to cursor' })
+    m.nnore({ '<leader>dq', dap.terminate, desc = 'Terminate DAP debug' })
+    m.nnore({ '<leader>dd', dap.continue, desc = 'Start/continue DAP debug' })
+    m.nnore({ '<leader>dr', dap.run_to_cursor, desc = 'Run to cursor' })
     m.nnore({ '<leader>db', breakpoint, desc = 'Toggle breakpoint' })
     m.nnore({ '<leader>dc', breakpoint_condition, desc = 'Set condition breakpoint' })
     m.nnore({ '<leader>dh', breakpoint_hit_condition, desc = 'Set hit condition breakpoint' })

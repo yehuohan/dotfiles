@@ -5,21 +5,27 @@ local await = a._await
 local replace = nlib.u.replace
 local task = require('v.task')
 
+--- Create new workspace config for fzer
+--- @return Configer
+local function new_wsc()
+    return nlib.new_configer({
+        envs = '',
+        path = '',
+        paths = {},
+        glob = '!_VOut',
+        globs = {},
+        hidden = true,
+        ignore = true,
+        options = '',
+        vimgrep = false, -- `:vimgrep` doesn't works with `hidden`, `ignore` and `options`
+        fuzzier = 'telescope',
+        verbose = '',
+        hltext = {},
+    })
+end
+
 --- @type Configer Workspace config for fzer
-local wsc = nlib.new_configer({
-    envs = '',
-    path = '',
-    paths = {},
-    glob = '!_VOut',
-    globs = {},
-    hidden = true,
-    ignore = true,
-    options = '',
-    vimgrep = false, -- `:vimgrep` doesn't works with `hidden`, `ignore` and `options`
-    fuzzier = 'telescope',
-    verbose = '',
-    hltext = {},
-})
+local wsc = new_wsc()
 
 --- @return string[]
 local function rg_paths()
@@ -146,11 +152,7 @@ local _maps_fuzzier = { f = 'file', l = 'live', h = 'tags' }
 --- @type PopSelection Selection for fzer task
 local _sels = {
     opt = 'setup fzer task',
-    lst = nil,
-    -- lst for rg
-    lst_r = { 'envs', 'path', 'glob', 'hidden', 'ignore', 'options', 'vimgrep', 'verbose' },
-    -- lst for fuzzier
-    lst_f = { 'envs', 'path', 'glob', 'hidden', 'ignore', 'options', 'fuzzier', 'verbose' },
+    lst = { 'envs', 'path', 'glob', 'hidden', 'ignore', 'options', 'vimgrep', 'fuzzier', 'verbose' },
     dic = {
         envs = { lst = { 'PATH=' }, cpl = 'environment' },
         path = { dsr = 'cached fzer path list', lst = wsc.paths, cpl = 'file' },
@@ -180,28 +182,39 @@ local _sels = {
             },
         },
     },
-    evt = function(name)
-        if name == 'onCR' then
-            if wsc.path ~= '' then
-                wsc.path = vim.fs.normalize(vim.fn.fnamemodify(wsc.path, ':p'))
-                if not vim.tbl_contains(wsc.paths, wsc.path) then
-                    table.insert(wsc.paths, wsc.path)
-                end
-            end
-            if wsc.glob ~= '' then
-                if not vim.tbl_contains(wsc.globs, wsc.glob) then
-                    table.insert(wsc.globs, wsc.glob)
-                end
-            end
-            wsc:new(wsc:get())
-        end
-    end,
     sub = {
         lst = { true, false },
         cmd = function(sopt, sel) wsc[sopt] = sel end,
         get = function(sopt) return wsc[sopt] end,
     },
 }
+
+--- @type PopSelectionEvent
+local function evt_f(name)
+    if name == 'onCR' then
+        if wsc.path ~= '' then
+            wsc.path = vim.fs.normalize(vim.fn.fnamemodify(wsc.path, ':p'))
+            if not vim.tbl_contains(wsc.paths, wsc.path) then
+                table.insert(wsc.paths, wsc.path)
+            end
+        end
+        if wsc.glob ~= '' then
+            if not vim.tbl_contains(wsc.globs, wsc.glob) then
+                table.insert(wsc.globs, wsc.glob)
+            end
+        end
+        wsc:new(wsc:get())
+    end
+end
+
+--- @type PopSelectionEvent
+local function evt_r(name)
+    if name == 'onCR' then
+        task.wsc.fzer = wsc:get()
+        wsc:new(task.wsc.fzer)
+        vim.notify('Fzer task wsc is reset!')
+    end
+end
 
 --- @return string
 local function parse_pat(kt)
@@ -259,8 +272,8 @@ local function parse_loc(kt)
     end
     -- Need reinit wsc when modified path or paths
     if restore then
-        wsc:mut('path', wsc.path)
-        wsc:mut('paths', wsc.paths)
+        wsc:mut({ path = wsc.path })
+        wsc:mut({ paths = wsc.paths })
         task.wsc.fzer = wsc:get()
     end
     return loc
@@ -339,9 +352,17 @@ local entry = async(function(kt, bang)
         return
     end
 
+    -- Highlight pattern
+    local append = kt.A == 'a'
+    if not append then
+        wsc.hltext = {}
+    end
+    table.insert(wsc.hltext, rep.pat)
+    wsc:mut({ hltext = wsc.hltext })
+
     -- Set config
     if kt.S == 'F' then
-        _sels.lst = _sels.lst_r
+        _sels.evt = evt_f
         _sels.dic.path.lst = wsc.paths
         _sels.dic.glob.lst = wsc.globs
         if not await(a.pop_selection(_sels)) then
@@ -358,14 +379,6 @@ local entry = async(function(kt, bang)
     if not wsc.vimgrep then
         rep.opt = table.concat(parse_opt(kt), ' ')
     end
-
-    -- Highlight text
-    local append = kt.A == 'a'
-    if not append then
-        wsc.hltext = {}
-    end
-    table.insert(wsc.hltext, rep.pat)
-    wsc:mut('hltext', wsc.hltext)
 
     -- Run task
     if wsc.vimgrep then
@@ -440,7 +453,7 @@ local entry_fuzzier = async(function(kt)
 
     -- Modify fzer.fuzzier config
     if kt.S == 'F' then
-        _sels.lst = _sels.lst_f
+        _sels.evt = evt_f
         _sels.dic.path.lst = wsc.paths
         _sels.dic.glob.lst = wsc.globs
         if not await(a.pop_selection(_sels)) then
@@ -492,12 +505,20 @@ local function setup()
         end
         vim.print(wsc)
     end, { bang = true, nargs = 0 })
+    vim.api.nvim_create_user_command('FzerReset', function(opts)
+        if opts.bang then
+            wsc = new_wsc()
+        else
+            wsc:new()
+        end
+        _sels.evt = evt_r
+        _sels.dic.path.lst = wsc.paths
+        _sels.dic.glob.lst = wsc.globs
+        vim.fn.PopSelection(_sels)
+    end, { bang = true, nargs = 0 })
 end
 
 return {
     setup = setup,
-    setwsc = function(__wsc)
-        wsc:set(__wsc)
-        wsc:new(wsc:get())
-    end,
+    setwsc = function(__wsc) wsc:mut(__wsc) end,
 }
