@@ -155,8 +155,15 @@ local _sels = {
     lst = { 'envs', 'path', 'glob', 'hidden', 'ignore', 'options', 'vimgrep', 'fuzzier', 'verbose' },
     dic = {
         envs = { lst = { 'PATH=' }, cpl = 'environment' },
-        path = { dsr = 'cached fzer path list', lst = wsc.paths, cpl = 'file' },
-        glob = { dsr = function() return table.concat(rg_globs(), ' ') end, lst = wsc.globs },
+        path = {
+            dsr = 'cached fzer path list',
+            lst = function() return wsc.paths end,
+            cpl = 'file',
+        },
+        glob = {
+            dsr = function() return table.concat(rg_globs(), ' ') end,
+            lst = function() return wsc.globs end,
+        },
         hidden = { dsr = 'search hidden files and directories' },
         ignore = { dsr = 'respect .gitignore, .ignore and .rgignore' },
         options = {
@@ -363,8 +370,6 @@ local entry = async(function(kt, bang)
     -- Set config
     if kt.S == 'F' then
         _sels.evt = evt_f
-        _sels.dic.path.lst = wsc.paths
-        _sels.dic.glob.lst = wsc.globs
         if not await(a.pop_selection(_sels)) then
             return
         end
@@ -454,8 +459,6 @@ local entry_fuzzier = async(function(kt)
     -- Modify fzer.fuzzier config
     if kt.S == 'F' then
         _sels.evt = evt_f
-        _sels.dic.path.lst = wsc.paths
-        _sels.dic.glob.lst = wsc.globs
         if not await(a.pop_selection(_sels)) then
             return
         end
@@ -512,8 +515,6 @@ local function setup()
             wsc:new()
         end
         _sels.evt = evt_r
-        _sels.dic.path.lst = wsc.paths
-        _sels.dic.glob.lst = wsc.globs
         vim.fn.PopSelection(_sels)
     end, { bang = true, nargs = 0 })
 end

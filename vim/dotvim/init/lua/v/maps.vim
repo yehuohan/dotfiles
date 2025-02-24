@@ -1,9 +1,9 @@
 " Basic {{{
-" Mark跳转
+" 跳转
 nnoremap ' `
 nnoremap ` '
-" 回退操作
-nnoremap <S-u> <C-r>
+" 回退
+nnoremap U <C-r>
 " 行移动
 nnoremap > >>
 nnoremap < <<
@@ -15,16 +15,20 @@ noremap <leader>aj <C-x>
 noremap <leader>ak <C-a>
 vnoremap <leader>agj g<C-x>
 vnoremap <leader>agk g<C-a>
-" 大小写切换
+" 切换大小写
 noremap <leader>u ~
-" 行移动
+" 移动光标
 noremap j gj
 noremap k gk
-noremap <S-l> $
-noremap <S-h> ^
+noremap L $
+noremap H ^
 " 折叠
 nnoremap <leader>zc zC
 nnoremap <leader>zo zO
+nnoremap { <Cmd>set foldlevel=0<CR>
+nnoremap } <Cmd>set foldlevel=99<CR>
+nnoremap <M-[> <Cmd>set foldlevel-=1<CR>
+nnoremap <M-]> <Cmd>set foldlevel+=1<CR>
 " nnoremap <leader>zm zM
 " nnoremap <leader>zr zR
 " 滚屏
@@ -94,10 +98,10 @@ vnoremap <leader><leader>/ /<C-r>=v:lua.require('v.nlib').get_selected('')<CR>
 " }}}
 
 " Copy & Paste {{{
-" 行复制
+" 复制行
 nnoremap yL y$
 nnoremap yH y^
-" yank append
+" 追加复制行
 nnoremap ya
     \ <Cmd>
     \ execute 'silent normal! "9' . v:count1 . 'yy' <Bar>
@@ -126,11 +130,11 @@ xnoremap <C-g> <C-g><Cmd>call v:lua.vim.notify('mode: ' . string(mode(1)))<CR>
 snoremap <C-g> <C-g><Cmd>call v:lua.vim.notify('mode: ' . string(mode(1)))<CR>
 
 for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m 0 1 2 3 4 5 6 7 8 9', ' ')
-    " 寄存器快速复制与粘贴
+    " 寄存器复制与粘贴
     execute printf('vnoremap <leader>''%s "%sy', t, t)
     execute printf('nnoremap <leader>''%s "%sp', t, t)
     execute printf('nnoremap <leader>''%s "%sP', toupper(t), t)
-    " 快速执行宏
+    " 执行宏
     let s:mstr = ':normal! @' . t
     execute printf('nnoremap <leader>2%s <Cmd>execute "%s" <Bar> call v:lua.require("v.nlib").recall("%s")<CR>', t, s:mstr, s:mstr)
 endfor

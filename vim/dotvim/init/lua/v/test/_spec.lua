@@ -464,8 +464,8 @@ describe('task', function()
     local tmp
     before_each(function()
         tmp = vim.fn.tempname() .. '.lua'
-        vim.cmd.edit(tmp)
-        vim.cmd.write()
+        vim.cmd.edit({ args = { tmp }, mods = { silent = true } })
+        vim.cmd.write({ mods = { silent = true } })
     end)
 
     -- Use `print(vim.inspect())` to debug for `vim.print` has been mocked!

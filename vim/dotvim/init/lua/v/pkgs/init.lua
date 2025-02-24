@@ -9,7 +9,7 @@ local m = nlib.m
 local function pkg_matchup()
     -- packadd matchit
     vim.g.matchup_matchparen_offscreen = { method = 'popup' }
-    m.map({ '<S-m>', '%' })
+    m.map({ 'M', '%' })
 end
 
 -- 快速跳转
