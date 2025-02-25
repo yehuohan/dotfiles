@@ -214,7 +214,7 @@ local function new_ansi(verbose)
     local bufc = { '', {} } -- Processed buffer cache lines
     local cnt = 1 -- Buffer line counter
     local bot = 1 -- The bottom buffer line in terminal window
-    local wid = vim.o.columns
+    local wid = vim.o.columns - 3 -- 别问为什么要减3，问就是根据结果凑出来的
     local hei = vim.o.lines
     local sgr = new_sgr()
 
@@ -304,17 +304,22 @@ local function new_ansi(verbose)
                 while bot < nr do
                     row, buf, hlt = nextline(buf, hlt, { completed = true })
                 end
-                if bot == nr + 1 then
+                if bot - 1 == nr then
                     row, buf, hlt = prevline(buf, hlt) -- Backtrace one buffer line had been processed
                 end
-                local cell_len = vim.fn.strdisplaywidth(buf)
-                local tail_len = cell_len % wid
-                local head_len = cell_len - tail_len
-                if tail_len < (nc - 1) then
-                    buf = buf .. string.rep(' ', nc - 1 - tail_len)
-                else
-                    buf = string.sub(buf, 1, head_len + nc - 1) -- Don't support multi-bytes char
+                -- 这里就针对一种情况：将打断输出的多行文本重新连接成一行
+                if wid + 1 == nc then
+                    buf = string.sub(buf, 1, #buf - 1)
                 end
+                -- 原来的实现：结果凑不出来
+                -- local cell_len = vim.fn.strdisplaywidth(buf)
+                -- local tail_len = cell_len % wid
+                -- local head_len = cell_len - tail_len
+                -- if tail_len < (nc - 1) then
+                --     buf = buf .. string.rep(' ', nc - 1 - tail_len)
+                -- else
+                --     buf = string.sub(buf, 1, head_len + nc - 1) -- Don't support multi-bytes char
+                -- end
             elseif byte == 'K' then
                 -- n = 0: clear from cursor to end of line
                 -- n = 1: clear from cursor to begin of line

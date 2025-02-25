@@ -239,32 +239,39 @@ describe('nlib', function()
     end)
 
     -- nlib.new_chanor
-    it('. new_chanor', function()
-        vim.o.columns = 200
-        vim.o.lines = 50
+    describe('. new_chanor', function()
         local data = require('v.test.data')
-        local chanor = nlib.new_chanor({ style = 'ansi' })
-        local lines, hls = chanor(data['test.rs'])
-        local _lines, _hls = chanor({ '' })
-        vim.list_extend(lines, _lines)
-        vim.list_extend(hls, _hls)
-        EQ([[warning: unused variable: `args`]], lines[1])
-        EQ(unpack({ 1, 0, 7 }), unpack(hls[1][1], 2, 4))
-        EQ(unpack({ 1, 7, 7 + 25 }), unpack(hls[1][1], 2, 4))
-        EQ([[3 |     let args = std::env::args();]], lines[4])
-        EQ(unpack({ 4, 0, 1 }), unpack(hls[4][1], 2, 4))
-        EQ(unpack({ 4, 2, 3 }), unpack(hls[4][2], 2, 4))
-        EQ('', lines[8])
-        EQ(0, #hls[8])
-        EQ('', lines[10])
-        EQ(0, #hls[10])
-        EQ('Hello Rust', lines[#lines])
-        -- for _, line in ipairs(lines) do
-        --     vim.print(vim.inspect(line))
-        -- end
-        -- for _, hl in ipairs(hls) do
-        --     vim.print(vim.inspect(hl))
-        -- end
+        local chanor
+        before_each(function()
+            vim.o.columns = 155
+            vim.o.lines = 33
+            chanor = nlib.new_chanor({ style = 'ansi' })
+        end)
+
+        -- for _, line in ipairs(lines) do vim.print(vim.inspect(line)) end
+        -- for _, hl in ipairs(hls) do vim.print(vim.inspect(hl)) end
+        it('. rust', function()
+            local lines, hls = chanor(data.rust.inp)
+            local _lines, _hls = chanor({ '' })
+            vim.list_extend(lines, _lines)
+            vim.list_extend(hls, _hls)
+            EQ(data.rust.out, lines)
+            EQ(unpack({ 1, 0, 7 }), unpack(hls[1][1], 2, 4))
+            EQ(unpack({ 1, 7, 7 + 25 }), unpack(hls[1][1], 2, 4))
+            EQ(unpack({ 4, 0, 1 }), unpack(hls[4][1], 2, 4))
+            EQ(unpack({ 4, 2, 3 }), unpack(hls[4][2], 2, 4))
+        end)
+
+        it('. vulkan', function()
+            for _ = 1, vim.o.lines do
+                chanor({ '\r' })
+            end
+            local lines, hls = chanor(data.vulkan.inp)
+            local _lines, _hls = chanor({ '' })
+            vim.list_extend(lines, _lines)
+            vim.list_extend(hls, _hls)
+            EQ(data.vulkan.out, lines[#lines])
+        end)
     end)
 
     -- nlib.modeline
