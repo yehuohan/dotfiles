@@ -56,19 +56,19 @@ local function rg_hidden() return wsc.hidden and { '--hidden' } or {} end
 local function rg_ignore() return wsc.ignore and {} or { '--no-ignore' } end
 
 --- @class FzerVars
---- @field opt(string) Options
---- @field pat(string) Pattern
---- @field loc(string) Location
+--- @field opt string Options
+--- @field pat string Pattern
+--- @field loc string Location
 
 --- @class Fuzzier
---- @field file(string|function)
---- @field live(string|function)
---- @field tags(string|function)
+--- @field file string|function
+--- @field live string|function
+--- @field tags string|function
 
 --- @class FzerTable Fuzzy finder tasks
---- @field rg(string)
---- @field fzf(Fuzzier)
---- @field telescope(Fuzzier)
+--- @field rg string
+--- @field fzf Fuzzier
+--- @field telescope Fuzzier
 local fzer = {
     rg = 'rg --vimgrep -F {opt} -e "{pat}" {loc}',
     vg = ':vimgrepadd /{pat}/j {loc}',
@@ -325,8 +325,8 @@ local function parse_vg(kt, txt)
 end
 
 --- Entry of fzer task
---- @param kt(table): [fF][av][bp][IiWwSsYyUu]
----                   [%S][%A][%B][%E        ]
+--- @param kt table: [fF][av][bp][IiWwSsYyUu]
+---                  [%S][%A][%B][%E        ]
 --- kt.S
 ---     F : find with modified fzer task config
 --- kt.A
@@ -433,8 +433,8 @@ local entry = async(function(kt, bang)
 end)
 
 --- Entry of fzer.fuzzier task
---- @param kt(table): [fF][p   ][flh]
----                   [%S][%A/B][%E ]
+--- @param kt table: [fF][p   ][flh]
+---                  [%S][%A/B][%E ]
 --- kt.S
 ---     F : fuzzier with inputing args
 --- kt.A/B

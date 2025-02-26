@@ -158,7 +158,7 @@ nnoremap <leader>wl <C-w>l
 nnoremap <leader>wp <C-w>p
 nnoremap <leader>wP <C-w>P
 nnoremap <leader>ww <C-w>w
-nnoremap <leader>wf <Cmd>call v:lua.require('v.sets').win_goto_next_floating()<CR>
+nnoremap <leader>wf <Cmd>call v:lua.require('v.sets').extwin_goto_floating()<CR>
 " 移动窗口
 nnoremap <leader>wH <C-w>H
 nnoremap <leader>wJ <C-w>J
@@ -167,14 +167,14 @@ nnoremap <leader>wL <C-w>L
 nnoremap <leader>wT <C-w>T
 " 改变窗口大小
 nnoremap <leader>w= <C-w>=
-nnoremap <M-e> <Cmd>call v:lua.require('v.sets').win_move_bottom_spliter(-5)<CR>
-nnoremap <M-d> <Cmd>call v:lua.require('v.sets').win_move_bottom_spliter(5)<CR>
-nnoremap <M-s> <Cmd>call v:lua.require('v.sets').win_move_right_spliter(-5)<CR>
-nnoremap <M-f> <Cmd>call v:lua.require('v.sets').win_move_right_spliter(5)<CR>
-nnoremap <M-E> <Cmd>call v:lua.require('v.sets').win_move_bottom_spliter(-1)<CR>
-nnoremap <M-D> <Cmd>call v:lua.require('v.sets').win_move_bottom_spliter(1)<CR>
-nnoremap <M-S> <Cmd>call v:lua.require('v.sets').win_move_right_spliter(-1)<CR>
-nnoremap <M-F> <Cmd>call v:lua.require('v.sets').win_move_right_spliter(1)<CR>
+nnoremap <M-e> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:true, -5)<CR>
+nnoremap <M-d> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:true, 5)<CR>
+nnoremap <M-s> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:false, -5)<CR>
+nnoremap <M-f> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:false, 5)<CR>
+nnoremap <M-E> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:true, -1)<CR>
+nnoremap <M-D> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:true, 1)<CR>
+nnoremap <M-S> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:false, -1)<CR>
+nnoremap <M-F> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:false, 1)<CR>
 " }}}
 
 " Quickfix {{{

@@ -27,7 +27,7 @@ local NOK = assert.has.errors
 --- local mocked = mock(fns)
 --- unmock(mocked, fns)
 --- ```
---- @param fns(MockFnList[]) All function need to mock
+--- @param fns MockFnList[] All function need to mock
 local function mock(fns)
     local mocked = {}
     for _, fn in ipairs(fns) do
@@ -39,7 +39,7 @@ local function mock(fns)
 end
 
 --- Restor the mocked funcions
---- @param fns(MockFnList[]) All function need to unmock
+--- @param fns MockFnList[] All function need to unmock
 local function unmock(mocked, fns)
     for _, fn in ipairs(fns) do
         for k = 2, #fn do
@@ -48,7 +48,7 @@ local function unmock(mocked, fns)
     end
 end
 
---- @param keys(string)
+--- @param keys string
 local function feedkeys(keys)
     local codes = vim.api.nvim_replace_termcodes(keys, true, false, true)
     return vim.api.nvim_feedkeys(codes, 'x', false)

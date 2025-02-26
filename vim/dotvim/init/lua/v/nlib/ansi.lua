@@ -60,11 +60,11 @@ local function trim(str)
 end
 
 --- Generate next line that ends with a CSI code
---- @param pat(string) One of the CSI pattern
---- @yield last(boolean) Indicate the last valid match
---- @yield line(string) The matched line ends with a CSI code
---- @yield args(string) CSI args
---- @yield byte(string) CSI final byte
+--- @param pat string One of the CSI pattern
+--- @yield last boolean Indicate the last valid match
+--- @yield line string The matched line ends with a CSI code
+--- @yield args string CSI args
+--- @yield byte string CSI final byte
 local function next_csi(str, pat)
     local len = string.len(str)
     local ci = 1
@@ -90,8 +90,8 @@ local function next_csi(str, pat)
 end
 
 --- Generate next line that ends with '\r'
---- @param str(string)
---- @yield line(string) The matched line ends with '\r'
+--- @param str string
+--- @yield line string The matched line ends with '\r'
 local function next_cr(str)
     local ci = 1
 
@@ -222,9 +222,9 @@ local function new_ansi(verbose)
     local ansi = {}
 
     --- Create next buffer line
-    --- @param buf(string|nil) The processed buffer line
-    --- @param hlt(table|nil) The highlight of a processed buffer line
-    --- @param opts(table|nil)
+    --- @param buf string|nil The processed buffer line
+    --- @param hlt table|nil The highlight of a processed buffer line
+    --- @param opts table|nil
     --- @return integer row The row of buffer line to process
     --- @return string buf The buffer line to process
     --- @return table hlt The highlight of buffer line to process
@@ -248,8 +248,8 @@ local function new_ansi(verbose)
     end
 
     --- Backtrace previous buffer line
-    --- @param buf(string) The processed buffer line
-    --- @param hlt(table) The highlight of a processed buffer line
+    --- @param buf string The processed buffer line
+    --- @param hlt table The highlight of a processed buffer line
     --- @return integer row The row of buffer line to process
     --- @return string buf The buffer line to process
     --- @return table hlt The highlight of buffer line to process

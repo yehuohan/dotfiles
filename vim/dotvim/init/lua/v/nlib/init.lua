@@ -32,7 +32,7 @@ local M = {}
 ---         },
 ---     },
 --- }
---- @param opts(table) Savable options of configer
+--- @param opts table Savable options of configer
 --- @return Configer opts with `ConfigerMethod` is called `Configer`
 function M.new_configer(opts)
     if type(opts) ~= 'table' then
@@ -40,8 +40,8 @@ function M.new_configer(opts)
     end
 
     --- Setup `sub_nsc` for `sub_sc`
-    --- @param sub_nsc(ConfigerNonSaveable) Sub level non-savable options
-    --- @param sub_sc(ConfigerSaveable) Sub level savable options
+    --- @param sub_nsc ConfigerNonSaveable Sub level non-savable options
+    --- @param sub_sc ConfigerSaveable Sub level savable options
     local function setup_non_savble(sub_nsc, sub_sc)
         local B = {}
         B.__call = function(self, rhs)
@@ -77,7 +77,7 @@ function M.new_configer(opts)
     end
 
     --- Create non-savable options
-    --- @param init_opts(table) Savable options of configer
+    --- @param init_opts table Savable options of configer
     --- @return ConfigerNonSaveable
     local function non_savable(init_opts)
         local nsc = {}
@@ -107,7 +107,7 @@ function M.new_configer(opts)
     --- * Replace `C.__opts` with `new_opts`;
     --- * Replace all savable options with `C.__opts`;
     --- * Clear all non-savable options.
-    --- @param new_opts(table|nil) New savable options of configer
+    --- @param new_opts table|nil New savable options of configer
     function C:new(new_opts)
         if new_opts then
             C.__opts = M.u.deepcopy(new_opts)
@@ -129,7 +129,7 @@ function M.new_configer(opts)
     --- * Merge `new_opts` into `C.__opts`;
     --- * Merge `new_opts` into all savable options;
     --- * Keep all non-savable options.
-    --- @param new_opts(table) New savable options of configer
+    --- @param new_opts table New savable options of configer
     function C:mut(new_opts)
         M.u.deepmerge(C.__opts, new_opts)
         M.u.deepmerge(self, new_opts, true)
@@ -149,11 +149,11 @@ end
 
 --- @alias Chanor function A channel lines processor for terminal's stdout
 --- @class ChanorOptions Chanor options according to OnTaskOutput.params
---- @field style(string|nil)
---- @field verbose(string|nil)
+--- @field style string|nil
+--- @field verbose string|nil
 
 --- Create a chanor
---- @param opts(ChanorOptions|nil)
+--- @param opts ChanorOptions|nil
 --- @return Chanor
 function M.new_chanor(opts)
     local style = opts and opts.style
@@ -166,7 +166,7 @@ function M.new_chanor(opts)
     local pending = ''
 
     --- Process one raw line string of data stream
-    --- @param linestr(string) String to be processed
+    --- @param linestr string String to be processed
     --- @return string|nil Pending string that can't be break into multi-lines
     local function process_linestr(linestr)
         if verb_r then
@@ -181,7 +181,7 @@ function M.new_chanor(opts)
     end
 
     --- Process raw data stream from terminal's stdout
-    --- @param data(string[]|nil) nil means all processed buffer lines should be displayed
+    --- @param data string[]|nil nil means all processed buffer lines should be displayed
     --- @return string[] lines Processed lines
     --- @return table highlights Processed highlights for lines
     return function(data)
@@ -235,11 +235,12 @@ end
 
 --- Get selected text
 --- When used with 'vmap', '<Cmd>' is required and ':' will cause issue.
---- @param sep(string|nil): Join with sep for multi-lines text
+--- @param sep string|nil Join with sep for multi-lines text
 --- @return string
 function M.get_selected(sep)
     local reg_var = vim.fn.getreg('9', 1)
     local reg_mode = vim.fn.getregtype('9')
+    -- Get selected with reg for nvim_buf_get_text doesn't support block text
     if vim.fn.mode() == 'n' then
         vim.cmd.normal({ args = { 'gv"9y' }, bang = true, mods = { silent = true } })
     else
@@ -248,15 +249,12 @@ function M.get_selected(sep)
     local selected = vim.fn.getreg('9')
     vim.fn.setreg('9', reg_var, reg_mode)
 
-    if sep then
-        return vim.fn.join(vim.fn.split(selected, '\n'), sep)
-    else
-        return selected
-    end
+    local res = sep and string.gsub(selected, '\n', sep) or selected
+    return res
 end
 
 --- Try to find root directory upward that contains marker
---- @param marker(string[]|string|nil)
+--- @param marker string[]|string|nil
 --- @return string|nil
 function M.try_root(marker)
     return vim.fs.root(
@@ -266,7 +264,7 @@ function M.try_root(marker)
 end
 
 --- Get extended modeline
---- @param tag(string) Tag for extended modeline
+--- @param tag string Tag for extended modeline
 --- @return table|nil tbl
 --- @return string|nil cmd
 function M.modeline(tag, file)
@@ -301,13 +299,13 @@ function M.modeline(tag, file)
 end
 
 --- @class RecallOptions
---- @field feedcmd(boolean|nil) Feed command into command line
+--- @field feedcmd boolean|nil Feed command into command line
 
 --- @type string|function
 local __cmdfn
 --- Store/recall command or function
---- @param cmdfn(string|function) Vim command string or function
---- @param opts(RecallOptions|nil)
+--- @param cmdfn string|function Vim command string or function
+--- @param opts RecallOptions|nil
 function M.recall(cmdfn, opts)
     if cmdfn then
         -- Store
@@ -356,7 +354,7 @@ end
 --- @alias PopSelectionEvent fun(name:string, ...)
 
 --- Async PopSelection
---- @param sel(PopSelection)
+--- @param sel PopSelection
 --- @yield boolean Selection is confirmed(true) or canceled(false)
 function _a.pop_selection(sel)
     local caller = coroutine.running()
@@ -389,7 +387,7 @@ M.u = _u
 function _u.str2arg(str) return vim.split(str, '%s+', { trimempty = true }) end
 
 --- Parse string to table of environment variables
---- @param str(string) Input with format 'VAR0=var0 VAR1=var1'
+--- @param str string Input with format 'VAR0=var0 VAR1=var1'
 --- @return table Environment table with { VAR0 = 'var0', VAR1 = 'var1' }
 function _u.str2env(str)
     local env = {}
@@ -401,16 +399,16 @@ function _u.str2env(str)
 end
 
 --- Repleace command's placeholders
---- @param cmd(string) String command with format 'cmd {arg}'
---- @param rep(table) Replacement with { arg = 'val' }
+--- @param cmd string String command with format 'cmd {arg}'
+--- @param rep table Replacement with { arg = 'val' }
 function _u.replace(cmd, rep) return vim.trim(string.gsub(cmd, '{(%w+)}', rep)) end
 
 --- Sequence commands
---- @param cmdlist(string[]) Command list to join with ' && '
+--- @param cmdlist string[] Command list to join with ' && '
 function _u.sequence(cmdlist) return table.concat(cmdlist, ' && ') end
 
 --- Deep copy variable
---- @param mt(boolean|nil) Copy metatable or not
+--- @param mt boolean|nil Copy metatable or not
 function _u.deepcopy(orig, mt)
     local copy
     if type(orig) == 'table' then
@@ -428,9 +426,9 @@ function _u.deepcopy(orig, mt)
 end
 
 --- Deep merge table
---- @param dst(table) The table to merge into, and metatable will be keeped
---- @param src(table) The table to merge from, and value will be keeped for same key
---- @param raw(boolean|nil) Use `rawget/rawset` to avoid `dst.metatable` works
+--- @param dst table The table to merge into, and metatable will be keeped
+--- @param src table The table to merge from, and value will be keeped for same key
+--- @param raw boolean|nil Use `rawget/rawset` to avoid `dst.metatable` works
 function _u.deepmerge(dst, src, raw)
     if raw then
         for k, v in pairs(src) do
@@ -488,8 +486,8 @@ end
 ---      m.nnore{'<leader>', ':echo b:<CR>', silent = true, buffer = 9}
 ---      m.ndel{'<leader>', buffer = 9}
 --- ```
---- @param mods(string|table) Mapping modes
---- @param opts(table) Mapping options with {lhs, rhs, **kwargs}
+--- @param mods string|table Mapping modes
+--- @param opts table Mapping options with {lhs, rhs, **kwargs}
 -- stylua: ignore start
 function _m.del(mods, opts)     delmap(mods, opts[1], setopts(opts)) end
 function _m.add(mods, opts)     setmap(mods, opts[1], opts[2], setopts(opts, { remap = true })) end

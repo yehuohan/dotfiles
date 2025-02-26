@@ -1,7 +1,8 @@
 local fn = vim.fn
 local api = vim.api
 local use = require('v.use')
-local m = require('v.nlib').m
+local nlib = require('v.nlib')
+local m = nlib.m
 
 --------------------------------------------------------------------------------
 -- Options
@@ -237,11 +238,12 @@ local function on_UIEnter()
 end
 
 --------------------------------------------------------------------------------
--- Sets model
+-- Extended
 --------------------------------------------------------------------------------
 local M = {}
 
-function M.win_goto_next_floating()
+--- Goto floating window
+function M.extwin_goto_floating()
     local wins = {}
     for _, wid in ipairs(api.nvim_tabpage_list_wins(0)) do
         if fn.win_gettype(wid) == 'popup' then
@@ -259,31 +261,30 @@ function M.win_goto_next_floating()
     end
 end
 
-function M.win_move_bottom_spliter(inc)
+--- Resize window by moving spliter
+--- @param dir boolean Move bottom(true) or right(false) spliter
+--- @param inc integer The size to move
+function M.extwin_move_spliter(dir, inc)
     local pos = api.nvim_win_get_position(0)
-    local cur = pos[1] + 1 + api.nvim_win_get_height(0) + vim.o.cmdheight
-    local max = vim.o.lines
     local offset = inc * vim.v.count1
-
-    if cur >= max then
-        if pos[1] >= 2 then
-            vim.cmd.resize({ args = { ('%+d'):format(-offset) } })
+    if dir then
+        local cur = pos[1] + 1 + api.nvim_win_get_height(0) + vim.o.cmdheight
+        local max = vim.o.lines
+        if cur >= max then
+            if pos[1] >= 2 then
+                vim.cmd.resize({ args = { ('%+d'):format(-offset) } })
+            end
+        else
+            fn.win_move_statusline(fn.winnr(), offset)
         end
     else
-        fn.win_move_statusline(fn.winnr(), offset)
-    end
-end
-
-function M.win_move_right_spliter(inc)
-    local pos = api.nvim_win_get_position(0)
-    local cur = pos[2] + api.nvim_win_get_width(0)
-    local max = vim.o.columns
-    local offset = inc * vim.v.count1
-
-    if cur >= max then
-        vim.cmd.resize({ args = { ('%+d'):format(-offset) }, mods = { vertical = true } })
-    else
-        fn.win_move_separator(fn.winnr(), offset)
+        local cur = pos[2] + api.nvim_win_get_width(0)
+        local max = vim.o.columns
+        if cur >= max then
+            vim.cmd.resize({ args = { ('%+d'):format(-offset) }, mods = { vertical = true } })
+        else
+            fn.win_move_separator(fn.winnr(), offset)
+        end
     end
 end
 

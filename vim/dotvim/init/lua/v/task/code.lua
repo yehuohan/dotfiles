@@ -30,10 +30,10 @@ end
 local wsc = new_wsc()
 
 --- @class CodeVars
---- @field barg(string) Build arguments
---- @field bsrc(string) Build source file
---- @field bout(string) Build output file
---- @field earg(string) Execution arguments
+--- @field barg string Build arguments
+--- @field bsrc string Build source file
+--- @field bout string Build output file
+--- @field earg string Execution arguments
 
 --- @class CodeTable Single code file tasks according to filetype
 --- For codes: cmd {barg} {bsrc} => {bout} {earg}
@@ -90,7 +90,7 @@ local packs = {
 }
 
 --- Fetch and combine errorformats
---- @param types(string[])
+--- @param types string[]
 --- @return string[]
 local function fetch_efm(types)
     local res1 = {}
@@ -237,8 +237,8 @@ function _hdls.cargo(cfg)
 end
 
 --- Dispatch task handle and return task command
---- @param rhs(CodeHandleMap)
---- @param cfg(TaskConfig)
+--- @param rhs CodeHandleMap
+--- @param cfg TaskConfig
 --- @return string
 local function dispatch(rhs, cfg)
     if cfg.file == '' then
@@ -291,8 +291,8 @@ function _args.cargo(dic, file)
 end
 
 --- Update _sels.dic
---- @param rhs(CodeHandleMap)
---- @param dic(table) The _sels.dic to update
+--- @param rhs CodeHandleMap
+--- @param dic table The _sels.dic to update
 --- @return boolean
 local function update_sels(rhs, dic)
     dic.envs = { lst = { 'PATH=.' }, cpl = 'environment' }
@@ -311,9 +311,9 @@ local function update_sels(rhs, dic)
 end
 
 --- @class CodeHandleMap
---- @field fn(string) Function name for CodeHandles
---- @field desc(string)
---- @field pat(string|nil) File pattern to get item from CodeTable or PackTable
+--- @field fn string Function name for CodeHandles
+--- @field desc string
+--- @field pat string|nil File pattern to get item from CodeTable or PackTable
 
 -- stylua: ignore start
 --- @type table<string,CodeHandleMap>
@@ -393,8 +393,8 @@ local function evt_r(name)
 end
 
 --- Entry of code task
---- @param kt(table) [rR][  ][p...]
----                  [%S][%A][%E  ]
+--- @param kt table [rR][  ][p...]
+---                 [%S][%A][%E  ]
 --- kt.S
 ---     r : run task
 ---     R : modify code task config

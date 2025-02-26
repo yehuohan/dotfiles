@@ -3,7 +3,7 @@ local nlib = require('v.nlib')
 local m = nlib.m
 
 --- Expand configuration ${variable} with repls
---- @param repls(table<string, string|function>) Replacements for ${variable}
+--- @param repls table<string, string|function> Replacements for ${variable}
 --- @return fun(option:any):any
 local function expand_config(repls)
     local function expand_variables(option)
@@ -30,7 +30,7 @@ end
 local function setup_adapters()
     local dap = require('dap')
 
-    -- .vscode/launch.json
+    -- launch.json
     dap.providers.configs['dap.launch.json'] = function()
         local root = nlib.try_root('.vscode')
         local path = root and root .. '/.vscode/launch.json'

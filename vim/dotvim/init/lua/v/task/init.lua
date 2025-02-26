@@ -3,26 +3,26 @@ local nlib = require('v.nlib')
 local M = {}
 
 --- @class TaskWorkspace Task workspace config
---- @field code(ConfigerSaveable)
---- @field fzer(ConfigerSaveable)
+--- @field code ConfigerSaveable
+--- @field fzer ConfigerSaveable
 
 --- @class TaskConfig Task config from a 'Configer'
---- @field cmd(string) Task command that includes args
---- @field wdir(string) Wording directory
---- @field envs(string) Environment variables
---- @field tout(TaskOutputConfig)
+--- @field cmd string Task command that includes args
+--- @field wdir string Wording directory
+--- @field envs string Environment variables
+--- @field tout TaskOutputConfig
 
 --- @class TaskOutputConfig
---- @field efm(string|nil)
---- @field open(boolean)
---- @field jump(boolean)
---- @field scroll(boolean)
---- @field append(boolean)
---- @field hltext(string[]|nil)
---- @field title(string)
---- @field style(string)
---- @field encoding(string)
---- @field verbose(string|nil)
+--- @field efm string|nil
+--- @field open boolean
+--- @field jump boolean
+--- @field scroll boolean
+--- @field append boolean
+--- @field hltext string[]|nil
+--- @field title string
+--- @field style string
+--- @field encoding string
+--- @field verbose string|nil
 
 --- @type TaskWorkspace
 M.wsc = {
@@ -38,7 +38,7 @@ M.title = {
 }
 
 --- Run task
---- @param cfg(TaskConfig)
+--- @param cfg TaskConfig
 function M.run(cfg)
     local opts = {}
     opts.cmd = cfg.cmd
@@ -84,7 +84,7 @@ function M.cmd(cmd, bang)
 end
 
 --- Goto the quickfix item
---- @param qfwin(integer) Quickfix window handle
+--- @param qfwin integer Quickfix window handle
 function M.qf_goto(qfwin)
     -- Open with absolute file path
     local row = vim.fn.line('.', qfwin)
@@ -101,7 +101,7 @@ function M.qf_goto(qfwin)
 end
 
 --- Adapt quickfix output like terminal
---- @param qfwin(integer) Quickfix window handle
+--- @param qfwin integer Quickfix window handle
 function M.qf_adapt(qfwin)
     vim.api.nvim_win_call(qfwin, function()
         vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| / conceal]] } })
@@ -114,8 +114,8 @@ function M.qf_adapt(qfwin)
 end
 
 --- Highlight specified strings from quickfix output
---- @param qfwin(integer) Quickfix window handle
---- @param texts(string[]|nil) Text array to highlight
+--- @param qfwin integer Quickfix window handle
+--- @param texts string[]|nil Text array to highlight
 function M.qf_hlstr(qfwin, texts)
     if type(texts) == 'table' then
         vim.api.nvim_win_call(qfwin, function()

@@ -58,7 +58,7 @@ local fast_cmds = {
 }
 
 --- Edit or create chore files
---- @param under_root(boolean) Edit or create chore file from root
+--- @param under_root boolean Edit or create chore file from root
 local function new_chores(under_root)
     local dir = nil
     if under_root then
@@ -90,8 +90,8 @@ local function new_chores(under_root)
 end
 
 --- Edit new temporary file
---- @param ft(string) File type
---- @param wt(string|nil) Window type with 'tab' or 'floating'
+--- @param ft string File type
+--- @param wt string|nil Window type with 'tab' or 'floating'
 local function new_tmpfile(ft, wt)
     if not ft then
         return
@@ -113,8 +113,8 @@ local function new_tmpfile(ft, wt)
 end
 
 --- Evaluate string of command, function and expression
---- @param strfn(string) Evaluation function: 'eval' or 'execute'
---- @param copy_result(boolean|nil) Copy evaluation result or not
+--- @param strfn string Evaluation function: 'eval' or 'execute'
+--- @param copy_result boolean|nil Copy evaluation result or not
 local function eval_str(strfn, copy_result)
     local str = ''
     if vim.fn.mode() == 'n' then
@@ -141,8 +141,8 @@ local function eval_str(strfn, copy_result)
 end
 
 --- Evaluate math expression
---- @param strfn(string) Evaluation function: 'eval' or 'luaeval'
---- @param copy_result(boolean|nil) Copy evaluation result or not
+--- @param strfn string Evaluation function: 'eval' or 'luaeval'
+--- @param copy_result boolean|nil Copy evaluation result or not
 local function eval_math(strfn, copy_result)
     local expr = ''
     local lstr = ''

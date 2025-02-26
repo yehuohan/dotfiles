@@ -8,11 +8,11 @@ local PAUSE_PATS = {
 }
 
 --- @class ToutQuickfix
---- @field ns(integer) Quickfix highlight namespace
---- @field hwin(integer|nil) Quickfix window handle
---- @field hbuf(integer|nil) Quickfix buffer handle
---- @field task(table|nil) The task output to quickfix
---- @field title(TaskTitle|nil)
+--- @field ns integer Quickfix highlight namespace
+--- @field hwin integer|nil Quickfix window handle
+--- @field hbuf integer|nil Quickfix buffer handle
+--- @field task table|nil The task output to quickfix
+--- @field title TaskTitle|nil
 local qf = {
     ns = vim.api.nvim_create_namespace('v.task.tout'),
     hwin = nil,
@@ -197,8 +197,8 @@ function qf.on_output(task, data, cpt, params)
 end
 
 --- @class ToutTerminal
---- @field twin(table<integer,integer>) The pined terminal(vterm) window handle for each tabpage
---- @field task(table|nil) The task output to terminal
+--- @field twin table<integer,integer> The pined terminal(vterm) window handle for each tabpage
+--- @field task table|nil The task output to terminal
 local term = {
     -- hwin = nil,
     twin = {},
@@ -213,7 +213,7 @@ function term.close()
     end
 end
 
---- @param pin(boolean|nil) Pin task output to the terminal or not
+--- @param pin boolean|nil Pin task output to the terminal or not
 function term.redir(task, pin)
     local tab = vim.api.nvim_get_current_tabpage()
     local hwin
@@ -249,7 +249,7 @@ end
 --- @alias Tout.Params table
 --- @alias Tout.Component table
 --- @class Tout
---- @field params(Tout.Params) Parameters to sync task output
+--- @field params Tout.Params Parameters to sync task output
 --- For params.style:
 ---     'term' : termopen + terminal
 ---     'ansi' : termopen + quickfix with highlighted ANSI

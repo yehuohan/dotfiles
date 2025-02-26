@@ -172,9 +172,9 @@ local function load_colors()
 end
 
 --- Pad component as a block
---- @param color(string|function) Block background color
---- @param component(table) Component contained within block
---- @param fileds(table|nil) Extra fileds for the whole block
+--- @param color string|function Block background color
+--- @param component table Component contained within block
+--- @param fileds table|nil Extra fileds for the whole block
 local function pad(color, component, fileds)
     local utils = require('heirline.utils')
     local res = utils.surround(sym.sep, color, component)
