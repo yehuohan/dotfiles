@@ -16,7 +16,7 @@ noremap <leader>ak <C-a>
 vnoremap <leader>agj g<C-x>
 vnoremap <leader>agk g<C-a>
 " 切换大小写
-noremap <leader>u ~
+noremap <leader>uu ~
 " 移动光标
 noremap j gj
 noremap k gk
@@ -58,25 +58,24 @@ cnoremap <M-p> <C-e>
 " }}}
 
 " Cmdline {{{
-nnoremap <leader>.         <Cmd>lua require('v.nlib').recall()<CR>
-nnoremap <leader><leader>. <Cmd>lua require('v.nlib').recall(nil, { feedcmd = true })<CR>
 nnoremap <M-;> @:
-vnoremap <leader><leader>; <Cmd>call feedkeys(':' . v:lua.require('v.nlib').get_selected(''), 'n')<CR>
-vnoremap <leader><leader>: <Cmd>call feedkeys(':lua ' . v:lua.require('v.nlib').get_selected(''), 'n')<CR>
+nnoremap <leader>. <Cmd>lua require('v.nlib').e.dotrepeat()<CR>
+vnoremap <leader><leader>; <Cmd>call feedkeys(':' . v:lua.require('v.nlib').e.selected(''), 'n')<CR>
+vnoremap <leader><leader>: <Cmd>call feedkeys(':lua ' . v:lua.require('v.nlib').e.selected(''), 'n')<CR>
 " 替换
 nnoremap <leader><leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
-vnoremap <leader><leader>s <Cmd>call feedkeys(':%s/' . v:lua.require('v.nlib').get_selected('') . '/', 'n')<CR>
+vnoremap <leader><leader>s <Cmd>call feedkeys(':%s/' . v:lua.require('v.nlib').e.selected('') . '/', 'n')<CR>
 " 排序
 nnoremap <leader><leader>S :sort fr //<Left>
 vnoremap <leader><leader>S :<C-u>sort fr /\%><C-r>=getpos("'<")[2]-1<CR>c.*\%<<C-r>=getpos("'>")[2]+1<CR>c/
 " lua测试代码
 nnoremap <leader><leader>u :lua=<Space>
 nnoremap <leader><leader>U :lua= vim.api.nvim_parse_cmd('', {})<Left><Left><Left><Left><Left><Left>
-vnoremap <leader><leader>u <Cmd>call feedkeys(':lua= ' . v:lua.require('v.nlib').get_selected(''), 'n')<CR>
-vnoremap <leader><leader>U <Cmd>call feedkeys(':lua= vim.api.nvim_parse_cmd(''' . v:lua.require('v.nlib').get_selected('') . ''', {})', 'n')<CR>
+vnoremap <leader><leader>u <Cmd>call feedkeys(':lua= ' . v:lua.require('v.nlib').e.selected(''), 'n')<CR>
+vnoremap <leader><leader>U <Cmd>call feedkeys(':lua= vim.api.nvim_parse_cmd(''' . v:lua.require('v.nlib').e.selected('') . ''', {})', 'n')<CR>
 " 查看help文档
 nnoremap <leader><leader>k :h <C-r><C-w>
-vnoremap <leader><leader>k <Cmd>call feedkeys(':h ' . v:lua.require('v.nlib').get_selected(''), 'n')<CR>
+vnoremap <leader><leader>k <Cmd>call feedkeys(':h ' . v:lua.require('v.nlib').e.selected(''), 'n')<CR>
 " HEX编辑
 nnoremap <leader>xx :%!xxd<CR>
 nnoremap <leader>xr :%!xxd -r<CR>
@@ -89,12 +88,12 @@ nnoremap <leader>8 *
 nnoremap <leader>3 #
 nnoremap <leader>* /\V\C\<<C-r><C-w>\><CR>
 nnoremap <leader># ?\V\C\<<C-r><C-w>\><CR>
-vnoremap <leader>8 /\V\c\<<C-r>=escape(v:lua.require('v.nlib').get_selected(''), '\/')<CR>\><CR>
-vnoremap <leader>3 ?\V\c\<<C-r>=escape(v:lua.require('v.nlib').get_selected(''), '\/')<CR>\><CR>
+vnoremap <leader>8 /\V\c\<<C-r>=escape(v:lua.require('v.nlib').e.selected(''), '\/')<CR>\><CR>
+vnoremap <leader>3 ?\V\c\<<C-r>=escape(v:lua.require('v.nlib').e.selected(''), '\/')<CR>\><CR>
 nnoremap <leader>/ /\V\c<C-r><C-w><CR>
-vnoremap <leader>/ /\V\c<C-r>=escape(v:lua.require('v.nlib').get_selected(''), '\/')<CR><CR>
+vnoremap <leader>/ /\V\c<C-r>=escape(v:lua.require('v.nlib').e.selected(''), '\/')<CR><CR>
 nnoremap <leader><leader>/ /<C-r><C-w>
-vnoremap <leader><leader>/ /<C-r>=v:lua.require('v.nlib').get_selected('')<CR>
+vnoremap <leader><leader>/ /<C-r>=v:lua.require('v.nlib').e.selected('')<CR>
 " }}}
 
 " Copy & Paste {{{
@@ -105,13 +104,12 @@ nnoremap yH y^
 nnoremap ya
     \ <Cmd>
     \ execute 'silent normal! "9' . v:count1 . 'yy' <Bar>
-    \ let @0 .= @" <Bar>
-    \ call v:lua.vim.notify(v:count1 . ' lines append') <CR>
+    \ let @0 .= @" <CR>
 nnoremap yd
     \ <Cmd>
     \ execute 'silent normal! ' . v:count1 . 'dd' <Bar>
-    \ let @0 .= @" <Bar>
-    \ call v:lua.vim.notify(v:count1 . ' deleted lines append') <CR>
+    \ let @0 .= @" <CR>
+" 粘贴
 nnoremap <leader>p "0p
 nnoremap <leader>P "0P
 nnoremap <leader>ap p`[<Left>
@@ -136,7 +134,7 @@ for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m 0 1 2 3 4 5 
     execute printf('nnoremap <leader>''%s "%sP', toupper(t), t)
     " 执行宏
     let s:mstr = ':normal! @' . t
-    execute printf('nnoremap <leader>2%s <Cmd>execute "%s" <Bar> call v:lua.require("v.nlib").recall("%s")<CR>', t, s:mstr, s:mstr)
+    execute printf('nnoremap <leader>2%s <Cmd>lua require("v.nlib").e.dotrepeat("%s", true)<CR>', t, s:mstr)
 endfor
 " }}}
 
@@ -145,7 +143,7 @@ endfor
 "nnoremap <M-u> gT
 "nnoremap <M-p> gt
 nnoremap <leader>bl <C-^>
-nnoremap <leader>ba <Cmd>execute ':tabnext ' . tabpagenr('#')<CR>
+nnoremap <leader>bk <Cmd>execute ':tabnext ' . tabpagenr('#')<CR>
 " 分割窗口
 nnoremap <leader>ws <C-w>s
 nnoremap <leader>wv <C-W>v
@@ -158,7 +156,7 @@ nnoremap <leader>wl <C-w>l
 nnoremap <leader>wp <C-w>p
 nnoremap <leader>wP <C-w>P
 nnoremap <leader>ww <C-w>w
-nnoremap <leader>wf <Cmd>call v:lua.require('v.sets').extwin_goto_floating()<CR>
+nnoremap <leader>wf <Cmd>lua require('v.nlib').e.win_jump_floating()<CR>
 " 移动窗口
 nnoremap <leader>wH <C-w>H
 nnoremap <leader>wJ <C-w>J
@@ -167,14 +165,14 @@ nnoremap <leader>wL <C-w>L
 nnoremap <leader>wT <C-w>T
 " 改变窗口大小
 nnoremap <leader>w= <C-w>=
-nnoremap <M-e> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:true, -5)<CR>
-nnoremap <M-d> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:true, 5)<CR>
-nnoremap <M-s> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:false, -5)<CR>
-nnoremap <M-f> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:false, 5)<CR>
-nnoremap <M-E> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:true, -1)<CR>
-nnoremap <M-D> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:true, 1)<CR>
-nnoremap <M-S> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:false, -1)<CR>
-nnoremap <M-F> <Cmd>call v:lua.require('v.sets').extwin_move_spliter(v:false, 1)<CR>
+nnoremap <M-e> <Cmd>lua require('v.nlib').e.win_resize(true, -5)<CR>
+nnoremap <M-d> <Cmd>lua require('v.nlib').e.win_resize(true, 5)<CR>
+nnoremap <M-s> <Cmd>lua require('v.nlib').e.win_resize(false, -5)<CR>
+nnoremap <M-f> <Cmd>lua require('v.nlib').e.win_resize(false, 5)<CR>
+nnoremap <M-E> <Cmd>lua require('v.nlib').e.win_resize(true, -1)<CR>
+nnoremap <M-D> <Cmd>lua require('v.nlib').e.win_resize(true, 1)<CR>
+nnoremap <M-S> <Cmd>lua require('v.nlib').e.win_resize(false, -1)<CR>
+nnoremap <M-F> <Cmd>lua require('v.nlib').e.win_resize(false, 1)<CR>
 " }}}
 
 " Quickfix {{{

@@ -1,4 +1,5 @@
 local nlib = require('v.nlib')
+local e = nlib.e
 local a = nlib.a
 local async = a._async
 local await = a._await
@@ -233,7 +234,7 @@ local function parse_pat(kt)
             pat = vim.fn.expand('<cword>')
         end
     else
-        local selected = nlib.get_selected()
+        local selected = e.selected()
         if kt.E:match('[iI]') then
             pat = vim.fn.input('Pattern: ', selected)
         elseif kt.E:match('[wWsS]') then
@@ -269,7 +270,7 @@ local function parse_loc(kt)
         end
     else
         if wsc.path == '' then
-            wsc.path = nlib.try_root() or vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+            wsc.path = nlib.u.try_root() or vim.fs.dirname(vim.api.nvim_buf_get_name(0))
             if not vim.tbl_contains(wsc.paths, wsc.path) then
                 table.insert(wsc.paths, wsc.path)
             end
@@ -428,8 +429,7 @@ local entry = async(function(kt, bang)
     if wsc.tout.verbose:match('[aw]') then
         vim.notify(vim.inspect(wsc))
     end
-    task.run(wsc)
-    nlib.recall(function() task.run(wsc) end)
+    e.dotrepeat(function() task.run(wsc) end, true)
 end)
 
 --- Entry of fzer.fuzzier task
@@ -453,7 +453,7 @@ local entry_fuzzier = async(function(kt)
             rep.pat = vim.fn.expand('<cword>')
         end
     else
-        rep.pat = nlib.get_selected()
+        rep.pat = e.selected()
     end
 
     -- Modify fzer.fuzzier config
@@ -474,8 +474,7 @@ local entry_fuzzier = async(function(kt)
 
     -- Run fzer.fuzzier task
     local rhs = _maps_fuzzier[kt.E]
-    fzer[wsc.fuzzier](rhs, rep)
-    nlib.recall(function() fzer[wsc.fuzzier](rhs, rep) end)
+    e.dotrepeat(function() fzer[wsc.fuzzier](rhs, rep) end, true)
 end)
 
 local function setup()

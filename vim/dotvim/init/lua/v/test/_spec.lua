@@ -275,7 +275,7 @@ describe('nlib', function()
     end)
 
     -- nlib.modeline
-    it('. modeline', function()
+    it('. ext . modeline', function()
         local fns = { { io, 'lines' }, { vim, 'notify' } }
         local mocked = mock(fns)
 
@@ -292,22 +292,22 @@ describe('nlib', function()
         local lines, tbl, cmd
 
         lines = { [[head-foo]], [[-- vim@code: nvim -l lua]], [[tail-bar]] }
-        tbl, cmd = nlib.modeline('code', lines)
+        tbl, cmd = nlib.e.modeline('code', lines)
         EQ(nil, tbl)
         EQ('nvim -l lua', cmd)
 
         lines = { [[head-foo]], [[-- vim@code { }: nvim -l lua]], [[tail-bar]] }
-        tbl, cmd = nlib.modeline('code', lines)
+        tbl, cmd = nlib.e.modeline('code', lines)
         EQ(nil, tbl)
         EQ(nil, cmd)
 
         lines = { [[head-foo]], [[-- vim@code{ }: nvim -l lua]], [[tail-bar]] }
-        tbl, cmd = nlib.modeline('code', lines)
+        tbl, cmd = nlib.e.modeline('code', lines)
         EQ({}, tbl)
         EQ('nvim -l lua', cmd)
 
         lines = { [[head-foo]], [[-- vim@code{ foo - BAR }: nvim -l lua]], [[tail-bar]] }
-        tbl, cmd = nlib.modeline('code', lines)
+        tbl, cmd = nlib.e.modeline('code', lines)
         EQ(nil, tbl)
         EQ('nvim -l lua', cmd)
         EQ('Wrong table from modeline: { foo - BAR }', msg)
@@ -317,7 +317,7 @@ describe('nlib', function()
             [[-- vim@code{ envs = { FOO = 'bar'}, args = '-l' }: 	]],
             [[tail-bar]],
         }
-        tbl, cmd = nlib.modeline('code', lines)
+        tbl, cmd = nlib.e.modeline('code', lines)
         EQ({ envs = { FOO = 'bar' }, args = '-l' }, tbl)
         EQ(nil, cmd)
 
@@ -326,12 +326,12 @@ describe('nlib', function()
             [[-- vim@code{ envs = { FOO = 'bar'}, args = '-l' }: nvim -l lua]],
             [[tail-bar]],
         }
-        tbl, cmd = nlib.modeline('code', lines)
+        tbl, cmd = nlib.e.modeline('code', lines)
         EQ({ envs = { FOO = 'bar' }, args = '-l' }, tbl)
         EQ('nvim -l lua', cmd)
 
         lines = { [[head-foo]], [[-- vim@code: :Test]], [[tail-bar]] }
-        tbl, cmd = nlib.modeline('code', lines)
+        tbl, cmd = nlib.e.modeline('code', lines)
         EQ(nil, tbl)
         EQ(':Test', cmd)
 

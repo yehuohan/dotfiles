@@ -1,5 +1,6 @@
 local use = require('v.use')
 local nlib = require('v.nlib')
+local e = nlib.e
 local m = nlib.m
 
 --------------------------------------------------------------------------------
@@ -327,6 +328,7 @@ local function pkg_popc()
     }
     vim.g.Popc_useTabline = 1
     vim.g.Popc_useStatusline = 1
+    vim.g.Popc_bufIgnoredType = { 'Popc', 'qf', 'sagaoutline' }
     vim.g.Popc_wksSaveUnderRoot = 0
     vim.g.Popc_wksRootPatterns = { '.popc', '.git', '.svn', '.hg', 'tags' }
     m.nnore({ '<leader><leader>h', '<Cmd>PopcBuffer<CR>' })
@@ -380,9 +382,7 @@ local function pkg_neotree()
             local node = state.tree:get_node()
             local path = node:get_id()
             local copy = vim.fn.fnamemodify(path, mods)
-            vim.fn.setreg('"', copy)
             vim.fn.setreg('0', copy)
-            vim.fn.setreg('*', copy)
             vim.fn.setreg('+', copy)
             vim.notify('Copied: ' .. copy)
         end
@@ -870,7 +870,7 @@ local function pkg_translator()
     m.nnore({ '<leader><leader>t', ':TranslateW<Space>' })
     m.vnore({
         '<leader><leader>t',
-        function() vim.api.nvim_feedkeys(':TranslateW ' .. nlib.get_selected(' '), 'n', true) end,
+        function() vim.fn.feedkeys(':TranslateW ' .. e.selected(' '), 'n') end,
         desc = 'Translate',
     })
 end

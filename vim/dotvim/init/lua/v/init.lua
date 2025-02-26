@@ -46,7 +46,6 @@ local function setup(dotvim)
     require('v.use').setup()
     require('v.pkgs').setup()
     require('v.task').setup()
-    require('v.lite').setup()
     require('v.sets').setup()
 end
 

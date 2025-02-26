@@ -32,7 +32,7 @@ local function setup_adapters()
 
     -- launch.json
     dap.providers.configs['dap.launch.json'] = function()
-        local root = nlib.try_root('.vscode')
+        local root = nlib.u.try_root('.vscode')
         local path = root and root .. '/.vscode/launch.json'
         local ok, cfgs = pcall(require('dap.ext.vscode').getconfigs, path)
         if ok then
@@ -219,7 +219,7 @@ local function setup_mappings()
     })
     m.vnore({
         '<leader>de',
-        function() dapui.eval(nlib.get_selected(''), { enter = true }) end,
+        function() dapui.eval(nlib.e.selected(''), { enter = true }) end,
         desc = 'Eval expression',
     })
     m.nnore({

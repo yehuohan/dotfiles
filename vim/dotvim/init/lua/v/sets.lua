@@ -2,12 +2,53 @@ local fn = vim.fn
 local api = vim.api
 local use = require('v.use')
 local nlib = require('v.nlib')
+local e = nlib.e
 local m = nlib.m
 
 --------------------------------------------------------------------------------
 -- Options
 --------------------------------------------------------------------------------
-local function set_default_opts()
+local options = {
+    conceallevel = { 2, 0 },
+    virtualedit = { { 'block' }, { 'all' }, { 'none' } },
+    laststatus = { 2, 3 },
+    number = function()
+        if vim.o.number and vim.o.relativenumber then
+            vim.o.number = false
+            vim.o.relativenumber = false
+        elseif (not vim.o.number) and not vim.o.relativenumber then
+            vim.o.number = true
+            vim.o.relativenumber = false
+        elseif vim.o.number and not vim.o.relativenumber then
+            vim.o.number = true
+            vim.o.relativenumber = true
+        end
+    end,
+    syntax = function()
+        if fn.exists('g:syntax_on') == 1 then
+            vim.cmd.syntax({ args = { 'off' } })
+            vim.notify('syntax off')
+        else
+            vim.cmd.syntax({ args = { 'on' } })
+            vim.notify('syntax on')
+        end
+    end,
+}
+
+local function opt_inv(opt)
+    vim.opt_local[opt] = not vim.opt_local[opt]:get()
+    vim.notify(('%s = %s'):format(opt, vim.opt_local[opt]:get()))
+end
+
+local function opt_lst(opt)
+    local vals = options[opt]
+    local idx = fn.index(vals, vim.opt_local[opt]:get())
+    idx = (idx + 1) % #vals
+    vim.opt_local[opt] = vals[idx + 1]
+    vim.notify(('%s = %s'):format(opt, vim.inspect(vals[idx + 1])))
+end
+
+local function setup_default_opts()
     -- stylua: ignore start
     local o = vim.o
     o.synmaxcol = 512                                -- 最大高亮列数
@@ -89,46 +130,6 @@ local function set_default_opts()
     -- stylua: ignore end
 end
 
-local options = {
-    conceallevel = { 2, 0 },
-    virtualedit = { { 'block' }, { 'all' }, { 'none' } },
-    laststatus = { 2, 3 },
-    number = function()
-        if vim.o.number and vim.o.relativenumber then
-            vim.o.number = false
-            vim.o.relativenumber = false
-        elseif (not vim.o.number) and not vim.o.relativenumber then
-            vim.o.number = true
-            vim.o.relativenumber = false
-        elseif vim.o.number and not vim.o.relativenumber then
-            vim.o.number = true
-            vim.o.relativenumber = true
-        end
-    end,
-    syntax = function()
-        if fn.exists('g:syntax_on') == 1 then
-            vim.cmd.syntax({ args = { 'off' } })
-            vim.notify('syntax off')
-        else
-            vim.cmd.syntax({ args = { 'on' } })
-            vim.notify('syntax on')
-        end
-    end,
-}
-
-local function opt_inv(opt)
-    vim.opt_local[opt] = not vim.opt_local[opt]:get()
-    vim.notify(('%s = %s'):format(opt, vim.opt_local[opt]:get()))
-end
-
-local function opt_lst(opt)
-    local vals = options[opt]
-    local idx = fn.index(vals, vim.opt_local[opt]:get())
-    idx = (idx + 1) % #vals
-    vim.opt_local[opt] = vals[idx + 1]
-    vim.notify(('%s = %s'):format(opt, vim.inspect(vals[idx + 1])))
-end
-
 --------------------------------------------------------------------------------
 -- Autocmds
 --------------------------------------------------------------------------------
@@ -160,7 +161,7 @@ local function on_alter_leave()
     end
 end
 
-local function set_default_autocmds()
+local function setup_default_autocmds()
     -- stylua: ignore start
     api.nvim_create_autocmd('BufNewFile', { group = 'v.Sets', command = 'setlocal fileformat=unix' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.nvim' }, command = 'setlocal filetype=vim' })
@@ -238,58 +239,65 @@ local function on_UIEnter()
 end
 
 --------------------------------------------------------------------------------
--- Extended
+-- Misc
 --------------------------------------------------------------------------------
-local M = {}
+--- Some special commands for fast_cmds
+--- @type table<string,string|function>
+local special_cmds = {
+    t = [[%s/\s\+$//ge]],
+    m = [[%s/\r//ge]],
+    ['Clear undo'] = function()
+        local ulbak = vim.o.undolevels
+        vim.o.undolevels = -1
+        vim.cmd.normal({
+            args = { api.nvim_replace_termcodes('i<Space><Esc>x', true, true, true) },
+            bang = true,
+        })
+        vim.o.undolevels = ulbak
+    end,
+}
 
---- Goto floating window
-function M.extwin_goto_floating()
-    local wins = {}
-    for _, wid in ipairs(api.nvim_tabpage_list_wins(0)) do
-        if fn.win_gettype(wid) == 'popup' then
-            wins[#wins + 1] = wid
-        end
-    end
-    if #wins > 0 then
-        local idx = fn.index(wins, api.nvim_get_current_win())
-        if idx == -1 or (idx + 1 == #wins) then
-            idx = 0
+--- Some fast commands to execute conveniently
+--- @type PopSelection
+local fast_cmds = {
+    opt = 'execute fast command',
+    lst = {
+        'retab!',
+        special_cmds.t,
+        special_cmds.m,
+        'edit ++enc=utf-8',
+        'edit ++enc=cp936',
+        'Assembly commands',
+        'Clear undo',
+    },
+    dic = {
+        ['retab!'] = 'retab with expandtab',
+        [special_cmds.t] = 'remove trailing spaces',
+        [special_cmds.m] = 'remove ^M',
+        ['Assembly commands'] = {
+            dsr = '',
+            lst = {
+                'rustc --emit asm={src}.asm {src}',
+                'rustc --emit asm={src}.asm -C "llvm-args=-x86-asm-syntax=intel" {src}',
+                'gcc -S -masm=att -fverbose-asm {src}',
+                'gcc -S -masm=intel -fverbose-asm {src}',
+            },
+            cmd = function(_, sel)
+                require('v.task').cmd(nlib.u.replace(sel, { src = api.nvim_buf_get_name(0) }))
+            end,
+        },
+    },
+    cmd = function(_, sel)
+        if special_cmds[sel] then
+            special_cmds[sel]()
         else
-            idx = idx + 1
+            vim.cmd(sel)
         end
-        vim.api.nvim_set_current_win(wins[idx + 1])
-    end
-end
+    end,
+}
 
---- Resize window by moving spliter
---- @param dir boolean Move bottom(true) or right(false) spliter
---- @param inc integer The size to move
-function M.extwin_move_spliter(dir, inc)
-    local pos = api.nvim_win_get_position(0)
-    local offset = inc * vim.v.count1
-    if dir then
-        local cur = pos[1] + 1 + api.nvim_win_get_height(0) + vim.o.cmdheight
-        local max = vim.o.lines
-        if cur >= max then
-            if pos[1] >= 2 then
-                vim.cmd.resize({ args = { ('%+d'):format(-offset) } })
-            end
-        else
-            fn.win_move_statusline(fn.winnr(), offset)
-        end
-    else
-        local cur = pos[2] + api.nvim_win_get_width(0)
-        local max = vim.o.columns
-        if cur >= max then
-            vim.cmd.resize({ args = { ('%+d'):format(-offset) }, mods = { vertical = true } })
-        else
-            fn.win_move_separator(fn.winnr(), offset)
-        end
-    end
-end
-
-function M.setup()
-    set_default_opts()
+local function setup()
+    setup_default_opts()
     m.nnore({ '<leader>iw', function() opt_inv('wrap') end, desc = 'Invert wrap' })
     m.nnore({ '<leader>il', function() opt_inv('list') end, desc = 'Invert list' })
     m.nnore({ '<leader>ii', function() opt_inv('ignorecase') end, desc = 'Invert ignorecase' })
@@ -303,7 +311,7 @@ function M.setup()
     m.nnore({ '<leader>ih', options.syntax, desc = 'Invert syntax' })
 
     api.nvim_create_augroup('v.Sets', { clear = true })
-    set_default_autocmds()
+    setup_default_autocmds()
 
     --vim.o.guioptions = 'M' -- 完全禁用Gui界面元素
     vim.g.did_install_default_menus = 1 -- 禁止加载缺省菜单
@@ -311,6 +319,56 @@ function M.setup()
     api.nvim_create_autocmd('UIEnter', { group = 'v.Sets', callback = on_UIEnter })
 
     vim.cmd.source(vim.env.DotVimInit .. '/lua/v/maps.vim')
+
+    m.nnore({
+        '<leader>se',
+        function() fn['popset#set#PopSelection'](fast_cmds) end,
+        desc = 'Fast commands',
+    })
+
+    local path = vim.env.DotVimShare .. '/chores'
+    m.nnore({ '<leader>sl', function() e.buf_etpl(path, true) end, desc = 'New chores under root' })
+    m.nnore({ '<leader>sL', function() e.buf_etpl(path, false) end, desc = 'New chores' })
+
+    local prompt = { prompt = 'Filetype:' }
+    m.nnore({ '<leader>ni', function() vim.ui.input(prompt, e.buf_etmp) end, desc = 'Edit tmpfile' })
+    m.nnore({
+        '<leader>nti',
+        function()
+            vim.ui.input(prompt, function(ft) e.buf_etmp(ft, 'tab') end)
+        end,
+        desc = 'Edit tmpfile in tab',
+    })
+    m.nnore({
+        '<leader>nfi',
+        function()
+            vim.ui.input(prompt, function(ft) e.buf_etmp(ft, 'floating') end)
+        end,
+        desc = 'Edit tmpfile in floating',
+    })
+    local fts = { c = 'c', a = 'cpp', r = 'rs', p = 'py', l = 'lua', m = 'md' }
+    local wts = { t = 'tab', f = 'floating' }
+    for fk, fv in pairs(fts) do
+        m.nnore({ '<leader>n' .. fk, function() e.buf_etmp(fv) end })
+        for wk, wv in pairs(wts) do
+            m.nnore({ '<leader>n' .. wk .. fk, function() e.buf_etmp(fv, wv) end })
+        end
+    end
+
+    m.nore({ '<leader>ef', function() e.eval('eval') end, desc = 'Append eval expression' })
+    m.nore({ '<leader>ec', function() e.eval('execute') end, desc = 'Append exec command' })
+    m.nore({ '<leader>egf', function() e.eval('eval', true) end, desc = 'Copy eval expression' })
+    m.nore({ '<leader>egc', function() e.eval('execute', true) end, desc = 'Copy exec command' })
+    m.nore({ '<leader>ev', function() e.eval_math('eval') end, desc = 'Append vim math' })
+    m.nore({ '<leader>el', function() e.eval_math('luaeval') end, desc = 'Append lua math' })
+    m.nore({ '<leader>ep', function() e.eval_math('py3eval') end, desc = 'Append python math' })
+    m.nore({ '<leader>egv', function() e.eval_math('eval', true) end, desc = 'Copy vim math' })
+    m.nore({ '<leader>egl', function() e.eval_math('luaeval', true) end, desc = 'Copy lua math' })
+    m.nore({ '<leader>egp', function() e.eval_math('py3eval', true) end, desc = 'Copy python math' })
+
+    m.nore({ '<leader>bs', function() e.buf_search(nil, true) end, desc = 'Smart search' })
+    m.nore({ '<leader>bb', function() e.buf_search() end, desc = 'Search with bing' })
+    m.nore({ '<leader>bg', function() e.buf_search('google') end, desc = 'Search with google' })
 end
 
-return M
+return { setup = setup }

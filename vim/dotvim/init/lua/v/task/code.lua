@@ -1,4 +1,5 @@
 local nlib = require('v.nlib')
+local e = nlib.e
 local a = nlib.a
 local async = a._async
 local await = a._await
@@ -146,7 +147,7 @@ function _hdls.nvim(cfg)
     rep.barg = cfg.barg
     rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
     rep.earg = cfg.earg
-    local tbl, cmd = nlib.modeline('code', cfg.file)
+    local tbl, cmd = e.modeline('code', cfg.file)
     cfg:set(tbl or {})
     cmd = cmd or codes.nvim.cmd
     if cmd:sub(1, 1) == ':' then
@@ -170,7 +171,7 @@ function _hdls.file(cfg)
     rep.bsrc = '"' .. vim.fn.fnamemodify(cfg.file, ':t') .. '"'
     rep.bout = vim.fn.fnamemodify(cfg.file, ':t:r')
     rep.earg = cfg.earg
-    local tbl, cmd = nlib.modeline('code', cfg.file)
+    local tbl, cmd = e.modeline('code', cfg.file)
     cfg:set(tbl or {})
     cmd = cmd or codes[ft].cmd
     return replace(cmd, rep)
@@ -184,7 +185,7 @@ function _hdls.just(cfg)
     cmds[#cmds + 1] = (IsWin() and cfg.msvc) and packs._msvc or nil
     cmds[#cmds + 1] = replace(packs.just, rep)
 
-    local tbl, cmd = nlib.modeline('code', cfg.file)
+    local tbl, cmd = e.modeline('code', cfg.file)
     if tbl then
         local efm = fetch_efm(vim.list_extend(tbl.efm_fts or {}, { 'just' }))
         cfg:set(tbl)
@@ -208,7 +209,7 @@ function _hdls.make(cfg)
     cmds[#cmds + 1] = (IsWin() and cfg.msvc) and packs._msvc or nil
     cmds[#cmds + 1] = replace(packs.make, rep)
 
-    local tbl, cmd = nlib.modeline('code', cfg.file)
+    local tbl, cmd = e.modeline('code', cfg.file)
     if tbl then
         local efm = fetch_efm(vim.list_extend(tbl.efm_fts or {}, { 'make' }))
         cfg:set(tbl)
@@ -475,8 +476,7 @@ local entry = async(function(kt, bang)
         if wsc.tout.verbose:match('[aw]') then
             vim.notify(('resovle = %s, restore = %s\n%s'):format(resovle, restore, vim.inspect(wsc)))
         end
-        task.run(wsc)
-        nlib.recall(function() task.run(wsc) end)
+        e.dotrepeat(function() task.run(wsc) end, true)
     end)
     if not ok then
         vim.notify(tostring(msg))
