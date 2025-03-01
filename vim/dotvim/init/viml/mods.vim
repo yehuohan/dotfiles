@@ -1148,29 +1148,29 @@ endfunction
 
 let ScriptEval = function('popset#set#PopSelection', [s:rs.sel])
 nnoremap <leader>se :call ScriptEval()<CR>
-nnoremap <leader>ei <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 'e')<CR>
-nnoremap <leader>ec  :call FnEditFile('c'  , 'e')<CR>
-nnoremap <leader>ea  :call FnEditFile('cpp', 'e')<CR>
-nnoremap <leader>er  :call FnEditFile('rs' , 'e')<CR>
-nnoremap <leader>ep  :call FnEditFile('py' , 'e')<CR>
-nnoremap <leader>em  :call FnEditFile('md' , 'e')<CR>
-nnoremap <leader>el  :call FnEditFile('lua', 'e')<CR>
-nnoremap <leader>eti <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 't')<CR>
-nnoremap <leader>etc :call FnEditFile('c'  , 't')<CR>
-nnoremap <leader>eta :call FnEditFile('cpp', 't')<CR>
-nnoremap <leader>etr :call FnEditFile('rs' , 't')<CR>
-nnoremap <leader>etp :call FnEditFile('py' , 't')<CR>
-nnoremap <leader>etm :call FnEditFile('md' , 't')<CR>
-nnoremap <leader>etl :call FnEditFile('lua', 't')<CR>
+nnoremap <leader>ni <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 'e')<CR>
+nnoremap <leader>nc  :call FnEditFile('c'  , 'e')<CR>
+nnoremap <leader>na  :call FnEditFile('cpp', 'e')<CR>
+nnoremap <leader>nr  :call FnEditFile('rs' , 'e')<CR>
+nnoremap <leader>np  :call FnEditFile('py' , 'e')<CR>
+nnoremap <leader>nm  :call FnEditFile('md' , 'e')<CR>
+nnoremap <leader>nl  :call FnEditFile('lua', 'e')<CR>
+nnoremap <leader>nti <Cmd>call Input2Fn(['Suffix: '], 'FnEditFile', 't')<CR>
+nnoremap <leader>ntc :call FnEditFile('c'  , 't')<CR>
+nnoremap <leader>nta :call FnEditFile('cpp', 't')<CR>
+nnoremap <leader>ntr :call FnEditFile('rs' , 't')<CR>
+nnoremap <leader>ntp :call FnEditFile('py' , 't')<CR>
+nnoremap <leader>ntm :call FnEditFile('md' , 't')<CR>
+nnoremap <leader>ntl :call FnEditFile('lua', 't')<CR>
 nnoremap <silent> <leader>dh :call Input2Fn(['Divide Right: '] , 'FnInsertSpace', 'h')<CR>
 nnoremap <silent> <leader>db :call Input2Fn(['Divide Both: ']  , 'FnInsertSpace', 'b')<CR>
 nnoremap <silent> <leader>dl :call Input2Fn(['Divide Left: ']  , 'FnInsertSpace', 'l')<CR>
 nnoremap <silent> <leader>dd :call Input2Fn(['Divide Delete: '], 'FnInsertSpace', 'd')<CR>
 nnoremap <leader>sf <Cmd>call FnSwitchFile({'lhs': ['c', 'cc', 'cpp', 'cxx'], 'rhs': ['h', 'hh', 'hpp', 'hxx']})<CR>
-noremap <leader>ae  <Cmd>call FnEvalStr('execute', 'i', 'n')<CR>
-noremap <leader>age <Cmd>call FnEvalStr('execute', 'i', 'c')<CR>
-noremap <leader>af  <Cmd>call FnEvalStr('eval', 'i', 'n')<CR>
-noremap <leader>agf <Cmd>call FnEvalStr('eval', 'i', 'c')<CR>
+noremap <leader>cc  <Cmd>call FnEvalStr('execute', 'i', 'n')<CR>
+noremap <leader>cgc <Cmd>call FnEvalStr('execute', 'i', 'c')<CR>
+noremap <leader>cf  <Cmd>call FnEvalStr('eval', 'i', 'n')<CR>
+noremap <leader>cgf <Cmd>call FnEvalStr('eval', 'i', 'c')<CR>
 noremap <leader>ev  <Cmd>call FnEvalStr('eval', 'l', 'a')<CR>
 noremap <leader>egv <Cmd>call FnEvalStr('eval', 'l', 'c')<CR>
 noremap <leader>eu  <Cmd>call FnEvalStr('luaeval', 'l', 'a')<CR>

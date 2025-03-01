@@ -25,9 +25,10 @@ local api = vim.api
 ---         __index,
 ---         __newindex,
 ---         __opts = { ... },
+---         new(),
+---         mut(),
 ---         set(),
 ---         get(),
----         ...
 ---         <metatable> = nsc@ConfigerNonSaveable {
 ---             ext = yyy,
 ---             arg = { 'ABC' }, -- opts.arg[1] = 'ABC'
@@ -314,67 +315,108 @@ function _e.selected(sep)
     return res
 end
 
---- Evaluate string of command, function and expression
---- @param strfn string Evaluation function: 'eval' or 'execute'
---- @param copy_result boolean|nil Copy evaluation result or not
-function _e.eval(strfn, copy_result)
-    local str = ''
-    if fn.mode() == 'n' then
-        local cpl = ({ execute = 'command', eval = 'function' })[strfn]
-        str = fn.input(('Eval %s:'):format(strfn), '', cpl)
-    else
-        str = _e.selected('')
-    end
+--- @alias PipeInpHandler fun(table):string
+_e.buf_inp = {
+    input = fn.input,
+    word = function() return fn.expand('<cword>') end,
+    line = function()
+        local lnum = fn.line('.')
+        return fn.join(fn.getline(lnum, lnum + vim.v.count), '\n')
+    end,
+}
 
-    if str ~= '' then
-        local res = fn[strfn](str)
-        if type(res) ~= 'string' then
-            res = tostring(res)
-        end
+--- @alias PipeOutHandler fun(string, opts:table)
+_e.buf_out = {
+    append = function(txt) fn.append(fn.line('.'), fn.split(txt, '\n')) end,
+    replace = function(txt) fn.setline(fn.line('.'), txt) end,
+    -- cmdline = function(txt) fn.feedkeys(txt, 'n') end,
+    yank = function(txt)
+        vim.notify(txt)
+        fn.setreg('0', txt)
+    end,
+    yank_append = function(txt)
+        vim.notify(txt)
+        fn.setreg('0', fn.getreg('0') .. txt)
+    end,
+    yankcopy = function(txt)
+        vim.notify(txt)
+        fn.setreg('0', txt)
+        fn.setreg('+', txt)
+    end,
+    yankcopy_append = function(txt)
+        vim.notify(txt)
+        fn.setreg('0', fn.getreg('0') .. txt)
+        fn.setreg('+', fn.getreg('+') .. txt)
+    end,
+    open = function(txt)
+        vim.notify(txt)
+        vim.ui.open(txt)
+    end,
+}
 
-        if copy_result then
-            fn.setreg('0', res)
-            fn.setreg('+', res)
-            vim.notify(res .. ' → copied')
+--- @alias PipeProcHandler fun(string, opts:table):string
+_e.buf_proc = {
+    trim = function(txt)
+        local lines = fn.split(txt, '\n')
+        return fn.join(vim.tbl_map(vim.trim, lines), '\n')
+    end,
+    exec = function(txt) return fn.execute(txt) end,
+    eval = function(txt) return fn.eval(txt) end,
+    eval_math = function(txt, opts)
+        local expr = txt:gsub('([^=]+)=[^=]*$', '%1'):gsub('%s*$', '')
+        local res = fn[opts.eval](expr)
+        if opts.mode == 'n' then
+            return ('%s = %s'):format(expr, res)
         else
-            fn.append(fn.line('.'), fn.split(res, '\n'))
+            local line = fn.getline('.')
+            local col = fn.getpos("'>")[3]
+            return line:sub(1, col) .. (' = %s '):format(res) .. line:sub(col + 1)
         end
-    end
-end
+    end,
+}
 
---- Evaluate math expression
---- @param strfn string Evaluation function: 'eval' or 'luaeval'
---- @param copy_result boolean|nil Copy evaluation result or not
-function _e.eval_math(strfn, copy_result)
-    local expr = ''
-    local lstr = ''
-    local rstr = ''
+--- @class PipeOptions Options for `inp`, `out` and `proc`
+--- @field mode string 'n' or 'v'
+--- @field prompt string For `_e.buf_inp.input`
+--- @field completion string For `_e.buf_inp.input`
+--- @field sep string For `_e.selected`
+--- @field eval string For `_e.buf_proc.eval_math`
+
+--- Pipe the buffer text from input to output after process
+--- @param inp string|PipeInpHandler|nil Only for normal mode
+--- @param out string|PipeOutHandler
+--- @param proc string|PipeProcHandler|nil
+--- @param opts PipeOptions|nil
+function _e.buf_pipe(inp, out, proc, opts)
+    opts = opts or {}
+    local fninp = type(inp) == 'string' and _e.buf_inp[inp] or inp
+    local fnout = type(out) == 'string' and _e.buf_out[out] or out
+    local fnproc = type(proc) == 'string' and _e.buf_proc[proc] or proc
+    local txt = ''
+    --- Input
     if fn.mode() == 'n' then
-        expr = fn.getline('.')
-        expr = expr:gsub('([^=]+)=[^=]*$', '%1'):gsub('%s*$', '')
-        lstr = expr
-    else
-        expr = _e.selected('')
-        local col = fn.getpos("'>")[3]
-        local txt = fn.getline('.')
-        lstr = txt:sub(1, col)
-        rstr = txt:sub(col + 1)
-        vim.notify(lstr .. '|' .. rstr)
-    end
-
-    if expr ~= '' then
-        local res = fn[strfn](expr)
-        if type(res) ~= 'string' then
-            res = tostring(res)
-        end
-
-        if copy_result then
-            fn.setreg('0', res)
-            fn.setreg('+', res)
-            vim.notify(res .. ' -> copied')
+        opts.mode = 'n'
+        if fninp then
+            txt = fninp(opts)
         else
-            fn.setline(fn.line('.'), ('%s = %s%s'):format(lstr, res, rstr))
+            vim.notify('Require input handler for normal mode')
         end
+    else
+        opts.mode = 'v'
+        txt = _e.selected(opts and opts.sep or nil)
+    end
+    if txt ~= '' then
+        -- Process
+        if fnproc ~= nil then
+            txt = fnproc(txt, opts)
+        end
+        -- Ouptut
+        if type(txt) ~= 'string' then
+            txt = fn.string(txt)
+        end
+        fnout(txt, opts)
+    else
+        vim.notify("There's nothing to pipe")
     end
 end
 
@@ -431,29 +473,6 @@ function _e.buf_etpl(path, under_root)
             end
         end
     )
-end
-
---- Search buffer content from internet
---- @param engine string|nil Search engine
---- @param smart boolean|nil Auto distinguish text and url
-function _e.buf_search(engine, smart)
-    local text
-    local head = 'https://cn.bing.com/search?q='
-    if engine == 'google' then
-        head = 'https://google.com/search?q='
-    end
-    if fn.mode() == 'n' then
-        text = fn.expand('<cWORD>')
-        if not (smart and text:match('^https?://.*$')) then
-            text = head .. fn.expand('<cword>')
-        end
-    else
-        text = _e.selected(' ')
-        if not (smart and text:match('^https?://.*$')) then
-            text = head .. text
-        end
-    end
-    vim.ui.open(text)
 end
 
 --- Resize window by moving spliter

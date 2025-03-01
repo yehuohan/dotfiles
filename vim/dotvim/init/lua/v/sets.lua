@@ -318,18 +318,15 @@ local function setup()
     vim.g.did_install_syntax_menu = 1 -- 禁止加载Syntax菜单
     api.nvim_create_autocmd('UIEnter', { group = 'v.Sets', callback = on_UIEnter })
 
-    vim.cmd.source(vim.env.DotVimInit .. '/lua/v/maps.vim')
+    -- Fast commands
+    m.nnore({ '<leader>se', function() fn.PopSelection(fast_cmds) end, desc = 'Fast commands' })
 
-    m.nnore({
-        '<leader>se',
-        function() fn['popset#set#PopSelection'](fast_cmds) end,
-        desc = 'Fast commands',
-    })
-
+    -- New chore file
     local path = vim.env.DotVimShare .. '/chores'
-    m.nnore({ '<leader>sl', function() e.buf_etpl(path, true) end, desc = 'New chores under root' })
-    m.nnore({ '<leader>sL', function() e.buf_etpl(path, false) end, desc = 'New chores' })
+    m.nnore({ '<leader>sl', function() e.buf_etpl(path, true) end, desc = 'New chore file under root' })
+    m.nnore({ '<leader>sL', function() e.buf_etpl(path, false) end, desc = 'New chore file' })
 
+    -- New tmpfile
     local prompt = { prompt = 'Filetype:' }
     m.nnore({ '<leader>ni', function() vim.ui.input(prompt, e.buf_etmp) end, desc = 'Edit tmpfile' })
     m.nnore({
@@ -355,20 +352,58 @@ local function setup()
         end
     end
 
-    m.nore({ '<leader>ef', function() e.eval('eval') end, desc = 'Append eval expression' })
-    m.nore({ '<leader>ec', function() e.eval('execute') end, desc = 'Append exec command' })
-    m.nore({ '<leader>egf', function() e.eval('eval', true) end, desc = 'Copy eval expression' })
-    m.nore({ '<leader>egc', function() e.eval('execute', true) end, desc = 'Copy exec command' })
-    m.nore({ '<leader>ev', function() e.eval_math('eval') end, desc = 'Append vim math' })
-    m.nore({ '<leader>el', function() e.eval_math('luaeval') end, desc = 'Append lua math' })
-    m.nore({ '<leader>ep', function() e.eval_math('py3eval') end, desc = 'Append python math' })
-    m.nore({ '<leader>egv', function() e.eval_math('eval', true) end, desc = 'Copy vim math' })
-    m.nore({ '<leader>egl', function() e.eval_math('luaeval', true) end, desc = 'Copy lua math' })
-    m.nore({ '<leader>egp', function() e.eval_math('py3eval', true) end, desc = 'Copy python math' })
+    -- Execute and evaluate
+    local eopts = { prompt = 'Command:', completion = 'command' }
+    local fopts = { prompt = 'Expression:', completion = 'expression' }
+    local append_exec = function() e.buf_pipe('input', 'append', 'exec', eopts) end
+    local append_eval = function() e.buf_pipe('input', 'append', 'eval', fopts) end
+    local yankcopy_exec = function() e.buf_pipe('input', 'yankcopy', 'exec', eopts) end
+    local yankcopy_eval = function() e.buf_pipe('input', 'yankcopy', 'eval', fopts) end
+    m.nore({ '<leader>ec', append_exec, desc = 'Append command result' })
+    m.nore({ '<leader>ef', append_eval, desc = 'Append expression result' })
+    m.nore({ '<leader>yc', yankcopy_exec, desc = 'Yank and copy command result' })
+    m.nore({ '<leader>yf', yankcopy_eval, desc = 'Yank and copy expression result' })
 
-    m.nore({ '<leader>bs', function() e.buf_search(nil, true) end, desc = 'Smart search' })
-    m.nore({ '<leader>bb', function() e.buf_search() end, desc = 'Search with bing' })
-    m.nore({ '<leader>bg', function() e.buf_search('google') end, desc = 'Search with google' })
+    -- Evaluate math
+    local vmath = function() e.buf_pipe('line', 'replace', 'eval_math', { eval = 'eval' }) end
+    local lmath = function() e.buf_pipe('line', 'replace', 'eval_math', { eval = 'luaeval' }) end
+    local pmath = function() e.buf_pipe('line', 'replace', 'eval_math', { eval = 'py3eval' }) end
+    m.nore({ '<leader>ev', vmath, desc = 'Append vim math' })
+    m.nore({ '<leader>el', lmath, desc = 'Append lua math' })
+    m.nore({ '<leader>ep', pmath, desc = 'Append python math' })
+    vmath = function() e.buf_pipe('line', 'yankcopy', 'eval_math', { eval = 'eval' }) end
+    lmath = function() e.buf_pipe('line', 'yankcopy', 'eval_math', { eval = 'luaeval' }) end
+    pmath = function() e.buf_pipe('line', 'yankcopy', 'eval_math', { eval = 'py3eval' }) end
+    m.nore({ '<leader>yv', vmath, desc = 'Yank and copy vim math' })
+    m.nore({ '<leader>yl', lmath, desc = 'Yank and copy lua math' })
+    m.nore({ '<leader>yp', pmath, desc = 'Yank and copy python math' })
+
+    -- Search with internet
+    local bing = function(txt) return 'https://cn.bing.com/search?q=' .. txt end
+    local google = function(txt) return 'https://google.com/search?q=' .. txt end
+    local github = function(txt) return '' .. txt end
+    local smart = function(txt, opts)
+        local si, ei, res = txt:find([[(h?[tf]tps?://[^ ()%[%]{}<>]+)]])
+        if res then
+            if opts.mode == 'n' then
+                local col = fn.getpos('.')[3]
+                if si <= col and col <= ei then
+                    return res
+                end
+            else
+                return res
+            end
+        end
+        res = opts.mode == 'n' and fn.expand('<cword>') or txt
+        return bing(res)
+    end
+    m.nore({ '<leader>bs', function() e.buf_pipe('line', 'open', smart) end, desc = 'Smart search' })
+    m.nore({ '<leader>bb', function() e.buf_pipe('word', 'open', bing) end, desc = 'Search with bing' })
+    m.nore({ '<leader>bg', function() e.buf_pipe('word', 'open', google) end, desc = 'Search with google' })
+    m.nore({ '<leader>bh', function() e.buf_pipe('word', 'open', github) end, desc = 'Search with github' })
+
+    -- Extra mappings
+    vim.cmd.source(vim.env.DotVimInit .. '/lua/v/maps.vim')
 end
 
 return { setup = setup }

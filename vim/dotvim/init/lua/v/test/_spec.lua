@@ -275,72 +275,222 @@ describe('nlib', function()
     end)
 
     -- nlib.modeline
-    it('. ext . modeline', function()
-        local fns = { { io, 'lines' }, { vim, 'notify' } }
-        local mocked = mock(fns)
-
-        io.lines = function(data)
-            local idx = 0
-            return function()
-                idx = idx + 1
-                return idx <= #data and data[idx] or nil
+    describe('. ext', function()
+        it('. modeline', function()
+            local fns = { { io, 'lines' }, { vim, 'notify' } }
+            local mocked = mock(fns)
+            io.lines = function(data)
+                local idx = 0
+                return function()
+                    idx = idx + 1
+                    return idx <= #data and data[idx] or nil
+                end
             end
-        end
-        local msg
-        vim.notify = function(_msg) msg = _msg end
+            local msg
+            vim.notify = function(_msg) msg = _msg end
 
-        local lines, tbl, cmd
+            local lines, tbl, cmd
 
-        lines = { [[head-foo]], [[-- vim@code: nvim -l lua]], [[tail-bar]] }
-        tbl, cmd = nlib.e.modeline('code', lines)
-        EQ(nil, tbl)
-        EQ('nvim -l lua', cmd)
+            lines = { [[head-foo]], [[-- vim@code: nvim -l lua]], [[tail-bar]] }
+            tbl, cmd = nlib.e.modeline('code', lines)
+            EQ(nil, tbl)
+            EQ('nvim -l lua', cmd)
 
-        lines = { [[head-foo]], [[-- vim@code { }: nvim -l lua]], [[tail-bar]] }
-        tbl, cmd = nlib.e.modeline('code', lines)
-        EQ(nil, tbl)
-        EQ(nil, cmd)
+            lines = { [[head-foo]], [[-- vim@code { }: nvim -l lua]], [[tail-bar]] }
+            tbl, cmd = nlib.e.modeline('code', lines)
+            EQ(nil, tbl)
+            EQ(nil, cmd)
 
-        lines = { [[head-foo]], [[-- vim@code{ }: nvim -l lua]], [[tail-bar]] }
-        tbl, cmd = nlib.e.modeline('code', lines)
-        EQ({}, tbl)
-        EQ('nvim -l lua', cmd)
+            lines = { [[head-foo]], [[-- vim@code{ }: nvim -l lua]], [[tail-bar]] }
+            tbl, cmd = nlib.e.modeline('code', lines)
+            EQ({}, tbl)
+            EQ('nvim -l lua', cmd)
 
-        lines = { [[head-foo]], [[-- vim@code{ foo - BAR }: nvim -l lua]], [[tail-bar]] }
-        tbl, cmd = nlib.e.modeline('code', lines)
-        EQ(nil, tbl)
-        EQ('nvim -l lua', cmd)
-        EQ('Wrong table from modeline: { foo - BAR }', msg)
+            lines = { [[head-foo]], [[-- vim@code{ foo - BAR }: nvim -l lua]], [[tail-bar]] }
+            tbl, cmd = nlib.e.modeline('code', lines)
+            EQ(nil, tbl)
+            EQ('nvim -l lua', cmd)
+            EQ('Wrong table from modeline: { foo - BAR }', msg)
 
-        lines = {
-            [[head-foo]],
-            [[-- vim@code{ envs = { FOO = 'bar'}, args = '-l' }: 	]],
-            [[tail-bar]],
-        }
-        tbl, cmd = nlib.e.modeline('code', lines)
-        EQ({ envs = { FOO = 'bar' }, args = '-l' }, tbl)
-        EQ(nil, cmd)
+            lines = {
+                [[head-foo]],
+                [[-- vim@code{ envs = { FOO = 'bar'}, args = '-l' }: 	]],
+                [[tail-bar]],
+            }
+            tbl, cmd = nlib.e.modeline('code', lines)
+            EQ({ envs = { FOO = 'bar' }, args = '-l' }, tbl)
+            EQ(nil, cmd)
 
-        lines = {
-            [[head-foo]],
-            [[-- vim@code{ envs = { FOO = 'bar'}, args = '-l' }: nvim -l lua]],
-            [[tail-bar]],
-        }
-        tbl, cmd = nlib.e.modeline('code', lines)
-        EQ({ envs = { FOO = 'bar' }, args = '-l' }, tbl)
-        EQ('nvim -l lua', cmd)
+            lines = {
+                [[head-foo]],
+                [[-- vim@code{ envs = { FOO = 'bar'}, args = '-l' }: nvim -l lua]],
+                [[tail-bar]],
+            }
+            tbl, cmd = nlib.e.modeline('code', lines)
+            EQ({ envs = { FOO = 'bar' }, args = '-l' }, tbl)
+            EQ('nvim -l lua', cmd)
 
-        lines = { [[head-foo]], [[-- vim@code: :Test]], [[tail-bar]] }
-        tbl, cmd = nlib.e.modeline('code', lines)
-        EQ(nil, tbl)
-        EQ(':Test', cmd)
+            lines = { [[head-foo]], [[-- vim@code: :Test]], [[tail-bar]] }
+            tbl, cmd = nlib.e.modeline('code', lines)
+            EQ(nil, tbl)
+            EQ(':Test', cmd)
 
-        unmock(mocked, fns)
+            unmock(mocked, fns)
+        end)
+
+        describe('. buf_pipe', function()
+            local fns = { { vim, 'notify' } }
+            local mocked = mock(fns)
+            local msg
+            vim.notify = function(_msg) msg = _msg end
+
+            local tmp
+            local nextline = '<Esc>o<Esc>:silent w<CR>yy'
+            before_each(function()
+                tmp = vim.fn.tempname() .. '.txt'
+                vim.cmd.edit({ args = { tmp }, mods = { silent = true } })
+                vim.cmd.write({ mods = { silent = true } })
+                vim.fn.setreg('0', '')
+                vim.fn.setreg('+', '')
+            end)
+
+            it('. exec/eval', function()
+                local inp
+                local input = function() return inp end -- Can't use vim.fn.input for it will block at cmdline
+                local append_exec = function() nlib.e.buf_pipe(input, 'append', 'exec') end
+                local append_eval = function() nlib.e.buf_pipe(input, 'append', 'eval') end
+                local yankcopy_exec = function() nlib.e.buf_pipe(input, 'yankcopy', 'exec') end
+                local yankcopy_eval = function() nlib.e.buf_pipe(input, 'yankcopy', 'eval') end
+
+                inp = "echo getpos('.')"
+                feedkeys(nextline)
+                append_exec()
+                EQ('[0, 2, 1, 0]', vim.fn.getline(vim.fn.line('.') + 1))
+                feedkeys(nextline)
+                feedkeys("<Esc>iecho getpos('.')<Esc>:silent w<CR>v0")
+                append_exec()
+                EQ('[0, 3, 1, 0]', vim.fn.getline(vim.fn.line('.') + 1))
+
+                inp = "getpos('.')"
+                feedkeys(nextline)
+                append_eval()
+                EQ('[0, 4, 1, 0]', vim.fn.getline(vim.fn.line('.') + 1))
+                feedkeys(nextline)
+                feedkeys("<Esc>igetpos('.')<Esc>:silent w<CR>v0")
+                append_eval()
+                EQ('[0, 5, 1, 0]', vim.fn.getline(vim.fn.line('.') + 1))
+
+                inp = "echo getpos('.')"
+                feedkeys(nextline)
+                yankcopy_exec()
+                EQ('\n[0, 6, 1, 0]', vim.fn.getreg('0'))
+                EQ('\n[0, 6, 1, 0]', vim.fn.getreg('+'))
+                EQ('\n[0, 6, 1, 0]', msg)
+                feedkeys(nextline)
+                feedkeys("<Esc>iecho getpos('.')<Esc>:silent w<CR>v0")
+                yankcopy_exec()
+                EQ('\n[0, 7, 1, 0]', vim.fn.getreg('0'))
+                EQ('\n[0, 7, 1, 0]', vim.fn.getreg('+'))
+                EQ('\n[0, 7, 1, 0]', msg)
+
+                inp = "getpos('.')"
+                feedkeys(nextline)
+                yankcopy_eval()
+                EQ('[0, 8, 1, 0]', vim.fn.getreg('0'))
+                EQ('[0, 8, 1, 0]', vim.fn.getreg('+'))
+                EQ('[0, 8, 1, 0]', msg)
+                feedkeys(nextline)
+                feedkeys("<Esc>igetpos('.')<Esc>:silent w<CR>v0")
+                yankcopy_eval()
+                EQ('[0, 9, 1, 0]', vim.fn.getreg('0'))
+                EQ('[0, 9, 1, 0]', vim.fn.getreg('+'))
+                EQ('[0, 9, 1, 0]', msg)
+            end)
+
+            it('. eval_math', function()
+                local opts = {}
+                local replace_math = function() nlib.e.buf_pipe('line', 'replace', 'eval_math', opts) end
+                local yank_math = function() nlib.e.buf_pipe('line', 'yankcopy', 'eval_math', opts) end
+
+                opts.eval = 'eval'
+                feedkeys(nextline)
+                feedkeys("<Esc>i'test' . 'math' . 'plus'<Esc>:silent w<CR>")
+                replace_math()
+                EQ("'test' . 'math' . 'plus' = testmathplus", vim.fn.getline('.'))
+                yank_math()
+                EQ("'test' . 'math' . 'plus' = testmathplus", vim.fn.getreg('0'))
+                EQ("'test' . 'math' . 'plus' = testmathplus", vim.fn.getreg('+'))
+                EQ("'test' . 'math' . 'plus' = testmathplus", msg)
+                feedkeys('<Esc>09lv15l')
+                replace_math()
+                EQ("'test' . 'math' . 'plus'  = mathplus = testmathplus", vim.fn.getline('.'))
+                feedkeys('<Esc>09lv15l')
+                yank_math()
+                EQ("'test' . 'math' . 'plus'  = mathplus  = mathplus = testmathplus", vim.fn.getreg('0'))
+                EQ("'test' . 'math' . 'plus'  = mathplus  = mathplus = testmathplus", vim.fn.getreg('+'))
+                EQ("'test' . 'math' . 'plus'  = mathplus  = mathplus = testmathplus", msg)
+
+                opts.eval = 'luaeval'
+                feedkeys(nextline)
+                feedkeys('<Esc>i1 + math.sin(math.pi / 6) + 0.5<Esc>:silent w<CR>')
+                replace_math()
+                EQ('1 + math.sin(math.pi / 6) + 0.5 = 2', vim.fn.getline('.'))
+                yank_math()
+                EQ('1 + math.sin(math.pi / 6) + 0.5 = 2', vim.fn.getreg('0'))
+                EQ('1 + math.sin(math.pi / 6) + 0.5 = 2', vim.fn.getreg('+'))
+                EQ('1 + math.sin(math.pi / 6) + 0.5 = 2', msg)
+                feedkeys('<Esc>03lv22l')
+                replace_math()
+                EQ('1 + math.sin(math.pi / 6)  = 0.5 + 0.5 = 2', vim.fn.getline('.'))
+                feedkeys('<Esc>03lv22l')
+                yank_math()
+                EQ('1 + math.sin(math.pi / 6)  = 0.5  = 0.5 + 0.5 = 2', vim.fn.getreg('0'))
+                EQ('1 + math.sin(math.pi / 6)  = 0.5  = 0.5 + 0.5 = 2', vim.fn.getreg('+'))
+                EQ('1 + math.sin(math.pi / 6)  = 0.5  = 0.5 + 0.5 = 2', msg)
+
+                opts.eval = 'py3eval'
+                feedkeys(nextline)
+                feedkeys('<Esc>i1 + 2**3 + 3<Esc>:silent w<CR>')
+                replace_math()
+                EQ('1 + 2**3 + 3 = 12', vim.fn.getline('.'))
+                yank_math()
+                EQ('1 + 2**3 + 3 = 12', vim.fn.getreg('0'))
+                EQ('1 + 2**3 + 3 = 12', vim.fn.getreg('+'))
+                EQ('1 + 2**3 + 3 = 12', msg)
+                feedkeys('<Esc>03lv5l')
+                replace_math()
+                EQ('1 + 2**3  = 8 + 3 = 12', vim.fn.getline('.'))
+                feedkeys('<Esc>03lv5l')
+                yank_math()
+                EQ('1 + 2**3  = 8  = 8 + 3 = 12', vim.fn.getreg('0'))
+                EQ('1 + 2**3  = 8  = 8 + 3 = 12', vim.fn.getreg('+'))
+                EQ('1 + 2**3  = 8  = 8 + 3 = 12', msg)
+            end)
+
+            it('. copy', function()
+                feedkeys('<Esc>oneovim     <Esc>')
+                feedkeys('<Esc>ovim   <Esc>')
+                feedkeys('<Esc>oothers <Esc>')
+                feedkeys('<Esc>o<Esc>:silent w<CR>')
+
+                feedkeys('<Esc>gg0jyyjV')
+                nlib.e.buf_pipe(nil, 'yankcopy_append')
+                EQ('neovim     \nvim   \n', vim.fn.getreg('0'))
+                EQ('vim   \n', vim.fn.getreg('+'))
+
+                feedkeys('<Esc>gg0jVGk')
+                nlib.e.buf_pipe(nil, 'yankcopy', 'trim')
+                EQ('neovim\nvim\nothers', vim.fn.getreg('0'))
+                EQ('neovim\nvim\nothers', vim.fn.getreg('+'))
+            end)
+
+            unmock(mocked, fns)
+        end)
     end)
 
     -- nlib.a.pop_selection
     it('. async . pop_selection', function()
-        local tst = { opt = '', lst = { 1, 2, 3 }, num = 0 }
+        local tst = { opt = '', lst = { 11, 22, 33 }, num = 0 }
         tst.cmd = function(sopt, sel) tst.num = tst.num + 1 + sel end
         tst.evt = function(name)
             if 'onCR' == name then
@@ -355,22 +505,27 @@ describe('nlib', function()
             res = nlib.a._await(nlib.a.pop_selection(sel))
         end)
 
+        -- Can use vim.fn.input from popc for it's invoked from asynchronously
         entry(tst, 'FOO')
         EQ('FOO', tst.opt)
         EQ(0, tst.num)
         feedkeys('<Space>')
-        EQ(0 + 1 + 1, tst.num)
-        feedkeys('j<CR>')
-        EQ(2 + 1 + 2, tst.num)
+        EQ(0 + 1 + 11, tst.num)
+        feedkeys('j<Space>')
+        EQ(12 + 1 + 22, tst.num)
+        feedkeys('i33<CR>') -- Will call tst.cmd with input once
+        EQ(35 + 1 + 33, tst.num)
+        feedkeys('<CR>') -- Will call tst.cmd with the selected (at cursor line) once
+        EQ(69 + 1 + 22, tst.num)
         EQ('foo', tst.opt)
         EQ(true, res)
 
         entry(tst)
         EQ(nil, tst.opt)
         feedkeys('jj<Space>')
-        EQ(5 + 1 + 3, tst.num)
+        EQ(92 + 1 + 33, tst.num)
         feedkeys('<ESC>')
-        EQ(9, tst.num)
+        EQ(126, tst.num)
         EQ('bar', tst.opt)
         EQ(false, res)
     end)
@@ -459,9 +614,9 @@ describe('task', function()
     require('v')
     local task = require('v.task')
     task.setup()
+
     local fns = { { task, 'run' }, { vim, 'notify', 'print' }, { vim.fn, 'input' } }
     local mocked = mock(fns)
-
     local cfg, msg, txt, inp
     task.run = function(_cfg) cfg = _cfg end
     vim.notify = function(_msg) msg = _msg end
@@ -513,7 +668,7 @@ describe('task', function()
             vim.cmd.Code({ args = { 'Rp' }, bang = true })
             feedkeys('mf<CR>')
             feedkeys('jm' .. tmp .. '<CR>')
-            feedkeys('kkkmterm<CR>')
+            feedkeys('kkkkmterm<CR>')
             feedkeys('<CR>')
             EQ(true, cfg == wsc)
             EQ('f', wsc.key)
