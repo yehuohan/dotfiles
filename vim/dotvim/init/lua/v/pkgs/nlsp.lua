@@ -2,7 +2,13 @@ local use = require('v.use')
 local m = require('v.nlib').m
 
 --- Setup language servers
-local function setup_servers()
+--- Required plugins:
+--- * 'williamboman/mason.nvim'
+--- * 'williamboman/mason-lspconfig.nvim'
+--- * 'neovim/nvim-lspconfig'
+--- * 'folke/neoconf.nvim'
+--- * 'folke/lazydev.nvim'
+local function setup_lsp_servers(capabilities)
     -- Settings
     require('neoconf').setup({
         -- Priority: lspconfig.setup() < global < local
@@ -31,7 +37,6 @@ local function setup_servers()
     })
     require('mason-lspconfig').setup({})
     local lspconfig = require('lspconfig')
-    local capabilities = require('cmp_nvim_lsp').default_capabilities()
     local opts = {
         function(server_name)
             lspconfig[server_name].setup({
@@ -105,8 +110,119 @@ local function setup_servers()
     require('mason-lspconfig').setup_handlers(opts)
 end
 
+--- Setup lsp mappings
+local function setup_lsp_mappings()
+    m.inore({ '<M-o>', vim.lsp.buf.signature_help })
+    m.nnore({ 'gd', vim.lsp.buf.definition })
+    m.nnore({ 'gD', vim.lsp.buf.declaration })
+    m.nnore({ '<leader>gd', vim.lsp.buf.definition })
+    m.nnore({ '<leader>gD', vim.lsp.buf.declaration })
+    m.nnore({ '<leader>gi', vim.lsp.buf.implementation })
+    m.nnore({ '<leader>gy', vim.lsp.buf.type_definition })
+    m.nnore({ '<leader>gr', vim.lsp.buf.references })
+    m.nnore({ '<leader>gn', vim.lsp.buf.rename })
+    m.nnore({
+        '<leader>gf',
+        function() vim.lsp.buf.code_action({ apply = true }) end,
+        desc = 'Apply code action',
+    })
+    -- m.nnore({ '<leader>ga', vim.lsp.buf.code_action })
+    -- m.nnore({ '<leader>gh', vim.lsp.buf.hover })
+    m.nnore({ '<leader>ga', '<Cmd>Lspsaga code_action<CR>' })
+    m.nnore({ '<leader>gh', '<Cmd>Lspsaga hover_doc<CR>' })
+    m.nnore({ '<leader>gp', '<Cmd>Lspsaga peek_definition<CR>' })
+    m.nnore({ '<leader>gs', '<Cmd>Lspsaga finder<CR>' })
+    m.nnore({ '<leader>go', '<Cmd>Lspsaga outline<CR>' })
+
+    m.nore({ '<leader>of', vim.lsp.buf.format })
+    m.nnore({ '<leader>od', vim.diagnostic.setloclist })
+    m.nnore({
+        '<leader>oD',
+        function()
+            local filter = { bufnr = 0 }
+            local enabled = vim.diagnostic.is_enabled(filter)
+            vim.diagnostic.enable(not enabled, filter)
+            vim.notify('Diagnostic ' .. (enabled and 'disabled' or 'enabled'))
+        end,
+        desc = 'Toggle lsp diagnostic',
+    })
+    m.nnore({
+        '<leader>oH',
+        function()
+            local filter = { bufnr = 0 }
+            local enabled = vim.lsp.inlay_hint.is_enabled(filter)
+            vim.lsp.inlay_hint.enable(not enabled, filter)
+            vim.notify('Inlay hint ' .. (enabled and 'disabled' or 'enabled'))
+        end,
+        desc = 'Toggle lsp inlay hint',
+    })
+    m.nnore({ '<leader>oi', vim.diagnostic.open_float })
+    local opts = { severity = vim.diagnostic.severity.ERROR }
+    m.nnore({ '<leader>oj', function() vim.diagnostic.goto_next(opts) end, desc = 'Next error' })
+    m.nnore({ '<leader>ok', function() vim.diagnostic.goto_prev(opts) end, desc = 'Prev error' })
+    m.nnore({ '<leader>oJ', vim.diagnostic.goto_next, desc = 'Next diagnostic' })
+    m.nnore({ '<leader>oK', vim.diagnostic.goto_prev, desc = 'Prev diagnostic' })
+    -- TODO: lsp workspace and commands
+    -- m.nnore{'<leader>ow', vim.lsp.buf.xxx_workspace_folder}
+    -- m.nnore{'<leader>oe', vim.lsp.buf.execute_command}
+    m.nnore({ '<leader><leader>o', ':LspStart<Space>' })
+    m.nnore({ '<leader>oR', ':LspRestart<CR>' })
+    m.nnore({ '<leader>ol', ':LspInfo<CR>' })
+
+    m.nnore({ '<leader>oc', ':Neoconf<CR>' })
+    m.nnore({ '<leader>on', ':Neoconf lsp<CR>' })
+    m.nnore({ '<leader>oN', ':Neoconf show<CR>' })
+    m.nnore({ '<leader>om', ':Mason<CR>' })
+
+    m.nnore({ '<leader>oh', '<Cmd>ClangdSwitchSourceHeader<CR>' })
+end
+
+--- Setup lsp appearance
+local function setup_lsp_appearance()
+    vim.lsp.set_log_level(vim.lsp.log_levels.OFF)
+
+    local signs
+    if use.ui.icon then
+        signs = {
+            text = {
+                [vim.diagnostic.severity.ERROR] = '🗴',
+                [vim.diagnostic.severity.WARN] = '',
+                [vim.diagnostic.severity.INFO] = '󰍟',
+                [vim.diagnostic.severity.HINT] = '󰌶',
+            },
+        }
+    end
+    vim.diagnostic.config({ virtual_text = { prefix = '▪' }, signs = signs })
+
+    vim.api.nvim_set_hl(0, 'LspSignatureActiveParameter', { link = 'Tag' })
+    vim.api.nvim_set_hl(0, 'DiagnosticUnderlineError', { undercurl = true, sp = 'Red' })
+    vim.api.nvim_set_hl(0, 'DiagnosticUnderlineWarn', { undercurl = true, sp = 'Orange' })
+    vim.api.nvim_set_hl(0, 'DiagnosticUnderlineInfo', { undercurl = true, sp = 'LightBlue' })
+    vim.api.nvim_set_hl(0, 'DiagnosticUnderlineHint', { link = 'Comment' })
+end
+
+--- Setup lsp extensions
+local function setup_lsp_extensions()
+    require('lspsaga').setup({
+        ui = { border = 'single' },
+        scroll_preview = {
+            scroll_down = '<M-n>',
+            scroll_up = '<M-m>',
+        },
+        code_action = {
+            keys = { quit = { 'q', '<Esc>' } },
+        },
+        lightbulb = { enable = false },
+        diagnostic = { on_insert = false },
+        symbol_in_winbar = {
+            enable = true,
+            separator = use.ui.icon and '  ' or ' > ',
+        },
+    })
+end
+
 --- Setup completion sources
-local function setup_sources()
+local function setup_cmp_sources()
     local cmp_im = require('cmp_im')
     local cmp_im_zh = require('cmp_im_zh')
     cmp_im.setup({
@@ -130,10 +246,24 @@ local function setup_sources()
         end,
         desc = 'Toggle input method',
     })
+
+    require('lsp_signature').setup({
+        bind = true,
+        doc_lines = 50,
+        max_height = 50,
+        max_width = 80,
+        hint_enable = true,
+        hint_prefix = '» ',
+        handler_opts = { border = 'none' },
+        padding = ' ',
+        floating_window = false,
+        toggle_key = '<M-o>',
+        select_signature_key = '<M-p>',
+    })
 end
 
 -- stylua: ignore start
-local kind_icons = {
+local cmp_kind_icons = {
     Text          = { '', 'Txt' , 1  },
     Method        = { '󰆧', 'Meth', 2  },
     Function      = { '󰊕', 'Fun' , 3  },
@@ -161,7 +291,7 @@ local kind_icons = {
     TypeParameter = { '', 'TyPa', 25 },
 }
 
-local kind_sources = {
+local cmp_kind_sources = {
     buffer          = 'Buf',
     nvim_lsp        = 'Lsp',
     luasnip         = 'Snp',
@@ -177,8 +307,8 @@ local kind_sources = {
 
 --- Format completion menu with (cmp.Entry, vim.CompletedItem)
 local function cmp_format(entry, citem)
-    local ico = kind_icons[citem.kind] or { '?', vim.inspect(citem.kind) }
-    local src = kind_sources[entry.source.name] or entry.source.name
+    local ico = cmp_kind_icons[citem.kind] or { '?', vim.inspect(citem.kind) }
+    local src = cmp_kind_sources[entry.source.name] or entry.source.name
     citem.kind = string.format(' %s', use.ui.icon and ico[1] or ico[2]:sub(1, 1))
     if string.len(citem.abbr) > 80 then
         citem.abbr = string.sub(citem.abbr, 1, 78) .. ' …'
@@ -215,7 +345,7 @@ local function cmp_select(count)
         elseif index > index_max then
             index = 0
         end
-        if index > 0 and entries[index].completion_item.kind == kind_icons['Snippet'][3] then
+        if index > 0 and entries[index].completion_item.kind == cmp_kind_icons['Snippet'][3] then
             behavior = cmp.SelectBehavior.Select
         end
     end
@@ -223,7 +353,7 @@ local function cmp_select(count)
 end
 
 --- Setup completion framework
-local function setup_completion()
+local function setup_cmp_completion()
     local cmp = require('cmp')
     local cmp_lsp_rs = require('cmp_lsp_rs')
     local compare = cmp.config.compare
@@ -260,6 +390,7 @@ local function setup_completion()
     }
     m.imap({ '<C-j>', '<M-j>' })
     m.imap({ '<C-k>', '<M-k>' })
+    m.nnore({ '<leader>os', ':CmpStatus<CR>' })
 
     cmp.setup({
         mapping = cmp_mappings,
@@ -331,16 +462,10 @@ local function setup_completion()
     })
 end
 
---- Setup lsp highlights
-local function setup_highlights()
+--- Setup completion highlights
+local function setup_cmp_highlights()
     local api = vim.api
     -- stylua: ignore start
-    api.nvim_set_hl(0, 'LspSignatureActiveParameter', {link = 'Tag' })
-    api.nvim_set_hl(0, 'DiagnosticUnderlineError'   , {undercurl = true, sp = 'Red' })
-    api.nvim_set_hl(0, 'DiagnosticUnderlineWarn'    , {undercurl = true, sp = 'Orange' })
-    api.nvim_set_hl(0, 'DiagnosticUnderlineInfo'    , {undercurl = true, sp = 'LightBlue' })
-    api.nvim_set_hl(0, 'DiagnosticUnderlineHint'    , {link = 'Comment' })
-
     api.nvim_set_hl(0, 'CmpItemMenu'             , {ctermfg = 175, fg = '#d3869b', italic = true })
     api.nvim_set_hl(0, 'CmpItemAbbrMatch'        , {ctermfg = 208, fg = '#fe8019' })
     api.nvim_set_hl(0, 'CmpItemAbbrMatchFuzzy'   , {ctermfg = 208, fg = '#fe8019' })
@@ -373,141 +498,31 @@ local function setup_highlights()
     -- stylua: ignore end
 end
 
---- Setup lsp settings
-local function setup_lsp_settings()
-    vim.lsp.set_log_level(vim.lsp.log_levels.OFF)
-    local signs
-    if use.ui.icon then
-        signs = {
-            text = {
-                [vim.diagnostic.severity.ERROR] = '🗴',
-                [vim.diagnostic.severity.WARN] = '',
-                [vim.diagnostic.severity.INFO] = '󰍟',
-                [vim.diagnostic.severity.HINT] = '󰌶',
-            },
-        }
-    end
-    vim.diagnostic.config({ virtual_text = { prefix = '▪' }, signs = signs })
-
-    require('lspsaga').setup({
-        ui = { border = 'single' },
-        scroll_preview = {
-            scroll_down = '<M-n>',
-            scroll_up = '<M-m>',
-        },
-        code_action = {
-            keys = { quit = { 'q', '<Esc>' } },
-        },
-        lightbulb = { enable = false },
-        diagnostic = { on_insert = false },
-        symbol_in_winbar = {
-            enable = true,
-            separator = use.ui.icon and '  ' or ' > ',
-        },
-    })
-
-    require('lsp_signature').setup({
-        bind = true,
-        doc_lines = 50,
-        max_height = 50,
-        max_width = 80,
-        hint_enable = true,
-        hint_prefix = '» ',
-        handler_opts = { border = 'none' },
-        padding = ' ',
-        floating_window = false,
-        toggle_key = '<M-o>',
-        select_signature_key = '<M-p>',
-    })
-end
-
---- Setup lsp mappings
-local function setup_lsp_mappings()
-    -- m.inore({ '<M-o>', vim.lsp.buf.signature_help })
-    m.nnore({ 'gd', vim.lsp.buf.definition })
-    m.nnore({ 'gD', vim.lsp.buf.declaration })
-    m.nnore({ '<leader>gd', vim.lsp.buf.definition })
-    m.nnore({ '<leader>gD', vim.lsp.buf.declaration })
-    m.nnore({ '<leader>gi', vim.lsp.buf.implementation })
-    m.nnore({ '<leader>gy', vim.lsp.buf.type_definition })
-    m.nnore({ '<leader>gr', vim.lsp.buf.references })
-    m.nnore({ '<leader>gn', vim.lsp.buf.rename })
-    m.nnore({
-        '<leader>gf',
-        function() vim.lsp.buf.code_action({ apply = true }) end,
-        desc = 'Apply code action',
-    })
-    -- m.nnore({ '<leader>ga', vim.lsp.buf.code_action })
-    -- m.nnore({ '<leader>gh', vim.lsp.buf.hover })
-    m.nnore({ '<leader>ga', '<Cmd>Lspsaga code_action<CR>' })
-    m.nnore({ '<leader>gh', '<Cmd>Lspsaga hover_doc<CR>' })
-    m.nnore({ '<leader>gp', '<Cmd>Lspsaga peek_definition<CR>' })
-    m.nnore({ '<leader>gs', '<Cmd>Lspsaga finder<CR>' })
-    m.nnore({ '<leader>go', '<Cmd>Lspsaga outline<CR>' })
-
-    m.nore({ '<leader>of', vim.lsp.buf.format })
-    m.nnore({ '<leader>od', vim.diagnostic.setloclist })
-    m.nnore({
-        '<leader>oD',
-        function()
-            local filter = { bufnr = 0 }
-            local enabled = vim.diagnostic.is_enabled(filter)
-            vim.diagnostic.enable(not enabled, filter)
-            vim.notify('Diagnostic ' .. (enabled and 'disabled' or 'enabled'))
-        end,
-        desc = 'Toggle lsp diagnostic',
-    })
-    m.nnore({
-        '<leader>oH',
-        function()
-            local filter = { bufnr = 0 }
-            local enabled = vim.lsp.inlay_hint.is_enabled(filter)
-            vim.lsp.inlay_hint.enable(not enabled, filter)
-            vim.notify('Inlay hint ' .. (enabled and 'disabled' or 'enabled'))
-        end,
-        desc = 'Toggle lsp inlay hint',
-    })
-    m.nnore({ '<leader>oi', vim.diagnostic.open_float })
-    local opts = { severity = vim.diagnostic.severity.ERROR }
-    m.nnore({ '<leader>oj', function() vim.diagnostic.goto_next(opts) end, desc = 'Next error' })
-    m.nnore({ '<leader>ok', function() vim.diagnostic.goto_prev(opts) end, desc = 'Prev error' })
-    m.nnore({ '<leader>oJ', vim.diagnostic.goto_next, desc = 'Next diagnostic' })
-    m.nnore({ '<leader>oK', vim.diagnostic.goto_prev, desc = 'Prev diagnostic' })
-    -- TODO: list for workspace, sources, servers, commands
-    -- m.nnore{'<leader>ow', vim.lsp.buf.xxx_workspace_folder}
-    -- m.nnore{'<leader>oe', vim.lsp.buf.execute_command}
-    m.nnore({ '<leader><leader>o', ':LspStart<Space>' })
-    m.nnore({ '<leader>oR', ':LspRestart<CR>' })
-    m.nnore({ '<leader>ol', ':LspInfo<CR>' })
-    m.nnore({ '<leader>oc', ':Neoconf<CR>' })
-    m.nnore({ '<leader>on', ':Neoconf lsp<CR>' })
-    m.nnore({ '<leader>oN', ':Neoconf show<CR>' })
-    m.nnore({ '<leader>om', ':Mason<CR>' })
-    m.nnore({ '<leader>os', ':CmpStatus<CR>' })
-    m.nnore({ '<leader>oh', '<Cmd>ClangdSwitchSourceHeader<CR>' })
-end
-
-local pkg_nslp = vim.schedule_wrap(function()
-    setup_servers()
-    setup_sources()
-    setup_completion()
-    setup_highlights()
-    setup_lsp_settings()
+local pkg_nlsp = vim.schedule_wrap(function()
+    setup_lsp_servers(require('cmp_nvim_lsp').default_capabilities())
     setup_lsp_mappings()
+    setup_lsp_appearance()
+    setup_lsp_extensions()
+
+    setup_cmp_sources()
+    setup_cmp_completion()
+    setup_cmp_highlights()
 end)
 
 return {
     'hrsh7th/nvim-cmp',
     cond = use.nlsp,
-    config = pkg_nslp,
+    config = pkg_nlsp,
     event = { 'InsertEnter' },
     dependencies = {
+        -- Lsp
         'williamboman/mason.nvim',
         'williamboman/mason-lspconfig.nvim',
         'neovim/nvim-lspconfig',
         'folke/neoconf.nvim',
         { 'folke/lazydev.nvim', ft = 'lua' },
         'nvimdev/lspsaga.nvim',
+        -- Completion
         'ray-x/lsp_signature.nvim',
         'hrsh7th/cmp-nvim-lsp',
         'hrsh7th/cmp-buffer',
