@@ -22,8 +22,7 @@ local function pkg_hop()
     m.nore({ 'F', '<Cmd>HopAnywhereCurrentLine<CR>' })
     m.nore({ '<leader>ms', '<Cmd>HopPatternMW<CR>' })
     m.nore({ '<leader>j', '<Cmd>HopVertical<CR>' })
-    m.nore({ '<leader><leader>j', '<Cmd>HopLine<CR>' })
-    m.nore({ '<leader>mj', '<Cmd>HopLineStart<CR>' })
+    m.nore({ '<leader>k', '<Cmd>HopLineStart<CR>' })
     m.nore({ '<leader>mw', '<Cmd>HopWord<CR>' })
 end
 
@@ -65,8 +64,8 @@ end
 local function pkg_easy_align()
     vim.g.easy_align_bypass_fold = 1
     vim.g.easy_align_ignore_groups = {} -- 默认任何group都进行对齐
-    m.nmap({ '<leader>al', '<Plug>(LiveEasyAlign)ip' })
-    m.xmap({ '<leader>al', '<Plug>(LiveEasyAlign)' })
+    m.nmap({ '<leader>ai', '<Plug>(LiveEasyAlign)ip' })
+    m.xmap({ '<leader>ai', '<Plug>(LiveEasyAlign)' })
 end
 
 -- 书签管理
@@ -315,7 +314,7 @@ end
 
 -- Buffer,Bookmarks,Workspace管理
 local function pkg_popc()
-    -- vim.g.Popc_enableLog = 1
+    vim.g.Popc_enableLog = 1
     vim.g.Popc_jsonPath = vim.env.DotVimLocal
     vim.g.Popc_useFloatingWin = 1
     vim.g.Popc_useNerdSymbols = use.ui.icon
@@ -586,6 +585,8 @@ local function pkg_mini()
             start_with_preview = 'ga',
         },
     })
+    m.nmap({ '<leader>al', 'gaip' })
+    m.vmap({ '<leader>al', 'ga' })
 end
 
 --------------------------------------------------------------------------------

@@ -341,7 +341,7 @@ local _sels = {
     -- lst for kt.E != p
     lst_d = { 'envs', 'barg', 'earg', 'msvc', 'outer', 'style', 'encoding', 'verbose' },
     -- lst for kt.E = p
-    lst_p = { 'key', 'file', 'type', 'envs', 'barg', 'earg', 'msvc', 'style', 'encoding' },
+    lst_p = { 'key', 'file', 'type', 'envs', 'barg', 'earg', 'msvc', 'style', 'encoding', 'verbose' },
     -- lst for CodeReset
     lst_r = { 'envs', 'msvc', 'outer', 'style', 'encoding', 'verbose' },
     dic = {
