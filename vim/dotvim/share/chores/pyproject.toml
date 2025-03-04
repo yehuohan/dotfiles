@@ -8,6 +8,7 @@ skip-string-normalization = false
 
 
 ### ruff
+# fmt: on/off
 [tool.ruff]
 line-length = 88
 indent-width = 4

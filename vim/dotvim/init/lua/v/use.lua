@@ -5,6 +5,7 @@ local use = {
     ndap = false,
     nts = false,
     pkgs = {
+        blink = true,
         coc = false,
         which_key = false,
         im_select = false,

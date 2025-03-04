@@ -616,10 +616,10 @@ endfunction
         }),
     })
     require('luasnip.loaders.from_snipmate').lazy_load({
-        paths = {
-            vim.env.DotVimShare .. '/snippets',
-            vim.env.DotVimDir .. '/bundle/vim-snippets/snippets',
-        },
+        paths = vim.env.DotVimShare .. '/snippets',
+    })
+    require('luasnip.loaders.from_vscode').lazy_load({
+        paths = vim.env.DotVimDir .. '/bundle/friendly-snippets',
     })
     m.inore({
         '<Tab>',
@@ -889,6 +889,14 @@ end
 -- Lazy
 --------------------------------------------------------------------------------
 local pkgs = {
+    -- Libraries
+    { 'nvim-tree/nvim-web-devicons', lazy = true, cond = use.ui.icon },
+    { 'nvim-lua/plenary.nvim', lazy = true },
+    { 'MunifTanjim/nui.nvim', lazy = true },
+    { 'kevinhwang91/promise-async', lazy = true },
+    { 'nvim-neotest/nvim-nio', lazy = true },
+    { 'rafamadriz/friendly-snippets' },
+
     -- Editor
     { 'andymass/vim-matchup', config = pkg_matchup, event = 'VeryLazy' },
     { 'yehuohan/hop.nvim', config = pkg_hop, event = 'VeryLazy' },
@@ -904,11 +912,6 @@ local pkgs = {
     { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' }, event = 'VeryLazy' },
 
     -- Enchance
-    { 'nvim-tree/nvim-web-devicons', lazy = true, cond = use.ui.icon },
-    { 'nvim-lua/plenary.nvim', lazy = true },
-    { 'MunifTanjim/nui.nvim', lazy = true },
-    { 'kevinhwang91/promise-async', lazy = true },
-    { 'nvim-neotest/nvim-nio', lazy = true },
     require('v.pkgs.nstl'),
     { 'ellisonleao/gruvbox.nvim', config = pkg_gruvbox, event = 'VeryLazy' },
     { 'polirritmico/monokai-nightasty.nvim', event = 'VeryLazy' },
@@ -932,7 +935,7 @@ local pkgs = {
     require('v.pkgs.nlsp'),
     require('v.pkgs.nts'),
     { 'stevearc/overseer.nvim' }, -- Setup from v.task
-    { 'L3MON4D3/LuaSnip', config = pkg_snip, dependencies = { 'honza/vim-snippets' }, event = 'VeryLazy' },
+    { 'L3MON4D3/LuaSnip', config = pkg_snip, event = 'VeryLazy' },
     { 'kmontocam/nvim-conda', ft = 'python' },
     { 'stevearc/conform.nvim', config = pkg_conform, event = 'VeryLazy' },
     { 'voldikss/vim-floaterm', config = pkg_floaterm, event = 'VeryLazy' },
