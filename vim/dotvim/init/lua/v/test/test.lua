@@ -25,8 +25,9 @@ function T.chanor()
 end
 
 function T.sqljson()
-    -- { 'kkharji/sqlite.lua', lazy = true }
-    vim.g.sqlite_clib_path = dir_init .. '/../local/lib/sqlite3.dll'
+    if (vim.fn.has('win32') == 1) or (vim.fn.has('win64') == 1) then
+        vim.g.sqlite_clib_path = dir_init .. '/../share/lib/sqlite3.dll'
+    end
     vim.opt.rtp:prepend(dir_bundle .. '/sqlite.lua')
 
     local name = 'sqljson'

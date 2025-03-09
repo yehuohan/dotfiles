@@ -276,9 +276,9 @@ local function setup_cmp_completion()
         },
         snippets = { preset = 'luasnip' },
         sources = {
-            default = { 'lsp', 'path', 'snippets', 'buffer', 'ripgrep', 'env', 'im' },
+            default = { 'lsp', 'path', 'snippets', 'buffer', 'env', 'im' },
             per_filetype = {
-                lua = { 'lazydev', 'lsp', 'path', 'snippets', 'buffer', 'ripgrep', 'env', 'im' },
+                lua = { 'lazydev', 'lsp', 'path', 'snippets', 'buffer', 'env', 'im' },
             },
             providers = {
                 lsp = { name = 'Lsp.' },

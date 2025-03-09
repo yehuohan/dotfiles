@@ -1,6 +1,5 @@
 local use = require('v.use')
 local nlib = require('v.nlib')
-local e = nlib.e
 local m = nlib.m
 
 --------------------------------------------------------------------------------
@@ -20,44 +19,36 @@ local function pkg_hop()
     m.nore({ 'S', '<Cmd>HopChar1<CR>' })
     m.nore({ 'f', '<Cmd>HopChar1CurrentLine<CR>' })
     m.nore({ 'F', '<Cmd>HopAnywhereCurrentLine<CR>' })
-    m.nore({ '<leader>ms', '<Cmd>HopPatternMW<CR>' })
     m.nore({ '<leader>j', '<Cmd>HopVertical<CR>' })
     m.nore({ '<leader>k', '<Cmd>HopLineStart<CR>' })
+    m.nore({ '<leader>ms', '<Cmd>HopPatternMW<CR>' })
     m.nore({ '<leader>mw', '<Cmd>HopWord<CR>' })
 end
 
 -- 多光标编辑
-local function pkg_visual_multi()
-    -- Tab: 切换cursor/extend模式
-    vim.g.VM_mouse_mappings = 0 -- 禁用鼠标
-    vim.g.VM_leader = ','
-    vim.g.VM_maps = {
-        -- stylua: ignore start
-        ['Find Under']           = '<leader><leader>v',
-        ['Find Subword Under']   = '<leader><leader>v',
-        ['Cursor Down']          = '<C-Down>',
-        ['Cursor Up']            = '<C-Up>',
-        ['Select All']           = ',a',
-        ['Start Regex Search']   = ',/',
-        ['Add Cursor At Pos']    = ',,',
-        ['Visual All']           = ',A',
-        ['Visual Regex']         = ',/',
-        ['Visual Cursors']       = ',c',
-        ['Visual Add']           = ',a',
-        ['Find Next']            = 'n',
-        ['Find Prev']            = 'N',
-        ['Goto Next']            = ']',
-        ['Goto Prev']            = '[',
-        ['Skip Region']          = 'q',
-        ['Remove Region']        = 'Q',
-        ['Select Operator']      = 'v',
-        ['Toggle Mappings']      = ',<Space>',
-        ['Toggle Single Region'] = ',<CR>',
-        -- stylua: ignore end
-    }
-    vim.g.VM_custom_remaps = {
-        ['s'] = '<Cmd>HopChar1<CR>',
-    }
+local function pkg_multicursor()
+    local mc = require('multicursor-nvim')
+    mc.setup()
+    m.nnore({ ',c', mc.toggleCursor, desc = 'Toggle cursor' })
+    m.vnore({ ',c', mc.insertVisual, desc = 'Create cursors from visual' })
+    m.vnore({ ',v', function() mc.matchAddCursor(1) end, desc = 'Create cursors from selected' })
+    m.vnore({ ',m', mc.matchCursors, desc = 'Match cursors from viaual' })
+    m.vnore({ ',s', mc.splitCursors, desc = 'Split cursors from viaual' })
+    m.nnore({ ',a', mc.alignCursors, desc = 'Align cursors' })
+    mc.addKeymapLayer(function(lyr)
+        lyr({ 'n', 'x' }, 'n', function() mc.matchAddCursor(1) end)
+        lyr({ 'n', 'x' }, 'N', function() mc.matchAddCursor(-1) end)
+        lyr({ 'n', 'x' }, 'm', function() mc.matchSkipCursor(1) end)
+        lyr({ 'n', 'x' }, 'M', function() mc.matchSkipCursor(-1) end)
+        lyr('n', '<leader><Esc>', mc.disableCursors)
+        lyr('n', '<Esc>', function()
+            if mc.cursorsEnabled() then
+                mc.clearCursors()
+            else
+                mc.enableCursors()
+            end
+        end)
+    end)
 end
 
 -- 字符对齐
@@ -84,15 +75,6 @@ local function pkg_marks()
     })
     m.nnore({ '<leader>ts', ':MarksToggleSigns<CR>' })
     m.nnore({ '<leader>ma', ':MarksListBuf<CR>' })
-end
-
--- 自动高亮当前word
-local function pkg_cursorword()
-    vim.g.cursorword_disable_filetypes = { 'neo-tree' }
-    vim.g.cursorword_disable_at_startup = false
-    vim.g.cursorword_min_width = 2
-    vim.g.cursorword_max_width = 64
-    m.nnore({ '<leader>tg', ':CursorWordToggle<CR>' })
 end
 
 -- 块编辑
@@ -142,7 +124,7 @@ local function pkg_winshift()
     m.nnore({ '<leader>wm', ':WinShift<CR>' })
 end
 
--- 块扩展
+-- 选区扩展
 local function pkg_expand_region()
     m.map({ '<M-r>', '<Plug>(expand_region_expand)' })
     m.map({ '<M-w>', '<Plug>(expand_region_shrink)' })
@@ -522,6 +504,7 @@ local function pkg_telescope()
     })
     telescope.load_extension('fzf')
     telescope.load_extension('frecency')
+    telescope.load_extension('nerdy')
     m.nnore({ '<leader><leader>f', ':Telescope<Space>' })
     m.nnore({
         '<leader>lf',
@@ -543,6 +526,7 @@ local function pkg_telescope()
     m.nnore({ '<leader>ll', ':Telescope current_buffer_fuzzy_find<CR>' })
     m.nnore({ '<leader>lm', ':Telescope keymaps<CR>' })
     m.nnore({ '<leader>lr', ':Telescope frecency<CR>' })
+    m.nnore({ '<leader>ln', ':Telescope nerdy<CR>' })
 end
 
 -- 模糊查找
@@ -579,6 +563,7 @@ end
 
 -- Mini插件库
 local function pkg_mini()
+    -- 自动对齐
     require('mini.align').setup({
         mappings = {
             start = '',
@@ -587,6 +572,37 @@ local function pkg_mini()
     })
     m.nmap({ '<leader>al', 'gaip' })
     m.vmap({ '<leader>al', 'ga' })
+    -- 代码注释
+    require('mini.comment').setup({
+        options = {
+            custom_commentstring = function()
+                if vim.o.ft == 'c' then
+                    return '// %s'
+                end
+            end,
+        },
+    })
+    m.nmap({ '<leader>cl', 'gcc' })
+    m.nmap({ '<leader>cu', 'gcc' })
+    -- 高亮Word
+    require('mini.cursorword').setup({ delay = 10 })
+    -- 自动括号
+    require('mini.pairs').setup()
+    -- 添加包围符
+    require('mini.surround').setup({
+        mappings = {
+            add = 'vs',
+            delete = 'ds',
+            replace = 'cs',
+            find = '',
+            find_left = '',
+            highlight = '',
+            update_n_lines = '',
+            suffix_last = '',
+            suffix_next = '',
+        },
+    })
+    m.nmap({ '<leader>sw', 'vsiw' })
 end
 
 --------------------------------------------------------------------------------
@@ -669,62 +685,6 @@ local function pkg_floaterm()
     m.nnore({ '<leader>mz', ':FloatermNew --cwd=. zsh<CR>' })
     m.nnore({ '<leader>mf', ':FloatermNew --cwd=. fzf --cycle<CR>' })
     m.nnore({ '<leader>mg', ':FloatermNew --cwd=. lazygit<CR>' })
-end
-
--- 代码注释
-local function pkg_comment()
-    require('Comment').setup({
-        toggler = { line = '<leader>cl', block = '<leader>cb' },
-        opleader = { line = 'gc', block = 'gb' },
-        mappings = {
-            basic = true,
-            extra = false,
-            extended = false,
-        },
-    })
-    local comment = require('Comment.api')
-    m.nnore({
-        '<leader>cu',
-        function()
-            -- ignore errors when uncommenting a non-commented line
-            pcall(function() comment.uncomment.linewise.count(vim.v.count1) end)
-        end,
-        desc = 'Uncomment lines',
-    })
-end
-
--- 自动括号
-local function pkg_autopairs()
-    require('nvim-autopairs').setup({
-        map_cr = false,
-    })
-    m.nnore({
-        '<leader>tp',
-        function()
-            local ap = require('nvim-autopairs').state.disabled
-            vim.notify(string.format('Auto pairs: %s', ap))
-            require('nvim-autopairs').state.disabled = not ap
-        end,
-        desc = 'Toggle auto pairs',
-    })
-end
-
--- 添加包围符
-local function pkg_surround()
-    require('nvim-surround').setup({
-        keymaps = {
-            visual = 'vs',
-            visual_line = 'vS',
-            normal = 'ys',
-            normal_line = 'yS',
-            normal_cur = 'ysl',
-            normal_cur_line = 'ysL',
-            delete = 'ds',
-            change = 'cs',
-        },
-    })
-    m.nmap({ '<leader>sw', 'ysiw' })
-    m.nmap({ '<leader>sW', 'ySiw' })
 end
 
 -- 快速高亮
@@ -854,26 +814,22 @@ local function pkg_ccc()
     })
 end
 
--- 字体图标选择器
-local function pkg_icon_picker()
-    require('icon-picker').setup({
-        disable_legacy_commands = true,
-    })
-    m.inore({ '<M-w>', '<Cmd>IconPickerInsert alt_font emoji html_colors nerd_font_v3 symbols<CR>' })
-    m.nnore({ '<leader><leader>i', ':IconPickerInsert<Space>' })
-end
-
 -- 翻译
-local function pkg_translator()
-    vim.g.translator_default_engines = { 'haici', 'bing', 'youdao' }
-    m.nmap({ '<leader>tw', '<Plug>TranslateW' })
-    m.vmap({ '<leader>tw', '<Plug>TranslateWV' })
-    m.nnore({ '<leader><leader>t', ':TranslateW<Space>' })
-    m.vnore({
-        '<leader><leader>t',
-        function() vim.fn.feedkeys(':TranslateW ' .. e.selected(' '), 'n') end,
-        desc = 'Translate',
+local function pkg_trans()
+    require('Trans').setup({
+        dir = vim.env.DotVimLocal .. '/ecdict', -- ultimate.db
+        theme = 'dracula',
+        frontend = {
+            default = {
+                animation = {
+                    open = false,
+                    close = false,
+                },
+            },
+        },
     })
+    m.nore({ '<leader>tw', '<Cmd>Translate<CR>' })
+    m.nnore({ '<leader><leader>t', '<Cmd>TranslateInput<CR>' })
 end
 
 -- 输入法切换
@@ -895,15 +851,23 @@ local pkgs = {
     { 'MunifTanjim/nui.nvim', lazy = true },
     { 'kevinhwang91/promise-async', lazy = true },
     { 'nvim-neotest/nvim-nio', lazy = true },
+    {
+        'kkharji/sqlite.lua',
+        lazy = true,
+        init = function()
+            if IsWin() then
+                vim.g.sqlite_clib_path = vim.env.DotVimShare .. '/lib/sqlite3.dll'
+            end
+        end,
+    },
     { 'rafamadriz/friendly-snippets' },
 
     -- Editor
     { 'andymass/vim-matchup', config = pkg_matchup, event = 'VeryLazy' },
     { 'yehuohan/hop.nvim', config = pkg_hop, event = 'VeryLazy' },
-    { 'mg979/vim-visual-multi', init = pkg_visual_multi, event = 'VeryLazy' },
+    { 'jake-stewart/multicursor.nvim', config = pkg_multicursor, event = 'VeryLazy' },
     { 'junegunn/vim-easy-align', config = pkg_easy_align, event = 'VeryLazy' },
     { 'yehuohan/marks.nvim', config = pkg_marks, event = 'VeryLazy' },
-    { 'xiyaowong/nvim-cursorword', config = pkg_cursorword, event = 'VeryLazy' },
     { 'booperlv/nvim-gomove', config = pkg_gomove, event = 'VeryLazy' },
     { 's1n7ax/nvim-window-picker', config = pkg_window_picker, event = 'VeryLazy' },
     { 'sindrets/winshift.nvim', config = pkg_winshift, keys = { '<leader>wm' } },
@@ -926,9 +890,10 @@ local pkgs = {
     { 'nvim-telescope/telescope.nvim', config = pkg_telescope, event = 'VeryLazy' },
     { 'nvim-telescope/telescope-fzf-native.nvim', lazy = true, build = 'make' },
     { 'nvim-telescope/telescope-frecency.nvim', lazy = true },
+    { '2kabhishek/nerdy.nvim', lazy = true },
     { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' }, event = 'VeryLazy' },
     { 'folke/which-key.nvim', cond = use.pkgs.which_key, config = pkg_which_key, event = 'VeryLazy' },
-    { 'echasnovski/mini.align', config = pkg_mini, event = 'VeryLazy' },
+    { 'echasnovski/mini.nvim', version = '*', config = pkg_mini, event = 'VeryLazy' },
 
     -- Coding
     require('v.pkgs.ndap'),
@@ -939,9 +904,6 @@ local pkgs = {
     { 'kmontocam/nvim-conda', ft = 'python' },
     { 'stevearc/conform.nvim', config = pkg_conform, event = 'VeryLazy' },
     { 'voldikss/vim-floaterm', config = pkg_floaterm, event = 'VeryLazy' },
-    { 'numToStr/Comment.nvim', config = pkg_comment, event = 'VeryLazy' },
-    { 'windwp/nvim-autopairs', config = pkg_autopairs, event = 'VeryLazy' },
-    { 'kylechui/nvim-surround', config = pkg_surround, event = 'VeryLazy' },
     { 't9md/vim-quickhl', config = pkg_quickhl, event = 'VeryLazy' },
     { 'HiPhish/rainbow-delimiters.nvim', config = pkg_rainbow, submodules = false, event = 'VeryLazy' },
     { 'shellRaining/hlchunk.nvim', config = pkg_hlchunk, event = 'VeryLazy' },
@@ -954,9 +916,8 @@ local pkgs = {
     { 'chomosuke/typst-preview.nvim', config = pkg_typst, ft = 'typst' },
     { 'lervag/vimtex', config = pkg_tex, ft = 'tex' },
     { 'uga-rosa/ccc.nvim', config = pkg_ccc, event = 'VeryLazy' },
-    { 'ziontee113/icon-picker.nvim', config = pkg_icon_picker, event = 'VeryLazy' },
     { 'itchyny/screensaver.vim', keys = { { '<leader>ss', '<Cmd>ScreenSaver clock<CR>' } } },
-    { 'voldikss/vim-translator', config = pkg_translator, event = 'VeryLazy' },
+    { 'JuanZoran/Trans.nvim', config = pkg_trans, event = 'VeryLazy' },
     { 'keaising/im-select.nvim', cond = use.pkgs.im_select, config = pkg_im_select, event = 'VeryLazy' },
 }
 
@@ -1013,9 +974,9 @@ local function pkg_lazy()
         group = 'v.Pkgs',
         callback = function()
             vim.api.nvim_set_hl(0, 'HopPreview', { fg = '#b8bb26', bold = true, ctermfg = 142 })
-            vim.api.nvim_set_hl(0, 'CursorWord', { bg = '#505060', ctermbg = 60 })
+            vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#505060', ctermbg = 60 })
+            vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { link = 'MiniCursorword' })
             vim.api.nvim_set_hl(0, 'FloatermBorder', { link = 'Constant' })
-            vim.api.nvim_set_hl(0, 'TranslatorBorder', { link = 'Constant' })
         end,
     })
 

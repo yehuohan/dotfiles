@@ -36,6 +36,7 @@ local lst = {
     git = {
         vim.v.null,
         'https://kkgithub.com',
+        'https://bgithub.xyz',
     },
 }
 
