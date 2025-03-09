@@ -381,7 +381,7 @@ local function setup()
     -- Search with internet
     local bing = function(txt) return 'https://cn.bing.com/search?q=' .. txt end
     local google = function(txt) return 'https://google.com/search?q=' .. txt end
-    local github = function(txt) return '' .. txt end
+    local github = function(txt) return 'https://github.com/search?q=' .. txt end
     local smart = function(txt, opts)
         local si, ei, res = txt:find([[(h?[tf]tps?://[^ ()%[%]{}<>]+)]])
         if res then

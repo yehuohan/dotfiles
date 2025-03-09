@@ -301,8 +301,8 @@ let g:startify_custom_header = 'startify#pad(startify#fortune#cowsay(PkgTodo(), 
 nnoremap <leader>su :Startify<CR>
 
 function! PkgTodo()
-    if filereadable($DotVimLocal.'/todo.md')
-        let l:todo = filter(readfile($DotVimLocal.'/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
+    if filereadable($DotVimLocal . '/todo.md')
+        let l:todo = filter(readfile($DotVimLocal . '/todo.md'), 'v:val !~ "\\m^[ \t]*$"')
         return empty(l:todo) ? '' : l:todo
     else
         return ''
@@ -424,7 +424,7 @@ augroup END
 "  * 'py -3 ...' => 'python ...'
 " 然后运行 ':LeaderfInstallCExtension'
 if s:use.has_py
-let g:Lf_CacheDirectory = $DotVimLocal
+let g:Lf_CacheDirectory = $DotVimDir . '/bundle/LeaderF/.LeaderF'
 let g:Lf_PreviewInPopup = 1
 let g:Lf_PreviewResult = {'File': 0, 'Buffer': 0, 'Mru': 0, 'Tag': 0, 'Rg': 0}
 let g:Lf_StlSeparator = s:use.ui.icon ? {'left': '', 'right': ''} : {'left': '', 'right': ''}
@@ -650,7 +650,7 @@ nnoremap <leader>tb
 " }}}
 
 " vimtex {{{ Latex
-let g:vimtex_cache_root = $DotVimLocal . '/.vimtex'
+let g:vimtex_cache_root = $DotVimDir . '/bundle/vimtex/.vimtex'
 let g:vimtex_view_general_viewer = 'sioyek'
 let g:vimtex_complete_enabled = 1       " 使用vimtex#complete#omnifunc补全
 let g:vimtex_complete_close_braces = 1
@@ -710,7 +710,7 @@ endif
 if !empty(s:use.xgit)
     let g:plug_url_format = s:use.xgit . '/%s.git'
 endif
-call plug#begin($DotVimDir.'/bundle')  " 设置插件位置，且自动设置了syntax enable和filetype plugin indent on
+call plug#begin($DotVimDir . '/bundle')  " 设置插件位置，且自动设置了syntax enable和filetype plugin indent on
     " editor
     Plug 'andymass/vim-matchup'
     Plug 'yehuohan/vim-easymotion'
