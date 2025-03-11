@@ -377,7 +377,9 @@ local function setup_cmp_completion()
     m.imap({ '<C-j>', '<M-j>' })
     m.imap({ '<C-k>', '<M-k>' })
     m.nnore({ '<leader>os', ':BlinkCmp status<CR>' })
+end
 
+local function setup_cmp_highlights()
     local api = vim.api
     -- stylua: ignore start
     api.nvim_set_hl(0, 'BlinkCmpMenu'               , {link = 'Pmenu'})
@@ -432,6 +434,11 @@ local pkg_nlsp = vim.schedule_wrap(function()
 
     setup_cmp_sources()
     setup_cmp_completion()
+    setup_cmp_highlights()
+    vim.api.nvim_create_autocmd('ColorScheme', {
+        group = 'v.Pkgs',
+        callback = setup_cmp_highlights,
+    })
 end)
 
 if use.pkgs.blink then
@@ -529,7 +536,7 @@ local function setup_cmp_completion_deprecated()
     end
 
     --- Get select options
-    ---@param count(integer) +1 for next and -1 for prev
+    --- @param count(integer) +1 for next and -1 for prev
     local function cmp_select(count)
         local cmp = require('cmp')
         local behavior = cmp.SelectBehavior.Insert

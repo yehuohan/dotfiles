@@ -34,14 +34,12 @@ nnoremap <M-]> <Cmd>set foldlevel+=1<CR>
 " 滚屏
 nnoremap <C-j> <C-e>
 nnoremap <C-k> <C-y>
-nnoremap <M-j> <C-d>
-nnoremap <M-k> <C-u>
-vnoremap <M-f> <C-d>
-vnoremap <M-d> <C-u>
 nnoremap <C-h> zh
 nnoremap <C-l> zl
-nnoremap <M-h> 16zh
-nnoremap <M-l> 16zl
+noremap <M-j> <C-d>
+noremap <M-k> <C-u>
+noremap <M-h> 16zh
+noremap <M-l> 16zl
 noremap zh zt
 noremap zl zb
 " 命令行

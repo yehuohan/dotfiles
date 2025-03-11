@@ -39,6 +39,9 @@ return function(dotvim)
     vim.env.DotVimShare = dotvim .. '/share'
     vim.env.DotVimLocal = dotvim .. '/local'
     vim.g.mapleader = ' '
+    vim.keymap.set('n', ';', ':', { noremap = true })
+    vim.keymap.set('v', ';', ':', { noremap = true })
+    vim.keymap.set('n', ':', ';', { noremap = true })
 
     setup_pkgs(pkgs)
 end
