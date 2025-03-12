@@ -321,6 +321,11 @@ local function setup()
     -- Fast commands
     m.nnore({ '<leader>se', function() fn.PopSelection(fast_cmds) end, desc = 'Fast commands' })
 
+    -- Toggle terminal
+    m.tnore({ '<Esc>', '<C-\\><C-n>' })
+    m.nnore({ '<leader>tz', e.buf_term, desc = 'Toggle terminal' })
+    m.nnore({ '<leader>mz', function() e.buf_term('zsh') end, desc = 'Toggle zsh terminal' })
+
     -- New chore file
     local path = vim.env.DotVimShare .. '/chores'
     m.nnore({ '<leader>sl', function() e.buf_etpl(path, true) end, desc = 'New chore file under root' })

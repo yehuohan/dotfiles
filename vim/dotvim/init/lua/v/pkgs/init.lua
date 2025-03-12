@@ -12,12 +12,6 @@ local function pkg_matchup()
     m.map({ 'M', '%' })
 end
 
--- 选区扩展
-local function pkg_expand_region()
-    m.map({ '<M-r>', '<Plug>(expand_region_expand)' })
-    m.map({ '<M-w>', '<Plug>(expand_region_shrink)' })
-end
-
 -- 快速高亮
 local function pkg_quickhl()
     m.map({ '<leader>hw', '<Plug>(quickhl-manual-this)' })
@@ -186,32 +180,6 @@ local function pkg_marks()
     })
     m.nnore({ '<leader>ts', ':MarksToggleSigns<CR>' })
     m.nnore({ '<leader>ma', ':MarksListBuf<CR>' })
-end
-
--- 多光标编辑
-local function pkg_multicursor()
-    local mc = require('multicursor-nvim')
-    mc.setup()
-    m.nnore({ ',c', mc.toggleCursor, desc = 'Toggle cursor' })
-    m.vnore({ ',c', mc.insertVisual, desc = 'Create cursors from visual' })
-    m.vnore({ ',v', function() mc.matchAddCursor(1) end, desc = 'Create cursors from selected' })
-    m.vnore({ ',m', mc.matchCursors, desc = 'Match cursors from viaual' })
-    m.vnore({ ',s', mc.splitCursors, desc = 'Split cursors from viaual' })
-    m.nnore({ ',a', mc.alignCursors, desc = 'Align cursors' })
-    mc.addKeymapLayer(function(lyr)
-        lyr({ 'n', 'x' }, 'n', function() mc.matchAddCursor(1) end)
-        lyr({ 'n', 'x' }, 'N', function() mc.matchAddCursor(-1) end)
-        lyr({ 'n', 'x' }, 'm', function() mc.matchSkipCursor(1) end)
-        lyr({ 'n', 'x' }, 'M', function() mc.matchSkipCursor(-1) end)
-        lyr('n', '<leader><Esc>', mc.disableCursors)
-        lyr('n', '<Esc>', function()
-            if mc.cursorsEnabled() then
-                mc.clearCursors()
-            else
-                mc.enableCursors()
-            end
-        end)
-    end)
 end
 
 -- 代码折叠
@@ -439,28 +407,6 @@ local function pkg_popc()
     }
     m.nnore({ '<leader><leader>p', ':PopSet<Space>' })
     m.nnore({ '<leader>sp', ':PopSet popset<CR>' })
-    m.nnore({ '<leader><leader>m', '<Cmd>Popc Floaterm<CR>' })
-end
-
--- 终端浮窗
-local function pkg_floaterm()
-    m.tnore({ '<C-l>', '<C-\\><C-n><C-w>' })
-    m.tnore({ '<Esc>', '<C-\\><C-n>' })
-    m.nnore({ '<leader>tz', ':FloatermToggle<CR>' })
-    m.nnore({ '<leader><leader>z', ':FloatermNew --cwd=.<Space>' })
-    m.tnore({ '<M-u>', '<C-\\><C-n>:FloatermFirst<CR>' })
-    m.tnore({ '<M-i>', '<C-\\><C-n>:FloatermPrev<CR>' })
-    m.tnore({ '<M-o>', '<C-\\><C-n>:FloatermNext<CR>' })
-    m.tnore({ '<M-p>', '<C-\\><C-n>:FloatermLast<CR>' })
-    m.tnore({ '<M-q>', '<C-\\><C-n>:FloatermKill<CR>' })
-    m.tnore({ '<M-h>', '<C-\\><C-n>:FloatermHide<CR>' })
-    m.tnore({ '<M-n>', '<C-\\><C-n>:FloatermUpdate --height=0.6 --width=0.6<CR>' })
-    m.tnore({ '<M-m>', '<C-\\><C-n>:FloatermUpdate --height=0.9 --width=0.9<CR>' })
-    m.tnore({ '<M-r>', '<C-\\><C-n>:FloatermUpdate --position=topright<CR>' })
-    m.tnore({ '<M-c>', '<C-\\><C-n>:FloatermUpdate --position=center<CR>' })
-    m.nnore({ '<leader>mz', ':FloatermNew --cwd=. zsh<CR>' })
-    m.nnore({ '<leader>mf', ':FloatermNew --cwd=. fzf --cycle<CR>' })
-    m.nnore({ '<leader>mg', ':FloatermNew --cwd=. lazygit<CR>' })
 end
 
 -- Mini插件库
@@ -527,7 +473,7 @@ local function pkg_snacks()
     require('snacks').setup({
         -- 显示缩进
         indent = {
-            indent = { char = '⁞' },
+            indent = { char = '┊' },
             scope = { enabled = false, char = '┋' },
         },
         -- 消息提示
@@ -679,6 +625,32 @@ local function pkg_conform()
         },
     })
     m.nore({ '<leader>fo', conform.format, desc = 'Format code' })
+end
+
+-- 多光标编辑
+local function pkg_multicursor()
+    local mc = require('multicursor-nvim')
+    mc.setup()
+    m.nnore({ ',c', mc.toggleCursor, desc = 'Toggle cursor' })
+    m.vnore({ ',c', mc.insertVisual, desc = 'Create cursors from visual' })
+    m.vnore({ ',v', function() mc.matchAddCursor(1) end, desc = 'Create cursors from selected' })
+    m.vnore({ ',m', mc.matchCursors, desc = 'Match cursors from viaual' })
+    m.vnore({ ',s', mc.splitCursors, desc = 'Split cursors from viaual' })
+    m.nnore({ ',a', mc.alignCursors, desc = 'Align cursors' })
+    mc.addKeymapLayer(function(lyr)
+        lyr({ 'n', 'x' }, 'n', function() mc.matchAddCursor(1) end)
+        lyr({ 'n', 'x' }, 'N', function() mc.matchAddCursor(-1) end)
+        lyr({ 'n', 'x' }, 'm', function() mc.matchSkipCursor(1) end)
+        lyr({ 'n', 'x' }, 'M', function() mc.matchSkipCursor(-1) end)
+        lyr('n', '<leader><Esc>', mc.disableCursors)
+        lyr('n', '<Esc>', function()
+            if mc.cursorsEnabled() then
+                mc.clearCursors()
+            else
+                mc.enableCursors()
+            end
+        end)
+    end)
 end
 
 --------------------------------------------------------------------------------
@@ -839,7 +811,6 @@ local pkgs = {
 
     -- Editor
     { 'andymass/vim-matchup', config = pkg_matchup, event = 'VeryLazy' },
-    { 'terryma/vim-expand-region', config = pkg_expand_region, event = 'VeryLazy' },
     { 't9md/vim-quickhl', config = pkg_quickhl, event = 'VeryLazy' },
     { 's1n7ax/nvim-window-picker', config = pkg_window_picker, event = 'VeryLazy' },
     { 'sindrets/winshift.nvim', config = pkg_winshift, keys = { '<leader>wm' } },
@@ -851,14 +822,11 @@ local pkgs = {
     { 'stevearc/dressing.nvim', config = pkg_dressing, event = 'VeryLazy' },
     { 'yehuohan/hop.nvim', config = pkg_hop, event = 'VeryLazy' },
     { 'yehuohan/marks.nvim', config = pkg_marks, event = 'VeryLazy' },
-    { 'jake-stewart/multicursor.nvim', config = pkg_multicursor, event = 'VeryLazy' },
     { 'kevinhwang91/nvim-ufo', config = pkg_ufo, event = 'VeryLazy' },
     { 'kevinhwang91/nvim-bqf', config = pkg_bqf, ft = 'qf' },
     { 'nvim-neo-tree/neo-tree.nvim', config = pkg_neotree, event = 'VeryLazy' },
     { 'yehuohan/popc', init = pkg_popc, event = 'VeryLazy' },
     { 'yehuohan/popset', dependencies = { 'yehuohan/popc' }, event = 'VeryLazy' },
-    { 'yehuohan/popc-floaterm', dependencies = { 'yehuohan/popc' }, event = 'VeryLazy' },
-    { 'voldikss/vim-floaterm', config = pkg_floaterm, event = 'VeryLazy' },
     { 'echasnovski/mini.nvim', config = pkg_mini, event = 'VeryLazy' },
     { 'folke/snacks.nvim', config = pkg_snacks, event = 'VeryLazy' },
 
@@ -875,6 +843,7 @@ local pkgs = {
     { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' }, event = 'VeryLazy' },
     { 'L3MON4D3/LuaSnip', config = pkg_snip, event = 'VeryLazy' },
     { 'stevearc/conform.nvim', config = pkg_conform, event = 'VeryLazy' },
+    { 'jake-stewart/multicursor.nvim', config = pkg_multicursor, event = 'VeryLazy' },
     { 'kmontocam/nvim-conda', ft = 'python' },
     { 'rust-lang/rust.vim', event = 'VeryLazy' },
     { 'NoahTheDuke/vim-just', ft = 'just' },
@@ -946,7 +915,6 @@ local function pkg_lazy()
             vim.api.nvim_set_hl(0, 'HopPreview', { fg = '#b8bb26', bold = true, ctermfg = 142 })
             vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#505060', ctermbg = 60 })
             vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', {})
-            vim.api.nvim_set_hl(0, 'FloatermBorder', { link = 'Constant' })
         end,
     })
 

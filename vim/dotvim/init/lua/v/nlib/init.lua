@@ -475,6 +475,47 @@ function _e.buf_etpl(path, under_root)
     )
 end
 
+--- @type table
+local __term = { hbuf = nil, hwin = nil }
+--- Toggle buffer terminal
+--- @param cmd string|nil Command to run in terminal
+function _e.buf_term(cmd)
+    -- Toggle terminal
+    if __term.hwin and vim.api.nvim_win_is_valid(__term.hwin) then
+        vim.api.nvim_win_close(__term.hwin, false)
+        __term.hwin = nil
+        return
+    end
+    -- New terminal
+    local hbuf = __term.hbuf or api.nvim_create_buf(false, true)
+    __term.hwin = api.nvim_open_win(hbuf, true, {
+        relative = 'editor',
+        width = math.floor(0.6 * vim.o.columns),
+        height = math.floor(0.6 * vim.o.lines),
+        col = math.floor(0.2 * vim.o.columns),
+        row = math.floor(0.2 * vim.o.lines),
+        style = 'minimal',
+        border = 'single',
+    })
+    vim.api.nvim_set_option_value(
+        'winhighlight',
+        'NormalFloat:Normal,FloatBorder:Normal',
+        { scope = 'local', win = __term.hwin }
+    )
+    if not __term.hbuf then
+        __term.hbuf = hbuf
+        vim.fn.termopen({ cmd or vim.o.shell }, {
+            pty = true,
+            on_exit = function()
+                vim.api.nvim_win_close(__term.hwin, false)
+                vim.api.nvim_buf_delete(__term.hbuf, { force = true })
+                __term = { hbuf = nil, hwin = nil }
+            end,
+        })
+    end
+    vim.cmd.startinsert()
+end
+
 --- Resize window by moving spliter
 --- @param dir boolean Move bottom(true) or right(false) spliter
 --- @param inc integer The size to move
