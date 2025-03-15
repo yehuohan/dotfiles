@@ -402,8 +402,8 @@ local entry = async(function(kt, bang)
             lines = { string.format('}}} [%s] Completed', os.date('%H:%M:%S')) },
             efm = ' ',
         })
-        vim.api.nvim_set_option_value('foldmethod', 'marker', { win = 0 })
-        vim.api.nvim_set_option_value('foldmarker', '{{{,}}}', { win = 0 })
+        vim.wo[0].foldmethod = 'marker'
+        vim.wo[0].foldmarker = '{{{,}}}'
         vim.fn.win_execute(0, 'silent! normal! zO')
         return
     end

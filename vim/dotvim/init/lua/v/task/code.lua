@@ -136,7 +136,7 @@ local function pat_file(pattern)
     return files[#files]
 end
 
---- @class CodeHandles All task handles to produce commands
+--- @class CodeHandler All task handles to produce commands
 local _hdls = {}
 
 function _hdls.nvim(cfg)
@@ -238,7 +238,7 @@ function _hdls.cargo(cfg)
 end
 
 --- Dispatch task handle and return task command
---- @param rhs CodeHandleMap
+--- @param rhs CodeHandlerMap
 --- @param cfg TaskConfig
 --- @return string
 local function dispatch(rhs, cfg)
@@ -252,7 +252,7 @@ local function dispatch(rhs, cfg)
     return _hdls[rhs.fn](cfg)
 end
 
---- @class CodeHandleArgs Provide more args for _sels
+--- @class CodeHandlerArgs Provide more args for _sels
 local _args = {}
 
 function _args.nvim(dic, file)
@@ -292,7 +292,7 @@ function _args.cargo(dic, file)
 end
 
 --- Update _sels.dic
---- @param rhs CodeHandleMap
+--- @param rhs CodeHandlerMap
 --- @param dic table The _sels.dic to update
 --- @return boolean
 local function update_sels(rhs, dic)
@@ -311,13 +311,13 @@ local function update_sels(rhs, dic)
     return true
 end
 
---- @class CodeHandleMap
---- @field fn string Function name for CodeHandles
+--- @class CodeHandlerMap
+--- @field fn string Function name for CodeHandler
 --- @field desc string
 --- @field pat string|nil File pattern to get item from CodeTable or PackTable
 
 -- stylua: ignore start
---- @type table<string,CodeHandleMap>
+--- @type table<string,CodeHandlerMap>
 local _maps = {
     { 'l', 'f', 'j', 'm', 'o' },
     l = { fn = 'nvim',   desc = 'Nvim lua' },

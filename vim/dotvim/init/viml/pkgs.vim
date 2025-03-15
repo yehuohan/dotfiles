@@ -597,28 +597,6 @@ nnoremap <leader>rk :AsyncStop<CR>
 nnoremap <leader>rK :AsyncReset<CR>
 " }}}
 
-" floaterm {{{ 终端浮窗
-set termwinkey=<C-l>
-tnoremap <Esc> <C-l>N
-nnoremap <leader>tz :FloatermToggle<CR>
-nnoremap <leader><leader>m :Popc Floaterm<CR>
-nnoremap <leader><leader>z :FloatermNew --cwd=.<Space>
-tnoremap <M-u> <C-\><C-n>:FloatermFirst<CR>
-tnoremap <M-i> <C-\><C-n>:FloatermPrev<CR>
-tnoremap <M-o> <C-\><C-n>:FloatermNext<CR>
-tnoremap <M-p> <C-\><C-n>:FloatermLast<CR>
-tnoremap <M-q> <C-\><C-n>:FloatermKill<CR>
-tnoremap <M-h> <C-\><C-n>:FloatermHide<CR>
-tnoremap <M-n> <C-\><C-n>:FloatermUpdate --height=0.6 --width=0.6<CR>
-tnoremap <M-m> <C-\><C-n>:FloatermUpdate --height=0.9 --width=0.9<CR>
-tnoremap <M-r> <C-\><C-n>:FloatermUpdate --position=topright<CR>
-tnoremap <M-c> <C-\><C-n>:FloatermUpdate --position=center<CR>
-nnoremap <leader>mz :FloatermNew --cwd=. zsh<CR>
-nnoremap <leader>mf :FloatermNew --cwd=. fzf --cycle<CR>
-nnoremap <leader>mg :FloatermNew --cwd=. lazygit<CR>
-highlight! default link FloatermBorder Constant
-" }}}
-
 " Vista {{{ 代码Tags
 let g:vista_echo_cursor = 0
 let g:vista_stay_on_open = 0
@@ -741,7 +719,6 @@ endif
     Plug 'Yggdroot/indentLine'
     Plug 'yehuohan/popc'
     Plug 'yehuohan/popset'
-    Plug 'yehuohan/popc-floaterm'
     Plug 'scrooloose/nerdtree', {'on': ['NERDTreeToggle', 'NERDTree']}
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
@@ -761,7 +738,6 @@ endif
     Plug 'tpope/vim-surround'
     Plug 't9md/vim-quickhl'
     Plug 'skywind3000/asyncrun.vim'
-    Plug 'voldikss/vim-floaterm'
     Plug 'liuchengxu/vista.vim', {'on': 'Vista'}
     Plug 'bfrg/vim-cpp-modern', {'for': ['c', 'cpp']}
     Plug 'rust-lang/rust.vim'

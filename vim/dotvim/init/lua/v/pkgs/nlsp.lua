@@ -461,6 +461,7 @@ if use.pkgs.blink then
             { 'yehuohan/blink-cmp-im', dependencies = { 'yehuohan/cmp-im-zh' } },
             'mikavilpas/blink-ripgrep.nvim',
             'bydlw98/blink-cmp-env',
+            -- { 'mrcjkb/rustaceanvim', ft = { 'rust' } },
         },
     }
 end

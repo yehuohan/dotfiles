@@ -134,6 +134,15 @@ for t in split('q w e r t y u i o p a s d f g h j k l z x c v b n m 0 1 2 3 4 5 
 endfor
 " }}}
 
+" Terminal {{{
+tnoremap <Esc> <C-\><C-n>
+tnoremap <M-h> <Cmd>lua require('v.nlib').new_terminal()<CR>
+tnoremap <M-q> <Cmd>lua require('v.nlib').new_terminal({ quit = true })<CR>
+nnoremap <leader>tz <Cmd>lua require('v.nlib').new_terminal()<CR>
+nnoremap <leader>tv <Cmd>lua require('v.nlib').new_terminal({ bottom = true })<CR>
+nnoremap <leader>mz <Cmd>lua require('v.nlib').new_terminal({ cmd = { 'zsh' } })<CR>
+" }}}
+
 " Tab, Window, Buffer {{{
 " tab/buffer切换(使用Popc的tab切换)
 "nnoremap <M-u> gT

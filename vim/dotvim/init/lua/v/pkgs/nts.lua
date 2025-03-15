@@ -24,9 +24,9 @@ local function pkg_nts()
         incremental_selection = {
             enable = true,
             keymaps = {
-                init_selection = '<M-g>',
-                node_incremental = '<M-g>',
-                node_decremental = '<M-a>',
+                init_selection = '<M-r>',
+                node_incremental = '<M-r>',
+                node_decremental = '<M-w>',
                 scope_incremental = '<M-q>',
             },
         },

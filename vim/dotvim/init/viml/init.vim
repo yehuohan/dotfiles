@@ -42,6 +42,7 @@ let mapleader="\<Space>"                " Space leader
 nnoremap ; :
 vnoremap ; :
 nnoremap : ;
+tnoremap <Esc> <C-l>N
 map <CR> <CR>
 map <Tab> <Tab>
 " }}}

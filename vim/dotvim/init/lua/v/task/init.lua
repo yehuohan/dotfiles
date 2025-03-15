@@ -108,9 +108,9 @@ function M.qf_adapt(qfwin)
         vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| {{{ / conceal]] } })
         vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| }}} / conceal]] } })
     end)
-    vim.api.nvim_set_option_value('number', false, { win = qfwin })
-    vim.api.nvim_set_option_value('relativenumber', false, { win = qfwin })
-    vim.api.nvim_set_option_value('signcolumn', 'no', { win = qfwin })
+    vim.wo[qfwin].number = false
+    vim.wo[qfwin].relativenumber = false
+    vim.wo[qfwin].signcolumn = 'no'
 end
 
 --- Highlight specified strings from quickfix output

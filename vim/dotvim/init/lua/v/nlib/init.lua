@@ -150,14 +150,13 @@ function M.new_configer(opts)
     return opts
 end
 
---- @alias Chanor function A channel lines processor for terminal's stdout
---- @class ChanorOptions Chanor options according to OnTaskOutput.params
+--- @class new_chanor.Opts Chanor options according to `Tout.Params`
 --- @field style string|nil
 --- @field verbose string|nil
 
 --- Create a chanor
---- @param opts ChanorOptions|nil
---- @return Chanor
+--- @param opts new_chanor.Opts|nil
+--- @return function chanor A channel lines processor for terminal's stdout
 function M.new_chanor(opts)
     local style = opts and opts.style
     local verbose = opts and opts.verbose or ''
@@ -234,6 +233,78 @@ function M.new_chanor(opts)
 
         return lines, highlights
     end
+end
+
+--- @class new_terminal.Opts
+--- @field cmd table The command to run
+--- @field exit boolean Exit terminal
+--- @field bottom boolean Split terminal at bottom window
+
+--- @type table
+local __term = { hbuf = nil, hwin = nil }
+--- Create a terminal
+--- @param opts new_terminal.Opts|nil
+function M.new_terminal(opts)
+    local del_terminal = function()
+        if __term.hwin and vim.api.nvim_win_is_valid(__term.hwin) then
+            vim.api.nvim_win_close(__term.hwin, false)
+        end
+        if __term.hbuf and vim.api.nvim_buf_is_valid(__term.hbuf) then
+            vim.api.nvim_buf_delete(__term.hbuf, { force = true })
+        end
+        __term = { hbuf = nil, hwin = nil }
+    end
+
+    -- Exit terminal
+    if opts and opts.exit then
+        del_terminal()
+        return
+    end
+
+    -- Hide terminal
+    if __term.hwin and vim.api.nvim_win_is_valid(__term.hwin) then
+        vim.api.nvim_win_close(__term.hwin, false)
+        __term.hwin = nil
+        return
+    end
+
+    -- Create window
+    local hbuf = __term.hbuf or api.nvim_create_buf(false, true)
+    local hwin
+    if opts and opts.bottom then
+        vim.cmd.split({ mods = { split = 'botright' }, range = { 12 } })
+        hwin = vim.api.nvim_get_current_win()
+        vim.wo[hwin].number = false
+        vim.wo[hwin].relativenumber = false
+        vim.wo[hwin].signcolumn = 'no'
+        vim.api.nvim_win_set_buf(hwin, hbuf)
+    else
+        hwin = api.nvim_open_win(hbuf, true, {
+            relative = 'editor',
+            width = math.floor(0.6 * vim.o.columns),
+            height = math.floor(0.6 * vim.o.lines),
+            col = math.floor(0.2 * vim.o.columns),
+            row = math.floor(0.2 * vim.o.lines),
+            style = 'minimal',
+            border = 'single',
+        })
+        vim.wo[hwin].winhighlight = 'NormalFloat:Normal,FloatBorder:Normal'
+    end
+    __term.hwin = hwin
+
+    -- Open terminal
+    if not __term.hbuf then
+        __term.hbuf = hbuf
+        vim.fn.termopen(opts and opts.cmd or { vim.o.shell }, {
+            on_exit = function()
+                -- Delete with `opts.exit` will still invoke `on_exit`
+                if __term.hbuf == hbuf then
+                    del_terminal()
+                end
+            end,
+        })
+    end
+    vim.cmd.startinsert()
 end
 
 --------------------------------------------------------------------------------
@@ -315,7 +386,7 @@ function _e.selected(sep)
     return res
 end
 
---- @alias PipeInpHandler fun(table):string
+--- @alias buf_pipe.InpHandler fun(table):string
 _e.buf_inp = {
     input = fn.input,
     word = function() return fn.expand('<cword>') end,
@@ -325,7 +396,7 @@ _e.buf_inp = {
     end,
 }
 
---- @alias PipeOutHandler fun(string, opts:table)
+--- @alias buf_pipe.OutHandler fun(string, opts:table)
 _e.buf_out = {
     append = function(txt) fn.append(fn.line('.'), fn.split(txt, '\n')) end,
     replace = function(txt) fn.setline(fn.line('.'), txt) end,
@@ -354,7 +425,7 @@ _e.buf_out = {
     end,
 }
 
---- @alias PipeProcHandler fun(string, opts:table):string
+--- @alias buf_pipe.ProcHandler fun(string, opts:table):string
 _e.buf_proc = {
     trim = function(txt)
         local lines = fn.split(txt, '\n')
@@ -375,7 +446,7 @@ _e.buf_proc = {
     end,
 }
 
---- @class PipeOptions Options for `inp`, `out` and `proc`
+--- @class buf_pipe.Opts Options for `inp`, `out` and `proc`
 --- @field mode string 'n' or 'v'
 --- @field prompt string For `_e.buf_inp.input`
 --- @field completion string For `_e.buf_inp.input`
@@ -383,10 +454,10 @@ _e.buf_proc = {
 --- @field eval string For `_e.buf_proc.eval_math`
 
 --- Pipe the buffer text from input to output after process
---- @param inp string|PipeInpHandler|nil Only for normal mode
---- @param out string|PipeOutHandler
---- @param proc string|PipeProcHandler|nil
---- @param opts PipeOptions|nil
+--- @param inp string|buf_pipe.InpHandler|nil Only for normal mode
+--- @param out string|buf_pipe.OutHandler
+--- @param proc string|buf_pipe.ProcHandler|nil
+--- @param opts buf_pipe.Opts|nil
 function _e.buf_pipe(inp, out, proc, opts)
     opts = opts or {}
     local fninp = type(inp) == 'string' and _e.buf_inp[inp] or inp
