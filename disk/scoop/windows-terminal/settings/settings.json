@@ -100,7 +100,7 @@
                 "guid": "{0496ac52-53d6-4473-98dd-847bcafc97e2}",
                 "hidden": false,
                 "historySize": 9001,
-                "icon": "C:\\apps\\_packs\\apps\\pwsh\\current\\pwsh.exe",
+                "icon": "%DOT_APPS%\\_packs\\apps\\pwsh\\current\\pwsh.exe",
                 "name": "Pwsh",
                 "padding": "8, 8, 8, 8",
                 "snapOnInput": true,
@@ -112,7 +112,7 @@
                 "antialiasingMode": "grayscale",
                 "closeOnExit": "automatic",
                 "colorScheme": "One Half Dark",
-                "commandline": "pwsh -ExecutionPolicy ByPass -NoExit -Command \"& 'C:\\apps\\miniconda3\\shell\\condabin\\conda-hook.ps1' ; conda activate 'C:\\apps\\miniconda3' \"",
+                "commandline": "pwsh -ExecutionPolicy ByPass -NoExit -Command \"& '%DOT_APPS%\\miniconda3\\shell\\condabin\\conda-hook.ps1' ; conda activate '%DOT_APPS%\\miniconda3' \"",
                 "cursorShape": "bar",
                 "font": 
                 {
@@ -122,7 +122,7 @@
                 "guid": "{dafbccaa-f9e3-4cb0-b47f-3e5dc557de7e}",
                 "hidden": false,
                 "historySize": 9001,
-                "icon": "C:\\apps\\_packs\\apps\\pwsh\\current\\pwsh.exe",
+                "icon": "%DOT_APPS%\\_packs\\apps\\pwsh\\current\\pwsh.exe",
                 "name": "Pwsh::Conda",
                 "padding": "8, 8, 8, 8",
                 "snapOnInput": true,
