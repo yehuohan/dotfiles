@@ -12,10 +12,35 @@ function IsGw() return vim.fn.has('win32unix') == 1 end
 
 function IsMac() return vim.fn.has('mac') == 1 end
 
+--- Setup profiler
+--- View with chrome://tracing or https://ui.perfetto.dev
+local function setup_profiler(dotvim, startup)
+    vim.opt.rtp:prepend(dotvim .. '/bundle/profile.nvim')
+
+    local prof = require('profile')
+    prof.instrument_autocmds()
+    if startup then
+        prof.start('*') -- Profile all pattern
+    else
+        prof.instrument('*')
+    end
+    vim.keymap.set('', '<F2>', function()
+        local file = dotvim .. '/local/profile.json'
+        if prof.is_recording() then
+            prof.stop()
+            prof.export(file)
+            vim.notify('Dumped to ' .. file)
+        else
+            prof.start('*')
+            vim.notify('Start profiling')
+        end
+    end)
+end
+
+--- Load extra { "path" : [] } from .env.json
 local function setup_env()
     local fp = io.open(vim.env.DotVimLocal .. '/.env.json')
     if fp then
-        -- Load extra {"path":[]} from .env.json
         local ex = vim.json.decode(fp:read('*a'))
         local sep = IsWin() and ';' or ':'
         vim.env.PATH = vim.env.PATH .. sep .. table.concat(ex.path, sep)
@@ -23,6 +48,8 @@ local function setup_env()
 end
 
 local function setup(dotvim)
+    -- setup_profiler(dotvim, true)
+
     vim.env.DotVimDir = dotvim
     vim.env.DotVimInit = dotvim .. '/init'
     vim.env.DotVimShare = dotvim .. '/share'

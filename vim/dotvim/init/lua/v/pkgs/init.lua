@@ -151,15 +151,13 @@ end
 
 -- 快速跳转
 local function pkg_hop()
-    require('hop').setup({ match_mappings = { 'zh', 'zh_sc' }, extensions = {} })
+    require('hop').setup({ match_mappings = { 'zh', 'zh_sc' } })
     m.nore({ 's', '<Cmd>HopChar1MW<CR>' })
-    m.nore({ 'S', '<Cmd>HopChar1<CR>' })
+    m.nore({ 'S', '<Cmd>HopWord<CR>' })
     m.nore({ 'f', '<Cmd>HopChar1CurrentLine<CR>' })
     m.nore({ 'F', '<Cmd>HopAnywhereCurrentLine<CR>' })
     m.nore({ '<leader>j', '<Cmd>HopVertical<CR>' })
     m.nore({ '<leader>k', '<Cmd>HopLineStart<CR>' })
-    m.nore({ '<leader>ms', '<Cmd>HopPatternMW<CR>' })
-    m.nore({ '<leader>mw', '<Cmd>HopWord<CR>' })
 end
 
 -- 书签管理
@@ -418,6 +416,7 @@ local function pkg_mini()
     })
     m.nmap({ '<leader>al', 'gaip' })
     m.vmap({ '<leader>al', 'ga' })
+
     -- 代码注释
     require('mini.comment').setup({
         options = {
@@ -430,10 +429,22 @@ local function pkg_mini()
     })
     m.nmap({ '<leader>cl', 'gcc' })
     m.nmap({ '<leader>cu', 'gcc' })
+
     -- 高亮Word
+    vim.api.nvim_create_autocmd('CursorMoved', {
+        group = 'v.Pkgs',
+        callback = function()
+            vim.b.minicursorword_disable = vim.tbl_contains({
+                'Popc',
+                'neo-tree',
+            }, vim.bo.filetype)
+        end,
+    })
     require('mini.cursorword').setup({ delay = 10 })
+
     -- 显示缩进
     require('mini.indentscope').setup({ symbol = '┋' })
+
     -- 移动选区
     require('mini.move').setup({
         mappings = {
@@ -447,8 +458,10 @@ local function pkg_mini()
             line_up = '',
         },
     })
+
     -- 自动括号
     require('mini.pairs').setup()
+
     -- 添加包围符
     require('mini.surround').setup({
         mappings = {
@@ -631,9 +644,9 @@ local function pkg_multicursor()
     mc.setup()
     m.nnore({ ',c', mc.toggleCursor, desc = 'Toggle cursor' })
     m.vnore({ ',c', mc.insertVisual, desc = 'Create cursors from visual' })
-    m.vnore({ ',v', function() mc.matchAddCursor(1) end, desc = 'Create cursors from selected' })
-    m.vnore({ ',m', mc.matchCursors, desc = 'Match cursors from viaual' })
-    m.vnore({ ',s', mc.splitCursors, desc = 'Split cursors from viaual' })
+    m.nore({ ',v', function() mc.matchAddCursor(1) end, desc = 'Create cursors from word/selection' })
+    m.vnore({ ',m', mc.matchCursors, desc = 'Match cursors from visual' })
+    m.vnore({ ',s', mc.splitCursors, desc = 'Split cursors from visual' })
     m.nnore({ ',a', mc.alignCursors, desc = 'Align cursors' })
     mc.addKeymapLayer(function(lyr)
         lyr({ 'n', 'x' }, 'n', function() mc.matchAddCursor(1) end)
@@ -791,6 +804,7 @@ end
 --------------------------------------------------------------------------------
 local pkgs = {
     -- Libraries
+    { 'stevearc/profile.nvim', lazy = true },
     { 'nvim-tree/nvim-web-devicons', lazy = true, cond = use.ui.icon },
     { 'nvim-lua/plenary.nvim', lazy = true },
     { 'MunifTanjim/nui.nvim', lazy = true },
@@ -911,7 +925,7 @@ local function pkg_lazy()
         callback = function()
             vim.api.nvim_set_hl(0, 'HopPreview', { fg = '#b8bb26', bold = true, ctermfg = 142 })
             vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#505060', ctermbg = 60 })
-            vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', {})
+            vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { link = 'MiniCursorword' })
         end,
     })
 

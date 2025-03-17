@@ -10,16 +10,13 @@ local function pkg_nts()
     local parser_dir = vim.env.DotVimLocal .. '/.treesitter'
     require('nvim-treesitter.configs').setup({
         parser_install_dir = parser_dir,
-        --neovim's builtin: { 'bash', 'c', 'vim', 'lua', 'python', 'markdown', 'markdown_inline' },
-        --ensure_installed = { 'cpp', 'rust', 'cmake', 'glsl', 'hlsl', 'wgsl', 'json', 'jsonc' },
-        --auto_install = true,
         highlight = {
             enable = true,
+            disable = function(_, bufnr) return vim.b[bufnr].sets_large_file == true end,
             additional_vim_regex_highlighting = false,
         },
         indent = {
             enable = true,
-            disable = { 'python' },
         },
         incremental_selection = {
             enable = true,
@@ -30,9 +27,13 @@ local function pkg_nts()
                 scope_incremental = '<M-q>',
             },
         },
-        matchup = { enable = true },
+        matchup = {
+            enable = true,
+            disable = function(_, bufnr) return vim.b[bufnr].sets_large_file == true end,
+        },
     })
     vim.opt.runtimepath:prepend(parser_dir)
+
     m.nnore({
         '<leader>sh',
         function()

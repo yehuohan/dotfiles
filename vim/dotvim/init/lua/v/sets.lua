@@ -138,10 +138,10 @@ local function on_large_file()
     if fsize >= 5 * 1024 * 1024 or fsize == -2 then
         require('ufo').detach()
         vim.b.sets_large_file = true
-        vim.bo.filetype = '_' .. vim.bo.filetype -- Stop treesitter with a wrong filetype
-        vim.bo.undolevels = -1
+        vim.b.snacks_scope = false
         vim.bo.swapfile = false
         vim.opt.eventignore:append('FileType')
+        vim.notify('On large file')
     else
         vim.b.sets_large_file = false
         vim.opt.eventignore:remove('FileType')
