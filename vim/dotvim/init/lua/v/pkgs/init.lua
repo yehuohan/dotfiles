@@ -152,10 +152,10 @@ end
 -- 快速跳转
 local function pkg_hop()
     require('hop').setup({ match_mappings = { 'zh', 'zh_sc' } })
-    m.nore({ 's', '<Cmd>HopChar1MW<CR>' })
+    m.nore({ 's', '<Cmd>HopChar<CR>' })
     m.nore({ 'S', '<Cmd>HopWord<CR>' })
-    m.nore({ 'f', '<Cmd>HopChar1CurrentLine<CR>' })
-    m.nore({ 'F', '<Cmd>HopAnywhereCurrentLine<CR>' })
+    m.nore({ 'f', '<Cmd>HopCharCL<CR>' })
+    m.nore({ 'F', '<Cmd>HopAnywhereCL<CR>' })
     m.nore({ '<leader>j', '<Cmd>HopVertical<CR>' })
     m.nore({ '<leader>k', '<Cmd>HopLineStart<CR>' })
 end
@@ -421,7 +421,8 @@ local function pkg_mini()
     require('mini.comment').setup({
         options = {
             custom_commentstring = function()
-                if vim.o.ft == 'c' then
+                local ft = vim.o.ft
+                if 'c' == ft or 'cpp' == ft then
                     return '// %s'
                 end
             end,
@@ -923,7 +924,6 @@ local function pkg_lazy()
     vim.api.nvim_create_autocmd('ColorScheme', {
         group = 'v.Pkgs',
         callback = function()
-            vim.api.nvim_set_hl(0, 'HopPreview', { fg = '#b8bb26', bold = true, ctermfg = 142 })
             vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#505060', ctermbg = 60 })
             vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { link = 'MiniCursorword' })
         end,

@@ -49,19 +49,19 @@ local codes = {
                                   or 'rustc {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
                    efm = { [[%Eerror:%m,%C %#%[%^ ]%# %#%f:%l:%c %#,]]
                         .. [[%Wwarning:%m,%C %#%[%^ ]%# %#%f:%l:%c %#]],
-                           [[ %#%[%^ ]%# %#%f:%l:%c %#]] }},
+                           [[%\ %#%[%^ ]%# %#%f:%l:%c %#]] }},
     python     = { cmd = 'python {bsrc} {earg}',
                    efm = [[%*\sFile \"%f\"\, line %l\, %m,]]
                       .. [[%*\sFile \"%f\"\, line %l]] },
     lua        = { cmd = 'lua {bsrc} {earg}', efm = [[%.%#: %f:%l: %m, %#%f:%l: %m]] },
     julia      = { cmd = 'julia {bsrc} {earg}' },
-    glsl       = { cmd = 'glslangValidator {earg} {bsrc}', efm = [[%+P%f,ERROR: %c:%l: %m,%-Q]] },
+    glsl       = { cmd = 'glslangValidator {earg} {bsrc}', efm = [[%f:%l: error: %m,%+P%f,ERROR: %c:%l: %m,%-Q]] },
     java       = { cmd = 'javac {barg} {bsrc} && java "{bout}" {earg}' },
     javascript = { cmd = 'node {bsrc} {earg}', efm = [[%f:%l]] },
     typescript = { cmd = 'node {bsrc} {earg}', efm = [[%f:%l]] },
     just       = { cmd = 'just -f {bsrc} {earg}',
                    efm = { [[%Eerror:%m,%C %#%[%^ ]%# %#%f:%l:%c %#]],
-                           [[ %#%[%^ ]%# %#%f:%l:%c %#]] }},
+                           [[%\ %#%[%^ ]%# %#%f:%l:%c %#]] }},
     make       = { cmd = 'make -f {bsrc} {earg}', efm = [[make: *** [%f:%l:%m] Error %n]] },
     cmake      = { cmd = 'cmake {earg} -P {bsrc}', efm = [[%ECMake Error at %f:%l:]] },
     sh         = { cmd = 'bash ./{bsrc} {earg}',
@@ -74,7 +74,7 @@ local codes = {
     json       = { cmd = 'python -m json.tool {bsrc}' },
     typst      = { cmd = 'typst compile {bsrc} && sioyek "{bout}.pdf"',
                    efm = { [[%Eerror:%m,%C %#%[%^ ]%# %#%\%\%\%\?%\%\%f:%l:%c %#]],
-                           [[ %#%[%^ ]%# %#%\%\%\%\?%\%\%f:%l:%c %#]] }},
+                           [[%\ %#%[%^ ]%# %#%\%\%\%\?%\%\%f:%l:%c %#]] }},
     tex        = { cmd = 'xelatex -file-line-error {bsrc} && sioyek "{bout}.pdf"', efm = [[%f:%l: %m]] },
 }
 -- stylua: ignore end
@@ -91,19 +91,20 @@ local packs = {
 }
 
 --- Fetch and combine errorformats
---- @param types string[]
+--- @param efm string|nil
+--- @param fts string[]
 --- @return string[]
-local function fetch_efm(types)
-    local res1 = {}
-    local res2 = {}
-    for _, ft in ipairs(types) do
-        local efm = codes[ft].efm
-        if type(efm) == 'table' then
-            res1[#res1 + 1] = efm[1]
-            res2[#res2 + 1] = efm[2]
-        elseif type(efm) == 'string' then
-            res1[#res1 + 1] = efm
-            res2[#res2 + 1] = efm
+local function fetch_efm(efm, fts)
+    local res1 = { efm or nil }
+    local res2 = { efm or nil }
+    for _, ft in ipairs(fts) do
+        local f = codes[ft].efm
+        if type(f) == 'table' then
+            res1[#res1 + 1] = f[1]
+            res2[#res2 + 1] = f[2]
+        elseif type(f) == 'string' then
+            res1[#res1 + 1] = f
+            res2[#res2 + 1] = f
         end
     end
     return {
@@ -186,17 +187,11 @@ function _hdls.just(cfg)
     cmds[#cmds + 1] = replace(packs.just, rep)
 
     local tbl, cmd = e.modeline('code', cfg.file)
-    if tbl then
-        local efm = fetch_efm(vim.list_extend(tbl.efm_fts or {}, { 'just' }))
-        cfg:set(tbl)
-        cfg.efm = efm
-        if tbl.efm then
-            cfg.efm = { tbl.efm .. ',' .. efm[1], tbl.efm .. ',' .. efm[2] }
-        end
-    else
-        local efm = fetch_efm({ 'just', 'cmake', 'c', 'rust', 'python' })
-        cfg.efm = efm
-    end
+    cfg:set(tbl or {})
+    cfg.efm = fetch_efm(
+        tbl and tbl.efm,
+        vim.list_extend({ 'just' }, tbl and tbl.efm_fts or { 'cmake', 'c', 'rust', 'python' })
+    )
     cmd = cmd or sequence(cmds)
     return cmd
 end
@@ -210,17 +205,11 @@ function _hdls.make(cfg)
     cmds[#cmds + 1] = replace(packs.make, rep)
 
     local tbl, cmd = e.modeline('code', cfg.file)
-    if tbl then
-        local efm = fetch_efm(vim.list_extend(tbl.efm_fts or {}, { 'make' }))
-        cfg:set(tbl)
-        cfg.efm = efm
-        if tbl.efm then
-            cfg.efm = { tbl.efm .. ',' .. efm[1], tbl.efm .. ',' .. efm[2] }
-        end
-    else
-        local efm = fetch_efm({ 'make', 'cmake', 'c' })
-        cfg.efm = efm
-    end
+    cfg:set(tbl or {})
+    cfg.efm = fetch_efm(
+        tbl and tbl.efm,
+        vim.list_extend({ 'make' }, tbl and tbl.efm_fts or { 'cmake', 'c', 'rust', 'python' })
+    )
     cmd = cmd or sequence(cmds)
     return cmd
 end
