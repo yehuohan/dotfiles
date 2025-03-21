@@ -1,6 +1,6 @@
 
 ### Setup home
-$dir_disk = Get-Location
+$dir_disk = $PSScriptRoot
 $dir_disk = Split-Path -Path $dir_disk -Parent
 echo "dir_disk = $dir_disk"
 echo "USERPROFILE = $env:USERPROFILE"
@@ -38,4 +38,5 @@ echo 'Generated msys2_here.reg'
 [IO.File]::WriteAllText("$dir_disk/setup/msys2_here.reg", $cmd_add, [Text.Encoding]::UTF8)
 echo 'Generated msys2_here.del.reg'
 [IO.File]::WriteAllText("$dir_disk/setup/msys2_here.del.reg", $cmd_del, [Text.Encoding]::UTF8)
+
 pause
