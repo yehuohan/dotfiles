@@ -1,5 +1,5 @@
 
-$dir_vim = Get-Location
+$dir_vim = $PSScriptRoot
 $dir_vim = Split-Path -Path $dir_vim -Parent
 echo "dir_vim = $dir_vim"
 
@@ -96,3 +96,5 @@ foreach ($editor in $editors) {
     echo ('Generated ' + $editor.Name)
     [IO.File]::WriteAllText("$dir_vim/setup/" + $editor.Name, $editor.Text, [Text.Encoding]::UTF8)
 }
+
+pause
