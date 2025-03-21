@@ -49,6 +49,7 @@ local function setup_lsp_servers(capabilities)
             capabilities = capabilities,
             -- Treesitter is better than clangd's semantic
             on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
+            cmd = { 'clangd', '--header-insertion=never' },
         })
     end
     opts['cmake'] = function()
