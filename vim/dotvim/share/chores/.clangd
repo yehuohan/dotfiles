@@ -13,6 +13,9 @@ CompileFlags:
   ]
   CompilationDatabase: _VOut/
 
+Completion:
+  HeaderInsertion: Never
+
 Diagnostics:
   UnusedIncludes: None
 
