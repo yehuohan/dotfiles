@@ -149,35 +149,6 @@ local function pkg_dressing()
     })
 end
 
--- 快速跳转
-local function pkg_hop()
-    require('hop').setup({ match_mappings = { 'zh', 'zh_sc' } })
-    m.nore({ 's', '<Cmd>HopChar<CR>' })
-    m.nore({ 'S', '<Cmd>HopWord<CR>' })
-    m.nore({ 'f', '<Cmd>HopCharCL<CR>' })
-    m.nore({ 'F', '<Cmd>HopAnywhereCL<CR>' })
-    m.nore({ '<leader>j', '<Cmd>HopVertical<CR>' })
-    m.nore({ '<leader>k', '<Cmd>HopLineStart<CR>' })
-end
-
--- 书签管理
-local function pkg_marks()
-    require('marks').setup({
-        default_mappings = false,
-        force_write_shada = true,
-        cyclic = false,
-        mappings = {
-            toggle_mark = 'm',
-            delete_line = '<leader>ml',
-            delete_buf = '<leader>mc',
-            next = '<M-.>',
-            prev = '<M-,>',
-        },
-    })
-    m.nnore({ '<leader>ts', ':MarksToggleSigns<CR>' })
-    m.nnore({ '<leader>ma', ':MarksListBuf<CR>' })
-end
-
 -- 代码折叠
 local function pkg_ufo()
     local ufo = require('ufo')
@@ -639,17 +610,64 @@ local function pkg_conform()
     m.nore({ '<leader>fo', conform.format, desc = 'Format code' })
 end
 
+-- 快速跳转
+local function pkg_hop()
+    require('hop').setup({ match_mappings = { 'zh', 'zh_sc' } })
+    m.nore({ 's', '<Cmd>HopChar<CR>' })
+    m.nore({ 'S', '<Cmd>HopWord<CR>' })
+    m.nore({ 'f', '<Cmd>HopCharCL<CR>' })
+    m.nore({ 'F', '<Cmd>HopAnywhereCL<CR>' })
+    m.nore({ '<leader>j', '<Cmd>HopVertical<CR>' })
+    m.nore({ '<leader>k', '<Cmd>HopLineStart<CR>' })
+end
+
+-- 书签管理
+local function pkg_marks()
+    require('marks').setup({
+        default_mappings = false,
+        force_write_shada = true,
+        cyclic = false,
+        mappings = {
+            toggle_mark = 'm',
+            delete_line = '<leader>ml',
+            delete_buf = '<leader>mc',
+            next = '<M-.>',
+            prev = '<M-,>',
+        },
+    })
+    m.nnore({ '<leader>ts', ':MarksToggleSigns<CR>' })
+    m.nnore({ '<leader>ma', ':MarksListBuf<CR>' })
+end
+
 -- 多光标编辑
 local function pkg_multicursor()
     local mc = require('multicursor-nvim')
     mc.setup()
     m.nnore({ ',c', mc.toggleCursor, desc = 'Toggle cursor' })
-    m.vnore({ ',c', mc.insertVisual, desc = 'Create cursors from visual' })
+    m.vnore({
+        ',c',
+        function()
+            mc.action(function(ctx)
+                ctx:forEachCursor(function(cur) cur:splitVisualLines() end)
+            end)
+            mc.feedkeys('<Esc>', { remap = false, keycodes = true })
+        end,
+        desc = 'Create cursors from visual',
+    })
     m.nore({ ',v', function() mc.matchAddCursor(1) end, desc = 'Create cursors from word/selection' })
     m.vnore({ ',m', mc.matchCursors, desc = 'Match cursors from visual' })
     m.vnore({ ',s', mc.splitCursors, desc = 'Split cursors from visual' })
     m.nnore({ ',a', mc.alignCursors, desc = 'Align cursors' })
     mc.addKeymapLayer(function(lyr)
+        local hop = require('hop')
+        local move_mc = require('hop.jumper').move_multicursor
+        lyr({ 'n', 'x' }, 's', function() hop.char({ jump = move_mc }) end)
+        lyr({ 'n', 'x' }, 'S', function() hop.word({ jump = move_mc }) end)
+        lyr({ 'n', 'x' }, 'f', function() hop.char({ jump = move_mc, current_line_only = true }) end)
+        lyr({ 'n', 'x' }, 'F', function() hop.anywhere({ jump = move_mc, current_line_only = true }) end)
+        lyr({ 'n', 'x' }, '<leader>j', function() hop.vertical({ jump = move_mc }) end)
+        lyr({ 'n', 'x' }, '<leader>k', function() hop.line_start({ jump = move_mc }) end)
+
         lyr({ 'n', 'x' }, 'n', function() mc.matchAddCursor(1) end)
         lyr({ 'n', 'x' }, 'N', function() mc.matchAddCursor(-1) end)
         lyr({ 'n', 'x' }, 'm', function() mc.matchSkipCursor(1) end)
@@ -832,8 +850,6 @@ local pkgs = {
     { 'ellisonleao/gruvbox.nvim', config = pkg_gruvbox, event = 'VeryLazy' },
     { 'polirritmico/monokai-nightasty.nvim', event = 'VeryLazy' },
     { 'stevearc/dressing.nvim', config = pkg_dressing, event = 'VeryLazy' },
-    { 'yehuohan/hop.nvim', config = pkg_hop, event = 'VeryLazy' },
-    { 'yehuohan/marks.nvim', config = pkg_marks, event = 'VeryLazy' },
     { 'kevinhwang91/nvim-ufo', config = pkg_ufo, event = 'VeryLazy' },
     { 'kevinhwang91/nvim-bqf', config = pkg_bqf, ft = 'qf' },
     { 'nvim-neo-tree/neo-tree.nvim', config = pkg_neotree, event = 'VeryLazy' },
@@ -855,6 +871,8 @@ local pkgs = {
     { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' }, event = 'VeryLazy' },
     { 'L3MON4D3/LuaSnip', config = pkg_snip, dependencies = { 'honza/vim-snippets' }, event = 'VeryLazy' },
     { 'stevearc/conform.nvim', config = pkg_conform, event = 'VeryLazy' },
+    { 'yehuohan/hop.nvim', config = pkg_hop, event = 'VeryLazy' },
+    { 'yehuohan/marks.nvim', config = pkg_marks, event = 'VeryLazy' },
     { 'jake-stewart/multicursor.nvim', config = pkg_multicursor, event = 'VeryLazy' },
     { 'kmontocam/nvim-conda', ft = 'python' },
     { 'rust-lang/rust.vim', event = 'VeryLazy' },
