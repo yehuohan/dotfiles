@@ -237,7 +237,7 @@ end
 
 --- @class new_terminal.Opts
 --- @field cmd table The command to run
---- @field exit boolean Exit terminal
+--- @field quit boolean Quit terminal
 --- @field bottom boolean Split terminal at bottom window
 
 --- @type table
@@ -256,7 +256,7 @@ function M.new_terminal(opts)
     end
 
     -- Exit terminal
-    if opts and opts.exit then
+    if opts and opts.quit then
         del_terminal()
         return
     end
@@ -279,12 +279,14 @@ function M.new_terminal(opts)
         vim.wo[hwin].signcolumn = 'no'
         vim.api.nvim_win_set_buf(hwin, hbuf)
     else
+        local scl = opts and opts.size or 0.6
+        local ofs = (1.0 - scl) / 2.0
         hwin = api.nvim_open_win(hbuf, true, {
             relative = 'editor',
-            width = math.floor(0.6 * vim.o.columns),
-            height = math.floor(0.6 * vim.o.lines),
-            col = math.floor(0.2 * vim.o.columns),
-            row = math.floor(0.2 * vim.o.lines),
+            width = math.floor(scl * vim.o.columns),
+            height = math.floor(scl * vim.o.lines),
+            col = math.floor(ofs * vim.o.columns),
+            row = math.floor(ofs * vim.o.lines),
             style = 'minimal',
             border = 'single',
         })

@@ -21,35 +21,6 @@ local function pkg_quickhl()
     m.nmap({ '<leader>th', '<Plug>(quickhl-manual-toggle)' })
 end
 
--- 窗口跳转
-local function pkg_window_picker()
-    local window_picker = require('window-picker')
-    window_picker.setup({
-        hint = 'floating-big-letter',
-        filter_rules = {
-            autoselect_one = false,
-            include_current_win = true,
-            bo = { filetype = {}, buftype = {} },
-        },
-    })
-    m.nnore({
-        '<leader>wi',
-        function()
-            local hwin = window_picker.pick_window()
-            if hwin and vim.api.nvim_win_is_valid(hwin) then
-                vim.api.nvim_set_current_win(hwin)
-            end
-        end,
-        desc = 'Pick window',
-    })
-end
-
--- 窗口移动
-local function pkg_winshift()
-    require('winshift').setup({})
-    m.nnore({ '<leader>wm', ':WinShift<CR>' })
-end
-
 -- 彩虹括号
 local function pkg_rainbow()
     local rainbow = require('rainbow-delimiters')
@@ -612,13 +583,34 @@ end
 
 -- 快速跳转
 local function pkg_hop()
-    require('hop').setup({ match_mappings = { 'zh', 'zh_sc' } })
+    local hop = require('hop')
+    hop.setup({ match_mappings = { 'zh', 'zh_sc' } })
     m.nore({ 's', '<Cmd>HopChar<CR>' })
     m.nore({ 'S', '<Cmd>HopWord<CR>' })
     m.nore({ 'f', '<Cmd>HopCharCL<CR>' })
     m.nore({ 'F', '<Cmd>HopAnywhereCL<CR>' })
     m.nore({ '<leader>j', '<Cmd>HopVertical<CR>' })
     m.nore({ '<leader>k', '<Cmd>HopLineStart<CR>' })
+    m.nnore({
+        '<leader>wi',
+        function()
+            hop.wrap({
+                oneshot = true,
+                match = function(_, wctx, lctx)
+                    if require('hop.window').is_cursor_line(wctx, lctx) then
+                        local jt = wctx.cursor
+                        return { b = jt.col, e = jt.col, off = jt.off, virt = jt.virt }
+                    end
+                end,
+            }, {
+                keys = 'fdsjklaweriop',
+                hint_upper = true,
+                auto_jump_one_target = false,
+                msg_no_targets = function() vim.notify('There’s only one window', vim.log.levels.ERROR) end,
+            })
+        end,
+        desc = 'Pick window',
+    })
 end
 
 -- 书签管理
@@ -663,10 +655,8 @@ local function pkg_multicursor()
         local move_mc = require('hop.jumper').move_multicursor
         lyr({ 'n', 'x' }, 's', function() hop.char({ jump = move_mc }) end)
         lyr({ 'n', 'x' }, 'S', function() hop.word({ jump = move_mc }) end)
-        lyr({ 'n', 'x' }, 'f', function() hop.char({ jump = move_mc, current_line_only = true }) end)
-        lyr({ 'n', 'x' }, 'F', function() hop.anywhere({ jump = move_mc, current_line_only = true }) end)
-        lyr({ 'n', 'x' }, '<leader>j', function() hop.vertical({ jump = move_mc }) end)
-        lyr({ 'n', 'x' }, '<leader>k', function() hop.line_start({ jump = move_mc }) end)
+        lyr({ 'n', 'x' }, 'f', 'f')
+        lyr({ 'n', 'x' }, 'F', 'F')
 
         lyr({ 'n', 'x' }, 'n', function() mc.matchAddCursor(1) end)
         lyr({ 'n', 'x' }, 'N', function() mc.matchAddCursor(-1) end)
@@ -693,7 +683,7 @@ local function pkg_markview()
             modes = { 'n', 'no', 'c', 'v', 'V', '\22' },
         },
     })
-    m.nore({ '<leader>tm', ':Markview toggle<CR>' })
+    m.nnore({ '<leader>tm', ':Markview toggle<CR>' })
 end
 
 -- Markdown
@@ -842,8 +832,6 @@ local pkgs = {
     -- Editor
     { 'andymass/vim-matchup', config = pkg_matchup, event = 'VeryLazy' },
     { 't9md/vim-quickhl', config = pkg_quickhl, event = 'VeryLazy' },
-    { 's1n7ax/nvim-window-picker', config = pkg_window_picker, event = 'VeryLazy' },
-    { 'sindrets/winshift.nvim', config = pkg_winshift, keys = { '<leader>wm' } },
     { 'HiPhish/rainbow-delimiters.nvim', config = pkg_rainbow, submodules = false, event = 'VeryLazy' },
     { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' }, event = 'VeryLazy' },
     { 'goolord/alpha-nvim', config = pkg_alpha },
@@ -865,7 +853,7 @@ local pkgs = {
     require('v.pkgs.nts'),
     { 'stevearc/overseer.nvim' }, -- Setup from v.task
     { 'nvim-telescope/telescope.nvim', config = pkg_telescope, event = 'VeryLazy' },
-    { 'nvim-telescope/telescope-fzf-native.nvim', lazy = true, build = 'make' },
+    { 'nvim-telescope/telescope-fzf-native.nvim', lazy = true, build = 'make' }, -- MSYSTEM=UCRT64
     { 'nvim-telescope/telescope-frecency.nvim', lazy = true },
     { '2kabhishek/nerdy.nvim', lazy = true },
     { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' }, event = 'VeryLazy' },

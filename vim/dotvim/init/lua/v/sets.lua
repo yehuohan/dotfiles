@@ -196,7 +196,11 @@ end
 local function set_fonts(inc)
     use.ui.fontsize = use.ui.fontsize + inc
     use.ui.widesize = use.ui.widesize + inc
-    vim.o.guifont = use.ui.font .. ':h' .. tostring(use.ui.fontsize)
+    if vim.g.nvy then
+        vim.o.guifont = use.ui.fontback .. ':h' .. tostring(use.ui.fontsize)
+    else
+        vim.o.guifont = use.ui.font .. ':h' .. tostring(use.ui.fontsize)
+    end
     vim.o.guifontwide = use.ui.wide .. ':h' .. tostring(use.ui.widesize)
 end
 
@@ -234,7 +238,6 @@ local function on_UIEnter()
 
     if vim.g.nvy then
         vim.o.guicursor = 'n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20'
-        vim.o.guifont = use.ui.fontback .. ':h' .. tostring(use.ui.fontsize)
     end
 end
 

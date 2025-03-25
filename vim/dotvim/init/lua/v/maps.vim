@@ -138,9 +138,12 @@ endfor
 tnoremap <Esc> <C-\><C-n>
 tnoremap <M-h> <Cmd>lua require('v.nlib').new_terminal()<CR>
 tnoremap <M-q> <Cmd>lua require('v.nlib').new_terminal({ quit = true })<CR>
-nnoremap <leader>tz <Cmd>lua require('v.nlib').new_terminal()<CR>
-nnoremap <leader>tv <Cmd>lua require('v.nlib').new_terminal({ bottom = true })<CR>
-nnoremap <leader>mz <Cmd>lua require('v.nlib').new_terminal({ cmd = { 'zsh' } })<CR>
+nnoremap <leader>tp <Cmd>lua require('v.nlib').new_terminal({ cmd = { 'powershell' } })<CR>
+nnoremap <leader>tP <Cmd>lua require('v.nlib').new_terminal({ cmd = { 'powershell' }, size = 0.8 })<CR>
+nnoremap <leader>vp <Cmd>lua require('v.nlib').new_terminal({ cmd = { 'powershell' }, bottom = true })<CR>
+nnoremap <leader>tz <Cmd>lua require('v.nlib').new_terminal({ cmd = { 'zsh' } })<CR>
+nnoremap <leader>tZ <Cmd>lua require('v.nlib').new_terminal({ cmd = { 'zsh' }, size = 0.8 })<CR>
+nnoremap <leader>vz <Cmd>lua require('v.nlib').new_terminal({ cmd = { 'zsh' }, bottom = true })<CR>
 " }}}
 
 " Tab, Window, Buffer {{{
