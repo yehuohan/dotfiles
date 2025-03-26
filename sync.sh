@@ -103,7 +103,6 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp -r $USERPROFILE/Documents/PowerShell         ./disk/home/Documents/
     cp -r $APPDATA/helix                            ./disk/home/AppData/Roaming/
     cp $APPDATA/lazygit/config.yml                  ./disk/home/AppData/Roaming/lazygit/
-    cp $LOCALAPPDATA/lf/lfrc                        ./disk/home/AppData/Local/lf/
 
     # scoop
     cp $DOT_APPS/_packs/persist/windows-terminal/settings/settings.json     ./disk/scoop/windows-terminal/settings/
