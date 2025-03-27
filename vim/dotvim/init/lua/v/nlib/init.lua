@@ -297,7 +297,8 @@ function M.new_terminal(opts)
     -- Open terminal
     if not __term.hbuf then
         __term.hbuf = hbuf
-        vim.fn.termopen(opts and opts.cmd or { vim.o.shell }, {
+        vim.fn.jobstart(opts and opts.cmd or { vim.o.shell }, {
+            term = true,
             on_exit = function()
                 -- Delete with `opts.exit` will still invoke `on_exit`
                 if __term.hbuf == hbuf then

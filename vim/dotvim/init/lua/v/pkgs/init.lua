@@ -168,18 +168,6 @@ local function pkg_ufo()
     m.nnore({ '<leader>zm', ufo.closeAllFolds })
 end
 
--- QF增强
-local function pkg_bqf()
-    require('bqf').setup({
-        auto_enable = true,
-        preview = { auto_preview = false },
-        func_map = {
-            open = '', -- bqf's open doesn't trigger popc.buf's insertion
-            pscrollorig = 'zP', -- bqf's pscrollorig breaks zo to open current fold
-        },
-    })
-end
-
 -- 目录树
 local function pkg_neotree()
     --- Goto first sibling
@@ -657,6 +645,8 @@ local function pkg_multicursor()
         lyr({ 'n', 'x' }, 'S', function() hop.word({ jump = move_mc }) end)
         lyr({ 'n', 'x' }, 'f', 'f')
         lyr({ 'n', 'x' }, 'F', 'F')
+        lyr({ 'n', 'x' }, '<leader>j', function() hop.vertical({ jump = move_mc }) end)
+        lyr({ 'n', 'x' }, '<leader>k', function() hop.vertical({ jump = move_mc }) end)
 
         lyr({ 'n', 'x' }, 'n', function() mc.matchAddCursor(1) end)
         lyr({ 'n', 'x' }, 'N', function() mc.matchAddCursor(-1) end)
@@ -819,6 +809,7 @@ local pkgs = {
     { 'MunifTanjim/nui.nvim', lazy = true },
     { 'kevinhwang91/promise-async', lazy = true },
     { 'nvim-neotest/nvim-nio', lazy = true },
+    { 'honza/vim-snippets' },
     {
         'kkharji/sqlite.lua',
         lazy = true,
@@ -839,7 +830,6 @@ local pkgs = {
     { 'polirritmico/monokai-nightasty.nvim', event = 'VeryLazy' },
     { 'stevearc/dressing.nvim', config = pkg_dressing, event = 'VeryLazy' },
     { 'kevinhwang91/nvim-ufo', config = pkg_ufo, event = 'VeryLazy' },
-    { 'kevinhwang91/nvim-bqf', config = pkg_bqf, ft = 'qf' },
     { 'nvim-neo-tree/neo-tree.nvim', config = pkg_neotree, event = 'VeryLazy' },
     { 'yehuohan/popc', init = pkg_popc, event = 'VeryLazy' },
     { 'yehuohan/popset', dependencies = { 'yehuohan/popc' }, event = 'VeryLazy' },
@@ -853,11 +843,11 @@ local pkgs = {
     require('v.pkgs.nts'),
     { 'stevearc/overseer.nvim' }, -- Setup from v.task
     { 'nvim-telescope/telescope.nvim', config = pkg_telescope, event = 'VeryLazy' },
-    { 'nvim-telescope/telescope-fzf-native.nvim', lazy = true, build = 'make' }, -- MSYSTEM=UCRT64
+    { 'nvim-telescope/telescope-fzf-native.nvim', lazy = true },
     { 'nvim-telescope/telescope-frecency.nvim', lazy = true },
     { '2kabhishek/nerdy.nvim', lazy = true },
     { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' }, event = 'VeryLazy' },
-    { 'L3MON4D3/LuaSnip', config = pkg_snip, dependencies = { 'honza/vim-snippets' }, event = 'VeryLazy' },
+    { 'L3MON4D3/LuaSnip', config = pkg_snip, event = 'VeryLazy', submodules = false },
     { 'stevearc/conform.nvim', config = pkg_conform, event = 'VeryLazy' },
     { 'yehuohan/hop.nvim', config = pkg_hop, event = 'VeryLazy' },
     { 'yehuohan/marks.nvim', config = pkg_marks, event = 'VeryLazy' },
@@ -938,6 +928,9 @@ local function pkg_lazy()
     local ok = pcall(function()
         vim.o.background = 'dark'
         vim.cmd.colorscheme('gruvbox')
+        -- Hack: gruvbox inverse for statusline will break in neovim v0.11
+        vim.api.nvim_set_hl(0, 'StatusLine', { reverse = false })
+        vim.api.nvim_set_hl(0, 'StatusLineNC', { reverse = false })
     end)
     if not ok then
         vim.cmd.colorscheme('default')

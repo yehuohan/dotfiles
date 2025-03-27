@@ -136,6 +136,16 @@ local function setup_lsp_mappings()
     m.nnore({ '<leader>go', '<Cmd>Lspsaga outline<CR>' })
 
     m.nore({ '<leader>of', vim.lsp.buf.format })
+    m.nnore({
+        '<leader>oH',
+        function()
+            local filter = { bufnr = 0 }
+            local enabled = vim.lsp.inlay_hint.is_enabled(filter)
+            vim.lsp.inlay_hint.enable(not enabled, filter)
+            vim.notify('Inlay hint ' .. (enabled and 'disabled' or 'enabled'))
+        end,
+        desc = 'Toggle lsp inlay hint',
+    })
     m.nnore({ '<leader>od', vim.diagnostic.setloclist })
     m.nnore({
         '<leader>oD',
@@ -147,25 +157,33 @@ local function setup_lsp_mappings()
         end,
         desc = 'Toggle lsp diagnostic',
     })
-    m.nnore({
-        '<leader>oH',
-        function()
-            local filter = { bufnr = 0 }
-            local enabled = vim.lsp.inlay_hint.is_enabled(filter)
-            vim.lsp.inlay_hint.enable(not enabled, filter)
-            vim.notify('Inlay hint ' .. (enabled and 'disabled' or 'enabled'))
-        end,
-        desc = 'Toggle lsp inlay hint',
-    })
     m.nnore({ '<leader>oi', vim.diagnostic.open_float })
-    local opts = { severity = vim.diagnostic.severity.ERROR }
-    m.nnore({ '<leader>oj', function() vim.diagnostic.goto_next(opts) end, desc = 'Next error' })
-    m.nnore({ '<leader>ok', function() vim.diagnostic.goto_prev(opts) end, desc = 'Prev error' })
-    m.nnore({ '<leader>oJ', vim.diagnostic.goto_next, desc = 'Next diagnostic' })
-    m.nnore({ '<leader>oK', vim.diagnostic.goto_prev, desc = 'Prev diagnostic' })
+    m.nnore({
+        '<leader>oI',
+        function()
+            local enabled = vim.diagnostic.config().virtual_lines
+            vim.diagnostic.config({
+                virtual_lines = not enabled,
+                virtual_text = enabled and { prefix = '▪' },
+            })
+            vim.notify('Diagnostic in virtual ' .. (enabled and 'text' or 'lines'))
+        end,
+        desc = 'Toggle diagnostic virtual type',
+    })
+    m.nnore({
+        '<leader>oj',
+        function() vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR }) end,
+        desc = 'Next error',
+    })
+    m.nnore({
+        '<leader>ok',
+        function() vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR }) end,
+        desc = 'Prev error',
+    })
+    m.nnore({ '<leader>oJ', function() vim.diagnostic.jump({ count = 1 }) end, desc = 'Next diagnostic' })
+    m.nnore({ '<leader>oK', function() vim.diagnostic.jump({ count = -1 }) end, desc = 'Prev diagnostic' })
     -- TODO: lsp workspace and commands
-    -- m.nnore{'<leader>ow', vim.lsp.buf.xxx_workspace_folder}
-    -- m.nnore{'<leader>oe', vim.lsp.buf.execute_command}
+    -- m.nnore({ '<leader>ow', vim.lsp.buf.xxx_workspace_folder })
     m.nnore({ '<leader><leader>o', ':LspStart<Space>' })
     m.nnore({ '<leader>oR', ':LspRestart<CR>' })
     m.nnore({ '<leader>ol', ':LspInfo<CR>' })
@@ -191,7 +209,7 @@ local function setup_lsp_appearance()
             },
         }
     end
-    vim.diagnostic.config({ virtual_text = { prefix = '▪' }, signs = signs })
+    vim.diagnostic.config({ virtual_lines = true, signs = signs })
 
     vim.api.nvim_set_hl(0, 'LspSignatureActiveParameter', { link = 'Title' })
     vim.api.nvim_set_hl(0, 'DiagnosticUnderlineError', { undercurl = true, sp = 'Red' })
