@@ -258,7 +258,7 @@ return {
     keys = { '<leader>td' },
     dependencies = {
         'mfussenegger/nvim-dap',
-        { 'Joakker/lua-json5', build = IsWin() and 'powershell ./install.ps1' or './install.sh' },
+        'Joakker/lua-json5',
         'jbyuki/one-small-step-for-vimkind',
     },
 }

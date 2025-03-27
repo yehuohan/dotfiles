@@ -73,13 +73,12 @@ function qf.scroll(dnum)
 end
 
 function qf.highlight(hl, line, cs, ce)
-    vim.api.nvim_buf_add_highlight(
+    vim.api.nvim_buf_set_extmark(
         qf.hbuf,
         qf.ns,
-        hl,
         line, -- '+1' for on_start's command line, '-1' for zero-based line
         cs + 3, -- '+3' for offset form '|| '
-        ce + 3
+        { end_col = ce + 3, hl_group = hl }
     )
 end
 

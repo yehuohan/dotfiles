@@ -182,7 +182,7 @@ local function setup_default_autocmds()
     api.nvim_create_autocmd('Filetype', { group = 'v.Sets', pattern = { 'txt', 'log' }, command = 'setlocal foldmethod=manual' })
     api.nvim_create_autocmd('TextYankPost', {
         group = 'v.Sets',
-        callback = function() vim.highlight.on_yank({ higroup = 'IncSearch', timeout = 200 }) end,
+        callback = function() vim.hl.on_yank({ higroup = 'IncSearch', timeout = 200 }) end,
     })
     api.nvim_create_autocmd('BufReadPre', { group = 'v.Sets', callback = on_large_file })
     api.nvim_create_autocmd('BufEnter', { group = 'v.Sets', callback = on_alter_enter })
@@ -210,9 +210,8 @@ local function on_UIEnter()
     m.nnore({ '<kPlus>', function() set_fonts(1) end })
     m.nnore({ '<kMinus>', function() set_fonts(-1) end })
 
-    vim.o.guicursor = 'n-v-c:block,i-ci-ve:ver25,r-cr-o:hor20'
-        .. ',a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor'
-        .. ',sm:block-blinkwait175-blinkoff150-blinkon175'
+    vim.o.guicursor = 'n-v-c-sm:block,i-ci-ve-t:ver25,r-cr-o:hor20'
+        .. ',a:blinkwait500-blinkoff500-blinkon250-Cursor/lCursor'
 
     -- g:GuiLoaded works after UIEnter
     if vim.g.GuiLoaded then
@@ -237,7 +236,7 @@ local function on_UIEnter()
     end
 
     if vim.g.nvy then
-        vim.o.guicursor = 'n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20'
+        vim.o.guicursor = 'n-v-c-sm:block,i-ci-ve-t:ver25,r-cr-o:hor20'
     end
 end
 
