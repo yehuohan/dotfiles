@@ -25,10 +25,7 @@ local api = vim.api
 ---         __index,
 ---         __newindex,
 ---         __opts = { ... },
----         new(),
----         mut(),
----         set(),
----         get(),
+---         new(), mut(), set(), get(),
 ---         <metatable> = nsc@ConfigerNonSaveable {
 ---             ext = yyy,
 ---             arg = { 'ABC' }, -- opts.arg[1] = 'ABC'
@@ -150,7 +147,7 @@ function M.new_configer(opts)
     return opts
 end
 
---- @class new_chanor.Opts Chanor options according to `Tout.Params`
+--- @class new_chanor.Opts
 --- @field style string|nil
 --- @field verbose string|nil
 
@@ -163,7 +160,7 @@ function M.new_chanor(opts)
     local verb_r = verbose:match('[ar]')
 
     local raws = {}
-    local ansi = require('v.nlib.ansi').new(verbose)
+    local bufs, ansi = require('v.nlib.ansi').new(verbose)
     local buf_idx = 1
     local pending = ''
 
@@ -175,9 +172,8 @@ function M.new_chanor(opts)
             raws[#raws + 1] = linestr
         end
         if style == 'ansi' then
-            ansi.feed(linestr)
+            ansi(linestr)
         else
-            local bufs = ansi.bufs()
             bufs[#bufs + 1] = { linestr:gsub('\r', '') } -- Remove ^M
         end
     end
@@ -185,10 +181,8 @@ function M.new_chanor(opts)
     --- Process raw data stream from terminal's stdout
     --- @param data string[]|nil nil means all processed buffer lines should be displayed
     --- @return string[] lines Processed lines
-    --- @return table highlights Processed highlights for lines
+    --- @return ANSILineHighlight[] highlights Processed highlights for lines
     return function(data)
-        local bufs = ansi.bufs()
-
         -- Process raw data into lines according to ':h channel-lines'
         local eof = (not data) or (#data == 1 and data[1] == '')
         if eof then
@@ -212,11 +206,9 @@ function M.new_chanor(opts)
         local lines = {}
         local highlights = {}
         for k = buf_idx, #bufs - (eof and 0 or 1), 1 do -- `ansi` may backtrace one buffer line
-            if bufs[k] then
-                lines[#lines + 1] = bufs[k][1]
-                if style == 'ansi' then
-                    highlights[#highlights + 1] = bufs[k][2]
-                end
+            lines[#lines + 1] = bufs[k][1]
+            if style == 'ansi' then
+                highlights[#highlights + 1] = bufs[k][2]
             end
             buf_idx = buf_idx + 1
         end
@@ -226,7 +218,7 @@ function M.new_chanor(opts)
             if verb_r then
                 vim.notify(vim.inspect(raws))
             end
-            ansi = require('v.nlib.ansi').new(verbose)
+            bufs, ansi = require('v.nlib.ansi').new(verbose)
             buf_idx = 1
             pending = ''
         end
@@ -663,7 +655,7 @@ end
 
 --- Split string arguments with blanks
 --- Attention: currently each arg can't contain any blanks.
---- @return table List of arguments
+--- @return string[] List of arguments
 function _u.str2arg(str) return vim.split(str, '%s+', { trimempty = true }) end
 
 --- Parse string to table of environment variables
@@ -757,6 +749,13 @@ local function setopts(opts, defaults)
     return map_opts
 end
 
+--- @class map.Opts Mapping options with {lhs, rhs, **kwargs}
+--- @field [1] string The mapping lhs
+--- @field [2] string|function The mapping rhs
+--- @field remap boolean|nil
+--- @field noremap boolean|nil
+--- @field buffer integer|nil
+
 --- Map functions
 --- 'map' and 'nore' works at normal and visual mode by default here
 --- ```lua
@@ -766,8 +765,8 @@ end
 ---      m.nnore{'<leader>', ':echo b:<CR>', silent = true, buffer = 9}
 ---      m.ndel{'<leader>', buffer = 9}
 --- ```
---- @param mods string|table Mapping modes
---- @param opts table Mapping options with {lhs, rhs, **kwargs}
+--- @param mods string|string[] Mapping modes
+--- @param opts map.Opts
 -- stylua: ignore start
 function _m.del(mods, opts)     delmap(mods, opts[1], setopts(opts)) end
 function _m.add(mods, opts)     setmap(mods, opts[1], opts[2], setopts(opts, { remap = true })) end

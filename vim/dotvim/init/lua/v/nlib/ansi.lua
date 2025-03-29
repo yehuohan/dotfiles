@@ -1,4 +1,7 @@
---- CSI(Control Sequence Introducer) pattern
+--- @alias CSIArgs string
+--- @alias CSIByte string
+
+--- CSI(Control Sequence Introducer) pattern: \x1b%[<CSIArgs><CSIByte>
 --- A: move cursor up
 --- B: move cursor down
 --- C: move cursor forward
@@ -59,12 +62,15 @@ local function trim(str)
         :gsub('\x1b%[[\x30-\x3f]*[\x20-\x2f]*[\x40-\x7e]', '') -- Remove all CSI code
 end
 
+--- @alias CSIGenerator fun(): last:boolean|nil, line:string|nil, args:CSIArgs|nil, byte:CSIByte|nil
+--- @yield last Indicate the last valid match
+--- @yield line The matched line ends with a CSI code
+--- @yield args CSI args
+--- @yield byte CSI final byte
+
 --- Generate next line that ends with a CSI code
 --- @param pat string One of the CSI pattern
---- @yield last boolean Indicate the last valid match
---- @yield line string The matched line ends with a CSI code
---- @yield args string CSI args
---- @yield byte string CSI final byte
+--- @return CSIGenerator
 local function next_csi(str, pat)
     local len = string.len(str)
     local ci = 1
@@ -89,9 +95,12 @@ local function next_csi(str, pat)
     end
 end
 
+--- @alias LineGenerator fun(): line:string|nil
+--- @yield line The matched line ends with '\r'
+
 --- Generate next line that ends with '\r'
 --- @param str string
---- @yield line string The matched line ends with '\r'
+--- @return LineGenerator
 local function next_cr(str)
     local ci = 1
 
@@ -112,6 +121,7 @@ local function next_cr(str)
     end
 end
 
+--- New ANSI SGR object
 local function new_sgr()
     local opts = {
         fg = nil,
@@ -122,9 +132,9 @@ local function new_sgr()
         strikethrough = false,
         reverse = false,
     }
-    -- ANSI SGR object
     local sgr = { hl = nil }
 
+    --- @param args CSIArgs
     sgr.tohl = function(args)
         if args == '' or args == '0' then
             sgr.hl = nil
@@ -206,30 +216,39 @@ local function new_sgr()
     return sgr
 end
 
+--- New ANSI object
 local function new_ansi(verbose)
     local verb_h = verbose:match('[ah]')
     local verb_r = verbose:match('[ar]')
 
-    local bufs = {} -- Processed buffer lines
-    local bufc = { '', {} } -- Processed buffer cache lines
+    --- @class ANSILine Processed buffer line and highlights
+    --- @field [1] string Processed buffer line
+    --- @field [2] ANSILineHighlight[] Processed buffer line highlighs list
+
+    --- @class ANSILineHighlight Processed buffer line highlight
+    --- @field [1] string Highlight group name
+    --- @field [2] integer Line row, 0-based
+    --- @field [3] integer Line column start, 0-based inclusive
+    --- @field [4] integer Line column end, 0-based exclusive
+
+    --- @type ANSILine[]
+    local bufs = {} -- Processed buffer lines and highlights
+    --- @type ANSILine
+    local bufc = { '', {} } -- Processed buffer cache lines and highlights
     local cnt = 1 -- Buffer line counter
     local bot = 1 -- The bottom buffer line in terminal window
     local wid = vim.o.columns - 3 -- 别问为什么要减3，问就是根据结果凑出来的
     local hei = vim.o.lines
     local sgr = new_sgr()
 
-    -- ANSI object
-    local ansi = {}
-
     --- Create next buffer line
     --- @param buf string|nil The processed buffer line
-    --- @param hlt table|nil The highlight of a processed buffer line
-    --- @param opts table|nil
+    --- @param hlt ANSILineHighlight[]|nil The highlight of a processed buffer line
+    --- @param completed boolean|nil Append a completed buffer line
     --- @return integer row The row of buffer line to process
     --- @return string buf The buffer line to process
-    --- @return table hlt The highlight of buffer line to process
-    local function nextline(buf, hlt, opts)
-        local completed = opts and opts.completed
+    --- @return ANSILineHighlight[] hlt The highlight of buffer line to process
+    local function nextline(buf, hlt, completed)
         if buf and hlt then
             if completed then
                 bufs[#bufs + 1] = { buf, hlt }
@@ -244,42 +263,32 @@ local function new_ansi(verbose)
                 bufc = { buf, hlt }
             end
         end
-        return #bufs + 1, bufc[1], bufc[2]
+        return #bufs, bufc[1], bufc[2]
     end
 
     --- Backtrace previous buffer line
     --- @param buf string The processed buffer line
-    --- @param hlt table The highlight of a processed buffer line
+    --- @param hlt ANSILineHighlight[] The highlight of a processed buffer line
     --- @return integer row The row of buffer line to process
     --- @return string buf The buffer line to process
-    --- @return table hlt The highlight of buffer line to process
+    --- @return ANSILineHighlight[] hlt The highlight of buffer line to process
     local function prevline(buf, hlt)
         local _buf, _hlt = unpack(bufs[#bufs])
         bot = bot - 1
         bufs[#bufs] = nil
-        return #bufs + 1, _buf .. buf, vim.list_extend(_hlt, hlt)
+        return #bufs, _buf .. buf, vim.list_extend(_hlt, hlt)
     end
 
-    ansi.bufs = function() return bufs end
-
-    ansi.feed = function(linestr)
-        if verb_r then
-            local head = ('> line=%d'):format(cnt)
-            bufs[#bufs + 1] = { head, { { 'DiffText', #bufs + 1, 0, string.len(head) } } }
-            bufs[#bufs + 1] = { linestr, {} }
-            bufs[#bufs + 1] = { '<', {} } -- May populate `bufs` used by `prevline()`
-            cnt = cnt + 1
-        end
-
+    local function feedline(linestr)
         local row, buf, hlt = nextline()
         for _, line, args, byte in next_csi(linestr, CSI_PAT) do
             -- Process CSI SGR
             for separated in next_cr(line) do
                 local trimed = trim(separated)
                 if trimed ~= '' then
-                    local cs = string.len(buf) -- col_start
-                    local ce = cs + string.len(trimed) -- col_end
                     if sgr.hl then
+                        local cs = string.len(buf) -- col_start
+                        local ce = cs + string.len(trimed) -- col_end
                         hlt[#hlt + 1] = { sgr.hl, row, cs, ce }
                         if verb_h then
                             trimed = trimed .. ('<%d,%d,%d>'):format(row, cs, ce)
@@ -287,7 +296,7 @@ local function new_ansi(verbose)
                     end
                     buf = buf .. trimed
                 end
-                row, buf, hlt = nextline(buf, hlt, { completed = separated:match('.*\r$') })
+                row, buf, hlt = nextline(buf, hlt, separated:match('.*\r$'))
             end
             if byte == 'm' then
                 sgr.tohl(args)
@@ -302,7 +311,7 @@ local function new_ansi(verbose)
                 nr = (nr ~= '') and tonumber(nr) or 1
                 nc = (nc ~= '') and tonumber(nc) or 1
                 while bot < nr do
-                    row, buf, hlt = nextline(buf, hlt, { completed = true })
+                    row, buf, hlt = nextline(buf, hlt, true)
                 end
                 if bot - 1 == nr then
                     row, buf, hlt = prevline(buf, hlt) -- Backtrace one buffer line had been processed
@@ -329,7 +338,21 @@ local function new_ansi(verbose)
         end
     end
 
-    return ansi
+    return bufs,
+        function(linestr)
+            if verb_r then
+                local head = ('> line=%d'):format(cnt)
+                bufs[#bufs + 1] = { head, { { 'DiffText', #bufs, 0, string.len(head) } } }
+                bufs[#bufs + 1] = { linestr, {} }
+                bufs[#bufs + 1] = { '<', {} } -- May populate `bufs` used by `prevline()`
+                cnt = cnt + 1
+                for _, hlt in ipairs(bufc[2]) do
+                    hlt[2] = hlt[2] + 3
+                end
+            end
+
+            feedline(linestr)
+        end
 end
 
 return { new = new_ansi }
