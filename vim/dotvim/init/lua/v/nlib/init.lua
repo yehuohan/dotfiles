@@ -147,7 +147,7 @@ function M.new_configer(opts)
     return opts
 end
 
---- @class new_chanor.Opts Chanor options according to `Tout.Params`
+--- @class new_chanor.Opts Options according to `Tout.Params`
 --- @field style string|nil
 --- @field verbose string|nil
 
@@ -206,12 +206,12 @@ function M.new_chanor(opts)
         local lines = {}
         local highlights = {}
         for k = buf_idx, #bufs - (eof and 0 or 1), 1 do -- `ansi` may backtrace one buffer line
-            if bufs[k] then
-                lines[#lines + 1] = bufs[k][1]
-                if style == 'ansi' then
-                    highlights[#highlights + 1] = bufs[k][2]
-                end
+            -- if bufs[k] then
+            lines[#lines + 1] = bufs[k][1]
+            if style == 'ansi' then
+                highlights[#highlights + 1] = bufs[k][2]
             end
+            -- end
             buf_idx = buf_idx + 1
         end
 

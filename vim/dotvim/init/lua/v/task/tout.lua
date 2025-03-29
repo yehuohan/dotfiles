@@ -76,7 +76,7 @@ function qf.highlight(hl, line, cs, ce)
     vim.api.nvim_buf_set_extmark(
         qf.hbuf,
         qf.ns,
-        line, -- '+1' for on_start's command line, '-1' for zero-based line
+        line + 1, -- '+1' for on_start's command line
         cs + 3, -- '+3' for offset form '|| '
         { end_col = ce + 3, hl_group = hl }
     )
@@ -137,11 +137,11 @@ function qf.on_start(task, cpt, params)
     })
     if qf.hbuf then
         local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
-        qf.highlight('Constant', line, 5, 13)
-        qf.highlight('Identifier', line, 15, string.len(msg))
+        qf.highlight('Constant', line - 1, 5, 13)
+        qf.highlight('Identifier', line - 1, 15, string.len(msg))
     end
     if qf.hwin and params.title == require('v.task').title.Fzer then
-        require('v.task').qf_hlstr(qf.hwin, params.hltext)
+        require('v.task').qf.hlstr(qf.hwin, params.hltext)
     end
 end
 
@@ -164,8 +164,8 @@ function qf.on_complete(task, status, result, cpt, params)
     if qf.hbuf then
         local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
         local hlgrp = 'Overseer' .. status
-        qf.highlight('Constant', line, 5, 13)
-        qf.highlight(hlgrp, line, 15, string.len(msg))
+        qf.highlight('Constant', line - 1, 5, 13)
+        qf.highlight(hlgrp, line - 1, 15, string.len(msg))
     end
     if params.scroll then
         qf.scroll(#lines + 1)
@@ -314,7 +314,6 @@ function M.constructor(params)
     --- @type Tout.Component
     local cpt = {
         start_time = nil,
-        --- @type Chanor|nil
         chanor = nil,
     }
 

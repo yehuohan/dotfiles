@@ -24,6 +24,9 @@ local M = {}
 --- @field encoding string
 --- @field verbose string|nil
 
+--- @class TaskQuickfix Better quickfix for task
+--- @field hwin integer|nil The view window handle
+
 --- @type TaskWorkspace
 M.wsc = {
     code = {},
@@ -83,17 +86,89 @@ function M.cmd(cmd, bang)
     M.run(cfg)
 end
 
---- Goto the quickfix item
+--- @type TaskQuickfix
+local _qf = { hwin = nil }
+M.qf = _qf
+
+--- For BufWinEnter
+function _qf.enter(args)
+    local qf = vim.fn.getqflist({ winid = 1, qfbufnr = 1, title = 1, context = 1 })
+    if qf.qfbufnr ~= args.buf then
+        return
+    end
+    nlib.m.nnore({ 'p', function() _qf.view(qf.winid) end, buffer = qf.qfbufnr })
+    nlib.m.nnore({ '<CR>', function() _qf.jump(qf.winid) end, buffer = qf.qfbufnr })
+    if (qf.winid > 0) and vim.api.nvim_win_is_valid(qf.winid) then
+        _qf.adapt(qf.winid)
+        if qf.title == M.title.Fzer then
+            _qf.hlstr(qf.winid, qf.context.hltext)
+        end
+    end
+end
+
+--- For WinLeave
+function _qf.leave(args)
+    local qf = vim.fn.getqflist({ qfbufnr = 1 })
+    if qf.qfbufnr == args.buf then
+        if _qf.hwin and vim.api.nvim_win_is_valid(_qf.hwin) then
+            vim.api.nvim_win_close(_qf.hwin, false)
+            _qf.hwin = nil
+        end
+    end
+end
+
+--- View content of current quickfix item
 --- @param qfwin integer Quickfix window handle
-function M.qf_goto(qfwin)
+function _qf.view(qfwin)
+    local row = vim.fn.line('.', qfwin)
+    local item = vim.fn.getqflist()[row]
+    if item.bufnr > 0 then
+        if _qf.hwin and vim.api.nvim_win_is_valid(_qf.hwin) then
+            local cur = vim.api.nvim_win_get_cursor(_qf.hwin)
+            if cur[1] == item.lnum and cur[2] == item.col - 1 then
+                -- Toggle view
+                vim.api.nvim_win_close(_qf.hwin, false)
+                _qf.hwin = nil
+            else
+                -- Switch buffer
+                vim.api.nvim_win_set_buf(_qf.hwin, item.bufnr)
+                vim.api.nvim_win_set_cursor(_qf.hwin, { item.lnum, item.col - 1 })
+            end
+        else
+            -- Create view
+            local qfwin_hei = vim.fn.winheight(qfwin)
+            _qf.hwin = vim.api.nvim_open_win(item.bufnr, false, {
+                relative = 'win',
+                win = qfwin,
+                anchor = 'SW',
+                width = vim.o.columns,
+                height = math.min(vim.o.lines - qfwin_hei - 6, 16),
+                col = 0,
+                row = -1,
+                border = 'single',
+            })
+            vim.wo[_qf.hwin].winblend = 10
+            vim.wo[_qf.hwin].winhighlight = 'NormalFloat:Normal,FloatBorder:Normal'
+            vim.api.nvim_win_set_cursor(_qf.hwin, { item.lnum, item.col - 1 })
+        end
+    else
+        -- Close view
+        if _qf.hwin and vim.api.nvim_win_is_valid(_qf.hwin) then
+            vim.api.nvim_win_close(_qf.hwin, false)
+            _qf.hwin = nil
+        end
+    end
+end
+
+--- jump to the quickfix item
+--- @param qfwin integer Quickfix window handle
+function _qf.jump(qfwin)
     -- Open with absolute file path
     local row = vim.fn.line('.', qfwin)
     local item = vim.fn.getqflist()[row]
     if item.bufnr > 0 then
         vim.api.nvim_set_current_win(vim.fn.win_getid(vim.fn.winnr('#')))
-        if not vim.b.sets_large_file then
-            vim.cmd.edit({ args = { vim.api.nvim_buf_get_name(item.bufnr) } })
-        end
+        vim.cmd.edit({ args = { vim.api.nvim_buf_get_name(item.bufnr) } })
         local pos = { item.lnum, item.col > 0 and (item.col - 1) or 0 }
         vim.api.nvim_win_set_cursor(0, pos)
     end
@@ -102,7 +177,7 @@ end
 
 --- Adapt quickfix output like terminal
 --- @param qfwin integer Quickfix window handle
-function M.qf_adapt(qfwin)
+function _qf.adapt(qfwin)
     vim.api.nvim_win_call(qfwin, function()
         vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| / conceal]] } })
         vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| {{{ / conceal]] } })
@@ -116,7 +191,7 @@ end
 --- Highlight specified strings from quickfix output
 --- @param qfwin integer Quickfix window handle
 --- @param texts string[]|nil Text array to highlight
-function M.qf_hlstr(qfwin, texts)
+function _qf.hlstr(qfwin, texts)
     if type(texts) == 'table' then
         vim.api.nvim_win_call(qfwin, function()
             for _, txt in ipairs(texts) do
@@ -125,27 +200,6 @@ function M.qf_hlstr(qfwin, texts)
             end
         end)
     end
-end
-
---- Setup quickfix window for task result
-local function setup_quickfix()
-    vim.api.nvim_create_autocmd('BufWinEnter', {
-        group = 'v.Task',
-        callback = function(args)
-            local qf = vim.fn.getqflist({ winid = 1, qfbufnr = 1, title = 1, context = 1 })
-            if qf.qfbufnr ~= args.buf then
-                return
-            end
-            nlib.m.nnore({ '<CR>', function() M.qf_goto(qf.winid) end, buffer = qf.qfbufnr })
-            if (qf.winid > 0) and vim.api.nvim_win_is_valid(qf.winid) then
-                M.qf_adapt(qf.winid)
-                if qf.title == M.title.Fzer then
-                    M.qf_hlstr(qf.winid, qf.context.hltext)
-                end
-            end
-        end,
-    })
-    vim.api.nvim_set_hl(0, 'QuickFixLine', { bg = '#505050' })
 end
 
 --- Setup task plugin overseer
@@ -264,8 +318,12 @@ function M.setup()
         end,
     })
 
+    -- Setup quickfix window for task result
+    vim.api.nvim_create_autocmd('BufWinEnter', { group = 'v.Task', callback = _qf.enter })
+    vim.api.nvim_create_autocmd('WinLeave', { group = 'v.Task', callback = _qf.leave })
+    vim.api.nvim_set_hl(0, 'QuickFixLine', { bg = '#505050' })
+
     setup_overseer()
-    setup_quickfix()
     require('v.task.code').setup()
     require('v.task.fzer').setup()
 end
