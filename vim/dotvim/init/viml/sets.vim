@@ -215,10 +215,10 @@ let g:did_install_default_menus = 1     " 禁止加载缺省菜单
 let g:did_install_syntax_menu = 1       " 禁止加载Syntax菜单
 
 function! GuiSetFonts(inc)
-    let s:use.ui.fontsize += a:inc
-    let s:use.ui.widesize += a:inc
-    execute printf('set guifont=%s:h%d', escape(s:use.ui.font, ' '), s:use.ui.fontsize)
-    execute printf('set guifontwide=%s:h%d', escape(s:use.ui.wide, ' '), s:use.ui.widesize)
+    let s:use.ui.font.size += a:inc
+    let s:use.ui.font_wide.size += a:inc
+    execute printf('set guifont=%s:h%d', escape(s:use.ui.font.name, ' '), s:use.ui.font.size)
+    execute printf('set guifontwide=%s:h%d', escape(s:use.ui.font_wide.name, ' '), s:use.ui.font_wide.size)
 endfunction
 call GuiSetFonts(0)
 nnoremap <k0> :call GuiSetFonts(0)<CR>

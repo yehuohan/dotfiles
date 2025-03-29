@@ -25,7 +25,6 @@ let g:EasyMotion_do_mapping = 0         " 禁止默认map
 let g:EasyMotion_smartcase = 1          " 不区分大小写
 nmap s <Plug>(easymotion-overwin-f)
 nmap f <Plug>(easymotion-bd-fl)
-nmap <leader>ms <Plug>(easymotion-sn)
 nmap <leader>j <Plug>(easymotion-bd-jk)
 nmap <leader><leader>j <Plug>(easymotion-overwin-line)
 nmap <leader>mw <Plug>(easymotion-bd-w)

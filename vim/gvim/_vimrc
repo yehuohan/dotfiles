@@ -3,6 +3,6 @@ source $DOT_HOME/dotvim/init/viml/init.vim
 if IsWin()
     set pythonthreedll=python312.dll
     let s:use = SvarUse()
-    let s:use.ui.wide = 'Microsoft YaHei Mono'
+    let s:use.ui.font_wide.name = 'Microsoft YaHei Mono'
     call GuiSetFonts(0)
 endif

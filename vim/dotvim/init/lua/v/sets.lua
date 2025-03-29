@@ -193,22 +193,10 @@ end
 --------------------------------------------------------------------------------
 -- Gui
 --------------------------------------------------------------------------------
-local function set_fonts(inc)
-    use.ui.fontsize = use.ui.fontsize + inc
-    use.ui.widesize = use.ui.widesize + inc
-    if vim.g.nvy then
-        vim.o.guifont = use.ui.fontback .. ':h' .. tostring(use.ui.fontsize)
-    else
-        vim.o.guifont = use.ui.font .. ':h' .. tostring(use.ui.fontsize)
-    end
-    vim.o.guifontwide = use.ui.wide .. ':h' .. tostring(use.ui.widesize)
-end
-
 local function on_UIEnter()
-    set_fonts(0)
-    m.nnore({ '<k0>', function() set_fonts(0) end })
-    m.nnore({ '<kPlus>', function() set_fonts(1) end })
-    m.nnore({ '<kMinus>', function() set_fonts(-1) end })
+    use.set_fonts(0)
+    m.nnore({ '<kPlus>', function() use.set_fonts(1) end })
+    m.nnore({ '<kMinus>', function() use.set_fonts(-1) end })
 
     vim.o.guicursor = 'n-v-c-sm:block,i-ci-ve-t:ver25,r-cr-o:hor20'
         .. ',a:blinkwait500-blinkoff500-blinkon250-Cursor/lCursor'
