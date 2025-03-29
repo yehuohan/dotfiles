@@ -14,12 +14,9 @@ let s:use = {
         \ 'im_select' : v:false,
         \ },
     \ 'ui'     : {
-        \ 'icon'     : v:false,
-        \ 'font'     : 'Consolas',
-        \ 'fontback' : 'Consolas',
-        \ 'fontsize' : 12,
-        \ 'wide'     : 'Microsoft YaHei UI',
-        \ 'widesize' : 11,
+        \ 'icon'      : v:false,
+        \ 'font'      : { 'name': '', 'size': 12 },
+        \ 'font_wide' : { 'name': '', 'size': 12 },
         \ },
     \ 'xgit'   : v:null,
     \ }
@@ -59,34 +56,53 @@ function! s:useInit()
             \ 'get' : {sopt -> s:use.pkgs[sopt]},
             \ },
         \ }
-    let l:fontlst = [
+    let l:fontnames = [
         \ 'Consolas',
-        \ 'Consolas,CodeNewRoman Nerd Font Mono',
         \ 'Consolas,Cousine Nerd Font Mono',
         \ 'Consolas Nerd Font Mono',
         \ 'FantasqueSansM Nerd Font Mono',
+        \ 'Maple Mono NF CN',
         \ 'Microsoft YaHei UI',
         \ 'Microsoft YaHei Mono',
         \ 'WenQuanYi Micro Hei Mono',
         \ ]
-    let l:fontsizelst = [9, 10, 11, 12, 13, 14, 15]
+    let l:fontsizes = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
     let l:dic.ui = {
         \ 'dsr' : 'set ui',
-        \ 'lst' : sort(keys(s:use.ui)),
+        \ 'lst' : ['icon', 'font', 'font_wide'],
         \ 'dic' : {
-            \ 'icon'     : {'lst' : [v:true, v:false]},
-            \ 'font'     : {'dsr' : 'as guifont', 'lst' : l:fontlst},
-            \ 'fontback' : {'dsr' : 'as guifont fallback', 'lst' : l:fontlst },
-            \ 'wide'     : {'dsr' : 'as guifontwide', 'lst' : l:fontlst},
-            \ 'fontsize' : {'lst' : l:fontsizelst},
-            \ 'widesize' : {'lst' : l:fontsizelst},
+            \ 'icon'      : {'lst' : [v:true, v:false]},
+            \ 'font'      : {
+                \ 'dsr' : 'as guifont',
+                \ 'lst' : ['name', 'size'],
+                \ 'dic' : {
+                    \ 'name' : { 'lst': l:fontnames },
+                    \ 'size' : { 'lst': l:fontsizes },
+                    \ },
+                    \ 'sub' : {
+                        \ 'cmd' : {sopt, sel -> extend(s:use.ui.font, {sopt : sel})},
+                        \ 'get' : {sopt -> s:use.ui.font[sopt]},
+                    \}
+                \ },
+            \ 'font_wide' : {
+                \ 'dsr' : 'as guifontwide',
+                \ 'lst' : ['name', 'size'],
+                \ 'dic' : {
+                    \ 'name' : { 'lst': l:fontnames },
+                    \ 'size' : { 'lst': l:fontsizes },
+                    \ },
+                    \ 'sub' : {
+                        \ 'cmd' : {sopt, sel -> extend(s:use.ui.font_wide, {sopt : sel})},
+                        \ 'get' : {sopt -> s:use.ui.font_wide[sopt]},
+                    \}
+                \ },
             \ },
         \ 'sub' : {
             \ 'cmd' : {sopt, sel -> extend(s:use.ui, {sopt : sel})},
             \ 'get' : {sopt -> s:use.ui[sopt]},
             \ },
         \ }
-    let l:dic.xgit = { 'lst': [v:null, 'https://kkgithub.com'] }
+    let l:dic.xgit = { 'lst': [v:null, 'https://kkgithub.com', 'https://bgithub.xyz'] }
 
     call PopSelection({
         \ 'opt' : 'use',
