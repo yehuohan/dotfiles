@@ -1,6 +1,8 @@
 local use_file = vim.env.DotVimLocal .. '/.use.json'
 local use = {
-    has_py = false,
+    has_py = false, -- Enable python features
+    has_git = false, -- Enable git features
+    has_build = false, -- Enable self-built libraries
     nlsp = false,
     ndap = false,
     nts = false,

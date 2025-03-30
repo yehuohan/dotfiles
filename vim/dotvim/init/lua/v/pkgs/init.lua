@@ -166,20 +166,8 @@ local function pkg_neotree()
 
     require('neo-tree').setup({
         sources = { 'filesystem' },
-        enable_diagnostics = false,
-        enable_git_status = false,
-        enable_modified_markers = false,
-        enable_opened_markers = false,
-        enable_refresh_on_write = false,
-        log_to_file = false,
+        enable_git_status = use.has_git,
         use_default_mappings = false,
-        default_component_configs = {
-            file_size = { enabled = false },
-            type = { enabled = false },
-            last_modified = { enabled = false },
-            created = { enabled = false },
-            symlink_target = { enabled = true },
-        },
         commands = {
             edit = edit(false),
             edit_preview = edit(true),
@@ -213,7 +201,7 @@ local function pkg_neotree()
             },
         },
         filesystem = {
-            filtered_items = { hide_gitignored = false },
+            filtered_items = { hide_gitignored = use.has_git },
             window = {
                 mappings = {
                     ['.'] = 'toggle_hidden',
@@ -794,7 +782,7 @@ local pkgs = {
     require('v.pkgs.nts'),
     { 'stevearc/overseer.nvim' }, -- Setup from v.task
     { 'nvim-telescope/telescope.nvim', config = pkg_telescope, event = 'VeryLazy' },
-    { 'nvim-telescope/telescope-fzf-native.nvim', lazy = true },
+    { 'nvim-telescope/telescope-fzf-native.nvim', lazy = true, build = use.has_build and 'make' },
     { 'nvim-telescope/telescope-frecency.nvim', lazy = true },
     { '2kabhishek/nerdy.nvim', lazy = true },
     { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' }, event = 'VeryLazy' },
