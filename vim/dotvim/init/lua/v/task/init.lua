@@ -83,71 +83,6 @@ function M.cmd(cmd, bang)
     M.run(cfg)
 end
 
---- Goto the quickfix item
---- @param qfwin integer Quickfix window handle
-function M.qf_goto(qfwin)
-    -- Open with absolute file path
-    local row = vim.fn.line('.', qfwin)
-    local item = vim.fn.getqflist()[row]
-    if item.bufnr > 0 then
-        vim.api.nvim_set_current_win(vim.fn.win_getid(vim.fn.winnr('#')))
-        if not vim.b.sets_large_file then
-            vim.cmd.edit({ args = { vim.api.nvim_buf_get_name(item.bufnr) } })
-        end
-        local pos = { item.lnum, item.col > 0 and (item.col - 1) or 0 }
-        vim.api.nvim_win_set_cursor(0, pos)
-    end
-    vim.fn.setqflist({}, 'a', { idx = row })
-end
-
---- Adapt quickfix output like terminal
---- @param qfwin integer Quickfix window handle
-function M.qf_adapt(qfwin)
-    vim.api.nvim_win_call(qfwin, function()
-        vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| / conceal]] } })
-        vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| {{{ / conceal]] } })
-        vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| }}} / conceal]] } })
-    end)
-    vim.wo[qfwin].number = false
-    vim.wo[qfwin].relativenumber = false
-    vim.wo[qfwin].signcolumn = 'no'
-end
-
---- Highlight specified strings from quickfix output
---- @param qfwin integer Quickfix window handle
---- @param texts string[]|nil Text array to highlight
-function M.qf_hlstr(qfwin, texts)
-    if type(texts) == 'table' then
-        vim.api.nvim_win_call(qfwin, function()
-            for _, txt in ipairs(texts) do
-                local etxt = vim.fn.escape(txt, [[/\]])
-                vim.cmd.syntax({ args = { ([[match IncSearch /\V\c%s/]]):format(etxt) } })
-            end
-        end)
-    end
-end
-
---- Setup quickfix window for task result
-local function setup_quickfix()
-    vim.api.nvim_create_autocmd('BufWinEnter', {
-        group = 'v.Task',
-        callback = function(args)
-            local qf = vim.fn.getqflist({ winid = 1, qfbufnr = 1, title = 1, context = 1 })
-            if qf.qfbufnr ~= args.buf then
-                return
-            end
-            nlib.m.nnore({ '<CR>', function() M.qf_goto(qf.winid) end, buffer = qf.qfbufnr })
-            if (qf.winid > 0) and vim.api.nvim_win_is_valid(qf.winid) then
-                M.qf_adapt(qf.winid)
-                if qf.title == M.title.Fzer then
-                    M.qf_hlstr(qf.winid, qf.context.hltext)
-                end
-            end
-        end,
-    })
-    vim.api.nvim_set_hl(0, 'QuickFixLine', { bg = '#505050' })
-end
-
 --- Setup task plugin overseer
 local function setup_overseer()
     local components = {
@@ -265,7 +200,7 @@ function M.setup()
     })
 
     setup_overseer()
-    setup_quickfix()
+    require('v.task.qfer').setup()
     require('v.task.code').setup()
     require('v.task.fzer').setup()
 end

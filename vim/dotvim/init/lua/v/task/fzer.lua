@@ -21,7 +21,7 @@ local function new_wsc()
         vimgrep = false, -- `:vimgrep` doesn't works with `hidden`, `ignore` and `options`
         fuzzier = 'telescope',
         verbose = '',
-        hltext = {},
+        hltexts = {},
     })
 end
 
@@ -363,10 +363,10 @@ local entry = async(function(kt, bang)
     -- Highlight pattern
     local append = kt.A == 'a'
     if not append then
-        wsc.hltext = {}
+        wsc.hltexts = {}
     end
-    table.insert(wsc.hltext, rep.pat)
-    wsc:mut({ hltext = wsc.hltext })
+    table.insert(wsc.hltexts, rep.pat)
+    wsc:mut({ hltexts = wsc.hltexts })
 
     -- Set config
     if kt.S == 'F' then
@@ -390,21 +390,13 @@ local entry = async(function(kt, bang)
     if wsc.vimgrep then
         rep.pat = parse_vg(kt, rep.pat)
         local cmd = replace(fzer.vg, rep)
-        vim.fn.setqflist({}, append and 'a' or 'r', {
-            lines = { string.format('{{{ [%s] %s', os.date('%H:%M:%S'), cmd) },
-            efm = ' ',
-            title = task.title.Fzer,
-            context = { hltext = wsc.hltext },
-        })
-        vim.cmd.copen({ count = 8, mods = { split = 'botright' } })
+        local qfer = require('v.task.qfer').get()
+        qfer.fetch()
+        qfer.open(true, true)
+        qfer.begin_block(cmd, 'Identifier', append)
+        qfer.set_hltexts(wsc.hltexts)
         vim.cmd(cmd)
-        vim.fn.setqflist({}, 'a', {
-            lines = { string.format('}}} [%s] Completed', os.date('%H:%M:%S')) },
-            efm = ' ',
-        })
-        vim.wo[0].foldmethod = 'marker'
-        vim.wo[0].foldmarker = '{{{,}}}'
-        vim.fn.win_execute(0, 'silent! normal! zO')
+        qfer.end_block('Completed', 'Identifier')
         return
     end
 
@@ -421,7 +413,7 @@ local entry = async(function(kt, bang)
         style = 'job',
         encoding = '',
         verbose = bang and 'a' or wsc.verbose,
-        hltext = wsc.hltext,
+        hltexts = wsc.hltexts,
     }
     if wsc.tout.verbose:match('[ae]') then
         wsc.tout.efm = ' '

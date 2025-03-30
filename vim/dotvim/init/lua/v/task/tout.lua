@@ -7,199 +7,13 @@ local PAUSE_PATS = {
     'Press Enter to continue...:',
 }
 
---- @class ToutQuickfix
---- @field ns integer Quickfix highlight namespace
---- @field hwin integer|nil Quickfix window handle
---- @field hbuf integer|nil Quickfix buffer handle
---- @field task table|nil The task output to quickfix
---- @field title TaskTitle|nil
-local qf = {
-    ns = vim.api.nvim_create_namespace('v.task.tout'),
-    hwin = nil,
-    hbuf = nil,
-    task = nil,
-    title = nil,
-}
-
-function qf.get()
-    qf.hwin = nil
-    qf.hbuf = nil
-    local lst = vim.fn.getqflist({ winid = 0, qfbufnr = 0 })
-    if lst.winid > 0 and vim.api.nvim_win_is_valid(lst.winid) then
-        qf.hwin = lst.winid
-    end
-    if lst.qfbufnr > 0 and vim.api.nvim_buf_is_valid(lst.qfbufnr) then
-        qf.hbuf = lst.qfbufnr
-    end
-end
-
-function qf.open(auto_open, auto_jump, append)
-    if auto_open then
-        if qf.hwin then
-            if auto_jump then
-                vim.api.nvim_set_current_win(qf.hwin)
-            end
-        else
-            vim.cmd.copen({ count = 8, mods = { split = 'botright' } })
-            if not auto_jump then
-                vim.cmd.wincmd('p')
-            end
-        end
-    end
-
-    qf.get()
-    if qf.hwin then
-        vim.api.nvim_win_call(qf.hwin, function() vim.cmd.lcd({ args = { qf.task.cwd } }) end)
-    end
-    if qf.hbuf and not append then
-        vim.api.nvim_buf_clear_namespace(qf.hbuf, qf.ns, 0, -1)
-    end
-end
-
-function qf.scroll(dnum)
-    if not qf.hwin then
-        return
-    end
-
-    local line_cur = vim.api.nvim_win_get_cursor(qf.hwin)[1]
-    local line_num = vim.api.nvim_buf_line_count(qf.hbuf)
-    if qf.hwin == vim.api.nvim_get_current_win() then
-        if line_cur + 1 >= (line_num - dnum) then
-            vim.api.nvim_win_set_cursor(qf.hwin, { line_cur + dnum, 0 })
-        end
-    else
-        vim.api.nvim_win_set_cursor(qf.hwin, { line_num, 0 })
-    end
-end
-
-function qf.highlight(hl, line, cs, ce)
-    vim.api.nvim_buf_set_extmark(
-        qf.hbuf,
-        qf.ns,
-        line, -- '+1' for on_start's command line, '-1' for zero-based line
-        cs + 3, -- '+3' for offset form '|| '
-        { end_col = ce + 3, hl_group = hl }
-    )
-end
-
-function qf.display(lines, highlights, efm, encoding)
-    if encoding ~= '' then
-        for k, _ in ipairs(lines) do
-            lines[k] = vim.iconv(lines[k], encoding, vim.o.encoding)
-        end
-    end
-    vim.fn.setqflist({}, 'a', {
-        lines = lines,
-        efm = efm,
-    })
-    if qf.hbuf then
-        for _, hls in ipairs(highlights) do
-            for _, hl in ipairs(hls) do
-                qf.highlight(hl[1], hl[2], hl[3], hl[4])
-            end
-        end
-    end
-end
-
-function qf.react(data, chan_id, encoding)
-    for _, str in ipairs(data) do
-        local txt = str
-        if encoding ~= '' then
-            txt = vim.iconv(str, encoding, vim.o.encoding)
-        end
-        -- React to pause command
-        if IsWin() then
-            for _, pat in ipairs(PAUSE_PATS) do
-                if txt and txt:match(pat) then
-                    vim.api.nvim_chan_send(chan_id, '\x0D')
-                end
-            end
-        end
-    end
-end
-
----@param cpt Tout.Component
----@param params Tout.Params
-function qf.on_start(task, cpt, params)
-    cpt.start_time = vim.fn.reltime()
-    qf.title = params.title
-    qf.task = task
-    qf.get()
-    qf.open(params.open, params.jump, params.append)
-
-    -- Add head message
-    local msg = string.format('{{{ [%s] %s', os.date('%H:%M:%S'), task.name)
-    vim.fn.setqflist({}, params.append and 'a' or 'r', {
-        lines = { msg },
-        efm = ' ', -- Avoid match time string
-        title = params.title,
-        context = { hltext = params.hltext },
-    })
-    if qf.hbuf then
-        local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
-        qf.highlight('Constant', line, 5, 13)
-        qf.highlight('Identifier', line, 15, string.len(msg))
-    end
-    if qf.hwin and params.title == require('v.task').title.Fzer then
-        require('v.task').qf_hlstr(qf.hwin, params.hltext)
-    end
-end
-
----@param cpt Tout.Component
----@param params Tout.Params
-function qf.on_complete(task, status, result, cpt, params)
-    local encoding = params.encoding
-    local dt = vim.fn.reltimefloat(vim.fn.reltime(cpt.start_time))
-    local lines, highlights = cpt.chanor()
-
-    qf.get()
-    qf.display(lines, highlights, params.efm, encoding)
-
-    -- Add tail message
-    local msg = string.format('}}} [%s] %s in %0.2fs', os.date('%H:%M:%S'), status, dt)
-    vim.fn.setqflist({}, 'a', {
-        lines = { msg },
-        efm = ' ', -- Avoid match time string
-    })
-    if qf.hbuf then
-        local line = vim.api.nvim_buf_line_count(qf.hbuf) - 1
-        local hlgrp = 'Overseer' .. status
-        qf.highlight('Constant', line, 5, 13)
-        qf.highlight(hlgrp, line, 15, string.len(msg))
-    end
-    if params.scroll then
-        qf.scroll(#lines + 1)
-    end
-
-    -- Setup fold
-    if qf.hwin then
-        vim.wo[qf.hwin].foldmethod = 'marker'
-        vim.wo[qf.hwin].foldmarker = '{{{,}}}'
-        vim.fn.win_execute(qf.hwin, 'silent! normal! zO')
-    end
-    qf.task = nil
-end
-
----@param cpt Tout.Component
----@param params Tout.Params
-function qf.on_output(task, data, cpt, params)
-    local encoding = params.encoding
-    local chan_id = params.style == 'job' and task.strategy.job_id or task.strategy.chan_id
-    qf.react(data, chan_id, encoding)
-
-    local lines, highlights = cpt.chanor(data)
-    qf.get()
-    qf.display(lines, highlights, params.efm, encoding)
-    if params.scroll then
-        qf.scroll(#lines)
-    end
-end
+--- @type Qfer
+local qfer = require('v.task.qfer').get()
 
 --- @class ToutTerminal
 --- @field twin table<integer,integer> The pined terminal(vterm) window handle for each tabpage
 --- @field task table|nil The task output to terminal
 local term = {
-    -- hwin = nil,
     twin = {},
     task = nil,
 }
@@ -236,7 +50,7 @@ function term.redir(task, pin)
     vim.wo[hwin].signcolumn = 'no'
 end
 
-function term.on_complete(task, status, result)
+function term.stop()
     local tab = vim.api.nvim_get_current_tabpage()
     if term.twin[tab] and vim.api.nvim_win_is_valid(term.twin[tab]) then
         local cursor = vim.api.nvim_win_get_cursor(term.twin[tab])
@@ -282,7 +96,7 @@ local M = {
             type = 'boolean',
             default = false,
         },
-        hltext = {
+        hltexts = {
             desc = 'Text to highlight from task outputs at quickfix window',
             type = 'string', -- Actually use string[]
             default = '',
@@ -290,7 +104,7 @@ local M = {
         title = {
             desc = 'Set quickfix title as a identifier',
             type = 'string',
-            default = 'v.task.tout',
+            default = 'v.task',
         },
         style = {
             desc = 'Choose the display style {term, ansi, job}',
@@ -314,7 +128,6 @@ function M.constructor(params)
     --- @type Tout.Component
     local cpt = {
         start_time = nil,
-        --- @type Chanor|nil
         chanor = nil,
     }
 
@@ -336,35 +149,76 @@ function M.constructor(params)
         end
     end
 
-    cpt.on_start = function(self, task)
+    cpt.on_start = function(_, task)
+        local function qfer_start()
+            cpt.start_time = vim.fn.reltime()
+            qfer.title = params.title
+            qfer.task = task
+            qfer.fetch()
+            qfer.open(params.open, params.jump)
+            qfer.lcd(task.cwd)
+            qfer.begin_block(task.name, 'Identifier', params.append)
+            qfer.set_hltexts(params.hltexts)
+        end
+
         if params.style == 'term' then
             term.redir(task, true)
         else
-            if qf.task then
+            if qfer.task then
                 local fzer = require('v.task').title.Fzer
-                if qf.title ~= fzer and params.title == fzer then
-                    term.redir(qf.task)
-                    qf.on_start(task, cpt, params)
+                if qfer.title ~= fzer and params.title == fzer then
+                    term.redir(qfer.task)
+                    qfer_start()
                 else
                     term.redir(task)
                 end
             else
-                qf.on_start(task, cpt, params)
+                qfer_start()
             end
         end
     end
 
-    cpt.on_complete = function(self, task, status, result)
-        if qf.task and qf.task.id == task.id then
-            qf.on_complete(task, status, result, cpt, params)
+    cpt.on_complete = function(_, task, status, result)
+        if qfer.task and qfer.task.id == task.id then
+            local dt = vim.fn.reltimefloat(vim.fn.reltime(cpt.start_time))
+            local lines, highlights = cpt.chanor()
+            qfer.fetch()
+            qfer.add_lines(lines, highlights, params.efm, params.encoding)
+            qfer.end_block(('%s in %0.2fs'):format(status, dt), 'Overseer' .. status)
+            if params.scroll then
+                qfer.scroll(#lines + 1)
+            end
+            qfer.task = nil
         elseif term.task and term.task.id == task.id then
-            term.on_complete(task, status, result)
+            term.stop()
         end
     end
 
-    cpt.on_output = function(self, task, data)
-        if qf.task and qf.task.id == task.id then
-            qf.on_output(task, data, cpt, params)
+    cpt.on_output = function(_, task, data)
+        if qfer.task and qfer.task.id == task.id then
+            local encoding = params.encoding
+            local chan_id = params.style == 'job' and task.strategy.job_id or task.strategy.chan_id
+            -- React to pause command
+            for _, str in ipairs(data) do
+                local txt = str
+                if encoding ~= '' then
+                    txt = vim.iconv(str, encoding, vim.o.encoding)
+                end
+                if IsWin() then
+                    for _, pat in ipairs(PAUSE_PATS) do
+                        if txt and txt:match(pat) then
+                            vim.api.nvim_chan_send(chan_id, '\x0D')
+                        end
+                    end
+                end
+            end
+
+            local lines, highlights = cpt.chanor(data)
+            qfer.fetch()
+            qfer.add_lines(lines, highlights, params.efm, encoding)
+            if params.scroll then
+                qfer.scroll(#lines)
+            end
         end
     end
 

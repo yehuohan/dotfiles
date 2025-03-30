@@ -928,9 +928,6 @@ local function pkg_lazy()
     local ok = pcall(function()
         vim.o.background = 'dark'
         vim.cmd.colorscheme('gruvbox')
-        -- Hack: gruvbox inverse for statusline will break in neovim v0.11
-        vim.api.nvim_set_hl(0, 'StatusLine', { reverse = false })
-        vim.api.nvim_set_hl(0, 'StatusLineNC', { reverse = false })
     end)
     if not ok then
         vim.cmd.colorscheme('default')

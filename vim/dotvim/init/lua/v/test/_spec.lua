@@ -733,7 +733,7 @@ describe('task', function()
             EQ(cfg, wsc)
             EQ(inp, wsc.path)
             EQ({ inp }, wsc.paths)
-            EQ({ 'word' }, wsc.hltext)
+            EQ({ 'word' }, wsc.hltexts)
         end)
 
         it('. :Fzer Fw', function()
@@ -748,7 +748,7 @@ describe('task', function()
             wsc = txt.fzer
             EQ({ '!_VOut' }, wsc.globs)
             EQ({ vim.fs.dirname(tmp) }, wsc.paths)
-            EQ({ 'word' }, wsc.hltext)
+            EQ({ 'word' }, wsc.hltexts)
         end)
     end)
 
