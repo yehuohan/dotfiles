@@ -29,8 +29,8 @@ nnoremap { <Cmd>set foldlevel=0<CR>
 nnoremap } <Cmd>set foldlevel=99<CR>
 nnoremap <M-[> <Cmd>set foldlevel-=1<CR>
 nnoremap <M-]> <Cmd>set foldlevel+=1<CR>
-" nnoremap <leader>zm zM
-" nnoremap <leader>zr zR
+nnoremap <leader>zm zM
+nnoremap <leader>zr zR
 " 滚屏
 nnoremap <C-j> <C-e>
 nnoremap <C-k> <C-y>

@@ -120,54 +120,6 @@ local function pkg_dressing()
     })
 end
 
--- 代码折叠
-local function pkg_ufo()
-    local ufo = require('ufo')
-    ufo.setup({
-        enable_get_fold_virt_text = true,
-        fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
-            local res = {}
-            local tag = use.ui.icon and '' or '»'
-            local tag_num = use.ui.icon and '󰁂' or '~'
-
-            for k, chunk in ipairs(virtText) do
-                if k == 1 then
-                    -- only match whitespace characters of first chunk
-                    local txt = chunk[1]:match('|| {{{ (.*)') or chunk[1]
-                    local ta, tb = txt:match('(%s*)(.*)')
-                    if ta and tb then
-                        local dwid = vim.fn.strdisplaywidth(ta) - vim.fn.strdisplaywidth(tag)
-                        tag = tag .. ('·'):rep(dwid - 1) .. ' '
-                        txt = tb
-                    end
-                    table.insert(res, { tag, 'Comment' })
-                    table.insert(res, { txt, chunk[2] })
-                else
-                    table.insert(res, chunk)
-                end
-            end
-            table.insert(res, { ('  %s%d '):format(tag_num, endLnum - lnum), 'MoreMsg' })
-            return res
-        end,
-        provider_selector = function() return use.nts and { 'treesitter', 'indent' } or { 'indent' } end,
-    })
-    vim.api.nvim_set_hl(0, 'UfoFoldedBg', { bg = '#5a5555' })
-    m.nnore({
-        '<leader>tu',
-        function()
-            local bufnr = vim.api.nvim_get_current_buf()
-            if ufo.hasAttached(bufnr) then
-                ufo.detach(bufnr)
-            else
-                ufo.attach(bufnr)
-            end
-        end,
-        desc = 'Toggle ufo',
-    })
-    m.nnore({ '<leader>zr', ufo.openAllFolds })
-    m.nnore({ '<leader>zm', ufo.closeAllFolds })
-end
-
 -- 目录树
 local function pkg_neotree()
     --- Goto first sibling
@@ -807,7 +759,6 @@ local pkgs = {
     { 'nvim-tree/nvim-web-devicons', lazy = true, cond = use.ui.icon },
     { 'nvim-lua/plenary.nvim', lazy = true },
     { 'MunifTanjim/nui.nvim', lazy = true },
-    { 'kevinhwang91/promise-async', lazy = true },
     { 'nvim-neotest/nvim-nio', lazy = true },
     { 'honza/vim-snippets' },
     {
@@ -829,7 +780,6 @@ local pkgs = {
     { 'ellisonleao/gruvbox.nvim', config = pkg_gruvbox, event = 'VeryLazy' },
     { 'polirritmico/monokai-nightasty.nvim', event = 'VeryLazy' },
     { 'stevearc/dressing.nvim', config = pkg_dressing, event = 'VeryLazy' },
-    { 'kevinhwang91/nvim-ufo', config = pkg_ufo, event = 'VeryLazy' },
     { 'nvim-neo-tree/neo-tree.nvim', config = pkg_neotree, event = 'VeryLazy' },
     { 'yehuohan/popc', init = pkg_popc, event = 'VeryLazy' },
     { 'yehuohan/popset', dependencies = { 'yehuohan/popc' }, event = 'VeryLazy' },

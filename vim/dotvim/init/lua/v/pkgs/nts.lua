@@ -8,18 +8,21 @@ local function pkg_nts()
         end
     end
     local parser_dir = vim.env.DotVimLocal .. '/.treesitter'
+    local disable = function(_, bufnr) return vim.b[bufnr].sets_large_file == true end
     require('nvim-treesitter.configs').setup({
         parser_install_dir = parser_dir,
         highlight = {
             enable = true,
-            disable = function(_, bufnr) return vim.b[bufnr].sets_large_file == true end,
+            disable = disable,
             additional_vim_regex_highlighting = false,
         },
         indent = {
             enable = true,
+            disable = disable,
         },
         incremental_selection = {
             enable = true,
+            disable = disable,
             keymaps = {
                 init_selection = '<M-r>',
                 node_incremental = '<M-r>',
@@ -29,7 +32,7 @@ local function pkg_nts()
         },
         matchup = {
             enable = true,
-            disable = function(_, bufnr) return vim.b[bufnr].sets_large_file == true end,
+            disable = disable,
         },
     })
     vim.opt.runtimepath:prepend(parser_dir)
