@@ -75,7 +75,7 @@ end
 
 function ctxs.root_path()
     if not vim.t.nstl_root_path_disabled then
-        return vim.fs.normalize(require('v.task').wsc.fzer.path)
+        return vim.t.task_fzer_path or vim.fs.normalize(require('v.task').wsc.fzer.path)
     end
     return ''
 end
@@ -85,7 +85,7 @@ function ctxs.relative_path()
     if vim.t.nstl_root_path_disabled then
         return filepath
     else
-        local rootpath = vim.fs.normalize(require('v.task').wsc.fzer.path)
+        local rootpath = vim.t.task_fzer_path or vim.fs.normalize(require('v.task').wsc.fzer.path)
         local pat = '^' .. vim.fn.escape(rootpath, '\\')
         return vim.fn.substitute(filepath, pat, '', '')
     end

@@ -210,6 +210,7 @@ local function setup_lsp_appearance()
         }
     end
     vim.diagnostic.config({ virtual_lines = true, signs = signs })
+    vim.lsp.inlay_hint.enable(true)
 
     vim.api.nvim_set_hl(0, 'LspSignatureActiveParameter', { link = 'Title' })
     vim.api.nvim_set_hl(0, 'DiagnosticUnderlineError', { undercurl = true, sp = 'Red' })

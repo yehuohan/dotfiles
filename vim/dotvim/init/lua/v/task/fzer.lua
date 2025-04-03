@@ -80,11 +80,8 @@ local fzer = {
             if IsWin() then
                 rep.loc = string.gsub(rep.loc, '/', '\\') -- Fzf preview needs '\' path
             end
-            local grep_cmd = replace(
-                'rg --column --line-number --no-heading --color=always --smart-case {opt} -e "{pat}" {loc}',
-                rep
-            )
-            vim.fn['fzf#vim#grep'](grep_cmd, vim.fn['fzf#vim#with_preview'](), 0)
+            local cmd = replace('rg --column --no-heading --color=always -S {opt} -e "{pat}" {loc}', rep)
+            vim.fn['fzf#vim#grep'](cmd, vim.fn['fzf#vim#with_preview'](), 0)
         end,
         tags = ':FzfTags {pat}',
     },
@@ -202,6 +199,7 @@ local function evt_f(name)
     if name == 'onCR' then
         if wsc.path ~= '' then
             wsc.path = vim.fs.normalize(vim.fn.fnamemodify(wsc.path, ':p'))
+            vim.t.task_fzer_path = wsc.path
             if not vim.tbl_contains(wsc.paths, wsc.path) then
                 table.insert(wsc.paths, wsc.path)
             end
@@ -219,6 +217,7 @@ end
 local function evt_r(name)
     if name == 'onCR' then
         task.wsc.fzer = wsc:get()
+        vim.t.task_fzer_path = wsc.path
         wsc:new(task.wsc.fzer)
         vim.notify('Fzer task wsc is reset!')
     end
@@ -369,6 +368,9 @@ local entry = async(function(kt, bang)
     wsc:mut({ hltexts = wsc.hltexts })
 
     -- Set config
+    if vim.t.task_fzer_path then
+        wsc.path = vim.t.task_fzer_path
+    end
     if kt.S == 'F' then
         _sels.evt = evt_f
         if not await(a.pop_selection(_sels)) then
@@ -400,7 +402,7 @@ local entry = async(function(kt, bang)
         return
     end
 
-    rep.pat = vim.fn.escape(rep.pat, [["\]])
+    rep.pat = vim.fn.escape(rep.pat, '"')
     wsc.cmd = replace(fzer.rg, rep)
     wsc.wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
     wsc.tout = {
@@ -502,6 +504,9 @@ local function setup()
     vim.api.nvim_create_user_command('FzerReset', function(opts)
         if opts.bang then
             wsc = new_wsc()
+            for _, tid in ipairs(vim.api.nvim_list_tabpages()) do
+                vim.t[tid].task_fzer_path = nil
+            end
         else
             wsc:new()
         end
