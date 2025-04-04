@@ -1,0 +1,43 @@
+# Helix configuration
+
+theme = "gruvbox_dark_soft"
+
+
+[editor]
+line-number = "relative"
+
+
+[editor.cursor-shape]
+insert = "bar"
+
+
+[editor.statusline]
+left = ["mode", "file-name"]
+center = ["spinner"]
+right = [
+  "file-modification-indicator",
+  "file-type",
+  "file-encoding",
+  "file-line-ending",
+  "selections",
+  "position",
+  "total-line-numbers"
+]
+separator = "│"
+mode.normal = "N"
+mode.insert = "I"
+mode.select = "S"
+
+
+[keys.normal]
+";" = "command_mode"
+
+H = "goto_line_start"
+L = "goto_line_end"
+A-j = "half_page_down"
+A-k = "half_page_up"
+A-n = "jump_backward"
+A-m = "jump_forward"
+
+
+[keys.insert]
