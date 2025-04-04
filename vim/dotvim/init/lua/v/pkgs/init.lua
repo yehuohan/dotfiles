@@ -337,7 +337,7 @@ local function pkg_mini()
     -- 添加包围符
     require('mini.surround').setup({
         mappings = {
-            add = 'vs',
+            add = 'ys',
             delete = 'ds',
             replace = 'cs',
             find = '',
@@ -348,7 +348,9 @@ local function pkg_mini()
             suffix_next = '',
         },
     })
-    m.nmap({ '<leader>sw', 'vsiw' })
+    m.nmap({ '<leader>sw', 'ysiw' })
+    m.xmap({ 'vs', [[:<C-u>lua MiniSurround.add('visual')<CR>]], silent = true })
+    m.xdel({ 'ys' })
 end
 
 -- Snacks插件库
