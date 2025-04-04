@@ -9,6 +9,11 @@
         "${env:VIMRUNTIME}/lua/vim/treesitter",
         "${env:DotVimDir}/bundle/plenary.nvim/lua"
     ],
+    "diagnostics.disable": [
+        "inject-field",
+        "missing-fields",
+        "undefined-field"
+    ],
     "telemetry.enable": false,
     "format.enable": false
 }

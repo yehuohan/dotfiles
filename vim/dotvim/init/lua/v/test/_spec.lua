@@ -1,5 +1,5 @@
 --- Simple testcases for neovim configration
---- vim@code{ style = 'term' }: nvim --headless --noplugin -i NONE -u NONE -i NONE -n -c "set rtp+=../../../../bundle/plenary.nvim | runtime plugin/plenary.vim | PlenaryBustedDirectory . {minimal_init='NONE'}"
+--- vim@code{ style = 'term' }: nvim --headless --noplugin -i NONE -u NONE -n -c "set rtp+=../../../../bundle/plenary.nvim | runtime plugin/plenary.vim | PlenaryBustedDirectory . {minimal_init='NONE'}"
 
 local dir_this = vim.fn.getcwd()
 local dir_init = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(dir_this)))
