@@ -111,15 +111,6 @@ local function pkg_gruvbox()
     })
 end
 
--- 美化vim.ui
-local function pkg_dressing()
-    require('dressing').setup({
-        select = {
-            backend = { 'telescope', 'snacks_picker', 'builtin' },
-        },
-    })
-end
-
 -- 目录树
 local function pkg_neotree()
     --- Goto first sibling
@@ -167,6 +158,7 @@ local function pkg_neotree()
     require('neo-tree').setup({
         sources = { 'filesystem' },
         enable_git_status = use.has_git,
+        use_popups_for_input = false,
         use_default_mappings = false,
         commands = {
             edit = edit(false),
@@ -184,7 +176,6 @@ local function pkg_neotree()
                 ['<2-LeftMouse>'] = 'edit',
                 ['o'] = 'edit',
                 ['go'] = 'edit_preview',
-                ['<Tab>'] = 'open_with_window_picker',
                 ['i'] = 'open_vsplit',
                 ['gi'] = 'open_split',
                 ['t'] = 'open_tabnew',
@@ -279,26 +270,12 @@ end
 -- Mini插件库
 local function pkg_mini()
     -- 自动对齐
-    require('mini.align').setup({
-        mappings = {
-            start = '',
-            start_with_preview = 'ga',
-        },
-    })
+    require('mini.align').setup({ mappings = { start = '', start_with_preview = 'ga' } })
     m.nmap({ '<leader>al', 'gaip' })
     m.vmap({ '<leader>al', 'ga' })
 
     -- 代码注释
-    require('mini.comment').setup({
-        options = {
-            custom_commentstring = function()
-                local ft = vim.o.ft
-                if 'c' == ft or 'cpp' == ft then
-                    return '// %s'
-                end
-            end,
-        },
-    })
+    require('mini.comment').setup()
     m.nmap({ '<leader>cl', 'gcc' })
     m.nmap({ '<leader>cu', 'gcc' })
 
@@ -361,10 +338,40 @@ local function pkg_snacks()
             indent = { char = '┊' },
             scope = { enabled = false, char = '┋' },
         },
-        -- 消息提示
+        -- 扩展vim.notify
         notifier = {
             margin = { bottom = 1 },
             top_down = false,
+        },
+        -- 扩展vim.ui.input
+        input = {},
+        -- 扩展vim.ui.select
+        picker = {
+            layout = { preset = 'telescope' },
+            db = { sqlite3_path = IsWin() and vim.env.DotVimShare .. '/lib/sqlite3.dll' or nil },
+            win = {
+                input = {
+                    keys = {
+                        ['<CR>'] = { 'confirm', mode = { 'n', 'i' } },
+                        ['<Esc>'] = { 'close', mode = { 'n', 'i' } },
+                        ['<Tab>'] = { '<Esc>', mode = { 'i' }, expr = true },
+                        ['<M-n>'] = { 'history_forward', mode = { 'i' } },
+                        ['<M-m>'] = { 'history_back', mode = { 'i' } },
+                        ['<M-j>'] = { 'list_down', mode = { 'i' } },
+                        ['<M-k>'] = { 'list_up', mode = { 'i' } },
+                        ['<M-d>'] = { 'preview_scroll_up', mode = { 'i', 'n' } },
+                        ['<M-f>'] = { 'preview_scroll_down', mode = { 'i', 'n' } },
+                        ['<M-p>'] = { 'toggle_preview', mode = { 'i', 'n' } },
+                    },
+                },
+            },
+        },
+        styles = {
+            input = {
+                width = 30,
+                relative = 'cursor',
+                b = { completion = use.pkgs.blink },
+            },
         },
     })
     m.nnore({ '<leader>dm', require('snacks').notifier.hide, desc = 'Hide all notifications' })
@@ -756,9 +763,7 @@ local pkgs = {
         'kkharji/sqlite.lua',
         lazy = true,
         init = function()
-            if IsWin() then
-                vim.g.sqlite_clib_path = vim.env.DotVimShare .. '/lib/sqlite3.dll'
-            end
+            vim.g.sqlite_clib_path = IsWin() and vim.env.DotVimShare .. '/lib/sqlite3.dll' or nil
         end,
     },
 
@@ -770,7 +775,6 @@ local pkgs = {
     { 'goolord/alpha-nvim', config = pkg_alpha },
     { 'ellisonleao/gruvbox.nvim', config = pkg_gruvbox, event = 'VeryLazy' },
     { 'polirritmico/monokai-nightasty.nvim', event = 'VeryLazy' },
-    { 'stevearc/dressing.nvim', config = pkg_dressing, event = 'VeryLazy' },
     { 'nvim-neo-tree/neo-tree.nvim', config = pkg_neotree, event = 'VeryLazy' },
     { 'yehuohan/popc', init = pkg_popc, event = 'VeryLazy' },
     { 'yehuohan/popset', dependencies = { 'yehuohan/popc' }, event = 'VeryLazy' },
@@ -863,6 +867,8 @@ local function pkg_lazy()
         callback = function()
             vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#505060', ctermbg = 60 })
             vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { link = 'MiniCursorword' })
+            vim.api.nvim_set_hl(0, 'SnacksPicker', { bg = 'none', nocombine = true })
+            vim.api.nvim_set_hl(0, 'SnacksPickerBorder', { bg = 'none', nocombine = true })
         end,
     })
 
