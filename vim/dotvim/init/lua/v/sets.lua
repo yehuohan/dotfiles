@@ -24,15 +24,6 @@ local options = {
             vim.o.relativenumber = true
         end
     end,
-    syntax = function()
-        if fn.exists('g:syntax_on') == 1 then
-            vim.cmd.syntax({ args = { 'off' } })
-            vim.notify('syntax off')
-        else
-            vim.cmd.syntax({ args = { 'on' } })
-            vim.notify('syntax on')
-        end
-    end,
 }
 
 local function opt_inv(opt)
@@ -181,10 +172,8 @@ local function setup_default_autocmds()
         },
         command = 'setlocal filetype=glsl',
     })
-    api.nvim_create_autocmd('Filetype', { group = 'v.Sets', pattern = { 'vim', 'tex' }, command = 'setlocal foldmethod=marker' })
-    api.nvim_create_autocmd('Filetype', { group = 'v.Sets', pattern = { 'c', 'cpp', 'rust', 'glsl', 'hlsl' }, command = 'setlocal foldmethod=syntax' })
-    api.nvim_create_autocmd('Filetype', { group = 'v.Sets', pattern = { 'python' }, command = 'setlocal foldmethod=indent foldignore=' })
-    api.nvim_create_autocmd('Filetype', { group = 'v.Sets', pattern = { 'txt', 'log' }, command = 'setlocal foldmethod=manual' })
+    api.nvim_create_autocmd('Filetype', { group = 'v.Sets', pattern = { 'vim' }, command = 'setlocal foldmethod=marker' })
+    api.nvim_create_autocmd('Filetype', { group = 'v.Sets', pattern = { 'text', 'log' }, command = 'setlocal foldmethod=manual' })
     api.nvim_create_autocmd('TextYankPost', {
         group = 'v.Sets',
         callback = function() vim.hl.on_yank({ higroup = 'IncSearch', timeout = 200 }) end,
@@ -303,7 +292,6 @@ local function setup()
     m.nnore({ '<leader>iv', function() opt_lst('virtualedit') end, desc = 'Invert virtualedit' })
     m.nnore({ '<leader>is', function() opt_lst('laststatus') end, desc = 'Invert laststatus' })
     m.nnore({ '<leader>in', options.number, desc = 'Invert number' })
-    m.nnore({ '<leader>ih', options.syntax, desc = 'Invert syntax' })
 
     api.nvim_create_augroup('v.Sets', { clear = true })
     setup_default_autocmds()

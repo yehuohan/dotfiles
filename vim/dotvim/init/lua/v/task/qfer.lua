@@ -89,7 +89,7 @@ function qfer.clear_ns()
     end
 end
 
---- Set quickfix highlighted texts (not work in neovim v0.11)
+--- Set quickfix highlighted texts
 --- Only works when quickfix window is valid
 --- @param hltexts string[]|nil
 function qfer.set_hltexts(hltexts)
@@ -99,12 +99,10 @@ function qfer.set_hltexts(hltexts)
 
     qfer.hltexts = hltexts or qfer.hltexts
     if qfer.hltexts then
-        vim.api.nvim_win_call(qfer.qwin, function()
-            for _, txt in ipairs(qfer.hltexts) do
-                local etxt = vim.fn.escape(txt, [[/\]])
-                vim.cmd.syntax({ args = { ([[match IncSearch /\V\c%s/]]):format(etxt) } })
-            end
-        end)
+        for _, txt in ipairs(qfer.hltexts) do
+            local pat = '\\V\\c' .. vim.fn.escape(txt, [[/\]])
+            vim.fn.matchadd('IncSearch', pat, 99, -1, { window = qfer.qwin })
+        end
     end
 end
 
@@ -238,11 +236,10 @@ function qfer.enter(args)
     end
 
     --- Make quikfix output like terminal
-    vim.api.nvim_win_call(qfer.qwin, function()
-        vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| / conceal]] } })
-        vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| {{{ / conceal]] } })
-        vim.cmd.syntax({ args = { [[match vTaskQF /\m^|| }}} / conceal]] } })
-    end)
+    local opts = { conceal = true, window = qfer.qwin }
+    vim.fn.matchadd('Conceal', [[\m^|| ]], 99, -1, opts)
+    vim.fn.matchadd('Conceal', [[\m^|| {{{ ]], 99, -1, opts)
+    vim.fn.matchadd('Conceal', [[\m^|| }}} ]], 99, -1, opts)
     vim.wo[qfer.qwin].number = false
     vim.wo[qfer.qwin].relativenumber = false
     vim.wo[qfer.qwin].signcolumn = 'no'

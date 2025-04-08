@@ -19,9 +19,9 @@
                 "inject-field",
                 "missing-fields",
                 "undefined-field",
-                "duplicate-set-field"
+                "duplicate-set-field",
+                "param-type-mismatch"
             ]
         }
     }
 }
-
