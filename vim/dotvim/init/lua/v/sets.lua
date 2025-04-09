@@ -62,27 +62,27 @@ local function setup_default_opts()
     o.equalalways = false                           -- 禁止自动调窗口大小
     o.textwidth = 0                                 -- 关闭自动换行
     vim.opt.listchars = {
-        tab = '⤜⤚→',
-        eol = '↲',
+        tab = use.ui.icon and '󰞔' or '-->',
+        eol = use.ui.icon and '󱞥' or '↲',
         space = '·',
         nbsp = '␣',
         precedes = '<',
         extends = '>',
         trail = '~',
     }                                               -- 显示不可见字符
-    o.showbreak = '↪ '                              -- wrap标志符
+    o.showbreak = use.ui.icon and '󱞩' or '>'        -- wrap标志符
     o.autoindent = true                             -- 使用autoindent缩进
     o.breakindent = false                           -- 折行时不缩进
     o.conceallevel = 3                              -- 显示高样样式中的隐藏字符
     o.concealcursor = 'nvic'                        -- 设置nvic模式下不显示conceal掉的字符
     o.foldenable = true                             -- 充许折叠
-    vim.opt.foldopen:remove('search')               -- 查找时不自动展开折叠
     o.foldcolumn = '0'                              -- 0~12,折叠标识列
     o.foldmethod = "expr"                           -- 设置折叠方式
     o.foldlevel = 99                                -- 折叠层数，高于level的会自动折叠
     o.foldlevelstart = 99                           -- 编辑另一个buffer时设置的foldlevel值
     o.foldexpr = "v:lua.vim.treesitter.foldexpr()"  -- 折叠显示内容
     o.foldtext = ""                                 -- 禁止显示foldtext，而是显示foldexpr
+    vim.opt.foldopen:remove('search')               -- 查找时不自动展开折叠
     vim.opt.fillchars = {
         fold = '─',                                 -- 填充折叠尾部
     }                                               -- 设置填充字符
@@ -90,9 +90,7 @@ local function setup_default_opts()
     o.startofline = false                           -- 执行滚屏等命令时，不改变光标列位置
     o.laststatus = 3                                -- 一直显示状态栏
     o.showmode = false                              -- 命令行栏不显示VISUAL等字样
-    vim.opt.completeopt = { 'menuone', 'preview' }  -- 补全显示设置
     o.wildmenu = true                               -- 使能命令补全
-    vim.opt.backspace = { 'indent', 'eol', 'start' }-- Insert模式下使用BackSpace删除
     o.title = true                                  -- 允许设置titlestring
     o.hidden = true                                 -- 允许在未保存文件时切换buffer
     o.bufhidden = ''                                -- 跟随hidden设置
@@ -101,6 +99,11 @@ local function setup_default_opts()
     o.autochdir = true                              -- 自动切换当前目录为当前文件所在的目录
     o.autowrite = false                             -- 禁止自动保存文件
     o.autowriteall = false                          -- 禁止自动保存文件
+    vim.opt.completeopt = { 'menuone', 'preview' }  -- 补全显示设置
+    vim.opt.backspace = { 'indent', 'eol', 'start' }-- Insert模式下使用BackSpace删除
+    vim.opt.nrformats = {
+        'bin', 'octal', 'hex', 'alpha'
+    }                                               -- CTRL-A-X支持数字和字母
     vim.opt.fileencodings = {
         'ucs-bom', 'utf-8', 'cp936', 'gb18030', 'big5', 'latin1'
     }                                               -- 解码尝试序列
@@ -110,9 +113,6 @@ local function setup_default_opts()
     o.smartcase = true                              -- 有大写字母时才区别大小写搜索
     o.tildeop = false                               -- 使切换大小写的~，类似于c,y,d等操作符
     o.keywordprg = ':help'                          -- K使用的command
-    vim.opt.nrformats = {
-        'bin', 'octal', 'hex', 'alpha'
-    }                                               -- CTRL-A-X支持数字和字母
     o.mouse = 'a'                                   -- 使能鼠标
     o.spell = false                                 -- 默认关闭拼写检查
     o.spelllang = 'en_us'                           -- 设置拼写语言
@@ -157,36 +157,6 @@ local function on_alter_leave()
     end
 end
 
-local function setup_default_autocmds()
-    -- stylua: ignore start
-    api.nvim_create_autocmd('BufNewFile', { group = 'v.Sets', command = 'setlocal fileformat=unix' })
-    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.nvim' }, command = 'setlocal filetype=vim' })
-    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { 'nlsp.json', '.nlsp.json', 'tasks.json', 'launch.json' }, command = 'setlocal filetype=jsonc' })
-    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.log' }, command = 'setlocal filetype=log' })
-    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.hlsl', '*.usf', '*.ush' }, command = 'setlocal filetype=hlsl' })
-    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.uproject', '*.uplugin', '*.gltf' }, command = 'setlocal filetype=json' })
-    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.wgsl' }, command = 'setlocal filetype=wgsl' })
-    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = {
-            '*.vert', '*.tesc', '*.tese', '*.glsl', '*.geom', '*.frag', '*.comp',
-            '*.rgen', '*.rmiss', '*.rchit', '*.rahit', '*.rint', '*.rcall',
-        },
-        command = 'setlocal filetype=glsl',
-    })
-    api.nvim_create_autocmd('Filetype', { group = 'v.Sets', pattern = { 'vim' }, command = 'setlocal foldmethod=marker' })
-    api.nvim_create_autocmd('Filetype', { group = 'v.Sets', pattern = { 'text', 'log' }, command = 'setlocal foldmethod=manual' })
-    api.nvim_create_autocmd('TextYankPost', {
-        group = 'v.Sets',
-        callback = function() vim.hl.on_yank({ higroup = 'IncSearch', timeout = 200 }) end,
-    })
-    api.nvim_create_autocmd('BufReadPre', { group = 'v.Sets', callback = on_large_file })
-    api.nvim_create_autocmd('BufEnter', { group = 'v.Sets', callback = on_alter_enter })
-    api.nvim_create_autocmd('BufLeave', { group = 'v.Sets', callback = on_alter_leave })
-    -- stylua: ignore end
-end
-
---------------------------------------------------------------------------------
--- Gui
---------------------------------------------------------------------------------
 local function on_UIEnter()
     use.set_fonts(0)
     m.nnore({ '<kPlus>', function() use.set_fonts(1) end })
@@ -220,6 +190,39 @@ local function on_UIEnter()
     if vim.g.nvy then
         vim.o.guicursor = 'n-v-c-sm:block,i-ci-ve-t:ver25,r-cr-o:hor20'
     end
+end
+
+local function setup_default_autocmds()
+    -- stylua: ignore start
+    api.nvim_create_autocmd('BufNewFile', { group = 'v.Sets', command = 'setlocal fileformat=unix' })
+    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.nvim' }, command = 'setlocal filetype=vim' })
+    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { 'nlsp.json', '.nlsp.json', 'tasks.json', 'launch.json' }, command = 'setlocal filetype=jsonc' })
+    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.log' }, command = 'setlocal filetype=log' })
+    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.hlsl', '*.usf', '*.ush' }, command = 'setlocal filetype=hlsl' })
+    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.uproject', '*.uplugin', '*.gltf' }, command = 'setlocal filetype=json' })
+    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.wgsl' }, command = 'setlocal filetype=wgsl' })
+    api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = {
+            '*.vert', '*.tesc', '*.tese', '*.glsl', '*.geom', '*.frag', '*.comp',
+            '*.rgen', '*.rmiss', '*.rchit', '*.rahit', '*.rint', '*.rcall',
+        },
+        command = 'setlocal filetype=glsl',
+    })
+    api.nvim_create_autocmd('Filetype', { group = 'v.Sets', pattern = { 'vim' }, command = 'setlocal foldmethod=marker' })
+    api.nvim_create_autocmd('Filetype', { group = 'v.Sets', pattern = { 'text', 'log' }, command = 'setlocal foldmethod=manual' })
+    api.nvim_create_autocmd('BufEnter', { group = 'v.Sets', callback = on_alter_enter })
+    api.nvim_create_autocmd('BufLeave', { group = 'v.Sets', callback = on_alter_leave })
+    api.nvim_create_autocmd('BufReadPre', { group = 'v.Sets', callback = on_large_file })
+    -- stylua: ignore end
+
+    api.nvim_create_autocmd('TextYankPost', {
+        group = 'v.Sets',
+        callback = function() vim.hl.on_yank({ higroup = 'IncSearch', timeout = 200 }) end,
+    })
+
+    --vim.o.guioptions = 'M' -- 完全禁用Gui界面元素
+    vim.g.did_install_default_menus = 1 -- 禁止加载缺省菜单
+    vim.g.did_install_syntax_menu = 1 -- 禁止加载Syntax菜单
+    api.nvim_create_autocmd('UIEnter', { group = 'v.Sets', callback = on_UIEnter })
 end
 
 --------------------------------------------------------------------------------
@@ -295,11 +298,6 @@ local function setup()
 
     api.nvim_create_augroup('v.Sets', { clear = true })
     setup_default_autocmds()
-
-    --vim.o.guioptions = 'M' -- 完全禁用Gui界面元素
-    vim.g.did_install_default_menus = 1 -- 禁止加载缺省菜单
-    vim.g.did_install_syntax_menu = 1 -- 禁止加载Syntax菜单
-    api.nvim_create_autocmd('UIEnter', { group = 'v.Sets', callback = on_UIEnter })
 
     -- Fast commands
     m.nnore({ '<leader>se', function() fn.PopSelection(fast_cmds) end, desc = 'Fast commands' })

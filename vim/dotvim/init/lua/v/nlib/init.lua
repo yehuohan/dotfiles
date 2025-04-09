@@ -273,7 +273,7 @@ function M.new_terminal(opts)
     else
         local scl = opts and opts.size or 0.6
         local ofs = (1.0 - scl) / 2.0
-        hwin = api.nvim_open_win(hbuf, true, {
+        hwin = api.nvim_open_win(hbuf, false, {
             relative = 'editor',
             width = math.floor(scl * vim.o.columns),
             height = math.floor(scl * vim.o.lines),
@@ -283,6 +283,7 @@ function M.new_terminal(opts)
             border = 'single',
         })
         vim.wo[hwin].winhighlight = 'NormalFloat:Normal,FloatBorder:Normal'
+        api.nvim_set_current_win(hwin) -- Avoid break original window view when closed floating windows
     end
     __term.hwin = hwin
 

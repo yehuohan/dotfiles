@@ -525,8 +525,8 @@ local function pkg_hop()
     hop.setup({ match_mappings = { 'zh', 'zh_sc' } })
     m.nore({ 's', '<Cmd>HopChar<CR>' })
     m.nore({ 'S', '<Cmd>HopWord<CR>' })
-    m.nore({ 'f', '<Cmd>HopCharCL<CR>' })
-    m.nore({ 'F', '<Cmd>HopAnywhereCL<CR>' })
+    m.add({ 'n', 'v', 'o' }, { 'f', '<Cmd>HopCharCL<CR>' })
+    m.add({ 'n', 'v', 'o' }, { 'F', '<Cmd>HopAnywhereCL<CR>' })
     m.nore({ '<leader>j', '<Cmd>HopVertical<CR>' })
     m.nore({ '<leader>k', '<Cmd>HopLineStart<CR>' })
     m.nnore({
@@ -549,24 +549,6 @@ local function pkg_hop()
         end,
         desc = 'Pick window',
     })
-end
-
--- 书签管理
-local function pkg_marks()
-    require('marks').setup({
-        default_mappings = false,
-        force_write_shada = true,
-        cyclic = false,
-        mappings = {
-            toggle_mark = 'm',
-            delete_line = '<leader>ml',
-            delete_buf = '<leader>mc',
-            next = '<M-.>',
-            prev = '<M-,>',
-        },
-    })
-    m.nnore({ '<leader>ts', ':MarksToggleSigns<CR>' })
-    m.nnore({ '<leader>ma', ':MarksListBuf<CR>' })
 end
 
 -- 多光标编辑
@@ -593,8 +575,8 @@ local function pkg_multicursor()
         local move_mc = require('hop.jumper').move_multicursor
         lyr({ 'n', 'x' }, 's', function() hop.char({ jump = move_mc }) end)
         lyr({ 'n', 'x' }, 'S', function() hop.word({ jump = move_mc }) end)
-        lyr({ 'n', 'x' }, 'f', 'f')
-        lyr({ 'n', 'x' }, 'F', 'F')
+        lyr({ 'n', 'x', 'o' }, 'f', 'f')
+        lyr({ 'n', 'x', 'o' }, 'F', 'F')
         lyr({ 'n', 'x' }, '<leader>j', function() hop.vertical({ jump = move_mc }) end)
         lyr({ 'n', 'x' }, '<leader>k', function() hop.vertical({ jump = move_mc }) end)
 
@@ -611,6 +593,24 @@ local function pkg_multicursor()
             end
         end)
     end)
+end
+
+-- 书签管理
+local function pkg_marks()
+    require('marks').setup({
+        default_mappings = false,
+        force_write_shada = true,
+        cyclic = false,
+        mappings = {
+            toggle_mark = 'm',
+            delete_line = '<leader>ml',
+            delete_buf = '<leader>mc',
+            next = '<M-.>',
+            prev = '<M-,>',
+        },
+    })
+    m.nnore({ '<leader>ts', ':MarksToggleSigns<CR>' })
+    m.nnore({ '<leader>ma', ':MarksListBuf<CR>' })
 end
 
 --------------------------------------------------------------------------------
@@ -795,8 +795,8 @@ local pkgs = {
     { 'L3MON4D3/LuaSnip', config = pkg_snip, event = 'VeryLazy', submodules = false },
     { 'stevearc/conform.nvim', config = pkg_conform, event = 'VeryLazy' },
     { 'yehuohan/hop.nvim', config = pkg_hop, event = 'VeryLazy' },
-    { 'yehuohan/marks.nvim', config = pkg_marks, event = 'VeryLazy' },
     { 'jake-stewart/multicursor.nvim', config = pkg_multicursor, event = 'VeryLazy' },
+    { 'yehuohan/marks.nvim', config = pkg_marks, event = 'VeryLazy' },
     { 'kmontocam/nvim-conda', ft = 'python' },
     { 'rust-lang/rust.vim', event = 'VeryLazy' },
     { 'NoahTheDuke/vim-just', ft = 'just' },
