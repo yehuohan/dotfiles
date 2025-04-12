@@ -79,7 +79,7 @@ local function setup_default_opts()
     o.foldcolumn = '0'                              -- 0~12,折叠标识列
     o.foldmethod = "expr"                           -- 设置折叠方式
     o.foldlevel = 99                                -- 折叠层数，高于level的会自动折叠
-    o.foldlevelstart = 99                           -- 编辑另一个buffer时设置的foldlevel值
+    o.foldlevelstart = -1                           -- 开始编辑另一个buffer时，禁止修改foldlevel
     o.foldexpr = "v:lua.vim.treesitter.foldexpr()"  -- 折叠显示内容
     o.foldtext = ""                                 -- 禁止显示foldtext，而是显示foldexpr
     vim.opt.foldopen:remove('search')               -- 查找时不自动展开折叠

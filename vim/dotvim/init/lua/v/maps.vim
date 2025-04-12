@@ -25,10 +25,10 @@ noremap H ^
 " 折叠
 nnoremap <leader>zc zC
 nnoremap <leader>zo zO
-nnoremap { <Cmd>set foldlevel=0<CR>
-nnoremap } <Cmd>set foldlevel=99<CR>
-nnoremap <M-[> <Cmd>set foldlevel-=1<CR>
-nnoremap <M-]> <Cmd>set foldlevel+=1<CR>
+nnoremap { <Cmd>setlocal foldlevel=0<CR>
+nnoremap } <Cmd>setlocal foldlevel=99<CR>
+nnoremap <M-[> <Cmd>setlocal foldlevel-=1<CR>
+nnoremap <M-]> <Cmd>setlocal foldlevel+=1<CR>
 nnoremap <leader>zm zM
 nnoremap <leader>zr zR
 " 滚屏
