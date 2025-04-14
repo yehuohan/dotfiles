@@ -89,23 +89,6 @@ function qfer.clear_ns()
     end
 end
 
---- Set quickfix highlighted texts
---- Only works when quickfix window is valid
---- @param hltexts string[]|nil
-function qfer.set_hltexts(hltexts)
-    if qfer.title ~= require('v.task').title.Fzer then
-        return
-    end
-
-    qfer.hltexts = hltexts or qfer.hltexts
-    if qfer.hltexts then
-        for _, txt in ipairs(qfer.hltexts) do
-            local pat = '\\V\\c' .. vim.fn.escape(txt, [[/\]])
-            vim.fn.matchadd('IncSearch', pat, 99, -1, { window = qfer.qwin })
-        end
-    end
-end
-
 --- Begin block with a head line
 --- @param line string Block head line
 --- @param line_hl string Block head line highlight
@@ -239,14 +222,20 @@ function qfer.enter(args)
 
     --- Make quikfix output like terminal
     local opts = { conceal = true, window = qfer.qwin }
-    vim.fn.matchadd('Conceal', [[\m^|| ]], 99, -1, opts)
-    vim.fn.matchadd('Conceal', [[\m^|| {{{ ]], 99, -1, opts)
-    vim.fn.matchadd('Conceal', [[\m^|| }}} ]], 99, -1, opts)
     vim.wo[qfer.qwin].number = false
     vim.wo[qfer.qwin].relativenumber = false
     vim.wo[qfer.qwin].signcolumn = 'no'
-
-    qfer.set_hltexts()
+    vim.fn.matchadd('Conceal', [[\m^|| ]], 99, -1, opts)
+    vim.fn.matchadd('Conceal', [[\m^|| {{{ ]], 99, -1, opts)
+    vim.fn.matchadd('Conceal', [[\m^|| }}} ]], 99, -1, opts)
+    if qfer.title == require('v.task').title.Fzer then
+        if qfer.hltexts then
+            for _, txt in ipairs(qfer.hltexts) do
+                local pat = '\\V\\c' .. vim.fn.escape(txt, [[/\]])
+                vim.fn.matchadd('IncSearch', pat, 99, -1, { window = qfer.qwin })
+            end
+        end
+    end
 
     nlib.m.nnore({ 'p', qfer.view, buffer = qfer.qbuf })
     nlib.m.nnore({ '<CR>', qfer.jump, buffer = qfer.qbuf })

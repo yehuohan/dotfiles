@@ -9,14 +9,14 @@ local m = nlib.m
 local function pkg_matchup()
     -- packadd matchit
     vim.g.matchup_matchparen_offscreen = { method = 'popup' }
-    m.map({ 'M', '%' })
+    m.nxmap({ 'M', '%' })
 end
 
 -- 快速高亮
 local function pkg_quickhl()
-    m.map({ '<leader>hw', '<Plug>(quickhl-manual-this)' })
-    m.map({ '<leader>hs', '<Plug>(quickhl-manual-this-whole-word)' })
-    m.map({ '<leader>hc', '<Plug>(quickhl-manual-clear)' })
+    m.nxmap({ '<leader>hw', '<Plug>(quickhl-manual-this)' })
+    m.nxmap({ '<leader>hs', '<Plug>(quickhl-manual-this-whole-word)' })
+    m.nxmap({ '<leader>hc', '<Plug>(quickhl-manual-clear)' })
     m.nmap({ '<leader>hr', '<Plug>(quickhl-manual-reset)' })
     m.nmap({ '<leader>th', '<Plug>(quickhl-manual-toggle)' })
 end
@@ -272,7 +272,7 @@ local function pkg_mini()
     -- 自动对齐
     require('mini.align').setup({ mappings = { start = '', start_with_preview = 'ga' } })
     m.nmap({ '<leader>al', 'gaip' })
-    m.vmap({ '<leader>al', 'ga' })
+    m.xmap({ '<leader>al', 'ga' })
 
     -- 代码注释
     require('mini.comment').setup()
@@ -496,8 +496,8 @@ endfunction
         expr = true,
         desc = 'Expand snippet or <Tab>',
     })
-    m.add({ 'i', 's' }, { '<M-l>', function() snip.jump(1) end, desc = 'Next snippet placeholder' })
-    m.add({ 'i', 's' }, { '<M-h>', function() snip.jump(-1) end, desc = 'Prev snippet placeholder' })
+    m.addnore({ 'i', 's' }, { '<M-l>', function() snip.jump(1) end, desc = 'Next snippet placeholder' })
+    m.addnore({ 'i', 's' }, { '<M-h>', function() snip.jump(-1) end, desc = 'Prev snippet placeholder' })
 end
 
 -- 代码格式化
@@ -516,19 +516,19 @@ local function pkg_conform()
             lsp_format = 'fallback',
         },
     })
-    m.nore({ '<leader>fo', conform.format, desc = 'Format code' })
+    m.nxnore({ '<leader>fo', conform.format, desc = 'Format code' })
 end
 
 -- 快速跳转
 local function pkg_hop()
     local hop = require('hop')
-    hop.setup({ match_mappings = { 'zh', 'zh_sc' } })
-    m.nore({ 's', '<Cmd>HopChar<CR>' })
-    m.nore({ 'S', '<Cmd>HopWord<CR>' })
-    m.add({ 'n', 'v', 'o' }, { 'f', '<Cmd>HopCharCL<CR>' })
-    m.add({ 'n', 'v', 'o' }, { 'F', '<Cmd>HopAnywhereCL<CR>' })
-    m.nore({ '<leader>j', '<Cmd>HopVertical<CR>' })
-    m.nore({ '<leader>k', '<Cmd>HopLineStart<CR>' })
+    hop.setup({ match_mappings = { 'noshift', 'zh', 'zh_sc' } })
+    m.nxnore({ 's', '<Cmd>HopChar<CR>' })
+    m.nxnore({ 'S', '<Cmd>HopWord<CR>' })
+    m.addnore({ 'n', 'x', 'o' }, { 'f', '<Cmd>HopCharCL<CR>' })
+    m.addnore({ 'n', 'x', 'o' }, { 'F', '<Cmd>HopAnywhereCL<CR>' })
+    m.nxnore({ '<leader>j', '<Cmd>HopVertical<CR>' })
+    m.nxnore({ '<leader>k', '<Cmd>HopLineStart<CR>' })
     m.nnore({
         '<leader>wi',
         function()
@@ -556,7 +556,7 @@ local function pkg_multicursor()
     local mc = require('multicursor-nvim')
     mc.setup()
     m.nnore({ ',c', mc.toggleCursor, desc = 'Toggle cursor' })
-    m.vnore({
+    m.xnore({
         ',c',
         function()
             mc.action(function(ctx)
@@ -566,9 +566,9 @@ local function pkg_multicursor()
         end,
         desc = 'Create cursors from visual',
     })
-    m.nore({ ',v', function() mc.matchAddCursor(1) end, desc = 'Create cursors from word/selection' })
-    m.vnore({ ',m', mc.matchCursors, desc = 'Match cursors from visual' })
-    m.vnore({ ',s', mc.splitCursors, desc = 'Split cursors from visual' })
+    m.nxnore({ ',v', function() mc.matchAddCursor(1) end, desc = 'Create cursors from word/selection' })
+    m.xnore({ ',m', mc.matchCursors, desc = 'Match cursors from visual' })
+    m.xnore({ ',s', mc.splitCursors, desc = 'Split cursors from visual' })
     m.nnore({ ',a', mc.alignCursors, desc = 'Align cursors' })
     mc.addKeymapLayer(function(lyr)
         local hop = require('hop')
@@ -735,7 +735,7 @@ local function pkg_trans()
             },
         },
     })
-    m.nore({ '<leader>tw', '<Cmd>Translate<CR>' })
+    m.nxnore({ '<leader>tw', '<Cmd>Translate<CR>' })
     m.nnore({ '<leader><leader>t', '<Cmd>TranslateInput<CR>' })
 end
 

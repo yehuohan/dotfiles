@@ -152,13 +152,13 @@ function M.constructor(params)
     cpt.on_start = function(_, task)
         local function qfer_start()
             cpt.start_time = vim.fn.reltime()
-            qfer.title = params.title
             qfer.task = task
+            qfer.title = params.title
+            qfer.hltexts = params.hltexts
             qfer.fetch()
             qfer.open(params.open, params.jump)
             qfer.lcd(task.cwd)
             qfer.begin_block(task.name, 'Identifier', params.append)
-            qfer.set_hltexts(params.hltexts)
         end
 
         if params.style == 'term' then

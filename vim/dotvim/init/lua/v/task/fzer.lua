@@ -393,10 +393,11 @@ local entry = async(function(kt, bang)
         rep.pat = parse_vg(kt, rep.pat)
         local cmd = replace(fzer.vg, rep)
         local qfer = require('v.task.qfer').get()
+        qfer.title = task.title.Fzer
+        qfer.hltexts = wsc.hltexts
         qfer.fetch()
         qfer.open(true, true)
         qfer.begin_block(cmd, 'Identifier', append)
-        qfer.set_hltexts(wsc.hltexts)
         vim.cmd(cmd)
         qfer.end_block('Completed', 'Identifier')
         return
@@ -484,10 +485,10 @@ local function setup()
         }
     end
     for _, keys in ipairs(_keys) do
-        nlib.m.nore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
+        nlib.m.nxnore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
     end
     for _, keys in ipairs(_keys_fuzzier) do
-        nlib.m.nore({ '<leader>' .. keys, function() entry_fuzzier(keys2kt(keys)) end })
+        nlib.m.nxnore({ '<leader>' .. keys, function() entry_fuzzier(keys2kt(keys)) end })
     end
 
     vim.api.nvim_create_user_command(

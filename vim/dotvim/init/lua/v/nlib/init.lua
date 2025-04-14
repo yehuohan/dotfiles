@@ -758,7 +758,11 @@ end
 --- @field buffer integer|nil
 
 --- Map functions
---- 'map' and 'nore' works at normal and visual mode by default here
+---
+--- * 'map' and 'nore' works at 'n', 'v' and 'o'
+--- * 'v' includes both 'x' and 's'
+--- * avoid mapping a-z in 's' mode, which breaks editing placeholder selection of snippet/completion
+---
 --- ```lua
 ---      local m = require('v.nlib').m
 ---      m.add({'n', 'v'}, {'<leader>', ':echo b:<CR>', buffer = true})
@@ -773,35 +777,39 @@ function _m.del(mods, opts)     delmap(mods, opts[1], setopts(opts)) end
 function _m.add(mods, opts)     setmap(mods, opts[1], opts[2], setopts(opts, { remap = true })) end
 function _m.addnore(mods, opts) setmap(mods, opts[1], opts[2], setopts(opts, { noremap = true })) end
 
-function _m.ndel(opts)  delmap('n', opts[1], setopts(opts)) end
-function _m.vdel(opts)  delmap('v', opts[1], setopts(opts)) end
-function _m.xdel(opts)  delmap('x', opts[1], setopts(opts)) end
-function _m.sdel(opts)  delmap('s', opts[1], setopts(opts)) end
-function _m.odel(opts)  delmap('o', opts[1], setopts(opts)) end
-function _m.idel(opts)  delmap('i', opts[1], setopts(opts)) end
-function _m.ldel(opts)  delmap('l', opts[1], setopts(opts)) end
-function _m.cdel(opts)  delmap('c', opts[1], setopts(opts)) end
-function _m.tdel(opts)  delmap('t', opts[1], setopts(opts)) end
-function _m.map(opts)   setmap({'n', 'v'}, opts[1], opts[2], setopts(opts, { remap = true })) end
-function _m.nmap(opts)  setmap('n', opts[1], opts[2], setopts(opts, { remap = true })) end
-function _m.vmap(opts)  setmap('v', opts[1], opts[2], setopts(opts, { remap = true })) end
-function _m.xmap(opts)  setmap('x', opts[1], opts[2], setopts(opts, { remap = true })) end
-function _m.smap(opts)  setmap('s', opts[1], opts[2], setopts(opts, { remap = true })) end
-function _m.omap(opts)  setmap('o', opts[1], opts[2], setopts(opts, { remap = true })) end
-function _m.imap(opts)  setmap('i', opts[1], opts[2], setopts(opts, { remap = true })) end
-function _m.lmap(opts)  setmap('l', opts[1], opts[2], setopts(opts, { remap = true })) end
-function _m.cmap(opts)  setmap('c', opts[1], opts[2], setopts(opts, { remap = true })) end
-function _m.tmap(opts)  setmap('t', opts[1], opts[2], setopts(opts, { remap = true })) end
-function _m.nore(opts)  setmap({'n', 'v'}, opts[1], opts[2], setopts(opts, { noremap = true })) end
-function _m.nnore(opts) setmap('n', opts[1], opts[2], setopts(opts, { noremap = true })) end
-function _m.vnore(opts) setmap('v', opts[1], opts[2], setopts(opts, { noremap = true })) end
-function _m.xnore(opts) setmap('x', opts[1], opts[2], setopts(opts, { noremap = true })) end
-function _m.snore(opts) setmap('s', opts[1], opts[2], setopts(opts, { noremap = true })) end
-function _m.onore(opts) setmap('o', opts[1], opts[2], setopts(opts, { noremap = true })) end
-function _m.inore(opts) setmap('i', opts[1], opts[2], setopts(opts, { noremap = true })) end
-function _m.lnore(opts) setmap('l', opts[1], opts[2], setopts(opts, { noremap = true })) end
-function _m.cnore(opts) setmap('c', opts[1], opts[2], setopts(opts, { noremap = true })) end
-function _m.tnore(opts) setmap('t', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.ndel(opts)   delmap('n', opts[1], setopts(opts)) end
+function _m.vdel(opts)   delmap('v', opts[1], setopts(opts)) end
+function _m.xdel(opts)   delmap('x', opts[1], setopts(opts)) end
+function _m.sdel(opts)   delmap('s', opts[1], setopts(opts)) end
+function _m.odel(opts)   delmap('o', opts[1], setopts(opts)) end
+function _m.idel(opts)   delmap('i', opts[1], setopts(opts)) end
+function _m.ldel(opts)   delmap('l', opts[1], setopts(opts)) end
+function _m.cdel(opts)   delmap('c', opts[1], setopts(opts)) end
+function _m.tdel(opts)   delmap('t', opts[1], setopts(opts)) end
+function _m.map(opts)    setmap({'n', 'v', 'o'}, opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.nvmap(opts)  setmap({'n', 'v'}, opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.nxmap(opts)  setmap({'n', 'x'}, opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.nmap(opts)   setmap('n', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.vmap(opts)   setmap('v', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.xmap(opts)   setmap('x', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.smap(opts)   setmap('s', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.omap(opts)   setmap('o', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.imap(opts)   setmap('i', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.lmap(opts)   setmap('l', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.cmap(opts)   setmap('c', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.tmap(opts)   setmap('t', opts[1], opts[2], setopts(opts, { remap = true })) end
+function _m.nore(opts)   setmap({'n', 'v', 'o'}, opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.nvnore(opts) setmap({'n', 'v'}, opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.nxnore(opts) setmap({'n', 'x'}, opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.nnore(opts)  setmap('n', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.vnore(opts)  setmap('v', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.xnore(opts)  setmap('x', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.snore(opts)  setmap('s', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.onore(opts)  setmap('o', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.inore(opts)  setmap('i', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.lnore(opts)  setmap('l', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.cnore(opts)  setmap('c', opts[1], opts[2], setopts(opts, { noremap = true })) end
+function _m.tnore(opts)  setmap('t', opts[1], opts[2], setopts(opts, { noremap = true })) end
 -- stylua: ignore end
 
 return M

@@ -169,12 +169,12 @@ function M.setup()
     )
     nlib.m.nnore({ '<leader><leader>r', ':TaskRun<Space>' })
     nlib.m.nnore({ '<leader><leader>R', ':TaskRun!<Space>' })
-    nlib.m.vnore({
+    nlib.m.xnore({
         '<leader><leader>r',
         function() vim.api.nvim_feedkeys(':TaskRun ' .. nlib.e.selected(''), 'n', true) end,
         desc = ':RunTask',
     })
-    nlib.m.vnore({
+    nlib.m.xnore({
         '<leader><leader>R',
         function() vim.api.nvim_feedkeys(':TaskRun! ' .. nlib.e.selected(''), 'n', true) end,
         desc = ':RunTask!',

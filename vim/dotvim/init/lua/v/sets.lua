@@ -170,7 +170,7 @@ local function on_UIEnter()
         vim.cmd.GuiLinespace(0)
         vim.cmd.GuiTabline(0)
         vim.cmd.GuiPopupmenu(0)
-        m.nore({ '<RightMouse>', fn.GuiShowContextMenu })
+        m.nvnore({ '<RightMouse>', fn.GuiShowContextMenu })
         m.inore({ '<RightMouse>', fn.GuiShowContextMenu })
         m.nnore({ '<leader>tF', [[<Cmd>call GuiWindowFullScreen(!g:GuiWindowFullScreen)<CR>]] })
         m.nnore({ '<leader>tM', [[<Cmd>call GuiWindowMaximized(!g:GuiWindowMaximized)<CR>]] })
@@ -340,24 +340,24 @@ local function setup()
     local append_eval = function() e.buf_pipe('input', 'append', 'eval', fopts) end
     local yankcopy_exec = function() e.buf_pipe('input', 'yankcopy', 'exec', eopts) end
     local yankcopy_eval = function() e.buf_pipe('input', 'yankcopy', 'eval', fopts) end
-    m.nore({ '<leader>ec', append_exec, desc = 'Append command result' })
-    m.nore({ '<leader>ef', append_eval, desc = 'Append expression result' })
-    m.nore({ '<leader>yc', yankcopy_exec, desc = 'Yank and copy command result' })
-    m.nore({ '<leader>yf', yankcopy_eval, desc = 'Yank and copy expression result' })
+    m.nxnore({ '<leader>ec', append_exec, desc = 'Append command result' })
+    m.nxnore({ '<leader>ef', append_eval, desc = 'Append expression result' })
+    m.nxnore({ '<leader>yc', yankcopy_exec, desc = 'Yank and copy command result' })
+    m.nxnore({ '<leader>yf', yankcopy_eval, desc = 'Yank and copy expression result' })
 
     -- Evaluate math
     local vmath = function() e.buf_pipe('line', 'replace', 'eval_math', { eval = 'eval' }) end
     local lmath = function() e.buf_pipe('line', 'replace', 'eval_math', { eval = 'luaeval' }) end
     local pmath = function() e.buf_pipe('line', 'replace', 'eval_math', { eval = 'py3eval' }) end
-    m.nore({ '<leader>ev', vmath, desc = 'Append vim math' })
-    m.nore({ '<leader>el', lmath, desc = 'Append lua math' })
-    m.nore({ '<leader>ep', pmath, desc = 'Append python math' })
+    m.nxnore({ '<leader>ev', vmath, desc = 'Append vim math' })
+    m.nxnore({ '<leader>el', lmath, desc = 'Append lua math' })
+    m.nxnore({ '<leader>ep', pmath, desc = 'Append python math' })
     vmath = function() e.buf_pipe('line', 'yankcopy', 'eval_math', { eval = 'eval' }) end
     lmath = function() e.buf_pipe('line', 'yankcopy', 'eval_math', { eval = 'luaeval' }) end
     pmath = function() e.buf_pipe('line', 'yankcopy', 'eval_math', { eval = 'py3eval' }) end
-    m.nore({ '<leader>yv', vmath, desc = 'Yank and copy vim math' })
-    m.nore({ '<leader>yl', lmath, desc = 'Yank and copy lua math' })
-    m.nore({ '<leader>yp', pmath, desc = 'Yank and copy python math' })
+    m.nxnore({ '<leader>yv', vmath, desc = 'Yank and copy vim math' })
+    m.nxnore({ '<leader>yl', lmath, desc = 'Yank and copy lua math' })
+    m.nxnore({ '<leader>yp', pmath, desc = 'Yank and copy python math' })
 
     -- Search with internet
     local bing = function(txt) return 'https://cn.bing.com/search?q=' .. txt end
@@ -378,10 +378,10 @@ local function setup()
         res = opts.mode == 'n' and fn.expand('<cword>') or txt
         return bing(res)
     end
-    m.nore({ '<leader>bs', function() e.buf_pipe('line', 'open', smart) end, desc = 'Smart search' })
-    m.nore({ '<leader>bb', function() e.buf_pipe('word', 'open', bing) end, desc = 'Search with bing' })
-    m.nore({ '<leader>bg', function() e.buf_pipe('word', 'open', google) end, desc = 'Search with google' })
-    m.nore({ '<leader>bh', function() e.buf_pipe('word', 'open', github) end, desc = 'Search with github' })
+    m.nxnore({ '<leader>bs', function() e.buf_pipe('line', 'open', smart) end, desc = 'Smart search' })
+    m.nxnore({ '<leader>bb', function() e.buf_pipe('word', 'open', bing) end, desc = 'Search by bing' })
+    m.nxnore({ '<leader>bg', function() e.buf_pipe('word', 'open', google) end, desc = 'Search by google' })
+    m.nxnore({ '<leader>bh', function() e.buf_pipe('word', 'open', github) end, desc = 'Search by github' })
 
     -- Extra mappings
     vim.cmd.source(vim.env.DotVimInit .. '/lua/v/maps.vim')

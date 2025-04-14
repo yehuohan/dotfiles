@@ -217,7 +217,7 @@ local function setup_mappings()
         function() dapui.eval(vim.fn.expand('<cword>'), { enter = true }) end,
         desc = 'Eval expression',
     })
-    m.vnore({
+    m.xnore({
         '<leader>de',
         function() dapui.eval(nlib.e.selected(''), { enter = true }) end,
         desc = 'Eval expression',

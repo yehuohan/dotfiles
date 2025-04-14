@@ -135,7 +135,7 @@ local function setup_lsp_mappings()
     m.nnore({ '<leader>gs', '<Cmd>Lspsaga finder<CR>' })
     m.nnore({ '<leader>go', '<Cmd>Lspsaga outline<CR>' })
 
-    m.nore({ '<leader>of', vim.lsp.buf.format })
+    m.nxnore({ '<leader>of', vim.lsp.buf.format })
     m.nnore({
         '<leader>oH',
         function()
@@ -247,7 +247,7 @@ local function setup_cmp_sources()
         tables = cmp_im_zh.tables({ 'wubi', 'pinyin' }),
         symbols = cmp_im_zh.symbols(true),
     })
-    m.add({ 'n', 'v', 'c', 'i' }, {
+    m.addnore({ 'n', 'v', 'c', 'i' }, {
         '<C-;>',
         function() vim.notify('IM is ' .. (cmp_im.toggle() and 'enabled' or 'disabled')) end,
         desc = 'Toggle input method',
