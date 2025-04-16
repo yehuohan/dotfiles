@@ -676,6 +676,33 @@ local function pkg_tex()
     m.nmap({ '<leader>ak', '<Plug>(vimtex-stop-all)' })
 end
 
+-- 画图
+local function pkg_venn()
+    m.nnore({
+        '<leader>tv',
+        function()
+            if vim.b.pkgs_venn_enabled == true then
+                vim.b.pkgs_venn_enabled = false
+                vim.o.virtualedit = 'block'
+                m.ndel({ 'J', buffer = 0 })
+                m.ndel({ 'K', buffer = 0 })
+                m.ndel({ 'L', buffer = 0 })
+                m.ndel({ 'H', buffer = 0 })
+                m.xdel({ '<leader>vo', buffer = 0 })
+            else
+                vim.b.pkgs_venn_enabled = true
+                vim.o.virtualedit = 'all'
+                m.nnore({ 'J', '<C-v>j:VBox<CR>', buffer = 0 })
+                m.nnore({ 'K', '<C-v>k:VBox<CR>', buffer = 0 })
+                m.nnore({ 'L', '<C-v>l:VBox<CR>', buffer = 0 })
+                m.nnore({ 'H', '<C-v>h:VBox<CR>', buffer = 0 })
+                m.xnore({ '<leader>vo', ':VBox<CR>', buffer = 0 })
+            end
+            vim.notify('Venn is ' .. (vim.b.pkgs_venn_enabled and 'enabled' or 'disabled'))
+        end,
+    })
+end
+
 -- 按键提示
 local function pkg_which_key()
     local which_key = require('which-key')
@@ -806,6 +833,7 @@ local pkgs = {
     { 'toppair/peek.nvim', config = pkg_peek, ft = 'markdown', build = 'deno task build:fast' },
     { 'chomosuke/typst-preview.nvim', config = pkg_typst, ft = 'typst' },
     { 'lervag/vimtex', config = pkg_tex, ft = 'tex' },
+    { 'jbyuki/venn.nvim', config = pkg_venn, event = 'VeryLazy' },
     { 'folke/which-key.nvim', cond = use.pkgs.which_key, config = pkg_which_key, event = 'VeryLazy' },
     { 'uga-rosa/ccc.nvim', config = pkg_ccc, event = 'VeryLazy' },
     { 'itchyny/screensaver.vim', keys = { { '<leader>ss', '<Cmd>ScreenSaver clock<CR>' } } },

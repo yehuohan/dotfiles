@@ -161,7 +161,7 @@ nnoremap <leader>vz <Cmd>lua require('v.nlib').new_terminal({ cmd = { 'zsh' }, b
 "nnoremap <M-u> gT
 "nnoremap <M-p> gt
 nnoremap <leader>bl <C-^>
-nnoremap <leader>bk <Cmd>execute ':tabnext ' . tabpagenr('#')<CR>
+nnoremap <leader>bk <Cmd>tabnext #<CR>
 " 分割窗口
 nnoremap <leader>ws <C-w>s
 nnoremap <leader>wv <C-W>v
