@@ -266,9 +266,6 @@ function M.new_terminal(opts)
     if opts and opts.bottom then
         vim.cmd.split({ mods = { split = 'botright' }, range = { 12 } })
         hwin = vim.api.nvim_get_current_win()
-        vim.wo[hwin].number = false
-        vim.wo[hwin].relativenumber = false
-        vim.wo[hwin].signcolumn = 'no'
         vim.api.nvim_win_set_buf(hwin, hbuf)
     else
         local scl = opts and opts.size or 0.6

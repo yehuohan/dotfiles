@@ -162,11 +162,8 @@ local function setup_lsp_mappings()
         '<leader>oI',
         function()
             local enabled = vim.diagnostic.config().virtual_lines
-            vim.diagnostic.config({
-                virtual_lines = not enabled,
-                virtual_text = enabled and { prefix = '▪' },
-            })
-            vim.notify('Diagnostic in virtual ' .. (enabled and 'text' or 'lines'))
+            vim.diagnostic.config({ virtual_lines = (not enabled) and { current_line = true } })
+            vim.notify('Diagnostic virtual lines ' .. (enabled and 'disabled' or 'enabled'))
         end,
         desc = 'Toggle diagnostic virtual type',
     })
@@ -209,7 +206,11 @@ local function setup_lsp_appearance()
             },
         }
     end
-    vim.diagnostic.config({ virtual_lines = true, signs = signs })
+    vim.diagnostic.config({
+        signs = signs,
+        virtual_lines = { current_line = true },
+        virtual_text = { prefix = '▪' },
+    })
     vim.lsp.inlay_hint.enable(true)
 
     vim.api.nvim_set_hl(0, 'LspSignatureActiveParameter', { link = 'Title' })
