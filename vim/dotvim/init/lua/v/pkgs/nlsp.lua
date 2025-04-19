@@ -16,7 +16,11 @@ local function setup_lsp_servers(capabilities)
         global_settings = 'nlsp.json',
         filetype_jsonc = use.nts,
     })
-    require('lazydev').setup({})
+    require('lazydev').setup({
+        library = {
+            { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+        },
+    })
     -- Servers
     local url = 'https://github.com/%s/releases/download/%s/%s'
     if vim.fn.empty(use.xgit) == 0 then

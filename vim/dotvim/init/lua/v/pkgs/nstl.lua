@@ -127,17 +127,18 @@ function ctxs.check_lines()
 end
 
 function ctxs.tabs_bufs(layout)
-    local buflst = layout.buf and vim.fn['popc#layer#buf#GetBufs'](vim.fn.tabpagenr()) or {}
-    local tablst = layout.tab and vim.fn['popc#layer#buf#GetTabs']() or {}
-    local buftab = vim.fn['popc#stl#ShortenTabsBufs'](buflst, tablst, 2)
+    local popc_tabuf = require('popc.panel.tabuf')
+    local buflst = layout.buf and popc_tabuf.get_bufstatus(vim.api.nvim_get_current_tabpage()) or {}
+    local tablst = layout.tab and popc_tabuf.get_tabstatus() or {}
+    buflst, tablst = require('popc.panel.tabuf.tabline').adjust(buflst, tablst, 2, vim.o.columns - 4)
     local res = {}
     if layout.buf then
-        res.buf = buftab[1]
-        res.buf_click = 'popc#stl#SwitchBuffer'
+        res.buf = buflst
+        res.buf_click = require('popc.panel.tabuf.tabline').switch_buffer
     end
     if layout.tab then
-        res.tab = buftab[2]
-        res.tab_click = 'popc#stl#SwitchTab'
+        res.tab = tablst
+        res.tab_click = require('popc.panel.tabuf.tabline').switch_tabpage
     end
     return res
 end
@@ -280,19 +281,19 @@ end
 local function ele(e, fn)
     local fg = 'atxt'
     local bg = 'area'
-    local txt = e.title
-    if e.modified == 0 and e.selected == 1 then
+    local txt = e.name
+    if e.current and not e.modified then
         fg = 'ftxt'
         bg = 'blue'
-    elseif e.modified == 1 and e.selected == 1 then
+    elseif e.current and e.modified then
         txt = txt .. '+'
         fg = 'ftxt'
         bg = 'green'
-    elseif e.modified == 1 and e.selected == 0 then
+    elseif (not e.current) and e.modified then
         txt = txt .. '+'
         fg = 'green'
     end
-    return pad(bg, { provider = txt, hl = { fg = fg } }, { on_click = { callback = fn, minwid = e.index } })
+    return pad(bg, { provider = txt, hl = { fg = fg } }, { on_click = { callback = fn, minwid = e.id } })
 end
 
 local function tabs()
@@ -396,8 +397,6 @@ local function toggle_tabline_layout()
 end
 
 local function pkg_nstl()
-    -- Tabline status from popc
-    vim.g.Popc_useTabline = 0
     vim.g.nstl_tabline_layout = { tab = true, buf = true }
     vim.o.termguicolors = true
     vim.o.showtabline = 2
@@ -420,7 +419,7 @@ local function pkg_nstl()
         local heirline = require('heirline')
         heirline.setup({
             statusline = stls(),
-            tabline = tabs(),
+            -- tabline = tabs(),
             winbar = bars(),
             opts = {
                 disable_winbar_cb = disabled_bars,

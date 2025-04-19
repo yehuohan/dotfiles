@@ -65,7 +65,7 @@ local function setup(dotvim)
     vim.o.encoding = 'utf-8'
     vim.g.mapleader = ' '
     vim.keymap.set('n', ';', ':', { noremap = true })
-    vim.keymap.set('v', ';', ':', { noremap = true })
+    vim.keymap.set('x', ';', ':', { noremap = true })
     vim.keymap.set('n', ':', ';', { noremap = true })
     vim.keymap.set('', '<CR>', '<CR>', { remap = true })
     vim.keymap.set('', '<Tab>', '<Tab>', { remap = true })

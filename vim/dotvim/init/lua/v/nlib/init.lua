@@ -466,7 +466,7 @@ function _e.buf_pipe(inp, out, proc, opts)
             vim.notify('Require input handler for normal mode')
         end
     else
-        opts.mode = 'v'
+        opts.mode = 'x'
         txt = _e.selected(opts and opts.sep or nil)
     end
     if txt ~= '' then

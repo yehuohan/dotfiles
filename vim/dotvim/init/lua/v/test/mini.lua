@@ -40,7 +40,7 @@ return function(dotvim)
     vim.env.DotVimLocal = dotvim .. '/local'
     vim.g.mapleader = ' '
     vim.keymap.set('n', ';', ':', { noremap = true })
-    vim.keymap.set('v', ';', ':', { noremap = true })
+    vim.keymap.set('x', ';', ':', { noremap = true })
     vim.keymap.set('n', ':', ';', { noremap = true })
 
     setup_pkgs(pkgs)

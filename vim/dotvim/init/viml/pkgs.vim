@@ -337,9 +337,6 @@ nnoremap <leader>sp :PopSet popset<CR>
 let g:Popc_jsonPath = $DotVimLocal
 let g:Popc_useFloatingWin = 1
 let Popc_useNerdSymbols = s:use.ui.icon
-if s:use.ui.icon
-let g:Popc_symbols = { 'Sep' : ['', ''], 'SubSep': [ '', '' ] }
-endif
 let g:Popc_highlight = {
     \ 'text'     : 'Pmenu',
     \ 'selected' : 'CursorLineNr',

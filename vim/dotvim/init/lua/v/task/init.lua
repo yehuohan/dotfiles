@@ -184,16 +184,16 @@ function M.setup()
     vim.api.nvim_create_augroup('v.Task', { clear = true })
     vim.api.nvim_create_autocmd('User', {
         group = 'v.Task',
-        pattern = 'PopcLayerWksSavePre',
-        callback = function() vim.fn['popc#layer#wks#SetSettings'](M.wsc) end,
+        pattern = 'PopcWorkspaceSavePre',
+        callback = function() require('popc.panel.workspace').cmd_set_userdata(M.wsc) end,
     })
     vim.api.nvim_create_autocmd('User', {
         group = 'v.Task',
-        pattern = 'PopcLayerWksLoaded',
+        pattern = 'PopcWorkspaceLoaded',
         callback = function()
-            M.wsc = vim.tbl_deep_extend('force', M.wsc, vim.fn['popc#layer#wks#GetSettings']())
+            M.wsc = vim.tbl_deep_extend('force', M.wsc, require('popc.panel.workspace').cmd_get_userdata())
             if M.wsc.fzer.path == '' then
-                M.wsc.fzer.path = vim.fn['popc#layer#wks#GetCurrentWks']('root')
+                M.wsc.fzer.path = require('popc.panel.workspace').cmd_get_wksroot()
             end
             require('v.task.fzer').setwsc(M.wsc.fzer)
         end,
