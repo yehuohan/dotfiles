@@ -228,6 +228,20 @@ end
 
 -- Buffer,Bookmarks,Workspace管理
 local function pkg_popc()
+    require('popc').setup()
+    m.nnore({ '<leader><leader>h', '<Cmd>PopcTabuf<CR>' })
+    m.nnore({ '<M-u>', 'gT' })
+    m.nnore({ '<M-p>', 'gt' })
+    m.nnore({ '<M-i>', '<Cmd>PopcBufferSwitchLeft!<CR>' })
+    m.nnore({ '<M-o>', '<Cmd>PopcBufferSwitchRight!<CR>' })
+    m.nnore({ '<M-n>', '<Cmd>PopcBufferJumpPrev<CR>' })
+    m.nnore({ '<M-m>', '<Cmd>PopcBufferJumpNext<CR>' })
+    m.nnore({ '<C-n>', '<C-o>' })
+    m.nnore({ '<C-m>', '<C-i>' })
+    m.nnore({ '<leader>wq', '<Cmd>PopcBufferClose<CR>' })
+end
+
+local function pkg_popc_init()
     vim.g.Popc_enableLog = 1
     vim.g.Popc_jsonPath = vim.env.DotVimLocal
     vim.g.Popc_useFloatingWin = 1
@@ -244,16 +258,6 @@ local function pkg_popc()
     vim.g.Popc_bufIgnoredType = { 'Popc', 'qf', 'sagaoutline' }
     vim.g.Popc_wksSaveUnderRoot = 0
     vim.g.Popc_wksRootPatterns = { '.popc', '.git', '.svn', '.hg', 'tags' }
-    m.nnore({ '<leader><leader>h', '<Cmd>PopcBuffer<CR>' })
-    m.nnore({ '<M-u>', '<Cmd>PopcBufferSwitchTabLeft!<CR>' })
-    m.nnore({ '<M-p>', '<Cmd>PopcBufferSwitchTabRight!<CR>' })
-    m.nnore({ '<M-i>', '<Cmd>PopcBufferSwitchLeft!<CR>' })
-    m.nnore({ '<M-o>', '<Cmd>PopcBufferSwitchRight!<CR>' })
-    m.nnore({ '<M-n>', '<Cmd>PopcBufferJumpPrev<CR>' })
-    m.nnore({ '<M-m>', '<Cmd>PopcBufferJumpNext<CR>' })
-    m.nnore({ '<C-n>', '<C-o>' })
-    m.nnore({ '<C-m>', '<C-i>' })
-    m.nnore({ '<leader>wq', '<Cmd>PopcBufferClose!<CR>' })
     m.nnore({ '<leader><leader>b', '<Cmd>PopcBookmark<CR>' })
     m.nnore({ '<leader><leader>w', '<Cmd>PopcWorkspace<CR>' })
 
@@ -803,7 +807,7 @@ local pkgs = {
     { 'ellisonleao/gruvbox.nvim', config = pkg_gruvbox, event = 'VeryLazy' },
     { 'polirritmico/monokai-nightasty.nvim', event = 'VeryLazy' },
     { 'nvim-neo-tree/neo-tree.nvim', config = pkg_neotree, event = 'VeryLazy' },
-    { 'yehuohan/popc', init = pkg_popc, event = 'VeryLazy' },
+    { 'yehuohan/popc', config = pkg_popc, init = pkg_popc_init, event = 'VeryLazy' },
     { 'yehuohan/popset', dependencies = { 'yehuohan/popc' }, event = 'VeryLazy' },
     { 'echasnovski/mini.nvim', config = pkg_mini, event = 'VeryLazy' },
     { 'folke/snacks.nvim', config = pkg_snacks, event = 'VeryLazy' },

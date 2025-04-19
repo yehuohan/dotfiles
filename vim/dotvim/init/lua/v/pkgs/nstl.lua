@@ -127,17 +127,19 @@ function ctxs.check_lines()
 end
 
 function ctxs.tabs_bufs(layout)
-    local buflst = layout.buf and vim.fn['popc#layer#buf#GetBufs'](vim.fn.tabpagenr()) or {}
-    local tablst = layout.tab and vim.fn['popc#layer#buf#GetTabs']() or {}
-    local buftab = vim.fn['popc#stl#ShortenTabsBufs'](buflst, tablst, 2)
+    local popc_tabuf = require('popc.panel.tabuf')
+    local buflst = layout.buf and popc_tabuf.get_bufstatus(vim.api.nvim_get_current_tabpage())
+    local tablst = layout.tab and popc_tabuf.get_tabstatus()
+    -- local buftab = vim.fn['popc#stl#ShortenTabsBufs'](buflst, tablst, 2)
+    local buftab = { buflst, tablst }
     local res = {}
     if layout.buf then
         res.buf = buftab[1]
-        res.buf_click = 'popc#stl#SwitchBuffer'
+        -- res.buf_click = 'popc#stl#SwitchBuffer'
     end
     if layout.tab then
         res.tab = buftab[2]
-        res.tab_click = 'popc#stl#SwitchTab'
+        -- res.tab_click = 'popc#stl#SwitchTab'
     end
     return res
 end
@@ -280,19 +282,23 @@ end
 local function ele(e, fn)
     local fg = 'atxt'
     local bg = 'area'
-    local txt = e.title
-    if e.modified == 0 and e.selected == 1 then
+    local txt = e.name
+    if e.current and not e.modified then
         fg = 'ftxt'
         bg = 'blue'
-    elseif e.modified == 1 and e.selected == 1 then
+    elseif e.current and e.modified then
         txt = txt .. '+'
         fg = 'ftxt'
         bg = 'green'
-    elseif e.modified == 1 and e.selected == 0 then
+    elseif (not e.current) and e.modified then
         txt = txt .. '+'
         fg = 'green'
     end
-    return pad(bg, { provider = txt, hl = { fg = fg } }, { on_click = { callback = fn, minwid = e.index } })
+    return pad(
+        bg,
+        { provider = txt, hl = { fg = fg } }
+        -- , { on_click = { callback = fn, minwid = e.index } }
+    )
 end
 
 local function tabs()
