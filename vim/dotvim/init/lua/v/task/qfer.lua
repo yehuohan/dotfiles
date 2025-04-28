@@ -194,10 +194,8 @@ function qfer.view()
                 height = math.min(vim.o.lines - qhei - 6, 16),
                 col = 0,
                 row = -1,
-                border = 'single',
             })
             vim.wo[qfer.vwin].winblend = 10
-            vim.wo[qfer.vwin].winhighlight = 'NormalFloat:Normal,FloatBorder:Normal'
             vim.api.nvim_win_set_cursor(qfer.vwin, { item.lnum, item.col - 1 })
         end
     else

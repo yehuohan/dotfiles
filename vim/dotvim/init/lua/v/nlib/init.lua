@@ -277,9 +277,7 @@ function M.new_terminal(opts)
             col = math.floor(ofs * vim.o.columns),
             row = math.floor(ofs * vim.o.lines),
             style = 'minimal',
-            border = 'single',
         })
-        vim.wo[hwin].winhighlight = 'NormalFloat:Normal,FloatBorder:Normal'
         api.nvim_set_current_win(hwin) -- Avoid break original window view when closed floating windows
     end
     __term.hwin = hwin
@@ -496,12 +494,12 @@ function _e.buf_etmp(ft, wt)
         wt = ''
         local buf = api.nvim_create_buf(true, false)
         api.nvim_open_win(buf, true, {
+            anchor = 'NE',
             relative = 'editor',
-            width = math.floor(0.6 * vim.o.columns),
-            height = math.floor(0.7 * vim.o.lines),
-            col = 3,
+            width = math.floor(0.5 * vim.o.columns),
+            height = math.floor(0.5 * vim.o.lines),
+            col = vim.o.columns,
             row = 2,
-            border = 'single',
         })
     end
     vim.cmd[wt .. 'edit'](fn.tempname() .. '.' .. ft)

@@ -31,7 +31,6 @@ local function setup_lsp_servers(capabilities)
         github = { download_url_template = url },
         ui = {
             check_outdated_packages_on_open = true,
-            border = 'single',
             icons = {
                 package_installed = '√',
                 package_pending = '●',
@@ -227,14 +226,11 @@ end
 --- Setup lsp extensions
 local function setup_lsp_extensions()
     require('lspsaga').setup({
-        ui = { border = 'single' },
         scroll_preview = {
             scroll_down = '<M-n>',
             scroll_up = '<M-m>',
         },
-        code_action = {
-            keys = { quit = { 'q', '<Esc>' } },
-        },
+        code_action = { keys = { quit = { 'q', '<Esc>' } } },
         lightbulb = { enable = false },
         diagnostic = { on_insert = false },
         symbol_in_winbar = {
@@ -407,19 +403,14 @@ end
 local function setup_cmp_highlights()
     local api = vim.api
     -- stylua: ignore start
-    api.nvim_set_hl(0, 'BlinkCmpMenu'               , {link = 'Pmenu'})
-    api.nvim_set_hl(0, 'BlinkCmpMenuBorder'         , {link = 'Pmenu'})
+    -- Blink-CmpLabel/CmpDoc/DocBorder/DocSeparator/SignatureHelp/SignatureHelpBorder use NormalFloat by default
+    api.nvim_set_hl(0, 'BlinkCmpMenu'               , {link = 'Normal'})
+    api.nvim_set_hl(0, 'BlinkCmpMenuBorder'         , {link = 'Normal'})
     api.nvim_set_hl(0, 'BlinkCmpMenuSelection'      , {link = 'DiffChange'})
-    api.nvim_set_hl(0, 'BlinkCmpLabel'              , {link = 'Pmenu'})
     api.nvim_set_hl(0, 'BlinkCmpLabelMatch'         , {link = 'Question'})
     api.nvim_set_hl(0, 'BlinkCmpLabelDescription'   , {link = 'Comment'})
     api.nvim_set_hl(0, 'BlinkCmpSource'             , {italic = true})
     api.nvim_set_hl(0, 'BlinkCmpLabelDeprecated'    , {strikethrough = true})
-    api.nvim_set_hl(0, 'BlinkCmpDoc'                , {link = 'Pmenu'})
-    api.nvim_set_hl(0, 'BlinkCmpDocBorder'          , {link = 'Pmenu'})
-    api.nvim_set_hl(0, 'BlinkCmpDocSeparator'       , {link = 'Pmenu'})
-    api.nvim_set_hl(0, 'BlinkCmpSignatureHelp'      , {link = 'Pmenu'})
-    api.nvim_set_hl(0, 'BlinkCmpSignatureHelpBorder', {link = 'Pmenu'})
     api.nvim_set_hl(0, 'BlinkCmpGhostText'          , {link = 'SpecialKey'})
 
     api.nvim_set_hl(0, 'BlinkCmpKind'             , {fg = '#b8bb26', italic = true})
@@ -460,10 +451,7 @@ local pkg_nlsp = vim.schedule_wrap(function()
     setup_cmp_sources()
     setup_cmp_completion()
     setup_cmp_highlights()
-    vim.api.nvim_create_autocmd('ColorScheme', {
-        group = 'v.Pkgs',
-        callback = setup_cmp_highlights,
-    })
+    vim.api.nvim_create_autocmd('ColorScheme', { group = 'v.Pkgs', callback = setup_cmp_highlights })
 end)
 
 if use.pkgs.blink then

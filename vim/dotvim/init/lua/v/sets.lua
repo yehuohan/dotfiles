@@ -157,6 +157,13 @@ local function on_alter_leave()
     end
 end
 
+local function on_ColorScheme()
+    -- An unified floating window style
+    vim.o.winborder = 'rounded'
+    api.nvim_set_hl(0, 'NormalFloat', { link = 'Normal' }) -- Pmenu
+    api.nvim_set_hl(0, 'FloatBorder', { link = 'Normal' })
+end
+
 local function on_UIEnter()
     use.set_fonts(0)
     m.nnore({ '<kPlus>', function() use.set_fonts(1) end })
@@ -214,6 +221,8 @@ local function setup_default_autocmds()
     api.nvim_create_autocmd('BufReadPre', { group = 'v.Sets', callback = on_large_file })
     -- stylua: ignore end
 
+    on_ColorScheme()
+    api.nvim_create_autocmd('ColorScheme', { group = 'v.Sets', callback = on_ColorScheme })
     api.nvim_create_autocmd('TextYankPost', {
         group = 'v.Sets',
         callback = function() vim.hl.on_yank({ higroup = 'IncSearch', timeout = 200 }) end,
