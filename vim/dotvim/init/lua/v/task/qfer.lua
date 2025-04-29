@@ -162,8 +162,7 @@ function qfer.jump()
         if item.bufnr ~= vim.api.nvim_get_current_buf() then -- Avoid empty undo
             vim.cmd.edit({ args = { vim.api.nvim_buf_get_name(item.bufnr) } })
         end
-        local pos = { item.lnum, item.col > 0 and (item.col - 1) or 0 }
-        vim.api.nvim_win_set_cursor(0, pos)
+        vim.api.nvim_win_set_cursor(0, { item.lnum, item.col > 0 and (item.col - 1) or 0 })
     end
     vim.fn.setqflist({}, 'a', { idx = row })
 end
@@ -181,7 +180,7 @@ function qfer.view()
             else
                 -- Switch buffer
                 vim.api.nvim_win_set_buf(qfer.vwin, item.bufnr)
-                vim.api.nvim_win_set_cursor(qfer.vwin, { item.lnum, item.col - 1 })
+                vim.api.nvim_win_set_cursor(qfer.vwin, { item.lnum, item.col > 0 and (item.col - 1) or 0 })
             end
         else
             -- Create view
@@ -196,7 +195,7 @@ function qfer.view()
                 row = -1,
             })
             vim.wo[qfer.vwin].winblend = 10
-            vim.api.nvim_win_set_cursor(qfer.vwin, { item.lnum, item.col - 1 })
+            vim.api.nvim_win_set_cursor(qfer.vwin, { item.lnum, item.col > 0 and (item.col - 1) or 0 })
         end
     else
         qfer.close_view()

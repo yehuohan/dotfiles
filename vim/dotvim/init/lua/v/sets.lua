@@ -132,7 +132,6 @@ end
 local function on_large_file()
     local fsize = fn.getfsize(fn.expand('<afile>'))
     if fsize >= 5 * 1024 * 1024 or fsize == -2 then
-        require('ufo').detach()
         vim.b.sets_large_file = true
         vim.b.snacks_scope = false
         vim.bo.swapfile = false
