@@ -1,8 +1,5 @@
 local nlib = require('v.nlib')
 local e = nlib.e
-local a = nlib.a
-local async = a._async
-local await = a._await
 local replace = nlib.u.replace
 local sequence = nlib.u.sequence
 local task = require('v.task')
@@ -362,7 +359,6 @@ local _sels = {
     },
 }
 
---- @type PopSelectionEvent
 local function evt_p(name)
     if name == 'onCR' then
         if wsc.file ~= '' then
@@ -374,7 +370,6 @@ local function evt_p(name)
     end
 end
 
---- @type PopSelectionEvent
 local function evt_r(name)
     if name == 'onCR' then
         wsc:new(wsc:get())
@@ -396,7 +391,7 @@ end
 --- Forward
 ---     R^p => r^p (r^p means r[kt.E != p])
 ---     Rp  => rp  => r^p
-local entry = async(function(kt, bang)
+local function entry(kt, bang)
     wsc:new()
 
     local resovle = false
@@ -427,7 +422,7 @@ local entry = async(function(kt, bang)
         if not update_sels(_maps[kt.E], _sels.dic) then
             return
         end
-        if not await(a.pop_selection(_sels)) then
+        if not require('popc').pop_selection(_sels) then
             return
         end
     end
@@ -470,7 +465,7 @@ local entry = async(function(kt, bang)
     if not ok then
         vim.notify(tostring(msg))
     end
-end)
+end
 
 local function setup()
     task.wsc.code = wsc:get()
@@ -518,7 +513,7 @@ local function setup()
         end
         _sels.lst = _sels.lst_r
         _sels.evt = evt_r
-        vim.fn.PopSelection(_sels)
+        require('popc').pop_selection(_sels)
     end, { bang = true, nargs = 0 })
 end
 

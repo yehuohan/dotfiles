@@ -1,8 +1,5 @@
 local nlib = require('v.nlib')
 local e = nlib.e
-local a = nlib.a
-local async = a._async
-local await = a._await
 local replace = nlib.u.replace
 local task = require('v.task')
 
@@ -194,7 +191,6 @@ local _sels = {
     },
 }
 
---- @type PopSelectionEvent
 local function evt_f(name)
     if name == 'onCR' then
         if wsc.path ~= '' then
@@ -213,7 +209,6 @@ local function evt_f(name)
     end
 end
 
---- @type PopSelectionEvent
 local function evt_r(name)
     if name == 'onCR' then
         task.wsc.fzer = wsc:get()
@@ -349,7 +344,7 @@ end
 ---         s : selected with boundaries
 ---     LowerCase: [iwsyu] ignorecase
 ---     UpperCase: [IWSYU] case insensitive
-local entry = async(function(kt, bang)
+local entry = function(kt, bang)
     wsc:new()
 
     -- Parse pattern
@@ -373,7 +368,7 @@ local entry = async(function(kt, bang)
     end
     if kt.S == 'F' then
         _sels.evt = evt_f
-        if not await(a.pop_selection(_sels)) then
+        if not require('popc').pop_selection(_sels) then
             return
         end
         task.wsc.fzer = wsc:get()
@@ -425,7 +420,7 @@ local entry = async(function(kt, bang)
         vim.notify(vim.inspect(wsc))
     end
     e.dotrepeat(function() task.run(wsc) end, true)
-end)
+end
 
 --- Entry of fzer.fuzzier task
 --- @param kt table: [fF][p   ][flh]
@@ -438,7 +433,7 @@ end)
 ---     f : fuzzier.file
 ---     l : fuzzier.live
 ---     h : fuzzier.tags with <cword> by default
-local entry_fuzzier = async(function(kt)
+local entry_fuzzier = function(kt)
     wsc:new()
 
     -- Parse fuzzier pattern
@@ -454,7 +449,7 @@ local entry_fuzzier = async(function(kt)
     -- Modify fzer.fuzzier config
     if kt.S == 'F' then
         _sels.evt = evt_f
-        if not await(a.pop_selection(_sels)) then
+        if not require('popc').pop_selection(_sels) then
             return
         end
         task.wsc.fzer = wsc:get()
@@ -470,7 +465,7 @@ local entry_fuzzier = async(function(kt)
     -- Run fzer.fuzzier task
     local rhs = _maps_fuzzier[kt.E]
     e.dotrepeat(function() fzer[wsc.fuzzier](rhs, rep) end, true)
-end)
+end
 
 local function setup()
     task.wsc.fzer = wsc:get()
@@ -512,7 +507,7 @@ local function setup()
             wsc:new()
         end
         _sels.evt = evt_r
-        vim.fn.PopSelection(_sels)
+        require('popc').pop_selection(_sels)
     end, { bang = true, nargs = 0 })
 end
 

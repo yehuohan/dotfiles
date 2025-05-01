@@ -231,6 +231,7 @@ local function pkg_popc()
     require('popc').setup({
         debug = true,
         data_path = vim.env.DotVimLocal,
+        selection = { enable = true },
     })
     m.nnore({ '<leader><leader>b', '<Cmd>PopcBookmark<CR>' })
     m.nnore({ '<leader><leader>w', '<Cmd>PopcWorkspace<CR>' })
@@ -245,12 +246,8 @@ local function pkg_popc()
     m.nnore({ '<C-m>', '<C-i>' })
     m.nnore({ '<leader>wq', '<Cmd>PopcBufferClose<CR>' })
 
-    vim.api.nvim_set_hl(0, 'PopcSel', { link = 'CursorLineNr' })
-    vim.g.Popset_SelectionData = {
-        { opt = { 'colorscheme', 'colo' }, lst = { 'gruvbox', 'monokai-nightasty' } },
-    }
-    m.nnore({ '<leader><leader>p', ':PopSet<Space>' })
-    m.nnore({ '<leader>sp', ':PopSet popset<CR>' })
+    m.nnore({ '<leader><leader>p', ':PopcSet<Space>' })
+    m.nnore({ '<leader>sp', ':PopcSet<CR>' })
 end
 
 -- Mini插件库
@@ -845,7 +842,7 @@ end
 
 local function pkg_lazy()
     local url = 'https://github.com'
-    if vim.fn.empty(use.xgit) == 0 then
+    if use.xgit ~= vim.NIL then
         url = use.xgit
     end
     local bundle = vim.env.DotVimDir .. '/bundle'
