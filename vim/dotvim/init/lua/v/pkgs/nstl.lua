@@ -447,7 +447,7 @@ return {
     config = pkg_nstl,
     event = 'VeryLazy',
     dependencies = {
-        'yehuohan/popc',
+        -- 'yehuohan/popc',
         'linrongbin16/lsp-progress.nvim',
     },
 }

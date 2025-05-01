@@ -308,7 +308,11 @@ local function setup()
     setup_default_autocmds()
 
     -- Fast commands
-    m.nnore({ '<leader>se', function() fn.PopSelection(fast_cmds) end, desc = 'Fast commands' })
+    m.nnore({
+        '<leader>se',
+        function() require('popc').pop_selection(fast_cmds) end,
+        desc = 'Fast commands',
+    })
 
     -- New chore file
     local path = vim.env.DotVimShare .. '/chores'

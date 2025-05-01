@@ -19,7 +19,7 @@ local use = {
         font_neovide = { name = '', size = 12 },
         font_wide = { name = '', size = 12 },
     },
-    xgit = vim.v.null,
+    xgit = vim.NIL,
 }
 
 local lst = {
@@ -35,7 +35,7 @@ local lst = {
     },
     fontsizes = { 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 },
     git = {
-        vim.v.null,
+        vim.NIL,
         'https://kkgithub.com',
         'https://bgithub.xyz',
     },
@@ -61,7 +61,6 @@ local function set_fonts(inc)
     vim.o.guifontwide = use.ui.font_wide.name .. ':h' .. tostring(use.ui.font_wide.size)
 end
 
---- @type PopSelectionEvent
 local function use_save(name)
     if name == 'onCR' then
         vim.fn.mkdir(vim.env.DotVimLocal, 'p')
@@ -124,7 +123,7 @@ local function use_init()
         },
     }
     udic.xgit = { lst = lst.git }
-    vim.fn.PopSelection({
+    require('popc').pop_selection({
         opt = 'use',
         lst = vim.fn.sort(vim.tbl_keys(use)),
         dic = udic,

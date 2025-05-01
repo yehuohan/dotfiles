@@ -6,11 +6,10 @@ local dir_init = vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(dir_this)))
 local dir_bundle = vim.fs.dirname(dir_init) .. '/bundle'
 vim.opt.rtp:prepend(dir_init)
 vim.opt.rtp:prepend(dir_bundle .. '/popc')
-vim.opt.rtp:prepend(dir_bundle .. '/popset')
 vim.opt.rtp:prepend(dir_bundle .. '/overseer.nvim')
-vim.cmd.runtime('plugin/popc.vim')
-vim.cmd.runtime('plugin/popset.vim')
-vim.cmd.runtime('plugin/overseer.nvim')
+require('popc').setup({ selection = { enable = true } })
+require('overseer').setup()
+require('plenary.busted')
 
 local EQ = assert.are.same -- The table's metatable won't be compared
 local OK = assert.has.no.errors
@@ -45,6 +44,24 @@ local function unmock(mocked, fns)
         for k = 2, #fn do
             fn[1][fn[k]] = mocked[fn[k]]
         end
+    end
+end
+
+local function override_input(...)
+    local idx = 0
+    local inps = { ... }
+    vim.fn.input = function(args)
+        idx = idx + 1
+        return (args.default or '') .. inps[idx]
+    end
+end
+
+local function override_getcharstr(...)
+    local idx = 0
+    local chars = { ... }
+    vim.fn.getcharstr = function()
+        idx = idx + 1
+        return vim.keycode(chars[idx] or '<Esc>')
     end
 end
 
@@ -489,48 +506,6 @@ describe('nlib', function()
         end)
     end)
 
-    -- nlib.a.pop_selection
-    it('. async . pop_selection', function()
-        local tst = { opt = '', lst = { 11, 22, 33 }, num = 0 }
-        tst.cmd = function(_, sel) tst.num = tst.num + 1 + sel end
-        tst.evt = function(name)
-            if 'onCR' == name then
-                tst.opt = 'foo'
-            elseif 'onQuit' == name then
-                tst.opt = 'bar'
-            end
-        end
-        local res
-        local entry = nlib.a._async(function(sel, val)
-            sel.opt = val
-            res = nlib.a._await(nlib.a.pop_selection(sel))
-        end)
-
-        -- Can use vim.fn.input from popc for it's invoked from asynchronously
-        entry(tst, 'FOO')
-        EQ('FOO', tst.opt)
-        EQ(0, tst.num)
-        feedkeys('<Space>')
-        EQ(0 + 1 + 11, tst.num)
-        feedkeys('j<Space>')
-        EQ(12 + 1 + 22, tst.num)
-        feedkeys('i33<CR>') -- Will call tst.cmd with input once
-        EQ(35 + 1 + 33, tst.num)
-        feedkeys('<CR>') -- Will call tst.cmd with the selected (at cursor line) once
-        EQ(69 + 1 + 22, tst.num)
-        EQ('foo', tst.opt)
-        EQ(true, res)
-
-        entry(tst)
-        EQ(nil, tst.opt)
-        feedkeys('jj<Space>')
-        EQ(92 + 1 + 33, tst.num)
-        feedkeys('<ESC>')
-        EQ(126, tst.num)
-        EQ('bar', tst.opt)
-        EQ(false, res)
-    end)
-
     describe('. utils', function()
         -- nlib.u.str2env
         it('. str2env', function()
@@ -616,16 +591,17 @@ describe('task', function()
     local task = require('v.task')
     task.setup()
 
-    local fns = { { task, 'run' }, { vim, 'notify', 'print' }, { vim.fn, 'input' } }
+    local fns = { { task, 'run' }, { vim, 'notify', 'print' }, { vim.fn, 'input', 'getcharstr' } }
     local mocked = mock(fns)
-    local cfg, msg, txt, inp
+    local cfg, msg, txt
     task.run = function(_cfg) cfg = _cfg end
     vim.notify = function(_msg) msg = _msg end
     vim.print = function(_txt) txt = _txt end
-    vim.fn.input = function() return inp end
 
     local tmp
     before_each(function()
+        override_input()
+        override_getcharstr()
         tmp = vim.fn.tempname() .. '.lua'
         vim.cmd.edit({ args = { tmp }, mods = { silent = true } })
         vim.cmd.write({ mods = { silent = true } })
@@ -636,7 +612,6 @@ describe('task', function()
         local wsc
         before_each(function()
             vim.cmd.CodeReset({ bang = true })
-            feedkeys('<CR>')
             vim.cmd.CodeWsc({ bang = false }) -- Use `CodeWsc` to get `code.wsc`
             wsc = txt
             -- print(vim.inspect(wsc))
@@ -650,27 +625,26 @@ describe('task', function()
         end)
 
         it('. :CodeReset', function()
+            override_input('job')
+            override_getcharstr('j', 'j', 'j', 'm', '<CR>')
             vim.cmd.CodeReset({ bang = false })
-            feedkeys('jjjmjob<CR><CR>')
             EQ('job', wsc.style)
 
+            override_getcharstr('<CR>')
             vim.cmd.CodeReset({ bang = false })
-            feedkeys('<CR>')
             EQ('job', wsc.style)
 
+            override_getcharstr('<CR>')
             vim.cmd.CodeReset({ bang = true })
-            feedkeys('<CR>')
             -- `:CodeReset!` will re-create `code.wsc`, so need get new `code.wsc`
             vim.cmd.CodeWsc({ bang = false })
             EQ('ansi', txt.style)
         end)
 
         it('. :Code! Rp', function()
+            override_input('f', tmp, 'term')
+            override_getcharstr('m', 'j', 'm', 'k', 'k', 'k', 'k', 'm', '<CR>')
             vim.cmd.Code({ args = { 'Rp' }, bang = true })
-            feedkeys('mf<CR>')
-            feedkeys('jm' .. tmp .. '<CR>')
-            feedkeys('kkkkmterm<CR>')
-            feedkeys('<CR>')
             EQ(true, cfg == wsc)
             EQ('f', wsc.key)
             EQ(vim.fn.expand(tmp), vim.fn.expand(wsc.file))
@@ -692,7 +666,6 @@ describe('task', function()
         local wsc
         before_each(function()
             vim.cmd.FzerReset({ bang = true })
-            feedkeys('<CR>')
             vim.cmd.FzerWsc({ bang = false }) -- Use `FzerWsc` to get `fzer.wsc`
             wsc = txt
             -- print(vim.inspect(wsc))
@@ -706,16 +679,17 @@ describe('task', function()
         end)
 
         it('. :FzerReset', function()
+            override_input(' *.lua')
+            override_getcharstr('j', 'j', 'M', '<CR>')
             vim.cmd.FzerReset({ bang = false })
-            feedkeys('jjM *.lua<CR><CR>')
             EQ('!_VOut *.lua', wsc.glob)
 
+            override_getcharstr('<CR>')
             vim.cmd.FzerReset({ bang = false })
-            feedkeys('<CR>')
             EQ('!_VOut *.lua', wsc.glob)
 
+            override_getcharstr('<CR>')
             vim.cmd.FzerReset({ bang = true })
-            feedkeys('<CR>')
             -- `:FzerReset!` will re-create `fzer.wsc`, so need get new `fzer.wsc`
             vim.cmd.FzerWsc({ bang = false })
             EQ('!_VOut', txt.glob)
@@ -725,10 +699,11 @@ describe('task', function()
             feedkeys('iword<Esc>')
 
             EQ('', wsc.path)
-            inp = '/abc/def'
+            local inp = '/abc/def'
             if (vim.fn.has('win32') == 1) or (vim.fn.has('win64') == 1) then
                 inp = 'Z:/abc/def'
             end
+            override_input(inp)
             vim.cmd.Fzer({ args = { 'fpw' } })
             EQ(cfg, wsc)
             EQ(inp, wsc.path)
@@ -739,8 +714,8 @@ describe('task', function()
         it('. :Fzer Fw', function()
             feedkeys('iword<Esc>')
 
+            override_getcharstr('<CR>')
             vim.cmd.Fzer({ args = { 'Fw' } })
-            feedkeys('<CR>')
             EQ(true, cfg == wsc)
             EQ(vim.fs.dirname(tmp), wsc.path)
 

@@ -608,31 +608,6 @@ function _a._wrap(afunc)
     end
 end
 
---- @alias PopSelection table Selection of plugin popset
---- @alias PopSelectionEvent fun(name:string, ...)
-
---- Async PopSelection
---- @param sel PopSelection
---- @yield boolean Selection is confirmed(true) or canceled(false)
-function _a.pop_selection(sel)
-    local caller = coroutine.running()
-
-    local old_evt = sel.evt
-    local new_evt = function(name, ...)
-        if old_evt then
-            old_evt(name, ...)
-        end
-        if 'onCR' == name then
-            coroutine.resume(caller, true)
-        elseif 'onQuit' == name then
-            coroutine.resume(caller, false)
-        end
-    end
-    sel.evt = new_evt
-
-    fn.PopSelection(sel)
-end
-
 --------------------------------------------------------------------------------
 --- @class NLib.Utils
 --------------------------------------------------------------------------------

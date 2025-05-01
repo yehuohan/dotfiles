@@ -23,7 +23,7 @@ local function setup_lsp_servers(capabilities)
     })
     -- Servers
     local url = 'https://github.com/%s/releases/download/%s/%s'
-    if vim.fn.empty(use.xgit) == 0 then
+    if use.xgit ~= vim.NIL then
         url = use.xgit .. '/%s/releases/download/%s/%s'
     end
     require('mason').setup({

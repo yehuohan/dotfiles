@@ -226,11 +226,12 @@ local function pkg_neotree()
     m.nnore({ '<leader>tT', ':Neotree left reveal_force_cwd<CR>' })
 end
 
--- Buffer,Bookmark,Workspace
+-- Buffer,Bookmark,Workspace,Selection
 local function pkg_popc()
     require('popc').setup({
         debug = true,
         data_path = vim.env.DotVimLocal,
+        selection = { enable = true, collect_builtin_colorscheme = false },
     })
     m.nnore({ '<leader><leader>b', '<Cmd>PopcBookmark<CR>' })
     m.nnore({ '<leader><leader>w', '<Cmd>PopcWorkspace<CR>' })
@@ -245,12 +246,8 @@ local function pkg_popc()
     m.nnore({ '<C-m>', '<C-i>' })
     m.nnore({ '<leader>wq', '<Cmd>PopcBufferClose<CR>' })
 
-    vim.api.nvim_set_hl(0, 'PopcSel', { link = 'CursorLineNr' })
-    vim.g.Popset_SelectionData = {
-        { opt = { 'colorscheme', 'colo' }, lst = { 'gruvbox', 'monokai-nightasty' } },
-    }
-    m.nnore({ '<leader><leader>p', ':PopSet<Space>' })
-    m.nnore({ '<leader>sp', ':PopSet popset<CR>' })
+    m.nnore({ '<leader><leader>p', ':PopcSet<Space>' })
+    m.nnore({ '<leader>sp', ':PopcSet<CR>' })
 end
 
 -- Mini插件库
@@ -790,7 +787,6 @@ local pkgs = {
     { 'polirritmico/monokai-nightasty.nvim', event = 'VeryLazy' },
     { 'nvim-neo-tree/neo-tree.nvim', config = pkg_neotree, event = 'VeryLazy' },
     { 'yehuohan/popc', config = pkg_popc, event = 'VeryLazy' },
-    { 'yehuohan/popset', dependencies = { 'yehuohan/popc' }, event = 'VeryLazy' },
     { 'echasnovski/mini.nvim', config = pkg_mini, event = 'VeryLazy' },
     { 'folke/snacks.nvim', config = pkg_snacks, event = 'VeryLazy' },
 
@@ -845,7 +841,7 @@ end
 
 local function pkg_lazy()
     local url = 'https://github.com'
-    if vim.fn.empty(use.xgit) == 0 then
+    if use.xgit ~= vim.NIL then
         url = use.xgit
     end
     local bundle = vim.env.DotVimDir .. '/bundle'

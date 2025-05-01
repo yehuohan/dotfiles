@@ -2,7 +2,7 @@ local use = require('v.use')
 local m = require('v.nlib').m
 
 local function pkg_nts()
-    if vim.fn.empty(use.xgit) == 0 then
+    if use.xgit ~= vim.NIL then
         for _, c in pairs(require('nvim-treesitter.parsers').get_parser_configs()) do
             c.install_info.url = c.install_info.url:gsub('https://github.com', use.xgit)
         end
