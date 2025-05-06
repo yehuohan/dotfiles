@@ -238,8 +238,14 @@ local function pkg_popc()
     m.nnore({ '<leader><leader>h', '<Cmd>PopcTabuf<CR>' })
     m.nnore({ '<M-u>', 'gT' })
     m.nnore({ '<M-p>', 'gt' })
-    m.nnore({ '<M-i>', '<Cmd>PopcBufferSwitchLeft!<CR>' })
-    m.nnore({ '<M-o>', '<Cmd>PopcBufferSwitchRight!<CR>' })
+    m.nnore({
+        '<M-i>',
+        function() vim.cmd.PopcBufferSwitchLeft({ bang = true, count = vim.v.count1 }) end,
+    })
+    m.nnore({
+        '<M-o>',
+        function() vim.cmd.PopcBufferSwitchRight({ bang = true, count = vim.v.count1 }) end,
+    })
     m.nnore({ '<M-n>', '<Cmd>PopcBufferJumpPrev<CR>' })
     m.nnore({ '<M-m>', '<Cmd>PopcBufferJumpNext<CR>' })
     m.nnore({ '<C-n>', '<C-o>' })
