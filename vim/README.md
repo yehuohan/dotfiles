@@ -17,8 +17,6 @@ setup_dotvim.bat
 setup_link_msys64.bat
 ```
 
-> Remove `dotvim/bundle/nvim-treesitter` and `dotvim/local/.treesitter` when updating neovim
-
 ## dotvim
 
 > *Code task:*
@@ -60,15 +58,14 @@ neovide --remote-tcp=localhost:6666
 - [vim](https://github.com/vim/vim)
   - [GvimFullscreen](./gvim/gvimfullscreen)
 - [neovim](https://github.com/neovim/neovim)
-  - [nvim.appimage](https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage)
+  - [nvim.appimage](https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-arm64.appimage)
   - `pacman -S xclip or xsel`
 - Miniconda3
   - `pip install pynvim`
 - NodeJs
   - `HTTPS_PROXY=addr:port npm install -g neovim`
-  - `cd $DotVimPath/local && HTTPS_PROXY=addr:port npm install neovim`
+  - `cd dotvim/local && HTTPS_PROXY=addr:port npm install neovim`
 - Git: Msys2
   - `git config --global http.proxy addr:port`
 - [Ripgrep](https://github.com/BurntSushi/ripgrep)
 - [Fzf](https://github.com/junegunn/fzf)
-- [Bat](https://github.com/sharkdp/bat)

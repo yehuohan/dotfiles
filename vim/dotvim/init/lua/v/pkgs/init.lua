@@ -109,6 +109,8 @@ local function pkg_gruvbox()
             folds = true,
         },
     })
+    vim.o.background = 'dark'
+    vim.cmd.colorscheme('gruvbox')
 end
 
 -- 目录树
@@ -789,7 +791,7 @@ local pkgs = {
     { 'HiPhish/rainbow-delimiters.nvim', config = pkg_rainbow, submodules = false, event = 'VeryLazy' },
     { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' }, event = 'VeryLazy' },
     { 'goolord/alpha-nvim', config = pkg_alpha },
-    { 'ellisonleao/gruvbox.nvim', config = pkg_gruvbox, event = 'VeryLazy' },
+    { 'ellisonleao/gruvbox.nvim', config = pkg_gruvbox },
     { 'polirritmico/monokai-nightasty.nvim', event = 'VeryLazy' },
     { 'nvim-neo-tree/neo-tree.nvim', config = pkg_neotree, event = 'VeryLazy' },
     { 'yehuohan/popc', config = pkg_popc, event = 'VeryLazy' },
@@ -878,23 +880,14 @@ local function pkg_lazy()
         },
     })
 
-    vim.api.nvim_create_autocmd('ColorScheme', {
-        group = 'v.Pkgs',
-        callback = function()
-            vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#505060', ctermbg = 60 })
-            vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { link = 'MiniCursorword' })
-            vim.api.nvim_set_hl(0, 'SnacksPicker', { bg = 'none', nocombine = true })
-            vim.api.nvim_set_hl(0, 'SnacksPickerBorder', { bg = 'none', nocombine = true })
-        end,
-    })
-
-    local ok = pcall(function()
-        vim.o.background = 'dark'
-        vim.cmd.colorscheme('gruvbox')
-    end)
-    if not ok then
-        vim.cmd.colorscheme('default')
+    local setup_pkg_highlights = function()
+        vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#505060', ctermbg = 60 })
+        vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { link = 'MiniCursorword' })
+        vim.api.nvim_set_hl(0, 'SnacksPicker', { bg = 'none', nocombine = true })
+        vim.api.nvim_set_hl(0, 'SnacksPickerBorder', { bg = 'none', nocombine = true })
     end
+    vim.api.nvim_create_autocmd('ColorScheme', { group = 'v.Pkgs', callback = setup_pkg_highlights })
+    setup_pkg_highlights()
 end
 
 return { setup = pkg_lazy }
