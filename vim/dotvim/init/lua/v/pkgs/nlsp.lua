@@ -38,80 +38,55 @@ local function setup_lsp_servers(capabilities)
             },
         },
     })
-    require('mason-lspconfig').setup({})
-    local lspconfig = require('lspconfig')
-    local opts = {
-        function(server_name)
-            lspconfig[server_name].setup({
-                capabilities = capabilities,
-            })
-        end,
-    }
-    opts['clangd'] = function()
-        lspconfig.clangd.setup({
-            capabilities = capabilities,
-            -- Treesitter is better than clangd's semantic
-            on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
-            cmd = { 'clangd', '--header-insertion=never' },
-        })
-    end
-    opts['cmake'] = function()
-        lspconfig.cmake.setup({
-            capabilities = capabilities,
-            init_options = { buildDirectory = '_VOut' },
-        })
-    end
-    opts['rust_analyzer'] = function()
-        lspconfig.rust_analyzer.setup({
-            capabilities = capabilities,
-            settings = {
-                ['rust-analyzer'] = {
-                    updates = { checkOnStartup = false, channel = 'nightly' },
-                    cargo = { allFeatures = true },
-                    notifications = { cargoTomlNotFound = false },
-                },
+    require('mason-lspconfig').setup({
+        ensure_installed = {},
+        automatic_enable = { exclude = { 'ruff' } },
+    })
+    vim.lsp.config('clangd', {
+        capabilities = capabilities,
+        -- Treesitter is better than clangd's semantic
+        on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
+        cmd = { 'clangd', '--header-insertion=never' },
+    })
+    vim.lsp.config('cmake', {
+        capabilities = capabilities,
+        init_options = { buildDirectory = '_VOut' },
+    })
+    vim.lsp.config('rust_analyzer', {
+        capabilities = capabilities,
+        settings = {
+            ['rust-analyzer'] = {
+                updates = { checkOnStartup = false, channel = 'nightly' },
+                cargo = { allFeatures = true },
+                notifications = { cargoTomlNotFound = false },
             },
-        })
-    end
-    opts['basedpyright'] = function()
-        lspconfig.basedpyright.setup({
-            capabilities = capabilities,
-            -- Treesitter is better than basedpyright's semantic
-            on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
-        })
-    end
-    opts['ruff'] = function() end -- Disable ruff server
-    opts['lua_ls'] = function()
-        lspconfig.lua_ls.setup({
-            capabilities = capabilities,
-            settings = {
-                Lua = {
-                    runtime = { version = 'LuaJIT' },
-                    workspace = {
-                        library = {
-                            vim.env.DotVimInit .. '/lua',
-                            vim.env.VIMRUNTIME .. '/lua',
-                            vim.env.VIMRUNTIME .. '/lua/vim',
-                            vim.env.VIMRUNTIME .. '/lua/vim/lsp',
-                            vim.env.VIMRUNTIME .. '/lua/vim/treesitter',
-                        },
-                        checkThirdParty = false,
-                    },
-                    telemetry = { enable = false },
-                    format = { enable = false },
+        },
+    })
+    vim.lsp.config('basedpyright', {
+        capabilities = capabilities,
+        -- Treesitter is better than basedpyright's semantic
+        on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
+    })
+    vim.lsp.config('lua_ls', {
+        capabilities = capabilities,
+        settings = {
+            Lua = {
+                runtime = { version = 'LuaJIT' },
+                workspace = {
+                    library = { vim.env.DotVimInit .. '/lua' },
+                    checkThirdParty = false,
                 },
+                telemetry = { enable = false },
+                format = { enable = false },
             },
-        })
-    end
-    opts['tinymist'] = function()
-        lspconfig.tinymist.setup({
-            capabilities = capabilities,
-            single_file_support = true,
-            offset_encoding = 'utf-8',
-            settings = { formatterMode = 'typstyle' },
-        })
-    end
-    require('mason-lspconfig').setup_handlers(opts)
+        },
+    })
+    vim.lsp.config('tinymist', {
+        capabilities = capabilities,
+        single_file_support = true,
+        offset_encoding = 'utf-8',
+        settings = { formatterMode = 'typstyle' },
+    })
 end
 
 --- Setup lsp mappings
