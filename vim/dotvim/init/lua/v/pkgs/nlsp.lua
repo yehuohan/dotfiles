@@ -166,7 +166,7 @@ local function setup_lsp_mappings()
     m.nnore({ '<leader>oc', ':Neoconf<CR>' })
     m.nnore({ '<leader>on', ':Neoconf lsp<CR>' })
     m.nnore({ '<leader>oN', ':Neoconf show<CR>' })
-    m.nnore({ '<leader>oh', '<Cmd>ClangdSwitchSourceHeader<CR>' })
+    m.nnore({ '<leader>oh', '<Cmd>LspClangdSwitchSourceHeader<CR>' })
 end
 
 --- Setup lsp appearance

@@ -146,6 +146,8 @@ local function setup_ui()
                 size = 10,
             },
         },
+        expand_lines = false,
+        floating = { border = vim.o.winborder },
         mappings = {
             edit = 'e',
             expand = { 'o', '<CR>', '<2-LeftMouse>' },
@@ -221,6 +223,16 @@ local function setup_mappings()
         '<leader>de',
         function() dapui.eval(nlib.e.selected(''), { enter = true }) end,
         desc = 'Eval expression',
+    })
+    m.nnore({
+        '<leader>da',
+        function() dapui.elements.watches.add(vim.fn.expand('<cword>')) end,
+        desc = 'Add watch expression',
+    })
+    m.xnore({
+        '<leader>da',
+        function() dapui.elements.watches.add(nlib.e.selected('')) end,
+        desc = 'Add watch expression',
     })
     m.nnore({
         '<leader>dn',
