@@ -407,6 +407,7 @@ local function pkg_telescope()
             },
             frecency = {
                 db_safe_mode = false, -- `true` will break vim.ui.select
+                db_validate_threshold = 20,
                 auto_validate = true,
                 sorter = require('telescope.config').values.file_sorter(),
             },
