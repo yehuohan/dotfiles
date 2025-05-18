@@ -9,8 +9,12 @@ local function new_wsc()
     return nlib.new_configer({
         envs = '',
         path = '',
+        --- @type string[] Path history list
         paths = {},
+        --- @type table<integer, string> Tabpage path
+        patht = {},
         glob = '!_VOut',
+        --- @type string[] Glob history list
         globs = {},
         hidden = true,
         ignore = true,
@@ -195,10 +199,10 @@ local function evt_f(name)
     if name == 'onCR' then
         if wsc.path ~= '' then
             wsc.path = vim.fs.normalize(vim.fn.fnamemodify(wsc.path, ':p'))
-            vim.t.task_fzer_path = wsc.path
             if not vim.tbl_contains(wsc.paths, wsc.path) then
                 table.insert(wsc.paths, wsc.path)
             end
+            rawset(wsc.patht, tostring(vim.api.nvim_get_current_tabpage()), wsc.path)
         end
         if wsc.glob ~= '' then
             if not vim.tbl_contains(wsc.globs, wsc.glob) then
@@ -211,8 +215,8 @@ end
 
 local function evt_r(name)
     if name == 'onCR' then
+        rawset(wsc.patht, tostring(vim.api.nvim_get_current_tabpage()), wsc.path)
         task.wsc.fzer = wsc:get()
-        vim.t.task_fzer_path = wsc.path
         wsc:new(task.wsc.fzer)
         vim.notify('Fzer task wsc is reset!')
     end
@@ -274,8 +278,7 @@ local function parse_loc(kt)
     end
     -- Need reinit wsc when modified path or paths
     if restore then
-        wsc:mut({ path = wsc.path })
-        wsc:mut({ paths = wsc.paths })
+        wsc:mut({ path = wsc.path, paths = wsc.paths })
         task.wsc.fzer = wsc:get()
     end
     return loc
@@ -363,8 +366,9 @@ local entry = function(kt, bang)
     wsc:mut({ hltexts = wsc.hltexts })
 
     -- Set config
-    if vim.t.task_fzer_path then
-        wsc.path = vim.t.task_fzer_path
+    local tab = tostring(vim.api.nvim_get_current_tabpage())
+    if wsc.patht[tab] then
+        wsc.path = wsc.patht[tab]
     end
     if kt.S == 'F' then
         _sels.evt = evt_f
@@ -500,9 +504,6 @@ local function setup()
     vim.api.nvim_create_user_command('FzerReset', function(opts)
         if opts.bang then
             wsc = new_wsc()
-            for _, tid in ipairs(vim.api.nvim_list_tabpages()) do
-                vim.t[tid].task_fzer_path = nil
-            end
         else
             wsc:new()
         end

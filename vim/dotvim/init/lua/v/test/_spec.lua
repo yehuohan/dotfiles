@@ -115,8 +115,9 @@ describe('nlib', function()
             EQ({ '-o' }, getmetatable(getmetatable(cfg)).opts)
             cfg.args[1] = '-f1'
             cfg.args[2] = '-f2'
+            rawset(cfg.args, 3, '-f3')
             cfg.args.opts = { '-a' }
-            EQ({ '-f1', subs = { '-g' } }, rawget(cfg, 'args'))
+            EQ({ '-f1', [3] = '-f3', subs = { '-g' } }, rawget(cfg, 'args'))
             EQ({ [2] = '-f2', subs = {}, opts = { '-a' } }, getmetatable(getmetatable(cfg)).args)
             cfg.args.subs[1] = '-g1'
             cfg.args.subs[2] = '-g2'

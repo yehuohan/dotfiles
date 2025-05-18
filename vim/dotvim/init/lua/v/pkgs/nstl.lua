@@ -75,7 +75,8 @@ end
 
 function ctxs.root_path()
     if not vim.t.nstl_root_path_disabled then
-        return vim.t.task_fzer_path or vim.fs.normalize(require('v.task').wsc.fzer.path)
+        local fzer = require('v.task').wsc.fzer
+        return vim.fs.normalize(fzer.patht[tostring(vim.api.nvim_get_current_tabpage())] or fzer.path)
     end
     return ''
 end
@@ -85,8 +86,9 @@ function ctxs.relative_path()
     if vim.t.nstl_root_path_disabled then
         return filepath
     else
-        local rootpath = vim.t.task_fzer_path or vim.fs.normalize(require('v.task').wsc.fzer.path)
-        local pat = '^' .. vim.fn.escape(rootpath, '\\')
+        local fzer = require('v.task').wsc.fzer
+        local root = vim.fs.normalize(fzer.patht[tostring(vim.api.nvim_get_current_tabpage())] or fzer.path)
+        local pat = '^' .. vim.fn.escape(root, '\\')
         return vim.fn.substitute(filepath, pat, '', '')
     end
 end
