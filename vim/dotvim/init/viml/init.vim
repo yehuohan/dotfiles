@@ -27,8 +27,8 @@ let $DotVimInit=$DotVimDir . '/init'
 let $DotVimVimL=$DotVimDir . '/init/viml'
 let $DotVimShare=$DotVimDir . '/share'
 let $DotVimLocal=$DotVimDir . '/local'
-" Append {'path':[]} from .env.json
-let s:env_file = $DotVimLocal . '/.env.json'
+" Append {'path':[]} from env.json
+let s:env_file = $DotVimLocal . '/env.json'
 if filereadable(s:env_file)
     let s:sep = IsWin() ? ';' : ':'
     let s:env = json_decode(join(readfile(s:env_file)))

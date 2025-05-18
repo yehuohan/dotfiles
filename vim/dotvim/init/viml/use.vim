@@ -3,7 +3,7 @@ function! SvarUse()
 endfunction
 
 " Struct s:use {{{
-let s:use_file = $DotVimLocal . '/.use.json'
+let s:use_file = $DotVimLocal . '/use.json'
 let s:use = {
     \ 'has_py' : v:false,
     \ 'nlsp'   : v:false,

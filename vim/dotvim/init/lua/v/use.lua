@@ -1,4 +1,4 @@
-local use_file = vim.env.DotVimLocal .. '/.use.json'
+local use_file = vim.env.DotVimLocal .. '/use.json'
 local use = {
     has_py = false, -- Enable python features
     has_git = false, -- Enable git features
