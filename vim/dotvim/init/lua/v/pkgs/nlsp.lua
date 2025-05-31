@@ -44,13 +44,9 @@ local function setup_lsp_servers(capabilities)
     })
     vim.lsp.config('clangd', {
         capabilities = capabilities,
-        -- Treesitter is better than clangd's semantic
+        -- Treesitter is better than lsp's semantic
         on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
         cmd = { 'clangd', '--header-insertion=never' },
-    })
-    vim.lsp.config('cmake', {
-        capabilities = capabilities,
-        init_options = { buildDirectory = '_VOut' },
     })
     vim.lsp.config('rust_analyzer', {
         capabilities = capabilities,
@@ -64,7 +60,7 @@ local function setup_lsp_servers(capabilities)
     })
     vim.lsp.config('basedpyright', {
         capabilities = capabilities,
-        -- Treesitter is better than basedpyright's semantic
+        -- Treesitter is better than lsp's semantic
         on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
     })
     vim.lsp.config('lua_ls', {
