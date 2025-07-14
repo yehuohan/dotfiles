@@ -22,13 +22,13 @@ setup_link_msys64.bat
 > *Code task:*
 
 <div align="center">
-<img alt="Code task" src="README/Code.gif"  width=75% height=75% />
+<img alt="Code task" src="README/Code.gif" style="width:75%; height:auto;" />
 </div>
 
 > *Fzer task:*
 
 <div align="center">
-<img alt="Fzer task" src="README/Fzer.gif"  width=75% height=75% />
+<img alt="Fzer task" src="README/Fzer.gif" style="width:75%; height:auto;" />
 </div>
 
 
