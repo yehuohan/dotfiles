@@ -420,6 +420,10 @@ local pkg_nlsp = vim.schedule_wrap(function()
     setup_cmp_completion()
     setup_cmp_highlights()
     vim.api.nvim_create_autocmd('ColorScheme', { group = 'v.Pkgs', callback = setup_cmp_highlights })
+    vim.api.nvim_create_autocmd('VimLeavePre', {
+        group = 'v.Pkgs',
+        callback = function() vim.lsp.stop_client(vim.lsp.get_clients(), true) end,
+    })
 end)
 
 if use.pkgs.blink then
