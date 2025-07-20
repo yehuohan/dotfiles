@@ -11,6 +11,7 @@
         }
     },
     /* Language server settings */
+    // neoconf doesn't support vim.lsp.config: https://github.com/folke/neoconf.nvim/issues/116
     "lspconfig": {
         "lua_ls": {
             "Lua.runtime.version": "LuaJIT", // "Lua 5.2", "LuaJIT"
