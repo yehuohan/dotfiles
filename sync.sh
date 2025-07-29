@@ -100,7 +100,6 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp $USERPROFILE/.cargo/config                           ./disk/home/.cargo/
     cp $USERPROFILE/pip/pip.ini                             ./disk/home/pip/
     cp $USERPROFILE/.condarc                                ./disk/home/
-    cp $USERPROFILE/clink_inputrc                           ./disk/home/
     cp -r $USERPROFILE/Documents/WindowsPowerShell          ./disk/home/Documents/
     cp -r $USERPROFILE/Documents/PowerShell                 ./disk/home/Documents/
     cp -r $APPDATA/helix                                    ./disk/home/AppData/Roaming/
@@ -110,7 +109,6 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     cp $DOT_APPS/_packs/persist/windows-terminal/settings/settings.json     ./disk/scoop/windows-terminal/settings/
     cp $DOT_APPS/_packs/persist/sioyek/keys_user.config                     ./disk/scoop/sioyek/
     cp $DOT_APPS/_packs/persist/sioyek/prefs_user.config                    ./disk/scoop/sioyek/
-    cp -r $DOT_APPS/_packs/persist/conemu                                   ./disk/scoop/
 
     echo "Win: Copy completed!"
 fi

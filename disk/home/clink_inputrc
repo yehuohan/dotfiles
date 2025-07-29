@@ -1,5 +1,0 @@
-
-# "\e`H": history-search-backward # arrow up
-# "\e`P": history-search-forward  # arrow down
-"\e[A": history-search-backward # arrow up
-"\e[B": history-search-forward  # arrow down
