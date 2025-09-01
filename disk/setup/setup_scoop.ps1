@@ -2,7 +2,7 @@
 ### Install
 <#
 Get install.ps1 from https://github.com/ScoopInstaller/Install/blob/master/install.ps1
-Then unlock install.ps1 from attributes to install scoop. How stupid!
+How stupid that requires unlocking install.ps1 from attributes to install scoop.
 #>
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh -outfile 'install.ps1'
@@ -10,18 +10,18 @@ irm get.scoop.sh -outfile 'install.ps1'
 
 
 ### Patch
-$SCOOP_PACKAGE_REPO = "https://kkgithub.com/ScoopInstaller/Scoop/archive/master.zip"
-$SCOOP_MAIN_BUCKET_REPO = "https://kkgithub.com/ScoopInstaller/Main/archive/master.zip"
-$SCOOP_PACKAGE_GIT_REPO = "https://kkgithub.com/ScoopInstaller/Scoop.git"
-$SCOOP_MAIN_BUCKET_GIT_REPO = "https://kkgithub.com/ScoopInstaller/Main.git"
+$env:SCOOP_PACKAGE_REPO = "https://bgithub.xyz/ScoopInstaller/Scoop/archive/master.zip"
+$env:SCOOP_MAIN_BUCKET_REPO = "https://bgithub.xyz/ScoopInstaller/Main/archive/master.zip"
+$env:SCOOP_PACKAGE_GIT_REPO = "https://bgithub.xyz/ScoopInstaller/Scoop.git"
+$env:SCOOP_MAIN_BUCKET_GIT_REPO = "https://bgithub.xyz/ScoopInstaller/Main.git"
 .\install.ps1 -ScoopDir "$env:DOT_APPS\_packs" -ScoopGlobalDir "$env:DOT_APPS\_packs" -NoProxy
 <#
 Patch source code '$DOT_APPS/_packs/apps/scoop/current/lib/install.ps1':
     function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
-    +    $url = "$url".Replace("https://github.com", "https://kkgithub.com").Replace("https://raw.githubusercontent.com", "https://raw.kkgithub.com")
+    +    $url = "$url".Replace("https://github.com", "https://bgithub.xyz").Replace("https://raw.githubusercontent.com", "https://raw.bgithub.xyz")
 #>
 <# Code patch is not compatible with aria2 #>
-scoop config scoop_repo http://kkgithub.com/ScoopInstaller/Scoop
+scoop config scoop_repo http://bgithub.xyz/ScoopInstaller/Scoop
 scoop config aria2-enabled false
 
 
