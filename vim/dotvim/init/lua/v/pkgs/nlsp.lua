@@ -4,17 +4,14 @@ local m = require('v.nlib').m
 --- Setup language servers
 --- Required plugins:
 --- * 'williamboman/mason.nvim'
---- * 'williamboman/mason-lspconfig.nvim'
 --- * 'neovim/nvim-lspconfig'
---- * 'folke/neoconf.nvim'
+--- * 'mrjones2014/codesettings.nvim'
 --- * 'folke/lazydev.nvim'
 local function setup_lsp_servers(capabilities)
     -- Settings
-    require('neoconf').setup({
-        -- Priority: lspconfig.setup() < global < local
-        local_settings = '.nlsp.json',
-        global_settings = 'nlsp.json',
-        filetype_jsonc = use.nts,
+    local codesettings = require('codesettings')
+    codesettings.setup({
+        config_file_paths = { '.nlsp.json', 'nlsp.json' },
     })
     require('lazydev').setup({
         library = {
@@ -38,50 +35,21 @@ local function setup_lsp_servers(capabilities)
             },
         },
     })
-    require('mason-lspconfig').setup({
-        ensure_installed = {},
-        automatic_enable = { exclude = { 'ruff' } },
-    })
-    vim.lsp.config('clangd', {
+    vim.lsp.config('*', {
         capabilities = capabilities,
-        -- Treesitter is better than lsp's semantic
-        on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
-        cmd = { 'clangd', '--header-insertion=never' },
+        before_init = function(_, config) config = codesettings.with_local_settings(config.name, config) end,
     })
-    vim.lsp.config('rust_analyzer', {
-        capabilities = capabilities,
-        settings = {
-            ['rust-analyzer'] = {
-                updates = { checkOnStartup = false, channel = 'nightly' },
-                cargo = { allFeatures = true },
-                notifications = { cargoTomlNotFound = false },
-            },
-        },
-    })
-    vim.lsp.config('basedpyright', {
-        capabilities = capabilities,
-        -- Treesitter is better than lsp's semantic
-        on_init = function(client) client.server_capabilities.semanticTokensProvider = nil end,
-    })
-    vim.lsp.config('lua_ls', {
-        capabilities = capabilities,
-        settings = {
-            Lua = {
-                runtime = { version = 'LuaJIT' },
-                workspace = {
-                    library = { vim.env.DotVimInit .. '/lua' },
-                    checkThirdParty = false,
-                },
-                telemetry = { enable = false },
-                format = { enable = false },
-            },
-        },
-    })
-    vim.lsp.config('tinymist', {
-        capabilities = capabilities,
-        single_file_support = true,
-        offset_encoding = 'utf-8',
-        settings = { formatterMode = 'typstyle' },
+    vim.lsp.enable({
+        'basedpyright',
+        'clangd',
+        'cmake',
+        'glsl_analyzer',
+        'jsonls',
+        'lua_ls',
+        'rust_analyzer',
+        'taplo',
+        'tinymist',
+        'vimls',
     })
 end
 
@@ -156,9 +124,9 @@ local function setup_lsp_mappings()
     m.nnore({ '<leader><leader>o', ':LspStart<Space>' })
     m.nnore({ '<leader>ol', ':LspInfo<CR>' })
     m.nnore({ '<leader>om', ':Mason<CR>' })
-    m.nnore({ '<leader>oc', ':Neoconf<CR>' })
-    m.nnore({ '<leader>on', ':Neoconf lsp<CR>' })
-    m.nnore({ '<leader>oN', ':Neoconf show<CR>' })
+    m.nnore({ '<leader>oc', ':Codesettings edit<CR>' })
+    m.nnore({ '<leader>on', ':Codesettings local<CR>' })
+    m.nnore({ '<leader>oN', ':Codesettings show<CR>' })
     m.nnore({ '<leader>oh', '<Cmd>LspClangdSwitchSourceHeader<CR>' })
 end
 
@@ -436,9 +404,8 @@ if use.pkgs.blink then
         dependencies = {
             -- Lsp
             'williamboman/mason.nvim',
-            'williamboman/mason-lspconfig.nvim',
             'neovim/nvim-lspconfig',
-            'folke/neoconf.nvim',
+            'mrjones2014/codesettings.nvim',
             { 'folke/lazydev.nvim', ft = 'lua' },
             'nvimdev/lspsaga.nvim',
             -- Sources
@@ -717,9 +684,8 @@ return {
     dependencies = {
         -- Lsp
         'williamboman/mason.nvim',
-        'williamboman/mason-lspconfig.nvim',
         'neovim/nvim-lspconfig',
-        'folke/neoconf.nvim',
+        'mrjones2014/codesettings.nvim',
         { 'folke/lazydev.nvim', ft = 'lua' },
         'nvimdev/lspsaga.nvim',
         -- Sources

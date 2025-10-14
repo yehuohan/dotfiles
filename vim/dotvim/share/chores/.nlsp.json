@@ -1,38 +1,32 @@
 /// Local .nlsp.json
-///
-/// Disable server: "lspconfig.server": false
 {
-    /* Neoconf settings */
-    "neoconf": {
-        "plugins": {
-            "lspconfig": { "enabled": true },
-            "jsonls": { "enabled": true },
-            "lua_ls": { "enabled": true }
-        }
+    "clangd": {
+        "arguments": [],
+        "fallbackFlags": [
+            "-std=c++20"
+        ]
     },
-    /* Language server settings */
-    "lspconfig": {
-        "clangd": {
-            "clangd.arguments": [],
-            "clangd.fallbackFlags": ["-std=c++20"]
-        },
-        "rust_analyzer": {
-            "rust-analyzer.updates.channel": "nightly", // stable, nightly
-            "rust-analyzer.diagnostics.disabled": ["inactive-code"],
-            "rust-analyzer.inlayHints.typeHints.enable": true,
-            "rust-analyzer.inlayHints.parameterHints.enable": true,
-            "rust-analyzer.procMacro.enable": true,
-            "rust-analyzer.checkOnSave.enable": true,
-            "rust-analyzer.checkOnSave.extraArgs": ["--target-dir", "target/check"]
-        },
-        "lua_ls": {
-            "Lua.runtime.version": "LuaJIT", // "Lua 5.2", "LuaJIT"
-            "Lua.workspace.library": [],
-            "Lua.diagnostics.disable": [
-                "inject-field",
-                "missing-fields",
-                "undefined-field"
-            ]
-        }
+    "rust_analyzer": {
+        "updates.channel": "nightly", // stable, nightly
+        "diagnostics.disabled": [
+            "inactive-code"
+        ],
+        "inlayHints.typeHints.enable": true,
+        "inlayHints.parameterHints.enable": true,
+        "procMacro.enable": true,
+        "checkOnSave.enable": true,
+        "checkOnSave.extraArgs": [
+            "--target-dir",
+            "target/check"
+        ]
+    },
+    "Lua": {
+        "runtime.version": "LuaJIT", // "Lua 5.2", "LuaJIT"
+        "workspace.library": [],
+        "diagnostics.disable": [
+            "inject-field",
+            "missing-fields",
+            "undefined-field"
+        ]
     }
 }

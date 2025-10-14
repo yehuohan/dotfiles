@@ -1,5 +1,0 @@
-/// Global nlsp.json
-///
-/// Here's empty because neoconf only support global settings path (~/.config/nvim/nlsp.json) currently
-{
-}

@@ -1,28 +1,14 @@
 /// Local .nlsp.json
-///
-/// Disable server: "lspconfig.server": false
 {
-    /* Neoconf settings */
-    "neoconf": {
-        "plugins": {
-            "lspconfig": { "enabled": true },
-            "jsonls": { "enabled": true },
-            "lua_ls": { "enabled": true }
-        }
-    },
-    /* Language server settings */
-    // neoconf doesn't support vim.lsp.config: https://github.com/folke/neoconf.nvim/issues/116
-    "lspconfig": {
-        "lua_ls": {
-            "Lua.runtime.version": "LuaJIT", // "Lua 5.2", "LuaJIT"
-            "Lua.workspace.library": ["../../bundle/plenary.nvim/lua"],
-            "Lua.diagnostics.disable": [
-                "inject-field",
-                "missing-fields",
-                "undefined-field",
-                "duplicate-set-field",
-                "param-type-mismatch"
-            ]
-        }
+    "Lua": {
+        "runtime.version": "LuaJIT", // "Lua 5.2", "LuaJIT"
+        "workspace.library": ["../../bundle/plenary.nvim/lua"],
+        "diagnostics.disable": [
+            "inject-field",
+            "missing-fields",
+            "undefined-field",
+            "duplicate-set-field",
+            "param-type-mismatch"
+        ]
     }
 }

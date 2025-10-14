@@ -35,7 +35,7 @@ if filereadable(s:env_file)
     let $PATH .= s:sep . join(s:env.path, s:sep)
 endif
 
-set rtp^=$DotVimDir
+set rtp^=$DotVimInit
 set encoding=utf-8                      " 内部使用utf-8编码
 set nocompatible                        " 不兼容vi
 let mapleader="\<Space>"                " Space leader
