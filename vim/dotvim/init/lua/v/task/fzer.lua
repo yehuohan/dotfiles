@@ -251,8 +251,13 @@ end
 local function parse_loc(kt)
     local loc = {}
     local restore = false
-    if kt.B == 'b' or wsc.vimgrep then
+    if wsc.vimgrep then
+        loc = { vim.fn.escape(vim.fs.normalize(vim.api.nvim_buf_get_name(0)), ' ') }
+    elseif kt.B == 'b' then
         loc = { vim.fs.normalize(vim.api.nvim_buf_get_name(0)) }
+        if string.match(loc[1], ' ') then
+            loc[1] = '"' .. loc[1] .. '"'
+        end
     elseif kt.B == 'p' then
         loc = rg_paths()
         if #loc > 0 then
@@ -378,16 +383,13 @@ local entry = function(kt, bang)
         task.wsc.fzer = wsc:get()
     end
 
-    -- Parse location and options
+    -- Parse location
     rep.loc = table.concat(parse_loc(kt), ' ')
     if rep.loc == '' then
         return
     end
-    if not wsc.vimgrep then
-        rep.opt = table.concat(parse_opt(kt), ' ')
-    end
 
-    -- Run task
+    -- Execute vimgrep
     if wsc.vimgrep then
         rep.pat = parse_vg(kt, rep.pat)
         local cmd = replace(fzer.vg, rep)
@@ -402,6 +404,10 @@ local entry = function(kt, bang)
         return
     end
 
+    -- Parse options
+    rep.opt = table.concat(parse_opt(kt), ' ')
+
+    -- Run task
     rep.pat = vim.fn.escape(rep.pat, '"')
     wsc.cmd = replace(fzer.rg, rep)
     wsc.wdir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))

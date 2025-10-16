@@ -244,11 +244,7 @@ local function setup_cmp_completion()
                 buffer = { name = 'Buf.' },
                 omni = { name = 'Omn.' },
                 cmdline = { name = 'Cmd.' },
-                lazydev = {
-                    name = 'Lzy.',
-                    module = 'lazydev.integrations.blink',
-                    score_offset = 5,
-                },
+                lazydev = { name = 'Lzy.', module = 'lazydev.integrations.blink', score_offset = 5 },
                 ripgrep = {
                     name = ' Rg.',
                     module = 'blink-ripgrep',
