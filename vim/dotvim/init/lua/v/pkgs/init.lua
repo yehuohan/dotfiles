@@ -605,6 +605,23 @@ local function pkg_marks()
     m.nnore({ '<leader>ma', ':MarksListBuf<CR>' })
 end
 
+-- Python环境管理
+local function pkg_venv()
+    local miniconda3_cmds = {
+        'fd',
+        IsWin() and 'python.exe$' or 'python$',
+        vim.env.DOT_APPS .. '/miniconda3',
+        '-E scripts -E pkgs',
+        '--full-path --color never',
+    }
+    require('venv-selector').setup({
+        options = { enable_default_searches = false },
+        search = {
+            miniconda3 = { command = table.concat(miniconda3_cmds, ' '), type = 'anaconda' },
+        },
+    })
+end
+
 --------------------------------------------------------------------------------
 -- Misc
 --------------------------------------------------------------------------------
@@ -815,7 +832,7 @@ local pkgs = {
     { 'yehuohan/hop.nvim', config = pkg_hop, event = 'VeryLazy' },
     { 'jake-stewart/multicursor.nvim', config = pkg_multicursor, event = 'VeryLazy' },
     { 'yehuohan/marks.nvim', config = pkg_marks, event = 'VeryLazy' },
-    { 'kmontocam/nvim-conda', ft = 'python' },
+    { 'linux-cultist/venv-selector.nvim', config = pkg_venv, ft = 'python' },
     { 'rust-lang/rust.vim', event = 'VeryLazy' },
     { 'NoahTheDuke/vim-just', ft = 'just' },
 
