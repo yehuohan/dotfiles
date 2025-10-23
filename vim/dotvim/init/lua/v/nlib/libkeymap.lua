@@ -1,8 +1,42 @@
 --- @class NLib.libkeymap
 local M = {}
 
-local delmap = vim.keymap.del
-local setmap = vim.keymap.set
+local __group_tbl = {}
+local __group = nil
+
+function M.group_begin(name)
+    if not __group_tbl[name] then
+        __group_tbl[name] = {}
+    end
+    __group = name
+end
+
+function M.group_end() __group = nil end
+
+--- Wrap vim.keymap.set
+local function setmap(modes, lhs, rhs, opts)
+    vim.keymap.set(modes, lhs, rhs, opts)
+    if __group then
+        local desc = opts and opts.desc
+        if not desc then
+            if type(rhs) == 'string' then
+                desc = rhs
+            elseif type(rhs) == 'function' then
+                local info = debug.getinfo(rhs, 'S')
+                desc = ('%s:L%d'):format(info.short_src, info.linedefined)
+            end
+        end
+        __group_tbl[__group][lhs] = desc
+    end
+end
+
+--- Wrap vim.keymap.del
+local function delmap(modes, lhs, opts)
+    vim.keymap.del(modes, lhs, opts)
+    if __group then
+        __group_tbl[__group][lhs] = nil
+    end
+end
 
 --- Setup options for setmap and delmap
 local function setopts(opts, defaults)

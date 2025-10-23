@@ -196,6 +196,7 @@ local function setup_mappings()
         end)
     end
 
+    m.group_begin('DAP')
     m.nnore({ '<F4>', dap.terminate })
     m.nnore({ '<S-F5>', dap.terminate })
     m.nnore({ '<F5>', dap.continue })
@@ -247,6 +248,7 @@ local function setup_mappings()
         end,
         desc = 'Toggle DAP UI',
     })
+    m.group_end()
 end
 
 local function pkg_ndap()
