@@ -1,4 +1,5 @@
 local nlib = require('v.nlib')
+local m = nlib.m
 
 local M = {}
 
@@ -126,17 +127,17 @@ local function setup_overseer()
     local overseer = require('overseer')
     overseer.setup(opts)
 
-    nlib.m.nnore({
+    m.nnore({
         '<leader>ru',
         function() overseer.run_template({ prompt = 'never' }) end,
         desc = 'Run overseer template without prompt',
     })
-    nlib.m.nnore({
+    m.nnore({
         '<leader>rU',
         function() overseer.run_template({ prompt = 'allow' }) end,
         desc = 'Run overseer template with prompt',
     })
-    nlib.m.nnore({
+    m.nnore({
         '<leader>rk',
         function()
             local list = overseer.list_tasks()
@@ -146,7 +147,7 @@ local function setup_overseer()
         end,
         desc = 'Kill the last overseer task',
     })
-    nlib.m.nnore({
+    m.nnore({
         '<leader>rK',
         function()
             local list = overseer.list_tasks()
@@ -156,7 +157,7 @@ local function setup_overseer()
         end,
         desc = 'Kill all overseer tasks',
     })
-    nlib.m.nnore({ '<leader>tk', '<Cmd>OverseerToggle<CR>' })
+    m.nnore({ '<leader>tk', '<Cmd>OverseerToggle<CR>' })
 end
 
 function M.setup()
@@ -167,14 +168,14 @@ function M.setup()
         function(opts) M.cmd(opts.args, opts.bang) end,
         { bang = true, nargs = 1 }
     )
-    nlib.m.nnore({ '<leader><leader>r', ':TaskRun<Space>' })
-    nlib.m.nnore({ '<leader><leader>R', ':TaskRun!<Space>' })
-    nlib.m.xnore({
+    m.nnore({ '<leader><leader>r', ':TaskRun<Space>' })
+    m.nnore({ '<leader><leader>R', ':TaskRun!<Space>' })
+    m.xnore({
         '<leader><leader>r',
         function() vim.api.nvim_feedkeys(':TaskRun ' .. nlib.e.selected(''), 'n', true) end,
         desc = ':RunTask',
     })
-    nlib.m.xnore({
+    m.xnore({
         '<leader><leader>R',
         function() vim.api.nvim_feedkeys(':TaskRun! ' .. nlib.e.selected(''), 'n', true) end,
         desc = ':RunTask!',

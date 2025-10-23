@@ -1,4 +1,5 @@
 local nlib = require('v.nlib')
+local m = nlib.m
 local e = nlib.e
 local replace = nlib.u.replace
 local task = require('v.task')
@@ -490,10 +491,10 @@ local function setup()
         }
     end
     for _, keys in ipairs(_keys) do
-        nlib.m.nxnore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
+        m.nxnore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
     end
     for _, keys in ipairs(_keys_fuzzier) do
-        nlib.m.nxnore({ '<leader>' .. keys, function() entry_fuzzier(keys2kt(keys)) end })
+        m.nxnore({ '<leader>' .. keys, function() entry_fuzzier(keys2kt(keys)) end })
     end
 
     vim.api.nvim_create_user_command(

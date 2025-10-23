@@ -1,4 +1,5 @@
 local nlib = require('v.nlib')
+local m = nlib.m
 local e = nlib.e
 local replace = nlib.u.replace
 local sequence = nlib.u.sequence
@@ -479,9 +480,9 @@ local function setup()
         }
     end
     for _, keys in ipairs(_keys) do
-        nlib.m.nnore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
+        m.nnore({ '<leader>' .. keys, function() entry(keys2kt(keys)) end })
     end
-    nlib.m.nnore({
+    m.nnore({
         '<leader>rv',
         function()
             local ft = vim.o.filetype

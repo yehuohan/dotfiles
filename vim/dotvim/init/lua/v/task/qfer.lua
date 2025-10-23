@@ -1,4 +1,5 @@
 local nlib = require('v.nlib')
+local m = nlib.m
 
 --- @class Qfer
 --- @field ns integer Quickfix highlight namespace
@@ -234,8 +235,8 @@ function qfer.enter(args)
         end
     end
 
-    nlib.m.nnore({ 'p', qfer.view, buffer = qfer.qbuf })
-    nlib.m.nnore({ '<CR>', qfer.jump, buffer = qfer.qbuf })
+    m.nnore({ 'p', qfer.view, buffer = qfer.qbuf })
+    m.nnore({ '<CR>', qfer.jump, buffer = qfer.qbuf })
 end
 
 --- For WinLeave
