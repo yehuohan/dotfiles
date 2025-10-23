@@ -293,6 +293,7 @@ local fast_cmds = {
 
 local function setup()
     setup_default_opts()
+    m.group_begin('options')
     m.nnore({ '<leader>iw', function() opt_inv('wrap') end, desc = 'Invert wrap' })
     m.nnore({ '<leader>il', function() opt_inv('list') end, desc = 'Invert list' })
     m.nnore({ '<leader>ii', function() opt_inv('ignorecase') end, desc = 'Invert ignorecase' })
@@ -303,6 +304,7 @@ local function setup()
     m.nnore({ '<leader>iv', function() opt_lst('virtualedit') end, desc = 'Invert virtualedit' })
     m.nnore({ '<leader>is', function() opt_lst('laststatus') end, desc = 'Invert laststatus' })
     m.nnore({ '<leader>in', options.number, desc = 'Invert number' })
+    m.group_end()
 
     api.nvim_create_augroup('v.Sets', { clear = true })
     setup_default_autocmds()
@@ -352,24 +354,28 @@ local function setup()
     local append_eval = function() e.buf_pipe('input', 'append', 'eval', fopts) end
     local yankcopy_exec = function() e.buf_pipe('input', 'yankcopy', 'exec', eopts) end
     local yankcopy_eval = function() e.buf_pipe('input', 'yankcopy', 'eval', fopts) end
+    m.group_begin('exec')
     m.nxnore({ '<leader>ec', append_exec, desc = 'Append command result' })
     m.nxnore({ '<leader>ef', append_eval, desc = 'Append expression result' })
     m.nxnore({ '<leader>yc', yankcopy_exec, desc = 'Yank and copy command result' })
     m.nxnore({ '<leader>yf', yankcopy_eval, desc = 'Yank and copy expression result' })
+    m.group_end()
 
     -- Evaluate math
     local vmath = function() e.buf_pipe('line', 'replace', 'eval_math', { eval = 'eval' }) end
     local lmath = function() e.buf_pipe('line', 'replace', 'eval_math', { eval = 'luaeval' }) end
     local pmath = function() e.buf_pipe('line', 'replace', 'eval_math', { eval = 'py3eval' }) end
+    local yvmath = function() e.buf_pipe('line', 'yankcopy', 'eval_math', { eval = 'eval' }) end
+    local ylmath = function() e.buf_pipe('line', 'yankcopy', 'eval_math', { eval = 'luaeval' }) end
+    local ypmath = function() e.buf_pipe('line', 'yankcopy', 'eval_math', { eval = 'py3eval' }) end
+    m.group_begin('math')
     m.nxnore({ '<leader>ev', vmath, desc = 'Append vim math' })
     m.nxnore({ '<leader>el', lmath, desc = 'Append lua math' })
     m.nxnore({ '<leader>ep', pmath, desc = 'Append python math' })
-    vmath = function() e.buf_pipe('line', 'yankcopy', 'eval_math', { eval = 'eval' }) end
-    lmath = function() e.buf_pipe('line', 'yankcopy', 'eval_math', { eval = 'luaeval' }) end
-    pmath = function() e.buf_pipe('line', 'yankcopy', 'eval_math', { eval = 'py3eval' }) end
-    m.nxnore({ '<leader>yv', vmath, desc = 'Yank and copy vim math' })
-    m.nxnore({ '<leader>yl', lmath, desc = 'Yank and copy lua math' })
-    m.nxnore({ '<leader>yp', pmath, desc = 'Yank and copy python math' })
+    m.nxnore({ '<leader>yv', yvmath, desc = 'Yank and copy vim math' })
+    m.nxnore({ '<leader>yl', ylmath, desc = 'Yank and copy lua math' })
+    m.nxnore({ '<leader>yp', ypmath, desc = 'Yank and copy python math' })
+    m.group_end()
 
     -- Search with internet
     local bing = function(txt) return 'https://cn.bing.com/search?q=' .. txt end
@@ -390,10 +396,12 @@ local function setup()
         res = opts.mode == 'n' and fn.expand('<cword>') or txt
         return bing(res)
     end
+    m.group_begin('search_online')
     m.nxnore({ '<leader>bs', function() e.buf_pipe('line', 'open', smart) end, desc = 'Smart search' })
     m.nxnore({ '<leader>bb', function() e.buf_pipe('word', 'open', bing) end, desc = 'Search by bing' })
     m.nxnore({ '<leader>bg', function() e.buf_pipe('word', 'open', google) end, desc = 'Search by google' })
     m.nxnore({ '<leader>bh', function() e.buf_pipe('word', 'open', github) end, desc = 'Search by github' })
+    m.group_end()
 
     -- Extra mappings
     vim.cmd.source(vim.env.DotVimInit .. '/lua/v/maps.vim')

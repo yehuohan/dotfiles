@@ -547,6 +547,7 @@ end
 local function pkg_multicursor()
     local mc = require('multicursor-nvim')
     mc.setup()
+    m.group_begin('multicursor')
     m.nnore({ ',c', mc.toggleCursor, desc = 'Toggle cursor' })
     m.xnore({
         ',c',
@@ -562,6 +563,7 @@ local function pkg_multicursor()
     m.xnore({ ',m', mc.matchCursors, desc = 'Match cursors from visual' })
     m.xnore({ ',s', mc.splitCursors, desc = 'Split cursors from visual' })
     m.nnore({ ',a', mc.alignCursors, desc = 'Align cursors' })
+    m.group_end()
     mc.addKeymapLayer(function(lyr)
         local hop = require('hop')
         local move_mc = require('hop.jumper').move_multicursor

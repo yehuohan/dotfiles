@@ -37,6 +37,7 @@ local function pkg_nts()
     })
     vim.opt.runtimepath:prepend(parser_dir)
 
+    m.group_begin('treesitter')
     m.nnore({
         '<leader>sh',
         function()
@@ -56,6 +57,7 @@ local function pkg_nts()
         end,
         desc = 'Toggle treesitter indent',
     })
+    m.group_end()
 end
 
 return {

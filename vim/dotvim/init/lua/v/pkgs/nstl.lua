@@ -439,9 +439,11 @@ local function pkg_nstl()
             require('heirline.utils').on_colorscheme(colors)
         end,
     })
+    m.group_begin('statusline')
     m.nnore({ '<leader>ta', toggle_root_path, desc = 'Toggle root path' })
     m.nnore({ '<leader>tl', toggle_check_lines, desc = 'Toggle check lines' })
     m.nnore({ '<leader>ty', toggle_tabline_layout, desc = 'Toggle table layout' })
+    m.group_end()
 end
 
 return {

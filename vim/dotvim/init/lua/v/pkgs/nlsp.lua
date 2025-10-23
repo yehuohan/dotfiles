@@ -55,6 +55,7 @@ end
 
 --- Setup lsp mappings
 local function setup_lsp_mappings()
+    m.group_begin('lsp')
     m.inore({ '<M-o>', vim.lsp.buf.signature_help })
     m.nnore({ 'gd', vim.lsp.buf.definition })
     m.nnore({ 'gD', vim.lsp.buf.declaration })
@@ -128,6 +129,7 @@ local function setup_lsp_mappings()
     m.nnore({ '<leader>on', ':Codesettings local<CR>' })
     m.nnore({ '<leader>oN', ':Codesettings show<CR>' })
     m.nnore({ '<leader>oh', '<Cmd>LspClangdSwitchSourceHeader<CR>' })
+    m.group_end()
 end
 
 --- Setup lsp appearance
