@@ -124,22 +124,36 @@ local function setup_default_opts()
     o.timeoutlen = 1000                             -- 映射超时时间为1000ms
     o.ttimeoutlen = 70                              -- 键码超时时间为70ms
     -- stylua: ignore end
+
+    m.group_begin('options')
+    m.nnore({ '<leader>iw', function() opt_inv('wrap') end, desc = 'Invert wrap' })
+    m.nnore({ '<leader>il', function() opt_inv('list') end, desc = 'Invert list' })
+    m.nnore({ '<leader>ii', function() opt_inv('ignorecase') end, desc = 'Invert ignorecase' })
+    m.nnore({ '<leader>ie', function() opt_inv('expandtab') end, desc = 'Invert expandtab' })
+    m.nnore({ '<leader>ib', function() opt_inv('scrollbind') end, desc = 'Invert scrollbind' })
+    m.nnore({ '<leader>ip', function() opt_inv('spell') end, desc = 'Invert spell' })
+    m.nnore({ '<leader>ic', function() opt_lst('conceallevel') end, desc = 'Invert conceallevel' })
+    m.nnore({ '<leader>iv', function() opt_lst('virtualedit') end, desc = 'Invert virtualedit' })
+    m.nnore({ '<leader>is', function() opt_lst('laststatus') end, desc = 'Invert laststatus' })
+    m.nnore({ '<leader>in', options.number, desc = 'Invert number' })
+    m.group_end()
 end
 
 --------------------------------------------------------------------------------
 -- Autocmds
 --------------------------------------------------------------------------------
-local function on_large_file()
-    local fsize = fn.getfsize(fn.expand('<afile>'))
-    if fsize >= 5 * 1024 * 1024 or fsize == -2 then
+local function on_large_file(args)
+    local fsize = fn.getfsize(args.file)
+    if vim.b.sets_large_file_force or (fsize >= 1024 * 1024 or fsize == -2) then
         vim.b.sets_large_file = true
-        vim.b.snacks_scope = false
+        vim.b.snacks_scope = false -- Disable snacks.scope.get()
         vim.bo.swapfile = false
-        vim.opt.eventignore:append('FileType')
-        vim.notify('On large file')
+        vim.bo.indentexpr = '' -- Disable nvim-treesitter.indent.get_indent()
+        vim.wo.foldmethod = 'manual' -- Disable vim.treesitter.foldexpr()
+        vim.notify('A large file')
     else
         vim.b.sets_large_file = false
-        vim.opt.eventignore:remove('FileType')
+        vim.wo.foldmethod = 'expr'
     end
 end
 
@@ -199,6 +213,8 @@ local function on_UIEnter()
 end
 
 local function setup_default_autocmds()
+    api.nvim_create_augroup('v.Sets', { clear = true })
+
     -- stylua: ignore start
     api.nvim_create_autocmd('BufNewFile', { group = 'v.Sets', command = 'setlocal fileformat=unix' })
     api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, { group = 'v.Sets', pattern = { '*.nvim' }, command = 'setlocal filetype=vim' })
@@ -227,10 +243,22 @@ local function setup_default_autocmds()
         callback = function() vim.hl.on_yank({ higroup = 'IncSearch', timeout = 200 }) end,
     })
 
-    --vim.o.guioptions = 'M' -- 完全禁用Gui界面元素
     vim.g.did_install_default_menus = 1 -- 禁止加载缺省菜单
     vim.g.did_install_syntax_menu = 1 -- 禁止加载Syntax菜单
     api.nvim_create_autocmd('UIEnter', { group = 'v.Sets', callback = on_UIEnter })
+
+    m.nnore({
+        '<leader>tL',
+        function()
+            if vim.b.sets_large_file_force == true then
+                vim.b.sets_large_file_force = false
+            else
+                vim.b.sets_large_file_force = true
+            end
+            vim.cmd.edit()
+        end,
+        desc = 'Toggle large file',
+    })
 end
 
 --------------------------------------------------------------------------------
@@ -293,20 +321,6 @@ local fast_cmds = {
 
 local function setup()
     setup_default_opts()
-    m.group_begin('options')
-    m.nnore({ '<leader>iw', function() opt_inv('wrap') end, desc = 'Invert wrap' })
-    m.nnore({ '<leader>il', function() opt_inv('list') end, desc = 'Invert list' })
-    m.nnore({ '<leader>ii', function() opt_inv('ignorecase') end, desc = 'Invert ignorecase' })
-    m.nnore({ '<leader>ie', function() opt_inv('expandtab') end, desc = 'Invert expandtab' })
-    m.nnore({ '<leader>ib', function() opt_inv('scrollbind') end, desc = 'Invert scrollbind' })
-    m.nnore({ '<leader>ip', function() opt_inv('spell') end, desc = 'Invert spell' })
-    m.nnore({ '<leader>ic', function() opt_lst('conceallevel') end, desc = 'Invert conceallevel' })
-    m.nnore({ '<leader>iv', function() opt_lst('virtualedit') end, desc = 'Invert virtualedit' })
-    m.nnore({ '<leader>is', function() opt_lst('laststatus') end, desc = 'Invert laststatus' })
-    m.nnore({ '<leader>in', options.number, desc = 'Invert number' })
-    m.group_end()
-
-    api.nvim_create_augroup('v.Sets', { clear = true })
     setup_default_autocmds()
 
     -- Fast commands
@@ -377,7 +391,7 @@ local function setup()
     m.nxnore({ '<leader>yp', ypmath, desc = 'Yank and copy python math' })
     m.group_end()
 
-    -- Search with internet
+    -- Search online
     local bing = function(txt) return 'https://cn.bing.com/search?q=' .. txt end
     local google = function(txt) return 'https://google.com/search?q=' .. txt end
     local github = function(txt) return 'https://github.com/search?q=' .. txt end

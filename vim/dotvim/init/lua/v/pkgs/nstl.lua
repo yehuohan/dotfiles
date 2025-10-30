@@ -8,9 +8,11 @@ local sym = {
     col = '$',
     buf = 'B',
     tab = 'T',
-    lck = '*',
+    lck = '&',
+    lgf = 'L',
     mod = '+',
     lck_mod = '#',
+    lgf_mod = '#',
     lsp = '@',
     vos = '',
 }
@@ -21,8 +23,10 @@ if use.ui.icon then
     sym.buf = ''
     sym.tab = ''
     sym.lck = '󰌾'
+    sym.lgf = '󰍁'
     sym.mod = '󱇬'
     sym.lck_mod = '󰗻'
+    sym.lgf_mod = '󱚲'
     sym.lsp = ''
     if IsLinux() then
         sym.vos = ''
@@ -63,11 +67,12 @@ function ctxs.hint()
         res = 'Help'
     end
     local icon = sym.vos
-    if vim.bo.readonly and vim.bo.modified then
-        icon = sym.lck_mod
-    elseif vim.bo.readonly then
-        icon = sym.lck
-    elseif vim.bo.modified then
+    local mod = vim.bo.modified
+    if vim.bo.readonly then
+        icon = mod and sym.lck_mod or sym.lck
+    elseif vim.b.sets_large_file then
+        icon = mod and sym.lgf_mod or sym.lgf
+    elseif mod then
         icon = sym.mod
     end
     return icon .. ' ' .. res
@@ -234,7 +239,7 @@ local function stls()
         end,
     })
     local ComLsp = pad('area', {
-        provider = function(self) return self:nonlocal('lsp') end,
+        provider = function() return require('lsp-progress').progress() end,
         hl = { fg = 'blue', bold = true, italic = true },
         update = {
             'User',
@@ -242,10 +247,7 @@ local function stls()
             callback = vim.schedule_wrap(function() vim.cmd.redrawstatus() end),
         },
     }, {
-        condition = function(self)
-            self.lsp = require('lsp-progress').progress(self)
-            return use.nlsp and self.lsp ~= ''
-        end,
+        condition = function() return use.nlsp and conds.lsp_attached() end,
     })
 
     local SecLeft = {
@@ -410,10 +412,7 @@ local function pkg_nstl()
             if #client_messages > 0 then
                 return sign .. ' ' .. table.concat(client_messages, ' ')
             end
-            if #vim.lsp.get_clients({ bufnr = vim.api.nvim_get_current_buf() }) > 0 then
-                return sign
-            end
-            return ''
+            return sign
         end,
     })
 

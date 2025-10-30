@@ -711,6 +711,7 @@ local function pkg_venn()
             end
             vim.notify('Venn is ' .. (vim.b.pkgs_venn_enabled and 'enabled' or 'disabled'))
         end,
+        desc = 'Toggle venn',
     })
 end
 
