@@ -37,13 +37,16 @@ local function setup_profiler(dotvim, startup)
     end)
 end
 
---- Load extra { "path" : [] } from env.json
+--- Load extra { "path" : [], "vars": {} } from env.json
 local function setup_env()
     local fp = io.open(vim.env.DotVimLocal .. '/env.json')
     if fp then
         local ex = vim.json.decode(fp:read('*a'))
         local sep = IsWin() and ';' or ':'
         vim.env.PATH = vim.env.PATH .. sep .. table.concat(ex.path, sep)
+        for name, val in pairs(ex.vars) do
+            vim.env[name] = val
+        end
     end
 end
 

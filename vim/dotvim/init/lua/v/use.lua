@@ -1,4 +1,3 @@
-local use_file = vim.env.DotVimLocal .. '/use.json'
 local use = {
     has_py = false, -- Enable python features
     has_git = false, -- Enable git features
@@ -19,10 +18,11 @@ local use = {
         font_neovide = { name = '', size = 12 },
         font_wide = { name = '', size = 12 },
     },
+    xai = vim.NIL,
     xgit = vim.NIL,
 }
-
-local lst = {
+local _json = vim.env.DotVimLocal .. '/use.json'
+local _list = {
     fontnames = {
         'Consolas',
         'Consolas,Cousine Nerd Font Mono',
@@ -34,7 +34,8 @@ local lst = {
         'WenQuanYi Micro Hei Mono',
     },
     fontsizes = { 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 },
-    git = {
+    ai_providers = { vim.NIL },
+    git_urls = {
         vim.NIL,
         'https://kkgithub.com',
         'https://bgithub.xyz',
@@ -64,14 +65,14 @@ end
 local function use_save(name)
     if name == 'onCR' then
         vim.fn.mkdir(vim.env.DotVimLocal, 'p')
-        vim.fn.writefile({ vim.json.encode(use) }, use_file)
+        vim.fn.writefile({ vim.json.encode(use) }, _json)
         vim.notify('v.use save successful!')
     end
 end
 
 local function use_load()
-    if vim.fn.filereadable(use_file) == 1 then
-        use = vim.tbl_deep_extend('force', use, vim.json.decode(vim.fn.join(vim.fn.readfile(use_file))))
+    if vim.fn.filereadable(_json) == 1 then
+        use = vim.tbl_deep_extend('force', use, vim.json.decode(vim.fn.join(vim.fn.readfile(_json))))
     else
         use_save('onCR')
     end
@@ -80,13 +81,13 @@ end
 local function use_init()
     -- Init with empty dict '{}' to indicate sub-selection
     local udic = vim.tbl_map(function() return vim.empty_dict() end, use)
-    local fdic = function(name)
+    local gen_font_dic = function(name)
         return {
             dsr = 'set ' .. name,
             lst = { 'name', 'size' },
             dic = {
-                name = { lst = lst.fontnames },
-                size = { lst = lst.fontsizes },
+                name = { lst = _list.fontnames },
+                size = { lst = _list.fontsizes },
             },
             sub = {
                 cmd = function(sopt, sel)
@@ -112,17 +113,18 @@ local function use_init()
         lst = vim.fn.sort(vim.tbl_keys(use.ui)),
         dic = {
             icon = { lst = { true, false } },
-            font = fdic('font'),
-            font_nvy = fdic('font_nvy'),
-            font_neovide = fdic('font_neovide'),
-            font_wide = fdic('font_wide'),
+            font = gen_font_dic('font'),
+            font_nvy = gen_font_dic('font_nvy'),
+            font_neovide = gen_font_dic('font_neovide'),
+            font_wide = gen_font_dic('font_wide'),
         },
         sub = {
             cmd = function(sopt, sel) use.ui[sopt] = sel end,
             get = function(sopt) return use.ui[sopt] end,
         },
     }
-    udic.xgit = { lst = lst.git }
+    udic.xai = { lst = _list.ai_providers }
+    udic.xgit = { lst = _list.git_urls }
     require('popc').pop_selection({
         opt = 'use',
         lst = vim.fn.sort(vim.tbl_keys(use)),

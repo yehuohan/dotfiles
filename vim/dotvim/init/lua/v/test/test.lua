@@ -26,7 +26,7 @@ end
 
 function T.sqljson()
     if (vim.fn.has('win32') == 1) or (vim.fn.has('win64') == 1) then
-        vim.g.sqlite_clib_path = dir_init .. '/../share/lib/sqlite3.dll'
+        vim.g.sqlite_clib_path = dir_init .. '/../share/lib3rd/sqlite3.dll'
     end
     vim.opt.rtp:prepend(dir_bundle .. '/sqlite.lua')
 
