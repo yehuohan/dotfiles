@@ -457,7 +457,7 @@ end
 local function pkg_snip()
     vim.cmd([[
 function! PkgLoadSnip(filename)
-    return join(readfile($DotVimShare . '/' . a:filename), "\n")
+    return join(readfile($DotVimShare . '/codes/' . a:filename), "\n")
 endfunction
     ]])
 

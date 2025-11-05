@@ -10,6 +10,7 @@ if [[ `uname` == "Linux" ]]; then
     fi
 
     # vim & neovim
+    mkdir -p ./vim/dotvim
     cp -r ~/dotvim/init                             ./vim/dotvim/
     cp -r ~/dotvim/share                            ./vim/dotvim/
     cp ~/.config/nvim/init.lua                      ./vim/nvim/
@@ -76,6 +77,7 @@ elif [[ `uname -o` == "Msys" || `uname -o` == "Cygwin" ]]; then
     fi
 
     # vim & neovim
+    mkdir -p ./vim/dotvim
     cp -r $DOT_HOME/dotvim/init                             ./vim/dotvim/
     cp -r $DOT_HOME/dotvim/share                            ./vim/dotvim/
     cp $LOCALAPPDATA/nvim/init.lua                          ./vim/nvim/
