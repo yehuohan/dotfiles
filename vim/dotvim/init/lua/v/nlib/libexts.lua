@@ -210,7 +210,7 @@ end
 function M.buf_etpl(path, under_root)
     local dir = nil
     if under_root then
-        dir = M.u.try_root()
+        dir = require('v.nlib').u.try_root()
     end
     if not dir then
         dir = vim.fs.dirname(api.nvim_buf_get_name(0))
