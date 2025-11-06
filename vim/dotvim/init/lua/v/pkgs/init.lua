@@ -490,6 +490,11 @@ endfunction
     })
     m.addnore({ 'i', 's' }, { '<M-l>', function() snip.jump(1) end, desc = 'Next snippet placeholder' })
     m.addnore({ 'i', 's' }, { '<M-h>', function() snip.jump(-1) end, desc = 'Prev snippet placeholder' })
+    vim.api.nvim_create_user_command(
+        'LuaSnipLoad',
+        function(opts) require('luasnip.loaders.from_snipmate').load({ paths = opts.fargs }) end,
+        { nargs = '+', complete = 'dir' }
+    )
 end
 
 -- 代码格式化
