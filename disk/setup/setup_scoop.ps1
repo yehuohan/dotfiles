@@ -16,7 +16,7 @@ $env:SCOOP_PACKAGE_GIT_REPO = "https://bgithub.xyz/ScoopInstaller/Scoop.git"
 $env:SCOOP_MAIN_BUCKET_GIT_REPO = "https://bgithub.xyz/ScoopInstaller/Main.git"
 .\install.ps1 -ScoopDir "$env:DOT_APPS\_packs" -ScoopGlobalDir "$env:DOT_APPS\_packs" -NoProxy
 <#
-Patch source code '$DOT_APPS/_packs/apps/scoop/current/lib/install.ps1':
+Patch source code '$DOT_APPS/_packs/apps/scoop/current/lib/download.ps1':
     function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
     +    $url = "$url".Replace("https://github.com", "https://bgithub.xyz").Replace("https://raw.githubusercontent.com", "https://raw.bgithub.xyz")
 #>
