@@ -630,7 +630,7 @@ local function pkg_venv()
         'fd',
         IsWin() and 'python.exe$' or 'python$',
         vim.env.DOT_APPS .. '/miniconda3',
-        '-E scripts -E pkgs',
+        '-E scripts -E Scripts -E pkgs',
         '--full-path --color never',
     }
     require('venv-selector').setup({
