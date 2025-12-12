@@ -47,6 +47,7 @@ local function setup_lsp_servers(capabilities)
         'jsonls',
         'lua_ls',
         'rust_analyzer',
+        'slangd',
         'taplo',
         'tinymist',
         'vimls',
