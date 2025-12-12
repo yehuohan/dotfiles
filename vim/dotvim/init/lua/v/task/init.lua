@@ -45,16 +45,10 @@ function M.run(cfg)
     opts.cmd = cfg.cmd
     opts.cwd = cfg.wdir
     opts.env = type(cfg.envs) == 'string' and nlib.u.str2env(cfg.envs) or cfg.envs
-    if cfg.tout.style == 'job' then
-        opts.strategy = { 'jobstart', use_terminal = false }
-    else
-        opts.strategy = 'terminal'
-    end
+    opts.strategy = { 'jobstart', use_terminal = cfg.tout.style ~= 'job' }
     cfg.tout[1] = 'on_task_output'
     opts.components = {
         cfg.tout,
-        'display_duration',
-        'on_output_summarize',
         'on_exit_set_status',
         'on_complete_dispose',
         'unique',
@@ -96,32 +90,32 @@ local function setup_overseer()
             title = M.title.Task,
             style = 'job',
         },
-        'display_duration',
-        'on_output_summarize',
         'on_exit_set_status',
         'on_complete_dispose',
         'unique',
     }
     local opts = {
-        -- `overseer.run_template` requires 'jobstart' to get a clean 'on_task_output'
-        strategy = { 'jobstart', use_terminal = false },
-        templates = { 'builtin' },
         dap = false,
+        output = { use_terminal = false, preserve_output = false },
         form = { win_opts = { winblend = 0 } },
         task_list = {
             direction = 'right',
-            bindings = {
-                ['i'] = 'Edit',
-                ['p'] = 'TogglePreview',
-                ['o'] = 'OpenQuickFix',
-                ['O'] = function() require('overseer.task_list.sidebar').get():run_action('restart') end,
-                ['K'] = function() require('overseer.task_list.sidebar').get():run_action('stop') end,
-                ['D'] = function() require('overseer.task_list.sidebar').get():run_action('dispose') end,
+            keymaps = {
+                ['i'] = { 'keymap.run_action', opts = { action = 'edit' }, desc = 'Edit task' },
+                ['o'] = {
+                    'keymap.run_action',
+                    opts = { action = 'open output in quickfix' },
+                    desc = 'Open task output in the quickfix',
+                },
+                ['<S-o>'] = { 'keymap.run_action', opts = { action = 'restart' }, desc = 'Restart task' },
+                ['K'] = { 'keymap.run_action', opts = { action = 'stop' }, desc = 'Stop task' },
+                ['D'] = { 'keymap.run_action', opts = { action = 'dispose' }, desc = 'Dispose task' },
             },
         },
         component_aliases = {
             default = components,
             default_vscode = components,
+            default_builtin = components,
         },
     }
     local overseer = require('overseer')
@@ -129,12 +123,12 @@ local function setup_overseer()
 
     m.nnore({
         '<leader>ru',
-        function() overseer.run_template({ prompt = 'never' }) end,
+        function() overseer.run_task({ disallow_prompt = true }) end,
         desc = 'Run overseer template without prompt',
     })
     m.nnore({
         '<leader>rU',
-        function() overseer.run_template({ prompt = 'allow' }) end,
+        function() overseer.run_task({ disallow_prompt = false }) end,
         desc = 'Run overseer template with prompt',
     })
     m.nnore({
@@ -142,7 +136,7 @@ local function setup_overseer()
         function()
             local list = overseer.list_tasks()
             if #list > 0 then
-                list[#list]:stop()
+                list[1]:stop()
             end
         end,
         desc = 'Kill the last overseer task',
