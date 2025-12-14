@@ -43,6 +43,7 @@ $vars = @(
     },
     @{ Name = 'RUSTUP_HOME'; Value = $rustup_home; },
     @{ Name = 'CARGO_HOME'; Value = $cargo_home; },
+    @{ Name = 'XMAKE_GLOBALDIR'; Value = "$dot_apps\_packs\persist"; },
     @{ Name = 'VCPKG_DEFAULT_BINARY_CACHE'; Value = "$dot_apps\vcpkg\archives"; }
 )
 if ($android_home) {
