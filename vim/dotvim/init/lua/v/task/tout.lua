@@ -197,7 +197,7 @@ function M.constructor(params)
     cpt.on_output = function(_, task, data)
         if qfer.task and qfer.task.id == task.id then
             local encoding = params.encoding
-            local chan_id = params.style == 'job' and task.strategy.job_id or task.strategy.chan_id
+            local chan_id = task.strategy.job_id
             -- React to pause command
             for _, str in ipairs(data) do
                 local txt = str
@@ -208,6 +208,7 @@ function M.constructor(params)
                     for _, pat in ipairs(PAUSE_PATS) do
                         if txt and txt:match(pat) then
                             vim.api.nvim_chan_send(chan_id, '\x0D')
+                            break
                         end
                     end
                 end
