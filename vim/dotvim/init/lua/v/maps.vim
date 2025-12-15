@@ -2,6 +2,8 @@
 " 跳转
 nnoremap ' `
 nnoremap ` '
+nmap M %
+xmap M %
 " 回退
 nnoremap U <C-r>
 " 行移动

@@ -5,13 +5,6 @@ local m = nlib.m
 --------------------------------------------------------------------------------
 -- Editor
 --------------------------------------------------------------------------------
--- 匹配符跳转
-local function pkg_matchup()
-    -- packadd matchit
-    vim.g.matchup_matchparen_offscreen = { method = 'popup' }
-    m.nxmap({ 'M', '%' })
-end
-
 -- 快速高亮
 local function pkg_quickhl()
     m.nxmap({ '<leader>hw', '<Plug>(quickhl-manual-this)' })
@@ -836,7 +829,6 @@ local pkgs = {
     },
 
     -- Editor
-    { 'andymass/vim-matchup', config = pkg_matchup, event = 'VeryLazy' },
     { 't9md/vim-quickhl', config = pkg_quickhl, event = 'VeryLazy' },
     { 'HiPhish/rainbow-delimiters.nvim', config = pkg_rainbow, submodules = false, event = 'VeryLazy' },
     { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' }, event = 'VeryLazy' },
@@ -926,8 +918,8 @@ local function pkg_lazy()
     vim.g.loaded_zip = 1
     vim.g.loaded_netrw = 1
     vim.g.loaded_netrwPlugin = 1
-    vim.g.loaded_matchit = 1
-    vim.g.loaded_matchparen = 1
+    -- vim.g.loaded_matchit = 1
+    -- vim.g.loaded_matchparen = 1
     require('lazy').setup(pkgs, {
         root = bundle,
         defaults = { lazy = false },

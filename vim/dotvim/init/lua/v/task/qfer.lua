@@ -74,7 +74,10 @@ end
 --- Add quickfix highlight
 --- Only works when quickfix buffer is valid
 function qfer.add_hl(hl, line, cs, ce)
-    vim.api.nvim_buf_set_extmark(
+    -- Wrap inside pcall to avoid vim.api.nvim_buf_set_extmark's error crash
+    -- Tout.on_complete, which will break reseting qfer.task to nil.
+    pcall(
+        vim.api.nvim_buf_set_extmark,
         qfer.qbuf,
         qfer.ns,
         line + 1, -- '+1' for block head line
