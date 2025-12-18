@@ -1,3 +1,4 @@
+# vim@code{ efm = [[error: %f:%l:%c: %m]] }:
 set shell := ['bash', '-uc']
 set windows-shell := ['pwsh', '-NoLogo', '-NoProfileLoadTime', '-Command']
 set windows-shell := ["powershell", "-NoLogo", "-Command"]
@@ -9,12 +10,14 @@ dir_root := replace(justfile_directory(), '\', '/')
 dir_home := replace(env('DOT_APPS'), '\', '/')
 dir_this := `pwd` # shell('pwd')
 
-build_type := env('BUILD_TYPE', 'Debug')
-# build_type := env('BUILD_TYPE', 'RelWithDebInfo')
-# build_type := env('BUILD_TYPE', 'Release')
-build_gen := env('BUILD_GEN', 'Ninja')
-# build_gen := env('BUILD_GEN', '"Unix Makefiles"')
-# build_gen := env('BUILD_GEN', '"NMake Makefiles"')
+xplat := env('xplat', 'linux') # 'android', 'mingw', 'windows'
+xarch := env('xarch', 'x86_64') # 'arm64-v8a', 'x64'
+xmode := env('xbuild', 'debug')
+dir_xbuild := dir_root / '_VOut'
+dir_xinstall := dir_root / 'install'
+
+build_type := env('BUILD_TYPE', 'Debug') # 'RelWithDebInfo', 'Release'
+build_gen := env('BUILD_GEN', 'Ninja') # '"Unix Makefiles"', '"NMake Makefiles"'
 build_job := '-j4'
 dir_build := dir_root / '_VOut' / build_type
 dir_install := dir_root / 'install' / build_type
@@ -24,6 +27,8 @@ NDK_ABI := env('NDK_ABI', 'arm64-v8a')
 NDK_PLATFORM := env('NDK_PLATFORM', 'android-27')
 export ANDROID_NDK_HOME := NDK_ROOT
 
+export XMAKE_MAIN_REPO := 'https://gitee.com/tboox/xmake-repo.git'
+
 export VCPKG_ROOT := env('VCPKG_ROOT', dir_home / 'vcpkg')
 export VCPKG_TRIPLET := if os() == "windows" { 'x64-mingw-mix' } else { 'x64-linux-mix' } # x64-linux-mix, x64-windows-mix, arm64-android
 VCPKG_XSCRIPT := '"clear;x-script,bash ' + dir_root + '/scripts/vcpkg_xscript.sh {url} {dst};x-block-origin"'
@@ -31,6 +36,24 @@ VCPKG_XSCRIPT := '"clear;x-script,cmd /k' + dir_root + '/scripts/vcpkg_xscript.b
 DEPS := 'vulkan-headers volk'
 DEPS_DIR := dir_root / 'deps'
 
+
+
+x-all: x-gen
+    xmake b # <target>
+    xmake i --installdir={{dir_xinstall}}
+
+x-gen:
+    # -git clone --depth=1 https://github.com/LelouchHe/xmake-luals-addon.git {{DEPS_DIR}}/repos/xmake-luals-addon
+    # pac.lua:
+    # function mirror(url)
+    # 	return url:gsub("github.com", "bgithub.xyz")
+    # end
+    # xmake g --proxy_pac={{dir_root}}/scripts/_pac.lua
+    xmake f -y \
+        --plat={{xplat}} --arch={{xarch}} --mode={{xmode}} \
+        # --ndk={{NDK_ROOT}} --ndk_cxxstl=c++_static \
+        --builddir={{dir_xbuild}}
+    xmake project -k compile_commands
 
 all: gen agen
     cmake --build {{dir_build}} {{build_job}}
