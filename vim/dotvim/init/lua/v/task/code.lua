@@ -42,7 +42,7 @@ local codes = {
     c           = { cmd = 'gcc {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}', efm = [[%f:%l:%c: %m]] },
     cpp         = { cmd = 'g++ -std=c++20 {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}', efm = [[%f:%l:%c: %m]] },
     rust        = { cmd = IsWin() and 'rustc {barg} {bsrc} -o "{bout}.exe" && "./{bout}" {earg}'
-                                  or 'rustc {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
+                                   or 'rustc {barg} {bsrc} -o "{bout}" && "./{bout}" {earg}',
                     efm = { [[%Eerror:%m,%C %#%[%^ ]%# %#%f:%l:%c %#,]]
                          .. [[%Wwarning:%m,%C %#%[%^ ]%# %#%f:%l:%c %#]],
                             [[%\ %#%[%^ ]%# %#%f:%l:%c %#]] }},
@@ -51,7 +51,8 @@ local codes = {
                        .. [[%*\sFile \"%f\"\, line %l]] },
     lua         = { cmd = 'lua {bsrc} {earg}', efm = [[%.%#: %f:%l: %m, %#%f:%l: %m]] },
     julia       = { cmd = 'julia {bsrc} {earg}' },
-    glsl        = { cmd = 'glslangValidator {earg} {bsrc}', efm = [[%f:%l: error: %m,%+P%f,ERROR: %c:%l: %m,%-Q]] },
+    glsl        = { cmd = 'glslc {earg} {bsrc} -o ' .. (IsWin() and 'NUL' or '/dev/null'),
+                    efm = [[%f:%l: error: %m,%+P%f,ERROR: %c:%l: %m,%-Q]] },
     shaderslang = { cmd = 'slangc {bsrc} {earg}' },
     java        = { cmd = 'javac {barg} {bsrc} && java "{bout}" {earg}' },
     javascript  = { cmd = 'node {bsrc} {earg}', efm = [[%f:%l]] },
