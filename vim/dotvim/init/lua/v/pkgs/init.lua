@@ -258,6 +258,7 @@ local function pkg_popc()
     m.nnore({ '<C-n>', '<C-o>' })
     m.nnore({ '<C-m>', '<C-i>' })
     m.nnore({ '<leader>wq', '<Cmd>PopcBufferClose<CR>' })
+    m.nnore({ '<leader>wQ', '<Cmd>PopcBufferClose!<CR>' })
 
     m.nnore({ '<leader><leader>p', ':PopcSet<Space>' })
     m.nnore({ '<leader>sp', ':PopcSet<CR>' })
