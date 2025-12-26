@@ -47,8 +47,8 @@ local codes = {
                          .. [[%Wwarning:%m,%C %#%[%^ ]%# %#%f:%l:%c %#]],
                             [[%\ %#%[%^ ]%# %#%f:%l:%c %#]] }},
     python      = { cmd = 'python {bsrc} {earg}',
-                    efm = [[%*\sFile \"%f\"\, line %l\, %m,]]
-                       .. [[%*\sFile \"%f\"\, line %l]] },
+                    efm = [[%\s%#File \"%f\"\, line %l\, %m,]]
+                       .. [[%\s%#File \"%f\"\, line %l]] },
     lua         = { cmd = 'lua {bsrc} {earg}', efm = [[%.%#: %f:%l: %m, %#%f:%l: %m]] },
     julia       = { cmd = 'julia {bsrc} {earg}' },
     glsl        = { cmd = 'glslc {earg} {bsrc} -o ' .. (IsWin() and 'NUL' or '/dev/null'),
@@ -70,8 +70,8 @@ local codes = {
     html        = { cmd = 'firefox {bsrc}' },
     json        = { cmd = 'python -m json.tool {bsrc}' },
     typst       = { cmd = 'typst compile {bsrc} && sioyek "{bout}.pdf"',
-                    efm = { [[%Eerror:%m,%C %#%[%^ ]%# %#%\%\%\%\?%\%\%f:%l:%c %#]],
-                            [[%\ %#%[%^ ]%# %#%\%\%\%\?%\%\%f:%l:%c %#]] }},
+                    efm = { [[%Eerror:%m,%C%\ %#%[%^?]%#?%\%\%f:%l:%c %#]],
+                            [[%\ %#%[%^?]%#?%\%\%f:%l:%c %#]] }},
     tex         = { cmd = 'xelatex -file-line-error {bsrc} && sioyek "{bout}.pdf"', efm = [[%f:%l: %m]] },
 }
 -- stylua: ignore end
