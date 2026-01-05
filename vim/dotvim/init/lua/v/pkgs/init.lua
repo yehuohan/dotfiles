@@ -516,6 +516,7 @@ local function pkg_conform()
             typst = { 'typstyle' },
         },
         default_format_opts = {
+            timeout_ms = 5000,
             lsp_format = 'fallback',
         },
     })
