@@ -1,16 +1,16 @@
 # .clangd
 
 CompileFlags:
-  Add: [
-    -Wall,
-    # -Wno-unused-variable,   # Show warning of unused variable
-    # -Wno-unused-parameter,  # Show warning of unused parameter
-    # -xc++,                  # Set language: 'c', 'c++', 'objc', 'cuda',
-    -DNDEBUG,
-    -isystem, /path/to/inc,
-  ]
-  Remove: [
-  ]
+  Add:
+    - "-Wall"
+    - "-Wno-unused-variable"
+    - "-Wno-unused-parameter"
+    - "-xc++" # Set language: 'c', 'c++', 'objc', 'cuda',
+    - "-DNDEBUG"
+    - "-isystem"
+    - "/path/to/inc"
+  Remove:
+    - "-Werror" # 防止Clangd过于严格，导致错误过多，影响diagnostic
   CompilationDatabase: _VOut/
 
 Completion:
