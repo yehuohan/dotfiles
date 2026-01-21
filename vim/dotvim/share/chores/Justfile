@@ -4,6 +4,7 @@ set shell := ['bash', '-uc']
 set windows-shell := ['pwsh', '-NoLogo', '-NoProfileLoadTime', '-Command']
 set windows-shell := ["powershell", "-NoLogo", "-Command"]
 set dotenv-load
+set dotenv-override
 set ignore-comments
 
 # dir_root := justfile_directory()
