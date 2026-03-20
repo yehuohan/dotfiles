@@ -495,6 +495,24 @@ local function setup()
         end,
         desc = 'Source vim script',
     })
+    m.nnore({
+        '<leader>rc',
+        function()
+            local wdir = nlib.u.try_root() or vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+            vim.system({ 'code', wdir }, { cwd = wdir, detach = true })
+        end,
+        desc = 'Run vscode',
+    })
+    m.nnore({
+        '<leader>rC',
+        function()
+            local wdir = vim.fn.input('Code: ')
+            if wdir ~= '' then
+                vim.system({ 'code', wdir }, { cwd = wdir, detach = true })
+            end
+        end,
+        desc = 'Run vscode',
+    })
 
     vim.api.nvim_create_user_command(
         'Code',
