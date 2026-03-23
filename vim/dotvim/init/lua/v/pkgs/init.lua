@@ -14,18 +14,6 @@ local function pkg_quickhl()
     m.nmap({ '<leader>th', '<Plug>(quickhl-manual-toggle)' })
 end
 
--- 行连接和打断
-local function pkg_treesj()
-    local tsj = require('treesj')
-    tsj.setup({
-        use_default_keymaps = false,
-        max_join_length = 320,
-    })
-    m.nnore({ '<leader>sj', tsj.toggle })
-    m.nnore({ '<leader>sk', tsj.split })
-    m.nnore({ '<leader>sK', tsj.join })
-end
-
 -- 彩虹括号
 local function pkg_rainbow()
     local rainbow = require('rainbow-delimiters')
@@ -275,6 +263,15 @@ local function pkg_mini()
     require('mini.comment').setup()
     m.nmap({ '<leader>cl', 'gcc' })
     m.nmap({ '<leader>cu', 'gcc' })
+
+    -- 参数连接
+    require('mini.splitjoin').setup({
+        mappings = {
+            toggle = '<leader>sj',
+            split = '<leader>sk',
+            join = '<leader>sK',
+        },
+    })
 
     -- 高亮Word
     vim.api.nvim_create_autocmd('CursorMoved', {
@@ -817,7 +814,6 @@ local pkgs = {
     { 't9md/vim-quickhl', config = pkg_quickhl, event = 'VeryLazy' },
     { 'HiPhish/rainbow-delimiters.nvim', config = pkg_rainbow, submodules = false, event = 'VeryLazy' },
     { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' }, event = 'VeryLazy' },
-    { 'Wansmer/treesj', event = 'VeryLazy', config = pkg_treesj },
     { 'goolord/alpha-nvim', config = pkg_alpha },
     { 'ellisonleao/gruvbox.nvim', config = pkg_gruvbox },
     { 'polirritmico/monokai-nightasty.nvim', event = 'VeryLazy' },
