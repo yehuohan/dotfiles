@@ -13,7 +13,7 @@ def tst_catch():
         raise Exception("tst_catch")
 
     sub()
-    print(">>> Tested singleton")
+    print(">>> Tested catch")
 
 
 def tst_singleton():
