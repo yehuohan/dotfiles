@@ -779,18 +779,6 @@ local function pkg_im_select()
     })
 end
 
--- AI
-local function pkg_avante()
-    local avante = require('avante')
-    avante.setup({
-        provider = use.xai,
-        mappings = { submit = { insert = '<S-CR>' } },
-        windows = { width = 35 },
-    })
-    m.nnore({ '<leader>ti', ':AvanteToggle<CR>' })
-    m.nnore({ '<leader>tI', ':AvanteChatNew<CR>' })
-end
-
 --------------------------------------------------------------------------------
 -- Lazy
 --------------------------------------------------------------------------------
@@ -853,17 +841,6 @@ local pkgs = {
     { 'itchyny/screensaver.vim', keys = { { '<leader>ss', '<Cmd>ScreenSaver clock<CR>' } } },
     { 'JuanZoran/Trans.nvim', config = pkg_trans, event = 'VeryLazy' },
     { 'keaising/im-select.nvim', cond = use.pkgs.im_select, config = pkg_im_select, event = 'VeryLazy' },
-    {
-        'yetone/avante.nvim',
-        cond = use.xai ~= vim.NIL,
-        config = pkg_avante,
-        event = 'VeryLazy',
-        build = use.has_build
-            and (
-                IsWin() and 'powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false'
-                or 'make'
-            ),
-    },
 }
 
 local function clone_lazy(url, bundle)

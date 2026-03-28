@@ -18,7 +18,6 @@ local use = {
         font_neovide = { name = '', size = 12 },
         font_wide = { name = '', size = 12 },
     },
-    xai = vim.NIL,
     xgit = vim.NIL,
 }
 local _json = vim.env.DotVimLocal .. '/use.json'
@@ -34,7 +33,6 @@ local _list = {
         'WenQuanYi Micro Hei Mono',
     },
     fontsizes = { 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 },
-    ai_providers = { vim.NIL },
     git_urls = {
         vim.NIL,
         'https://kkgithub.com',
@@ -123,7 +121,6 @@ local function use_init()
             get = function(sopt) return use.ui[sopt] end,
         },
     }
-    udic.xai = { lst = _list.ai_providers }
     udic.xgit = { lst = _list.git_urls }
     require('popc').pop_selection({
         opt = 'use',
