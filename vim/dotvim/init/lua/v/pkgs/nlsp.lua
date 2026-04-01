@@ -24,7 +24,7 @@ local function setup_lsp_servers(capabilities)
         url = use.xgit .. '/%s/releases/download/%s/%s'
     end
     require('mason').setup({
-        install_root_dir = vim.env.DotVimLocal .. '/.mason',
+        install_root_dir = vim.env.DotVimLocal .. '/mason',
         github = { download_url_template = url },
         ui = {
             check_outdated_packages_on_open = true,
@@ -123,8 +123,9 @@ local function setup_lsp_mappings()
     })
     m.nnore({ '<leader>oJ', function() vim.diagnostic.jump({ count = 1 }) end, desc = 'Next diagnostic' })
     m.nnore({ '<leader>oK', function() vim.diagnostic.jump({ count = -1 }) end, desc = 'Prev diagnostic' })
-    m.nnore({ '<leader><leader>o', ':LspStart<Space>' })
-    m.nnore({ '<leader>ol', ':LspInfo<CR>' })
+    m.nnore({ '<leader><leader>o', ':lsp enable<Space>' })
+    m.nnore({ '<leader><leader>O', ':lsp disable<Space>' })
+    m.nnore({ '<leader>ol', ':checkhealth vim.lsp<CR>' })
     m.nnore({ '<leader>om', ':Mason<CR>' })
     m.nnore({ '<leader>oc', ':Codesettings edit<CR>' })
     m.nnore({ '<leader>on', ':Codesettings local<CR>' })
@@ -135,7 +136,7 @@ end
 
 --- Setup lsp appearance
 local function setup_lsp_appearance()
-    vim.lsp.set_log_level(vim.lsp.log_levels.OFF)
+    vim.lsp.log.set_level(vim.lsp.log.levels.OFF)
 
     local signs
     if use.ui.icon then
@@ -389,7 +390,11 @@ local pkg_nlsp = vim.schedule_wrap(function()
     vim.api.nvim_create_autocmd('ColorScheme', { group = 'v.Pkgs', callback = setup_cmp_highlights })
     vim.api.nvim_create_autocmd('VimLeavePre', {
         group = 'v.Pkgs',
-        callback = function() vim.lsp.stop_client(vim.lsp.get_clients(), true) end,
+        callback = function()
+            for _, client in ipairs(vim.lsp.get_clients()) do
+                client:stop(true)
+            end
+        end,
     })
 end)
 
