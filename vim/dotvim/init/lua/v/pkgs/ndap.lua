@@ -54,7 +54,7 @@ local function setup_adapters()
     dap.adapters.cppdbg = {
         id = 'cppdbg',
         type = 'executable',
-        command = vim.env.DotVimLocal .. '/.mason/bin/OpenDebugAD7',
+        command = vim.env.DotVimLocal .. '/mason/bin/OpenDebugAD7',
     }
     if IsWin() then
         dap.adapters.cppdbg.command = dap.adapters.cppdbg.command .. '.cmd'

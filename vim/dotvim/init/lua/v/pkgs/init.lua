@@ -375,6 +375,23 @@ end
 --------------------------------------------------------------------------------
 -- Coding
 --------------------------------------------------------------------------------
+-- Treesitter
+local function pkg_treesitter()
+    if use.xgit ~= vim.NIL then
+        for _, lang in pairs(require('tree-sitter-manager.repos')) do
+            if lang.install_info then
+                lang.install_info.url = lang.install_info.url:gsub('https://github.com', use.xgit)
+            end
+        end
+    end
+    require('tree-sitter-manager').setup({
+        auto_install = false,
+        highlight = true, -- Enable treesitter highlighting
+        parser_dir = vim.env.DotVimLocal .. '/treesitter/parser',
+        query_dir = vim.env.DotVimLocal .. '/treesitter/queries',
+    })
+end
+
 -- 模糊查找
 local function pkg_telescope()
     local telescope = require('telescope')
@@ -687,19 +704,19 @@ local function pkg_venn()
             if vim.b.pkgs_venn_enabled == true then
                 vim.b.pkgs_venn_enabled = false
                 vim.o.virtualedit = 'block'
-                m.ndel({ 'J', buffer = 0 })
-                m.ndel({ 'K', buffer = 0 })
-                m.ndel({ 'L', buffer = 0 })
-                m.ndel({ 'H', buffer = 0 })
-                m.xdel({ '<leader>vo', buffer = 0 })
+                m.ndel({ 'J', buf = 0 })
+                m.ndel({ 'K', buf = 0 })
+                m.ndel({ 'L', buf = 0 })
+                m.ndel({ 'H', buf = 0 })
+                m.xdel({ '<leader>vo', buf = 0 })
             else
                 vim.b.pkgs_venn_enabled = true
                 vim.o.virtualedit = 'all'
-                m.nnore({ 'J', '<C-v>j:VBox<CR>', buffer = 0 })
-                m.nnore({ 'K', '<C-v>k:VBox<CR>', buffer = 0 })
-                m.nnore({ 'L', '<C-v>l:VBox<CR>', buffer = 0 })
-                m.nnore({ 'H', '<C-v>h:VBox<CR>', buffer = 0 })
-                m.xnore({ '<leader>vo', ':VBox<CR>', buffer = 0 })
+                m.nnore({ 'J', '<C-v>j:VBox<CR>', buf = 0 })
+                m.nnore({ 'K', '<C-v>k:VBox<CR>', buf = 0 })
+                m.nnore({ 'L', '<C-v>l:VBox<CR>', buf = 0 })
+                m.nnore({ 'H', '<C-v>h:VBox<CR>', buf = 0 })
+                m.xnore({ '<leader>vo', ':VBox<CR>', buf = 0 })
             end
             vim.notify('Venn is ' .. (vim.b.pkgs_venn_enabled and 'enabled' or 'disabled'))
         end,
@@ -814,8 +831,8 @@ local pkgs = {
     require('v.pkgs.nstl'),
     require('v.pkgs.ndap'),
     require('v.pkgs.nlsp'),
-    require('v.pkgs.nts'),
     { 'stevearc/overseer.nvim' }, -- Setup from v.task
+    { 'romus204/tree-sitter-manager.nvim', cond = use.nts, config = pkg_treesitter, event = 'VeryLazy' },
     { 'nvim-telescope/telescope.nvim', config = pkg_telescope, event = 'VeryLazy' },
     { 'nvim-telescope/telescope-fzf-native.nvim', lazy = true, build = use.has_build and 'make' },
     { 'nvim-telescope/telescope-frecency.nvim', lazy = true },

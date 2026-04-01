@@ -37,12 +37,19 @@ local function setup_profiler(dotvim, startup)
     end)
 end
 
---- Load extra { "path" : [], "vars": {} } from env.json
-local function setup_env()
+local function setup_env(dotvim)
+    local sep = IsWin() and ';' or ':'
+
+    vim.env.DotVimDir = dotvim
+    vim.env.DotVimInit = dotvim .. '/init'
+    vim.env.DotVimShare = dotvim .. '/share'
+    vim.env.DotVimLocal = dotvim .. '/local'
+    vim.env.PATH = vim.env.DotVimLocal .. '/mason/bin' .. sep .. vim.env.PATH
+
+    -- Load extra { "path" : [], "vars": {} } from env.json
     local fp = io.open(vim.env.DotVimLocal .. '/env.json')
     if fp then
         local ex = vim.json.decode(fp:read('*a'))
-        local sep = IsWin() and ';' or ':'
         vim.env.PATH = vim.env.PATH .. sep .. table.concat(ex.path, sep)
         for name, val in pairs(ex.vars) do
             vim.env[name] = val
@@ -52,12 +59,7 @@ end
 
 local function setup(dotvim)
     -- setup_profiler(dotvim, true)
-
-    vim.env.DotVimDir = dotvim
-    vim.env.DotVimInit = dotvim .. '/init'
-    vim.env.DotVimShare = dotvim .. '/share'
-    vim.env.DotVimLocal = dotvim .. '/local'
-    setup_env()
+    setup_env(dotvim)
 
     if IsWin() then
         vim.g.python3_host_prog = vim.env.DOT_APPS .. '/miniconda3/python.exe'

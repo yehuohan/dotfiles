@@ -35,8 +35,7 @@ local _list = {
     fontsizes = { 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 },
     git_urls = {
         vim.NIL,
-        'https://kkgithub.com',
-        'https://bgithub.xyz',
+        'https://gh.llkk.cc/https://github.com',
     },
 }
 
