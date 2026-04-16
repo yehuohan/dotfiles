@@ -204,6 +204,7 @@ local function setup_mappings()
     m.nnore({ '<F8>', breakpoint_condition, desc = 'Set condition breakpoint' })
     m.nnore({ '<F9>', breakpoint, desc = 'Toggle breakpoint' })
     m.nnore({ '<F10>', dap.step_over, desc = 'Step over' })
+    m.nnore({ '<S-F10>', dap.run_to_cursor, desc = 'Run to cursor' })
     m.nnore({ '<F11>', dap.step_into, desc = 'Step into' })
     m.nnore({ '<S-F11>', dap.step_out, desc = 'Step out' })
     m.nnore({ '<F12>', dap.step_out, desc = 'Step out' })
@@ -242,6 +243,9 @@ local function setup_mappings()
     m.nnore({
         '<leader>td',
         function()
+            vim.cmd.Neotree('close')
+            vim.cmd.lclose()
+            vim.cmd.cclose()
             dapui.toggle()
             dapui.update_render({})
         end,
