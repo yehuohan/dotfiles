@@ -102,7 +102,7 @@ function! s:useInit()
             \ 'get' : {sopt -> s:use.ui[sopt]},
             \ },
         \ }
-    let l:dic.xgit = { 'lst': [v:null, 'https://kkgithub.com', 'https://bgithub.xyz'] }
+    let l:dic.xgit = { 'lst': [v:null] }
 
     call PopSelection({
         \ 'opt' : 'use',
