@@ -50,7 +50,7 @@ x-gen:
     # -git clone --depth=1 https://github.com/LelouchHe/xmake-luals-addon.git {{DEPS_DIR}}/repos/xmake-luals-addon
     # pac.lua:
     # function mirror(url)
-    #   return url:gsub("github.com", "bgithub.xyz")
+    #   return url:gsub("github.com", "gitee.com")
     # end
     # xmake g --proxy_pac={{dir_root}}/scripts/_pac.lua
     xmake f -y \
