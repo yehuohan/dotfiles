@@ -213,12 +213,18 @@ local function setup_cmp_completion()
                 direction_priority = { 's', 'n' },
                 draw = {
                     align_to = 'label',
-                    -- treesitter = { 'lsp' },
                     components = {
                         -- colorful-menu combined label and label_description
                         label = {
-                            text = function(ctx) return cmp_menu.blink_components_text(ctx) end,
-                            highlight = function(ctx) return cmp_menu.blink_components_highlight(ctx) end,
+                            -- Use pcall to avoid colorful-menu crash with glsl_analyzer
+                            text = function(ctx)
+                                local ok, res = pcall(cmp_menu.blink_components_text, ctx)
+                                return ok and res or ctx.label
+                            end,
+                            highlight = function(ctx)
+                                local ok, res = pcall(cmp_menu.blink_components_highlight, ctx)
+                                return ok and res or {}
+                            end,
                         },
                     },
                     columns = { { 'kind_icon' }, { 'label', gap = 1 }, { 'source_name', 'kind' } },
