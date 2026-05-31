@@ -66,6 +66,9 @@ cnoremap <M-o> <C-Right>
 cnoremap <M-i> <C-Left>
 cnoremap <M-u> <C-b>
 cnoremap <M-p> <C-e>
+cnoremap <M-d> <C-w>
+cnoremap <M-Bs> <C-w>
+
 " }}}
 
 " Cmdline {{{

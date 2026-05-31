@@ -87,10 +87,24 @@ setopt HIST_IGNORE_SPACE
 # 扩展路径, /v/c/p/p => /var/cache/pacman/pkg
 setopt complete_in_word
 
-#键绑定, 设置 [DEL]键 为向后删除
-#bindkey "\e[3~" delete-char
-bindkey '^P' up-line-or-search
-bindkey '^N' down-line-or-search
+# Bindkey
+bindkey "^[k" up-line-or-beginning-search
+bindkey "^[j" down-line-or-beginning-search
+bindkey "^[m" up-line-or-beginning-search
+bindkey "^[n" down-line-or-beginning-search
+
+bindkey "^[l" forward-char
+bindkey "^[h" backward-char
+bindkey "^[o" forward-word
+bindkey "^[i" backward-word
+bindkey "^[u" beginning-of-line
+bindkey "^[p" end-of-line
+
+bindkey "^[g" delete-char
+bindkey "^[s" backward-delete-char
+bindkey "^[f" kill-word
+bindkey "^[d" backward-kill-word
+bindkey "^[^?" backward-kill-word
 
 # ctrl+z 返回vim
 fancy-ctrl-z () {
