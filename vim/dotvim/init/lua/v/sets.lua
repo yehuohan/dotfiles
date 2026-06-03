@@ -148,7 +148,6 @@ local function on_large_file(args)
         vim.b.sets_large_file = true
         vim.b.snacks_scope = false -- Disable snacks.scope.get()
         vim.bo.swapfile = false
-        vim.bo.indentexpr = '' -- Disable nvim-treesitter.indent.get_indent()
         vim.wo.foldmethod = 'manual' -- Disable vim.treesitter.foldexpr()
         vim.notify('A large file')
     else
