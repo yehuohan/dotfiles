@@ -115,8 +115,8 @@ xnoremap <leader><leader>/ /<C-r>=v:lua.require('v.nlib').e.selected('')<CR>
 nnoremap yL y$
 nnoremap yH y^
 " 追加复制行
-nnoremap yd <Cmd>execute 'silent normal! ' . v:count1 . 'dd' <Bar> let @0 .= @"  <CR>
-nnoremap ya <Cmd>execute 'silent normal! "9' . v:count1 . 'yy' <Bar> let @0 .= @"  <CR>
+nnoremap yd <Cmd>execute 'silent normal! ' . v:count1 . 'dd' <Bar> let @0 .= @" <Bar> let @" = @0<CR>
+nnoremap ya <Cmd>execute 'silent normal! "9' . v:count1 . 'yy' <Bar> let @0 .= @" <Bar> let @" = @0<CR>
 xnoremap <leader>ya <Cmd>lua require('v.nlib').e.buf_pipe(nil, 'yank_append')<CR>
 xnoremap <leader>yt <Cmd>lua require('v.nlib').e.buf_pipe(nil, 'yankcopy', 'trim')<CR>
 " 粘贴

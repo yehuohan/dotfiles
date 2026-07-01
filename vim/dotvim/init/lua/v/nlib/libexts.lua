@@ -94,19 +94,24 @@ M.buf_out = {
     yank = function(txt)
         vim.notify(txt)
         fn.setreg('0', txt)
+        -- Some action (C-u, C-d, etc.) may cover register 0 with "
+        fn.setreg('"', fn.getreg('0'))
     end,
     yank_append = function(txt)
         vim.notify(txt)
         fn.setreg('0', fn.getreg('0') .. txt)
+        fn.setreg('"', fn.getreg('0'))
     end,
     yankcopy = function(txt)
         vim.notify(txt)
         fn.setreg('0', txt)
+        fn.setreg('"', fn.getreg('0'))
         fn.setreg('+', txt)
     end,
     yankcopy_append = function(txt)
         vim.notify(txt)
         fn.setreg('0', fn.getreg('0') .. txt)
+        fn.setreg('"', fn.getreg('0'))
         fn.setreg('+', fn.getreg('+') .. txt)
     end,
     open = function(txt)
