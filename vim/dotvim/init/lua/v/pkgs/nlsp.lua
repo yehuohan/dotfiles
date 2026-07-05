@@ -90,7 +90,7 @@ local function setup_lsp_mappings()
         end,
         desc = 'Toggle lsp inlay hint',
     })
-    m.nnore({ '<leader>od', vim.diagnostic.setloclist })
+    m.nnore({ '<leader>od', vim.diagnostic.setloclist, desc = 'Show diagnostics in the location list' })
     m.nnore({
         '<leader>oD',
         function()

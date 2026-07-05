@@ -14,6 +14,25 @@ local function pkg_quickhl()
     m.nmap({ '<leader>th', '<Plug>(quickhl-manual-toggle)' })
 end
 
+-- 增量选择
+local function pkg_incselect()
+    local incselect = require('incselect')
+    m.nnore({ '<M-r>', incselect.init })
+    m.xnore({ '<M-r>', incselect.parent })
+    m.xnore({
+        '<M-w>',
+        function()
+            if not incselect.undo() then
+                return vim.api.nvim_feedkeys(
+                    vim.api.nvim_replace_termcodes('<Esc>', true, false, true),
+                    'x',
+                    false
+                )
+            end
+        end,
+    })
+end
+
 -- 彩虹括号
 local function pkg_rainbow()
     local rainbow = require('rainbow-delimiters')
@@ -817,6 +836,7 @@ local pkgs = {
 
     -- Editor
     { 't9md/vim-quickhl', config = pkg_quickhl, event = 'VeryLazy' },
+    { 'shushtain/incselect.nvim', config = pkg_incselect, event = 'VeryLazy' },
     { 'HiPhish/rainbow-delimiters.nvim', config = pkg_rainbow, submodules = false, event = 'VeryLazy' },
     { 'lukas-reineke/virt-column.nvim', opts = { char = '┊' }, event = 'VeryLazy' },
     { 'goolord/alpha-nvim', config = pkg_alpha },
