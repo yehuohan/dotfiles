@@ -33,3 +33,8 @@ function gitpush { git push $args }
 function gitpull { git pull $args }
 function gitfetch { git fetch $args }
 function gityzal { lazygit $args }
+
+if (Get-Command zoxide -ErrorAction SilentlyContinue) {
+    Invoke-Expression (& { (zoxide init powershell | Out-String) })
+}
+$env:FZF_DEFAULT_OPTS="--bind alt-j:down,alt-k:up"

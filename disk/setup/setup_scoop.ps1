@@ -42,7 +42,7 @@ scoop bucket add nerd-fonts https://github.com/matthewjberger/scoop-nerd-fonts.g
 ### Add
 scoop install 7zip 7ztm
 scoop install neovim neovim-qt neovide nvy vim-nightly vscode -a 64bit
-scoop install bat delta fd fzf ripgrep universal-ctags lazygit@0.40.2
+scoop install bat delta fd fzf ripgrep universal-ctags lazygit@0.40.2 zoxide
 scoop install cmake xmake ninja just lua deno nodejs
 scoop install wox everything screentogif rapidee snipaste # Or snipaste-beta for latest version
 scoop install autoruns process-explorer procmon context-menu-manager # cpu-z gpu-z
