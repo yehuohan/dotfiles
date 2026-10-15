@@ -83,9 +83,7 @@ local function setup_default_opts()
     o.foldexpr = "v:lua.vim.treesitter.foldexpr()"  -- 折叠显示内容
     o.foldtext = ""                                 -- 禁止显示foldtext，而是显示foldexpr
     vim.opt.foldopen:remove('search')               -- 查找时不自动展开折叠
-    vim.opt.fillchars = {
-        fold = '─',                                 -- 填充折叠尾部
-    }                                               -- 设置填充字符
+    vim.opt.fillchars = { fold = '─', diff = '╱' }  -- 设置填充字符
     o.scrolloff = 3                                 -- 光标上下保留的行数
     o.startofline = false                           -- 执行滚屏等命令时，不改变光标列位置
     o.laststatus = 3                                -- 一直显示状态栏

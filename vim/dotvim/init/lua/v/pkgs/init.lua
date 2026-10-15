@@ -652,6 +652,16 @@ local function pkg_marks()
     m.nnore({ '<leader>ma', ':MarksListBuf<CR>' })
 end
 
+-- Diff对比
+local function pkg_diffview()
+    require('diffview').setup({
+        restore_session = false,
+    })
+    m.nnore({ '<leader>dv', ':DiffviewToggle<CR>' })
+    m.nnore({ '<leader><leader>d', ':DiffviewDiffFiles<Space>' })
+    m.nnore({ '<leader><leader>D', ':DiffviewDiffDirs<Space>' })
+end
+
 --------------------------------------------------------------------------------
 -- Misc
 --------------------------------------------------------------------------------
@@ -863,6 +873,7 @@ local pkgs = {
     { 'yehuohan/hop.nvim', config = pkg_hop, event = 'VeryLazy' },
     { 'jake-stewart/multicursor.nvim', config = pkg_multicursor, event = 'VeryLazy' },
     { 'yehuohan/marks.nvim', config = pkg_marks, event = 'VeryLazy' },
+    { 'dlyongemallo/diffview-plus.nvim', config = pkg_diffview, event = 'VeryLazy' },
     { 'rust-lang/rust.vim', event = 'VeryLazy' },
     { 'diaz-esparza/nvim-conda', ft = 'python' },
     { 'NoahTheDuke/vim-just', ft = 'just' },
@@ -930,6 +941,7 @@ local function pkg_lazy()
     })
 
     local setup_pkg_highlights = function()
+        vim.api.nvim_set_hl(0, 'DiffDelete', { bg = 'none', fg = 'gray', nocombine = true })
         vim.api.nvim_set_hl(0, 'MiniCursorword', { bg = '#505060', ctermbg = 60 })
         vim.api.nvim_set_hl(0, 'MiniCursorwordCurrent', { link = 'MiniCursorword' })
         vim.api.nvim_set_hl(0, 'SnacksPicker', { bg = 'none', nocombine = true })
