@@ -712,19 +712,6 @@ local function pkg_typst()
     m.nnore({ '<leader>vt', ':TypstPreviewToggle<CR>' })
 end
 
--- Latex
-local function pkg_tex()
-    vim.g.vimtex_cache_root = vim.fn.stdpath('data') .. '/vimtex'
-    vim.g.vimtex_view_general_viewer = 'sioyek'
-    vim.g.vimtex_complete_enabled = 1 -- 使用vimtex#complete#omnifunc补全
-    vim.g.vimtex_complete_close_braces = 1
-    vim.g.vimtex_compiler_method = 'latexmk'
-    m.nmap({ '<leader>va', '<Plug>(vimtex-view)' })
-    m.nmap({ '<leader>ab', '<Plug>(vimtex-compile-ss)' })
-    m.nmap({ '<leader>aB', '<Plug>(vimtex-compile)' })
-    m.nmap({ '<leader>ak', '<Plug>(vimtex-stop-all)' })
-end
-
 -- 画图
 local function pkg_venn()
     m.nnore({
@@ -882,7 +869,6 @@ local pkgs = {
     { 'OXY2DEV/markview.nvim', config = pkg_markview, ft = 'markdown', submodules = false },
     { 'toppair/peek.nvim', config = pkg_peek, ft = 'markdown', build = 'deno task build:fast' },
     { 'chomosuke/typst-preview.nvim', config = pkg_typst, ft = 'typst' },
-    { 'lervag/vimtex', config = pkg_tex, ft = 'tex' },
     { 'jbyuki/venn.nvim', config = pkg_venn, event = 'VeryLazy' },
     { 'folke/which-key.nvim', cond = use.pkgs.which_key, config = pkg_which_key, event = 'VeryLazy' },
     { 'uga-rosa/ccc.nvim', config = pkg_ccc, event = 'VeryLazy' },
