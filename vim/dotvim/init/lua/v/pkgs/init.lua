@@ -243,10 +243,11 @@ end
 -- Buffer,Bookmark,Workspace,Selection
 local function pkg_popc()
     require('popc').setup({
-        debug = true,
+        debug = false,
         data_path = vim.env.DotVimLocal,
         selection = { enable = true, collect_builtin_colorscheme = false },
     })
+    require('popc-conda').setup()
     m.nnore({ '<leader><leader>b', '<Cmd>PopcBookmark<CR>' })
     m.nnore({ '<leader><leader>w', '<Cmd>PopcWorkspace<CR>' })
     m.nnore({ '<leader><leader>h', '<Cmd>PopcTabuf<CR>' })
@@ -862,7 +863,6 @@ local pkgs = {
     { 'yehuohan/marks.nvim', config = pkg_marks, event = 'VeryLazy' },
     { 'dlyongemallo/diffview-plus.nvim', config = pkg_diffview, event = 'VeryLazy' },
     { 'rust-lang/rust.vim', event = 'VeryLazy' },
-    { 'diaz-esparza/nvim-conda', ft = 'python' },
     { 'NoahTheDuke/vim-just', ft = 'just' },
 
     -- Misc
