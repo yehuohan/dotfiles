@@ -145,6 +145,7 @@ local function on_large_file(args)
     if vim.b.sets_large_file_force or (fsize >= 1024 * 1024 or fsize == -2) then
         vim.b.sets_large_file = true
         vim.b.snacks_scope = false -- Disable snacks.scope.get()
+        require('rainbow-delimiters').disable(0)
         vim.bo.swapfile = false
         vim.wo.foldmethod = 'manual' -- Disable vim.treesitter.foldexpr()
         vim.notify('A large file')
