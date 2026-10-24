@@ -247,7 +247,9 @@ local function pkg_popc()
         data_path = vim.env.DotVimLocal,
         selection = { enable = true, collect_builtin_colorscheme = false },
     })
-    require('popc-conda').setup()
+    require('popc-conda').setup({
+        python_servers = { 'basedpyright' },
+    })
     m.nnore({ '<leader><leader>b', '<Cmd>PopcBookmark<CR>' })
     m.nnore({ '<leader><leader>w', '<Cmd>PopcWorkspace<CR>' })
     m.nnore({ '<leader><leader>h', '<Cmd>PopcTabuf<CR>' })
@@ -270,6 +272,48 @@ local function pkg_popc()
 
     m.nnore({ '<leader><leader>p', ':PopcSet<Space>' })
     m.nnore({ '<leader>sp', ':PopcSet<CR>' })
+end
+
+-- 模糊查找
+local function pkg_fzf()
+    vim.g.fzf_command_prefix = 'Fzf'
+    vim.g.fzf_layout = { down = '40%' }
+    vim.g.fzf_preview_window = { 'right:40%,border-sharp' }
+    vim.env.FZF_DEFAULT_OPTS = '--bind alt-j:down,alt-k:up,esc:abort'
+    vim.api.nvim_create_autocmd('Filetype', {
+        group = 'v.Pkgs',
+        pattern = { 'fzf' },
+        command = 'tnoremap <buffer> <Esc> <C-c>',
+    })
+end
+
+-- 模糊查找
+local function pkg_telescope()
+    require('telescope').setup({
+        defaults = {
+            color_devicons = true,
+            mappings = {
+                i = {
+                    ['<Esc>'] = 'close',
+                    ['<Tab>'] = { '<Esc>', type = 'command' },
+                    ['<M-n>'] = 'cycle_history_next',
+                    ['<M-m>'] = 'cycle_history_prev',
+                    ['<M-j>'] = 'move_selection_next',
+                    ['<M-k>'] = 'move_selection_previous',
+                    ['<M-h>'] = 'results_scrolling_left',
+                    ['<M-l>'] = 'results_scrolling_right',
+                    ['<M-f>'] = 'preview_scrolling_down',
+                    ['<M-d>'] = 'preview_scrolling_up',
+                    ['<M-s>'] = 'preview_scrolling_left',
+                    ['<M-g>'] = 'preview_scrolling_right',
+                    ['<M-/>'] = 'which_key',
+                },
+            },
+        },
+        pickers = {
+            keymaps = { modes = { 'n', 'i', 'c', 'x', 's', 'v', 't', 'l', 'o' } },
+        },
+    })
 end
 
 -- Mini插件库
@@ -361,8 +405,14 @@ local function pkg_snacks()
         input = {},
         -- 扩展vim.ui.select
         picker = {
-            layout = { preset = 'telescope' },
-            db = { sqlite3_path = IsWin() and vim.env.DotVimShare .. '/lib3rd/sqlite3.dll' or nil },
+            ui_select = true,
+            limit_live = 100000,
+            layout = {
+                preset = function() return vim.o.columns >= 120 and 'telescope' or 'vertical' end,
+            },
+            db = {
+                sqlite3_path = IsWin() and vim.env.DotVimShare .. '/lib3rd/sqlite3.dll' or nil,
+            },
             win = {
                 input = {
                     keys = {
@@ -376,6 +426,16 @@ local function pkg_snacks()
                         ['<M-d>'] = { 'preview_scroll_up', mode = { 'i', 'n' } },
                         ['<M-f>'] = { 'preview_scroll_down', mode = { 'i', 'n' } },
                         ['<M-p>'] = { 'toggle_preview', mode = { 'i', 'n' } },
+                        ['<M-/>'] = { 'toggle_help_input', mode = { 'i', 'n' } },
+                    },
+                },
+                preview = {
+                    wo = {
+                        number = false,
+                        relativenumber = false,
+                        signcolumn = 'no',
+                        cursorline = false,
+                        cursorcolumn = false,
                     },
                 },
             },
@@ -388,8 +448,34 @@ local function pkg_snacks()
             },
         },
     })
-    m.nnore({ '<leader>dm', require('snacks').notifier.hide, desc = 'Hide all notifications' })
-    m.nnore({ '<leader>vn', require('snacks').notifier.show_history, desc = 'Show all notifications' })
+    m.nnore({ '<leader>dn', Snacks.notifier.hide, desc = 'Hide all notifications' })
+    m.nnore({ '<leader>vn', Snacks.notifier.show_history, desc = 'Show all notifications' })
+    m.nnore({ '<leader><leader>f', ':lua Snacks.picker.()<Left><Left>' })
+    m.nnore({
+        '<leader>lf',
+        function()
+            local cwd = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+            Snacks.picker.files({ cwd = cwd, dirs = { cwd }, hidden = true })
+        end,
+        desc = 'Pick files',
+    })
+    m.nnore({
+        '<leader>lg',
+        function()
+            local cwd = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+            Snacks.picker.grep({ cwd = cwd, dirs = { cwd }, hidden = true, need_search = false })
+        end,
+        desc = 'Pick grep',
+    })
+    m.nnore({ '<leader>lb', Snacks.picker.buffers, desc = 'Pick buffers' })
+    m.nnore({ '<leader>ll', Snacks.picker.lines, desc = 'Pick lines' })
+    m.nnore({ '<leader>lr', Snacks.picker.recent, desc = 'Pick recent' })
+    m.nnore({ '<leader>lm', Snacks.picker.keymaps, desc = 'Pick keymaps' })
+    m.nnore({
+        '<leader>ln',
+        function() Snacks.picker.icons({ layout = { preset = 'select' } }) end,
+        desc = 'Pick icons',
+    })
 end
 
 --------------------------------------------------------------------------------
@@ -409,87 +495,6 @@ local function pkg_treesitter()
         highlight = true, -- Enable treesitter highlighting
         parser_dir = vim.env.DotVimLocal .. '/treesitter/parser',
         query_dir = vim.env.DotVimLocal .. '/treesitter/queries',
-    })
-end
-
--- 模糊查找
-local function pkg_telescope()
-    local telescope = require('telescope')
-    local builtin = require('telescope.builtin')
-    telescope.setup({
-        defaults = {
-            color_devicons = true,
-            mappings = {
-                i = {
-                    ['<Esc>'] = 'close',
-                    ['<Tab>'] = { '<Esc>', type = 'command' },
-                    ['<M-i>'] = 'toggle_selection',
-                    ['<M-j>'] = 'move_selection_next',
-                    ['<M-k>'] = 'move_selection_previous',
-                    ['<M-n>'] = 'results_scrolling_down',
-                    ['<M-m>'] = 'results_scrolling_up',
-                    ['<M-h>'] = 'results_scrolling_left',
-                    ['<M-l>'] = 'results_scrolling_right',
-                    ['<M-f>'] = 'preview_scrolling_down',
-                    ['<M-d>'] = 'preview_scrolling_up',
-                    ['<M-s>'] = 'preview_scrolling_left',
-                    ['<M-g>'] = 'preview_scrolling_right',
-                },
-            },
-        },
-        pickers = {
-            keymaps = { modes = { 'n', 'i', 'c', 'x', 's', 'v', 't', 'l', 'o' } },
-        },
-        extensions = {
-            fzf = {
-                override_generic_sorter = true,
-                override_file_sorter = true,
-            },
-            frecency = {
-                db_safe_mode = false, -- `true` will break vim.ui.select
-                db_validate_threshold = 20,
-                auto_validate = true,
-                sorter = require('telescope.config').values.file_sorter(),
-            },
-        },
-    })
-    telescope.load_extension('fzf')
-    telescope.load_extension('frecency')
-    telescope.load_extension('nerdy')
-    m.nnore({ '<leader><leader>f', ':Telescope<Space>' })
-    m.nnore({
-        '<leader>lf',
-        function()
-            local bufname = vim.api.nvim_buf_get_name(0)
-            builtin.find_files({ cwd = vim.fs.dirname(bufname), hidden = true })
-        end,
-        desc = 'Telescope files',
-    })
-    m.nnore({
-        '<leader>lg',
-        function()
-            local bufname = vim.api.nvim_buf_get_name(0)
-            builtin.grep_string({ cwd = vim.fs.dirname(bufname), search = '', search_dirs = { bufname } })
-        end,
-        desc = 'Telescope grep string',
-    })
-    m.nnore({ '<leader>lb', ':Telescope buffers<CR>' })
-    m.nnore({ '<leader>ll', ':Telescope current_buffer_fuzzy_find<CR>' })
-    m.nnore({ '<leader>lm', ':Telescope keymaps<CR>' })
-    m.nnore({ '<leader>lr', ':Telescope frecency<CR>' })
-    m.nnore({ '<leader>ln', ':Telescope nerdy<CR>' })
-end
-
--- 模糊查找
-local function pkg_fzf()
-    vim.g.fzf_command_prefix = 'Fzf'
-    vim.g.fzf_layout = { down = '40%' }
-    vim.g.fzf_preview_window = { 'right:40%,border-sharp' }
-    vim.env.FZF_DEFAULT_OPTS = '--bind alt-j:down,alt-k:up,esc:abort'
-    vim.api.nvim_create_autocmd('Filetype', {
-        group = 'v.Pkgs',
-        pattern = { 'fzf' },
-        command = 'tnoremap <buffer> <Esc> <C-c>',
     })
 end
 
@@ -842,6 +847,13 @@ local pkgs = {
     { 'polirritmico/monokai-nightasty.nvim', event = 'VeryLazy' },
     { 'nvim-neo-tree/neo-tree.nvim', config = pkg_neotree, event = 'VeryLazy' },
     { 'yehuohan/popc', config = pkg_popc, event = 'VeryLazy' },
+    { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' }, event = 'VeryLazy' },
+    {
+        'nvim-telescope/telescope.nvim',
+        cond = use.pkgs.telescope,
+        config = pkg_telescope,
+        event = 'VeryLazy',
+    },
     { 'echasnovski/mini.nvim', config = pkg_mini, event = 'VeryLazy' },
     { 'folke/snacks.nvim', config = pkg_snacks, event = 'VeryLazy' },
 
@@ -851,11 +863,6 @@ local pkgs = {
     require('v.pkgs.nlsp'),
     { 'stevearc/overseer.nvim' }, -- Setup from v.task
     { 'romus204/tree-sitter-manager.nvim', cond = use.nts, config = pkg_treesitter, event = 'VeryLazy' },
-    { 'nvim-telescope/telescope.nvim', config = pkg_telescope, event = 'VeryLazy' },
-    { 'nvim-telescope/telescope-fzf-native.nvim', lazy = true, build = use.has_build and 'make' },
-    { 'nvim-telescope/telescope-frecency.nvim', lazy = true },
-    { '2kabhishek/nerdy.nvim', lazy = true },
-    { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' }, event = 'VeryLazy' },
     { 'L3MON4D3/LuaSnip', config = pkg_snip, event = 'VeryLazy', submodules = false },
     { 'stevearc/conform.nvim', config = pkg_conform, event = 'VeryLazy' },
     { 'yehuohan/hop.nvim', config = pkg_hop, event = 'VeryLazy' },

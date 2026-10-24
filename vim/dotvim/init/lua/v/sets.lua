@@ -121,6 +121,7 @@ local function setup_default_opts()
     o.ttimeout = true                               -- 打开键码超时检测
     o.timeoutlen = 1000                             -- 映射超时时间为1000ms
     o.ttimeoutlen = 70                              -- 键码超时时间为70ms
+    o.shada = "!,'1000,<50,s10,h,r/tmp/,r/private/"
     -- stylua: ignore end
 
     m.group_begin('options')
@@ -145,6 +146,7 @@ local function on_large_file(args)
     if vim.b.sets_large_file_force or (fsize >= 1024 * 1024 or fsize == -2) then
         vim.b.sets_large_file = true
         vim.b.snacks_scope = false -- Disable snacks.scope.get()
+        require('rainbow-delimiters').disable(0)
         vim.bo.swapfile = false
         vim.wo.foldmethod = 'manual' -- Disable vim.treesitter.foldexpr()
         vim.notify('A large file')

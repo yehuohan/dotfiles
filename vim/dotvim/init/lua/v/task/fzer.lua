@@ -21,7 +21,7 @@ local function new_wsc()
         ignore = true,
         options = '',
         vimgrep = false, -- `:vimgrep` doesn't works with `hidden`, `ignore` and `options`
-        fuzzier = 'telescope',
+        fuzzier = 'picker',
         verbose = '',
         hltexts = {},
     })
@@ -71,6 +71,7 @@ local function rg_ignore() return wsc.ignore and {} or { '--no-ignore' } end
 --- @class FzerTable Fuzzy finder tasks
 --- @field rg string
 --- @field fzf Fuzzier
+--- @field picker Fuzzier
 --- @field telescope Fuzzier
 local fzer = {
     rg = 'rg --vimgrep -F {opt} -e "{pat}" {loc}',
@@ -78,7 +79,7 @@ local fzer = {
     efm = [[%f:%l:%c:%m]],
     fzf = {
         file = ':FzfFiles {loc}',
-        live = function(rep)
+        live = function(rep) ---@param rep FzerVars
             if IsWin() then
                 rep.loc = string.gsub(rep.loc, '/', '\\') -- Fzf preview needs '\' path
             end
@@ -86,6 +87,11 @@ local fzer = {
             vim.fn['fzf#vim#grep'](cmd, vim.fn['fzf#vim#with_preview'](), 0)
         end,
         tags = ':FzfTags {pat}',
+    },
+    picker = {
+        file = 'files',
+        live = 'grep',
+        tags = 'tags',
     },
     telescope = {
         file = 'find_files',
@@ -96,6 +102,7 @@ local fzer = {
 
 setmetatable(fzer.fzf, {
     __call = function(self, rhs, args)
+        --- @type FzerVars
         local rep = {
             pat = args.pat,
             loc = table.concat(args.loc, ' '),
@@ -110,10 +117,25 @@ setmetatable(fzer.fzf, {
     end,
 })
 
+setmetatable(fzer.picker, {
+    __call = function(self, rhs, args)
+        Snacks.picker[self[rhs]]({
+            cwd = args.loc[1],
+            dirs = args.loc, -- For files and grep
+            hidden = wsc.hidden, -- For files and grep
+            ignored = not wsc.ignore, -- For files and grep
+            pattern = (rhs == 'file') and args.pat or nil, -- For files
+            search = (rhs == 'live') and args.pat or nil, -- For grep
+            args = (rhs == 'live') and args.opt or nil, -- For grep
+            regex = false, -- For grep
+            need_search = false, -- For grep
+        })
+    end,
+})
+
 setmetatable(fzer.telescope, {
     __call = function(self, rhs, args)
-        local picker = self[rhs]
-        require('telescope.builtin')[picker]({
+        require('telescope.builtin')[self[rhs]]({
             cwd = args.loc[1],
             hidden = wsc.hidden, -- For find_files
             no_ignore = not wsc.ignore, -- For find_files
@@ -179,7 +201,7 @@ local _sels = {
             },
         },
         vimgrep = vim.empty_dict(),
-        fuzzier = { lst = { 'fzf', 'telescope' } },
+        fuzzier = { lst = { 'fzf', 'picker', 'telescope' } },
         verbose = {
             lst = { 'a', 'w', 'e' },
             dic = {

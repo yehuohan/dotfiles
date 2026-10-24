@@ -329,8 +329,6 @@ local function setup_cmp_completion()
                 ['<M-e>'] = { 'cancel' },
                 ['<M-j>'] = { 'select_next' },
                 ['<M-k>'] = { 'select_prev' },
-                ['<M-f>'] = { 'scroll_documentation_down' },
-                ['<M-d>'] = { 'scroll_documentation_up' },
                 ['<C-p>'] = { function() vim.api.nvim_feedkeys(vim.fn.getreg('0'), 't', false) end },
                 ['<C-v>'] = { function() vim.api.nvim_feedkeys(vim.fn.getreg('+'), 't', false) end },
             },

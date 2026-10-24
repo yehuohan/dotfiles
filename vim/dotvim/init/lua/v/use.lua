@@ -6,6 +6,7 @@ local use = {
     ndap = false,
     nts = false,
     pkgs = {
+        telescope = false,
         blink = true,
         coc = false,
         which_key = false,
