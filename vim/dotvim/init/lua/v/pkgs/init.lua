@@ -1,6 +1,7 @@
 local use = require('v.use')
 local nlib = require('v.nlib')
 local m = nlib.m
+local sqlite3_path = IsWin() and vim.env.DotVimShare .. '/lib3rd/sqlite3.dll' or nil
 
 --------------------------------------------------------------------------------
 -- Editor
@@ -23,11 +24,7 @@ local function pkg_incselect()
         '<M-w>',
         function()
             if not incselect.undo() then
-                return vim.api.nvim_feedkeys(
-                    vim.api.nvim_replace_termcodes('<Esc>', true, false, true),
-                    'x',
-                    false
-                )
+                return vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'x', false)
             end
         end,
     })
@@ -410,9 +407,7 @@ local function pkg_snacks()
             layout = {
                 preset = function() return vim.o.columns >= 120 and 'telescope' or 'vertical' end,
             },
-            db = {
-                sqlite3_path = IsWin() and vim.env.DotVimShare .. '/lib3rd/sqlite3.dll' or nil,
-            },
+            db = { sqlite3_path = sqlite3_path },
             win = {
                 input = {
                     keys = {
@@ -828,14 +823,8 @@ local pkgs = {
     { 'nvim-lua/plenary.nvim', lazy = true },
     { 'MunifTanjim/nui.nvim', lazy = true },
     { 'nvim-neotest/nvim-nio', lazy = true },
-    { 'honza/vim-snippets' },
-    {
-        'kkharji/sqlite.lua',
-        lazy = true,
-        init = function()
-            vim.g.sqlite_clib_path = IsWin() and vim.env.DotVimShare .. '/lib3rd/sqlite3.dll' or nil
-        end,
-    },
+    { 'honza/vim-snippets', lazy = true },
+    { 'kkharji/sqlite.lua', lazy = true, init = function() vim.g.sqlite_clib_path = sqlite3_path end },
 
     -- Editor
     { 't9md/vim-quickhl', config = pkg_quickhl, event = 'VeryLazy' },
@@ -848,12 +837,7 @@ local pkgs = {
     { 'nvim-neo-tree/neo-tree.nvim', config = pkg_neotree, event = 'VeryLazy' },
     { 'yehuohan/popc', config = pkg_popc, event = 'VeryLazy' },
     { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' }, event = 'VeryLazy' },
-    {
-        'nvim-telescope/telescope.nvim',
-        cond = use.pkgs.telescope,
-        config = pkg_telescope,
-        event = 'VeryLazy',
-    },
+    { 'nvim-telescope/telescope.nvim', cond = use.pkgs.telescope, config = pkg_telescope, event = 'VeryLazy' },
     { 'echasnovski/mini.nvim', config = pkg_mini, event = 'VeryLazy' },
     { 'folke/snacks.nvim', config = pkg_snacks, event = 'VeryLazy' },
 

@@ -542,14 +542,8 @@ local function setup_cmp_completion_deprecated()
         ['<M-m>'] = cmp.mapping.scroll_docs(-4),
         ['<M-f>'] = cmp.mapping.scroll_docs(4),
         ['<M-d>'] = cmp.mapping.scroll_docs(-4),
-        ['<C-p>'] = cmp.mapping(
-            function() vim.api.nvim_feedkeys(vim.fn.getreg('0'), 'i', false) end,
-            { 'i', 'c' }
-        ),
-        ['<C-v>'] = cmp.mapping(
-            function() vim.api.nvim_feedkeys(vim.fn.getreg('+'), 'i', false) end,
-            { 'i', 'c' }
-        ),
+        ['<C-p>'] = cmp.mapping(function() vim.api.nvim_feedkeys(vim.fn.getreg('0'), 'i', false) end, { 'i', 'c' }),
+        ['<C-v>'] = cmp.mapping(function() vim.api.nvim_feedkeys(vim.fn.getreg('+'), 'i', false) end, { 'i', 'c' }),
         ['<Space>'] = cmp.mapping(require('cmp_im').select(), { 'i', 'c' }),
     }
     m.imap({ '<C-j>', '<M-j>' })

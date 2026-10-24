@@ -297,7 +297,6 @@ local fast_cmds = {
         [special_cmds.t] = 'remove trailing spaces',
         [special_cmds.m] = 'remove ^M',
         ['Assembly commands'] = {
-            dsr = '',
             lst = {
                 'rustc --emit asm={src}.asm {src}',
                 'rustc --emit asm={src}.asm -C "llvm-args=-x86-asm-syntax=intel" {src}',
@@ -305,7 +304,8 @@ local fast_cmds = {
                 'gcc -S -masm=intel -fverbose-asm {src}',
             },
             cmd = function(_, sel)
-                require('v.task').cmd(nlib.u.replace(sel, { src = api.nvim_buf_get_name(0) }))
+                local cmd = nlib.u.replace(sel, { src = api.nvim_buf_get_name(0) })
+                require('v.task').cmd(cmd)
             end,
         },
     },
