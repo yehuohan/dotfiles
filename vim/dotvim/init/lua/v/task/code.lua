@@ -257,7 +257,8 @@ function _args.file(dic, file)
 end
 
 function _args.just(dic, file)
-    dic.barg.lst = nlib.u.str2arg(vim.fn.system('just --summary --unsorted -f ' .. file))
+    local out = vim.fn.system('just --summary --unsorted -f ' .. file)
+    dic.barg.lst = nlib.u.str2arg(out)
 end
 
 function _args.make(dic, file)

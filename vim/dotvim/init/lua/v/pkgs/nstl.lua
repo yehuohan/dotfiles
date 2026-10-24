@@ -253,15 +253,11 @@ local function stls()
     local SecLeft = {
         fallthrough = false,
         {
-            condition = function()
-                return conds.buffer_matches({ filetype = { 'OverseerList', 'neo%-tree' } })
-            end,
+            condition = function() return conds.buffer_matches({ filetype = { 'OverseerList', 'neo%-tree' } }) end,
             ComType,
         },
         {
-            condition = function()
-                return conds.is_not_active() or conds.buffer_matches({ buftype = { 'terminal' } })
-            end,
+            condition = function() return conds.is_not_active() or conds.buffer_matches({ buftype = { 'terminal' } }) end,
             ComFile,
         },
         ComPath,
