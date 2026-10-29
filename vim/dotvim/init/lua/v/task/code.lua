@@ -381,13 +381,14 @@ local function evt_r(name)
 end
 
 --- Entry of code task
---- @param kt table [rR][  ][p...]
+--- @param kt table [rR][tg][p...]
 ---                 [%S][%A][%E  ]
 --- kt.S
 ---     r : run task
 ---     R : modify code task config
 --- kt.A
 ---     t : set wsc.style = 'term'
+---     g : set wsc.style = 'job'
 --- kt.E
 ---     ? : from _maps
 ---     p : run task from task.wsc.code

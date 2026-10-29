@@ -176,7 +176,8 @@ end
 function qfer.view()
     local row = vim.fn.line('.', qfer.qwin)
     local item = vim.fn.getqflist()[row]
-    if item.bufnr > 0 then
+    if item and item.bufnr > 0 then
+
         if qfer.vwin and vim.api.nvim_win_is_valid(qfer.vwin) then
             local cur = vim.api.nvim_win_get_cursor(qfer.vwin)
             if cur[1] == item.lnum and cur[2] == item.col - 1 then
