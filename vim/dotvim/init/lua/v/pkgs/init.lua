@@ -313,6 +313,15 @@ local function pkg_telescope()
     })
 end
 
+-- 最近打开的文件
+local function pkg_recent()
+    require('recent').setup({
+        max_age_days = 30,
+        max_list_items = 2000,
+        auto_purge = true,
+    })
+end
+
 -- Mini插件库
 local function pkg_mini()
     -- 自动对齐
@@ -455,6 +464,20 @@ local function pkg_snacks()
         desc = 'Pick files',
     })
     m.nnore({
+        '<leader>lr',
+        function()
+            Snacks.picker.pick({
+                title = 'Recent Files',
+                items = vim.tbl_map(
+                    function(row) return { file = row.path, text = row.path } end,
+                    require('recent').list()
+                ),
+                format = 'file',
+            })
+        end,
+        desc = 'Pick recent',
+    })
+    m.nnore({
         '<leader>lg',
         function()
             local cwd = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
@@ -464,7 +487,6 @@ local function pkg_snacks()
     })
     m.nnore({ '<leader>lb', Snacks.picker.buffers, desc = 'Pick buffers' })
     m.nnore({ '<leader>ll', Snacks.picker.lines, desc = 'Pick lines' })
-    m.nnore({ '<leader>lr', Snacks.picker.recent, desc = 'Pick recent' })
     m.nnore({ '<leader>lm', Snacks.picker.keymaps, desc = 'Pick keymaps' })
     m.nnore({
         '<leader>ln',
@@ -838,6 +860,7 @@ local pkgs = {
     { 'yehuohan/popc', config = pkg_popc, event = 'VeryLazy' },
     { 'junegunn/fzf.vim', init = pkg_fzf, dependencies = { 'junegunn/fzf' }, event = 'VeryLazy' },
     { 'nvim-telescope/telescope.nvim', cond = use.pkgs.telescope, config = pkg_telescope, event = 'VeryLazy' },
+    { 'yehuohan/recent.nvim', config = pkg_recent, event = 'VeryLazy' },
     { 'echasnovski/mini.nvim', config = pkg_mini, event = 'VeryLazy' },
     { 'folke/snacks.nvim', config = pkg_snacks, event = 'VeryLazy' },
 
